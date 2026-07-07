@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>So do I! — Agreement Practice</title>
+<style>
+  :root{
+    --paper:#FBF9F3;
+    --line:#DCE4EA;
+    --ink:#20344B;
+    --ink-soft:#5A6B7E;
+    --pen-red:#C6372B;
+    --pen-green:#2C7A4B;
+    --highlight:#FFE9A8;
+    --card:#FFFFFF;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:Georgia,'Times New Roman',serif;
+    background:var(--paper);
+    color:var(--ink);
+    line-height:1.55;
+    padding-bottom:80px;
+  }
+  .wrap{max-width:820px;margin:0 auto;padding:0 20px;}
+
+  /* ---------- header ---------- */
+  header{
+    background:
+      repeating-linear-gradient(transparent 0 31px, var(--line) 31px 32px),
+      var(--card);
+    border-bottom:3px solid var(--ink);
+    padding:48px 0 36px;
+    position:relative;
+  }
+  header::before{
+    content:"";
+    position:absolute;left:64px;top:0;bottom:0;
+    width:2px;background:rgba(198,55,43,.35);
+  }
+  .eyebrow{
+    font-family:'Courier New',monospace;
+    font-size:13px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--ink-soft);margin-bottom:10px;
+  }
+  h1{
+    font-size:clamp(30px,5.5vw,46px);
+    font-weight:700;letter-spacing:-.01em;line-height:1.15;
+  }
+  h1 .red{
+    color:var(--pen-red);
+    text-decoration:underline wavy rgba(198,55,43,.5) 2px;
+    text-underline-offset:6px;
+  }
+  .subtitle{margin-top:12px;color:var(--ink-soft);font-size:17px;max-width:600px;}
+
+  /* ---------- theory ---------- */
+  .theory{
+    background:var(--card);
+    border:1.5px solid var(--ink);
+    border-radius:6px;
+    margin:32px 0;
+    box-shadow:4px 4px 0 rgba(32,52,75,.12);
+  }
+  .theory summary{
+    cursor:pointer;padding:16px 20px;
+    font-weight:700;font-size:17px;
+    list-style:none;display:flex;align-items:center;gap:10px;
+  }
+  .theory summary::before{content:"▸";transition:transform .2s;color:var(--pen-red);}
+  .theory[open] summary::before{transform:rotate(90deg);}
+  .theory-body{padding:0 20px 20px;font-size:15.5px;}
+  .rule-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:8px;}
+  @media(max-width:640px){.rule-grid{grid-template-columns:1fr;}}
+  .rule{
+    border:1px solid var(--line);border-radius:6px;padding:14px;
+    background:var(--paper);
+  }
+  .rule h3{font-size:14px;text-transform:uppercase;letter-spacing:.1em;
+    font-family:'Courier New',monospace;margin-bottom:8px;}
+  .rule.pos h3{color:var(--pen-green);}
+  .rule.neg h3{color:var(--pen-red);}
+  .rule p{margin:4px 0;}
+  .rule b{background:var(--highlight);padding:0 3px;border-radius:2px;}
+  .rule small{color:var(--ink-soft);display:block;margin-top:8px;font-style:italic;}
+  .aux-note{
+    margin-top:14px;padding:12px 14px;border-left:4px solid var(--pen-red);
+    background:var(--paper);font-size:14.5px;
+  }
+
+  /* ---------- exercise cards ---------- */
+  .ex{
+    background:var(--card);
+    border:1.5px solid var(--ink);
+    border-radius:6px;
+    margin:36px 0;
+    box-shadow:4px 4px 0 rgba(32,52,75,.12);
+    overflow:hidden;
+  }
+  .ex-head{
+    display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;
+    padding:18px 22px 12px;
+    border-bottom:1.5px dashed var(--line);
+  }
+  .ex-num{
+    font-family:'Courier New',monospace;
+    font-size:13px;letter-spacing:.15em;color:var(--pen-red);
+    text-transform:uppercase;font-weight:700;white-space:nowrap;
+  }
+  .ex-head h2{font-size:21px;font-weight:700;}
+  .ex-task{padding:10px 22px 0;color:var(--ink-soft);font-size:15px;font-style:italic;}
+  .items{padding:12px 22px 20px;}
+
+  .item{
+    padding:14px 0;
+    border-bottom:1px solid var(--line);
+    display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;
+    font-size:16.5px;
+  }
+  .item:last-child{border-bottom:none;}
+  .item .n{
+    font-family:'Courier New',monospace;font-size:13px;color:var(--ink-soft);
+    min-width:22px;
+  }
+  .quote{font-style:italic;}
+  .quote .who{font-style:normal;font-weight:700;font-size:14px;color:var(--ink-soft);}
+
+  /* controls */
+  .pill-group{display:inline-flex;gap:6px;}
+  .pill{
+    font-family:inherit;font-size:15px;
+    border:1.5px solid var(--ink);border-radius:999px;
+    background:var(--card);color:var(--ink);
+    padding:4px 16px;cursor:pointer;
+    transition:background .15s;
+  }
+  .pill:hover{background:var(--highlight);}
+  .pill.sel{background:var(--ink);color:var(--card);}
+  select{
+    font-family:inherit;font-size:15px;
+    border:1.5px solid var(--ink);border-radius:5px;
+    background:var(--card);color:var(--ink);
+    padding:4px 8px;cursor:pointer;
+  }
+  input[type=text]{
+    font-family:inherit;font-size:16px;
+    border:none;border-bottom:2px solid var(--ink);
+    background:transparent;color:var(--ink);
+    padding:3px 6px;min-width:170px;
+  }
+  input[type=text]:focus{outline:none;border-bottom-color:var(--pen-red);background:#FFFDF4;}
+
+  /* result marks */
+  .mark{font-weight:700;min-width:20px;display:inline-block;}
+  .item.ok .mark{color:var(--pen-green);}
+  .item.bad .mark{color:var(--pen-red);}
+  .item.ok input[type=text]{border-bottom-color:var(--pen-green);}
+  .item.bad input[type=text]{border-bottom-color:var(--pen-red);}
+  .fix{
+    display:none;width:100%;
+    font-size:14px;color:var(--pen-red);font-style:italic;
+    padding-left:32px;
+  }
+  .item.bad .fix{display:block;}
+
+  /* footer of each exercise */
+  .ex-foot{
+    display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+    padding:14px 22px 20px;
+    border-top:1.5px dashed var(--line);
+  }
+  .check-btn{
+    font-family:inherit;font-size:16px;font-weight:700;
+    background:var(--ink);color:var(--card);
+    border:none;border-radius:6px;
+    padding:10px 26px;cursor:pointer;
+    box-shadow:3px 3px 0 rgba(198,55,43,.55);
+    transition:transform .1s, box-shadow .1s;
+  }
+  .check-btn:hover{transform:translate(-1px,-1px);box-shadow:4px 4px 0 rgba(198,55,43,.55);}
+  .check-btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 rgba(198,55,43,.55);}
+  .reset-btn{
+    font-family:inherit;font-size:14px;
+    background:none;border:none;color:var(--ink-soft);
+    text-decoration:underline;cursor:pointer;
+  }
+  .score{font-family:'Courier New',monospace;font-size:15px;font-weight:700;}
+  .score.full{color:var(--pen-green);}
+
+  /* total bar */
+  .total{
+    position:fixed;bottom:0;left:0;right:0;
+    background:var(--ink);color:var(--card);
+    padding:10px 0;
+    font-family:'Courier New',monospace;font-size:14px;letter-spacing:.05em;
+    z-index:10;
+  }
+  .total .wrap{display:flex;justify-content:space-between;align-items:center;}
+  .total b{color:var(--highlight);}
+
+  :focus-visible{outline:3px solid var(--pen-red);outline-offset:2px;}
+  @media (prefers-reduced-motion: reduce){
+    *{transition:none!important;}
+    html{scroll-behavior:auto;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="eyebrow">Grammar workout · agreement &amp; short additions</div>
+    <h1>“I love grammar.” — <span class="red">So do I!</span></h1>
+    <p class="subtitle">Practise agreeing with people: <b>too / either</b> and <b>So do I / Neither do I</b> — in different tenses and with modal verbs.</p>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- THEORY -->
+  <details class="theory" open>
+    <summary>Quick reference — how it works</summary>
+    <div class="theory-body">
+      <div class="rule-grid">
+        <div class="rule pos">
+          <h3>✓ Agreeing with positive</h3>
+          <p>“I like coffee.” → “I like it <b>too</b>.” / “Me <b>too</b>.”</p>
+          <p>“I like coffee.” → “<b>So do I</b>.”</p>
+          <p>“She can swim.” → “<b>So can I</b>.”</p>
+          <p>“He has been to Rome.” → “<b>So have I</b>.”</p>
+          <small>So + auxiliary + subject (inverted word order!)</small>
+        </div>
+        <div class="rule neg">
+          <h3>✗ Agreeing with negative</h3>
+          <p>“I don't like tea.” → “I don't like it <b>either</b>.” / “Me <b>neither</b>.”</p>
+          <p>“I don't like tea.” → “<b>Neither do I</b>.” / “<b>Nor do I</b>.”</p>
+          <p>“She can't drive.” → “<b>Neither can I</b>.”</p>
+          <p>“He wasn't there.” → “<b>Neither was I</b>.”</p>
+          <small>Neither/Nor + auxiliary + subject — no “not”! (Neither is already negative.)</small>
+        </div>
+      </div>
+      <div class="aux-note">
+        <b>Which auxiliary?</b> Copy the “engine” of the first sentence:
+        Present Simple → <b>do / does</b> · Past Simple → <b>did</b> · Continuous → <b>am / is / are / was / were</b> ·
+        Perfect → <b>have / has / had</b> · Future → <b>will</b> · Modals → <b>can, could, must, should, would, may…</b>
+      </div>
+    </div>
+  </details>
+
+  <!-- EXERCISE 1 : too / either pills -->
+  <section class="ex" id="ex1" data-type="pill">
+    <div class="ex-head"><span class="ex-num">Exercise 1</span><h2>too or either?</h2></div>
+    <p class="ex-task">Choose the correct word to complete the reply.</p>
+    <div class="items">
+      <div class="item" data-key="too"><span class="n">1.</span><span class="quote"><span class="who">A:</span> “I'm really tired today.” <span class="who">B:</span> “I'm tired</span><span class="pill-group"><button class="pill">too</button><button class="pill">either</button></span><span class="quote">.”</span><span class="mark"></span><span class="fix"></span></div>
+      <div class="item" data-key="either"><span class="n">2.</span><span class="quote"><span class="who">A:</span> “I don't eat meat.” <span class="who">B:</span> “I don't eat it</span><span class="pill-group"><button class="pill">too</button><button class="pill">either</button></span><span class="quote">.”</span><span class="mark"></span><span class="fix"></span></div>
+      <div class="item" data-key="too"><span class="n">3.</span><span class="quote"><span class="who">A:</span> “I've seen this film twice.” <span class="who">B:</span> “I've seen it twice</span><span class="pill-group"><button class="pill">too</button><button class="pill">either</button></span><span class="quote">.”</span><span class="mark"></span><span class="fix"></span></div>
+      <div class="item" data-key="either"><span class="n">4.</span><span class="quote"><span class="who">A:</span> “I can't play chess.” <span class="who">B:</span> “I can't play it</span><span class="pill-group"><button class="pill">too</button><button class="pill">either</button></span><span class="quote">.”</span><span class="mark"></span><span class="fix"></span></div>
+      <div class="item" data-key="either"><span class="n">5.</span><span class="quote"><span class="who">A:</span> “I didn't understand the lesson.” <span class="who">B:</span> “I didn't understand it</span><span class="pill-group"><button class="pill">too</button><button class="pill">either</button></span><span class="quote">.”</span><span class="mark"></span><span class="fix"></span></div>
+      <div class="item" data-key="too"><span class="n">6.</span><span class="quote"><span class="who">A:</span> “I'll be at the party.” <span class="who">B:</span> “I'll be there</span><span class="pill-group"><button class="pill">too</button><button class="pill">either</button></span><span class="quote">.”</span><span class="mark"></span><span class="fix"></span></div>
+      <div class="item" data-key="either"><span class="n">7.</span><span class="quote"><span class="who">A:</span> “I haven't finished my homework.” <span class="who">B:</span> “I haven't finished mine</span><span class="pill-group"><button class="pill">too</button><button class="pill">either</button></span><span class="quote">.”</span><span class="mark"></span><span class="fix"></span></div>
+      <div class="item" data-key="too"><span class="n">8.</span><span class="quote"><span class="who">A:</span> “I was at school yesterday.” <span class="who">B:</span> “I was there</span><span class="pill-group"><button class="pill">too</button><button class="pill">either</button></span><span class="quote">.”</span><span class="mark"></span><span class="fix"></span></div>
+    </div>
+    <div class="ex-foot">
+      <button class="check-btn">Check</button>
+      <button class="reset-btn">Reset</button>
+      <span class="score"></span>
+    </div>
+  </section>
+
+  <!-- EXERCISE 2 : So/Neither + auxiliary dropdowns -->
+  <section class="ex" id="ex2" data-type="select">
+    <div class="ex-head"><span class="ex-num">Exercise 2</span><h2>So / Neither + the right auxiliary</h2></div>
+    <p class="ex-task">Choose the correct words from the drop-down menus to agree with the speaker.</p>
+    <div class="items">
+      <div class="item"><span class="n">1.</span><span class="quote">“I love pizza.” —</span>
+        <select data-key="So"><option value="">—</option><option>So</option><option>Neither</option></select>
+        <select data-key="do"><option value="">—</option><option>do</option><option>does</option><option>am</option><option>can</option></select>
+        <span class="quote">I.</span><span class="mark"></span><span class="fix"></span></div>
+      <div class="item"><span class="n">2.</span><span class="quote">“I can't ride a horse.” —</span>
+        <select data-key="Neither"><option value="">—</option><option>So</option><option>Neither</option></select>
+        <select data-key="can"><option value="">—</option><option>do</option><option>can</option><option>can't</option><option>could</option></select>
+        <span class="quote">I.</span><span class="mark"></span><span class="fix"></span></div>
+      <div class="item"><span class="n">3.</span><span class="quote">“I went to bed late last night.” —</span>
+        <select data-key="So"><option value="">—</option><option>So</option><option>Neither</option></select>
+        <select data-key="did"><option value="">—</option><option>do</option><option>did</option><option>was</option><option>have</option></select>
+        <span class="quote">I.</span><span class="mark"></span><span class="fix"></span></div>
+      <div class="item"><span class="n">4.</span><span class="quote">“I'm not watching TV tonight.” —</span>
+        <select data-key="Neither"><option value="">—</option><option>So</option><option>Neither</option></select>
+        <select data-key="am"><option value="">—</option><option>am</option><option>do</option><option>is</option><option>will</option></select>
+        <span class="quote">I.</span><span class="mark"></span><span class="fix"></span></div>
+      <div class="item"><span class="n">5.</span><span class="quote">“I've never been to Japan.” —</span>
+        <select data-key="Neither"><option value="">—</option><option>So</option><option>Neither</option></select>
+        <select data-key="have"><option value="">—</option><option>have</option><option>haven't</option><option>did</option><option>do</option></select>
+        <span class="quote">I.</span><span class="mark"></span><span class="fix"></span></div>
+      <div class="item"><span class="n">6.</span><span class="quote">“I must leave early tomorrow.” —</span>
+        <select data-key="So"><option value="">—</option><option>So</option><option>Neither</option></select>
+        <select data-key="must"><option value="">—</option><option>must</option><option>do</option><option>will</option><option>have</option></select>
+        <span class="quote">I.</span><span class="mark"></span><span class="fix"></span></div>
+      <div class="item"><span class="n">7.</span><span class="quote">“I won't tell anyone.” —</span>
+        <select data-key="Neither"><option value="">—</option><option>So</option><option>Neither</option></select>
+        <select data-key="will"><option value="">—</option><option>will</option><option>won't</option><option>do</option><option>would</option></select>
+        <span class="quote">I.</span><span class="mark"></span><span class="fix"></span></div>
+      <div class="item"><span class="n">8.</span><span class="quote">“I was very busy yesterday.” —</span>
+        <select data-key="So"><option value="">—</option><option>So</option><option>Neither</option></select>
+        <select data-key="was"><option value="">—</option><option>was</option><option>were</option><option>did</option><option>am</option></select>
+        <span class="quote">I.</span><span class="mark"></span><span class="fix"></span></div>
+    </div>
+    <div class="ex-foot">
+      <button class="check-btn">Check</button>
+      <button class="reset-btn">Reset</button>
+      <span class="score"></span>
+    </div>
+  </section>
+
+  <!-- EXERCISE 3 : type the full short answer -->
+  <section class="ex" id="ex3" data-type="text">
+    <div class="ex-head"><span class="ex-num">Exercise 3</span><h2>Write the short agreement</h2></div>
+    <p class="ex-task">Agree with the speaker. Write the full short answer, e.g. <i>So do I</i> or <i>Neither can I</i>.</p>
+    <div class="items">
+      <div class="item" data-key="so do i"><span class="n">1.</span><span class="quote">“I work on Saturdays.” —</span><input type="text" placeholder="..." autocomplete="off"><span class="quote">.</span><span class="mark"></span><span class="fix"></span></div>
+      <div class="item" data-key="neither do i|nor do i"><span class="n">2.</span><span class="quote">“I don't speak French.” —</span><input type="text" placeholder="..." autocomplete="off"><span class="quote">.</span><span class="mark"></span><span class="fix"></span></div>
+      <div class="item" data-key="so can i"><span class="n">3.</span><span class="quote">“I can cook really well.” —</span><input type="text" placeholder="..." autocomplete="off"><span class="quote">.</span><span class="mark"></span><span class="fix"></span></div>
+      <div class="item" data-key="neither was i|nor was i"><span class="n">4.</span><span class="quote">“I wasn't at the meeting.” —</span><input type="text" placeholder="..." autocomplete="off"><span class="quote">.</span><span class="mark"></span><span class="fix"></span></div>
+      <div class="item" data-key="so have i"><span class="n">5.</span><span class="quote">“I have already had lunch.” —</span><input type="text" placeholder="..." autocomplete="off"><span class="quote">.</span><span class="mark"></span><span class="fix"></span></div>
+      <div class="item" data-key="neither could i|nor could i"><span class="n">6.</span><span class="quote">“I couldn't sleep last night.” —</span><input type="text" placeholder="..." autocomplete="off"><span class="quote">.</span><span class="mark"></span><span class="fix"></span></div>
+      <div class="item" data-key="so will i"><span class="n">7.</span><span class="quote">“I will call her tomorrow.” —</span><input type="text" placeholder="..." autocomplete="off"><span class="quote">.</span><span class="mark"></span><span class="fix"></span></div>
+      <div class="item" data-key="neither should i|nor should i"><span class="n">8.</span><span class="quote">“I shouldn't eat so much sugar.” —</span><input type="text" placeholder="..." autocomplete="off"><span class="quote">.</span><span class="mark"></span><span class="fix"></span></div>
+      <div class="item" data-key="so am i"><span class="n">9.</span><span class="quote">“I'm learning English.” —</span><input type="text" placeholder="..." autocomplete="off"><span class="quote">.</span><span class="mark"></span><span class="fix"></span></div>
+      <div class="item" data-key="neither did i|nor did i"><span class="n">10.</span><span class="quote">“I didn't see that movie.” —</span><input type="text" placeholder="..." autocomplete="off"><span class="quote">.</span><span class="mark"></span><span class="fix"></span></div>
+    </div>
+    <div class="ex-foot">
+      <button class="check-btn">Check</button>
+      <button class="reset-btn">Reset</button>
+      <span class="score"></span>
+    </div>
+  </section>
+
+  <!-- EXERCISE 4 : find the correct sentence -->
+  <section class="ex" id="ex4" data-type="pill">
+    <div class="ex-head"><span class="ex-num">Exercise 4</span><h2>Spot the correct reply</h2></div>
+    <p class="ex-task">One reply is correct, one has a typical mistake. Choose the correct one.</p>
+    <div class="items">
+      <div class="item" data-key="Neither do I."><span class="n">1.</span><span class="quote">“I don't like horror films.” —</span><span class="pill-group"><button class="pill">So don't I.</button><button class="pill">Neither do I.</button></span><span class="mark"></span><span class="fix"></span></div>
+      <div class="item" data-key="So did I."><span class="n">2.</span><span class="quote">“I enjoyed the concert.” —</span><span class="pill-group"><button class="pill">So did I.</button><button class="pill">So I did.</button></span><span class="mark"></span><span class="fix"></span></div>
+      <div class="item" data-key="Neither can I."><span class="n">3.</span><span class="quote">“I can't come on Friday.” —</span><span class="pill-group"><button class="pill">Neither can't I.</button><button class="pill">Neither can I.</button></span><span class="mark"></span><span class="fix"></span></div>
+      <div class="item" data-key="Me neither."><span class="n">4.</span><span class="quote">“I haven't tried sushi.” —</span><span class="pill-group"><button class="pill">Me too.</button><button class="pill">Me neither.</button></span><span class="mark"></span><span class="fix"></span></div>
+      <div class="item" data-key="So would I."><span class="n">5.</span><span class="quote">“I would love a holiday.” —</span><span class="pill-group"><button class="pill">So would I.</button><button class="pill">So I would love.</button></span><span class="mark"></span><span class="fix"></span></div>
+      <div class="item" data-key="I don't either."><span class="n">6.</span><span class="quote">“I don't drink coffee.” —</span><span class="pill-group"><button class="pill">I don't too.</button><button class="pill">I don't either.</button></span><span class="mark"></span><span class="fix"></span></div>
+    </div>
+    <div class="ex-foot">
+      <button class="check-btn">Check</button>
+      <button class="reset-btn">Reset</button>
+      <span class="score"></span>
+    </div>
+  </section>
+
+  <!-- EXERCISE 5 : mixed dialogue, typing -->
+  <section class="ex" id="ex5" data-type="text">
+    <div class="ex-head"><span class="ex-num">Exercise 5</span><h2>Finish the dialogue</h2></div>
+    <p class="ex-task">Two friends agree about everything. Fill each gap with <i>too</i>, <i>either</i>, or a full short answer (<i>So … I / Neither … I</i>).</p>
+    <div class="items">
+      <div class="item" data-key="so do i"><span class="n">1.</span><span class="quote"><span class="who">Anna:</span> “I really like this café.” <span class="who">Ben:</span> “</span><input type="text" placeholder="..." autocomplete="off"><span class="quote">. The coffee is great here.”</span><span class="mark"></span><span class="fix"></span></div>
+      <div class="item" data-key="too"><span class="n">2.</span><span class="quote"><span class="who">Anna:</span> “I'm going to order a croissant.” <span class="who">Ben:</span> “Good idea. I'll order one</span><input type="text" placeholder="..." autocomplete="off"><span class="quote">.”</span><span class="mark"></span><span class="fix"></span></div>
+      <div class="item" data-key="neither have i|nor have i"><span class="n">3.</span><span class="quote"><span class="who">Anna:</span> “I haven't been here since March.” <span class="who">Ben:</span> “</span><input type="text" placeholder="..." autocomplete="off"><span class="quote">. It's been ages!”</span><span class="mark"></span><span class="fix"></span></div>
+      <div class="item" data-key="either"><span class="n">4.</span><span class="quote"><span class="who">Anna:</span> “I can't stay long today.” <span class="who">Ben:</span> “I can't stay long</span><input type="text" placeholder="..." autocomplete="off"><span class="quote">. I have a meeting at three.”</span><span class="mark"></span><span class="fix"></span></div>
+      <div class="item" data-key="so should i"><span class="n">5.</span><span class="quote"><span class="who">Anna:</span> “I should probably go now.” <span class="who">Ben:</span> “</span><input type="text" placeholder="..." autocomplete="off"><span class="quote">, actually. Same time next week?”</span><span class="mark"></span><span class="fix"></span></div>
+      <div class="item" data-key="so was i"><span class="n">6.</span><span class="quote"><span class="who">Anna:</span> “I was hoping you'd say that!” <span class="who">Ben:</span> “</span><input type="text" placeholder="..." autocomplete="off"><span class="quote">!”</span><span class="mark"></span><span class="fix"></span></div>
+    </div>
+    <div class="ex-foot">
+      <button class="check-btn">Check</button>
+      <button class="reset-btn">Reset</button>
+      <span class="score"></span>
+    </div>
+  </section>
+
+</div>
+
+<div class="total">
+  <div class="wrap">
+    <span>Total score</span>
+    <span><b id="totalScore">0</b> / <span id="totalMax">0</span></span>
+  </div>
+</div>
+
+<script>
+(function(){
+  var totals = {};
+
+  function norm(s){
+    return s.toLowerCase()
+      .replace(/[’‘]/g,"'")
+      .replace(/[.,!?]/g,"")
+      .replace(/\s+/g," ")
+      .trim();
+  }
+
+  function updateTotal(){
+    var got = 0, max = 0;
+    Object.keys(totals).forEach(function(k){ got += totals[k].got; max += totals[k].max; });
+    document.getElementById('totalScore').textContent = got;
+    document.getElementById('totalMax').textContent = max;
+  }
+
+  document.querySelectorAll('.ex').forEach(function(ex){
+    var type = ex.dataset.type;
+    var items = ex.querySelectorAll('.item');
+    totals[ex.id] = { got: 0, max: items.length };
+    updateTotal();
+
+    // pill selection
+    ex.querySelectorAll('.pill-group').forEach(function(group){
+      group.querySelectorAll('.pill').forEach(function(btn){
+        btn.addEventListener('click', function(){
+          group.querySelectorAll('.pill').forEach(function(b){ b.classList.remove('sel'); });
+          btn.classList.add('sel');
+        });
+      });
+    });
+
+    function checkItem(item){
+      var ok = false, answerShown = '';
+      if(type === 'pill'){
+        var sel = item.querySelector('.pill.sel');
+        var key = item.dataset.key;
+        ok = !!sel && norm(sel.textContent) === norm(key);
+        answerShown = key;
+        if(!sel) ok = false;
+      } else if(type === 'select'){
+        ok = true;
+        var keys = [];
+        item.querySelectorAll('select').forEach(function(s){
+          keys.push(s.dataset.key);
+          if(norm(s.value) !== norm(s.dataset.key)) ok = false;
+        });
+        answerShown = keys.join(' ') + ' I';
+      } else { // text
+        var input = item.querySelector('input[type=text]');
+        var accepted = item.dataset.key.split('|');
+        var val = norm(input.value);
+        ok = accepted.some(function(a){ return norm(a) === val; });
+        answerShown = accepted[0].charAt(0).toUpperCase() + accepted[0].slice(1);
+      }
+      item.classList.remove('ok','bad');
+      item.classList.add(ok ? 'ok' : 'bad');
+      item.querySelector('.mark').textContent = ok ? '✓' : '✗';
+      if(!ok){
+        item.querySelector('.fix').textContent = 'Correct answer: ' + answerShown;
+      }
+      return ok;
+    }
+
+    ex.querySelector('.check-btn').addEventListener('click', function(){
+      var correct = 0;
+      items.forEach(function(item){ if(checkItem(item)) correct++; });
+      var scoreEl = ex.querySelector('.score');
+      scoreEl.textContent = correct + ' / ' + items.length +
+        (correct === items.length ? '  — perfect! ✓' : '');
+      scoreEl.classList.toggle('full', correct === items.length);
+      totals[ex.id].got = correct;
+      updateTotal();
+    });
+
+    ex.querySelector('.reset-btn').addEventListener('click', function(){
+      items.forEach(function(item){
+        item.classList.remove('ok','bad');
+        item.querySelector('.mark').textContent = '';
+        item.querySelector('.fix').textContent = '';
+        item.querySelectorAll('.pill').forEach(function(b){ b.classList.remove('sel'); });
+        item.querySelectorAll('select').forEach(function(s){ s.value = ''; });
+        item.querySelectorAll('input[type=text]').forEach(function(i){ i.value = ''; });
+      });
+      var scoreEl = ex.querySelector('.score');
+      scoreEl.textContent = '';
+      scoreEl.classList.remove('full');
+      totals[ex.id].got = 0;
+      updateTotal();
+    });
+  });
+})();
+</script>
+</body>
+</html>
