@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Дело №A2 — English Case File</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-night:#14161c;
+    --bg-night-2:#1b1e27;
+    --paper:#f2ead4;
+    --paper-2:#e9e0c6;
+    --ink:#2a2116;
+    --ink-soft:#5a4f3c;
+    --red-string:#a5382c;
+    --red-string-dark:#7e2a20;
+    --gold:#b8912b;
+    --stamp-green:#3f6b4f;
+    --stamp-red:#9c2b23;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(circle at 20% 20%, rgba(255,255,255,0.03) 0, transparent 40%),
+      radial-gradient(circle at 80% 60%, rgba(255,255,255,0.025) 0, transparent 45%),
+      repeating-linear-gradient(0deg, rgba(255,255,255,0.015) 0 1px, transparent 1px 3px),
+      var(--bg-night-2);
+    font-family:'Lora',serif;
+    color:var(--ink);
+    padding:32px 16px 80px;
+    min-height:100vh;
+  }
+  .wrap{max-width:880px;margin:0 auto;}
+
+  /* HEADER */
+  header.board{
+    text-align:center;
+    padding:28px 20px 34px;
+    margin-bottom:42px;
+    position:relative;
+  }
+  .badge{
+    display:inline-block;
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    letter-spacing:3px;
+    color:var(--gold);
+    border:1px solid var(--gold);
+    padding:4px 12px;
+    border-radius:2px;
+    text-transform:uppercase;
+    margin-bottom:14px;
+  }
+  h1.title{
+    font-family:'Special Elite',monospace;
+    color:#f2ead4;
+    font-size:clamp(28px,5vw,42px);
+    letter-spacing:1px;
+    margin:0 0 8px;
+    text-shadow:2px 2px 0 rgba(0,0,0,0.4);
+  }
+  .subtitle{
+    color:#a9a293;
+    font-style:italic;
+    font-size:15px;
+    margin:0;
+  }
+  .stamp-confidential{
+    position:absolute;
+    top:6px; right:10px;
+    font-family:'Special Elite',monospace;
+    color:var(--stamp-red);
+    border:3px solid var(--stamp-red);
+    padding:6px 10px;
+    font-size:11px;
+    letter-spacing:2px;
+    transform:rotate(8deg);
+    border-radius:4px;
+    opacity:0.75;
+    display:none;
+  }
+  @media(min-width:640px){.stamp-confidential{display:block;}}
+
+  /* CASE CARD */
+  .case-card{
+    background:var(--paper);
+    background-image:
+      radial-gradient(rgba(0,0,0,0.03) 1px, transparent 1px);
+    background-size:6px 6px;
+    border-radius:3px;
+    padding:30px 28px 28px;
+    margin-bottom:56px;
+    position:relative;
+    box-shadow:0 18px 40px rgba(0,0,0,0.45), 0 2px 0 rgba(255,255,255,0.04) inset;
+    border:1px solid #d9cca4;
+  }
+  .case-card:nth-of-type(odd){transform:rotate(-0.4deg);}
+  .case-card:nth-of-type(even){transform:rotate(0.4deg);}
+
+  .pin{
+    position:absolute;
+    top:-9px; left:50%;
+    transform:translateX(-50%);
+    width:16px;height:16px;
+    background:radial-gradient(circle at 35% 30%, #e2554a, var(--red-string-dark));
+    border-radius:50%;
+    box-shadow:0 3px 4px rgba(0,0,0,0.5);
+  }
+
+  .case-num{
+    font-family:'Special Elite',monospace;
+    font-size:12px;
+    color:var(--red-string);
+    letter-spacing:2px;
+    text-transform:uppercase;
+    margin-bottom:4px;
+  }
+  .case-title{
+    font-family:'Special Elite',monospace;
+    font-size:22px;
+    color:var(--ink);
+    margin:0 0 6px;
+    border-bottom:2px dashed #cbb98a;
+    padding-bottom:12px;
+  }
+  .instr{
+    font-size:14px;
+    color:var(--ink-soft);
+    font-style:italic;
+    margin:10px 0 20px;
+    line-height:1.5;
+  }
+
+  .wordbank{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-bottom:22px;
+  }
+  .chip{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12.5px;
+    background:var(--paper-2);
+    border:1px dashed var(--ink-soft);
+    color:var(--ink);
+    padding:4px 10px;
+    border-radius:20px;
+  }
+
+  .item{
+    margin-bottom:16px;
+    line-height:1.9;
+    font-size:15.5px;
+  }
+  .item .ru{
+    display:block;
+    font-size:12.5px;
+    color:var(--ink-soft);
+    font-style:italic;
+    margin-top:2px;
+  }
+  .item .num{
+    font-family:'JetBrains Mono',monospace;
+    color:var(--red-string);
+    margin-right:6px;
+    font-size:13px;
+  }
+
+  input.gap{
+    font-family:'JetBrains Mono',monospace;
+    font-size:14.5px;
+    border:none;
+    border-bottom:2px solid var(--ink-soft);
+    background:transparent;
+    padding:2px 4px;
+    width:130px;
+    color:var(--ink);
+    outline:none;
+  }
+  input.gap.narrow{width:90px;}
+  input.gap:focus{border-bottom-color:var(--red-string);}
+  input.gap.ok{border-bottom-color:var(--stamp-green); background:rgba(63,107,79,0.12);}
+  input.gap.bad{border-bottom-color:var(--stamp-red); background:rgba(156,43,35,0.12);}
+
+  /* explanation table for look/see/watch */
+  .explain{
+    width:100%;
+    border-collapse:collapse;
+    margin-bottom:24px;
+    font-size:14px;
+  }
+  .explain th, .explain td{
+    text-align:left;
+    padding:9px 10px;
+    border:1px solid #cbb98a;
+    vertical-align:top;
+  }
+  .explain th{
+    font-family:'Special Elite',monospace;
+    font-size:12px;
+    background:var(--paper-2);
+    letter-spacing:1px;
+  }
+  .explain td em{color:var(--ink-soft);}
+
+  /* verb table */
+  table.verbtable{
+    width:100%;
+    border-collapse:collapse;
+    font-size:14.5px;
+    margin-bottom:6px;
+  }
+  table.verbtable th{
+    font-family:'Special Elite',monospace;
+    font-size:12px;
+    text-align:left;
+    padding:8px 6px;
+    border-bottom:2px solid var(--ink);
+    letter-spacing:1px;
+  }
+  table.verbtable td{
+    padding:7px 6px;
+    border-bottom:1px dashed #cbb98a;
+  }
+  table.verbtable td.verb{font-family:'JetBrains Mono',monospace;font-weight:600;}
+  table.verbtable td.ru{color:var(--ink-soft);font-style:italic;font-size:13.5px;}
+
+  /* controls */
+  .controls{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    margin-top:18px;
+    flex-wrap:wrap;
+  }
+  button.checkbtn{
+    font-family:'Special Elite',monospace;
+    background:var(--ink);
+    color:var(--paper);
+    border:none;
+    padding:10px 20px;
+    font-size:13px;
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+    border-radius:2px;
+    cursor:pointer;
+    transition:transform .12s ease, background .2s ease;
+  }
+  button.checkbtn:hover{background:var(--red-string-dark);}
+  button.checkbtn:active{transform:scale(0.97);}
+  button.resetbtn{
+    font-family:'JetBrains Mono',monospace;
+    background:none;
+    border:1px solid var(--ink-soft);
+    color:var(--ink-soft);
+    padding:9px 14px;
+    font-size:12px;
+    border-radius:2px;
+    cursor:pointer;
+  }
+  button.resetbtn:hover{color:var(--ink); border-color:var(--ink);}
+
+  .score{
+    font-family:'JetBrains Mono',monospace;
+    font-size:13px;
+    color:var(--ink-soft);
+  }
+  .score b{color:var(--ink);}
+
+  .stamp-solved{
+    position:absolute;
+    top:20px; right:18px;
+    font-family:'Special Elite',monospace;
+    font-size:16px;
+    color:var(--stamp-green);
+    border:3px solid var(--stamp-green);
+    padding:6px 12px;
+    border-radius:4px;
+    transform:rotate(-9deg) scale(0.7);
+    opacity:0;
+    letter-spacing:2px;
+    transition:transform .35s ease, opacity .35s ease;
+    pointer-events:none;
+  }
+  .stamp-solved.show{
+    opacity:0.85;
+    transform:rotate(-9deg) scale(1);
+  }
+
+  footer{
+    text-align:center;
+    color:#8a8474;
+    font-size:12.5px;
+    font-family:'JetBrains Mono',monospace;
+    margin-top:10px;
+    letter-spacing:0.5px;
+  }
+
+  @media(max-width:520px){
+    .case-card{padding:22px 16px 22px;}
+    input.gap{width:110px;}
+    table.verbtable{font-size:13px;}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .stamp-solved{transition:none;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="board">
+    <div class="stamp-confidential">CONFIDENTIAL</div>
+    <span class="badge">Case File · Level A2</span>
+    <h1 class="title">ДЕЛО № A2‑DETECTIVE</h1>
+    <p class="subtitle">Расследование ведёт: инспектор английского языка</p>
+  </header>
+
+  <!-- CASE 1: VOCABULARY -->
+  <section class="case-card" id="case1">
+    <div class="pin"></div>
+    <div class="case-num">Дело №1</div>
+    <h2 class="case-title">Словарь детектива</h2>
+    <p class="instr">Впишите в пропуск подходящее слово из картотеки. Внимание: в пункте 9 предлог не нужен!</p>
+
+    <div class="wordbank">
+      <span class="chip">dead</span><span class="chip">murder</span><span class="chip">victim</span>
+      <span class="chip">suspect</span><span class="chip">inspector</span><span class="chip">moustache</span>
+      <span class="chip">die</span><span class="chip">murderer</span><span class="chip">follow me</span>
+    </div>
+
+    <div class="item"><span class="num">1.</span>The man is <input class="gap" data-ans="dead">.
+      <span class="ru">мужчина мёртв</span></div>
+    <div class="item"><span class="num">2.</span>The police are investigating a <input class="gap" data-ans="murder">.
+      <span class="ru">полиция расследует убийство</span></div>
+    <div class="item"><span class="num">3.</span>The <input class="gap" data-ans="victim"> was found at home.
+      <span class="ru">жертву нашли дома</span></div>
+    <div class="item"><span class="num">4.</span>The <input class="gap" data-ans="suspect"> was arrested.
+      <span class="ru">подозреваемого арестовали</span></div>
+    <div class="item"><span class="num">5.</span>The <input class="gap" data-ans="inspector"> is asking questions.
+      <span class="ru">инспектор задаёт вопросы</span></div>
+    <div class="item"><span class="num">6.</span>He has a <input class="gap" data-ans="moustache">.
+      <span class="ru">у него есть усы</span></div>
+    <div class="item"><span class="num">7.</span>People and animals <input class="gap" data-ans="die">.
+      <span class="ru">люди и животные умирают</span></div>
+    <div class="item"><span class="num">8.</span>The <input class="gap" data-ans="murderer"> was caught.
+      <span class="ru">убийцу поймали</span></div>
+    <div class="item"><span class="num">9.</span><input class="gap" style="width:170px" data-ans="follow me">, please.
+      <span class="ru">следуй за мной, пожалуйста — без предлога!</span></div>
+
+    <div class="controls">
+      <button class="checkbtn" onclick="checkCase('case1')">Проверить</button>
+      <button class="resetbtn" onclick="resetCase('case1')">Сбросить</button>
+      <span class="score" id="score-case1">0 / 9</span>
+    </div>
+    <div class="stamp-solved" id="stamp-case1">РАСКРЫТО</div>
+  </section>
+
+  <!-- CASE 2: look at / see / watch -->
+  <section class="case-card" id="case2">
+    <div class="pin"></div>
+    <div class="case-num">Дело №2</div>
+    <h2 class="case-title">look at / see / watch</h2>
+    <p class="instr">Три «свидетеля», но каждый видел по-разному. Сначала — показания, потом — ваша версия событий.</p>
+
+    <table class="explain">
+      <tr><th>Глагол</th><th>Значение</th><th>Пример</th></tr>
+      <tr>
+        <td><b>look at</b></td>
+        <td>смотреть <em>на что-то</em>, специально направить взгляд</td>
+        <td><em>Look at this picture.</em> — Посмотри на эту картинку.</td>
+      </tr>
+      <tr>
+        <td><b>see</b></td>
+        <td>видеть — непроизвольно, глаза просто воспринимают</td>
+        <td><em>I can see a bird.</em> — Я вижу птицу.</td>
+      </tr>
+      <tr>
+        <td><b>watch</b></td>
+        <td>смотреть <em>какое-то время</em>, следить за движением/процессом</td>
+        <td><em>I watch TV in the evening.</em> — Я смотрю телевизор вечером.</td>
+      </tr>
+    </table>
+
+    <div class="item"><span class="num">1.</span><input class="gap" data-ans="look at|Look at" style="width:100px"> that man over there! He looks suspicious.
+      <span class="ru">специально обратить внимание — направленный взгляд</span></div>
+    <div class="item"><span class="num">2.</span>I can't <input class="gap narrow" data-ans="see"> anything without my glasses.
+      <span class="ru">просто не воспринимаю глазами</span></div>
+    <div class="item"><span class="num">3.</span>Every evening the inspector likes to <input class="gap narrow" data-ans="watch"> the news.
+      <span class="ru">следит за процессом какое-то время</span></div>
+    <div class="item"><span class="num">4.</span>Can you <input class="gap" data-ans="look at|Look at" style="width:100px"> this photo? Do you recognize the suspect?
+      <span class="ru">специально направить взгляд на фото</span></div>
+    <div class="item"><span class="num">5.</span>From the window, we could <input class="gap narrow" data-ans="see"> the detective following the suspect.
+      <span class="ru">просто увидеть, без усилия</span></div>
+
+    <div class="controls">
+      <button class="checkbtn" onclick="checkCase('case2')">Проверить</button>
+      <button class="resetbtn" onclick="resetCase('case2')">Сбросить</button>
+      <span class="score" id="score-case2">0 / 5</span>
+    </div>
+    <div class="stamp-solved" id="stamp-case2">РАСКРЫТО</div>
+  </section>
+
+  <!-- CASE 3: past simple table -->
+  <section class="case-card" id="case3">
+    <div class="pin"></div>
+    <div class="case-num">Дело №3</div>
+    <h2 class="case-title">Картотека неправильных глаголов</h2>
+    <p class="instr">Заполните колонку Past Simple. Все эти глаголы — неправильные, формы нужно запомнить.</p>
+
+    <table class="verbtable">
+      <tr><th>Verb</th><th>Перевод</th><th>Past Simple</th></tr>
+      <tr><td class="verb">think</td><td class="ru">думать</td><td><input class="gap narrow" data-ans="thought"></td></tr>
+      <tr><td class="verb">swim</td><td class="ru">плавать</td><td><input class="gap narrow" data-ans="swam"></td></tr>
+      <tr><td class="verb">take</td><td class="ru">брать</td><td><input class="gap narrow" data-ans="took"></td></tr>
+      <tr><td class="verb">run</td><td class="ru">бежать</td><td><input class="gap narrow" data-ans="ran"></td></tr>
+      <tr><td class="verb">sit</td><td class="ru">сидеть</td><td><input class="gap narrow" data-ans="sat"></td></tr>
+      <tr><td class="verb">lose</td><td class="ru">терять</td><td><input class="gap narrow" data-ans="lost"></td></tr>
+      <tr><td class="verb">come</td><td class="ru">приходить</td><td><input class="gap narrow" data-ans="came"></td></tr>
+      <tr><td class="verb">say</td><td class="ru">говорить</td><td><input class="gap narrow" data-ans="said"></td></tr>
+      <tr><td class="verb">send</td><td class="ru">отправлять</td><td><input class="gap narrow" data-ans="sent"></td></tr>
+      <tr><td class="verb">choose</td><td class="ru">выбирать</td><td><input class="gap narrow" data-ans="chose"></td></tr>
+      <tr><td class="verb">break</td><td class="ru">ломать</td><td><input class="gap narrow" data-ans="broke"></td></tr>
+      <tr><td class="verb">wake up</td><td class="ru">просыпаться</td><td><input class="gap" style="width:100px" data-ans="woke up"></td></tr>
+      <tr><td class="verb">get up</td><td class="ru">вставать</td><td><input class="gap" style="width:100px" data-ans="got up"></td></tr>
+      <tr><td class="verb">forget</td><td class="ru">забывать</td><td><input class="gap narrow" data-ans="forgot"></td></tr>
+      <tr><td class="verb">sing</td><td class="ru">петь</td><td><input class="gap narrow" data-ans="sang"></td></tr>
+    </table>
+
+    <div class="controls">
+      <button class="checkbtn" onclick="checkCase('case3')">Проверить</button>
+      <button class="resetbtn" onclick="resetCase('case3')">Сбросить</button>
+      <span class="score" id="score-case3">0 / 15</span>
+    </div>
+    <div class="stamp-solved" id="stamp-case3">РАСКРЫТО</div>
+  </section>
+
+  <!-- CASE 4: present vs past with get up/wake up -->
+  <section class="case-card" id="case4">
+    <div class="pin"></div>
+    <div class="case-num">Дело №4</div>
+    <h2 class="case-title">Обычно vs Вчера: Present Simple ↔ Past Simple</h2>
+    <p class="instr">В каждом предложении два пропуска: обычное действие (Present Simple) и то, что случилось один раз (Past Simple). Не забудьте окончание -s в 3-м лице настоящего времени!</p>
+
+    <div class="item"><span class="num">1.</span>Detective Brown usually <input class="gap narrow" data-ans="gets up"> at six, but yesterday he <input class="gap narrow" data-ans="got up"> at eight.
+      <span class="ru">обычно встаёт в шесть, но вчера встал в восемь</span></div>
+    <div class="item"><span class="num">2.</span>I always <input class="gap narrow" data-ans="wake up"> before my alarm, but this morning I <input class="gap narrow" data-ans="woke up"> late.
+      <span class="ru">всегда просыпаюсь раньше будильника, но сегодня проснулся поздно</span></div>
+    <div class="item"><span class="num">3.</span>The inspector usually <input class="gap narrow" data-ans="gets up"> early, but last Monday he <input class="gap narrow" data-ans="got up"> very late.
+      <span class="ru">инспектор обычно встаёт рано, но в прошлый понедельник встал очень поздно</span></div>
+    <div class="item"><span class="num">4.</span>She usually <input class="gap narrow" data-ans="wakes up"> at 7 o'clock, but on the day of the murder she <input class="gap narrow" data-ans="woke up"> at midnight.
+      <span class="ru">обычно просыпается в 7, но в день убийства проснулась в полночь</span></div>
+    <div class="item"><span class="num">5.</span>We usually <input class="gap narrow" data-ans="get up"> together, but that day we <input class="gap narrow" data-ans="got up"> separately.
+      <span class="ru">обычно встаём вместе, но в тот день встали порознь</span></div>
+
+    <div class="controls">
+      <button class="checkbtn" onclick="checkCase('case4')">Проверить</button>
+      <button class="resetbtn" onclick="resetCase('case4')">Сбросить</button>
+      <span class="score" id="score-case4">0 / 10</span>
+    </div>
+    <div class="stamp-solved" id="stamp-case4">РАСКРЫТО</div>
+  </section>
+
+  <footer>досье закрыто, когда все штампы «РАСКРЫТО» на месте</footer>
+</div>
+
+<script>
+function norm(s){
+  return s.trim().toLowerCase().replace(/[.,!?]/g,'').replace(/\s+/g,' ');
+}
+
+function checkCase(caseId){
+  const card = document.getElementById(caseId);
+  const inputs = card.querySelectorAll('input.gap');
+  let correct = 0;
+  inputs.forEach(inp=>{
+    const answers = inp.dataset.ans.split('|').map(a=>norm(a));
+    const val = norm(inp.value);
+    inp.classList.remove('ok','bad');
+    if(answers.includes(val) && val.length>0){
+      inp.classList.add('ok');
+      correct++;
+    } else {
+      inp.classList.add('bad');
+    }
+  });
+  document.getElementById('score-'+caseId).innerHTML = '<b>'+correct+'</b> / '+inputs.length;
+  const stamp = document.getElementById('stamp-'+caseId);
+  if(correct===inputs.length){
+    stamp.classList.add('show');
+  } else {
+    stamp.classList.remove('show');
+  }
+}
+
+function resetCase(caseId){
+  const card = document.getElementById(caseId);
+  const inputs = card.querySelectorAll('input.gap');
+  inputs.forEach(inp=>{
+    inp.value='';
+    inp.classList.remove('ok','bad');
+  });
+  document.getElementById('score-'+caseId).innerHTML = '0 / '+inputs.length;
+  document.getElementById('stamp-'+caseId).classList.remove('show');
+}
+</script>
+</body>
+</html>
