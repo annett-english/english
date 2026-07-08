@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bad Jobs — Worksheet B2</title>
+<style>
+
+  :root{
+    --paper:#EAE3D3;
+    --paper-dark:#DED4BC;
+    --card:#F5F0E4;
+    --ink:#2A2B26;
+    --ink-soft:#5B5A4E;
+    --steel:#3F5C63;
+    --steel-light:#6C8B92;
+    --stamp:#B5432E;
+    --stamp-light:#e8d9d0;
+    --highlight:#E8B923;
+    --ok:#4C7A4A;
+    --bad:#B5432E;
+    --line: rgba(42,43,38,0.18);
+    font-family: 'Courier New', monospace;
+  }
+
+  *{box-sizing:border-box;}
+
+  body{
+    margin:0;
+    background:
+      repeating-linear-gradient(0deg, transparent, transparent 34px, rgba(42,43,38,0.035) 35px),
+      var(--paper);
+    color:var(--ink);
+    font-family: 'IBM Plex Mono', 'Courier New', monospace;
+    padding: 0 0 80px 0;
+  }
+
+  /* ---------- HEADER : punch card ---------- */
+  header{
+    background: var(--steel);
+    color: var(--card);
+    padding: 46px 20px 60px;
+    position: relative;
+    overflow:hidden;
+    border-bottom: 6px solid var(--ink);
+  }
+
+  .punchcard{
+    max-width: 760px;
+    margin: 0 auto;
+    background: var(--card);
+    color: var(--ink);
+    border-radius: 4px;
+    box-shadow: 0 18px 40px rgba(0,0,0,0.35);
+    position: relative;
+    padding: 28px 34px 34px;
+    transform: rotate(-1.2deg);
+  }
+
+  .punchcard::before{
+    content:"";
+    position:absolute;
+    top:14px; left:14px; right:14px; bottom:14px;
+    border: 1px dashed var(--line);
+    pointer-events:none;
+  }
+
+  .card-holes{
+    position:absolute;
+    top:0; bottom:0; left:-10px;
+    display:flex; flex-direction:column; justify-content:space-evenly;
+    padding: 20px 0;
+  }
+  .card-holes span{
+    width:9px;height:14px;background:var(--steel);border-radius:50%;
+    box-shadow: 0 0 0 3px var(--paper);
+  }
+
+  .eyebrow{
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--stamp);
+    font-weight: 700;
+    margin: 0 0 6px;
+  }
+
+  h1{
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: clamp(32px, 5vw, 46px);
+    margin: 0 0 10px;
+    line-height: 1.05;
+    letter-spacing: -0.5px;
+  }
+
+  .subtitle{
+    color: var(--ink-soft);
+    font-size: 15px;
+    margin: 0 0 20px;
+    max-width: 54ch;
+  }
+
+  .card-meta{
+    display:flex;
+    flex-wrap:wrap;
+    gap: 14px 28px;
+    border-top: 1px dashed var(--line);
+    padding-top: 16px;
+    font-size: 12.5px;
+    color: var(--ink-soft);
+  }
+  .card-meta b{ color: var(--ink); }
+
+  .stamp{
+    position:absolute;
+    top: 18px; right: 22px;
+    border: 3px solid var(--stamp);
+    color: var(--stamp);
+    font-family: Georgia, serif;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 6px 10px;
+    border-radius: 6px;
+    transform: rotate(8deg);
+    opacity: 0.85;
+  }
+
+  /* ---------- CLOCK / SCORE STRIP ---------- */
+  .clockstrip{
+    max-width: 760px;
+    margin: -26px auto 40px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap: 16px;
+    background: var(--ink);
+    color: var(--card);
+    padding: 14px 22px;
+    border-radius: 3px;
+    font-size: 13px;
+    letter-spacing: 1px;
+    position:relative;
+    z-index:2;
+  }
+  .clockstrip .dot{
+    display:inline-block; width:8px; height:8px; border-radius:50%;
+    background: var(--highlight); margin-right:8px;
+  }
+  #scoreDisplay{ font-weight:700; color: var(--highlight); }
+
+  /* ---------- MAIN ---------- */
+  main{
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  section.task{
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 28px 30px 30px;
+    margin-bottom: 30px;
+    position: relative;
+    box-shadow: 0 2px 0 var(--paper-dark);
+  }
+
+  section.task::before{
+    content: attr(data-tag);
+    position:absolute;
+    top: -13px;
+    left: 24px;
+    background: var(--stamp);
+    color: var(--card);
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 2px;
+    font-weight:700;
+  }
+
+  h2{
+    font-family: Georgia, serif;
+    font-size: 22px;
+    margin: 6px 0 4px;
+    color: var(--steel);
+  }
+
+  .instructions{
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    margin: 0 0 20px;
+    padding-bottom: 14px;
+    border-bottom: 1px dashed var(--line);
+  }
+
+  /* warm-up */
+  .warmup-list{ list-style:none; padding:0; margin:0; }
+  .warmup-list li{
+    padding: 12px 0 12px 30px;
+    border-bottom: 1px dashed var(--line);
+    position:relative;
+    font-size:15px;
+  }
+  .warmup-list li:last-child{border-bottom:none;}
+  .warmup-list li::before{
+    content:"?";
+    position:absolute; left:0; top:12px;
+    color: var(--stamp);
+    font-weight:700;
+    font-family: Georgia, serif;
+  }
+
+  /* matching */
+  .match-grid{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 20px;
+  }
+  @media (max-width:560px){ .match-grid{grid-template-columns:1fr;} }
+
+  .match-item{
+    background: var(--paper);
+    border:1px solid var(--line);
+    border-radius:3px;
+    padding: 10px 12px;
+    font-size: 14px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .match-item select{
+    font-family: inherit;
+    font-size: 13px;
+    padding: 4px 6px;
+    border: 1px solid var(--steel);
+    border-radius: 3px;
+    background: var(--card);
+    color: var(--ink);
+  }
+  .match-word{ font-weight:700; color: var(--steel); min-width: 150px; }
+
+  /* gap fill */
+  .gap-line{
+    font-size: 15px;
+    margin: 0 0 16px;
+    line-height:1.7;
+  }
+  .gap-line input{
+    font-family: inherit;
+    font-size: 14px;
+    border: none;
+    border-bottom: 2px solid var(--steel);
+    background: transparent;
+    width: 160px;
+    padding: 2px 4px;
+    color: var(--ink);
+    text-align:center;
+  }
+  .gap-line input:focus{ outline:none; border-bottom-color: var(--stamp); }
+  .word-bank{
+    background: var(--paper);
+    border: 1px dashed var(--line);
+    border-radius: 3px;
+    padding: 10px 14px;
+    font-size: 13px;
+    margin-bottom: 18px;
+    color: var(--ink-soft);
+  }
+  .word-bank b{ color: var(--steel); }
+
+  /* true/false */
+  .tf-item{
+    display:flex; align-items:flex-start; justify-content:space-between; gap:14px;
+    padding: 12px 0;
+    border-bottom: 1px dashed var(--line);
+    font-size: 14.5px;
+  }
+  .tf-item:last-child{border-bottom:none;}
+  .tf-buttons{ display:flex; gap:6px; flex-shrink:0; }
+  .tf-buttons button{
+    font-family:inherit;
+    font-size: 12px;
+    padding: 6px 12px;
+    border: 1px solid var(--steel);
+    background: var(--card);
+    color: var(--steel);
+    border-radius: 3px;
+    cursor:pointer;
+    letter-spacing:1px;
+  }
+  .tf-buttons button:hover{ background: var(--steel); color: var(--card); }
+  .tf-buttons button.selected-true{ background: var(--ok); color:#fff; border-color:var(--ok); }
+  .tf-buttons button.selected-false{ background: var(--bad); color:#fff; border-color:var(--bad); }
+
+  /* multiple choice */
+  .mc-question{ margin-bottom: 22px; }
+  .mc-question p{ font-size: 15px; font-weight:700; margin: 0 0 10px; color: var(--ink); }
+  .mc-options{ display:flex; flex-direction:column; gap:8px; }
+  .mc-options label{
+    display:flex; align-items:center; gap:10px;
+    font-size: 14px;
+    background: var(--paper);
+    border:1px solid var(--line);
+    border-radius:3px;
+    padding: 9px 12px;
+    cursor:pointer;
+  }
+  .mc-options label:hover{ border-color: var(--steel); }
+  .mc-options input{ accent-color: var(--steel); }
+
+  /* discussion */
+  .discuss-list{ list-style: decimal; padding-left: 22px; margin:0; }
+  .discuss-list li{ font-size:15px; padding: 8px 0; }
+  textarea.notepad{
+    width:100%;
+    min-height: 90px;
+    margin-top:14px;
+    font-family: inherit;
+    font-size: 13.5px;
+    background: repeating-linear-gradient(var(--card), var(--card) 27px, var(--line) 28px);
+    border: 1px solid var(--line);
+    border-radius:3px;
+    padding: 8px 10px;
+    resize:vertical;
+    color: var(--ink);
+  }
+
+  /* buttons */
+  .check-btn{
+    font-family: inherit;
+    font-size: 13px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    background: var(--stamp);
+    color: var(--card);
+    border: none;
+    padding: 11px 22px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-weight:700;
+    margin-top: 6px;
+  }
+  .check-btn:hover{ background: #96311f; }
+
+  .feedback{
+    margin-top: 12px;
+    font-size: 13px;
+    padding: 10px 12px;
+    border-radius: 3px;
+    display:none;
+  }
+  .feedback.show{ display:block; }
+  .feedback.good{ background:#e5efe4; color: var(--ok); border:1px solid var(--ok); }
+  .feedback.mixed{ background: var(--stamp-light); color: var(--stamp); border:1px solid var(--stamp); }
+
+  .correct-mark{ color: var(--ok); font-weight:700; margin-left:6px; }
+  .wrong-mark{ color: var(--bad); font-weight:700; margin-left:6px; }
+
+  footer{
+    max-width:760px;
+    margin: 10px auto 0;
+    padding: 0 20px;
+    text-align:center;
+    color: var(--ink-soft);
+    font-size: 12px;
+    letter-spacing:1px;
+  }
+
+</style>
+</head>
+<body>
+
+<header>
+  <div class="punchcard">
+    <div class="card-holes">
+      <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+    </div>
+    <div class="stamp">clocked&nbsp;in</div>
+    <p class="eyebrow">BBC · Six Minute English</p>
+    <h1>Bad Jobs</h1>
+    <p class="subtitle">Рабочий листок уровня B2 по выпуску "Bad Jobs": лексика о работе, стресс на рабочем месте и work-life balance.</p>
+    <div class="card-meta">
+      <span>Уровень: <b>B2</b></span>
+      <span>Время: <b>25–30 мин</b></span>
+      <span>Заданий: <b>6</b></span>
+      <span>Навыки: <b>Vocabulary · Reading · Speaking</b></span>
+    </div>
+  </div>
+</header>
+
+<div class="clockstrip">
+  <span><span class="dot"></span>ваш результат</span>
+  <span id="scoreDisplay">0 / 14</span>
+</div>
+
+<main>
+
+  <!-- TASK 1: WARM UP -->
+  <section class="task" data-tag="Task 1 · Warm-up">
+    <h2>Before you start</h2>
+    <p class="instructions">Обсудите вопросы с партнёром (или запишите свои мысли) перед чтением текста.</p>
+    <ul class="warmup-list">
+      <li>Have you ever had a job you disliked? What made it bad?</li>
+      <li>What do you think makes a job "good"?</li>
+      <li>What job do you think is the most stressful, and why?</li>
+    </ul>
+  </section>
+
+  <!-- TASK 2: VOCAB MATCHING -->
+  <section class="task" data-tag="Task 2 · Vocabulary">
+    <h2>Match the word to its meaning</h2>
+    <p class="instructions">Выберите правильное определение для каждого слова из выпадающего списка, затем нажмите «Check answers».</p>
+
+    <div class="match-grid" id="matchGrid">
+      <!-- filled by JS -->
+    </div>
+    <button class="check-btn" onclick="checkMatch()">Check answers</button>
+    <div class="feedback" id="matchFeedback"></div>
+  </section>
+
+  <!-- TASK 3: GAP FILL -->
+  <section class="task" data-tag="Task 3 · Gap-fill">
+    <h2>Complete the sentences</h2>
+    <p class="instructions">Заполните пропуски словами из списка. Каждое слово используется один раз.</p>
+    <div class="word-bank">
+      <b>Word bank:</b> burnout &nbsp;·&nbsp; deadline &nbsp;·&nbsp; breathing down your neck &nbsp;·&nbsp; presenteeism &nbsp;·&nbsp; work-life balance &nbsp;·&nbsp; win-win
+    </div>
+
+    <p class="gap-line">1. She felt completely exhausted and unmotivated — a classic case of <input type="text" id="g1" placeholder="..."> after months of overtime.</p>
+    <p class="gap-line">2. The report has to be finished by Friday — that's our <input type="text" id="g2" placeholder="..."></p>
+    <p class="gap-line">3. I can't concentrate when my manager is <input type="text" id="g3" placeholder="..."> — it makes me nervous.</p>
+    <p class="gap-line">4. Staying late just to look busy, even when there's no real work left, is a form of <input type="text" id="g4" placeholder="..."></p>
+    <p class="gap-line">5. Flexible hours let staff finish earlier and the company still hits its targets — a true <input type="text" id="g5" placeholder="..."> situation.</p>
+    <p class="gap-line">6. Since switching to part-time, he says his <input type="text" id="g6" placeholder="..."> has really improved.</p>
+
+    <button class="check-btn" onclick="checkGaps()">Check answers</button>
+    <div class="feedback" id="gapFeedback"></div>
+  </section>
+
+  <!-- TASK 4: TRUE / FALSE -->
+  <section class="task" data-tag="Task 4 · Comprehension">
+    <h2>True or false?</h2>
+    <p class="instructions">Отметьте, верны ли утверждения по содержанию выпуска.</p>
+    <div id="tfList"></div>
+    <button class="check-btn" onclick="checkTF()">Check answers</button>
+    <div class="feedback" id="tfFeedback"></div>
+  </section>
+
+  <!-- TASK 5: MULTIPLE CHOICE -->
+  <section class="task" data-tag="Task 5 · Detail">
+    <h2>Listen closely — multiple choice</h2>
+    <p class="instructions">Выберите правильный вариант ответа на основе текста.</p>
+    <div id="mcList"></div>
+    <button class="check-btn" onclick="checkMC()">Check answers</button>
+    <div class="feedback" id="mcFeedback"></div>
+  </section>
+
+  <!-- TASK 6: DISCUSSION -->
+  <section class="task" data-tag="Task 6 · Speaking">
+    <h2>Over to you</h2>
+    <p class="instructions">Обсудите вопросы в группе или запишите развёрнутые ответы (5+ предложений), используя новую лексику.</p>
+    <ol class="discuss-list">
+      <li>Do you agree that British work culture emphasises speed and targets more than other countries? Why or why not?</li>
+      <li>Emma Stewart suggests paying construction workers for finishing <em>tasks</em>, not for the hours they spend on site. Would this "output-based" system work in your own job or field of study? What could go wrong?</li>
+      <li>What would your ideal work-life balance look like? Describe a typical day.</li>
+    </ol>
+    <textarea class="notepad" placeholder="Запишите здесь свои мысли..."></textarea>
+  </section>
+
+</main>
+
+<footer>
+  BASED ON BBC LEARNING ENGLISH · SIX MINUTE ENGLISH — "BAD JOBS" · WORKSHEET FOR CLASSROOM USE
+</footer>
+
+<script>
+  let totalScore = 0;
+  const TOTAL_POSSIBLE = 14; // 6 match + 6 gap + 2 not auto... adjust below
+
+  /* ---------------- TASK 2: MATCHING ---------------- */
+  const matchData = [
+    { word: "Burnout", correct: "Lack of energy or enthusiasm because of working too hard" },
+    { word: "Deadline", correct: "A time or date by which a job must be finished" },
+    { word: "Breathing down your neck", correct: "Watching someone very closely and checking everything they do" },
+    { word: "Presenteeism", correct: "Staying at work longer than usual to show you work hard" },
+    { word: "Work-life balance", correct: "The amount of time spent working compared with relaxing" },
+    { word: "Win-win", correct: "A situation or result that is good for everyone involved" }
+  ];
+
+  const distractors = [
+    "A payment given for extra hours worked",
+    "A formal complaint made to a manager",
+    "A short break taken during the working day",
+    "The process of hiring new employees",
+    "A meeting held to review yearly performance",
+    "A document listing an employee's duties"
+  ];
+
+  function buildMatch(){
+    const allDefs = matchData.map(m => m.correct).concat(distractors);
+    const grid = document.getElementById("matchGrid");
+    matchData.forEach((item, i) => {
+      const shuffled = shuffle(allDefs.slice());
+      const div = document.createElement("div");
+      div.className = "match-item";
+      const sel = document.createElement("select");
+      sel.id = "match" + i;
+      const blank = document.createElement("option");
+      blank.textContent = "— select definition —";
+      blank.value = "";
+      sel.appendChild(blank);
+      shuffled.forEach(def => {
+        const opt = document.createElement("option");
+        opt.value = def;
+        opt.textContent = def;
+        sel.appendChild(opt);
+      });
+      div.innerHTML = `<span class="match-word">${item.word}</span>`;
+      div.appendChild(sel);
+      grid.appendChild(div);
+    });
+  }
+
+  function shuffle(arr){
+    for(let i = arr.length -1; i>0; i--){
+      const j = Math.floor(Math.random()*(i+1));
+      [arr[i],arr[j]] = [arr[j],arr[i]];
+    }
+    return arr;
+  }
+
+  function checkMatch(){
+    let score = 0;
+    matchData.forEach((item,i) => {
+      const sel = document.getElementById("match"+i);
+      if(sel.value === item.correct) score++;
+    });
+    const fb = document.getElementById("matchFeedback");
+    fb.className = "feedback show " + (score === matchData.length ? "good" : "mixed");
+    fb.textContent = `Правильно: ${score} из ${matchData.length}.`;
+    updateScore("match", score, matchData.length);
+  }
+
+  /* ---------------- TASK 3: GAP FILL ---------------- */
+  const gapAnswers = {
+    g1: "burnout",
+    g2: "deadline",
+    g3: "breathing down your neck",
+    g4: "presenteeism",
+    g5: "win-win",
+    g6: "work-life balance"
+  };
+
+  function checkGaps(){
+    let score = 0;
+    Object.keys(gapAnswers).forEach(id => {
+      const input = document.getElementById(id);
+      const val = input.value.trim().toLowerCase().replace(/^the\s+/,"");
+      const correctVal = gapAnswers[id];
+      const isRight = val === correctVal;
+      input.style.borderBottomColor = isRight ? "#4C7A4A" : "#B5432E";
+      if(isRight) score++;
+    });
+    const fb = document.getElementById("gapFeedback");
+    fb.className = "feedback show " + (score === 6 ? "good" : "mixed");
+    fb.textContent = `Правильно: ${score} из 6.`;
+    updateScore("gap", score, 6);
+  }
+
+  /* ---------------- TASK 4: TRUE / FALSE ---------------- */
+  const tfData = [
+    { text: "A recent Forbes survey named 'call centre worker' as the worst job in the UK.", answer: true },
+    { text: "British workers score better than most Europeans in surveys about work intensity.", answer: false },
+    { text: "In 2022 the NHS lost more than 15,000 nurses, many because of long, inflexible hours.", answer: true },
+    { text: "Emma Stewart's construction trial paid workers only for the exact hours they were on site.", answer: false }
+  ];
+
+  function buildTF(){
+    const list = document.getElementById("tfList");
+    tfData.forEach((item,i) => {
+      const div = document.createElement("div");
+      div.className = "tf-item";
+      div.innerHTML = `
+        <span>${i+1}. ${item.text}</span>
+        <span class="tf-buttons">
+          <button onclick="selectTF(${i}, true, this)" id="tf${i}true">True</button>
+          <button onclick="selectTF(${i}, false, this)" id="tf${i}false">False</button>
+        </span>`;
+      list.appendChild(div);
+    });
+  }
+
+  const tfSelected = {};
+  function selectTF(i, val, btn){
+    tfSelected[i] = val;
+    document.getElementById("tf"+i+"true").classList.remove("selected-true");
+    document.getElementById("tf"+i+"false").classList.remove("selected-false");
+    if(val) btn.classList.add("selected-true");
+    else btn.classList.add("selected-false");
+  }
+
+  function checkTF(){
+    let score = 0;
+    tfData.forEach((item,i) => {
+      if(tfSelected[i] === item.answer) score++;
+    });
+    const fb = document.getElementById("tfFeedback");
+    fb.className = "feedback show " + (score === tfData.length ? "good" : "mixed");
+    fb.textContent = `Правильно: ${score} из ${tfData.length}.`;
+    updateScore("tf", score, tfData.length);
+  }
+
+  /* ---------------- TASK 5: MULTIPLE CHOICE ---------------- */
+  const mcData = [
+    {
+      q: "According to Damian Grimshaw, what mainly explains British workers' low 'work intensity' scores?",
+      options: ["Low salaries compared to Europe", "Pace, cost efficiencies, meeting targets and deadlines", "A shortage of qualified staff", "Too much time spent in training"],
+      correct: 1
+    },
+    {
+      q: "What system did Emma Stewart trial in the construction industry?",
+      options: ["A four-day working week", "Paying workers only for completed tasks, not hours on site", "Remote work for all builders", "Higher hourly wages for night shifts"],
+      correct: 1
+    },
+    {
+      q: "What was the result of the construction trial, according to the workers' feedback?",
+      options: ["Projects were delayed but cheaper", "Work-life balance scores doubled and overtime was reduced", "Workers earned less overall", "Nothing changed"],
+      correct: 1
+    }
+  ];
+
+  function buildMC(){
+    const list = document.getElementById("mcList");
+    mcData.forEach((item,i) => {
+      const div = document.createElement("div");
+      div.className = "mc-question";
+      let optsHtml = item.options.map((opt,j) => `
+        <label><input type="radio" name="mc${i}" value="${j}"> ${opt}</label>
+      `).join("");
+      div.innerHTML = `<p>${i+1}. ${item.q}</p><div class="mc-options">${optsHtml}</div>`;
+      list.appendChild(div);
+    });
+  }
+
+  function checkMC(){
+    let score = 0;
+    mcData.forEach((item,i) => {
+      const chosen = document.querySelector(`input[name="mc${i}"]:checked`);
+      if(chosen && parseInt(chosen.value) === item.correct) score++;
+    });
+    const fb = document.getElementById("mcFeedback");
+    fb.className = "feedback show " + (score === mcData.length ? "good" : "mixed");
+    fb.textContent = `Правильно: ${score} из ${mcData.length}.`;
+    updateScore("mc", score, mcData.length);
+  }
+
+  /* ---------------- SCORE TRACKER ---------------- */
+  const scores = { match:0, gap:0, tf:0, mc:0 };
+  const maxes = { match:6, gap:6, tf:4, mc:3 };
+
+  function updateScore(key, val, max){
+    scores[key] = val;
+    maxes[key] = max;
+    const total = Object.values(scores).reduce((a,b)=>a+b,0);
+    const maxTotal = Object.values(maxes).reduce((a,b)=>a+b,0);
+    document.getElementById("scoreDisplay").textContent = `${total} / ${maxTotal}`;
+  }
+
+  buildMatch();
+  buildTF();
+  buildMC();
+  updateScore("match",0,6);
+  updateScore("gap",0,6);
+  updateScore("tf",0,4);
+  updateScore("mc",0,3);
+</script>
+
+</body>
+</html>
