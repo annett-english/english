@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weather · Отработка лексики и грамматики</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --sky-deep:#1B2A4A;
+    --sky-mid:#3E6FA6;
+    --sky-light:#EAF2FB;
+    --sun:#F2B33D;
+    --rain:#2C6E9B;
+    --cloud:#8A94A6;
+    --cream:#FBF8F2;
+    --ink:#1B2A4A;
+    --good:#2E7D4F;
+    --bad:#C1462F;
+    --line:#D8DEE8;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--sky-light);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    line-height:1.55;
+    padding-bottom:80px;
+  }
+  h1,h2,h3{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    margin:0 0 .4em 0;
+  }
+  .mono{font-family:'JetBrains Mono',monospace;}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    background:linear-gradient(180deg,var(--sky-deep) 0%, var(--sky-mid) 70%, #6FA8D6 100%);
+    color:#fff;
+    padding:64px 24px 100px;
+    position:relative;
+    overflow:hidden;
+  }
+  .hero-inner{max-width:880px;margin:0 auto;position:relative;z-index:2;}
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    font-size:12px;
+    color:#BFD6EF;
+    margin-bottom:14px;
+  }
+  .hero h1{font-size:clamp(32px,5vw,52px);color:#fff;max-width:640px;}
+  .hero p{color:#DCE9F7;max-width:560px;font-size:16px;}
+  .sun-glyph{
+    position:absolute;top:-40px;right:-40px;
+    width:220px;height:220px;border-radius:50%;
+    background:radial-gradient(circle at 35% 35%, #FFE9B0, var(--sun) 60%, transparent 72%);
+    filter:blur(1px);
+    z-index:1;
+  }
+  .cloud-row{position:absolute;bottom:20px;left:0;right:0;height:60px;z-index:1;opacity:.9;}
+
+  /* ---------- forecast strip (signature element) ---------- */
+  .forecast-strip{
+    max-width:880px;margin:-64px auto 0;padding:0 24px;position:relative;z-index:3;
+  }
+  .strip-card{
+    background:var(--cream);
+    border-radius:18px;
+    box-shadow:0 20px 40px -18px rgba(27,42,74,.35);
+    display:flex;
+    overflow-x:auto;
+  }
+  .strip-cell{
+    flex:1 0 110px;
+    padding:20px 14px;
+    text-align:center;
+    border-right:1px solid var(--line);
+  }
+  .strip-cell:last-child{border-right:none;}
+  .strip-cell .day{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--cloud);}
+  .strip-cell svg{width:38px;height:38px;margin:8px 0;}
+  .strip-cell .temp{font-family:'Fraunces',serif;font-weight:600;font-size:20px;}
+  .strip-cell .word{font-size:12px;color:var(--sky-mid);}
+
+  /* ---------- layout ---------- */
+  main{max-width:880px;margin:56px auto 0;padding:0 24px;}
+  section{margin-bottom:56px;}
+  .card{
+    background:var(--cream);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:28px 30px;
+  }
+  .section-label{
+    display:flex;align-items:center;gap:10px;
+    margin-bottom:18px;
+  }
+  .section-label .icon{
+    width:30px;height:30px;flex:none;
+  }
+  .section-label h2{font-size:22px;margin:0;}
+
+  /* vocab table */
+  .vocab-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+    gap:10px 18px;
+  }
+  .vocab-item{
+    display:flex;justify-content:space-between;gap:10px;
+    padding:9px 4px;
+    border-bottom:1px dashed var(--line);
+    font-size:15px;
+  }
+  .vocab-item b{font-weight:600;}
+  .vocab-item span{color:var(--sky-mid);}
+
+  /* notes */
+  .note{
+    background:#fff;
+    border-left:4px solid var(--sun);
+    border-radius:0 10px 10px 0;
+    padding:16px 20px;
+    margin:14px 0;
+    font-size:15px;
+  }
+  .note b{color:var(--rain);}
+  .compare{
+    display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:12px;
+  }
+  .compare div{
+    background:#fff;border-radius:10px;padding:14px 16px;border:1px solid var(--line);
+  }
+  .compare .label{font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--rain);margin-bottom:6px;}
+
+  .expr-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px;}
+  .expr-item{background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 16px;font-size:14.5px;}
+  .expr-item .en{font-weight:600;}
+  .expr-item .ru{color:var(--cloud);font-size:13px;}
+
+  /* exercises */
+  .ex{
+    counter-increment:ex;
+    background:var(--cream);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:26px 28px;
+    margin-bottom:22px;
+  }
+  .ex-head{display:flex;align-items:baseline;gap:12px;margin-bottom:14px;}
+  .ex-num{
+    font-family:'Fraunces',serif;font-weight:700;font-size:26px;color:var(--sun);
+    -webkit-text-stroke:1px var(--sky-deep);
+  }
+  .ex-title{font-family:'Fraunces',serif;font-weight:600;font-size:19px;}
+  .ex-instructions{color:var(--sky-mid);font-size:14px;margin-bottom:16px;}
+
+  .task-line{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:10px 0;font-size:15.5px;}
+  select, input[type=text]{
+    font-family:'Inter',sans-serif;
+    font-size:14.5px;
+    padding:6px 10px;
+    border:1px solid var(--line);
+    border-radius:8px;
+    background:#fff;
+    color:var(--ink);
+  }
+  input[type=text]{min-width:160px;}
+  input[type=text].wide{min-width:320px;width:100%;margin-top:4px;}
+
+  .choices{display:flex;gap:10px;flex-wrap:wrap;margin:6px 0 14px;}
+  .choice-btn{
+    padding:7px 14px;border-radius:20px;border:1px solid var(--line);
+    background:#fff;cursor:pointer;font-size:14px;font-family:'Inter',sans-serif;
+    transition:.15s;
+  }
+  .choice-btn:hover{border-color:var(--sky-mid);}
+  .choice-btn.selected{background:var(--sky-mid);color:#fff;border-color:var(--sky-mid);}
+  .choice-btn.correct{background:var(--good);color:#fff;border-color:var(--good);}
+  .choice-btn.incorrect{background:var(--bad);color:#fff;border-color:var(--bad);}
+
+  .tf-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px dashed var(--line);gap:12px;}
+  .tf-row:last-child{border-bottom:none;}
+  .tf-text{font-size:15px;flex:1;}
+  .tf-btns{display:flex;gap:6px;flex:none;}
+  .tf-btns button{width:38px;height:32px;border-radius:8px;border:1px solid var(--line);background:#fff;cursor:pointer;font-weight:600;}
+
+  .check-btn{
+    margin-top:10px;
+    background:var(--sky-deep);color:#fff;border:none;
+    padding:9px 18px;border-radius:24px;cursor:pointer;font-size:14px;font-family:'Inter',sans-serif;font-weight:600;
+  }
+  .check-btn:hover{background:var(--rain);}
+  .reveal-btn{
+    margin-top:10px;margin-left:8px;
+    background:transparent;color:var(--sky-mid);border:1px solid var(--sky-mid);
+    padding:8px 16px;border-radius:24px;cursor:pointer;font-size:13.5px;font-family:'Inter',sans-serif;
+  }
+  .feedback{margin-top:12px;font-size:14px;padding:10px 14px;border-radius:8px;display:none;}
+  .feedback.ok{background:#E4F3EA;color:var(--good);display:block;}
+  .feedback.no{background:#FBE7E2;color:var(--bad);display:block;}
+  .answer-box{
+    margin-top:12px;padding:12px 16px;background:#F1F6FB;border-radius:10px;font-size:14px;color:var(--rain);display:none;
+  }
+  .answer-box.show{display:block;}
+
+  /* picture exercise */
+  .weather-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:16px;}
+  .weather-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;text-align:center;}
+  .weather-card svg{width:64px;height:64px;}
+  .weather-card .city{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--cloud);margin-top:6px;}
+  .weather-card .deg{font-family:'Fraunces',serif;font-size:22px;font-weight:600;}
+  .weather-card textarea{
+    width:100%;margin-top:10px;min-height:56px;
+    font-family:'Inter',sans-serif;font-size:13.5px;border:1px solid var(--line);border-radius:8px;padding:8px;resize:vertical;
+  }
+
+  footer{max-width:880px;margin:0 auto;padding:20px 24px 60px;color:var(--cloud);font-size:13px;text-align:center;}
+
+  @media(max-width:560px){
+    .compare,.expr-grid{grid-template-columns:1fr;}
+    .hero{padding:48px 18px 90px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="sun-glyph"></div>
+  <div class="hero-inner">
+    <div class="eyebrow">Lesson · Weather &amp; Forecast</div>
+    <h1>What's the weather like today?</h1>
+    <p>Лексика, грамматика и восемь упражнений на тему погоды: от базовых слов до вопроса «What was it like?» и живых выражений вроде <span class="mono">put on makeup</span>.</p>
+  </div>
+</div>
+
+<div class="forecast-strip">
+  <div class="strip-card" id="forecastStrip"></div>
+</div>
+
+<main>
+
+  <!-- VOCABULARY -->
+  <section>
+    <div class="section-label">
+      <svg class="icon" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="5" fill="#F2B33D"/><g stroke="#F2B33D" stroke-width="2" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="23"/><line x1="1" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="23" y2="12"/></g></svg>
+      <h2>Vocabulary</h2>
+    </div>
+    <div class="card">
+      <div class="vocab-grid">
+        <div class="vocab-item"><b>fog / foggy</b><span>туман / туманно</span></div>
+        <div class="vocab-item"><b>rain / raining / rainy</b><span>дождь / идёт дождь / дождливо</span></div>
+        <div class="vocab-item"><b>cloud / cloudy</b><span>облако / облачно</span></div>
+        <div class="vocab-item"><b>snow / snowing</b><span>снег / идёт снег</span></div>
+        <div class="vocab-item"><b>sun / sunny</b><span>солнце / солнечно</span></div>
+        <div class="vocab-item"><b>wind / windy</b><span>ветер / ветрено</span></div>
+        <div class="vocab-item"><b>warm</b><span>тепло</span></div>
+        <div class="vocab-item"><b>cool</b><span>прохладно</span></div>
+        <div class="vocab-item"><b>dry</b><span>сухо</span></div>
+        <div class="vocab-item"><b>wet</b><span>мокро, сыро</span></div>
+        <div class="vocab-item"><b>hot</b><span>жарко</span></div>
+        <div class="vocab-item"><b>cold</b><span>холодно</span></div>
+        <div class="vocab-item"><b>degree / degrees</b><span>градус / градусы</span></div>
+        <div class="vocab-item"><b>typical weather</b><span>типичная погода</span></div>
+        <div class="vocab-item"><b>the weather forecast</b><span>прогноз погоды</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GRAMMAR NOTES -->
+  <section>
+    <div class="section-label">
+      <svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M4 18c0-4 3-7 8-7s8 3 8 7" stroke="#3E6FA6" stroke-width="2" stroke-linecap="round"/><circle cx="7" cy="9" r="2.4" fill="#8A94A6"/><circle cx="12" cy="7" r="3" fill="#8A94A6"/><circle cx="17" cy="9" r="2.4" fill="#8A94A6"/></svg>
+      <h2>Грамматика: разбор</h2>
+    </div>
+    <div class="card">
+      <div class="note">
+        <b>it's rainy</b> vs <b>it's raining</b> — в чём разница?
+        <div class="compare">
+          <div>
+            <div class="label">it's rainy</div>
+            <p style="margin:0;">Описание <b>типичной / общей</b> погоды — прилагательное. Похоже на <span class="mono">it's cold / it's sunny</span>.<br><i>London is rainy in autumn.</i></p>
+          </div>
+          <div>
+            <div class="label">it's raining</div>
+            <p style="margin:0;">Действие, которое происходит <b>прямо сейчас</b> — Present Continuous от глагола <span class="mono">to rain</span>.<br><i>Take an umbrella — it's raining!</i></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="note">
+        <b>What's the weather like today?</b> — «Какая сегодня погода?»<br>
+        <span class="mono">What is</span> = <span class="mono">What's</span>. Частица <b>like</b> здесь переводится как «как, какой» — она спрашивает не про сходство, а про <b>качество / характеристику</b> предмета или ситуации.
+        <ul style="margin:10px 0 0 18px;padding:0;">
+          <li><span class="mono">What was the weather like yesterday?</span> — Какая была погода вчера?</li>
+        </ul>
+        <p style="margin:10px 0 0;">По этой же модели можно спросить о <b>чём угодно</b>:</p>
+        <p class="mono" style="margin:6px 0 0;">What was _______ like?</p>
+        <ul style="margin:8px 0 0 18px;padding:0;">
+          <li><span class="mono">What was the hotel like?</span> — Какой был отель?</li>
+          <li><span class="mono">What was the cafe like?</span> — Как было в кафе?</li>
+          <li><span class="mono">What was the food like?</span> — Какая была еда?</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXPRESSIONS -->
+  <section>
+    <div class="section-label">
+      <svg class="icon" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="14" rx="2" stroke="#3E6FA6" stroke-width="2"/><path d="M3 8h18" stroke="#3E6FA6" stroke-width="2"/></svg>
+      <h2>Полезные выражения</h2>
+    </div>
+    <div class="card">
+      <div class="expr-grid">
+        <div class="expr-item"><div class="en">go outside</div><div class="ru">выйти на улицу — без "to the"</div></div>
+        <div class="expr-item"><div class="en">check the weather forecast</div><div class="ru">проверить прогноз погоды</div></div>
+        <div class="expr-item"><div class="en">on holiday / on Christmas holiday</div><div class="ru">в отпуске / на рождественских каникулах — <b>on</b>, не <i>at</i></div></div>
+        <div class="expr-item"><div class="en">put on makeup / put on your makeup</div><div class="ru">накраситься — <span class="mono">makeup</span> пишется слитно, без пробела</div></div>
+        <div class="expr-item"><div class="en">the weather</div><div class="ru">погода — почти всегда с артиклем <b>the</b></div></div>
+        <div class="expr-item"><div class="en">temperature</div><div class="ru">произношение: <span class="mono">/ˈtem.prə.tʃər/</span> — ударение на первый слог, «tem-pra-cher»</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= EXERCISES ================= -->
+  <section>
+    <div class="section-label">
+      <svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4M4.9 19.1l2.8-2.8M16.3 7.7l2.8-2.8" stroke="#2C6E9B" stroke-width="2" stroke-linecap="round"/></svg>
+      <h2>Упражнения</h2>
+    </div>
+
+    <!-- EX 1: translation match -->
+    <div class="ex">
+      <div class="ex-head"><span class="ex-num">1</span><span class="ex-title">Переведи слово</span></div>
+      <p class="ex-instructions">Выбери правильный перевод для каждого слова.</p>
+      <div id="ex1"></div>
+      <button class="check-btn" onclick="checkEx1()">Проверить</button>
+      <div class="feedback" id="ex1-feedback"></div>
+    </div>
+
+    <!-- EX 2: fill the gap -->
+    <div class="ex">
+      <div class="ex-head"><span class="ex-num">2</span><span class="ex-title">Заполни пропуск</span></div>
+      <p class="ex-instructions">Выбери подходящее слово из списка: <span class="mono">foggy, snowing, windy, warm, dry, degrees</span>.</p>
+      <div id="ex2"></div>
+      <button class="check-btn" onclick="checkEx2()">Проверить</button>
+      <div class="feedback" id="ex2-feedback"></div>
+    </div>
+
+    <!-- EX 3: picture description -->
+    <div class="ex">
+      <div class="ex-head"><span class="ex-num">3</span><span class="ex-title">Опиши погоду по картинке</span></div>
+      <p class="ex-instructions">Посмотри на карточки прогноза и опиши погоду для каждого города одним-двумя предложениями. Например: <i>The weather is sunny. It's 20 degrees.</i></p>
+      <div class="weather-cards" id="ex3"></div>
+      <button class="reveal-btn" onclick="toggleAnswers('ex3-answers')">Показать пример ответа</button>
+      <div class="answer-box" id="ex3-answers">
+        <p style="margin:.2em 0;"><b>London:</b> The weather is cloudy and rainy. It's 12 degrees.</p>
+        <p style="margin:.2em 0;"><b>Moscow:</b> It's snowing and it's very cold — minus 5 degrees.</p>
+        <p style="margin:.2em 0;"><b>Dubai:</b> The weather is sunny and hot. It's 35 degrees.</p>
+        <p style="margin:.2em 0;"><b>Reykjavik:</b> It's windy and foggy today. It's 3 degrees.</p>
+      </div>
+    </div>
+
+    <!-- EX 4: correct form -->
+    <div class="ex">
+      <div class="ex-head"><span class="ex-num">4</span><span class="ex-title">Выбери правильную форму</span></div>
+      <p class="ex-instructions">rain / rainy / raining — выбери нужную форму.</p>
+      <div id="ex4"></div>
+      <button class="check-btn" onclick="checkEx4()">Проверить</button>
+      <div class="feedback" id="ex4-feedback"></div>
+    </div>
+
+    <!-- EX 5: form questions with "like" -->
+    <div class="ex">
+      <div class="ex-head"><span class="ex-num">5</span><span class="ex-title">Составь вопрос со словом "like"</span></div>
+      <p class="ex-instructions">Переведи вопрос на английский, используя модель <span class="mono">What was ... like?</span> или <span class="mono">What's ... like?</span>. Напиши ответ и нажми «Проверить».</p>
+      <div id="ex5"></div>
+      <button class="check-btn" onclick="checkEx5()">Проверить</button>
+      <div class="feedback" id="ex5-feedback"></div>
+    </div>
+
+    <!-- EX 6: translate with expressions -->
+    <div class="ex">
+      <div class="ex-head"><span class="ex-num">6</span><span class="ex-title">Переведи предложение</span></div>
+      <p class="ex-instructions">Используй выражения: <span class="mono">go outside, check the weather forecast, on holiday, put on makeup, the weather</span>.</p>
+      <div id="ex6"></div>
+      <button class="check-btn" onclick="checkEx6()">Проверить</button>
+      <div class="feedback" id="ex6-feedback"></div>
+    </div>
+
+    <!-- EX 7: true/false reading -->
+    <div class="ex">
+      <div class="ex-head"><span class="ex-num">7</span><span class="ex-title">Прочитай прогноз погоды: True or False</span></div>
+      <p class="ex-instructions">
+        <i>"Good morning! Here is today's weather forecast. It's cloudy and cool in the morning, about 10 degrees. In the afternoon it will be warmer and sunny, around 17 degrees. In the evening it will get windy, so don't forget your jacket if you go outside. Tomorrow it's going to be rainy all day."</i>
+      </p>
+      <div id="ex7"></div>
+      <button class="check-btn" onclick="checkEx7()">Проверить</button>
+      <div class="feedback" id="ex7-feedback"></div>
+    </div>
+
+    <!-- EX 8: pronunciation stress -->
+    <div class="ex">
+      <div class="ex-head"><span class="ex-num">8</span><span class="ex-title">Произношение: где ударение?</span></div>
+      <p class="ex-instructions">Отметь ударный слог в слове <span class="mono">temperature</span> и <span class="mono">degree</span>.</p>
+      <div id="ex8"></div>
+      <button class="check-btn" onclick="checkEx8()">Проверить</button>
+      <div class="feedback" id="ex8-feedback"></div>
+    </div>
+
+  </section>
+</main>
+
+<footer>Weather &amp; Forecast · lesson material</footer>
+
+<script>
+/* ---------------- SVG weather icons ---------------- */
+function iconSun(){return `<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="5" fill="#F2B33D"/><g stroke="#F2B33D" stroke-width="2" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="23"/><line x1="1" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="23" y2="12"/><line x1="4.2" y1="4.2" x2="6.3" y2="6.3"/><line x1="17.7" y1="17.7" x2="19.8" y2="19.8"/><line x1="19.8" y1="4.2" x2="17.7" y2="6.3"/><line x1="6.3" y1="17.7" x2="4.2" y2="19.8"/></g></svg>`;}
+function iconCloud(){return `<svg viewBox="0 0 24 24" fill="none"><path d="M6.5 18a4.2 4.2 0 0 1-.5-8.37A5 5 0 0 1 15.6 8.1 4.5 4.5 0 0 1 17.5 18h-11z" fill="#AEB8C8"/></svg>`;}
+function iconRain(){return `<svg viewBox="0 0 24 24" fill="none"><path d="M6.5 14a4.2 4.2 0 0 1-.5-8.37A5 5 0 0 1 15.6 4.1 4.5 4.5 0 0 1 17.5 14h-11z" fill="#AEB8C8"/><g stroke="#3E6FA6" stroke-width="1.6" stroke-linecap="round"><line x1="7" y1="17" x2="6" y2="21"/><line x1="12" y1="17" x2="11" y2="21"/><line x1="17" y1="17" x2="16" y2="21"/></g></svg>`;}
+function iconSnow(){return `<svg viewBox="0 0 24 24" fill="none"><path d="M6.5 13a4.2 4.2 0 0 1-.5-8.37A5 5 0 0 1 15.6 3.1 4.5 4.5 0 0 1 17.5 13h-11z" fill="#C7D3E0"/><g stroke="#3E6FA6" stroke-width="1.5" stroke-linecap="round"><line x1="7" y1="17" x2="7" y2="21"/><line x1="7" y1="17" x2="5.3" y2="19"/><line x1="7" y1="17" x2="8.7" y2="19"/><line x1="17" y1="17" x2="17" y2="21"/><line x1="17" y1="17" x2="15.3" y2="19"/><line x1="17" y1="17" x2="18.7" y2="19"/></g></svg>`;}
+function iconWindFog(){return `<svg viewBox="0 0 24 24" fill="none"><g stroke="#8A94A6" stroke-width="2" stroke-linecap="round"><line x1="3" y1="9" x2="16" y2="9"/><line x1="3" y1="13" x2="19" y2="13"/><line x1="3" y1="17" x2="14" y2="17"/></g></svg>`;}
+
+/* ---------------- forecast strip ---------------- */
+const strip = [
+  {day:"Mon", icon:iconSun(), temp:"22°", word:"sunny"},
+  {day:"Tue", icon:iconCloud(), temp:"17°", word:"cloudy"},
+  {day:"Wed", icon:iconRain(), temp:"13°", word:"rainy"},
+  {day:"Thu", icon:iconWindFog(), temp:"9°", word:"windy"},
+  {day:"Fri", icon:iconSnow(), temp:"-2°", word:"snowy"},
+];
+document.getElementById('forecastStrip').innerHTML = strip.map(d=>`
+  <div class="strip-cell">
+    <div class="day">${d.day}</div>
+    ${d.icon}
+    <div class="temp">${d.temp}</div>
+    <div class="word">${d.word}</div>
+  </div>`).join('');
+
+/* ---------------- EX 1 ---------------- */
+const ex1data = [
+  {w:"foggy", opts:["туманно","снежно","сухо"], a:0},
+  {w:"cloudy", opts:["солнечно","облачно","ветрено"], a:1},
+  {w:"dry", opts:["мокро","сухо","тепло"], a:1},
+  {w:"typical weather", opts:["прогноз погоды","типичная погода","погодные условия"], a:1},
+];
+document.getElementById('ex1').innerHTML = ex1data.map((q,i)=>`
+  <div class="task-line">
+    <b>${q.w}</b> —
+    <span class="choices" id="ex1-${i}">
+      ${q.opts.map((o,j)=>`<button class="choice-btn" onclick="select('ex1-${i}',${j},this)">${o}</button>`).join('')}
+    </span>
+  </div>`).join('');
+
+function select(groupId, idx, btn){
+  document.getElementById(groupId).querySelectorAll('.choice-btn').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+  btn.dataset.picked = idx;
+}
+function checkEx1(){
+  let correct=0;
+  ex1data.forEach((q,i)=>{
+    const group = document.getElementById(`ex1-${i}`);
+    const buttons = group.querySelectorAll('.choice-btn');
+    let picked = null;
+    buttons.forEach((b,j)=>{ if(b.classList.contains('selected')) picked=j; b.classList.remove('correct','incorrect');});
+    buttons[q.a].classList.add('correct');
+    if(picked===q.a) correct++;
+    else if(picked!==null) buttons[picked].classList.add('incorrect');
+  });
+  showFeedback('ex1-feedback', correct, ex1data.length);
+}
+
+/* ---------------- EX 2 ---------------- */
+const ex2data = [
+  {sentence:"London is often ___ in autumn — you can't see far ahead.", a:"foggy"},
+  {sentence:"Look outside, it's ___! Let's build a snowman.", a:"snowing"},
+  {sentence:"Hold your hat, it's really ___ today!", a:"windy"},
+  {sentence:"In summer it's very ___ here, about 30 ___.", a:"warm"},
+  {sentence:"The desert air is very ___ — almost no rain all year.", a:"dry"},
+];
+document.getElementById('ex2').innerHTML = ex2data.map((q,i)=>`
+  <div class="task-line">${q.sentence.replace('___', `<input type="text" id="ex2-${i}" placeholder="слово">`).replace('___', `<input type="text" placeholder="число">`)}</div>
+`).join('');
+function checkEx2(){
+  let correct=0;
+  ex2data.forEach((q,i)=>{
+    const input = document.getElementById(`ex2-${i}`);
+    const val = input.value.trim().toLowerCase();
+    if(val===q.a){ input.style.borderColor='var(--good)'; correct++; }
+    else{ input.style.borderColor='var(--bad)'; }
+  });
+  showFeedback('ex2-feedback', correct, ex2data.length);
+}
+
+/* ---------------- EX 3 ---------------- */
+const ex3data = [
+  {city:"London", icon:iconRain(), deg:"12°"},
+  {city:"Moscow", icon:iconSnow(), deg:"-5°"},
+  {city:"Dubai", icon:iconSun(), deg:"35°"},
+  {city:"Reykjavik", icon:iconWindFog(), deg:"3°"},
+];
+document.getElementById('ex3').innerHTML = ex3data.map(c=>`
+  <div class="weather-card">
+    ${c.icon}
+    <div class="city">${c.city}</div>
+    <div class="deg">${c.deg}</div>
+    <textarea placeholder="The weather is ..."></textarea>
+  </div>`).join('');
+function toggleAnswers(id){
+  document.getElementById(id).classList.toggle('show');
+}
+
+/* ---------------- EX 4 ---------------- */
+const ex4data = [
+  {sentence:"Take an umbrella, it's ___ outside right now.", opts:["rain","rainy","raining"], a:2},
+  {sentence:"Autumn in this city is usually ___.", opts:["rain","rainy","raining"], a:1},
+  {sentence:"We need more ___ for the plants to grow.", opts:["rain","rainy","raining"], a:0},
+];
+document.getElementById('ex4').innerHTML = ex4data.map((q,i)=>`
+  <div class="task-line" style="display:block;">
+    <div>${q.sentence}</div>
+    <span class="choices" id="ex4-${i}">
+      ${q.opts.map((o,j)=>`<button class="choice-btn" onclick="select('ex4-${i}',${j},this)">${o}</button>`).join('')}
+    </span>
+  </div>`).join('');
+function checkEx4(){
+  let correct=0;
+  ex4data.forEach((q,i)=>{
+    const group = document.getElementById(`ex4-${i}`);
+    const buttons = group.querySelectorAll('.choice-btn');
+    let picked = null;
+    buttons.forEach((b,j)=>{ if(b.classList.contains('selected')) picked=j; b.classList.remove('correct','incorrect');});
+    buttons[q.a].classList.add('correct');
+    if(picked===q.a) correct++;
+    else if(picked!==null) buttons[picked].classList.add('incorrect');
+  });
+  showFeedback('ex4-feedback', correct, ex4data.length);
+}
+
+/* ---------------- EX 5 ---------------- */
+const ex5data = [
+  {ru:"Какая сегодня погода?", a:["what's the weather like today","what is the weather like today"]},
+  {ru:"Какая была погода вчера?", a:["what was the weather like yesterday"]},
+  {ru:"Какой был отель?", a:["what was the hotel like"]},
+  {ru:"Какая была еда в кафе?", a:["what was the food like"]},
+];
+document.getElementById('ex5').innerHTML = ex5data.map((q,i)=>`
+  <div class="task-line" style="display:block;">
+    <div>${q.ru}</div>
+    <input type="text" class="wide" id="ex5-${i}" placeholder="What ... like?">
+  </div>`).join('');
+function normalize(s){ return s.trim().toLowerCase().replace(/[?.!]/g,'').replace(/\s+/g,' '); }
+function checkEx5(){
+  let correct=0;
+  ex5data.forEach((q,i)=>{
+    const input = document.getElementById(`ex5-${i}`);
+    const val = normalize(input.value);
+    if(q.a.includes(val)){ input.style.borderColor='var(--good)'; correct++; }
+    else{ input.style.borderColor='var(--bad)'; }
+  });
+  showFeedback('ex5-feedback', correct, ex5data.length, true, 'ex5');
+}
+
+/* ---------------- EX 6 ---------------- */
+const ex6data = [
+  {ru:"Проверь прогноз погоды перед тем, как выйти на улицу.", a:["check the weather forecast before you go outside"]},
+  {ru:"Мы едем в отпуск на Рождество.", a:["we are going on christmas holiday","we're going on christmas holiday"]},
+  {ru:"Она красится каждое утро.", a:["she puts on makeup every morning"]},
+  {ru:"Какая сегодня погода — тепло?", a:["what's the weather like today is it warm","what is the weather like today is it warm"]},
+];
+document.getElementById('ex6').innerHTML = ex6data.map((q,i)=>`
+  <div class="task-line" style="display:block;">
+    <div>${q.ru}</div>
+    <input type="text" class="wide" id="ex6-${i}" placeholder="Type your translation...">
+  </div>`).join('');
+function checkEx6(){
+  let correct=0;
+  ex6data.forEach((q,i)=>{
+    const input = document.getElementById(`ex6-${i}`);
+    const val = normalize(input.value);
+    if(q.a.includes(val)){ input.style.borderColor='var(--good)'; correct++; }
+    else{ input.style.borderColor='var(--bad)'; }
+  });
+  showFeedback('ex6-feedback', correct, ex6data.length, true, 'ex6');
+}
+
+/* ---------------- EX 7 ---------------- */
+const ex7data = [
+  {s:"In the morning it's sunny and warm.", a:false},
+  {s:"In the afternoon the temperature is around 17 degrees.", a:true},
+  {s:"In the evening it becomes windy.", a:true},
+  {s:"Tomorrow the weather will be dry all day.", a:false},
+];
+document.getElementById('ex7').innerHTML = ex7data.map((q,i)=>`
+  <div class="tf-row">
+    <div class="tf-text">${q.s}</div>
+    <div class="tf-btns" id="ex7-${i}">
+      <button onclick="pickTF('ex7-${i}',true,this)">T</button>
+      <button onclick="pickTF('ex7-${i}',false,this)">F</button>
+    </div>
+  </div>`).join('');
+function pickTF(groupId, val, btn){
+  const group = document.getElementById(groupId);
+  group.querySelectorAll('button').forEach(b=>{b.style.background='#fff'; b.style.color='var(--ink)';});
+  btn.style.background='var(--sky-mid)'; btn.style.color='#fff';
+  group.dataset.picked = val;
+}
+function checkEx7(){
+  let correct=0;
+  ex7data.forEach((q,i)=>{
+    const group = document.getElementById(`ex7-${i}`);
+    const picked = group.dataset.picked;
+    const buttons = group.querySelectorAll('button');
+    buttons.forEach(b=>{b.style.background='#fff'; b.style.color='var(--ink)'; b.style.borderColor='var(--line)';});
+    const rightBtn = buttons[q.a ? 0 : 1];
+    rightBtn.style.background='var(--good)'; rightBtn.style.color='#fff'; rightBtn.style.borderColor='var(--good)';
+    if(picked!==undefined && (picked==='true')===q.a) correct++;
+  });
+  showFeedback('ex7-feedback', correct, ex7data.length);
+}
+
+/* ---------------- EX 8 ---------------- */
+document.getElementById('ex8').innerHTML = `
+  <div class="task-line" style="display:block;">
+    <div style="margin-bottom:8px;"><b>temperature</b></div>
+    <span class="choices" id="ex8-0">
+      <button class="choice-btn" onclick="select('ex8-0',0,this)">TEM-pe-ra-ture</button>
+      <button class="choice-btn" onclick="select('ex8-0',1,this)">tem-pe-RA-ture</button>
+      <button class="choice-btn" onclick="select('ex8-0',2,this)">tem-pe-ra-TURE</button>
+    </span>
+  </div>
+  <div class="task-line" style="display:block;margin-top:16px;">
+    <div style="margin-bottom:8px;"><b>degree</b></div>
+    <span class="choices" id="ex8-1">
+      <button class="choice-btn" onclick="select('ex8-1',0,this)">DEG-ree</button>
+      <button class="choice-btn" onclick="select('ex8-1',1,this)">de-GREE</button>
+    </span>
+  </div>`;
+const ex8data = [{a:0},{a:1}];
+function checkEx8(){
+  let correct=0;
+  ex8data.forEach((q,i)=>{
+    const group = document.getElementById(`ex8-${i}`);
+    const buttons = group.querySelectorAll('.choice-btn');
+    let picked = null;
+    buttons.forEach((b,j)=>{ if(b.classList.contains('selected')) picked=j; b.classList.remove('correct','incorrect');});
+    buttons[q.a].classList.add('correct');
+    if(picked===q.a) correct++;
+    else if(picked!==null) buttons[picked].classList.add('incorrect');
+  });
+  showFeedback('ex8-feedback', correct, ex8data.length);
+}
+
+/* ---------------- shared feedback ---------------- */
+function showFeedback(id, correct, total){
+  const el = document.getElementById(id);
+  el.className = 'feedback ' + (correct===total ? 'ok' : (correct===0 ? 'no' : 'ok'));
+  el.textContent = `Верно: ${correct} из ${total}` + (correct===total ? ' — отлично! 🌤️' : '');
+  el.style.display='block';
+}
+</script>
+</body>
+</html>
