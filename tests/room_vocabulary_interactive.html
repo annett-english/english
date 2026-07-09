@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interactive Review: Extreme Adjectives, Rooms &amp; Furniture, Comparatives</title>
+<style>
+  :root{
+    --ink:#2b3040;
+    --paper:#fdfcf7;
+    --card:#ffffff;
+    --accent:#3f6fb5;
+    --accent-soft:#e8f0fb;
+    --warn:#c65d3b;
+    --warn-soft:#fbeee8;
+    --green:#3d8a5f;
+    --green-soft:#e9f4ec;
+    --red:#c94c4c;
+    --red-soft:#fbe9e9;
+    --line:#d8d5cb;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:"Segoe UI", Verdana, sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+    line-height:1.55;
+  }
+  .wrap{max-width:880px;margin:0 auto;padding:24px 16px 80px;}
+  header{
+    border-bottom:3px solid var(--accent);
+    padding-bottom:12px;
+    margin-bottom:10px;
+  }
+  header h1{margin:0 0 4px;font-size:24px;color:var(--accent);}
+  header p{margin:0;color:#666;font-size:14px;}
+
+  .scorebar{
+    position:sticky;
+    top:0;
+    z-index:50;
+    background:var(--paper);
+    padding:10px 0;
+    border-bottom:1px solid var(--line);
+    margin-bottom:20px;
+  }
+  .scorebar .track{
+    background:#e5e2d8;
+    border-radius:20px;
+    height:16px;
+    overflow:hidden;
+  }
+  .scorebar .fill{
+    background:linear-gradient(90deg,var(--accent),var(--green));
+    height:100%;
+    width:0%;
+    transition:width .5s;
+    border-radius:20px;
+  }
+  .scorebar .label{font-size:13px;color:#666;margin-top:4px;text-align:right;}
+
+  .part{
+    margin:34px 0 10px;
+    font-size:13px;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    color:var(--accent);
+    font-weight:700;
+  }
+  .part.warn{color:var(--warn);}
+  .part.green{color:var(--green);}
+
+  .ex{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:18px 20px;
+    margin-bottom:22px;
+  }
+  .ex h2{margin:0 0 4px;font-size:17px;}
+  .ex .task{margin:0 0 14px;color:#555;font-size:14px;}
+  .num{
+    display:inline-block;
+    background:var(--accent);
+    color:#fff;
+    border-radius:6px;
+    padding:1px 9px;
+    margin-right:8px;
+    font-size:15px;
+  }
+  .warn-ex .num{background:var(--warn);}
+  .green-ex .num{background:var(--green);}
+
+  ol.items{margin:0;padding-left:24px;}
+  ol.items li{margin-bottom:12px;}
+
+  input[type=text]{
+    font-family:inherit;
+    font-size:15px;
+    padding:6px 10px;
+    border:1.5px solid var(--line);
+    border-radius:8px;
+    min-width:150px;
+    background:#fff;
+    color:var(--ink);
+  }
+  input.wide{width:100%;max-width:460px;}
+  input.short{min-width:90px;width:110px;}
+  input:focus{outline:2px solid var(--accent-soft);border-color:var(--accent);}
+  input.ok{border-color:var(--green);background:var(--green-soft);}
+  input.bad{border-color:var(--red);background:var(--red-soft);}
+  select{
+    font-family:inherit;font-size:15px;padding:6px 8px;
+    border:1.5px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);
+  }
+  select.ok{border-color:var(--green);background:var(--green-soft);}
+  select.bad{border-color:var(--red);background:var(--red-soft);}
+
+  .check-row{margin-top:14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+  button.check{
+    background:var(--accent);
+    color:#fff;border:none;border-radius:8px;
+    padding:9px 18px;font-size:15px;cursor:pointer;font-family:inherit;
+  }
+  button.check:hover{filter:brightness(1.1);}
+  .warn-ex button.check{background:var(--warn);}
+  .green-ex button.check{background:var(--green);}
+  .result{font-size:15px;font-weight:600;}
+  .result.good{color:var(--green);}
+  .result.mid{color:#b58a2c;}
+  .result.bad{color:var(--red);}
+
+  /* word bank chips */
+  .bank{
+    background:var(--accent-soft);
+    border-radius:10px;
+    padding:10px 12px;
+    margin-bottom:14px;
+    display:flex;flex-wrap:wrap;gap:8px;
+    min-height:46px;
+  }
+  .chip{
+    background:#fff;
+    border:1.5px solid var(--accent);
+    color:var(--accent);
+    border-radius:20px;
+    padding:4px 14px;
+    font-size:15px;
+    cursor:pointer;
+    user-select:none;
+    transition:transform .1s;
+  }
+  .chip:hover{transform:scale(1.06);}
+  .chip.selected{background:var(--accent);color:#fff;box-shadow:0 0 0 3px var(--accent-soft);}
+  .chip.used{opacity:.25;pointer-events:none;}
+
+  .pic-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(125px,1fr));
+    gap:12px;
+  }
+  .pic-card{
+    border:2px solid var(--line);
+    border-radius:12px;
+    text-align:center;
+    padding:12px 6px 10px;
+    background:#fff;
+    cursor:pointer;
+    transition:border-color .15s, transform .1s;
+  }
+  .pic-card:hover{border-color:var(--accent);transform:translateY(-2px);}
+  .pic-card .emoji{font-size:38px;line-height:1.2;}
+  .pic-card .slot{
+    margin-top:10px;
+    min-height:26px;
+    border-radius:8px;
+    background:var(--accent-soft);
+    font-size:14px;
+    display:flex;align-items:center;justify-content:center;
+    padding:2px 4px;
+    color:var(--accent);
+    font-weight:600;
+  }
+  .pic-card.ok{border-color:var(--green);background:var(--green-soft);}
+  .pic-card.ok .slot{background:#fff;color:var(--green);}
+  .pic-card.bad{border-color:var(--red);background:var(--red-soft);}
+  .pic-card.bad .slot{background:#fff;color:var(--red);}
+
+  /* room columns */
+  .rooms{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;}
+  .room-col{
+    border:2px dashed var(--line);
+    border-radius:12px;
+    padding:10px;
+    min-height:150px;
+    cursor:pointer;
+    transition:border-color .15s;
+  }
+  .room-col:hover{border-color:var(--accent);}
+  .room-col h3{margin:0 0 8px;font-size:15px;text-align:center;color:var(--accent);}
+  .room-col .dropzone{display:flex;flex-direction:column;gap:6px;}
+  .placed{
+    background:var(--accent-soft);
+    border-radius:8px;
+    padding:3px 10px;
+    font-size:14px;
+    cursor:pointer;
+    text-align:center;
+  }
+  .placed:hover{text-decoration:line-through;}
+  .placed.ok{background:var(--green-soft);color:var(--green);font-weight:600;}
+  .placed.bad{background:var(--red-soft);color:var(--red);font-weight:600;}
+
+  /* odd one out */
+  .odd-row{margin-bottom:12px;}
+  .odd-word{
+    display:inline-block;
+    background:#fff;
+    border:1.5px solid var(--line);
+    border-radius:8px;
+    padding:4px 12px;
+    margin:3px 6px 3px 0;
+    cursor:pointer;
+    font-size:15px;
+  }
+  .odd-word:hover{border-color:var(--accent);}
+  .odd-word.picked{border-color:var(--accent);background:var(--accent-soft);text-decoration:line-through;}
+  .odd-word.ok{border-color:var(--green);background:var(--green-soft);text-decoration:line-through;font-weight:600;}
+  .odd-word.bad{border-color:var(--red);background:var(--red-soft);}
+  .odd-hint{font-size:13px;color:#777;margin-left:4px;}
+
+  .room-plan{
+    background:var(--accent-soft);
+    border-radius:10px;
+    padding:14px;
+    text-align:center;
+    margin-bottom:16px;
+  }
+  .room-plan .row{margin:6px 0;font-size:30px;letter-spacing:14px;}
+  .room-plan .label{font-size:13px;color:#555;}
+
+  .note-box{
+    background:var(--warn-soft);
+    border-left:4px solid var(--warn);
+    border-radius:0 10px 10px 0;
+    padding:14px 18px;
+    margin-bottom:20px;
+    font-size:15px;
+  }
+  .note-box h3{margin:0 0 8px;font-size:15px;color:var(--warn);}
+  .note-box ul{margin:0;padding-left:20px;}
+  .note-box li{margin-bottom:6px;}
+  .ipa{font-family:Georgia,serif;color:var(--warn);font-weight:600;}
+
+  .correct-check{font-size:13px;color:#666;white-space:nowrap;margin-left:8px;}
+
+  .hintline{font-size:13px;color:#888;display:block;margin-top:2px;}
+
+  .celebrate{
+    text-align:center;
+    font-size:18px;
+    padding:20px;
+    display:none;
+  }
+  .celebrate.show{display:block;animation:pop .5s;}
+  @keyframes pop{0%{transform:scale(.7);opacity:0}100%{transform:scale(1);opacity:1}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>Interactive Review 🏠</h1>
+  <p>Extreme adjectives &bull; Rooms &amp; furniture &bull; Prepositions &bull; Comparatives — выполняй задания и нажимай <b>Check!</b></p>
+</header>
+
+<div class="scorebar">
+  <div class="track"><div class="fill" id="progressFill"></div></div>
+  <div class="label" id="progressLabel">0 / 76 баллов</div>
+</div>
+
+<!-- ===================== WARM-UP ===================== -->
+<div class="part">Warm-up — Extreme adjectives</div>
+
+<div class="ex" id="ex1">
+  <h2><span class="num">1</span>Match the pictures to the extreme adjectives.</h2>
+  <p class="task">Нажми на слово, потом на картинку. Чтобы убрать слово — нажми на него в картинке ещё раз.</p>
+  <div class="bank" id="bank1"></div>
+  <div class="pic-grid" id="grid1"></div>
+  <div class="check-row">
+    <button class="check" onclick="checkMatch('1')">Check!</button>
+    <span class="result" id="res1"></span>
+  </div>
+</div>
+
+<div class="ex" id="ex2">
+  <h2><span class="num">2</span>Replace the words in <i>italics</i> with an extreme adjective.</h2>
+  <p class="task">Впиши экстремальное прилагательное. Помни: с ними используем <b>absolutely / really</b>, а не <i>very</i>.</p>
+  <ol class="items">
+    <li>The film was <i>very funny</i>. → The film was absolutely <input type="text" data-ex="2" data-answer="hilarious"></li>
+    <li>This museum is <i>very interesting</i>. → This museum is really <input type="text" data-ex="2" data-answer="fascinating"></li>
+    <li>She was <i>very happy</i> when she saw her present. → She was absolutely <input type="text" data-ex="2" data-answer="delighted"></li>
+    <li>We were <i>very surprised</i> by the news. → We were <input type="text" data-ex="2" data-answer="amazed"></li>
+    <li>It's <i>very hot</i> in here — open the window! → It's <input type="text" data-ex="2" data-answer="boiling"> in here!</li>
+    <li>I'm <i>very hungry</i>. When is dinner? → I'm <input type="text" data-ex="2" data-answer="starving">!</li>
+    <li>After the marathon he was <i>very tired</i>. → He was <input type="text" data-ex="2" data-answer="exhausted"></li>
+    <li>Dad was <i>very angry</i> when he saw my room. → Dad was <input type="text" data-ex="2" data-answer="furious"></li>
+  </ol>
+  <div class="check-row">
+    <button class="check" onclick="checkInputs('2')">Check!</button>
+    <span class="result" id="res2"></span>
+  </div>
+</div>
+
+<!-- ===================== MAIN PART ===================== -->
+<div class="part">Main part — Rooms &amp; furniture</div>
+
+<div class="ex" id="ex3">
+  <h2><span class="num">3</span>Match the pictures to the words.</h2>
+  <p class="task">Нажми на слово, потом на картинку.</p>
+  <div class="bank" id="bank3"></div>
+  <div class="pic-grid" id="grid3"></div>
+  <div class="check-row">
+    <button class="check" onclick="checkMatch('3')">Check!</button>
+    <span class="result" id="res3"></span>
+  </div>
+</div>
+
+<div class="ex" id="ex4">
+  <h2><span class="num">4</span>Which room? Put the words into the correct room.</h2>
+  <p class="task">Нажми на слово, потом на комнату. Некоторые слова подходят к нескольким комнатам — засчитается любой верный вариант. Чтобы вернуть слово — нажми на него в комнате.</p>
+  <div class="bank" id="bank4"></div>
+  <div class="rooms" id="rooms4">
+    <div class="room-col" data-room="living"><h3>🛋️ Living room</h3><div class="dropzone"></div></div>
+    <div class="room-col" data-room="kitchen"><h3>🍳 Kitchen</h3><div class="dropzone"></div></div>
+    <div class="room-col" data-room="bathroom"><h3>🛁 Bathroom</h3><div class="dropzone"></div></div>
+    <div class="room-col" data-room="bedroom"><h3>🛏️ Bedroom</h3><div class="dropzone"></div></div>
+  </div>
+  <div class="check-row">
+    <button class="check" onclick="checkRooms()">Check!</button>
+    <span class="result" id="res4"></span>
+  </div>
+</div>
+
+<div class="ex" id="ex5">
+  <h2><span class="num">5</span>Read the definition and write the word.</h2>
+  <ol class="items">
+    <li>You put your TV on it. → a <input type="text" data-ex="5" data-answer="tv stand"></li>
+    <li>You cook food inside it, for example a cake or a chicken. → an <input type="text" data-ex="5" data-answer="oven"></li>
+    <li>A small soft carpet on the floor. → a <input type="text" data-ex="5" data-answer="rug"></li>
+    <li>You put books or plants on it, on the wall. → a <input type="text" data-ex="5" data-answer="shelf"></li>
+    <li>You close them in the evening so nobody can see into your room. → <input type="text" data-ex="5" data-answer="curtains"></li>
+    <li>A tall cupboard where you keep your clothes. → a <input type="text" data-ex="5" data-answer="wardrobe|closet"></li>
+    <li>Small soft pillows on a sofa — for decoration. → <input type="text" data-ex="5" data-answer="throw pillows|cushions|throw pillow|cushion"></li>
+    <li>A small table in front of the sofa. → a <input type="text" data-ex="5" data-answer="coffee table"></li>
+  </ol>
+  <div class="check-row">
+    <button class="check" onclick="checkInputs('5')">Check!</button>
+    <span class="result" id="res5"></span>
+  </div>
+</div>
+
+<div class="ex" id="ex6">
+  <h2><span class="num">6</span>Odd one out — нажми на лишнее слово.</h2>
+  <p class="task">В каждой строке одно слово лишнее. Нажми на него, чтобы вычеркнуть.</p>
+  <div id="odd6"></div>
+  <div class="check-row">
+    <button class="check" onclick="checkOdd()">Check!</button>
+    <span class="result" id="res6"></span>
+  </div>
+</div>
+
+<div class="ex" id="ex7">
+  <h2><span class="num">7</span>Prepositions of place: look at the room and complete the sentences.</h2>
+  <p class="task">Посмотри на «комнату» и выбери предлог.</p>
+  <div class="room-plan">
+    <div class="row">🪞&nbsp;🖼️&nbsp;🕰️</div>
+    <div class="label">(on the wall, above the sofa)</div>
+    <div class="row">🪴&nbsp;🛋️&nbsp;💡</div>
+    <div class="row">☕🪵</div>
+    <div class="label">(coffee table)</div>
+    <div class="row">🧶</div>
+    <div class="label">(rug)</div>
+    <div class="row">🐈</div>
+  </div>
+  <ol class="items">
+    <li>The picture is <select data-ex="7" data-answer="between"><option value=""></option><option>on</option><option>in</option><option>under</option><option>next to</option><option>between</option><option>in front of</option><option>above</option><option>behind</option></select> the mirror and the clock.</li>
+    <li>The plant is <select data-ex="7" data-answer="next to"><option value=""></option><option>on</option><option>in</option><option>under</option><option>next to</option><option>between</option><option>in front of</option><option>above</option><option>behind</option></select> the sofa. (= рядом)</li>
+    <li>The mirror is <select data-ex="7" data-answer="on"><option value=""></option><option>on</option><option>in</option><option>under</option><option>next to</option><option>between</option><option>in front of</option><option>above</option><option>behind</option></select> the wall.</li>
+    <li>The coffee table is <select data-ex="7" data-answer="in front of"><option value=""></option><option>on</option><option>in</option><option>under</option><option>next to</option><option>between</option><option>in front of</option><option>above</option><option>behind</option></select> the sofa. (= перед)</li>
+    <li>The rug is <select data-ex="7" data-answer="under"><option value=""></option><option>on</option><option>in</option><option>under</option><option>next to</option><option>between</option><option>in front of</option><option>above</option><option>behind</option></select> the coffee table.</li>
+    <li>The cat is <select data-ex="7" data-answer="on"><option value=""></option><option>on</option><option>in</option><option>under</option><option>next to</option><option>between</option><option>in front of</option><option>above</option><option>behind</option></select> the rug.</li>
+    <li>The clock is <select data-ex="7" data-answer="above"><option value=""></option><option>on</option><option>in</option><option>under</option><option>next to</option><option>between</option><option>in front of</option><option>above</option><option>behind</option></select> the sofa. (= над)</li>
+    <li>I keep my toys <select data-ex="7" data-answer="in"><option value=""></option><option>on</option><option>in</option><option>under</option><option>next to</option><option>between</option><option>in front of</option><option>above</option><option>behind</option></select> a big box <select data-ex="7" data-answer="under"><option value=""></option><option>on</option><option>in</option><option>under</option><option>next to</option><option>between</option><option>in front of</option><option>above</option><option>behind</option></select> my bed.</li>
+  </ol>
+  <div class="check-row">
+    <button class="check" onclick="checkSelects('7')">Check!</button>
+    <span class="result" id="res7"></span>
+  </div>
+</div>
+
+<div class="ex" id="ex8">
+  <h2><span class="num">8</span>Unscramble the letters and write the word.</h2>
+  <ol class="items">
+    <li>PACBOURD → <input type="text" data-ex="8" data-answer="cupboard"></li>
+    <li>RIMRRO → <input type="text" data-ex="8" data-answer="mirror"></li>
+    <li>HRAMCIAR → <input type="text" data-ex="8" data-answer="armchair"></li>
+    <li>SNIRTUCA → <input type="text" data-ex="8" data-answer="curtains"></li>
+    <li>FHESL → <input type="text" data-ex="8" data-answer="shelf"></li>
+    <li>BUTBHTA → <input type="text" data-ex="8" data-answer="bathtub"></li>
+    <li>DAWRROBE → <input type="text" data-ex="8" data-answer="wardrobe"></li>
+    <li>PIREFLEAC → <input type="text" data-ex="8" data-answer="fireplace"></li>
+  </ol>
+  <div class="check-row">
+    <button class="check" onclick="checkInputs('8')">Check!</button>
+    <span class="result" id="res8"></span>
+  </div>
+</div>
+
+<!-- ===================== TROUBLE SPOTS ===================== -->
+<div class="part warn">Watch out! — Наши прошлые ошибки</div>
+
+<div class="note-box">
+  <h3>📌 Remember:</h3>
+  <ul>
+    <li><b>Pronunciation:</b> ceiling <span class="ipa">/ˈsiːlɪŋ/</span> («си́линг»), cupboard <span class="ipa">/ˈkʌbəd/</span> — читается «ка́бэд», буква <b>p</b> не читается! equipment <span class="ipa">/ɪˈkwɪpmənt/</span>.</li>
+    <li><b>look AT</b> something — смотреть <i>на</i> что-то: <i>Look at the picture!</i></li>
+    <li><b>imagine</b> — без предлога: <i>I imagine my dream house.</i> (НЕ <s>imagine about</s>)</li>
+    <li><b>dream ABOUT</b> = сниться: <i>I dreamt about a huge spider.</i> &nbsp;|&nbsp; <b>dream OF</b> = мечтать: <i>I dream of a big house.</i></li>
+    <li><b>I keep my … in the …</b> = я храню…: <i>I keep my clothes in the wardrobe.</i></li>
+    <li><b>There is / There are:</b> смотрим на <u>первое</u> слово: <i>There <b>is</b> a mirror, a cupboard and two shelves.</i></li>
+    <li><b>eco-friendly</b> = экологичный.</li>
+  </ul>
+</div>
+
+<div class="ex warn-ex" id="ex9">
+  <h2><span class="num">9</span>Correct the mistakes. One sentence is correct!</h2>
+  <p class="task">Перепиши предложение правильно. Если предложение верное — поставь галочку «✓ верно».</p>
+  <ol class="items">
+    <li>Look on the ceiling — there is a spider!<br>
+      <input type="text" class="wide" data-ex="9" data-mode="contains" data-must="look at" data-not="look on">
+      <label class="correct-check"><input type="checkbox" data-ex9-correct="no"> ✓ верно</label>
+    </li>
+    <li>I imagine about my future room every day.<br>
+      <input type="text" class="wide" data-ex="9" data-mode="contains" data-must="imagine my" data-not="about">
+      <label class="correct-check"><input type="checkbox" data-ex9-correct="no"> ✓ верно</label>
+    </li>
+    <li>There are a mirror, a washbasin and a bathtub in the bathroom.<br>
+      <input type="text" class="wide" data-ex="9" data-mode="contains" data-must="there is" data-not="there are">
+      <label class="correct-check"><input type="checkbox" data-ex9-correct="no"> ✓ верно</label>
+    </li>
+    <li>I dream about living in an eco-friendly house one day. <span class="hintline">(= мечтаю)</span>
+      <input type="text" class="wide" data-ex="9" data-mode="contains" data-must="dream of" data-not="dream about">
+      <label class="correct-check"><input type="checkbox" data-ex9-correct="no"> ✓ верно</label>
+    </li>
+    <li>I keep my books on the shelf next to my bed.<br>
+      <input type="text" class="wide" data-ex="9" data-mode="contains" data-must="" data-not="" disabled style="opacity:.4">
+      <label class="correct-check"><input type="checkbox" data-ex9-correct="yes"> ✓ верно</label>
+    </li>
+    <li>Last night I dreamt of a filthy monster under my bed. <span class="hintline">(= приснился)</span>
+      <input type="text" class="wide" data-ex="9" data-mode="contains" data-must="dreamt about|dreamed about|dream about" data-not="dreamt of|dreamed of|dream of">
+      <label class="correct-check"><input type="checkbox" data-ex9-correct="no"> ✓ верно</label>
+    </li>
+  </ol>
+  <div class="check-row">
+    <button class="check" onclick="checkEx9()">Check!</button>
+    <span class="result" id="res9"></span>
+  </div>
+</div>
+
+<!-- ===================== COMPARATIVES ===================== -->
+<div class="part green">Grammar — Comparatives</div>
+
+<div class="ex green-ex" id="ex10">
+  <h2><span class="num">10</span>Compare the two rooms. Write full sentences.</h2>
+  <p class="task">Не забудь <b>to be</b> и <b>than</b>! <i>Example: Room A <u>is bigger than</u> Room B.</i></p>
+  <p><b>Room A</b> 🌞 — big, light, modern, expensive, comfortable &nbsp;&nbsp;|&nbsp;&nbsp; <b>Room B</b> 🌑 — small, dark, old, cheap, cosy</p>
+  <ol class="items">
+    <li>(big) Room A <input type="text" class="wide" data-ex="10" data-mode="contains" data-must="is bigger than" data-not="more big|biger"> Room B.</li>
+    <li>(light) Room A <input type="text" class="wide" data-ex="10" data-mode="contains" data-must="is lighter than" data-not="more light"> Room B.</li>
+    <li>(dark) Room B <input type="text" class="wide" data-ex="10" data-mode="contains" data-must="is darker than" data-not="more dark"> Room A.</li>
+    <li>(modern) Room A <input type="text" class="wide" data-ex="10" data-mode="contains" data-must="is more modern than" data-not="moderner"> Room B.</li>
+    <li>(comfortable) Room A <input type="text" class="wide" data-ex="10" data-mode="contains" data-must="is more comfortable than" data-not="comfortabler"> Room B.</li>
+    <li>(cosy) Room B <input type="text" class="wide" data-ex="10" data-mode="contains" data-must="is cosier than|is cozier than" data-not="more cosy|more cozy|cosyer"> Room A.</li>
+    <li>(cheap) Room B <input type="text" class="wide" data-ex="10" data-mode="contains" data-must="is cheaper than" data-not="more cheap"> Room A.</li>
+  </ol>
+  <div class="check-row">
+    <button class="check" onclick="checkContains('10')">Check!</button>
+    <span class="result" id="res10"></span>
+  </div>
+</div>
+
+<div class="ex green-ex" id="ex11">
+  <h2><span class="num">11</span>Find and correct the mistakes.</h2>
+  <p class="task">В каждом предложении есть ошибка. Перепиши предложение правильно.</p>
+  <ol class="items">
+    <li>My room more lighter than my brother's room.<br><input type="text" class="wide" data-ex="11" data-mode="contains" data-must="is lighter than" data-not="more lighter"></li>
+    <li>This sofa is more big than the armchair.<br><input type="text" class="wide" data-ex="11" data-mode="contains" data-must="is bigger than" data-not="more big"></li>
+    <li>The kitchen biger than the bathroom.<br><input type="text" class="wide" data-ex="11" data-mode="contains" data-must="is bigger than" data-not="biger"></li>
+    <li>My new bed is comfortabler than the old one.<br><input type="text" class="wide" data-ex="11" data-mode="contains" data-must="more comfortable than" data-not="comfortabler"></li>
+    <li>The living room is more darker in the evening.<br><input type="text" class="wide" data-ex="11" data-mode="contains" data-must="is darker" data-not="more darker"></li>
+    <li>Our flat is gooder than our old flat.<br><input type="text" class="wide" data-ex="11" data-mode="contains" data-must="is better than" data-not="gooder|more good"></li>
+  </ol>
+  <div class="check-row">
+    <button class="check" onclick="checkContains('11')">Check!</button>
+    <span class="result" id="res11"></span>
+  </div>
+</div>
+
+<div class="celebrate" id="celebrate">🎉🎉🎉 <b>Great job! Ты набрал(а) все баллы!</b> 🎉🎉🎉</div>
+
+</div>
+
+<script>
+/* ---------- data ---------- */
+const match1 = [
+  {letter:'A', emoji:'🥶', answer:'freezing'},
+  {letter:'B', emoji:'🥵', answer:'boiling'},
+  {letter:'C', emoji:'😡', answer:'furious'},
+  {letter:'D', emoji:'🐜', answer:'tiny'},
+  {letter:'E', emoji:'🐘', answer:'huge'},
+  {letter:'F', emoji:'😴', answer:'exhausted'},
+  {letter:'G', emoji:'🤤🍽️', answer:'starving'},
+  {letter:'H', emoji:'🧦🕳️🪳', answer:'filthy'},
+];
+const match3 = [
+  {letter:'A', emoji:'🛋️', answer:'sofa'},
+  {letter:'B', emoji:'🛁', answer:'bathtub'},
+  {letter:'C', emoji:'🪞', answer:'mirror'},
+  {letter:'D', emoji:'🕰️', answer:'clock'},
+  {letter:'E', emoji:'🪴', answer:'plant'},
+  {letter:'F', emoji:'🚿', answer:'shower'},
+  {letter:'G', emoji:'🔥🧱', answer:'fireplace'},
+  {letter:'H', emoji:'🛏️', answer:'a bed'},
+  {letter:'I', emoji:'💡', answer:'floor lamp'},
+  {letter:'J', emoji:'🌀📦', answer:'washing machine'},
+  {letter:'K', emoji:'🚪👗', answer:'wardrobe'},
+  {letter:'L', emoji:'💺', answer:'armchair'},
+];
+const roomsWords = [
+  {word:'washbasin', ok:['bathroom']},
+  {word:'TV stand', ok:['living']},
+  {word:'oven', ok:['kitchen']},
+  {word:'coffee table', ok:['living']},
+  {word:'wardrobe', ok:['bedroom']},
+  {word:'bathtub', ok:['bathroom']},
+  {word:'cooker', ok:['kitchen']},
+  {word:'sofa', ok:['living']},
+  {word:'curtains', ok:['living','bedroom','kitchen','bathroom']},
+  {word:'cupboard', ok:['kitchen','bedroom','living']},
+  {word:'throw pillows', ok:['living','bedroom']},
+  {word:'shower', ok:['bathroom']},
+];
+const oddRows = [
+  {words:['bathtub','washbasin','shower','fireplace'], odd:'fireplace', why:'fireplace — не в ванной'},
+  {words:['oven','cooker','stove','mirror'], odd:'mirror', why:'остальные — плита/духовка'},
+  {words:['sofa','armchair','washing machine','coffee table'], odd:'washing machine', why:'это техника, а не мебель гостиной'},
+  {words:['wardrobe','closet','cupboard','clock'], odd:'clock', why:'остальные — места для хранения'},
+];
+
+/* ---------- scoring ---------- */
+const TOTAL = 8 + 8 + 12 + 12 + 8 + 4 + 9 + 8 + 6 + 7 + 6; /* 88 */
+const scores = {};
+function updateProgress(){
+  let sum = 0;
+  for (const k in scores) sum += scores[k];
+  const fill = document.getElementById('progressFill');
+  const pct = Math.round(sum / TOTAL * 100);
+  fill.style.width = pct + '%';
+  document.getElementById('progressLabel').textContent = sum + ' / ' + TOTAL + ' баллов';
+  const cel = document.getElementById('celebrate');
+  if (sum === TOTAL) cel.classList.add('show'); else cel.classList.remove('show');
+}
+function showResult(id, got, total){
+  const el = document.getElementById('res'+id);
+  el.textContent = got + ' / ' + total + (got===total ? ' 🎉' : got >= total/2 ? ' 👍 почти!' : ' — попробуй ещё!');
+  el.className = 'result ' + (got===total ? 'good' : got >= total/2 ? 'mid' : 'bad');
+}
+function norm(s){
+  return (s||'').toLowerCase().replace(/[.,!?;:'"’‘“”]/g,' ').replace(/\s+/g,' ').trim();
+}
+
+/* ---------- matching (ex1, ex3) ---------- */
+const matchState = {};
+function shuffle(a){
+  const arr = [...a];
+  for (let i = arr.length-1; i>0; i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]] = [arr[j],arr[i]];
+  }
+  return arr;
+}
+function buildMatch(id, data){
+  matchState[id] = {selected:null, placed:{}};
+  const bank = document.getElementById('bank'+id);
+  shuffle(data.map(d=>d.answer)).forEach(word=>{
+    const c = document.createElement('div');
+    c.className='chip'; c.textContent=word; c.dataset.word=word;
+    c.onclick = ()=>{
+      if (c.classList.contains('used')) return;
+      const st = matchState[id];
+      if (st.selected === word){ st.selected = null; c.classList.remove('selected'); return; }
+      bank.querySelectorAll('.chip').forEach(x=>x.classList.remove('selected'));
+      st.selected = word; c.classList.add('selected');
+    };
+    bank.appendChild(c);
+  });
+  const grid = document.getElementById('grid'+id);
+  data.forEach(d=>{
+    const card = document.createElement('div');
+    card.className='pic-card'; card.dataset.answer=d.answer;
+    card.innerHTML = '<div class="emoji">'+d.emoji+'</div><div class="slot">&nbsp;</div>';
+    card.onclick = ()=>{
+      const st = matchState[id];
+      const slot = card.querySelector('.slot');
+      card.classList.remove('ok','bad');
+      const cur = card.dataset.placed;
+      if (st.selected){
+        if (cur) chipOf(id,cur).classList.remove('used');
+        card.dataset.placed = st.selected;
+        slot.textContent = st.selected;
+        const chip = chipOf(id, st.selected);
+        chip.classList.remove('selected'); chip.classList.add('used');
+        st.selected = null;
+      } else if (cur){
+        chipOf(id,cur).classList.remove('used');
+        delete card.dataset.placed;
+        slot.innerHTML='&nbsp;';
+      }
+    };
+    grid.appendChild(card);
+  });
+}
+function chipOf(id, word){
+  return document.querySelector('#bank'+id+' .chip[data-word="'+word+'"]');
+}
+function checkMatch(id){
+  let got = 0, total = 0;
+  document.querySelectorAll('#grid'+id+' .pic-card').forEach(card=>{
+    total++;
+    card.classList.remove('ok','bad');
+    if (card.dataset.placed){
+      if (card.dataset.placed === card.dataset.answer){ card.classList.add('ok'); got++; }
+      else card.classList.add('bad');
+    }
+  });
+  scores['ex'+id] = got;
+  showResult(id, got, total);
+  updateProgress();
+}
+
+/* ---------- rooms (ex4) ---------- */
+let roomSelected = null;
+function buildRooms(){
+  const bank = document.getElementById('bank4');
+  shuffle(roomsWords.map(w=>w.word)).forEach(word=>{
+    const c = document.createElement('div');
+    c.className='chip'; c.textContent=word; c.dataset.word=word;
+    c.onclick = ()=>{
+      if (c.classList.contains('used')) return;
+      if (roomSelected === word){ roomSelected=null; c.classList.remove('selected'); return; }
+      bank.querySelectorAll('.chip').forEach(x=>x.classList.remove('selected'));
+      roomSelected = word; c.classList.add('selected');
+    };
+    bank.appendChild(c);
+  });
+  document.querySelectorAll('#rooms4 .room-col').forEach(col=>{
+    col.onclick = (e)=>{
+      if (e.target.classList.contains('placed')){
+        const w = e.target.dataset.word;
+        const chip = document.querySelector('#bank4 .chip[data-word="'+w+'"]');
+        chip.classList.remove('used');
+        e.target.remove();
+        return;
+      }
+      if (!roomSelected) return;
+      const div = document.createElement('div');
+      div.className='placed'; div.textContent=roomSelected; div.dataset.word=roomSelected;
+      col.querySelector('.dropzone').appendChild(div);
+      const chip = document.querySelector('#bank4 .chip[data-word="'+roomSelected+'"]');
+      chip.classList.remove('selected'); chip.classList.add('used');
+      roomSelected = null;
+    };
+  });
+}
+function checkRooms(){
+  let got = 0;
+  document.querySelectorAll('#rooms4 .placed').forEach(p=>{
+    const room = p.closest('.room-col').dataset.room;
+    const entry = roomsWords.find(w=>w.word===p.dataset.word);
+    p.classList.remove('ok','bad');
+    if (entry && entry.ok.includes(room)){ p.classList.add('ok'); got++; }
+    else p.classList.add('bad');
+  });
+  scores['ex4'] = got;
+  showResult(4, got, roomsWords.length);
+  updateProgress();
+}
+
+/* ---------- odd one out (ex6) ---------- */
+function buildOdd(){
+  const box = document.getElementById('odd6');
+  oddRows.forEach((row,i)=>{
+    const div = document.createElement('div');
+    div.className='odd-row'; div.dataset.row=i;
+    row.words.forEach(w=>{
+      const s = document.createElement('span');
+      s.className='odd-word'; s.textContent=w; s.dataset.word=w;
+      s.onclick = ()=>{
+        div.querySelectorAll('.odd-word').forEach(x=>x.classList.remove('picked','ok','bad'));
+        s.classList.add('picked');
+        div.querySelector('.odd-hint').textContent='';
+      };
+      div.appendChild(s);
+    });
+    const hint = document.createElement('span');
+    hint.className='odd-hint';
+    div.appendChild(hint);
+    box.appendChild(div);
+  });
+}
+function checkOdd(){
+  let got = 0;
+  document.querySelectorAll('#odd6 .odd-row').forEach(div=>{
+    const row = oddRows[div.dataset.row];
+    const picked = div.querySelector('.odd-word.picked, .odd-word.ok, .odd-word.bad');
+    div.querySelectorAll('.odd-word').forEach(x=>x.classList.remove('ok','bad'));
+    if (picked){
+      if (picked.dataset.word === row.odd){
+        picked.classList.add('ok'); got++;
+        div.querySelector('.odd-hint').textContent = '✓ ' + row.why;
+      } else {
+        picked.classList.add('bad');
+        div.querySelector('.odd-hint').textContent = '';
+      }
+    }
+  });
+  scores['ex6'] = got;
+  showResult(6, got, oddRows.length);
+  updateProgress();
+}
+
+/* ---------- exact text inputs (ex2, ex5, ex8) ---------- */
+function checkInputs(ex){
+  const inputs = document.querySelectorAll('input[data-ex="'+ex+'"]');
+  let got = 0;
+  inputs.forEach(inp=>{
+    const answers = inp.dataset.answer.split('|').map(norm);
+    const val = norm(inp.value);
+    inp.classList.remove('ok','bad');
+    if (!val) return;
+    if (answers.includes(val)){ inp.classList.add('ok'); got++; }
+    else inp.classList.add('bad');
+  });
+  scores['ex'+ex] = got;
+  showResult(ex, got, inputs.length);
+  updateProgress();
+}
+
+/* ---------- selects (ex7) ---------- */
+function checkSelects(ex){
+  const sels = document.querySelectorAll('select[data-ex="'+ex+'"]');
+  let got = 0;
+  sels.forEach(s=>{
+    s.classList.remove('ok','bad');
+    if (!s.value) return;
+    if (norm(s.value) === norm(s.dataset.answer)){ s.classList.add('ok'); got++; }
+    else s.classList.add('bad');
+  });
+  scores['ex'+ex] = got;
+  showResult(ex, got, sels.length);
+  updateProgress();
+}
+
+/* ---------- "contains" sentence inputs (ex10, ex11) ---------- */
+function checkContainsInput(inp){
+  const val = norm(inp.value);
+  inp.classList.remove('ok','bad');
+  if (!val) return false;
+  const musts = inp.dataset.must ? inp.dataset.must.split('|').map(norm) : [];
+  const nots = inp.dataset.not ? inp.dataset.not.split('|').map(norm).filter(Boolean) : [];
+  const okMust = musts.length===0 || musts.some(m=>val.includes(m));
+  const okNot = !nots.some(n=>val.includes(n));
+  if (okMust && okNot){ inp.classList.add('ok'); return true; }
+  inp.classList.add('bad'); return false;
+}
+function checkContains(ex){
+  const inputs = document.querySelectorAll('input[data-ex="'+ex+'"]');
+  let got = 0;
+  inputs.forEach(inp=>{ if (checkContainsInput(inp)) got++; });
+  scores['ex'+ex] = got;
+  showResult(ex, got, inputs.length);
+  updateProgress();
+}
+
+/* ---------- ex9: corrections + "correct sentence" checkbox ---------- */
+function checkEx9(){
+  let got = 0;
+  const items = document.querySelectorAll('#ex9 ol.items > li');
+  items.forEach(li=>{
+    const inp = li.querySelector('input[type=text]');
+    const cb = li.querySelector('input[type=checkbox]');
+    const shouldBeCorrect = cb.dataset.ex9Correct === 'yes';
+    inp.classList.remove('ok','bad');
+    if (shouldBeCorrect){
+      if (cb.checked){ got++; inp.classList.add('ok'); }
+      else if (norm(inp.value)) inp.classList.add('bad');
+    } else {
+      if (cb.checked){ inp.classList.add('bad'); return; }
+      if (checkContainsInput(inp)) got++;
+    }
+  });
+  scores['ex9'] = got;
+  showResult(9, got, items.length);
+  updateProgress();
+}
+
+/* ---------- init ---------- */
+buildMatch('1', match1);
+buildMatch('3', match3);
+buildRooms();
+buildOdd();
+updateProgress();
+</script>
+</body>
+</html>
