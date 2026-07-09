@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Мастерская словообразования: Verb → Noun</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --blue-deep:#0a2f4d;
+    --blue-mid:#0f3d63;
+    --blue-line:rgba(255,255,255,.14);
+    --paper:#eef3f7;
+    --paper-line:#c9d7e2;
+    --ink:#10263d;
+    --ink-soft:#3c5570;
+    --amber:#f2b134;
+    --amber-dark:#c98a10;
+    --cyan:#7fc7e8;
+    --ok:#3f8f5f;
+    --font-display:'IBM Plex Sans Condensed',sans-serif;
+    --font-mono:'IBM Plex Mono',monospace;
+    --font-body:'IBM Plex Sans',sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--blue-deep);
+    background-image:
+      linear-gradient(var(--blue-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--blue-line) 1px, transparent 1px);
+    background-size:34px 34px;
+    color:var(--ink);
+    font-family:var(--font-body);
+    line-height:1.5;
+  }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    padding:76px 24px 54px;
+    text-align:center;
+    position:relative;
+    border-bottom:2px dashed var(--blue-line);
+  }
+  .hero .kicker{
+    font-family:var(--font-mono);
+    color:var(--cyan);
+    letter-spacing:.28em;
+    text-transform:uppercase;
+    font-size:12px;
+    margin:0 0 18px;
+  }
+  .hero h1{
+    font-family:var(--font-display);
+    color:#fff;
+    font-weight:700;
+    text-transform:uppercase;
+    font-size:clamp(32px,6vw,64px);
+    letter-spacing:.01em;
+    margin:0 0 6px;
+    line-height:1.02;
+  }
+  .hero h1 span{color:var(--amber);}
+  .blueprint-demo{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:14px;
+    margin:34px auto 26px;
+    flex-wrap:wrap;
+    font-family:var(--font-mono);
+  }
+  .block{
+    background:rgba(255,255,255,.06);
+    border:1px solid var(--cyan);
+    color:#eaf6ff;
+    padding:10px 16px;
+    border-radius:2px;
+    font-size:15px;
+    position:relative;
+  }
+  .block.root{border-style:solid;border-color:var(--amber);color:var(--amber);}
+  .block.suffix{border-style:dashed;}
+  .block.result{background:var(--amber);color:var(--blue-deep);border-color:var(--amber);font-weight:600;}
+  .plus,.arrow{color:var(--cyan);font-size:18px;}
+  .hero p.sub{
+    max-width:620px;
+    margin:0 auto;
+    color:#c8dcec;
+    font-size:15.5px;
+  }
+
+  /* ---------- NAV ---------- */
+  nav.tabs{
+    position:sticky;top:0;z-index:50;
+    background:var(--blue-deep);
+    border-bottom:1px solid var(--blue-line);
+    display:flex;
+    gap:0;
+    overflow-x:auto;
+    padding:0 12px;
+  }
+  nav.tabs a{
+    font-family:var(--font-mono);
+    color:#bcd3e4;
+    text-decoration:none;
+    font-size:13px;
+    letter-spacing:.05em;
+    padding:14px 18px;
+    white-space:nowrap;
+    border-bottom:3px solid transparent;
+    transition:.15s;
+  }
+  nav.tabs a:hover{color:#fff;border-color:var(--cyan);}
+
+  /* ---------- SHEETS (sections) ---------- */
+  main{max-width:980px;margin:0 auto;padding:40px 18px 100px;}
+  .sheet{
+    background:var(--paper);
+    border-radius:6px;
+    margin-bottom:56px;
+    padding:36px clamp(18px,4vw,44px) 40px;
+    position:relative;
+    box-shadow:0 18px 40px rgba(0,0,0,.28);
+  }
+  .sheet::before,.sheet::after,
+  .sheet .corner-tl,.sheet .corner-br{
+    content:"";position:absolute;width:22px;height:22px;
+    border-color:var(--ink-soft);
+  }
+  .sheet::before{top:10px;left:10px;border-top:2px solid var(--ink-soft);border-left:2px solid var(--ink-soft);}
+  .sheet::after{bottom:10px;right:10px;border-bottom:2px solid var(--ink-soft);border-right:2px solid var(--ink-soft);}
+
+  .sheet-label{
+    font-family:var(--font-mono);
+    font-size:12px;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    margin:0 0 4px;
+  }
+  .sheet h2{
+    font-family:var(--font-display);
+    text-transform:uppercase;
+    font-size:clamp(24px,3.4vw,34px);
+    margin:0 0 10px;
+    color:var(--ink);
+    border-bottom:2px solid var(--ink);
+    padding-bottom:12px;
+  }
+  .sheet > p.intro{color:var(--ink-soft);max-width:680px;margin:0 0 22px;font-size:15px;}
+
+  .wordbank{
+    display:flex;flex-wrap:wrap;gap:8px;margin:0 0 30px;
+  }
+  .wordbank span{
+    font-family:var(--font-mono);
+    background:#fff;
+    border:1px solid var(--paper-line);
+    padding:5px 11px;
+    border-radius:3px;
+    font-size:13px;
+    color:var(--ink);
+  }
+
+  /* ---------- EXERCISE BLOCKS ---------- */
+  .exercise{
+    background:#fff;
+    border:1px solid var(--paper-line);
+    border-radius:5px;
+    padding:22px clamp(14px,3vw,28px) 26px;
+    margin-bottom:22px;
+  }
+  .exercise-head{
+    display:flex;justify-content:space-between;align-items:flex-start;gap:14px;
+    margin-bottom:14px;flex-wrap:wrap;
+  }
+  .exercise-title{
+    font-family:var(--font-display);
+    text-transform:uppercase;
+    font-weight:700;
+    font-size:17px;
+    letter-spacing:.02em;
+    color:var(--ink);
+    margin:0;
+  }
+  .exercise-title small{
+    display:block;font-family:var(--font-body);text-transform:none;
+    font-weight:400;color:var(--ink-soft);font-size:13px;margin-top:3px;letter-spacing:0;
+  }
+  .toggle-btn{
+    font-family:var(--font-mono);
+    font-size:12px;
+    background:var(--blue-deep);
+    color:#fff;
+    border:none;
+    padding:8px 14px;
+    border-radius:3px;
+    cursor:pointer;
+    letter-spacing:.04em;
+    white-space:nowrap;
+    transition:.15s;
+  }
+  .toggle-btn:hover{background:var(--amber-dark);}
+  .exercise.show-answers .toggle-btn{background:var(--ok);}
+
+  .answer{
+    display:none;
+    font-family:var(--font-mono);
+    color:var(--ok);
+    font-weight:600;
+    margin-left:8px;
+  }
+  .exercise.show-answers .answer{display:inline;}
+  .exercise.show-answers input.blank{
+    border-color:var(--ok);
+    background:#f1fbf4;
+  }
+
+  input.blank{
+    font-family:var(--font-mono);
+    font-size:14px;
+    border:1px solid var(--paper-line);
+    border-bottom:2px solid var(--ink-soft);
+    border-radius:3px;
+    padding:6px 9px;
+    width:170px;
+    max-width:44vw;
+    background:#fbfcfe;
+    color:var(--ink);
+  }
+  input.blank:focus{outline:2px solid var(--cyan);}
+
+  /* table exercise */
+  table.build-table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:14.5px;
+  }
+  table.build-table th{
+    font-family:var(--font-mono);
+    text-transform:uppercase;
+    font-size:11.5px;
+    letter-spacing:.08em;
+    text-align:left;
+    color:#fff;
+    background:var(--blue-mid);
+    padding:9px 12px;
+  }
+  table.build-table td{
+    padding:8px 12px;
+    border-bottom:1px solid var(--paper-line);
+  }
+  table.build-table tr:nth-child(even) td{background:#f5f8fb;}
+  table.build-table td.verb{font-family:var(--font-mono);font-weight:600;color:var(--blue-deep);}
+  .table-scroll{overflow-x:auto;}
+
+  /* paraphrase list */
+  ol.paraphrase{padding-left:22px;margin:0;}
+  ol.paraphrase li{margin-bottom:16px;font-size:15px;}
+  ol.paraphrase .original{color:var(--ink-soft);display:block;margin-bottom:4px;font-size:14px;}
+  ol.paraphrase .original em{font-style:normal;font-family:var(--font-mono);color:var(--ink);}
+  ol.paraphrase .rewrite{display:flex;align-items:center;flex-wrap:wrap;gap:4px;}
+  .arrow-sm{color:var(--amber-dark);font-weight:700;margin-right:2px;}
+
+  /* context paragraph */
+  .context-text{font-size:15.5px;line-height:2.1;}
+  .context-text .cue{font-family:var(--font-mono);font-size:11px;color:var(--ink-soft);vertical-align:super;margin-left:1px;}
+
+  /* sorting exercise */
+  .sort-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+    gap:16px;
+  }
+  .sort-col h4{
+    font-family:var(--font-mono);
+    font-size:13px;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    background:var(--blue-deep);
+    color:#fff;
+    padding:8px 10px;
+    margin:0 0 8px;
+    border-radius:3px;
+  }
+  .sort-col textarea{
+    width:100%;min-height:90px;
+    font-family:var(--font-mono);font-size:13px;
+    border:1px solid var(--paper-line);border-radius:3px;
+    padding:8px;resize:vertical;background:#fbfcfe;color:var(--ink);
+  }
+  .sort-answer{
+    display:none;
+    font-family:var(--font-mono);
+    font-size:12.5px;
+    color:var(--ok);
+    margin-top:6px;
+    line-height:1.6;
+  }
+  .exercise.show-answers .sort-answer{display:block;}
+
+  /* general grid exercise */
+  table.grid3 th{background:var(--blue-mid);}
+  table.grid3 td.given{color:var(--ink-soft);font-style:italic;font-family:var(--font-mono);}
+
+  /* writing section */
+  .sheet.notebook{
+    background:#fff;
+    background-image:repeating-linear-gradient(#fff 0 33px, #dfe8ef 33px 34px);
+    box-shadow:0 18px 40px rgba(0,0,0,.28), inset 40px 0 0 -38px rgba(200,80,60,.28);
+  }
+  .sheet.notebook h2{border-bottom-color:var(--ink);}
+  .write-item{margin-bottom:20px;}
+  .write-item label{
+    display:block;font-size:15.5px;margin-bottom:6px;color:var(--ink);
+  }
+  .write-item label b{font-family:var(--font-mono);color:var(--blue-deep);}
+  .write-item textarea{
+    width:100%;min-height:44px;
+    font-family:var(--font-body);font-size:14.5px;
+    border:none;border-bottom:1px solid var(--paper-line);
+    background:transparent;padding:4px 2px;resize:vertical;color:var(--ink);
+  }
+  .write-item textarea:focus{outline:none;border-bottom:2px solid var(--cyan);}
+
+  footer{
+    text-align:center;color:#9fb8cc;font-family:var(--font-mono);
+    font-size:12px;padding:0 20px 50px;letter-spacing:.05em;
+  }
+
+  @media(max-width:640px){
+    .hero{padding:56px 16px 40px;}
+    input.blank{width:130px;max-width:60vw;}
+    .exercise-head{flex-direction:column;}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <p class="kicker">Word formation workshop · Verb → Noun</p>
+  <h1>Мастерская <span>слово­строения</span></h1>
+  <div class="blueprint-demo" aria-hidden="true">
+    <span class="block root">develop</span>
+    <span class="plus">+</span>
+    <span class="block suffix">-ment</span>
+    <span class="arrow">→</span>
+    <span class="block result">development</span>
+  </div>
+  <p class="sub">Три «чертежа» для тренировки образования существительных от глаголов: обозначающих действие, обозначающих человека, и общая схема, где нужно построить оба типа. В каждом блоке — таблица, перефраз, работа с контекстом и (местами) сортировка по суффиксам. Ответы скрыты — нажимайте кнопку, чтобы проверить себя.</p>
+</header>
+
+<nav class="tabs">
+  <a href="#group1">01 · Действие (noun of action)</a>
+  <a href="#group2">02 · Человек (person)</a>
+  <a href="#general">03 · Общая схема</a>
+  <a href="#writing">04 · Письмо</a>
+</nav>
+
+<main>
+
+<!-- ============ GROUP 1 ============ -->
+<section id="group1" class="sheet">
+  <p class="sheet-label">Лист 01 / Схема A</p>
+  <h2>Глагол → существительное действия</h2>
+  <p class="intro">develop, improve, discuss, advertise, employ, organise, educate, invite, promote, apply, retire, qualify, resign</p>
+
+  <!-- Ex 1.1 Table -->
+  <div class="exercise">
+    <div class="exercise-head">
+      <h3 class="exercise-title">Упражнение 1 — Таблица<small>Напишите существительное, образованное от глагола.</small></h3>
+      <button class="toggle-btn" onclick="toggleAnswers(this)">Показать ответы</button>
+    </div>
+    <div class="table-scroll">
+      <table class="build-table">
+        <thead><tr><th>Verb</th><th style="width:55%">Noun</th></tr></thead>
+        <tbody>
+          <tr><td class="verb">develop</td><td><input class="blank" type="text" placeholder="…"><span class="answer">development</span></td></tr>
+          <tr><td class="verb">improve</td><td><input class="blank" type="text" placeholder="…"><span class="answer">improvement</span></td></tr>
+          <tr><td class="verb">discuss</td><td><input class="blank" type="text" placeholder="…"><span class="answer">discussion</span></td></tr>
+          <tr><td class="verb">advertise</td><td><input class="blank" type="text" placeholder="…"><span class="answer">advertisement</span></td></tr>
+          <tr><td class="verb">employ</td><td><input class="blank" type="text" placeholder="…"><span class="answer">employment</span></td></tr>
+          <tr><td class="verb">organise</td><td><input class="blank" type="text" placeholder="…"><span class="answer">organisation</span></td></tr>
+          <tr><td class="verb">educate</td><td><input class="blank" type="text" placeholder="…"><span class="answer">education</span></td></tr>
+          <tr><td class="verb">invite</td><td><input class="blank" type="text" placeholder="…"><span class="answer">invitation</span></td></tr>
+          <tr><td class="verb">promote</td><td><input class="blank" type="text" placeholder="…"><span class="answer">promotion</span></td></tr>
+          <tr><td class="verb">apply</td><td><input class="blank" type="text" placeholder="…"><span class="answer">application</span></td></tr>
+          <tr><td class="verb">retire</td><td><input class="blank" type="text" placeholder="…"><span class="answer">retirement</span></td></tr>
+          <tr><td class="verb">qualify</td><td><input class="blank" type="text" placeholder="…"><span class="answer">qualification</span></td></tr>
+          <tr><td class="verb">resign</td><td><input class="blank" type="text" placeholder="…"><span class="answer">resignation</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Ex 1.2 Paraphrase -->
+  <div class="exercise">
+    <div class="exercise-head">
+      <h3 class="exercise-title">Упражнение 2 — Перефраз<small>Перепишите фразу, используя существительное вместо глагола.</small></h3>
+      <button class="toggle-btn" onclick="toggleAnswers(this)">Показать ответы</button>
+    </div>
+    <ol class="paraphrase">
+      <li>
+        <span class="original">They <em>discussed</em> the budget for an hour.</span>
+        <span class="rewrite">There was a long <input class="blank" type="text" style="width:150px"><span class="answer">discussion</span> about the budget.</span>
+      </li>
+      <li>
+        <span class="original">The firm <em>employs</em> over 500 staff.</span>
+        <span class="rewrite">The firm offers <input class="blank" type="text" style="width:150px"><span class="answer">employment</span> to over 500 staff.</span>
+      </li>
+      <li>
+        <span class="original">She <em>applied</em> for the manager position.</span>
+        <span class="rewrite">She submitted an <input class="blank" type="text" style="width:150px"><span class="answer">application</span> for the manager position.</span>
+      </li>
+      <li>
+        <span class="original">He <em>resigned</em> from the board last month.</span>
+        <span class="rewrite">His <input class="blank" type="text" style="width:150px"><span class="answer">resignation</span> from the board came last month.</span>
+      </li>
+      <li>
+        <span class="original">My aunt <em>retired</em> last year after 40 years.</span>
+        <span class="rewrite">My aunt's <input class="blank" type="text" style="width:150px"><span class="answer">retirement</span> came after 40 years of work.</span>
+      </li>
+      <li>
+        <span class="original">They <em>promoted</em> him to senior editor.</span>
+        <span class="rewrite">He received a <input class="blank" type="text" style="width:150px"><span class="answer">promotion</span> to senior editor.</span>
+      </li>
+      <li>
+        <span class="original">The charity <em>educates</em> local farmers about soil care.</span>
+        <span class="rewrite">The charity provides <input class="blank" type="text" style="width:150px"><span class="answer">education</span> about soil care.</span>
+      </li>
+      <li>
+        <span class="original">We <em>invited</em> the whole team to the launch.</span>
+        <span class="rewrite">We sent out <input class="blank" type="text" style="width:150px"><span class="answer">invitations</span> to the whole team.</span>
+      </li>
+    </ol>
+  </div>
+
+  <!-- Ex 1.3 Context -->
+  <div class="exercise">
+    <div class="exercise-head">
+      <h3 class="exercise-title">Упражнение 3 — В контексте<small>Вставьте нужную форму существительного (глагол дан в скобках).</small></h3>
+      <button class="toggle-btn" onclick="toggleAnswers(this)">Показать ответы</button>
+    </div>
+    <p class="context-text">
+      After finishing school, Maria decided to continue her
+      <input class="blank" type="text" style="width:140px"><span class="answer">education</span><span class="cue">(educate)</span>
+      at university. During her studies she applied for a part-time job — her
+      <input class="blank" type="text" style="width:140px"><span class="answer">application</span><span class="cue">(apply)</span>
+      was successful, and she got
+      <input class="blank" type="text" style="width:140px"><span class="answer">employment</span><span class="cue">(employ)</span>
+      at a local marketing agency. She worked hard, and after two years she received a
+      <input class="blank" type="text" style="width:140px"><span class="answer">promotion</span><span class="cue">(promote)</span>
+      to team leader. The agency was going through a period of
+      <input class="blank" type="text" style="width:140px"><span class="answer">development</span><span class="cue">(develop)</span>,
+      launching several new
+      <input class="blank" type="text" style="width:140px"><span class="answer">advertisements</span><span class="cue">(advertise)</span>
+      campaigns. Maria suggested many
+      <input class="blank" type="text" style="width:140px"><span class="answer">improvements</span><span class="cue">(improve)</span>
+      to the team's workflow. After 35 years in the industry, she is now looking forward to her
+      <input class="blank" type="text" style="width:140px"><span class="answer">retirement</span><span class="cue">(retire)</span>.
+    </p>
+  </div>
+
+  <!-- Ex 1.4 Sorting -->
+  <div class="exercise">
+    <div class="exercise-head">
+      <h3 class="exercise-title">Упражнение 4 — Сортировка по суффиксу<small>Распределите все 13 существительных из Упр. 1 по трём колонкам.</small></h3>
+      <button class="toggle-btn" onclick="toggleAnswers(this)">Показать ответы</button>
+    </div>
+    <div class="sort-grid">
+      <div class="sort-col">
+        <h4>-ment</h4>
+        <textarea placeholder="впишите слова…"></textarea>
+        <div class="sort-answer">development, employment, improvement, retirement, advertisement</div>
+      </div>
+      <div class="sort-col">
+        <h4>-ion / -tion</h4>
+        <textarea placeholder="впишите слова…"></textarea>
+        <div class="sort-answer">discussion, promotion</div>
+      </div>
+      <div class="sort-col">
+        <h4>-ation</h4>
+        <textarea placeholder="впишите слова…"></textarea>
+        <div class="sort-answer">organisation, education, invitation, application, qualification, resignation</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ GROUP 2 ============ -->
+<section id="group2" class="sheet">
+  <p class="sheet-label">Лист 02 / Схема B</p>
+  <h2>Глагол / существительное → человек (профессия)</h2>
+  <p class="intro">teach, act, design, science, music, art, electric, photograph, journal, translate, farm, direct, piano, politics, psychology, law, pharmacy</p>
+
+  <!-- Ex 2.1 Table -->
+  <div class="exercise">
+    <div class="exercise-head">
+      <h3 class="exercise-title">Упражнение 1 — Таблица<small>Напишите существительное, обозначающее человека.</small></h3>
+      <button class="toggle-btn" onclick="toggleAnswers(this)">Показать ответы</button>
+    </div>
+    <div class="table-scroll">
+      <table class="build-table">
+        <thead><tr><th>Verb / Noun</th><th style="width:55%">Person</th></tr></thead>
+        <tbody>
+          <tr><td class="verb">teach</td><td><input class="blank" type="text" placeholder="…"><span class="answer">teacher</span></td></tr>
+          <tr><td class="verb">act</td><td><input class="blank" type="text" placeholder="…"><span class="answer">actor</span></td></tr>
+          <tr><td class="verb">design</td><td><input class="blank" type="text" placeholder="…"><span class="answer">designer</span></td></tr>
+          <tr><td class="verb">science</td><td><input class="blank" type="text" placeholder="…"><span class="answer">scientist</span></td></tr>
+          <tr><td class="verb">music</td><td><input class="blank" type="text" placeholder="…"><span class="answer">musician</span></td></tr>
+          <tr><td class="verb">art</td><td><input class="blank" type="text" placeholder="…"><span class="answer">artist</span></td></tr>
+          <tr><td class="verb">electric</td><td><input class="blank" type="text" placeholder="…"><span class="answer">electrician</span></td></tr>
+          <tr><td class="verb">photograph</td><td><input class="blank" type="text" placeholder="…"><span class="answer">photographer</span></td></tr>
+          <tr><td class="verb">journal</td><td><input class="blank" type="text" placeholder="…"><span class="answer">journalist</span></td></tr>
+          <tr><td class="verb">translate</td><td><input class="blank" type="text" placeholder="…"><span class="answer">translator</span></td></tr>
+          <tr><td class="verb">farm</td><td><input class="blank" type="text" placeholder="…"><span class="answer">farmer</span></td></tr>
+          <tr><td class="verb">direct</td><td><input class="blank" type="text" placeholder="…"><span class="answer">director</span></td></tr>
+          <tr><td class="verb">piano</td><td><input class="blank" type="text" placeholder="…"><span class="answer">pianist</span></td></tr>
+          <tr><td class="verb">politics</td><td><input class="blank" type="text" placeholder="…"><span class="answer">politician</span></td></tr>
+          <tr><td class="verb">psychology</td><td><input class="blank" type="text" placeholder="…"><span class="answer">psychologist</span></td></tr>
+          <tr><td class="verb">law</td><td><input class="blank" type="text" placeholder="…"><span class="answer">lawyer</span></td></tr>
+          <tr><td class="verb">pharmacy</td><td><input class="blank" type="text" placeholder="…"><span class="answer">pharmacist</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Ex 2.2 Paraphrase -->
+  <div class="exercise">
+    <div class="exercise-head">
+      <h3 class="exercise-title">Упражнение 2 — Перефраз<small>Назовите профессию человека, описанного в предложении.</small></h3>
+      <button class="toggle-btn" onclick="toggleAnswers(this)">Показать ответы</button>
+    </div>
+    <ol class="paraphrase">
+      <li>
+        <span class="original">He <em>plays the piano</em> professionally.</span>
+        <span class="rewrite">He is a <input class="blank" type="text" style="width:150px"><span class="answer">pianist</span>.</span>
+      </li>
+      <li>
+        <span class="original">She <em>takes photos</em> for magazines.</span>
+        <span class="rewrite">She works as a <input class="blank" type="text" style="width:150px"><span class="answer">photographer</span>.</span>
+      </li>
+      <li>
+        <span class="original">He <em>translates</em> novels into English.</span>
+        <span class="rewrite">He is a <input class="blank" type="text" style="width:150px"><span class="answer">translator</span>.</span>
+      </li>
+      <li>
+        <span class="original">She <em>studies</em> how the mind works.</span>
+        <span class="rewrite">She is a <input class="blank" type="text" style="width:150px"><span class="answer">psychologist</span>.</span>
+      </li>
+      <li>
+        <span class="original">He <em>designs</em> websites for small businesses.</span>
+        <span class="rewrite">He is a <input class="blank" type="text" style="width:150px"><span class="answer">designer</span>.</span>
+      </li>
+      <li>
+        <span class="original">She <em>defends</em> clients in court.</span>
+        <span class="rewrite">She is a <input class="blank" type="text" style="width:150px"><span class="answer">lawyer</span>.</span>
+      </li>
+      <li>
+        <span class="original">He <em>grows</em> crops on his land.</span>
+        <span class="rewrite">He is a <input class="blank" type="text" style="width:150px"><span class="answer">farmer</span>.</span>
+      </li>
+      <li>
+        <span class="original">She <em>fixes</em> the wiring in houses.</span>
+        <span class="rewrite">She is an <input class="blank" type="text" style="width:150px"><span class="answer">electrician</span>.</span>
+      </li>
+    </ol>
+  </div>
+
+  <!-- Ex 2.3 Context -->
+  <div class="exercise">
+    <div class="exercise-head">
+      <h3 class="exercise-title">Упражнение 3 — В контексте<small>Заполните пропуски в диалоге на выставке профессий.</small></h3>
+      <button class="toggle-btn" onclick="toggleAnswers(this)">Показать ответы</button>
+    </div>
+    <p class="context-text">
+      "This is our stage manager, Alex — he used to be an
+      <input class="blank" type="text" style="width:140px"><span class="answer">actor</span><span class="cue">(act)</span>
+      before he moved behind the scenes. Next to him is Priya, our
+      <input class="blank" type="text" style="width:140px"><span class="answer">journalist</span><span class="cue">(journal)</span>,
+      writing the event report. The tall man by the window is a
+      <input class="blank" type="text" style="width:140px"><span class="answer">scientist</span><span class="cue">(science)</span>
+      from the university lab, and the woman next to him is a
+      <input class="blank" type="text" style="width:140px"><span class="answer">musician</span><span class="cue">(music)</span>
+      who's performing tonight. That's our
+      <input class="blank" type="text" style="width:140px"><span class="answer">director</span><span class="cue">(direct)</span>
+      giving instructions to the crew, and near the entrance a local
+      <input class="blank" type="text" style="width:140px"><span class="answer">politician</span><span class="cue">(politics)</span>
+      is greeting the guests."
+    </p>
+  </div>
+
+  <!-- Ex 2.4 Sorting -->
+  <div class="exercise">
+    <div class="exercise-head">
+      <h3 class="exercise-title">Упражнение 4 — Сортировка по суффиксу<small>Распределите все 17 слов из Упр. 1 по четырём колонкам.</small></h3>
+      <button class="toggle-btn" onclick="toggleAnswers(this)">Показать ответы</button>
+    </div>
+    <div class="sort-grid">
+      <div class="sort-col">
+        <h4>-er / -or</h4>
+        <textarea placeholder="впишите слова…"></textarea>
+        <div class="sort-answer">teacher, designer, photographer, farmer, actor, director, translator</div>
+      </div>
+      <div class="sort-col">
+        <h4>-ist</h4>
+        <textarea placeholder="впишите слова…"></textarea>
+        <div class="sort-answer">scientist, artist, journalist, pianist, psychologist, pharmacist</div>
+      </div>
+      <div class="sort-col">
+        <h4>-ian</h4>
+        <textarea placeholder="впишите слова…"></textarea>
+        <div class="sort-answer">electrician, politician, musician</div>
+      </div>
+      <div class="sort-col">
+        <h4>другое</h4>
+        <textarea placeholder="впишите слова…"></textarea>
+        <div class="sort-answer">lawyer</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ GENERAL GROUP ============ -->
+<section id="general" class="sheet">
+  <p class="sheet-label">Лист 03 / Сводная схема</p>
+  <h2>Общая схема: действие + человек</h2>
+  <p class="intro">employ, educate, advertise, translate, design, act — от каждого глагола нужно построить и существительное действия, и существительное-человека.</p>
+
+  <!-- Ex G.1 Grid -->
+  <div class="exercise">
+    <div class="exercise-head">
+      <h3 class="exercise-title">Упражнение 1 — Сводная таблица<small>Заполните пропущенные столбцы (первая строка дана как образец).</small></h3>
+      <button class="toggle-btn" onclick="toggleAnswers(this)">Показать ответы</button>
+    </div>
+    <div class="table-scroll">
+      <table class="build-table grid3">
+        <thead><tr><th>Verb</th><th>Noun</th><th>Person</th></tr></thead>
+        <tbody>
+          <tr><td class="verb">employ</td><td class="given">employment</td><td class="given">employer / employee</td></tr>
+          <tr><td class="verb">educate</td><td><input class="blank" type="text" placeholder="…" style="width:140px"><span class="answer">education</span></td><td><input class="blank" type="text" placeholder="…" style="width:140px"><span class="answer">educator</span></td></tr>
+          <tr><td class="verb">advertise</td><td><input class="blank" type="text" placeholder="…" style="width:140px"><span class="answer">advertisement</span></td><td><input class="blank" type="text" placeholder="…" style="width:140px"><span class="answer">advertiser</span></td></tr>
+          <tr><td class="verb">translate</td><td><input class="blank" type="text" placeholder="…" style="width:140px"><span class="answer">translation</span></td><td><input class="blank" type="text" placeholder="…" style="width:140px"><span class="answer">translator</span></td></tr>
+          <tr><td class="verb">design</td><td><input class="blank" type="text" placeholder="…" style="width:140px"><span class="answer">design</span></td><td><input class="blank" type="text" placeholder="…" style="width:140px"><span class="answer">designer</span></td></tr>
+          <tr><td class="verb">act</td><td><input class="blank" type="text" placeholder="…" style="width:140px"><span class="answer">action</span></td><td><input class="blank" type="text" placeholder="…" style="width:140px"><span class="answer">actor</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Ex G.2 Paraphrase -->
+  <div class="exercise">
+    <div class="exercise-head">
+      <h3 class="exercise-title">Упражнение 2 — Перефраз (два пропуска)<small>Впишите и существительное действия, и обозначение человека.</small></h3>
+      <button class="toggle-btn" onclick="toggleAnswers(this)">Показать ответы</button>
+    </div>
+    <ol class="paraphrase">
+      <li>
+        <span class="original">This poster was made to sell a new phone.</span>
+        <span class="rewrite">It's an effective <input class="blank" type="text" style="width:140px"><span class="answer">advertisement</span> — made by a talented <input class="blank" type="text" style="width:140px"><span class="answer">advertiser</span>.</span>
+      </li>
+      <li>
+        <span class="original">This book was originally written in Japanese.</span>
+        <span class="rewrite">It needed careful <input class="blank" type="text" style="width:140px"><span class="answer">translation</span>, done by a skilled <input class="blank" type="text" style="width:140px"><span class="answer">translator</span>.</span>
+      </li>
+      <li>
+        <span class="original">This chair was created by a famous studio.</span>
+        <span class="rewrite">It's a great piece of <input class="blank" type="text" style="width:140px"><span class="answer">design</span>, created by a well-known <input class="blank" type="text" style="width:140px"><span class="answer">designer</span>.</span>
+      </li>
+      <li>
+        <span class="original">In the film, the hero saves the city.</span>
+        <span class="rewrite">This is the main <input class="blank" type="text" style="width:140px"><span class="answer">action</span> of the film, played by a famous <input class="blank" type="text" style="width:140px"><span class="answer">actor</span>.</span>
+      </li>
+      <li>
+        <span class="original">My father works for a big bank; they pay him well.</span>
+        <span class="rewrite">His <input class="blank" type="text" style="width:140px"><span class="answer">employment</span> is stable — the bank is a fair <input class="blank" type="text" style="width:140px"><span class="answer">employer</span>.</span>
+      </li>
+    </ol>
+  </div>
+
+  <!-- Ex G.3 Context -->
+  <div class="exercise">
+    <div class="exercise-head">
+      <h3 class="exercise-title">Упражнение 3 — В контексте<small>Выберите нужную форму (действие или человек) для каждого пропуска.</small></h3>
+      <button class="toggle-btn" onclick="toggleAnswers(this)">Показать ответы</button>
+    </div>
+    <p class="context-text">
+      Bright Ideas is a small agency that offers
+      <input class="blank" type="text" style="width:140px"><span class="answer">education</span><span class="cue">(educate)</span>
+      programmes for schools. Each
+      <input class="blank" type="text" style="width:140px"><span class="answer">educator</span><span class="cue">(educate)</span>
+      on the team designs lessons for different ages. Last month the agency created a fun
+      <input class="blank" type="text" style="width:140px"><span class="answer">advertisement</span><span class="cue">(advertise)</span>
+      for a children's book, which needed a Spanish
+      <input class="blank" type="text" style="width:140px"><span class="answer">translation</span><span class="cue">(translate)</span>
+      for schools abroad — a professional
+      <input class="blank" type="text" style="width:140px"><span class="answer">translator</span><span class="cue">(translate)</span>
+      handled the text. The agency's
+      <input class="blank" type="text" style="width:140px"><span class="answer">employment</span><span class="cue">(employ)</span>
+      contracts are flexible, so every
+      <input class="blank" type="text" style="width:140px"><span class="answer">employee</span><span class="cue">(employ)</span>
+      can choose their hours. The creative
+      <input class="blank" type="text" style="width:140px"><span class="answer">designer</span><span class="cue">(design)</span>
+      on the team also produced a short
+      <input class="blank" type="text" style="width:140px"><span class="answer">action</span><span class="cue">(act)</span>
+      video, filmed with a local
+      <input class="blank" type="text" style="width:140px"><span class="answer">actor</span><span class="cue">(act)</span>.
+    </p>
+  </div>
+</section>
+
+<!-- ============ WRITING ============ -->
+<section id="writing" class="sheet notebook">
+  <p class="sheet-label">Лист 04 / Свободное письмо</p>
+  <h2>Закончите предложения своими идеями</h2>
+  <p class="intro">Используйте существительные, которые вы тренировали выше (employment, education, design, translation, advertisement и т.д.), там, где это уместно.</p>
+
+  <div class="write-item">
+    <label><b>An employer</b> should…</label>
+    <textarea></textarea>
+  </div>
+  <div class="write-item">
+    <label><b>An employee</b> shouldn't…</label>
+    <textarea></textarea>
+  </div>
+  <div class="write-item">
+    <label><b>A good designer</b> needs…</label>
+    <textarea></textarea>
+  </div>
+  <div class="write-item">
+    <label><b>A good translator</b> should…</label>
+    <textarea></textarea>
+  </div>
+  <div class="write-item">
+    <label>An <b>advertisement</b> is successful when…</label>
+    <textarea></textarea>
+  </div>
+  <div class="write-item">
+    <label>Good <b>education</b> helps people…</label>
+    <textarea></textarea>
+  </div>
+</section>
+
+</main>
+
+<footer>Мастерская словообразования · Verb → Noun · нажимайте «Показать ответы» в каждом блоке отдельно</footer>
+
+<script>
+function toggleAnswers(btn){
+  const ex = btn.closest('.exercise');
+  const showing = ex.classList.toggle('show-answers');
+  btn.textContent = showing ? 'Скрыть ответы' : 'Показать ответы';
+}
+</script>
+
+</body>
+</html>
