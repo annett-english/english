@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Тренажёр английских глаголов</title>
+<style>
+  :root{
+    --purple:#6C5CE7;
+    --purple-dark:#4834d4;
+    --pink:#ff6b9d;
+    --green:#00b894;
+    --red:#e74c3c;
+    --yellow:#fdcb6e;
+    --bg:#f5f3ff;
+    --card:#ffffff;
+    --text:#2d3436;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Segoe UI', Tahoma, sans-serif;
+    background:linear-gradient(135deg,#f5f3ff 0%,#e8f4ff 100%);
+    color:var(--text);
+    padding-bottom:60px;
+  }
+  header{
+    background:linear-gradient(135deg,var(--purple),var(--pink));
+    color:white;
+    padding:36px 20px 44px;
+    text-align:center;
+    border-radius:0 0 30px 30px;
+    box-shadow:0 6px 20px rgba(108,92,231,0.3);
+  }
+  header h1{margin:0 0 8px;font-size:1.8em;}
+  header p{margin:0;opacity:0.95;font-size:1.05em;}
+  .container{
+    max-width:820px;
+    margin:-20px auto 0;
+    padding:0 16px;
+  }
+  .section-title{
+    font-size:1.4em;
+    color:var(--purple-dark);
+    margin:40px 0 16px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .exercise{
+    background:var(--card);
+    border-radius:18px;
+    padding:22px 22px 26px;
+    margin-bottom:22px;
+    box-shadow:0 4px 16px rgba(0,0,0,0.06);
+  }
+  .exercise h3{
+    margin-top:0;
+    color:var(--purple-dark);
+    font-size:1.15em;
+  }
+  .exercise .instr{
+    color:#636e72;
+    font-size:0.95em;
+    margin-bottom:16px;
+  }
+  .item{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    flex-wrap:wrap;
+    padding:10px 0;
+    border-bottom:1px dashed #eee;
+  }
+  .item:last-of-type{border-bottom:none;}
+  .emoji{
+    font-size:1.7em;
+    min-width:42px;
+    text-align:center;
+  }
+  .item-text{flex:1 1 auto; min-width:160px;}
+  input[type="text"]{
+    padding:8px 12px;
+    border:2px solid #ddd;
+    border-radius:10px;
+    font-size:1em;
+    width:150px;
+    outline:none;
+    transition:0.2s;
+  }
+  input[type="text"]:focus{border-color:var(--purple);}
+  select{
+    padding:8px 10px;
+    border:2px solid #ddd;
+    border-radius:10px;
+    font-size:1em;
+    outline:none;
+    background:white;
+  }
+  select:focus{border-color:var(--purple);}
+  .correct{
+    border-color:var(--green) !important;
+    background:#e9fbf3 !important;
+  }
+  .incorrect{
+    border-color:var(--red) !important;
+    background:#fdecea !important;
+  }
+  .choice-group{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+  }
+  .choice-btn{
+    padding:8px 14px;
+    border:2px solid #ddd;
+    border-radius:10px;
+    background:white;
+    cursor:pointer;
+    font-size:0.95em;
+    transition:0.15s;
+  }
+  .choice-btn:hover{border-color:var(--purple);}
+  .choice-btn.selected{
+    border-color:var(--purple);
+    background:#efeaff;
+    font-weight:600;
+  }
+  .btn-row{
+    margin-top:18px;
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  button.action{
+    padding:10px 20px;
+    border:none;
+    border-radius:12px;
+    font-size:0.95em;
+    cursor:pointer;
+    font-weight:600;
+    transition:0.2s;
+  }
+  .btn-check{
+    background:var(--purple);
+    color:white;
+  }
+  .btn-check:hover{background:var(--purple-dark);}
+  .btn-show{
+    background:var(--yellow);
+    color:#5c4600;
+  }
+  .btn-show:hover{filter:brightness(0.95);}
+  .btn-reset{
+    background:#dfe6e9;
+    color:#2d3436;
+  }
+  .btn-reset:hover{background:#ced6e0;}
+  .result{
+    margin-top:14px;
+    font-weight:600;
+    font-size:0.98em;
+  }
+  .result.ok{color:var(--green);}
+  .result.bad{color:#d35400;}
+  .story{
+    line-height:2.1;
+    font-size:1.05em;
+  }
+  .story input[type="text"]{
+    width:130px;
+  }
+  .wordbank{
+    margin-top:14px;
+    padding:10px 14px;
+    background:#f0edff;
+    border-radius:10px;
+    font-size:0.9em;
+    color:#4834d4;
+  }
+  .sentence{width:100%;}
+  .badge{
+    display:inline-block;
+    background:var(--pink);
+    color:white;
+    border-radius:20px;
+    padding:2px 12px;
+    font-size:0.75em;
+    margin-left:6px;
+  }
+  footer{
+    text-align:center;
+    color:#95a5a6;
+    margin-top:40px;
+    font-size:0.85em;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🎓 Тренажёр английских глаголов</h1>
+  <p>Повторение глаголов + Past Simple</p>
+</header>
+
+<div class="container">
+
+  <div class="section-title">📘 Часть 1. Повторяем глаголы</div>
+
+  <!-- EXERCISE 1: dropdown matching -->
+  <div class="exercise" id="ex1">
+    <h3>Упражнение 1. Выбери подходящий глагол</h3>
+    <div class="instr">По эмодзи выбери правильный глагол из списка.</div>
+
+    <div class="item" data-answer="buy">
+      <div class="emoji">🛒💰</div>
+      <div class="item-text">___</div>
+      <select class="select-input">
+        <option value="">выбери...</option>
+        <option value="buy">buy</option>
+        <option value="draw">draw</option>
+        <option value="dance">dance</option>
+        <option value="find">find</option>
+        <option value="give">give</option>
+        <option value="hear">hear</option>
+        <option value="leave">leave</option>
+        <option value="paint">paint</option>
+        <option value="run">run</option>
+      </select>
+    </div>
+
+    <div class="item" data-answer="draw">
+      <div class="emoji">✏️📄</div>
+      <div class="item-text">___</div>
+      <select class="select-input">
+        <option value="">выбери...</option>
+        <option value="buy">buy</option>
+        <option value="draw">draw</option>
+        <option value="dance">dance</option>
+        <option value="find">find</option>
+        <option value="give">give</option>
+        <option value="hear">hear</option>
+        <option value="leave">leave</option>
+        <option value="paint">paint</option>
+        <option value="run">run</option>
+      </select>
+    </div>
+
+    <div class="item" data-answer="dance">
+      <div class="emoji">💃🕺</div>
+      <div class="item-text">___</div>
+      <select class="select-input">
+        <option value="">выбери...</option>
+        <option value="buy">buy</option>
+        <option value="draw">draw</option>
+        <option value="dance">dance</option>
+        <option value="find">find</option>
+        <option value="give">give</option>
+        <option value="hear">hear</option>
+        <option value="leave">leave</option>
+        <option value="paint">paint</option>
+        <option value="run">run</option>
+      </select>
+    </div>
+
+    <div class="item" data-answer="find">
+      <div class="emoji">🔍✅</div>
+      <div class="item-text">___</div>
+      <select class="select-input">
+        <option value="">выбери...</option>
+        <option value="buy">buy</option>
+        <option value="draw">draw</option>
+        <option value="dance">dance</option>
+        <option value="find">find</option>
+        <option value="give">give</option>
+        <option value="hear">hear</option>
+        <option value="leave">leave</option>
+        <option value="paint">paint</option>
+        <option value="run">run</option>
+      </select>
+    </div>
+
+    <div class="item" data-answer="give">
+      <div class="emoji">🎁➡️🙋</div>
+      <div class="item-text">___</div>
+      <select class="select-input">
+        <option value="">выбери...</option>
+        <option value="buy">buy</option>
+        <option value="draw">draw</option>
+        <option value="dance">dance</option>
+        <option value="find">find</option>
+        <option value="give">give</option>
+        <option value="hear">hear</option>
+        <option value="leave">leave</option>
+        <option value="paint">paint</option>
+        <option value="run">run</option>
+      </select>
+    </div>
+
+    <div class="item" data-answer="hear">
+      <div class="emoji">👂🎵</div>
+      <div class="item-text">___</div>
+      <select class="select-input">
+        <option value="">выбери...</option>
+        <option value="buy">buy</option>
+        <option value="draw">draw</option>
+        <option value="dance">dance</option>
+        <option value="find">find</option>
+        <option value="give">give</option>
+        <option value="hear">hear</option>
+        <option value="leave">leave</option>
+        <option value="paint">paint</option>
+        <option value="run">run</option>
+      </select>
+    </div>
+
+    <div class="item" data-answer="leave">
+      <div class="emoji">🚪🏃‍♂️💨</div>
+      <div class="item-text">___</div>
+      <select class="select-input">
+        <option value="">выбери...</option>
+        <option value="buy">buy</option>
+        <option value="draw">draw</option>
+        <option value="dance">dance</option>
+        <option value="find">find</option>
+        <option value="give">give</option>
+        <option value="hear">hear</option>
+        <option value="leave">leave</option>
+        <option value="paint">paint</option>
+        <option value="run">run</option>
+      </select>
+    </div>
+
+    <div class="item" data-answer="paint">
+      <div class="emoji">🖌️🎨</div>
+      <div class="item-text">___</div>
+      <select class="select-input">
+        <option value="">выбери...</option>
+        <option value="buy">buy</option>
+        <option value="draw">draw</option>
+        <option value="dance">dance</option>
+        <option value="find">find</option>
+        <option value="give">give</option>
+        <option value="hear">hear</option>
+        <option value="leave">leave</option>
+        <option value="paint">paint</option>
+        <option value="run">run</option>
+      </select>
+    </div>
+
+    <div class="item" data-answer="run">
+      <div class="emoji">🏃‍♀️💨</div>
+      <div class="item-text">___</div>
+      <select class="select-input">
+        <option value="">выбери...</option>
+        <option value="buy">buy</option>
+        <option value="draw">draw</option>
+        <option value="dance">dance</option>
+        <option value="find">find</option>
+        <option value="give">give</option>
+        <option value="hear">hear</option>
+        <option value="leave">leave</option>
+        <option value="paint">paint</option>
+        <option value="run">run</option>
+      </select>
+    </div>
+
+    <div class="btn-row">
+      <button class="action btn-check" onclick="checkSelectExercise('ex1')">✅ Проверить</button>
+      <button class="action btn-show" onclick="showSelectAnswers('ex1')">👀 Показать ответы</button>
+      <button class="action btn-reset" onclick="resetExercise('ex1')">🔄 Сбросить</button>
+    </div>
+    <div class="result" id="ex1-result"></div>
+  </div>
+
+  <!-- EXERCISE 2: text input -->
+  <div class="exercise" id="ex2">
+    <h3>Упражнение 2. Впиши глагол</h3>
+    <div class="instr">Посмотри на эмодзи-подсказку и напиши нужный глагол.</div>
+
+    <div class="item" data-answer="forget">
+      <div class="emoji">🧠❌</div>
+      <div class="item-text">___ something</div>
+      <input type="text" class="answer-input" placeholder="глагол">
+    </div>
+    <div class="item" data-answer="help">
+      <div class="emoji">🤝💪</div>
+      <div class="item-text">___ someone</div>
+      <input type="text" class="answer-input" placeholder="глагол">
+    </div>
+    <div class="item" data-answer="look for">
+      <div class="emoji">🔎❓</div>
+      <div class="item-text">___ something</div>
+      <input type="text" class="answer-input" placeholder="глагол">
+    </div>
+    <div class="item" data-answer="meet">
+      <div class="emoji">👋😊</div>
+      <div class="item-text">___ a friend</div>
+      <input type="text" class="answer-input" placeholder="глагол">
+    </div>
+    <div class="item" data-answer="send">
+      <div class="emoji">📧➡️</div>
+      <div class="item-text">___ a message</div>
+      <input type="text" class="answer-input" placeholder="глагол">
+    </div>
+    <div class="item" data-answer="remember">
+      <div class="emoji">🧠💭</div>
+      <div class="item-text">___ something</div>
+      <input type="text" class="answer-input" placeholder="глагол">
+    </div>
+    <div class="item" data-answer="see">
+      <div class="emoji">👀✨</div>
+      <div class="item-text">___ something</div>
+      <input type="text" class="answer-input" placeholder="глагол">
+    </div>
+    <div class="item" data-answer="swim">
+      <div class="emoji">🏊‍♀️🌊</div>
+      <div class="item-text">___ in the pool</div>
+      <input type="text" class="answer-input" placeholder="глагол">
+    </div>
+
+    <div class="btn-row">
+      <button class="action btn-check" onclick="checkTextExercise('ex2')">✅ Проверить</button>
+      <button class="action btn-show" onclick="showTextAnswers('ex2')">👀 Показать ответы</button>
+      <button class="action btn-reset" onclick="resetExercise('ex2')">🔄 Сбросить</button>
+    </div>
+    <div class="result" id="ex2-result"></div>
+  </div>
+
+  <!-- EXERCISE 3: choice buttons -->
+  <div class="exercise" id="ex3">
+    <h3>Упражнение 3. Выбери правильный глагол</h3>
+    <div class="instr">Нажми на кнопку с правильным глаголом.</div>
+
+    <div class="item">
+      <div class="emoji">✋🧳</div>
+      <div class="item-text">Взять что-то:</div>
+      <div class="choice-group" data-correct="take">
+        <div class="choice-btn" data-value="take" onclick="selectChoice(this)">take</div>
+        <div class="choice-btn" data-value="tell" onclick="selectChoice(this)">tell</div>
+        <div class="choice-btn" data-value="try" onclick="selectChoice(this)">try</div>
+      </div>
+    </div>
+
+    <div class="item">
+      <div class="emoji">🎤🎶</div>
+      <div class="item-text">Петь:</div>
+      <div class="choice-group" data-correct="sing">
+        <div class="choice-btn" data-value="sing" onclick="selectChoice(this)">sing</div>
+        <div class="choice-btn" data-value="talk" onclick="selectChoice(this)">talk</div>
+        <div class="choice-btn" data-value="use" onclick="selectChoice(this)">use</div>
+      </div>
+    </div>
+
+    <div class="item">
+      <div class="emoji">💬🙂</div>
+      <div class="item-text">Разговаривать:</div>
+      <div class="choice-group" data-correct="talk">
+        <div class="choice-btn" data-value="tell" onclick="selectChoice(this)">tell</div>
+        <div class="choice-btn" data-value="talk" onclick="selectChoice(this)">talk</div>
+        <div class="choice-btn" data-value="wait for" onclick="selectChoice(this)">wait for</div>
+      </div>
+    </div>
+
+    <div class="item">
+      <div class="emoji">🔧🖱️</div>
+      <div class="item-text">Использовать:</div>
+      <div class="choice-group" data-correct="use">
+        <div class="choice-btn" data-value="use" onclick="selectChoice(this)">use</div>
+        <div class="choice-btn" data-value="try" onclick="selectChoice(this)">try</div>
+        <div class="choice-btn" data-value="give" onclick="selectChoice(this)">give</div>
+      </div>
+    </div>
+
+    <div class="item">
+      <div class="emoji">🗣️📖</div>
+      <div class="item-text">Рассказать (историю):</div>
+      <div class="choice-group" data-correct="tell">
+        <div class="choice-btn" data-value="talk" onclick="selectChoice(this)">talk</div>
+        <div class="choice-btn" data-value="tell" onclick="selectChoice(this)">tell</div>
+        <div class="choice-btn" data-value="hear" onclick="selectChoice(this)">hear</div>
+      </div>
+    </div>
+
+    <div class="item">
+      <div class="emoji">⏳🚌</div>
+      <div class="item-text">Ждать:</div>
+      <div class="choice-group" data-correct="wait for">
+        <div class="choice-btn" data-value="wait for" onclick="selectChoice(this)">wait for</div>
+        <div class="choice-btn" data-value="look for" onclick="selectChoice(this)">look for</div>
+        <div class="choice-btn" data-value="find" onclick="selectChoice(this)">find</div>
+      </div>
+    </div>
+
+    <div class="item">
+      <div class="emoji">💪🎯</div>
+      <div class="item-text">Пытаться:</div>
+      <div class="choice-group" data-correct="try">
+        <div class="choice-btn" data-value="try" onclick="selectChoice(this)">try</div>
+        <div class="choice-btn" data-value="take" onclick="selectChoice(this)">take</div>
+        <div class="choice-btn" data-value="run" onclick="selectChoice(this)">run</div>
+      </div>
+    </div>
+
+    <div class="item">
+      <div class="emoji">📞☎️</div>
+      <div class="item-text">Звонить:</div>
+      <div class="choice-group" data-correct="call">
+        <div class="choice-btn" data-value="call" onclick="selectChoice(this)">call / phone</div>
+        <div class="choice-btn" data-value="send" onclick="selectChoice(this)">send</div>
+        <div class="choice-btn" data-value="meet" onclick="selectChoice(this)">meet</div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="action btn-check" onclick="checkChoiceExercise('ex3')">✅ Проверить</button>
+      <button class="action btn-show" onclick="showChoiceAnswers('ex3')">👀 Показать ответы</button>
+      <button class="action btn-reset" onclick="resetExercise('ex3')">🔄 Сбросить</button>
+    </div>
+    <div class="result" id="ex3-result"></div>
+  </div>
+
+  <div class="section-title">⏳ Часть 2. Past Simple</div>
+
+  <!-- PAST EXERCISE 1 -->
+  <div class="exercise" id="pex1">
+    <h3>Упражнение 4. Напиши глагол в Past Simple</h3>
+    <div class="instr">Впиши глагол в скобках в прошедшем времени.</div>
+
+    <div class="item sentence" data-answer="bought">
+      <span>1. Yesterday I <input type="text" class="answer-input" placeholder="buy"> a new bag.</span>
+    </div>
+    <div class="item sentence" data-answer="drew">
+      <span>2. She <input type="text" class="answer-input" placeholder="draw"> a beautiful picture last night.</span>
+    </div>
+    <div class="item sentence" data-answer="called|phoned">
+      <span>3. He <input type="text" class="answer-input" placeholder="call/phone"> his mother two days ago.</span>
+    </div>
+    <div class="item sentence" data-answer="danced">
+      <span>4. We <input type="text" class="answer-input" placeholder="dance"> at the party on Saturday.</span>
+    </div>
+    <div class="item sentence" data-answer="found">
+      <span>5. They <input type="text" class="answer-input" placeholder="find"> the keys under the sofa.</span>
+    </div>
+    <div class="item sentence" data-answer="forgot">
+      <span>6. I <input type="text" class="answer-input" placeholder="forget"> my umbrella at school yesterday.</span>
+    </div>
+    <div class="item sentence" data-answer="gave">
+      <span>7. My grandma <input type="text" class="answer-input" placeholder="give"> me a present for my birthday.</span>
+    </div>
+
+    <div class="btn-row">
+      <button class="action btn-check" onclick="checkTextExercise('pex1')">✅ Проверить</button>
+      <button class="action btn-show" onclick="showTextAnswers('pex1')">👀 Показать ответы</button>
+      <button class="action btn-reset" onclick="resetExercise('pex1')">🔄 Сбросить</button>
+    </div>
+    <div class="result" id="pex1-result"></div>
+  </div>
+
+  <!-- PAST EXERCISE 2 -->
+  <div class="exercise" id="pex2">
+    <h3>Упражнение 5. Выбери правильную форму</h3>
+    <div class="instr">Выбери правильную форму Past Simple.</div>
+
+    <div class="item">
+      <div class="item-text">Last week we ___ a strange noise in the garden. (hear)</div>
+      <div class="choice-group" data-correct="heard">
+        <div class="choice-btn" data-value="heared" onclick="selectChoice(this)">heared</div>
+        <div class="choice-btn" data-value="heard" onclick="selectChoice(this)">heard</div>
+        <div class="choice-btn" data-value="hears" onclick="selectChoice(this)">hears</div>
+      </div>
+    </div>
+
+    <div class="item">
+      <div class="item-text">He ___ his old house last year. (leave)</div>
+      <div class="choice-group" data-correct="left">
+        <div class="choice-btn" data-value="leaved" onclick="selectChoice(this)">leaved</div>
+        <div class="choice-btn" data-value="left" onclick="selectChoice(this)">left</div>
+        <div class="choice-btn" data-value="leaves" onclick="selectChoice(this)">leaves</div>
+      </div>
+    </div>
+
+    <div class="item">
+      <div class="item-text">My friend ___ me with my homework yesterday. (help)</div>
+      <div class="choice-group" data-correct="helped">
+        <div class="choice-btn" data-value="helped" onclick="selectChoice(this)">helped</div>
+        <div class="choice-btn" data-value="helpped" onclick="selectChoice(this)">helpped</div>
+        <div class="choice-btn" data-value="help" onclick="selectChoice(this)">help</div>
+      </div>
+    </div>
+
+    <div class="item">
+      <div class="item-text">She ___ for her cat all morning. (look for)</div>
+      <div class="choice-group" data-correct="looked for">
+        <div class="choice-btn" data-value="looked for" onclick="selectChoice(this)">looked for</div>
+        <div class="choice-btn" data-value="lookeded for" onclick="selectChoice(this)">lookeded for</div>
+        <div class="choice-btn" data-value="looks for" onclick="selectChoice(this)">looks for</div>
+      </div>
+    </div>
+
+    <div class="item">
+      <div class="item-text">The artist ___ a wonderful sunset. (paint)</div>
+      <div class="choice-group" data-correct="painted">
+        <div class="choice-btn" data-value="painted" onclick="selectChoice(this)">painted</div>
+        <div class="choice-btn" data-value="paintted" onclick="selectChoice(this)">paintted</div>
+        <div class="choice-btn" data-value="paints" onclick="selectChoice(this)">paints</div>
+      </div>
+    </div>
+
+    <div class="item">
+      <div class="item-text">We ___ our old friends at the station. (meet)</div>
+      <div class="choice-group" data-correct="met">
+        <div class="choice-btn" data-value="meeted" onclick="selectChoice(this)">meeted</div>
+        <div class="choice-btn" data-value="met" onclick="selectChoice(this)">met</div>
+        <div class="choice-btn" data-value="meets" onclick="selectChoice(this)">meets</div>
+      </div>
+    </div>
+
+    <div class="item">
+      <div class="item-text">I ___ an email to my teacher this morning. (send)</div>
+      <div class="choice-group" data-correct="sent">
+        <div class="choice-btn" data-value="sended" onclick="selectChoice(this)">sended</div>
+        <div class="choice-btn" data-value="sent" onclick="selectChoice(this)">sent</div>
+        <div class="choice-btn" data-value="sends" onclick="selectChoice(this)">sends</div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="action btn-check" onclick="checkChoiceExercise('pex2')">✅ Проверить</button>
+      <button class="action btn-show" onclick="showChoiceAnswers('pex2')">👀 Показать ответы</button>
+      <button class="action btn-reset" onclick="resetExercise('pex2')">🔄 Сбросить</button>
+    </div>
+    <div class="result" id="pex2-result"></div>
+  </div>
+
+  <!-- PAST EXERCISE 3: matching dropdown -->
+  <div class="exercise" id="pex3">
+    <h3>Упражнение 6. Собери пару: глагол → Past Simple</h3>
+    <div class="instr">Выбери правильную форму прошедшего времени для каждого глагола.</div>
+
+    <div class="item" data-answer="remembered">
+      <div class="item-text"><b>remember</b></div>
+      <select class="select-input">
+        <option value="">выбери...</option>
+        <option value="remembered">remembered</option>
+        <option value="saw">saw</option>
+        <option value="ran">ran</option>
+        <option value="swam">swam</option>
+        <option value="took">took</option>
+        <option value="sang">sang</option>
+      </select>
+    </div>
+    <div class="item" data-answer="saw">
+      <div class="item-text"><b>see</b></div>
+      <select class="select-input">
+        <option value="">выбери...</option>
+        <option value="remembered">remembered</option>
+        <option value="saw">saw</option>
+        <option value="ran">ran</option>
+        <option value="swam">swam</option>
+        <option value="took">took</option>
+        <option value="sang">sang</option>
+      </select>
+    </div>
+    <div class="item" data-answer="ran">
+      <div class="item-text"><b>run</b></div>
+      <select class="select-input">
+        <option value="">выбери...</option>
+        <option value="remembered">remembered</option>
+        <option value="saw">saw</option>
+        <option value="ran">ran</option>
+        <option value="swam">swam</option>
+        <option value="took">took</option>
+        <option value="sang">sang</option>
+      </select>
+    </div>
+    <div class="item" data-answer="swam">
+      <div class="item-text"><b>swim</b></div>
+      <select class="select-input">
+        <option value="">выбери...</option>
+        <option value="remembered">remembered</option>
+        <option value="saw">saw</option>
+        <option value="ran">ran</option>
+        <option value="swam">swam</option>
+        <option value="took">took</option>
+        <option value="sang">sang</option>
+      </select>
+    </div>
+    <div class="item" data-answer="took">
+      <div class="item-text"><b>take</b></div>
+      <select class="select-input">
+        <option value="">выбери...</option>
+        <option value="remembered">remembered</option>
+        <option value="saw">saw</option>
+        <option value="ran">ran</option>
+        <option value="swam">swam</option>
+        <option value="took">took</option>
+        <option value="sang">sang</option>
+      </select>
+    </div>
+    <div class="item" data-answer="sang">
+      <div class="item-text"><b>sing</b></div>
+      <select class="select-input">
+        <option value="">выбери...</option>
+        <option value="remembered">remembered</option>
+        <option value="saw">saw</option>
+        <option value="ran">ran</option>
+        <option value="swam">swam</option>
+        <option value="took">took</option>
+        <option value="sang">sang</option>
+      </select>
+    </div>
+
+    <div class="btn-row">
+      <button class="action btn-check" onclick="checkSelectExercise('pex3')">✅ Проверить</button>
+      <button class="action btn-show" onclick="showSelectAnswers('pex3')">👀 Показать ответы</button>
+      <button class="action btn-reset" onclick="resetExercise('pex3')">🔄 Сбросить</button>
+    </div>
+    <div class="result" id="pex3-result"></div>
+  </div>
+
+  <!-- PAST EXERCISE 4: story -->
+  <div class="exercise" id="pex4">
+    <h3>Упражнение 7. Закончи рассказ (Past Simple)</h3>
+    <div class="instr">Впиши глаголы из рамки в правильной форме прошедшего времени.</div>
+    <div class="wordbank">Слова: talk, use, tell, wait for, try</div>
+
+    <div class="story">
+      Yesterday Anna and Tom went to the park. They
+      <input type="text" class="answer-input" data-answer="talked" style="width:110px">
+      about their holiday plans. Tom
+      <input type="text" class="answer-input" data-answer="used" style="width:100px">
+      his phone to take photos. Then Anna
+      <input type="text" class="answer-input" data-answer="told" style="width:90px">
+      him a funny story. After that they
+      <input type="text" class="answer-input" data-answer="waited for" style="width:130px">
+      the bus for twenty minutes. Finally, Tom
+      <input type="text" class="answer-input" data-answer="tried" style="width:90px">
+      to catch the ball, but he dropped it!
+    </div>
+
+    <div class="btn-row">
+      <button class="action btn-check" onclick="checkStoryExercise('pex4')">✅ Проверить</button>
+      <button class="action btn-show" onclick="showStoryAnswers('pex4')">👀 Показать ответы</button>
+      <button class="action btn-reset" onclick="resetExercise('pex4')">🔄 Сбросить</button>
+    </div>
+    <div class="result" id="pex4-result"></div>
+  </div>
+
+</div>
+
+<footer>Учи глаголы с удовольствием 🌟</footer>
+
+<script>
+function normalize(s){
+  return s.trim().toLowerCase().replace(/\s+/g,' ');
+}
+
+// ---- SELECT-based exercises ----
+function checkSelectExercise(exId){
+  const ex = document.getElementById(exId);
+  const items = ex.querySelectorAll('.item');
+  let correct = 0, total = 0;
+  items.forEach(item=>{
+    const answer = item.dataset.answer;
+    const sel = item.querySelector('.select-input');
+    if(!answer || !sel) return;
+    total++;
+    sel.classList.remove('correct','incorrect');
+    if(normalize(sel.value) === normalize(answer)){
+      sel.classList.add('correct');
+      correct++;
+    } else {
+      sel.classList.add('incorrect');
+    }
+  });
+  showResult(exId, correct, total);
+}
+function showSelectAnswers(exId){
+  const ex = document.getElementById(exId);
+  const items = ex.querySelectorAll('.item');
+  items.forEach(item=>{
+    const answer = item.dataset.answer;
+    const sel = item.querySelector('.select-input');
+    if(!answer || !sel) return;
+    sel.value = answer;
+    sel.classList.remove('incorrect');
+    sel.classList.add('correct');
+  });
+  document.getElementById(exId+'-result').textContent = 'Показаны правильные ответы 👀';
+  document.getElementById(exId+'-result').className = 'result ok';
+}
+
+// ---- TEXT-input exercises (also handles story, since it uses .answer-input) ----
+function checkTextExercise(exId){
+  const ex = document.getElementById(exId);
+  const items = ex.querySelectorAll('.item');
+  let correct = 0, total = 0;
+  items.forEach(item=>{
+    const answer = item.dataset.answer;
+    const input = item.querySelector('.answer-input');
+    if(!answer || !input) return;
+    total++;
+    input.classList.remove('correct','incorrect');
+    const accepted = answer.split('|').map(normalize);
+    if(accepted.includes(normalize(input.value))){
+      input.classList.add('correct');
+      correct++;
+    } else {
+      input.classList.add('incorrect');
+    }
+  });
+  showResult(exId, correct, total);
+}
+function showTextAnswers(exId){
+  const ex = document.getElementById(exId);
+  const items = ex.querySelectorAll('.item');
+  items.forEach(item=>{
+    const answer = item.dataset.answer;
+    const input = item.querySelector('.answer-input');
+    if(!answer || !input) return;
+    input.value = answer.split('|')[0];
+    input.classList.remove('incorrect');
+    input.classList.add('correct');
+  });
+  document.getElementById(exId+'-result').textContent = 'Показаны правильные ответы 👀';
+  document.getElementById(exId+'-result').className = 'result ok';
+}
+
+// ---- STORY exercise (inputs carry their own data-answer) ----
+function checkStoryExercise(exId){
+  const ex = document.getElementById(exId);
+  const inputs = ex.querySelectorAll('.answer-input');
+  let correct = 0, total = 0;
+  inputs.forEach(input=>{
+    const answer = input.dataset.answer;
+    if(!answer) return;
+    total++;
+    input.classList.remove('correct','incorrect');
+    if(normalize(input.value) === normalize(answer)){
+      input.classList.add('correct');
+      correct++;
+    } else {
+      input.classList.add('incorrect');
+    }
+  });
+  showResult(exId, correct, total);
+}
+function showStoryAnswers(exId){
+  const ex = document.getElementById(exId);
+  const inputs = ex.querySelectorAll('.answer-input');
+  inputs.forEach(input=>{
+    const answer = input.dataset.answer;
+    if(!answer) return;
+    input.value = answer;
+    input.classList.remove('incorrect');
+    input.classList.add('correct');
+  });
+  document.getElementById(exId+'-result').textContent = 'Показаны правильные ответы 👀';
+  document.getElementById(exId+'-result').className = 'result ok';
+}
+
+// ---- CHOICE button exercises ----
+function selectChoice(btn){
+  const group = btn.parentElement;
+  group.querySelectorAll('.choice-btn').forEach(b=>b.classList.remove('selected','correct','incorrect'));
+  btn.classList.add('selected');
+}
+function checkChoiceExercise(exId){
+  const ex = document.getElementById(exId);
+  const groups = ex.querySelectorAll('.choice-group');
+  let correct = 0, total = 0;
+  groups.forEach(group=>{
+    total++;
+    const correctVal = group.dataset.correct;
+    const selected = group.querySelector('.selected');
+    group.querySelectorAll('.choice-btn').forEach(b=>b.classList.remove('correct','incorrect'));
+    if(selected && normalize(selected.dataset.value) === normalize(correctVal)){
+      selected.classList.add('correct');
+      correct++;
+    } else if(selected){
+      selected.classList.add('incorrect');
+    }
+  });
+  showResult(exId, correct, total);
+}
+function showChoiceAnswers(exId){
+  const ex = document.getElementById(exId);
+  const groups = ex.querySelectorAll('.choice-group');
+  groups.forEach(group=>{
+    const correctVal = group.dataset.correct;
+    group.querySelectorAll('.choice-btn').forEach(b=>{
+      b.classList.remove('incorrect');
+      if(normalize(b.dataset.value) === normalize(correctVal)){
+        b.classList.add('correct');
+      }
+    });
+  });
+  document.getElementById(exId+'-result').textContent = 'Показаны правильные ответы 👀';
+  document.getElementById(exId+'-result').className = 'result ok';
+}
+
+// ---- shared helpers ----
+function showResult(exId, correct, total){
+  const el = document.getElementById(exId+'-result');
+  el.textContent = `Результат: ${correct} из ${total} правильно ✔️`;
+  el.className = correct === total ? 'result ok' : 'result bad';
+}
+
+function resetExercise(exId){
+  const ex = document.getElementById(exId);
+  ex.querySelectorAll('input[type="text"]').forEach(i=>{i.value=''; i.classList.remove('correct','incorrect');});
+  ex.querySelectorAll('select').forEach(s=>{s.value=''; s.classList.remove('correct','incorrect');});
+  ex.querySelectorAll('.choice-btn').forEach(b=>b.classList.remove('selected','correct','incorrect'));
+  document.getElementById(exId+'-result').textContent = '';
+}
+</script>
+
+</body>
+</html>
