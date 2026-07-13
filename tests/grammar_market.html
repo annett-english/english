@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Рынок артиклей: a / an / some / any</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Nunito+Sans:ital,opsz,wght@0,6..12,400;0,6..12,600;0,6..12,800;1,6..12,600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EDE0C0;
+    --paper-dark:#DECDA0;
+    --kraft:#C7A874;
+    --board:#2E3A33;
+    --board-2:#3A4A41;
+    --chalk:#F3EFE2;
+    --tomato:#C1442D;
+    --tomato-dark:#9A3220;
+    --leaf:#5B7B4F;
+    --leaf-dark:#3F5A37;
+    --tag:#E8B84B;
+    --ink:#2B2620;
+    --muted:#7A6E58;
+    --good:#3F7A45;
+    --bad:#B23B2E;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:
+      repeating-linear-gradient(0deg, rgba(0,0,0,0.015) 0px, rgba(0,0,0,0.015) 2px, transparent 2px, transparent 4px),
+      radial-gradient(ellipse at top left, var(--paper-dark), var(--paper) 60%);
+    color:var(--ink);
+    font-family:'Nunito Sans', sans-serif;
+    line-height:1.5;
+    padding-bottom:60px;
+  }
+
+  .wrap{max-width:920px;margin:0 auto;padding:0 20px;}
+
+  /* ---------- HERO / CHALKBOARD ---------- */
+  header.board{
+    background:
+      radial-gradient(ellipse at 30% 0%, rgba(255,255,255,0.05), transparent 60%),
+      linear-gradient(180deg, var(--board-2), var(--board));
+    border-bottom:10px solid var(--kraft);
+    box-shadow:0 6px 18px rgba(0,0,0,0.25);
+    padding:40px 20px 34px;
+    position:relative;
+    overflow:hidden;
+  }
+  header.board::before{
+    content:"";
+    position:absolute; inset:0;
+    background-image:
+      repeating-linear-gradient(90deg, rgba(255,255,255,0.015) 0 1px, transparent 1px 90px),
+      repeating-linear-gradient(0deg, rgba(255,255,255,0.015) 0 1px, transparent 1px 90px);
+    pointer-events:none;
+  }
+  .board-inner{max-width:920px;margin:0 auto;position:relative;}
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    color:var(--tag);
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    font-size:12.5px;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom:10px;
+  }
+  .eyebrow::before{content:"✎";font-size:14px;}
+  h1{
+    font-family:'Kalam', cursive;
+    color:var(--chalk);
+    font-weight:700;
+    font-size:clamp(30px, 5vw, 48px);
+    margin:0 0 10px;
+    text-shadow:0 0 1px rgba(255,255,255,0.15);
+  }
+  h1 span{color:var(--tag);}
+  .board-sub{
+    color:#C9CBC3;
+    font-size:16px;
+    max-width:620px;
+    margin:0 0 18px;
+  }
+  .produce-row{display:flex;gap:14px;flex-wrap:wrap;margin-top:6px;}
+  .produce-row svg{width:46px;height:46px;filter:drop-shadow(0 3px 3px rgba(0,0,0,0.3));}
+
+  /* ---------- RULE TAGS (theory) ---------- */
+  section.theory{padding:34px 0 6px;}
+  .theory h2{
+    font-family:'Kalam', cursive;
+    font-size:26px;
+    color:var(--board);
+    margin:0 0 16px;
+  }
+  .tag-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(260px,1fr));
+    gap:20px;
+  }
+  .price-tag{
+    position:relative;
+    background:var(--tag);
+    border-radius:8px 30px 8px 8px;
+    padding:16px 18px 16px 22px;
+    box-shadow:0 4px 0 rgba(0,0,0,0.12), 0 6px 10px rgba(0,0,0,0.12);
+    transform:rotate(-1.4deg);
+  }
+  .tag-grid > .price-tag:nth-child(2){transform:rotate(1.1deg);}
+  .tag-grid > .price-tag:nth-child(3){transform:rotate(-0.7deg);}
+  .tag-grid > .price-tag:nth-child(4){transform:rotate(1.6deg);}
+  .price-tag::after{
+    content:"";
+    position:absolute;
+    top:14px; right:14px;
+    width:9px;height:9px;
+    background:var(--paper);
+    border-radius:50%;
+    box-shadow:inset 0 0 0 2px var(--muted);
+  }
+  .price-tag h3{
+    font-family:'JetBrains Mono', monospace;
+    margin:0 0 8px;
+    font-size:17px;
+    color:var(--board);
+  }
+  .price-tag p{margin:0 0 6px;font-size:14.5px;color:#3a3220;}
+  .price-tag p:last-child{margin-bottom:0;}
+  .price-tag b{color:var(--tomato-dark);}
+  .price-tag .ex{
+    font-style:italic;
+    color:var(--leaf-dark);
+    font-size:13.8px;
+  }
+
+  /* ---------- EXERCISE / RECEIPT CARDS ---------- */
+  section.ex{padding:26px 0;}
+  .receipt{
+    background:var(--chalk);
+    border:1px solid rgba(0,0,0,0.06);
+    border-radius:4px;
+    box-shadow:0 10px 24px rgba(43,38,32,0.14), 0 2px 0 rgba(0,0,0,0.04);
+    position:relative;
+    padding:26px 26px 22px;
+  }
+  .receipt::before, .receipt::after{
+    content:"";
+    position:absolute; left:0; right:0; height:14px;
+    background:
+      radial-gradient(circle at 10px 0, transparent 8px, var(--paper) 8.5px) repeat-x;
+    background-size:20px 16px;
+  }
+  .receipt::before{top:-8px;transform:rotate(180deg);}
+  .receipt::after{bottom:-8px;}
+
+  .ex-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:4px;}
+  .ex-num{
+    font-family:'JetBrains Mono', monospace;
+    background:var(--leaf);
+    color:var(--chalk);
+    padding:2px 9px;
+    border-radius:4px;
+    font-size:12.5px;
+    letter-spacing:.05em;
+  }
+  .ex h3{
+    font-family:'Kalam', cursive;
+    font-size:22px;
+    margin:8px 0 4px;
+    color:var(--board);
+  }
+  .ex .instructions{color:var(--muted);font-size:14.5px;margin:0 0 18px;}
+
+  .item{
+    display:flex;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:10px 14px;
+    padding:12px 0;
+    border-top:1px dashed rgba(0,0,0,0.12);
+  }
+  .item:first-of-type{border-top:none;}
+  .item-num{
+    font-family:'JetBrains Mono', monospace;
+    color:var(--muted);
+    font-size:13px;
+    min-width:20px;
+  }
+  .item-text{flex:1 1 220px;font-size:15.5px;}
+  .item-text .blank{color:var(--tomato-dark);font-weight:700;}
+
+  .icon-row{display:flex;gap:4px;align-items:center;background:#fff8ea;border:1px solid var(--kraft);border-radius:10px;padding:5px 8px;}
+  .icon-row svg{width:30px;height:30px;flex-shrink:0;}
+
+  .options{display:flex;gap:6px;flex-wrap:wrap;}
+  .options label{
+    border:1.5px solid var(--kraft);
+    background:#fff8ea;
+    padding:6px 12px;
+    border-radius:16px;
+    font-size:14px;
+    cursor:pointer;
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    transition:.15s;
+    user-select:none;
+  }
+  .options label:hover{border-color:var(--leaf);}
+  .options input{accent-color:var(--leaf);}
+  .options input:checked + span{font-weight:800;}
+  .options label.picked{background:#eef4e9;border-color:var(--leaf);}
+
+  .feedback{
+    min-width:26px;
+    font-size:18px;
+    text-align:center;
+  }
+  .item.correct{background:rgba(63,122,69,0.06);border-radius:8px;}
+  .item.correct .feedback::after{content:"✔";color:var(--good);}
+  .item.wrong{background:rgba(178,59,46,0.06);border-radius:8px;}
+  .item.wrong .feedback::after{content:"✘";color:var(--bad);}
+  .answer-reveal{
+    display:none;
+    font-size:13.5px;
+    color:var(--leaf-dark);
+    font-style:italic;
+    flex-basis:100%;
+    padding-left:34px;
+  }
+  .show-answers .answer-reveal{display:block;}
+
+  .ex-actions{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    margin-top:18px;
+    padding-top:14px;
+    border-top:1px dashed rgba(0,0,0,0.12);
+    flex-wrap:wrap;
+  }
+  button{
+    font-family:'JetBrains Mono', monospace;
+    font-weight:700;
+    font-size:13.5px;
+    letter-spacing:.03em;
+    border:none;
+    border-radius:20px;
+    padding:10px 20px;
+    cursor:pointer;
+    transition:transform .1s, box-shadow .15s;
+  }
+  button:active{transform:translateY(1px);}
+  .btn-check{background:var(--tomato);color:var(--chalk);box-shadow:0 3px 0 var(--tomato-dark);}
+  .btn-check:hover{box-shadow:0 4px 6px rgba(154,50,32,0.35);}
+  .btn-reveal{background:transparent;color:var(--leaf-dark);border:1.5px solid var(--leaf);box-shadow:none;}
+  .btn-reveal:hover{background:#eef4e9;}
+  .btn-reset{background:transparent;color:var(--muted);border:1.5px solid var(--kraft);box-shadow:none;}
+  .btn-reset:hover{background:#f6ecd6;}
+  .score{
+    margin-left:auto;
+    font-family:'JetBrains Mono', monospace;
+    font-size:14px;
+    background:var(--paper-dark);
+    padding:6px 14px;
+    border-radius:14px;
+    color:var(--board);
+    min-width:70px;
+    text-align:center;
+  }
+
+  /* pronunciation specific */
+  .word-chip{
+    font-family:'JetBrains Mono', monospace;
+    background:var(--board);
+    color:var(--tag);
+    padding:3px 9px;
+    border-radius:5px;
+    font-size:14px;
+  }
+  .ipa{color:var(--tomato-dark);font-style:normal;}
+
+  footer{
+    text-align:center;
+    color:var(--muted);
+    font-size:13px;
+    padding:34px 20px 10px;
+    font-family:'JetBrains Mono', monospace;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto;}
+  }
+</style>
+</head>
+<body>
+
+<!-- icon sprite sheet -->
+<svg style="display:none" aria-hidden="true">
+<defs>
+  <symbol id="ic-banana" viewBox="0 0 40 40"><path d="M10 32 C6 20 12 8 26 7 C26 7 25 13 19 18 C13 23 11 28 13 34 C10 34 10.5 33 10 32Z" fill="#E8C24B" stroke="#B99530" stroke-width="1"/></symbol>
+  <symbol id="ic-pear" viewBox="0 0 40 40"><ellipse cx="20" cy="26" rx="12" ry="13" fill="#C9A24B"/><ellipse cx="20" cy="14" rx="7" ry="8" fill="#C9A24B"/><path d="M20 6 Q23 2 27 3" stroke="#5B7B4F" stroke-width="2" fill="none" stroke-linecap="round"/></symbol>
+  <symbol id="ic-onion" viewBox="0 0 40 40"><circle cx="20" cy="24" r="13" fill="#EFE3CF"/><circle cx="20" cy="24" r="13" fill="none" stroke="#C7A874" stroke-width="1.5"/><path d="M20 11 Q17 4 20 1 Q23 4 20 11" fill="#5B7B4F"/></symbol>
+  <symbol id="ic-strawberry" viewBox="0 0 40 40"><path d="M20 8 C30 8 33 20 28 30 C25 36 15 36 12 30 C7 20 10 8 20 8Z" fill="#C1442D"/><circle cx="16" cy="18" r="1.1" fill="#F3EFE2"/><circle cx="24" cy="18" r="1.1" fill="#F3EFE2"/><circle cx="20" cy="24" r="1.1" fill="#F3EFE2"/><circle cx="16" cy="28" r="1.1" fill="#F3EFE2"/><circle cx="24" cy="28" r="1.1" fill="#F3EFE2"/><path d="M20 8 Q17 2 23 2 Q20 6 20 8" fill="#5B7B4F"/></symbol>
+  <symbol id="ic-mushroom" viewBox="0 0 40 40"><rect x="17" y="20" width="6" height="16" rx="2" fill="#EDE0C0"/><path d="M6 20 Q20 4 34 20 Q20 26 6 20Z" fill="#C1442D"/></symbol>
+  <symbol id="ic-pepperflakes" viewBox="0 0 40 40"><circle cx="12" cy="14" r="2" fill="#3a3220"/><circle cx="22" cy="10" r="1.6" fill="#3a3220"/><circle cx="28" cy="20" r="2" fill="#3a3220"/><circle cx="16" cy="24" r="1.6" fill="#3a3220"/><circle cx="24" cy="30" r="2" fill="#3a3220"/><circle cx="10" cy="28" r="1.4" fill="#3a3220"/></symbol>
+  <symbol id="ic-bread" viewBox="0 0 40 40"><path d="M6 30 C6 16 34 16 34 30 Z" fill="#C9A24B"/><rect x="6" y="28" width="28" height="8" rx="3" fill="#C9A24B"/><path d="M14 20 Q16 24 14 28 M20 18 Q22 24 20 29 M26 20 Q28 24 26 28" stroke="#9a7a3f" stroke-width="1.5" fill="none" stroke-linecap="round"/></symbol>
+  <symbol id="ic-butter" viewBox="0 0 40 40"><rect x="6" y="14" width="28" height="16" rx="2" fill="#F3D77A"/><rect x="6" y="14" width="28" height="16" rx="2" fill="none" stroke="#C7A874" stroke-width="1.5"/></symbol>
+  <symbol id="ic-cucumber" viewBox="0 0 40 40"><rect x="4" y="16" width="32" height="10" rx="5" fill="#5B7B4F"/></symbol>
+  <symbol id="ic-sandwich" viewBox="0 0 40 40"><path d="M6 32 L20 8 L34 32 Z" fill="#E8C24B"/><path d="M6 32 L34 32 L34 34 L6 34 Z" fill="#9a7a3f"/></symbol>
+</defs>
+</svg>
+
+<header class="board">
+  <div class="board-inner">
+    <div class="eyebrow">сегодня на рынке грамматики</div>
+    <h1>a / an <span>·</span> some / any</h1>
+    <p class="board-sub">Повторяем артикли и неопределённые местоимения на овощах, фруктах и прочей вкусной лексике.</p>
+    <div class="produce-row" aria-hidden="true">
+      <svg viewBox="0 0 40 40"><use href="#ic-pear"/></svg>
+      <svg viewBox="0 0 40 40"><use href="#ic-onion"/></svg>
+      <svg viewBox="0 0 40 40"><use href="#ic-strawberry"/></svg>
+      <svg viewBox="0 0 40 40"><use href="#ic-cucumber"/></svg>
+      <svg viewBox="0 0 40 40"><use href="#ic-mushroom"/></svg>
+      <svg viewBox="0 0 40 40"><use href="#ic-banana"/></svg>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <section class="theory">
+    <h2>Шпаргалка перед покупками</h2>
+    <div class="tag-grid">
+      <div class="price-tag">
+        <h3>A / AN</h3>
+        <p>Ставим перед <b>исчисляемыми</b> существительными в <b>единственном числе</b> в утвердительных предложениях.</p>
+        <p><b>an</b> — если слово начинается с гласного <b>звука</b> (не буквы!): <i>an onion, an apple, an hour</i>.</p>
+        <p class="ex">I ate a pear. · She chopped an onion.</p>
+      </div>
+      <div class="price-tag">
+        <h3>SOME</h3>
+        <p>Утвердительные предложения: с исчисляемыми во <b>множественном</b> числе и с <b>неисчисляемыми</b>.</p>
+        <p class="ex">We picked some mushrooms. · I bought some bread.</p>
+      </div>
+      <div class="price-tag">
+        <h3>ANY</h3>
+        <p>Отрицания и вопросы: с исчисляемыми во множественном числе и с неисчисляемыми.</p>
+        <p class="ex">We didn't buy any strawberries. · Is there any butter?</p>
+      </div>
+      <div class="price-tag">
+        <h3>Исч. vs неисч.</h3>
+        <p><b>Исчисляемые</b> — можно посчитать: a pear, two onions, three sandwiches.</p>
+        <p><b>Неисчисляемые</b> — нельзя посчитать напрямую: bread, pasta, butter, healthy food. Артикль a/an к ним не ставится.</p>
+        <p class="ex">a loaf of bread <span style="color:var(--muted)">(не a bread)</span></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXERCISE 1 -->
+  <section class="ex" id="ex1">
+    <div class="receipt" data-exercise>
+      <div class="ex-head"><span class="ex-num">Упражнение 1</span></div>
+      <h3>A или AN?</h3>
+      <p class="instructions">Выбери правильный артикль. Слушай не букву, а звук в начале слова!</p>
+
+      <div class="item" data-answer="a"><span class="item-num">1.</span><span class="item-text">I ate ___ <b>pear</b>.</span>
+        <div class="options"><label><input type="radio" name="e1-1" value="a"><span>a</span></label><label><input type="radio" name="e1-1" value="an"><span>an</span></label></div>
+        <span class="feedback"></span><span class="answer-reveal">Ответ: a pear — [p] согласный звук.</span>
+      </div>
+      <div class="item" data-answer="an"><span class="item-num">2.</span><span class="item-text">She chopped ___ <b>onion</b>.</span>
+        <div class="options"><label><input type="radio" name="e1-2" value="a"><span>a</span></label><label><input type="radio" name="e1-2" value="an"><span>an</span></label></div>
+        <span class="feedback"></span><span class="answer-reveal">Ответ: an onion — начинается со звука [ʌ], хотя буква «o».</span>
+      </div>
+      <div class="item" data-answer="a"><span class="item-num">3.</span><span class="item-text">We found ___ <b>mushroom</b> under the tree.</span>
+        <div class="options"><label><input type="radio" name="e1-3" value="a"><span>a</span></label><label><input type="radio" name="e1-3" value="an"><span>an</span></label></div>
+        <span class="feedback"></span><span class="answer-reveal">Ответ: a mushroom — [m] согласный звук.</span>
+      </div>
+      <div class="item" data-answer="a"><span class="item-num">4.</span><span class="item-text">She cut up ___ <b>cucumber</b>.</span>
+        <div class="options"><label><input type="radio" name="e1-4" value="a"><span>a</span></label><label><input type="radio" name="e1-4" value="an"><span>an</span></label></div>
+        <span class="feedback"></span><span class="answer-reveal">Ответ: a cucumber — [k] согласный звук.</span>
+      </div>
+      <div class="item" data-answer="a"><span class="item-num">5.</span><span class="item-text">I made ___ <b>sandwich</b> for lunch.</span>
+        <div class="options"><label><input type="radio" name="e1-5" value="a"><span>a</span></label><label><input type="radio" name="e1-5" value="an"><span>an</span></label></div>
+        <span class="feedback"></span><span class="answer-reveal">Ответ: a sandwich — [s] согласный звук.</span>
+      </div>
+      <div class="item" data-answer="an"><span class="item-num">6.</span><span class="item-text">Can you give me ___ <b>umbrella</b>? It's raining.</span>
+        <div class="options"><label><input type="radio" name="e1-6" value="a"><span>a</span></label><label><input type="radio" name="e1-6" value="an"><span>an</span></label></div>
+        <span class="feedback"></span><span class="answer-reveal">Ответ: an umbrella — [ʌ] гласный звук.</span>
+      </div>
+
+      <div class="ex-actions">
+        <button class="btn-check">Проверить</button>
+        <button class="btn-reveal">Показать ответы</button>
+        <button class="btn-reset">Сбросить</button>
+        <span class="score">0 / 6</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXERCISE 2 - mixed some/any -->
+  <section class="ex" id="ex2">
+    <div class="receipt" data-exercise>
+      <div class="ex-head"><span class="ex-num">Упражнение 2</span></div>
+      <h3>SOME или ANY?</h3>
+      <p class="instructions">Утверждения, отрицания и вопросы вперемешку — определи по типу предложения.</p>
+
+      <div class="item" data-answer="some"><span class="item-num">1.</span><span class="item-text">We picked ___ <b>mushrooms</b> in the forest.</span>
+        <div class="options"><label><input type="radio" name="e2-1" value="some"><span>some</span></label><label><input type="radio" name="e2-1" value="any"><span>any</span></label></div>
+        <span class="feedback"></span><span class="answer-reveal">Ответ: some mushrooms — утверждение.</span>
+      </div>
+      <div class="item" data-answer="any"><span class="item-num">2.</span><span class="item-text">We didn't buy ___ <b>strawberries</b> today.</span>
+        <div class="options"><label><input type="radio" name="e2-2" value="some"><span>some</span></label><label><input type="radio" name="e2-2" value="any"><span>any</span></label></div>
+        <span class="feedback"></span><span class="answer-reveal">Ответ: any strawberries — отрицание.</span>
+      </div>
+      <div class="item" data-answer="any"><span class="item-num">3.</span><span class="item-text">Is there ___ <b>bread</b> at home?</span>
+        <div class="options"><label><input type="radio" name="e2-3" value="some"><span>some</span></label><label><input type="radio" name="e2-3" value="any"><span>any</span></label></div>
+        <span class="feedback"></span><span class="answer-reveal">Ответ: any bread — вопрос.</span>
+      </div>
+      <div class="item" data-answer="any"><span class="item-num">4.</span><span class="item-text">There isn't ___ <b>butter</b> left.</span>
+        <div class="options"><label><input type="radio" name="e2-4" value="some"><span>some</span></label><label><input type="radio" name="e2-4" value="any"><span>any</span></label></div>
+        <span class="feedback"></span><span class="answer-reveal">Ответ: any butter — отрицание.</span>
+      </div>
+      <div class="item" data-answer="some"><span class="item-num">5.</span><span class="item-text">We're having ___ <b>pasta</b> for dinner.</span>
+        <div class="options"><label><input type="radio" name="e2-5" value="some"><span>some</span></label><label><input type="radio" name="e2-5" value="any"><span>any</span></label></div>
+        <span class="feedback"></span><span class="answer-reveal">Ответ: some pasta — утверждение.</span>
+      </div>
+      <div class="item" data-answer="any"><span class="item-num">6.</span><span class="item-text">Do we have ___ <b>onions</b> in the fridge?</span>
+        <div class="options"><label><input type="radio" name="e2-6" value="some"><span>some</span></label><label><input type="radio" name="e2-6" value="any"><span>any</span></label></div>
+        <span class="feedback"></span><span class="answer-reveal">Ответ: any onions — вопрос.</span>
+      </div>
+      <div class="item" data-answer="any"><span class="item-num">7.</span><span class="item-text">I don't have ___ <b>mushrooms</b> for the soup.</span>
+        <div class="options"><label><input type="radio" name="e2-7" value="some"><span>some</span></label><label><input type="radio" name="e2-7" value="any"><span>any</span></label></div>
+        <span class="feedback"></span><span class="answer-reveal">Ответ: any mushrooms — отрицание.</span>
+      </div>
+      <div class="item" data-answer="some"><span class="item-num">8.</span><span class="item-text">I try to eat ___ <b>healthy food</b> every day.</span>
+        <div class="options"><label><input type="radio" name="e2-8" value="some"><span>some</span></label><label><input type="radio" name="e2-8" value="any"><span>any</span></label></div>
+        <span class="feedback"></span><span class="answer-reveal">Ответ: some healthy food — утверждение.</span>
+      </div>
+      <div class="item" data-answer="any"><span class="item-num">9.</span><span class="item-text">Did you make ___ <b>sandwiches</b> for the trip?</span>
+        <div class="options"><label><input type="radio" name="e2-9" value="some"><span>some</span></label><label><input type="radio" name="e2-9" value="any"><span>any</span></label></div>
+        <span class="feedback"></span><span class="answer-reveal">Ответ: any sandwiches — вопрос.</span>
+      </div>
+      <div class="item" data-answer="some"><span class="item-num">10.</span><span class="item-text">There are ___ <b>cucumbers</b> in the bag.</span>
+        <div class="options"><label><input type="radio" name="e2-10" value="some"><span>some</span></label><label><input type="radio" name="e2-10" value="any"><span>any</span></label></div>
+        <span class="feedback"></span><span class="answer-reveal">Ответ: some cucumbers — утверждение.</span>
+      </div>
+
+      <div class="ex-actions">
+        <button class="btn-check">Проверить</button>
+        <button class="btn-reveal">Показать ответы</button>
+        <button class="btn-reset">Сбросить</button>
+        <span class="score">0 / 10</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXERCISE 3 - pictures, one vs many -->
+  <section class="ex" id="ex3">
+    <div class="receipt" data-exercise>
+      <div class="ex-head"><span class="ex-num">Упражнение 3</span></div>
+      <h3>Один или много?</h3>
+      <p class="instructions">Посмотри на картинку и выбери слово, которое подходит по количеству и типу предложения.</p>
+
+      <div class="item" data-answer="a">
+        <span class="item-num">1.</span>
+        <div class="icon-row"><svg><use href="#ic-banana"/></svg></div>
+        <span class="item-text">I ate ___ <b>banana</b>.</span>
+        <div class="options"><label><input type="radio" name="e3-1" value="a"><span>a</span></label><label><input type="radio" name="e3-1" value="an"><span>an</span></label></div>
+        <span class="feedback"></span><span class="answer-reveal">Ответ: a banana — один банан, [b] согласный звук.</span>
+      </div>
+
+      <div class="item" data-answer="some">
+        <span class="item-num">2.</span>
+        <div class="icon-row"><svg><use href="#ic-banana"/></svg><svg><use href="#ic-banana"/></svg><svg><use href="#ic-banana"/></svg></div>
+        <span class="item-text">There are ___ <b>bananas</b> on the table.</span>
+        <div class="options"><label><input type="radio" name="e3-2" value="some"><span>some</span></label><label><input type="radio" name="e3-2" value="any"><span>any</span></label></div>
+        <span class="feedback"></span><span class="answer-reveal">Ответ: some bananas — много бананов, утверждение.</span>
+      </div>
+
+      <div class="item" data-answer="a">
+        <span class="item-num">3.</span>
+        <div class="icon-row"><svg><use href="#ic-pear"/></svg></div>
+        <span class="item-text">She gave me ___ <b>pear</b>.</span>
+        <div class="options"><label><input type="radio" name="e3-3" value="a"><span>a</span></label><label><input type="radio" name="e3-3" value="an"><span>an</span></label></div>
+        <span class="feedback"></span><span class="answer-reveal">Ответ: a pear — одна груша.</span>
+      </div>
+
+      <div class="item" data-answer="any">
+        <span class="item-num">4.</span>
+        <div class="icon-row"><svg><use href="#ic-strawberry"/></svg><svg><use href="#ic-strawberry"/></svg><svg><use href="#ic-strawberry"/></svg></div>
+        <span class="item-text">I don't have ___ <b>strawberries</b> left.</span>
+        <div class="options"><label><input type="radio" name="e3-4" value="some"><span>some</span></label><label><input type="radio" name="e3-4" value="any"><span>any</span></label></div>
+        <span class="feedback"></span><span class="answer-reveal">Ответ: any strawberries — отрицание, хотя ягод много.</span>
+      </div>
+
+      <div class="item" data-answer="an">
+        <span class="item-num">5.</span>
+        <div class="icon-row"><svg><use href="#ic-onion"/></svg></div>
+        <span class="item-text">He needs ___ <b>onion</b> for the recipe.</span>
+        <div class="options"><label><input type="radio" name="e3-5" value="a"><span>a</span></label><label><input type="radio" name="e3-5" value="an"><span>an</span></label></div>
+        <span class="feedback"></span><span class="answer-reveal">Ответ: an onion — одна луковица, гласный звук в начале.</span>
+      </div>
+
+      <div class="item" data-answer="any">
+        <span class="item-num">6.</span>
+        <div class="icon-row"><svg><use href="#ic-mushroom"/></svg><svg><use href="#ic-mushroom"/></svg><svg><use href="#ic-mushroom"/></svg></div>
+        <span class="item-text">Did you find ___ <b>mushrooms</b> in the forest?</span>
+        <div class="options"><label><input type="radio" name="e3-6" value="some"><span>some</span></label><label><input type="radio" name="e3-6" value="any"><span>any</span></label></div>
+        <span class="feedback"></span><span class="answer-reveal">Ответ: any mushrooms — вопрос.</span>
+      </div>
+
+      <div class="item" data-answer="-">
+        <span class="item-num">7.</span>
+        <div class="icon-row"><svg><use href="#ic-pepperflakes"/></svg></div>
+        <span class="item-text">Add ___ <b>pepper</b> to the soup.</span>
+        <div class="options"><label><input type="radio" name="e3-7" value="a"><span>a</span></label><label><input type="radio" name="e3-7" value="some"><span>some</span></label><label><input type="radio" name="e3-7" value="-"><span>— (без слова)</span></label></div>
+        <span class="feedback"></span><span class="answer-reveal">Ответ: без слова — pepper как приправа неисчисляемо и часто идёт без артикля/some.</span>
+      </div>
+
+      <div class="item" data-answer="a">
+        <span class="item-num">8.</span>
+        <div class="icon-row"><svg><use href="#ic-bread"/></svg></div>
+        <span class="item-text">I bought ___ <b>loaf</b> of bread.</span>
+        <div class="options"><label><input type="radio" name="e3-8" value="a"><span>a</span></label><label><input type="radio" name="e3-8" value="some"><span>some</span></label></div>
+        <span class="feedback"></span><span class="answer-reveal">Ответ: a loaf — loaf исчисляемое слово-мера, хотя сам bread неисчисляем.</span>
+      </div>
+
+      <div class="item" data-answer="any">
+        <span class="item-num">9.</span>
+        <div class="icon-row"><svg><use href="#ic-butter"/></svg></div>
+        <span class="item-text">Is there ___ <b>butter</b> in the fridge?</span>
+        <div class="options"><label><input type="radio" name="e3-9" value="some"><span>some</span></label><label><input type="radio" name="e3-9" value="any"><span>any</span></label></div>
+        <span class="feedback"></span><span class="answer-reveal">Ответ: any butter — вопрос, butter неисчисляемо.</span>
+      </div>
+
+      <div class="ex-actions">
+        <button class="btn-check">Проверить</button>
+        <button class="btn-reveal">Показать ответы</button>
+        <button class="btn-reset">Сбросить</button>
+        <span class="score">0 / 9</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="theory">
+    <h2>Нюансы произношения</h2>
+    <div class="tag-grid">
+      <div class="price-tag">
+        <h3>pear <span class="ipa">/peə/</span></h3>
+        <p>Никакого «р» в конце — по-русски похоже на «пэа», а не «пир» и не «пэар».</p>
+      </div>
+      <div class="price-tag">
+        <h3>onion <span class="ipa">/ˈʌnjən/</span></h3>
+        <p>Начинается с гласного звука [ʌ] — поэтому <b>an onion</b>, а не a onion.</p>
+      </div>
+      <div class="price-tag">
+        <h3>pepper <span class="ipa">/ˈpepə/</span></h3>
+        <p>Первый звук — чистое [e], без лишнего «й», который русские часто добавляют.</p>
+      </div>
+      <div class="price-tag">
+        <h3>sandwich <span class="ipa">/ˈsænwɪdʒ/</span></h3>
+        <p>Буква <b>d</b> почти не слышна — получается «сэнwич», а не «сэндвич».</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXERCISE 4 - pronunciation traps -->
+  <section class="ex" id="ex4">
+    <div class="receipt" data-exercise>
+      <div class="ex-head"><span class="ex-num">Упражнение 4</span></div>
+      <h3>Какая ловушка спрятана в слове?</h3>
+      <p class="instructions">Выбери, какая особенность произношения относится к слову.</p>
+
+      <div class="item" data-answer="silent"><span class="item-num">1.</span><span class="item-text"><span class="word-chip">sandwich</span></span>
+        <div class="options">
+          <label><input type="radio" name="e4-1" value="silent"><span>непроизносимая буква</span></label>
+          <label><input type="radio" name="e4-1" value="vowel"><span>начинается с гласного звука</span></label>
+          <label><input type="radio" name="e4-1" value="stress"><span>ударение не на первый слог</span></label>
+        </div>
+        <span class="feedback"></span><span class="answer-reveal">Ответ: непроизносимая буква — d в /ˈsænwɪdʒ/ почти не слышна.</span>
+      </div>
+      <div class="item" data-answer="vowel"><span class="item-num">2.</span><span class="item-text"><span class="word-chip">onion</span></span>
+        <div class="options">
+          <label><input type="radio" name="e4-2" value="silent"><span>непроизносимая буква</span></label>
+          <label><input type="radio" name="e4-2" value="vowel"><span>начинается с гласного звука</span></label>
+          <label><input type="radio" name="e4-2" value="stress"><span>ударение не на первый слог</span></label>
+        </div>
+        <span class="feedback"></span><span class="answer-reveal">Ответ: гласный звук в начале — /ˈʌnjən/, поэтому an onion.</span>
+      </div>
+      <div class="item" data-answer="stress"><span class="item-num">3.</span><span class="item-text"><span class="word-chip">strawberry</span></span>
+        <div class="options">
+          <label><input type="radio" name="e4-3" value="silent"><span>непроизносимая буква</span></label>
+          <label><input type="radio" name="e4-3" value="vowel"><span>начинается с гласного звука</span></label>
+          <label><input type="radio" name="e4-3" value="stress"><span>сильное ударение именно на первый слог</span></label>
+        </div>
+        <span class="feedback"></span><span class="answer-reveal">Ответ: ударение на первый слог — «STRAW-berry», не «straw-BER-ry».</span>
+      </div>
+      <div class="item" data-answer="short-r"><span class="item-num">4.</span><span class="item-text"><span class="word-chip">pear</span></span>
+        <div class="options">
+          <label><input type="radio" name="e4-4" value="short-r"><span>конечная «r» не произносится</span></label>
+          <label><input type="radio" name="e4-4" value="vowel"><span>начинается с гласного звука</span></label>
+          <label><input type="radio" name="e4-4" value="stress"><span>ударение не на первый слог</span></label>
+        </div>
+        <span class="feedback"></span><span class="answer-reveal">Ответ: «r» на конце не звучит — /peə/, «пэа».</span>
+      </div>
+      <div class="item" data-answer="no-y"><span class="item-num">5.</span><span class="item-text"><span class="word-chip">pepper</span></span>
+        <div class="options">
+          <label><input type="radio" name="e4-5" value="no-y"><span>без лишнего «й»-звука в начале</span></label>
+          <label><input type="radio" name="e4-5" value="vowel"><span>начинается с гласного звука</span></label>
+          <label><input type="radio" name="e4-5" value="stress"><span>ударение не на первый слог</span></label>
+        </div>
+        <span class="feedback"></span><span class="answer-reveal">Ответ: без «й» — чистое [e], а не [ei].</span>
+      </div>
+      <div class="item" data-answer="kj"><span class="item-num">6.</span><span class="item-text"><span class="word-chip">cucumber</span></span>
+        <div class="options">
+          <label><input type="radio" name="e4-6" value="kj"><span>начинается со звука «кью», как в queue</span></label>
+          <label><input type="radio" name="e4-6" value="vowel"><span>начинается с гласного звука</span></label>
+          <label><input type="radio" name="e4-6" value="stress"><span>ударение не на первый слог</span></label>
+        </div>
+        <span class="feedback"></span><span class="answer-reveal">Ответ: «кью» — /ˈkjuːkʌmbə/, а не «ку».</span>
+      </div>
+
+      <div class="ex-actions">
+        <button class="btn-check">Проверить</button>
+        <button class="btn-reveal">Показать ответы</button>
+        <button class="btn-reset">Сбросить</button>
+        <span class="score">0 / 6</span>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>сделано для практики a / an / some / any — удачной охоты за артиклями 🧺</footer>
+
+<script>
+document.querySelectorAll('[data-exercise]').forEach(function(card){
+  const items = Array.from(card.querySelectorAll('.item'));
+  const checkBtn = card.querySelector('.btn-check');
+  const revealBtn = card.querySelector('.btn-reveal');
+  const resetBtn = card.querySelector('.btn-reset');
+  const scoreEl = card.querySelector('.score');
+  let revealed = false;
+
+  items.forEach(function(item){
+    item.querySelectorAll('.options label').forEach(function(label){
+      const input = label.querySelector('input');
+      input.addEventListener('change', function(){
+        item.querySelectorAll('.options label').forEach(l=>l.classList.remove('picked'));
+        label.classList.add('picked');
+      });
+    });
+  });
+
+  function getUserAnswer(item){
+    const radios = item.querySelectorAll('input[type="radio"]');
+    if(radios.length){
+      const checked = item.querySelector('input[type="radio"]:checked');
+      return checked ? checked.value.trim().toLowerCase() : null;
+    }
+    return null;
+  }
+
+  checkBtn.addEventListener('click', function(){
+    let correct = 0;
+    items.forEach(function(item){
+      const accepted = item.dataset.answer.trim().toLowerCase();
+      const user = getUserAnswer(item);
+      item.classList.remove('correct','wrong');
+      if(user === null || user === ''){
+        return;
+      }
+      if(user === accepted){
+        item.classList.add('correct');
+        correct++;
+      } else {
+        item.classList.add('wrong');
+      }
+    });
+    scoreEl.textContent = correct + ' / ' + items.length;
+  });
+
+  revealBtn.addEventListener('click', function(){
+    revealed = !revealed;
+    card.classList.toggle('show-answers', revealed);
+    revealBtn.textContent = revealed ? 'Скрыть ответы' : 'Показать ответы';
+  });
+
+  resetBtn.addEventListener('click', function(){
+    items.forEach(function(item){
+      item.classList.remove('correct','wrong');
+      item.querySelectorAll('input[type="radio"]').forEach(r=>r.checked=false);
+      item.querySelectorAll('.options label').forEach(l=>l.classList.remove('picked'));
+    });
+    scoreEl.textContent = '0 / ' + items.length;
+    revealed = false;
+    card.classList.remove('show-answers');
+    revealBtn.textContent = 'Показать ответы';
+  });
+});
+</script>
+
+</body>
+</html>
