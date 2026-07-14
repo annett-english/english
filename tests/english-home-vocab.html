@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Дом и мебель — практика лексики</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EDF2F4;
+    --paper-line:#c7d5da;
+    --ink:#1F3B4D;
+    --ink-soft:#4A6572;
+    --amber:#C98A3E;
+    --rust:#A6432B;
+    --sage:#5D8062;
+    --card:#F7FAFB;
+    --card-border:#c3d2d8;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:
+      repeating-linear-gradient(0deg, transparent 0 27px, var(--paper-line) 27px 28px),
+      repeating-linear-gradient(90deg, transparent 0 27px, var(--paper-line) 27px 28px),
+      var(--paper);
+    background-size:28px 28px;
+    color:var(--ink);
+    font-family:'Source Serif 4', serif;
+    line-height:1.5;
+    padding:24px 16px 80px;
+  }
+  .sheet{
+    max-width:920px;
+    margin:0 auto;
+    background:var(--card);
+    border:1.5px solid var(--ink);
+    box-shadow:6px 6px 0 rgba(31,59,77,0.12);
+  }
+  header.titleblock{
+    border-bottom:1.5px solid var(--ink);
+    padding:22px 28px;
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    flex-wrap:wrap;
+    gap:12px;
+  }
+  header.titleblock h1{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700;
+    font-size:1.7rem;
+    margin:0 0 4px;
+    letter-spacing:-0.01em;
+  }
+  header.titleblock .sub{
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.75rem;
+    color:var(--ink-soft);
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+  }
+  .stamp{
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.72rem;
+    border:1px solid var(--ink);
+    padding:6px 10px;
+    color:var(--ink-soft);
+    text-align:right;
+    line-height:1.6;
+    white-space:nowrap;
+  }
+  #progress-num{color:var(--amber); font-weight:600;}
+
+  nav.toc{
+    display:flex;
+    flex-wrap:wrap;
+    gap:0;
+    border-bottom:1.5px solid var(--ink);
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.72rem;
+  }
+  nav.toc a{
+    color:var(--ink-soft);
+    text-decoration:none;
+    padding:10px 16px;
+    border-right:1px solid var(--paper-line);
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+  }
+  nav.toc a:hover{ color:var(--ink); background:var(--paper); }
+
+  section.block{
+    padding:28px;
+    border-bottom:1.5px dashed var(--paper-line);
+  }
+  section.block:last-of-type{ border-bottom:none; }
+
+  .block-eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.7rem;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    color:var(--amber);
+    margin:0 0 6px;
+  }
+  .block h2{
+    font-family:'Space Grotesk', sans-serif;
+    font-size:1.25rem;
+    margin:0 0 6px;
+  }
+  .block .note{
+    color:var(--ink-soft);
+    font-size:0.92rem;
+    margin:0 0 20px;
+  }
+
+  .task{
+    background:var(--paper);
+    border:1px solid var(--card-border);
+    border-left:3px solid var(--ink-soft);
+    padding:14px 16px;
+    margin-bottom:12px;
+  }
+  .task.solved{ border-left-color:var(--sage); }
+  .task p.prompt{ margin:0 0 10px; font-size:1.02rem; }
+  .task p.prompt b{ color:var(--ink); }
+  .input-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+  .task input[type=text]{
+    flex:1 1 200px;
+    padding:8px 10px;
+    border:1px solid var(--card-border);
+    background:#fff;
+    font-family:'Source Serif 4', serif;
+    font-size:0.98rem;
+    color:var(--ink);
+  }
+  .task input[type=text]:focus{ outline:2px solid var(--amber); outline-offset:1px; }
+  button{
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.72rem;
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+    border:1px solid var(--ink);
+    background:var(--card);
+    color:var(--ink);
+    padding:8px 12px;
+    cursor:pointer;
+  }
+  button.btn-check{ background:var(--ink); color:var(--card); }
+  button.btn-check:hover{ background:var(--ink-soft); }
+  button.btn-show:hover{ background:var(--paper-line); }
+  .feedback{ margin-top:8px; font-family:'JetBrains Mono', monospace; font-size:0.82rem; min-height:1.1em; }
+  .feedback.ok{ color:var(--sage); }
+  .feedback.bad{ color:var(--rust); }
+  .feedback.shown{ color:var(--ink-soft); }
+  .feedback.warn{ color:var(--amber); }
+  .explain{ display:block; margin-top:4px; color:var(--ink-soft); font-family:'Source Serif 4', serif; font-size:0.85rem; }
+
+  .diagram-wrap{
+    background:var(--paper);
+    border:1px solid var(--card-border);
+    padding:16px;
+    margin-bottom:20px;
+  }
+  .diagram-wrap svg{ width:100%; height:auto; display:block; }
+  .legend{
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.75rem;
+    color:var(--ink-soft);
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(150px,1fr));
+    gap:4px 12px;
+    margin-top:12px;
+  }
+  .legend span b{ color:var(--amber); }
+
+  .reset-row{ text-align:center; padding:18px; }
+  .reset-row button{ background:var(--card); }
+
+  footer{ padding:18px 28px; font-family:'JetBrains Mono', monospace; font-size:0.7rem; color:var(--ink-soft); text-align:center; }
+  @media(max-width:600px){
+    header.titleblock{ padding:16px; }
+    section.block{ padding:18px; }
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <header class="titleblock">
+    <div>
+      <h1>Дом, комната, мебель</h1>
+      <div class="sub">Практика лексики · английский язык</div>
+    </div>
+    <div class="stamp">
+      ЛИСТ&nbsp;01&nbsp;/&nbsp;01<br>
+      ПРОВЕРЕНО: <span id="progress-num">0/0</span><br>
+      МАСШТАБ: A1–A2
+    </div>
+  </header>
+
+  <nav class="toc">
+    <a href="#ex1">01 EN→RU</a>
+    <a href="#ex2">02 RU→EN</a>
+    <a href="#ex3">03 Вставь слово</a>
+    <a href="#ex4">04 План комнаты</a>
+    <a href="#ex5">05 Сложные слова</a>
+    <a href="#ex6">06 Исправь ошибку</a>
+  </nav>
+
+  <!-- EXERCISE 1 -->
+  <section class="block" id="ex1">
+    <p class="block-eyebrow">Упражнение 01</p>
+    <h2>Английский → русский</h2>
+    <p class="note">Переведи слово или выражение на русский язык.</p>
+    <div id="ex1-tasks"></div>
+  </section>
+
+  <!-- EXERCISE 2 -->
+  <section class="block" id="ex2">
+    <p class="block-eyebrow">Упражнение 02</p>
+    <h2>Русский → английский</h2>
+    <p class="note">Напиши слово или выражение по-английски.</p>
+    <div id="ex2-tasks"></div>
+  </section>
+
+  <!-- EXERCISE 3 -->
+  <section class="block" id="ex3">
+    <p class="block-eyebrow">Упражнение 03</p>
+    <h2>Вставь пропущенное слово</h2>
+    <p class="note">Впиши одно слово (или предлог), которое пропущено в предложении.</p>
+    <div id="ex3-tasks"></div>
+  </section>
+
+  <!-- EXERCISE 4 -->
+  <section class="block" id="ex4">
+    <p class="block-eyebrow">Упражнение 04</p>
+    <h2>План комнаты — опиши картинку</h2>
+    <p class="note">Посмотри на план гостиной и опиши расположение предметов, вписав пропущенное слово (предлог места или название предмета).</p>
+
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 620 380" xmlns="http://www.w3.org/2000/svg">
+        <rect x="20" y="20" width="580" height="340" fill="none" stroke="#1F3B4D" stroke-width="2"/>
+        <!-- window -->
+        <rect x="260" y="14" width="100" height="12" fill="#F7FAFB" stroke="#1F3B4D" stroke-width="1.5"/>
+        <line x1="285" y1="14" x2="285" y2="26" stroke="#1F3B4D"/>
+        <line x1="335" y1="14" x2="335" y2="26" stroke="#1F3B4D"/>
+        <line x1="255" y1="32" x2="255" y2="60" stroke="#4A6572" stroke-width="1.5"/>
+        <line x1="365" y1="32" x2="365" y2="60" stroke="#4A6572" stroke-width="1.5"/>
+        <text x="310" y="48" font-family="JetBrains Mono" font-size="11" fill="#4A6572" text-anchor="middle">6</text>
+
+        <!-- fireplace, left wall -->
+        <rect x="20" y="140" width="16" height="80" fill="#F7FAFB" stroke="#1F3B4D" stroke-width="2"/>
+        <line x1="36" y1="150" x2="46" y2="150" stroke="#1F3B4D"/>
+        <line x1="36" y1="210" x2="46" y2="210" stroke="#1F3B4D"/>
+        <text x="60" y="184" font-family="JetBrains Mono" font-size="11" fill="#4A6572">1</text>
+
+        <!-- picture above fireplace, on left wall panel drawn as small rect just right of wall -->
+        <rect x="60" y="150" width="34" height="24" fill="none" stroke="#C98A3E" stroke-width="1.5"/>
+        <text x="77" y="145" font-family="JetBrains Mono" font-size="11" fill="#4A6572" text-anchor="middle">2</text>
+
+        <!-- sofa -->
+        <rect x="80" y="230" width="150" height="55" rx="4" fill="none" stroke="#1F3B4D" stroke-width="2"/>
+        <text x="155" y="315" font-family="JetBrains Mono" font-size="11" fill="#4A6572" text-anchor="middle">3</text>
+
+        <!-- plant next to sofa -->
+        <circle cx="250" cy="260" r="14" fill="none" stroke="#5D8062" stroke-width="1.5"/>
+        <line x1="250" y1="274" x2="250" y2="288" stroke="#5D8062" stroke-width="1.5"/>
+        <text x="250" y="305" font-family="JetBrains Mono" font-size="11" fill="#4A6572" text-anchor="middle">4</text>
+
+        <!-- floor lamp other side of sofa -->
+        <line x1="65" y1="230" x2="65" y2="270" stroke="#C98A3E" stroke-width="1.5"/>
+        <path d="M55 220 L75 220 L65 230 Z" fill="none" stroke="#C98A3E" stroke-width="1.5"/>
+        <text x="65" y="298" font-family="JetBrains Mono" font-size="11" fill="#4A6572" text-anchor="middle">5</text>
+
+        <!-- rug -->
+        <rect x="230" y="240" width="150" height="90" fill="none" stroke="#4A6572" stroke-width="1.5" stroke-dasharray="5 4"/>
+        <text x="305" y="345" font-family="JetBrains Mono" font-size="11" fill="#4A6572" text-anchor="middle">7</text>
+
+        <!-- coffee table on rug -->
+        <rect x="275" y="270" width="60" height="30" fill="none" stroke="#1F3B4D" stroke-width="2"/>
+        <text x="305" y="265" font-family="JetBrains Mono" font-size="11" fill="#4A6572" text-anchor="middle">8</text>
+
+        <!-- armchair opposite sofa -->
+        <rect x="400" y="245" width="70" height="60" rx="4" fill="none" stroke="#1F3B4D" stroke-width="2"/>
+        <text x="435" y="320" font-family="JetBrains Mono" font-size="11" fill="#4A6572" text-anchor="middle">9</text>
+
+        <!-- TV stand right wall -->
+        <rect x="540" y="150" width="16" height="70" fill="#F7FAFB" stroke="#1F3B4D" stroke-width="2"/>
+        <rect x="490" y="160" width="45" height="50" fill="none" stroke="#1F3B4D" stroke-width="1.5"/>
+        <text x="512" y="145" font-family="JetBrains Mono" font-size="11" fill="#4A6572" text-anchor="middle">10</text>
+      </svg>
+      <div class="legend">
+        <span><b>1</b> fireplace</span>
+        <span><b>2</b> picture</span>
+        <span><b>3</b> sofa</span>
+        <span><b>4</b> plant</span>
+        <span><b>5</b> floor lamp</span>
+        <span><b>6</b> curtains</span>
+        <span><b>7</b> rug</span>
+        <span><b>8</b> coffee table</span>
+        <span><b>9</b> armchair</span>
+        <span><b>10</b> TV stand</span>
+      </div>
+    </div>
+
+    <div id="ex4-tasks"></div>
+  </section>
+
+  <!-- EXERCISE 5 -->
+  <section class="block" id="ex5">
+    <p class="block-eyebrow">Упражнение 05 · Разбор ошибок</p>
+    <h2>Слова, которые путались</h2>
+    <p class="note">filthy / fascinating / downstairs / upstairs / minimalistic / minimalism — впиши подходящее слово в скобках.</p>
+    <div id="ex5-tasks"></div>
+  </section>
+
+  <!-- EXERCISE 6 -->
+  <section class="block" id="ex6">
+    <p class="block-eyebrow">Упражнение 06 · Разбор ошибок</p>
+    <h2>Найди и исправь ошибку</h2>
+    <p class="note">Предложение неверное. Впиши исправленный вариант целиком.</p>
+    <div id="ex6-tasks"></div>
+  </section>
+
+  <div class="reset-row">
+    <button onclick="location.reload()">Начать заново</button>
+  </div>
+
+  <footer>Материал составлен по личному списку лексики · для самопроверки</footer>
+</div>
+
+<script>
+let taskCounter = 0;
+let solvedCount = 0;
+
+function normalize(s){
+  return s.toLowerCase().trim()
+    .replace(/^(the|a|an)\s+/,'')
+    .replace(/[.,!?;:]+$/,'')
+    .replace(/\s+/g,' ');
+}
+
+function addTask(containerId, promptHTML, answers, explanation, placeholder){
+  taskCounter++;
+  const id = 'q' + taskCounter;
+  const container = document.getElementById(containerId);
+  const div = document.createElement('div');
+  div.className = 'task';
+  div.dataset.answers = answers.join('|');
+  div.dataset.explain = explanation || '';
+  div.innerHTML =
+    '<p class="prompt">' + promptHTML + '</p>' +
+    '<div class="input-row">' +
+      '<input type="text" id="' + id + '" placeholder="' + (placeholder || 'Введите ответ...') + '">' +
+      '<button class="btn-check" type="button">Проверить</button>' +
+      '<button class="btn-show" type="button">Показать ответ</button>' +
+    '</div>' +
+    '<div class="feedback"></div>';
+  container.appendChild(div);
+
+  const input = div.querySelector('input');
+  const checkBtn = div.querySelector('.btn-check');
+  const showBtn = div.querySelector('.btn-show');
+  checkBtn.addEventListener('click', function(){ check(id); });
+  showBtn.addEventListener('click', function(){ reveal(id); });
+  input.addEventListener('keydown', function(e){
+    if(e.key === 'Enter'){ e.preventDefault(); check(id); }
+  });
+}
+
+function check(id){
+  const input = document.getElementById(id);
+  const task = input.closest('.task');
+  const fb = task.querySelector('.feedback');
+  const accepted = task.dataset.answers.split('|').map(normalize);
+  const explain = task.dataset.explain;
+  const val = normalize(input.value);
+
+  if(!val){
+    fb.className = 'feedback warn';
+    fb.textContent = 'Впиши ответ, прежде чем проверять.';
+    return;
+  }
+  if(accepted.includes(val)){
+    fb.className = 'feedback ok';
+    fb.innerHTML = '✓ Верно!' + (explain ? '<span class="explain">' + explain + '</span>' : '');
+    if(!task.classList.contains('solved')){
+      task.classList.add('solved');
+      solvedCount++;
+      updateProgress();
+    }
+  } else {
+    fb.className = 'feedback bad';
+    fb.textContent = '✗ Пока не то. Попробуй ещё раз или посмотри ответ.';
+  }
+}
+
+function reveal(id){
+  const input = document.getElementById(id);
+  const task = input.closest('.task');
+  const fb = task.querySelector('.feedback');
+  const answers = task.dataset.answers.split('|');
+  const explain = task.dataset.explain;
+  fb.className = 'feedback shown';
+  fb.innerHTML = 'Ответ: <b>' + answers.join(' / ') + '</b>' + (explain ? '<span class="explain">' + explain + '</span>' : '');
+}
+
+function updateProgress(){
+  const total = document.querySelectorAll('.task').length;
+  document.getElementById('progress-num').textContent = solvedCount + '/' + total;
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+
+  // ---------- EX 1: EN -> RU ----------
+  const ex1 = [
+    ['desk','письменный стол'],
+    ['open-plan kitchen','кухня открытого типа|кухня-студия'],
+    ['pantry','кладовая'],
+    ['balcony','балкон'],
+    ['hall','прихожая|холл'],
+    ['dining room','столовая'],
+    ['home office / study','домашний офис|кабинет'],
+    ['gas stove','газовая плита'],
+    ['sink','раковина'],
+    ['counter','столешница|кухонная столешница'],
+    ['brushes','кисточки'],
+    ['equipment','оборудование'],
+    ['hardware','фурнитура|комплектующие'],
+    ['stairs','лестница'],
+    ['laundry','стирка|бельё'],
+    ['comfort','комфорт|удобство'],
+    ['TV stand','тумба под телевизор'],
+    ['shelf','полка'],
+    ['washing machine','стиральная машина'],
+    ['armchair','кресло'],
+    ['cupboard','шкафчик|кухонный шкаф'],
+    ['fireplace','камин'],
+    ['floor lamp','торшер'],
+    ['sofa','диван'],
+    ['coffee table','журнальный столик'],
+    ['rug','ковёр'],
+    ['bathtub','ванна'],
+    ['wardrobe','шкаф для одежды|гардероб'],
+    ['closet','шкаф'],
+    ['throw pillows / cushions','декоративные подушки'],
+    ['eco-friendly','экологичный|безопасный для окружающей среды']
+  ];
+  ex1.forEach(function(item){
+    addTask('ex1-tasks', '<b>' + item[0] + '</b>', item[1].split('|'), '', 'по-русски...');
+  });
+
+  // ---------- EX 2: RU -> EN ----------
+  const ex2 = [
+    ['кровать','bed'],
+    ['диван','sofa'],
+    ['кресло','armchair'],
+    ['ковёр','rug'],
+    ['торшер','floor lamp'],
+    ['камин','fireplace'],
+    ['шкаф для одежды','wardrobe'],
+    ['зеркало','mirror'],
+    ['шторы','curtains'],
+    ['картина','picture'],
+    ['растение','plant'],
+    ['душ','shower'],
+    ['духовка','oven'],
+    ['плита','cooker|stove'],
+    ['раковина','sink|washbasin'],
+    ['полка','shelf'],
+    ['лестница','stairs'],
+    ['балкон','balcony'],
+    ['кладовая','pantry'],
+    ['столовая','dining room'],
+    ['прихожая','hall'],
+    ['потолок','ceiling'],
+    ['часы','clock'],
+    ['журнальный столик','coffee table']
+  ];
+  ex2.forEach(function(item){
+    addTask('ex2-tasks', item[0], item[1].split('|'), '', 'in English...');
+  });
+
+  // ---------- EX 3: cloze ----------
+  const ex3 = [
+    ['The laptop is ___ the table.', 'on'],
+    ['The toy is ___ the table.', 'under'],
+    ['The chair is ___ the tables.', 'between'],
+    ['The picture is ___ the sofa.', 'above|over'],
+    ['The keys are ___ the drawer.', 'in'],
+    ['The car is ___ the house.', 'in front of'],
+    ['The garden is ___ the house.', 'behind'],
+    ['I work at my ___.', 'desk'],
+    ['We have an ___ kitchen.', 'open-plan'],
+    ['The food is in the ___.', 'pantry'],
+    ['I drink coffee on the ___.', 'balcony'],
+    ['The dishes are in the ___.', 'sink'],
+    ['There is a ___ in the living room.', 'fireplace'],
+    ['The ___ is next to the sofa.', 'floor lamp'],
+    ['My clothes are in the ___.', 'wardrobe']
+  ];
+  ex3.forEach(function(item){
+    addTask('ex3-tasks', item[0], item[1].split('|'), '', 'слово...');
+  });
+
+  // ---------- EX 4: picture description ----------
+  const ex4 = [
+    ['The picture (2) is ___ the fireplace.', 'above|over', 'Смотри на план: рисунок висит над камином.'],
+    ['The plant (4) is ___ the sofa.', 'near|next to', 'Растение стоит рядом с диваном.'],
+    ['The rug (7) is ___ the sofa and the armchair.', 'between', 'Ковёр лежит между диваном и креслом.'],
+    ['The floor lamp (5) is ___ the sofa.', 'near|next to', 'Торшер стоит рядом с диваном, с другой стороны от растения.'],
+    ['The ___ (8) is in front of the sofa, on the rug.', 'coffee table', 'Журнальный столик стоит перед диваном, прямо на ковре.'],
+    ['The curtains (6) are ___ the window.', 'on', 'Шторы висят на окне.'],
+    ['The armchair (9) is ___ the coffee table, opposite the sofa.', 'near|next to', 'Кресло стоит рядом со столиком, напротив дивана.'],
+    ['The ___ (10) is against the right wall.', 'TV stand', 'Тумба под телевизор стоит у правой стены.']
+  ];
+  ex4.forEach(function(item){
+    addTask('ex4-tasks', item[0], item[1].split('|'), item[2], 'слово...');
+  });
+
+  // ---------- EX 5: problem words ----------
+  const ex5 = [
+    ['The floor was absolutely ___ (dirty / filthy) — I have never seen so much mud in one room.',
+      'filthy',
+      '<b>filthy</b> — сильнее, чем dirty: не просто «грязный», а «очень грязный, отвратительно грязный». <b>dirty</b> — обычное, нейтральное «грязный».'],
+    ['Please wipe the table, it is a bit ___ (dirty / filthy).',
+      'dirty',
+      'Здесь грязь небольшая — подходит нейтральное <b>dirty</b>, а не сильное <b>filthy</b>.'],
+    ['The documentary was ___ (interesting / fascinating) — I could not stop watching, it was so gripping.',
+      'fascinating',
+      '<b>fascinating</b> — «увлекательный, завораживающий», сильнее эмоционально, чем <b>interesting</b> («интересный», нейтрально).'],
+    ['It is an ___ (interesting / fascinating) topic, worth reading a bit more about when you have time.',
+      'interesting',
+      'Обычный, спокойный интерес — нейтральное <b>interesting</b>, а не «завораживающий» <b>fascinating</b>.'],
+    ['The kitchen ___ (is / are) downstairs, next to the dining room.',
+      'is',
+      '<b>downstairs</b>/<b>upstairs</b> — наречия места, ведут себя как «here/there»: после подлежащего в единственном числе ставим <b>is</b> (The kitchen is downstairs), во множественном — <b>are</b>.'],
+    ['My parents ___ (is / are) upstairs at the moment, getting the bedroom ready.',
+      'are',
+      'Подлежащее множественное (my parents) → <b>are</b> upstairs.'],
+    ['I need to go ___ (downstairs / upstairs) to get my keys from the hall table.',
+      'downstairs',
+      'После глаголов движения (go, come, run) is/are не нужны — просто <b>go downstairs / go upstairs</b>, без is/are.'],
+    ['This apartment has a very ___ (minimalistic / minimalism) design — clean lines, no clutter.',
+      'minimalistic',
+      '<b>minimalistic</b> — прилагательное, описывает существительное (design). <b>minimalism</b> — существительное, название стиля/подхода.'],
+    ['I have become a big fan of ___ (minimalistic / minimalism) lately; I own very few things now.',
+      'minimalism',
+      'Здесь нужно существительное после fan of → <b>minimalism</b>, а не прилагательное minimalistic.']
+  ];
+  ex5.forEach(function(item){
+    addTask('ex5-tasks', item[0], item[1].split('|'), item[2], 'слово...');
+  });
+
+  // ---------- EX 6: error correction ----------
+  const ex6 = [
+    ['❌ The sofa near the plant.',
+      'the sofa is near the plant',
+      'В предложении нет сказуемого. Предлог <b>near</b> сам по себе не заменяет глагол — нужен глагол <b>is</b>: <i>The sofa is near the plant.</i>'],
+    ['❌ The sofa is grey colour.',
+      'the sofa is grey|the sofa is grey in colour',
+      'По-английски прилагательное цвета уже включает значение «цвета» — слово <b>colour</b> после него не нужно: просто <i>The sofa is grey.</i> Если очень хочется уточнить — <i>The sofa is grey in colour.</i>, но не «grey colour».'],
+    ['❌ The lamp shines bright in the evening.',
+      'the lamp shines brightly in the evening',
+      'Глагол <b>shines</b> описывается наречием, а не прилагательным: нужно <b>brightly</b>, а не <b>bright</b>. Сравни: <i>The room is bright</i> (прилагательное + is) — но <i>The lamp shines brightly</i> (наречие + глагол).']
+  ];
+  ex6.forEach(function(item){
+    addTask('ex6-tasks', item[0], item[1].split('|'), item[2], 'исправленное предложение...');
+  });
+
+  updateProgress();
+});
+</script>
+</body>
+</html>
