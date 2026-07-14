@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Английский · Работа над ошибками</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Rubik:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f5f8fc;
+    --grid:#dbe6f2;
+    --ink:#1e2a44;
+    --ink-soft:#5a6b8c;
+    --margin-red:#e57373;
+    --marker:#ffd84d;
+    --ok:#2e9e6b;
+    --ok-bg:#e3f4ec;
+    --bad:#e0524d;
+    --bad-bg:#fdeceb;
+    --blue:#3b6fd4;
+    --card:#ffffff;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:'Rubik',system-ui,sans-serif;
+    color:var(--ink);
+    background-color:var(--paper);
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size:26px 26px;
+    line-height:1.55;
+    padding-bottom:80px;
+  }
+  .wrap{max-width:780px;margin:0 auto;padding:0 16px}
+
+  header{padding:48px 0 28px}
+  .eyebrow{
+    display:inline-block;
+    font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--ink-soft);font-weight:500;
+    border:1.5px solid var(--ink-soft);
+    border-radius:999px;padding:4px 12px;margin-bottom:14px;
+    background:var(--card);
+  }
+  h1{
+    font-family:'Unbounded',sans-serif;
+    font-weight:700;font-size:clamp(24px,5vw,38px);
+    line-height:1.2;
+  }
+  h1 .hl{
+    background:linear-gradient(transparent 55%, var(--marker) 55%, var(--marker) 92%, transparent 92%);
+    padding:0 4px;
+  }
+  header p{margin-top:10px;color:var(--ink-soft);max-width:56ch}
+
+  .progress{
+    margin-top:18px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;
+    font-size:13px;color:var(--ink-soft);
+  }
+  .dot{
+    width:30px;height:30px;border-radius:50%;
+    border:2px solid var(--ink-soft);
+    display:flex;align-items:center;justify-content:center;
+    font-weight:700;font-size:13px;background:var(--card);
+    transition:all .25s;
+  }
+  .dot.done{background:var(--ok);border-color:var(--ok);color:#fff}
+
+  .ex{
+    background:var(--card);
+    border:1.5px solid var(--grid);
+    border-radius:var(--radius);
+    margin-bottom:34px;
+    position:relative;
+    box-shadow:0 2px 0 rgba(30,42,68,.06);
+    overflow:hidden;
+  }
+  .ex::before{ /* red notebook margin */
+    content:'';position:absolute;top:0;bottom:0;left:56px;
+    width:1.5px;background:var(--margin-red);opacity:.55;
+  }
+  .ex-head{
+    display:flex;gap:0;align-items:stretch;
+    border-bottom:1.5px solid var(--grid);
+  }
+  .ex-num{
+    flex:0 0 56px;display:flex;align-items:center;justify-content:center;
+    font-family:'Unbounded',sans-serif;font-weight:700;font-size:20px;
+    color:var(--margin-red);
+  }
+  .ex-title{padding:16px 18px 14px}
+  .ex-title h2{font-size:18px;font-weight:700;line-height:1.3}
+  .ex-title .rule{
+    font-size:13.5px;color:var(--ink-soft);margin-top:3px;
+  }
+  .ex-body{padding:18px 18px 20px 74px}
+  @media (max-width:560px){
+    .ex::before{left:44px}
+    .ex-num{flex-basis:44px;font-size:17px}
+    .ex-body{padding-left:58px;padding-right:14px}
+  }
+
+  .item{margin-bottom:16px}
+  .item:last-of-type{margin-bottom:0}
+  .item .q{font-size:16px}
+  .item .ru{color:var(--ink-soft);font-size:13.5px;font-style:italic}
+
+  input.gap{
+    font-family:'Rubik',sans-serif;font-size:16px;
+    border:none;border-bottom:2px dashed var(--ink-soft);
+    background:transparent;color:var(--blue);font-weight:500;
+    padding:2px 6px;margin:0 2px;text-align:center;
+    outline:none;min-width:70px;
+    transition:border-color .2s, background .2s;
+  }
+  input.gap:focus{border-bottom-style:solid;border-color:var(--blue)}
+  input.gap.right{border-color:var(--ok);background:var(--ok-bg);color:var(--ok);border-bottom-style:solid}
+  input.gap.wrong{border-color:var(--bad);background:var(--bad-bg);color:var(--bad);border-bottom-style:solid}
+
+  input.wide{min-width:220px;text-align:left;max-width:100%}
+
+  /* word-builder */
+  .builder{margin-bottom:22px}
+  .builder:last-of-type{margin-bottom:0}
+  .b-task{font-size:15px;margin-bottom:8px}
+  .b-task .ru-strong{font-weight:500}
+  .b-line{
+    min-height:46px;border:2px dashed var(--grid);border-radius:10px;
+    padding:7px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;
+    background:var(--paper);transition:border-color .2s, background .2s;
+  }
+  .b-line.right{border-color:var(--ok);border-style:solid;background:var(--ok-bg)}
+  .b-line.wrong{border-color:var(--bad);border-style:solid;background:var(--bad-bg)}
+  .b-line .placeholder{color:var(--ink-soft);font-size:13px;padding-left:6px}
+  .b-bank{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+  .chip{
+    font-family:'Rubik',sans-serif;font-size:15px;font-weight:500;
+    border:1.5px solid var(--ink);border-radius:8px;
+    background:var(--card);color:var(--ink);
+    padding:6px 12px;cursor:pointer;
+    box-shadow:0 2px 0 rgba(30,42,68,.15);
+    transition:transform .12s, opacity .2s;
+  }
+  .chip:hover{transform:translateY(-1px)}
+  .chip:active{transform:translateY(1px);box-shadow:none}
+  .chip.used{opacity:0;pointer-events:none;position:absolute}
+  .b-line .chip{border-color:var(--blue);color:var(--blue)}
+
+  .btns{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}
+  button.act{
+    font-family:'Rubik',sans-serif;font-size:15px;font-weight:700;
+    border-radius:10px;padding:10px 18px;cursor:pointer;
+    border:2px solid var(--ink);
+    transition:transform .12s, box-shadow .12s;
+    box-shadow:0 3px 0 var(--ink);
+  }
+  button.act:active{transform:translateY(3px);box-shadow:0 0 0 var(--ink)}
+  .btn-check{background:var(--marker);color:var(--ink)}
+  .btn-ans{background:var(--card);color:var(--ink)}
+  .btn-reset{background:var(--card);color:var(--ink-soft);border-color:var(--ink-soft);box-shadow:0 3px 0 var(--ink-soft)}
+
+  .score{
+    margin-top:14px;font-weight:700;font-size:15px;display:none;
+    padding:10px 14px;border-radius:10px;
+  }
+  .score.show{display:block}
+  .score.good{background:var(--ok-bg);color:var(--ok)}
+  .score.mid{background:#fff6d6;color:#8a6d00}
+  .score.low{background:var(--bad-bg);color:var(--bad)}
+
+  .answers{
+    display:none;margin-top:16px;border-top:2px dashed var(--grid);padding-top:16px;
+  }
+  .answers.show{display:block;animation:fade .3s}
+  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+  .answers h3{
+    font-size:13px;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--ink-soft);margin-bottom:10px;
+  }
+  .ans-item{margin-bottom:12px;font-size:14.5px}
+  .ans-item:last-child{margin-bottom:0}
+  .ans-item .a{font-weight:700;color:var(--ok)}
+  .ans-item .why{color:var(--ink-soft);display:block;margin-top:2px}
+  .ans-item .why b{color:var(--ink)}
+
+  footer{
+    text-align:center;color:var(--ink-soft);font-size:13px;margin-top:10px;
+  }
+  #totalBox{
+    display:none;background:var(--ink);color:#fff;border-radius:var(--radius);
+    padding:22px;text-align:center;margin-bottom:30px;
+  }
+  #totalBox.show{display:block;animation:fade .4s}
+  #totalBox .big{font-family:'Unbounded',sans-serif;font-size:30px;font-weight:700}
+  #totalBox .msg{margin-top:6px;color:#c9d8ec}
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none!important;transition:none!important}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <span class="eyebrow">Работа над ошибками · English</span>
+  <h1>Пять упражнений <span class="hl">по твоим ошибкам</span></h1>
+  <p>Впиши ответы, нажми <b>Проверить</b>. Если сложно — открой <b>Ответы + пояснения</b>. Заглавные/строчные буквы не важны.</p>
+  <div class="progress">
+    <span>Прогресс:</span>
+    <span class="dot" id="dot1">1</span>
+    <span class="dot" id="dot2">2</span>
+    <span class="dot" id="dot3">3</span>
+    <span class="dot" id="dot4">4</span>
+    <span class="dot" id="dot5">5</span>
+  </div>
+</header>
+
+<!-- ═══════════ EX 1 ═══════════ -->
+<section class="ex" id="ex1">
+  <div class="ex-head">
+    <div class="ex-num">1</div>
+    <div class="ex-title">
+      <h2>Прилагательные: easy / difficult, light / heavy</h2>
+      <div class="rule">heavy = тяжёлый, но также: heavy rain (сильный дождь), heavy traffic (пробки)</div>
+    </div>
+  </div>
+  <div class="ex-body">
+    <div class="item"><span class="q">1. This bag is not light, it's very <input class="gap" data-a="heavy" size="8">.</span><br><span class="ru">Эта сумка не лёгкая, она очень тяжёлая.</span></div>
+    <div class="item"><span class="q">2. The task isn't difficult, it's <input class="gap" data-a="easy" size="6">.</span><br><span class="ru">Задание не сложное, оно лёгкое.</span></div>
+    <div class="item"><span class="q">3. There was <input class="gap" data-a="heavy" size="8"> rain yesterday, so I stayed at home.</span><br><span class="ru">Вчера был сильный дождь, поэтому я остался дома.</span></div>
+    <div class="item"><span class="q">4. I was late because of <input class="gap" data-a="heavy" size="8"> traffic.</span><br><span class="ru">Я опоздал из-за сильных пробок.</span></div>
+    <div class="item"><span class="q">5. The test wasn't easy, it was really <input class="gap" data-a="difficult" size="10">.</span><br><span class="ru">Тест был не лёгким, он был очень сложным.</span></div>
+
+    <div class="btns">
+      <button class="act btn-check" onclick="checkEx('ex1')">Проверить</button>
+      <button class="act btn-ans" onclick="toggleAns('ex1')">Ответы + пояснения</button>
+      <button class="act btn-reset" onclick="resetEx('ex1')">Сбросить</button>
+    </div>
+    <div class="score" id="score-ex1"></div>
+
+    <div class="answers" id="ans-ex1">
+      <h3>Ответы и пояснения</h3>
+      <div class="ans-item">1. <span class="a">heavy</span><span class="why">Противоположность <b>light</b> (лёгкий) → <b>heavy</b> (тяжёлый).</span></div>
+      <div class="ans-item">2. <span class="a">easy</span><span class="why">Противоположность <b>difficult</b> (сложный) → <b>easy</b> (лёгкий, простой). Про задания говорим easy/difficult, а не light!</span></div>
+      <div class="ans-item">3. <span class="a">heavy</span><span class="why"><b>heavy rain</b> = сильный дождь. Устойчивое сочетание, не «strong rain».</span></div>
+      <div class="ans-item">4. <span class="a">heavy</span><span class="why"><b>heavy traffic</b> = сильное движение, пробки. Тоже устойчивое сочетание.</span></div>
+      <div class="ans-item">5. <span class="a">difficult</span><span class="why">Про тест/задание: <b>easy ↔ difficult</b>.</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ EX 2 ═══════════ -->
+<section class="ex" id="ex2">
+  <div class="ex-head">
+    <div class="ex-num">2</div>
+    <div class="ex-title">
+      <h2>Времена года с in + слово so</h2>
+      <div class="rule">in summer / in winter · so = 1) поэтому 2) так (красиво)</div>
+    </div>
+  </div>
+  <div class="ex-body">
+    <div class="item"><span class="q">1. <input class="gap" data-a="in" size="4"> summer I swim in the lake every day.</span><br><span class="ru">Летом я плаваю в озере каждый день.</span></div>
+    <div class="item"><span class="q">2. It often snows <input class="gap" data-a="in" size="4"> winter.</span><br><span class="ru">Зимой часто идёт снег.</span></div>
+    <div class="item"><span class="q">3. Leaves fall from the trees <input class="gap" data-a="in" size="4"> autumn.</span><br><span class="ru">Осенью листья падают с деревьев.</span></div>
+    <div class="item"><span class="q">4. The flowers <input class="gap" data-a="in" size="4"> spring are <input class="gap" data-a="so" size="4"> beautiful!</span><br><span class="ru">Цветы весной такие красивые!</span></div>
+    <div class="item"><span class="q">5. It was cold, <input class="gap" data-a="so" size="4"> I put on a warm jacket.</span><br><span class="ru">Было холодно, поэтому я надел тёплую куртку.</span></div>
+
+    <div class="btns">
+      <button class="act btn-check" onclick="checkEx('ex2')">Проверить</button>
+      <button class="act btn-ans" onclick="toggleAns('ex2')">Ответы + пояснения</button>
+      <button class="act btn-reset" onclick="resetEx('ex2')">Сбросить</button>
+    </div>
+    <div class="score" id="score-ex2"></div>
+
+    <div class="answers" id="ans-ex2">
+      <h3>Ответы и пояснения</h3>
+      <div class="ans-item">1–3. <span class="a">in</span><span class="why">С временами года всегда предлог <b>in</b>: <b>in summer</b> (летом), <b>in winter</b> (зимой), <b>in autumn</b> (осенью), <b>in spring</b> (весной). По-русски предлога нет, поэтому его легко забыть!</span></div>
+      <div class="ans-item">4. <span class="a">in</span>, <span class="a">so</span><span class="why"><b>in spring</b> = весной; <b>so beautiful</b> = такие красивые. Здесь so = «так/такой» (усиление перед прилагательным).</span></div>
+      <div class="ans-item">5. <span class="a">so</span><span class="why">Здесь <b>so = поэтому</b>: соединяет причину и следствие. Было холодно → поэтому надел куртку.</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ EX 3 ═══════════ -->
+<section class="ex" id="ex3">
+  <div class="ex-head">
+    <div class="ex-num">3</div>
+    <div class="ex-title">
+      <h2>need to / hate + ing / would like to / a lot (of)</h2>
+      <div class="rule">need <b>to</b> do · hate do<b>ing</b> · would like <b>to</b> buy · a lot / a lot <b>of</b> + сущ.</div>
+    </div>
+  </div>
+  <div class="ex-body">
+    <div class="item"><span class="q">1. I need <input class="gap" data-a="to do" size="8"> my homework now. (do)</span><br><span class="ru">Мне нужно сделать домашку сейчас.</span></div>
+    <div class="item"><span class="q">2. I hate <input class="gap" data-a="washing" size="9"> the dishes. (wash)</span><br><span class="ru">Ненавижу мыть посуду.</span></div>
+    <div class="item"><span class="q">3. I would like <input class="gap" data-a="to buy" size="8"> a new bike. (buy)</span><br><span class="ru">Я хотел бы купить новый велосипед.</span></div>
+    <div class="item"><span class="q">4. I sleep <input class="gap" data-a="a lot" size="8"> at the weekend.</span><br><span class="ru">Я много сплю на выходных.</span></div>
+    <div class="item"><span class="q">5. I eat <input class="gap" data-a="a lot of|lots of" size="10"> vegetables.</span><br><span class="ru">Я ем много овощей.</span></div>
+    <div class="item"><span class="q">6. I need 100 grams <input class="gap" data-a="of" size="4"> each.</span><br><span class="ru">Мне нужно по 100 грамм каждого.</span></div>
+
+    <div class="btns">
+      <button class="act btn-check" onclick="checkEx('ex3')">Проверить</button>
+      <button class="act btn-ans" onclick="toggleAns('ex3')">Ответы + пояснения</button>
+      <button class="act btn-reset" onclick="resetEx('ex3')">Сбросить</button>
+    </div>
+    <div class="score" id="score-ex3"></div>
+
+    <div class="answers" id="ans-ex3">
+      <h3>Ответы и пояснения</h3>
+      <div class="ans-item">1. <span class="a">to do</span><span class="why">После <b>need</b> всегда <b>to</b> + глагол: need <b>to do</b>, need <b>to go</b>.</span></div>
+      <div class="ans-item">2. <span class="a">washing</span><span class="why">После <b>hate</b> (и love, like, enjoy) глагол с <b>-ing</b>: hate wash<b>ing</b>.</span></div>
+      <div class="ans-item">3. <span class="a">to buy</span><span class="why">После <b>would like</b> всегда <b>to</b>: I would like <b>to buy</b>. (Сравни: I like buying — просто like идёт с -ing!)</span></div>
+      <div class="ans-item">4. <span class="a">a lot</span><span class="why">После глагола (без существительного) — просто <b>a lot</b>, без of: I sleep <b>a lot</b>.</span></div>
+      <div class="ans-item">5. <span class="a">a lot of</span> / <span class="a">lots of</span><span class="why">Перед существительным нужен <b>of</b>: a lot <b>of</b> vegetables = lots <b>of</b> vegetables.</span></div>
+      <div class="ans-item">6. <span class="a">of</span><span class="why">100 grams <b>of</b> flour, a cup <b>of</b> tea — количество + <b>of</b> + продукт.</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ EX 4 ═══════════ -->
+<section class="ex" id="ex4">
+  <div class="ex-head">
+    <div class="ex-num">4</div>
+    <div class="ex-title">
+      <h2>Собери предложение (порядок слов)</h2>
+      <div class="rule">Нажимай на слова по порядку. Помни: to be можно переводить как «находится».</div>
+    </div>
+  </div>
+  <div class="ex-body">
+    <div class="builder" data-answer="It will rain soon">
+      <div class="b-task"><span class="ru-strong">Скоро пойдёт дождь.</span></div>
+      <div class="b-line"><span class="placeholder">Нажимай на слова ниже…</span></div>
+      <div class="b-bank"></div>
+    </div>
+    <div class="builder" data-answer="10 coins are in my wallet">
+      <div class="b-task"><span class="ru-strong">10 монет находятся в моём кошельке.</span></div>
+      <div class="b-line"><span class="placeholder">Нажимай на слова ниже…</span></div>
+      <div class="b-bank"></div>
+    </div>
+    <div class="builder" data-answer="The keys are on the table">
+      <div class="b-task"><span class="ru-strong">Ключи (находятся) на столе.</span></div>
+      <div class="b-line"><span class="placeholder">Нажимай на слова ниже…</span></div>
+      <div class="b-bank"></div>
+    </div>
+    <div class="builder" data-answer="I eat a lot of fruit in summer">
+      <div class="b-task"><span class="ru-strong">Летом я ем много фруктов.</span></div>
+      <div class="b-line"><span class="placeholder">Нажимай на слова ниже…</span></div>
+      <div class="b-bank"></div>
+    </div>
+
+    <div class="btns">
+      <button class="act btn-check" onclick="checkEx('ex4')">Проверить</button>
+      <button class="act btn-ans" onclick="toggleAns('ex4')">Ответы + пояснения</button>
+      <button class="act btn-reset" onclick="resetEx('ex4')">Сбросить</button>
+    </div>
+    <div class="score" id="score-ex4"></div>
+
+    <div class="answers" id="ans-ex4">
+      <h3>Ответы и пояснения</h3>
+      <div class="ans-item">1. <span class="a">It will rain soon.</span><span class="why">В английском всегда нужен подлежащий: <b>It</b> will rain. Порядок: подлежащее → will → глагол → остальное. «Soon» — в конце.</span></div>
+      <div class="ans-item">2. <span class="a">10 coins are in my wallet.</span><span class="why"><b>are</b> здесь = «находятся». По-русски глагол можно опустить, по-английски — нельзя!</span></div>
+      <div class="ans-item">3. <span class="a">The keys are on the table.</span><span class="why">То же правило: The keys <b>are</b>… — глагол to be обязателен, переводится как «находятся».</span></div>
+      <div class="ans-item">4. <span class="a">I eat a lot of fruit in summer.</span><span class="why">Порядок: кто → что делает → что → когда. <b>a lot of</b> перед существительным, <b>in summer</b> — не забываем in! (Можно и: In summer I eat a lot of fruit.)</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ EX 5 ═══════════ -->
+<section class="ex" id="ex5">
+  <div class="ex-head">
+    <div class="ex-num">5</div>
+    <div class="ex-title">
+      <h2>It takes… — сколько времени занимает</h2>
+      <div class="rule">It takes (me) 2 hours to… · How long does it take (you) to…?</div>
+    </div>
+  </div>
+  <div class="ex-body">
+    <div class="item"><span class="q">1. It <input class="gap" data-a="takes" size="6"> me 2 hours to get to the village.</span><br><span class="ru">Дорога до деревни занимает у меня 2 часа.</span></div>
+    <div class="item"><span class="q">2. How long does it <input class="gap" data-a="take" size="6"> you to get to school?</span><br><span class="ru">Сколько времени у тебя занимает дорога до школы?</span></div>
+    <div class="item"><span class="q">3. It takes 10 minutes <input class="gap" data-a="to get" size="7"> to the shop. (get)</span><br><span class="ru">Дорога до магазина занимает 10 минут.</span></div>
+    <div class="item"><span class="q">4. How long <input class="gap" data-a="does" size="6"> it take you to cook dinner?</span><br><span class="ru">Сколько времени у тебя занимает приготовить ужин?</span></div>
+    <div class="item"><span class="q">5. It <input class="gap" data-a="takes" size="6"> my dad an hour to get to work.</span><br><span class="ru">Дорога до работы занимает у папы час.</span></div>
+
+    <div class="btns">
+      <button class="act btn-check" onclick="checkEx('ex5')">Проверить</button>
+      <button class="act btn-ans" onclick="toggleAns('ex5')">Ответы + пояснения</button>
+      <button class="act btn-reset" onclick="resetEx('ex5')">Сбросить</button>
+    </div>
+    <div class="score" id="score-ex5"></div>
+
+    <div class="answers" id="ans-ex5">
+      <h3>Ответы и пояснения</h3>
+      <div class="ans-item">1. <span class="a">takes</span><span class="why">Конструкция: <b>It takes</b> + кому + сколько времени + <b>to</b> + глагол. «It» — всегда подлежащее, поэтому take<b>s</b> с -s.</span></div>
+      <div class="ans-item">2. <span class="a">take</span><span class="why">В вопросе -s уходит в <b>does</b>: How long <b>does</b> it <b>take</b>…? (не «does it takes»!)</span></div>
+      <div class="ans-item">3. <span class="a">to get</span><span class="why">После времени идёт <b>to</b> + глагол: 10 minutes <b>to get</b> to the shop.</span></div>
+      <div class="ans-item">4. <span class="a">does</span><span class="why">Схема вопроса: <b>How long + does + it + take</b> + кому + to + глагол?</span></div>
+      <div class="ans-item">5. <span class="a">takes</span><span class="why">Даже если речь о папе, подлежащее — <b>It</b>: It takes <b>my dad</b> an hour…</span></div>
+    </div>
+  </div>
+</section>
+
+<div id="totalBox">
+  <div class="big" id="totalScore"></div>
+  <div class="msg" id="totalMsg"></div>
+</div>
+
+<footer>Сделано для работы над ошибками · нажми «Сбросить», чтобы решить заново</footer>
+</div>
+
+<script>
+// ---------- helpers ----------
+const norm = s => s.toLowerCase().trim().replace(/\s+/g,' ').replace(/[.!?]$/,'');
+const results = {}; // exId -> {ok, total}
+
+function checkEx(id){
+  const ex = document.getElementById(id);
+  let ok = 0, total = 0;
+
+  // text gaps
+  ex.querySelectorAll('input.gap').forEach(inp=>{
+    total++;
+    const variants = inp.dataset.a.split('|').map(norm);
+    const val = norm(inp.value);
+    inp.classList.remove('right','wrong');
+    if(val && variants.includes(val)){ inp.classList.add('right'); ok++; }
+    else{ inp.classList.add('wrong'); }
+  });
+
+  // word builders
+  ex.querySelectorAll('.builder').forEach(b=>{
+    total++;
+    const line = b.querySelector('.b-line');
+    const built = [...line.querySelectorAll('.chip')].map(c=>c.textContent).join(' ');
+    line.classList.remove('right','wrong');
+    if(norm(built) === norm(b.dataset.answer)){ line.classList.add('right'); ok++; }
+    else{ line.classList.add('wrong'); }
+  });
+
+  const box = document.getElementById('score-'+id);
+  box.className = 'score show ' + (ok===total ? 'good' : ok >= total/2 ? 'mid' : 'low');
+  box.textContent = ok===total
+    ? `Отлично! ${ok} из ${total} ✔`
+    : `Верно: ${ok} из ${total}. Красные поля — попробуй ещё раз или посмотри пояснения.`;
+
+  results[id] = {ok, total};
+  const n = id.replace('ex','');
+  document.getElementById('dot'+n).classList.toggle('done', ok===total);
+  updateTotal();
+}
+
+function updateTotal(){
+  const ids = ['ex1','ex2','ex3','ex4','ex5'];
+  if(!ids.every(i=>results[i])) return;
+  let ok=0, total=0;
+  ids.forEach(i=>{ ok+=results[i].ok; total+=results[i].total; });
+  const box = document.getElementById('totalBox');
+  document.getElementById('totalScore').textContent = `Итог: ${ok} / ${total}`;
+  document.getElementById('totalMsg').textContent =
+    ok===total ? 'Идеально! Все ошибки проработаны 🎉' :
+    ok>=total*0.8 ? 'Очень хорошо! Осталось совсем чуть-чуть.' :
+    'Хорошее начало — вернись к красным полям и пояснениям.';
+  box.classList.add('show');
+}
+
+function toggleAns(id){
+  document.getElementById('ans-'+id).classList.toggle('show');
+}
+
+function resetEx(id){
+  const ex = document.getElementById(id);
+  ex.querySelectorAll('input.gap').forEach(i=>{ i.value=''; i.classList.remove('right','wrong'); });
+  ex.querySelectorAll('.builder').forEach(initBuilder);
+  const box = document.getElementById('score-'+id);
+  box.className='score'; box.textContent='';
+  document.getElementById('ans-'+id).classList.remove('show');
+  delete results[id];
+  document.getElementById('dot'+id.replace('ex','')).classList.remove('done');
+  document.getElementById('totalBox').classList.remove('show');
+}
+
+// ---------- word builders ----------
+function shuffle(a){
+  const arr=[...a];
+  for(let i=arr.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]];
+  }
+  // make sure it's not already the correct order
+  if(arr.join(' ')===a.join(' ') && a.length>1){ [arr[0],arr[1]]=[arr[1],arr[0]]; }
+  return arr;
+}
+
+function initBuilder(b){
+  const words = b.dataset.answer.split(' ');
+  const line = b.querySelector('.b-line');
+  const bank = b.querySelector('.b-bank');
+  line.innerHTML = '<span class="placeholder">Нажимай на слова ниже…</span>';
+  line.classList.remove('right','wrong');
+  bank.innerHTML = '';
+  shuffle(words).forEach(w=>{
+    const chip = document.createElement('button');
+    chip.type='button'; chip.className='chip'; chip.textContent=w;
+    chip.onclick = ()=>{
+      // move to line
+      const ph = line.querySelector('.placeholder');
+      if(ph) ph.remove();
+      const c = document.createElement('button');
+      c.type='button'; c.className='chip'; c.textContent=w;
+      c.onclick = ()=>{ // return to bank
+        c.remove();
+        chip.classList.remove('used');
+        if(!line.querySelector('.chip')) line.innerHTML='<span class="placeholder">Нажимай на слова ниже…</span>';
+        line.classList.remove('right','wrong');
+      };
+      line.appendChild(c);
+      chip.classList.add('used');
+      line.classList.remove('right','wrong');
+    };
+    bank.appendChild(chip);
+  });
+}
+
+document.querySelectorAll('.builder').forEach(initBuilder);
+
+// Enter = check current exercise
+document.querySelectorAll('.ex').forEach(ex=>{
+  ex.addEventListener('keydown', e=>{
+    if(e.key==='Enter' && e.target.matches('input.gap')){ checkEx(ex.id); }
+  });
+});
+</script>
+</body>
+</html>
