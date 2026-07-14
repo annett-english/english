@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Карта симптомов · Health Vocabulary Practice</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=PT+Serif:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #E8F1EE;
+    --paper: #FFFFFF;
+    --ink: #1E2B28;
+    --ink-soft: #52625D;
+    --line: #CBD8D3;
+    --tab-bg: #17332B;
+    --tab-ink: #DCEAE4;
+    --accent: #C6432E;
+    --accent-soft: #F5DAD3;
+    --good: #2E7D5B;
+    --good-soft: #DCEEE3;
+    --bad: #B23A2E;
+    --bad-soft: #F7DEDA;
+    --metal-1: #D9E1DE;
+    --metal-2: #98A6A1;
+  }
+
+  *{ box-sizing: border-box; }
+
+  body{
+    margin:0;
+    background:
+      radial-gradient(1200px 600px at 10% -10%, #EFF6F3 0%, transparent 60%),
+      var(--bg);
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    line-height: 1.5;
+    padding: 40px 16px 100px;
+  }
+
+  .chart{
+    max-width: 860px;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  /* --- clipboard clip signature --- */
+  .clip{
+    position: absolute;
+    top: -34px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 60px;
+    z-index: 5;
+  }
+
+  .header{
+    background: var(--paper);
+    border-radius: 6px;
+    padding: 52px 40px 30px;
+    box-shadow: 0 1px 0 var(--line), 0 18px 40px -30px rgba(20,40,35,0.35);
+    position: relative;
+    border: 1px solid var(--line);
+  }
+
+  .eyebrow{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    display:flex;
+    justify-content: space-between;
+    border-bottom: 1px dashed var(--line);
+    padding-bottom: 14px;
+    margin-bottom: 20px;
+  }
+
+  h1{
+    font-family: 'PT Serif', serif;
+    font-weight: 700;
+    font-size: 40px;
+    margin: 0 0 6px;
+    letter-spacing: -0.01em;
+  }
+  h1 em{
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .subtitle{
+    color: var(--ink-soft);
+    font-size: 15.5px;
+    max-width: 560px;
+    margin-bottom: 22px;
+  }
+
+  .fields{
+    display:flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    color: var(--ink-soft);
+  }
+  .fields span{ color: var(--ink); font-weight: 600; }
+  .fields div{ border-bottom: 1px solid var(--line); padding-bottom: 3px; }
+
+  /* --- exercise sheets --- */
+  .sheet{
+    display:flex;
+    margin-top: 26px;
+    filter: drop-shadow(0 14px 26px -22px rgba(20,40,35,0.5));
+  }
+
+  .tab{
+    flex: 0 0 78px;
+    background: var(--tab-bg);
+    color: var(--tab-ink);
+    border-radius: 6px 0 0 6px;
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 6px;
+    font-family: 'JetBrains Mono', monospace;
+    text-align: center;
+  }
+  .tab .num{ font-size: 22px; font-weight: 700; }
+  .tab .kind{ font-size: 10px; letter-spacing: .08em; text-transform: uppercase; margin-top: 6px; opacity: .8; writing-mode: vertical-rl; transform: rotate(180deg); }
+
+  .card{
+    flex: 1;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-left: none;
+    border-radius: 0 6px 6px 0;
+    padding: 26px 30px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .torn{
+    position:absolute; top:0; left:0; right:0; height: 8px;
+    background: repeating-radial-gradient(circle at 0 4px, transparent 0 3px, var(--bg) 3px 4px);
+    background-size: 14px 8px;
+  }
+
+  .card h2{
+    font-family: 'PT Serif', serif;
+    font-size: 21px;
+    margin: 6px 0 4px;
+  }
+  .card .instr{
+    color: var(--ink-soft);
+    font-size: 14px;
+    margin-bottom: 18px;
+  }
+
+  .row{
+    display:flex;
+    align-items:center;
+    gap: 12px;
+    padding: 9px 0;
+    border-bottom: 1px dashed var(--line);
+    flex-wrap: wrap;
+  }
+  .row:last-of-type{ border-bottom: none; }
+  .row .term{ min-width: 210px; font-size: 15px; }
+  .row .term .emoji{ font-size: 20px; margin-right: 6px; }
+  .row .tr{ font-size: 15px; color: var(--ink-soft); flex: 1; min-width: 180px; }
+
+  select, input[type=text], textarea{
+    font-family: 'Inter', sans-serif;
+    font-size: 14.5px;
+    padding: 8px 10px;
+    border-radius: 5px;
+    border: 1px solid var(--line);
+    background: #FBFCFB;
+    color: var(--ink);
+    outline: none;
+  }
+  select:focus, input[type=text]:focus, textarea:focus{
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+  select{ min-width: 190px; }
+  input[type=text]{ min-width: 170px; }
+
+  .correct{ border-color: var(--good) !important; background: var(--good-soft) !important; }
+  .incorrect{ border-color: var(--bad) !important; background: var(--bad-soft) !important; }
+
+  .choices{ display:flex; gap: 10px; flex-wrap: wrap; margin: 8px 0 4px; }
+  .choice-btn{
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    padding: 9px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--line);
+    background: #FBFCFB;
+    cursor: pointer;
+    transition: transform .12s ease, background .15s ease;
+  }
+  .choice-btn:hover{ transform: translateY(-1px); }
+  .choice-btn.selected{ border-color: var(--ink); background: #EDEFEE; font-weight: 600; }
+
+  .q{ margin-bottom: 16px; }
+  .q .qtext{ font-size: 15px; margin-bottom: 8px; }
+  .q .qtext b{ color: var(--accent); }
+
+  .bank{
+    background: var(--accent-soft);
+    border: 1px dashed var(--accent);
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-size: 13.5px;
+    margin-bottom: 16px;
+    color: #7a2c1f;
+  }
+  .bank b{ color: var(--accent); }
+
+  .tf-row{ display:flex; justify-content: space-between; align-items:center; gap: 12px; padding: 8px 0; border-bottom: 1px dashed var(--line); }
+  .tf-row:last-of-type{ border: none; }
+  .tf-text{ font-size: 14.5px; flex:1; }
+  .tf-btns{ display:flex; gap: 6px; }
+  .tf-btn{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    padding: 6px 12px;
+    border-radius: 4px;
+    border: 1px solid var(--line);
+    background: #FBFCFB;
+    cursor: pointer;
+  }
+  .tf-btn.selected{ background: var(--ink); color: #fff; border-color: var(--ink); }
+
+  .personal-q{ margin-bottom: 18px; }
+  .personal-q .qtext{ font-weight: 600; margin-bottom: 8px; font-size: 15px; }
+  textarea{ width: 100%; min-height: 60px; resize: vertical; }
+  .sample{
+    display:none;
+    margin-top: 8px;
+    background: var(--good-soft);
+    border-left: 3px solid var(--good);
+    padding: 8px 12px;
+    font-size: 13.5px;
+    color: #1c4a35;
+    border-radius: 0 4px 4px 0;
+  }
+  .sample.show{ display:block; }
+
+  .verbtable{ width: 100%; border-collapse: collapse; margin-bottom: 6px; }
+  .verbtable th{
+    font-family:'JetBrains Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing:.06em;
+    color: var(--ink-soft); text-align:left; padding: 6px 8px; border-bottom: 2px solid var(--line);
+  }
+  .verbtable td{ padding: 8px; border-bottom: 1px dashed var(--line); }
+  .verbtable input{ width: 100%; }
+
+  .actions{ display:flex; gap: 10px; align-items:center; margin-top: 16px; flex-wrap: wrap; }
+  .btn{
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 13.5px;
+    padding: 10px 18px;
+    border-radius: 22px;
+    border: none;
+    cursor: pointer;
+    transition: transform .12s ease, filter .15s ease;
+  }
+  .btn:hover{ filter: brightness(0.95); transform: translateY(-1px); }
+  .btn-check{ background: var(--ink); color: #fff; }
+  .btn-show{ background: transparent; color: var(--accent); border: 1px solid var(--accent); }
+  .score{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin-left: auto;
+  }
+  .score b{ color: var(--ink); }
+
+  .note{
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    background: #F1F5F3;
+    border-radius: 5px;
+    padding: 8px 12px;
+    margin-top: 10px;
+  }
+
+  .footer{
+    text-align:center;
+    color: var(--ink-soft);
+    font-size: 12.5px;
+    margin-top: 30px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  @media (max-width: 620px){
+    .tab{ flex-direction: row; flex: 0 0 44px; }
+    .tab .kind{ display:none; }
+    .card{ padding: 20px 16px 18px; }
+    .row .term{ min-width: 140px; }
+    select{ min-width: 140px; }
+  }
+</style>
+</head>
+<body>
+<div class="chart">
+
+  <svg class="clip" viewBox="0 0 120 60" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#F1F4F3"/>
+        <stop offset="55%" stop-color="#B7C3BF"/>
+        <stop offset="100%" stop-color="#8B9793"/>
+      </linearGradient>
+    </defs>
+    <rect x="15" y="0" width="90" height="26" rx="6" fill="url(#metal)" stroke="#7c8985" stroke-width="1.5"/>
+    <rect x="30" y="18" width="60" height="34" rx="8" fill="url(#metal)" stroke="#7c8985" stroke-width="1.5"/>
+    <circle cx="60" cy="13" r="4" fill="#7c8985"/>
+  </svg>
+
+  <div class="header">
+    <div class="eyebrow">
+      <span>Chart No. 0179 · Health &amp; Symptoms</span>
+      <span>Level: B1+ / B2</span>
+    </div>
+    <h1>Карта <em>симптомов</em></h1>
+    <div class="subtitle">10 упражнений на лексику о здоровье и самочувствии: значения слов, формы глаголов, нюансы ache / hurt / sick и практика на себе. Каждое упражнение можно проверить или посмотреть готовые ответы.</div>
+    <div class="fields">
+      <div>Тема: <span>Health problems &amp; symptoms</span></div>
+      <div>Слов в карте: <span>16+</span></div>
+      <div>Статус: <span>в работе</span></div>
+    </div>
+  </div>
+
+  <!-- EXERCISE 1 -->
+  <div class="sheet">
+    <div class="tab"><div class="num">01</div><div class="kind">Vocabulary</div></div>
+    <div class="card">
+      <div class="torn"></div>
+      <h2>Подбери перевод</h2>
+      <div class="instr">Выбери из списка правильный перевод для каждого слова.</div>
+      <div id="ex1"></div>
+      <div class="actions">
+        <button class="btn btn-check" onclick="checkEx1()">Проверить</button>
+        <button class="btn btn-show" onclick="showEx1()">Показать ответы</button>
+        <span class="score" id="score1"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXERCISE 2 -->
+  <div class="sheet">
+    <div class="tab"><div class="num">02</div><div class="kind">Emoji</div></div>
+    <div class="card">
+      <div class="torn"></div>
+      <h2>Угадай слово по эмодзи</h2>
+      <div class="instr">Нажми на правильный вариант, который соответствует эмодзи.</div>
+      <div id="ex2"></div>
+      <div class="actions">
+        <button class="btn btn-check" onclick="checkEx2()">Проверить</button>
+        <button class="btn btn-show" onclick="showEx2()">Показать ответы</button>
+        <span class="score" id="score2"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXERCISE 3 -->
+  <div class="sheet">
+    <div class="tab"><div class="num">03</div><div class="kind">Fill-in</div></div>
+    <div class="card">
+      <div class="torn"></div>
+      <h2>Заполни пропуски</h2>
+      <div class="instr">Впиши подходящее слово из банка слов (в нужной форме, артикль не обязателен).</div>
+      <div class="bank"><b>Банк слов:</b> cough · headache · rash · temperature · sunburn · stomach ache</div>
+      <div id="ex3"></div>
+      <div class="actions">
+        <button class="btn btn-check" onclick="checkEx3()">Проверить</button>
+        <button class="btn btn-show" onclick="showEx3()">Показать ответы</button>
+        <span class="score" id="score3"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXERCISE 4 -->
+  <div class="sheet">
+    <div class="tab"><div class="num">04</div><div class="kind">Translate</div></div>
+    <div class="card">
+      <div class="torn"></div>
+      <h2>Выбери правильный перевод</h2>
+      <div class="instr">Для каждого русского предложения выбери верный английский вариант.</div>
+      <div id="ex4"></div>
+      <div class="actions">
+        <button class="btn btn-check" onclick="checkEx4()">Проверить</button>
+        <button class="btn btn-show" onclick="showEx4()">Показать ответы</button>
+        <span class="score" id="score4"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXERCISE 5 -->
+  <div class="sheet">
+    <div class="tab"><div class="num">05</div><div class="kind">True/False</div></div>
+    <div class="card">
+      <div class="torn"></div>
+      <h2>Верно или неверно?</h2>
+      <div class="instr">Отметь, верно ли утверждение о значении слова.</div>
+      <div id="ex5"></div>
+      <div class="actions">
+        <button class="btn btn-check" onclick="checkEx5()">Проверить</button>
+        <button class="btn btn-show" onclick="showEx5()">Показать ответы</button>
+        <span class="score" id="score5"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXERCISE 6 -->
+  <div class="sheet">
+    <div class="tab"><div class="num">06</div><div class="kind">Match</div></div>
+    <div class="card">
+      <div class="torn"></div>
+      <h2>Подбери перевод к предложению</h2>
+      <div class="instr">Выбери русский перевод для каждого английского предложения.</div>
+      <div id="ex6"></div>
+      <div class="actions">
+        <button class="btn btn-check" onclick="checkEx6()">Проверить</button>
+        <button class="btn btn-show" onclick="showEx6()">Показать ответы</button>
+        <span class="score" id="score6"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXERCISE 7 -->
+  <div class="sheet">
+    <div class="tab"><div class="num">07</div><div class="kind">Verb forms</div></div>
+    <div class="card">
+      <div class="torn"></div>
+      <h2>Формы глаголов</h2>
+      <div class="instr">Заполни пропущенные формы. У swell есть два варианта причастия — подойдёт любой.</div>
+      <table class="verbtable">
+        <tr><th>Base</th><th>Past Simple</th><th>Past Participle</th></tr>
+        <tr>
+          <td>swell</td>
+          <td><input type="text" id="v1a" data-answer="swelled"></td>
+          <td><input type="text" id="v1b" data-answer="swollen|swelled"></td>
+        </tr>
+        <tr>
+          <td><input type="text" id="v2base" data-answer="bleed"></td>
+          <td><input type="text" id="v2a" data-answer="bled"></td>
+          <td><input type="text" id="v2b" data-answer="bled"></td>
+        </tr>
+      </table>
+      <div class="actions">
+        <button class="btn btn-check" onclick="checkEx7()">Проверить</button>
+        <button class="btn btn-show" onclick="showEx7()">Показать ответы</button>
+        <span class="score" id="score7"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXERCISE 8 -->
+  <div class="sheet">
+    <div class="tab"><div class="num">08</div><div class="kind">About you</div></div>
+    <div class="card">
+      <div class="torn"></div>
+      <h2>Ответь о себе</h2>
+      <div class="instr">Открытые вопросы — здесь нет «правильного» ответа, но можно посмотреть пример.</div>
+      <div id="ex8"></div>
+    </div>
+  </div>
+
+  <!-- EXERCISE 9 -->
+  <div class="sheet">
+    <div class="tab"><div class="num">09</div><div class="kind">Nuance: ache/hurt</div></div>
+    <div class="card">
+      <div class="torn"></div>
+      <h2>Ache, hurt или sick?</h2>
+      <div class="instr">Выбери верный вариант с учётом разницы между ache (сущ.) / hurt (глагол) и sick (BrE/AmE).</div>
+      <div id="ex9"></div>
+      <div class="actions">
+        <button class="btn btn-check" onclick="checkEx9()">Проверить</button>
+        <button class="btn btn-show" onclick="showEx9()">Показать ответы</button>
+        <span class="score" id="score9"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXERCISE 10 -->
+  <div class="sheet">
+    <div class="tab"><div class="num">10</div><div class="kind">Fix mistakes</div></div>
+    <div class="card">
+      <div class="torn"></div>
+      <h2>Найди и исправь ошибку</h2>
+      <div class="instr">В каждом предложении одна ошибка. Впиши исправленный вариант целиком.</div>
+      <div id="ex10"></div>
+      <div class="actions">
+        <button class="btn btn-check" onclick="checkEx10()">Проверить</button>
+        <button class="btn btn-show" onclick="showEx10()">Показать ответы</button>
+        <span class="score" id="score10"></span>
+      </div>
+      <div class="note">Проверка нестрогая: не важны заглавные буквы и знаки препинания, важна грамматика.</div>
+    </div>
+  </div>
+
+  <div class="footer">END OF CHART · practice makes permanent, not just perfect</div>
+</div>
+
+<script>
+/* ---------- helpers ---------- */
+function norm(s){
+  return (s||'').toLowerCase().trim().replace(/[.!,;:']/g,'').replace(/\s+/g,' ');
+}
+function markScore(id, correct, total){
+  document.getElementById(id).innerHTML = 'Результат: <b>'+correct+' / '+total+'</b>';
+}
+
+/* ================= EX 1 : select translation ================= */
+const ex1data = [
+  {term:'a cough', ipa:'/ə kɒf/', answer:'кашель'},
+  {term:'a headache', ipa:'/ə ˈhedeɪk/', answer:'головная боль'},
+  {term:'a backache', ipa:'/ə ˈbækeɪk/', answer:'боль в спине'},
+  {term:'an earache', ipa:'/ən ˈɪəreɪk/', answer:'боль в ухе'},
+  {term:'a stomach ache', ipa:'/ə ˈstʌmək eɪk/', answer:'боль в животе'},
+  {term:'a toothache', ipa:'/ə ˈtuːθeɪk/', answer:'зубная боль'},
+  {term:'a rash', ipa:'/ə ræʃ/', answer:'сыпь'},
+  {term:'a temperature', ipa:'/ə ˈtemprətʃə(r)/', answer:'температура'},
+  {term:'sunburn', ipa:'/ˈsʌnbɜːn/', answer:'солнечный ожог'},
+];
+const ex1options = ex1data.map(d=>d.answer);
+(function renderEx1(){
+  const el = document.getElementById('ex1');
+  ex1data.forEach((d,i)=>{
+    const row = document.createElement('div'); row.className='row';
+    const opts = ['<option value="">— выбери —</option>'].concat(
+      ex1options.map(o=>`<option value="${o}">${o}</option>`)
+    ).join('');
+    row.innerHTML = `<div class="term">${d.term}<br><small style="color:var(--ink-soft)">${d.ipa}</small></div>
+      <select id="ex1-${i}" data-answer="${d.answer}">${opts}</select>`;
+    el.appendChild(row);
+  });
+})();
+function checkEx1(){
+  let c=0;
+  ex1data.forEach((d,i)=>{
+    const sel = document.getElementById('ex1-'+i);
+    sel.classList.remove('correct','incorrect');
+    if(sel.value === d.answer){ sel.classList.add('correct'); c++; }
+    else sel.classList.add('incorrect');
+  });
+  markScore('score1', c, ex1data.length);
+}
+function showEx1(){
+  ex1data.forEach((d,i)=>{
+    const sel = document.getElementById('ex1-'+i);
+    sel.value = d.answer;
+    sel.classList.remove('incorrect'); sel.classList.add('correct');
+  });
+  markScore('score1', ex1data.length, ex1data.length);
+}
+
+/* ================= EX 2 : emoji multiple choice ================= */
+const ex2data = [
+  {emoji:'🫢', answer:'a cough', options:['a cough','a headache','a rash','sunburn']},
+  {emoji:'🤕', answer:'a headache', options:['a headache','an earache','a toothache','a cough']},
+  {emoji:'🧎🏽\u200d♀️\u200d➡️', answer:'a backache', options:['a backache','a stomach ache','a rash','a temperature']},
+  {emoji:'👂', answer:'an earache', options:['an earache','a toothache','a headache','sunburn']},
+  {emoji:'🤢', answer:'a stomach ache', options:['a stomach ache','a backache','a cough','a rash']},
+  {emoji:'🦷', answer:'a toothache', options:['a toothache','an earache','a headache','a temperature']},
+];
+(function renderEx2(){
+  const el = document.getElementById('ex2');
+  ex2data.forEach((d,i)=>{
+    const q = document.createElement('div'); q.className='q';
+    q.innerHTML = `<div class="qtext" style="font-size:28px">${d.emoji}</div>
+      <div class="choices" id="ex2-${i}"></div>`;
+    el.appendChild(q);
+    const box = q.querySelector('.choices');
+    d.options.forEach(opt=>{
+      const b = document.createElement('button');
+      b.type='button'; b.className='choice-btn'; b.textContent=opt;
+      b.onclick = ()=>{
+        box.querySelectorAll('.choice-btn').forEach(x=>x.classList.remove('selected'));
+        b.classList.add('selected');
+        box.dataset.selected = opt;
+      };
+      box.appendChild(b);
+    });
+  });
+})();
+function checkEx2(){
+  let c=0;
+  ex2data.forEach((d,i)=>{
+    const box = document.getElementById('ex2-'+i);
+    const sel = box.dataset.selected;
+    box.querySelectorAll('.choice-btn').forEach(b=>{
+      b.classList.remove('correct','incorrect');
+      if(b.textContent === d.answer && sel===d.answer) b.classList.add('correct');
+      if(b.classList.contains('selected') && sel !== d.answer) b.classList.add('incorrect');
+    });
+    if(sel === d.answer) c++;
+  });
+  markScore('score2', c, ex2data.length);
+}
+function showEx2(){
+  ex2data.forEach((d,i)=>{
+    const box = document.getElementById('ex2-'+i);
+    box.dataset.selected = d.answer;
+    box.querySelectorAll('.choice-btn').forEach(b=>{
+      b.classList.remove('selected','incorrect');
+      if(b.textContent===d.answer) b.classList.add('selected','correct');
+      else b.classList.remove('correct');
+    });
+  });
+  markScore('score2', ex2data.length, ex2data.length);
+}
+
+/* ================= EX 3 : fill blanks ================= */
+const ex3data = [
+  {text:'After lying on the beach for hours, she got a bad ___.', answer:'sunburn'},
+  {text:'He has a nasty ___ and can\u2019t stop coughing.', answer:'cough'},
+  {text:'Little red spots appeared on his skin \u2014 the doctor said it was a ___.', answer:'rash'},
+  {text:'She\u2019s got a high ___ and needs to rest in bed.', answer:'temperature'},
+  {text:'I ate too much cake and now I have a ___.', answer:'stomach ache'},
+  {text:'I stared at the screen all day and now I have a terrible ___.', answer:'headache'},
+];
+(function renderEx3(){
+  const el = document.getElementById('ex3');
+  ex3data.forEach((d,i)=>{
+    const parts = d.text.split('___');
+    const row = document.createElement('div'); row.className='q';
+    row.innerHTML = `<div class="qtext">${i+1}. ${parts[0]}<input type="text" id="ex3-${i}" style="width:150px" data-answer="${d.answer}">${parts[1]}</div>`;
+    el.appendChild(row);
+  });
+})();
+function checkEx3(){
+  let c=0;
+  ex3data.forEach((d,i)=>{
+    const inp = document.getElementById('ex3-'+i);
+    inp.classList.remove('correct','incorrect');
+    const val = norm(inp.value).replace(/^(a|an)\s+/, '');
+    if(val === norm(d.answer)){ inp.classList.add('correct'); c++; }
+    else inp.classList.add('incorrect');
+  });
+  markScore('score3', c, ex3data.length);
+}
+function showEx3(){
+  ex3data.forEach((d,i)=>{
+    const inp = document.getElementById('ex3-'+i);
+    inp.value = d.answer;
+    inp.classList.remove('incorrect'); inp.classList.add('correct');
+  });
+  markScore('score3', ex3data.length, ex3data.length);
+}
+
+/* ================= EX 4 : translation multiple choice ================= */
+const ex4data = [
+  {ru:'Её тошнит.', options:['She\u2019s being sick.','She\u2019s sick.','She has sickness.'], answer:'She\u2019s being sick.'},
+  {ru:'Её рвёт.', options:['She\u2019s vomiting.','She\u2019s vomit.','She vomited always.'], answer:'She\u2019s vomiting.'},
+  {ru:'Она чихает.', options:['She sneezes always.','She\u2019s sneezing.','She sneezed now.'], answer:'She\u2019s sneezing.'},
+  {ru:'У неё опухла лодыжка.', options:['Her ankle swells.','Her ankle is swelling now.','Her ankle\u2019s swollen.'], answer:'Her ankle\u2019s swollen.'},
+  {ru:'У неё болит спина.', options:['Her back hurts.','Her back is hurt.','Her back pains.'], answer:'Her back hurts.'},
+  {ru:'У неё идёт кровь из пальца.', options:['Her finger bleeds always.','Her finger\u2019s bleeding.','Her finger bled now.'], answer:'Her finger\u2019s bleeding.'},
+];
+(function renderEx4(){
+  const el = document.getElementById('ex4');
+  ex4data.forEach((d,i)=>{
+    const q = document.createElement('div'); q.className='q';
+    q.innerHTML = `<div class="qtext"><b>${i+1}.</b> ${d.ru}</div><div class="choices" id="ex4-${i}"></div>`;
+    el.appendChild(q);
+    const box = q.querySelector('.choices');
+    d.options.forEach(opt=>{
+      const b = document.createElement('button');
+      b.type='button'; b.className='choice-btn'; b.textContent=opt;
+      b.onclick=()=>{
+        box.querySelectorAll('.choice-btn').forEach(x=>x.classList.remove('selected'));
+        b.classList.add('selected'); box.dataset.selected = opt;
+      };
+      box.appendChild(b);
+    });
+  });
+})();
+function checkEx4(){
+  let c=0;
+  ex4data.forEach((d,i)=>{
+    const box = document.getElementById('ex4-'+i);
+    const sel = box.dataset.selected;
+    box.querySelectorAll('.choice-btn').forEach(b=>{
+      b.classList.remove('correct','incorrect');
+      if(b.textContent===d.answer && sel===d.answer) b.classList.add('correct');
+      if(b.classList.contains('selected') && sel!==d.answer) b.classList.add('incorrect');
+    });
+    if(sel===d.answer) c++;
+  });
+  markScore('score4', c, ex4data.length);
+}
+function showEx4(){
+  ex4data.forEach((d,i)=>{
+    const box = document.getElementById('ex4-'+i);
+    box.dataset.selected = d.answer;
+    box.querySelectorAll('.choice-btn').forEach(b=>{
+      b.classList.remove('selected','incorrect','correct');
+      if(b.textContent===d.answer) b.classList.add('selected','correct');
+    });
+  });
+  markScore('score4', ex4data.length, ex4data.length);
+}
+
+/* ================= EX 5 : true/false ================= */
+const ex5data = [
+  {text:'\u00abA stomach ache\u00bb значит боль в животе.', answer:true},
+  {text:'\u00abAn earache\u00bb значит боль в спине.', answer:false},
+  {text:'\u00abA rash\u00bb значит высокая температура.', answer:false},
+  {text:'Sunburn появляется после долгого пребывания на солнце.', answer:true},
+  {text:'\u00abA backache\u00bb значит зубная боль.', answer:false},
+  {text:'\u00abA toothache\u00bb значит зубная боль.', answer:true},
+];
+(function renderEx5(){
+  const el = document.getElementById('ex5');
+  ex5data.forEach((d,i)=>{
+    const row = document.createElement('div'); row.className='tf-row';
+    row.innerHTML = `<div class="tf-text">${i+1}. ${d.text}</div>
+      <div class="tf-btns" id="ex5-${i}">
+        <button type="button" class="tf-btn" data-val="true">Верно</button>
+        <button type="button" class="tf-btn" data-val="false">Неверно</button>
+      </div>`;
+    el.appendChild(row);
+    row.querySelectorAll('.tf-btn').forEach(b=>{
+      b.onclick=()=>{
+        row.querySelectorAll('.tf-btn').forEach(x=>x.classList.remove('selected'));
+        b.classList.add('selected');
+        row.dataset.selected = b.dataset.val;
+      };
+    });
+  });
+})();
+function checkEx5(){
+  let c=0;
+  ex5data.forEach((d,i)=>{
+    const row = document.getElementById('ex5-'+i).parentElement;
+    const sel = row.dataset.selected;
+    row.querySelectorAll('.tf-btn').forEach(b=>b.classList.remove('correct','incorrect'));
+    const isRight = sel === String(d.answer);
+    row.querySelectorAll('.tf-btn.selected').forEach(b=> b.classList.add(isRight?'correct':'incorrect'));
+    if(isRight) c++;
+  });
+  markScore('score5', c, ex5data.length);
+}
+function showEx5(){
+  ex5data.forEach((d,i)=>{
+    const row = document.getElementById('ex5-'+i).parentElement;
+    row.dataset.selected = String(d.answer);
+    row.querySelectorAll('.tf-btn').forEach(b=>{
+      b.classList.remove('selected','incorrect','correct');
+      if(b.dataset.val === String(d.answer)) b.classList.add('selected','correct');
+    });
+  });
+  markScore('score5', ex5data.length, ex5data.length);
+}
+
+/* ================= EX 6 : match sentence -> RU meaning ================= */
+const ex6data = [
+  {en:'She\u2019s being sick.', answer:'Её тошнит.'},
+  {en:'She\u2019s vomiting.', answer:'Её рвёт.'},
+  {en:'She\u2019s sneezing.', answer:'Она чихает.'},
+  {en:'Her ankle\u2019s swollen.', answer:'У неё опухла лодыжка.'},
+  {en:'Her back aches.', answer:'У неё болит спина.'},
+  {en:'Her finger\u2019s bleeding.', answer:'У неё идёт кровь из пальца.'},
+];
+const ex6options = ex6data.map(d=>d.answer);
+(function renderEx6(){
+  const el = document.getElementById('ex6');
+  ex6data.forEach((d,i)=>{
+    const row = document.createElement('div'); row.className='row';
+    const opts = ['<option value="">— выбери —</option>'].concat(
+      ex6options.map(o=>`<option value="${o}">${o}</option>`)
+    ).join('');
+    row.innerHTML = `<div class="term">${d.en}</div><select id="ex6-${i}" data-answer="${d.answer}">${opts}</select>`;
+    el.appendChild(row);
+  });
+})();
+function checkEx6(){
+  let c=0;
+  ex6data.forEach((d,i)=>{
+    const sel = document.getElementById('ex6-'+i);
+    sel.classList.remove('correct','incorrect');
+    if(sel.value===d.answer){ sel.classList.add('correct'); c++; }
+    else sel.classList.add('incorrect');
+  });
+  markScore('score6', c, ex6data.length);
+}
+function showEx6(){
+  ex6data.forEach((d,i)=>{
+    const sel = document.getElementById('ex6-'+i);
+    sel.value = d.answer;
+    sel.classList.remove('incorrect'); sel.classList.add('correct');
+  });
+  markScore('score6', ex6data.length, ex6data.length);
+}
+
+/* ================= EX 7 : verb forms ================= */
+function checkEx7(){
+  const ids = ['v1a','v1b','v2base','v2a','v2b'];
+  let c=0;
+  ids.forEach(id=>{
+    const inp = document.getElementById(id);
+    inp.classList.remove('correct','incorrect');
+    const accepted = inp.dataset.answer.split('|').map(norm);
+    if(accepted.includes(norm(inp.value))){ inp.classList.add('correct'); c++; }
+    else inp.classList.add('incorrect');
+  });
+  markScore('score7', c, ids.length);
+}
+function showEx7(){
+  const ids = ['v1a','v1b','v2base','v2a','v2b'];
+  ids.forEach(id=>{
+    const inp = document.getElementById(id);
+    inp.value = inp.dataset.answer.split('|')[0];
+    inp.classList.remove('incorrect'); inp.classList.add('correct');
+  });
+  markScore('score7', ids.length, ids.length);
+}
+
+/* ================= EX 8 : personal questions ================= */
+const ex8data = [
+  {q:'Have you ever had a stomach ache after eating something bad? What happened?',
+   sample:'Yes, once I had a terrible stomach ache after eating sushi that wasn\u2019t fresh. I felt sick all night and had to stay in bed the next day.'},
+  {q:'Describe a time your back or head ached. What did you do about it?',
+   sample:'My back aches a lot after long days at the computer. Usually I stretch, go for a walk, and take a warm shower to feel better.'},
+  {q:'Do you get sunburnt easily? How do you protect your skin?',
+   sample:'I get sunburnt quite easily, so I always wear sunscreen and try to avoid the sun between 12 and 4pm.'},
+];
+(function renderEx8(){
+  const el = document.getElementById('ex8');
+  ex8data.forEach((d,i)=>{
+    const box = document.createElement('div'); box.className='personal-q';
+    box.innerHTML = `<div class="qtext">${i+1}. ${d.q}</div>
+      <textarea placeholder="Твой ответ..."></textarea>
+      <button class="btn btn-show" style="margin-top:8px" onclick="this.previousElementSibling.classList.toggle('show'); this.textContent = this.previousElementSibling.classList.contains('show') ? 'Скрыть пример' : 'Показать пример ответа'">Показать пример ответа</button>
+      <div class="sample">${d.sample}</div>`;
+    el.appendChild(box);
+  });
+})();
+
+/* ================= EX 9 : ache / hurt / sick nuance ================= */
+const ex9data = [
+  {text:'I have a bad ___ \u2014 I couldn\u2019t sleep all night.', options:['headache','head hurt','head ache verb'], answer:'headache'},
+  {text:'My head really ___ today, I need a painkiller.', options:['headache','hurts','have hurt'], answer:'hurts'},
+  {text:'(BrE) She ate too much and ___ after dinner.', options:['was sick','felt sick tomorrow','has sick'], answer:'was sick'},
+  {text:'(AmE) I\u2019m ___ today \u2014 I think it\u2019s the flu.', options:['sick','being sick','sick of'], answer:'sick'},
+  {text:'She ___ a rash on her arm since yesterday.', options:['has got','is got','have'], answer:'has got'},
+  {text:'His finger\u2019s ___ \u2014 we need a plaster right now!', options:['bleeds','bleeding','bled'], answer:'bleeding'},
+];
+(function renderEx9(){
+  const el = document.getElementById('ex9');
+  ex9data.forEach((d,i)=>{
+    const q = document.createElement('div'); q.className='q';
+    const parts = d.text.split('___');
+    q.innerHTML = `<div class="qtext">${i+1}. ${parts[0]}<b>___</b>${parts[1]}</div><div class="choices" id="ex9-${i}"></div>`;
+    el.appendChild(q);
+    const box = q.querySelector('.choices');
+    d.options.forEach(opt=>{
+      const b = document.createElement('button');
+      b.type='button'; b.className='choice-btn'; b.textContent=opt;
+      b.onclick=()=>{
+        box.querySelectorAll('.choice-btn').forEach(x=>x.classList.remove('selected'));
+        b.classList.add('selected'); box.dataset.selected = opt;
+      };
+      box.appendChild(b);
+    });
+  });
+})();
+function checkEx9(){
+  let c=0;
+  ex9data.forEach((d,i)=>{
+    const box = document.getElementById('ex9-'+i);
+    const sel = box.dataset.selected;
+    box.querySelectorAll('.choice-btn').forEach(b=>{
+      b.classList.remove('correct','incorrect');
+      if(b.textContent===d.answer && sel===d.answer) b.classList.add('correct');
+      if(b.classList.contains('selected') && sel!==d.answer) b.classList.add('incorrect');
+    });
+    if(sel===d.answer) c++;
+  });
+  markScore('score9', c, ex9data.length);
+}
+function showEx9(){
+  ex9data.forEach((d,i)=>{
+    const box = document.getElementById('ex9-'+i);
+    box.dataset.selected = d.answer;
+    box.querySelectorAll('.choice-btn').forEach(b=>{
+      b.classList.remove('selected','incorrect','correct');
+      if(b.textContent===d.answer) b.classList.add('selected','correct');
+    });
+  });
+  markScore('score9', ex9data.length, ex9data.length);
+}
+
+/* ================= EX 10 : fix the mistake ================= */
+const ex10data = [
+  {wrong:'She have a bad rash on her arm.', answer:'She has a bad rash on her arm.'},
+  {wrong:'My back hurt every morning.', answer:'My back hurts every morning.'},
+  {wrong:'He still feel sick now.', answer:'He still feels sick now.'},
+  {wrong:'I have a sunburn on my back\u2019s.', answer:'I have a sunburn on my back.'},
+  {wrong:'Her finger bleed a lot yesterday.', answer:'Her finger bled a lot yesterday.'},
+];
+(function renderEx10(){
+  const el = document.getElementById('ex10');
+  ex10data.forEach((d,i)=>{
+    const q = document.createElement('div'); q.className='q';
+    q.innerHTML = `<div class="qtext">${i+1}. <span style="text-decoration:line-through; color:var(--ink-soft)">${d.wrong}</span></div>
+      <input type="text" id="ex10-${i}" placeholder="Исправленный вариант..." style="width:100%" data-answer="${d.answer}">`;
+    el.appendChild(q);
+  });
+})();
+function checkEx10(){
+  let c=0;
+  ex10data.forEach((d,i)=>{
+    const inp = document.getElementById('ex10-'+i);
+    inp.classList.remove('correct','incorrect');
+    if(norm(inp.value) === norm(d.answer)){ inp.classList.add('correct'); c++; }
+    else inp.classList.add('incorrect');
+  });
+  markScore('score10', c, ex10data.length);
+}
+function showEx10(){
+  ex10data.forEach((d,i)=>{
+    const inp = document.getElementById('ex10-'+i);
+    inp.value = d.answer;
+    inp.classList.remove('incorrect'); inp.classList.add('correct');
+  });
+  markScore('score10', ex10data.length, ex10data.length);
+}
+</script>
+</body>
+</html>
