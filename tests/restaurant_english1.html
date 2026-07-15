@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>At the Restaurant — интерактивный урок</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=PT+Sans:ital,wght@0,400;0,700;1,400&family=PT+Mono&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#FBF7EE;
+  --card:#FFFFFF;
+  --ink:#22301F;
+  --green:#1F4632;
+  --green-soft:#2E5B43;
+  --brass:#A87B24;
+  --brass-soft:#C79A3F;
+  --tomato:#B4442C;
+  --ok:#2E7D4F;
+  --line:#DCD3BE;
+  --shadow:0 2px 10px rgba(34,48,31,.08);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:'PT Sans',sans-serif;
+  font-size:17px;
+  line-height:1.55;
+}
+.wrap{max-width:880px;margin:0 auto;padding:0 20px 80px}
+
+/* ---------- header ---------- */
+header{
+  text-align:center;
+  padding:56px 16px 36px;
+  border-bottom:3px double var(--brass);
+  margin-bottom:8px;
+}
+.eyebrow{
+  font-family:'PT Mono',monospace;
+  font-size:12px;
+  letter-spacing:.28em;
+  text-transform:uppercase;
+  color:var(--brass);
+}
+h1{
+  font-family:'Cormorant Garamond',serif;
+  font-weight:700;
+  font-size:clamp(42px,7vw,68px);
+  color:var(--green);
+  line-height:1.05;
+  margin:10px 0 6px;
+}
+header p.sub{font-style:italic;font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--green-soft)}
+
+/* ---------- course sections ---------- */
+section{margin-top:52px}
+.course-label{
+  display:flex;align-items:center;gap:14px;
+  margin-bottom:6px;
+}
+.course-label .rule{flex:1;height:1px;background:var(--line)}
+.course-label span{
+  font-family:'PT Mono',monospace;font-size:12px;letter-spacing:.24em;
+  text-transform:uppercase;color:var(--brass);white-space:nowrap;
+}
+h2{
+  font-family:'Cormorant Garamond',serif;font-weight:600;
+  font-size:clamp(28px,4vw,36px);color:var(--green);margin-bottom:4px;
+}
+.task{color:#5A6653;margin-bottom:18px}
+
+.card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:10px;
+  box-shadow:var(--shadow);
+  padding:26px 26px 22px;
+}
+
+/* ---------- chef's notes ---------- */
+.notes{
+  background:var(--green);
+  color:#F3EEDD;
+  border-radius:10px;
+  padding:28px 30px;
+  margin-top:26px;
+}
+.notes h2{color:var(--brass-soft);margin-bottom:14px}
+.notes ul{list-style:none}
+.notes li{
+  padding:10px 0;
+  border-bottom:1px dashed rgba(243,238,221,.25);
+}
+.notes li:last-child{border-bottom:none}
+.notes b{color:#fff}
+.notes .en{font-style:italic;color:var(--brass-soft)}
+.pill{
+  display:inline-block;background:rgba(255,255,255,.12);
+  border-radius:999px;padding:1px 10px;font-family:'PT Mono',monospace;font-size:14px;
+}
+
+/* ---------- controls ---------- */
+.btnrow{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px;align-items:center}
+button{
+  font-family:'PT Sans',sans-serif;font-size:15px;font-weight:700;
+  border:none;border-radius:8px;padding:10px 20px;cursor:pointer;
+  transition:transform .08s ease, box-shadow .15s ease;
+}
+button:active{transform:translateY(1px)}
+button:focus-visible{outline:3px solid var(--brass-soft);outline-offset:2px}
+.btn-check{background:var(--green);color:#fff}
+.btn-check:hover{box-shadow:0 3px 10px rgba(31,70,50,.35)}
+.btn-show{background:transparent;color:var(--green);border:1.5px solid var(--green)}
+.btn-show:hover{background:rgba(31,70,50,.06)}
+.score{
+  font-family:'PT Mono',monospace;font-size:15px;color:var(--green);
+  margin-left:auto;
+}
+
+select, input[type=text], textarea{
+  font-family:'PT Sans',sans-serif;font-size:16px;color:var(--ink);
+  border:1.5px solid var(--line);border-radius:6px;background:#FDFBF5;
+  padding:6px 10px;
+}
+select:focus, input:focus, textarea:focus{outline:2px solid var(--brass-soft)}
+.correct{border-color:var(--ok)!important;background:#EAF5EE!important}
+.wrong{border-color:var(--tomato)!important;background:#FBEDE9!important}
+
+/* ---------- ex1 matching ---------- */
+.match-grid{display:grid;grid-template-columns:1fr;gap:10px}
+.match-row{
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  padding:8px 10px;border-radius:8px;
+}
+.match-row:nth-child(odd){background:#F7F2E6}
+.match-row .ru{flex:1;min-width:200px}
+.match-row select{min-width:190px}
+
+/* ---------- ex2 choices ---------- */
+.q{padding:16px 0;border-bottom:1px dashed var(--line)}
+.q:last-of-type{border-bottom:none}
+.q .stem{margin-bottom:10px}
+.q .stem b{color:var(--green)}
+.opts{display:flex;gap:10px;flex-wrap:wrap}
+.opt{
+  background:#F7F2E6;border:1.5px solid var(--line);color:var(--ink);
+  font-weight:400;padding:7px 16px;border-radius:999px;
+}
+.opt:hover{border-color:var(--brass)}
+.opt.sel{border-color:var(--green);background:#E8EFE8;font-weight:700}
+.opt.ok{border-color:var(--ok);background:#DFF2E5;font-weight:700}
+.opt.bad{border-color:var(--tomato);background:#F9E2DB}
+.blank{
+  display:inline-block;min-width:64px;border-bottom:2px solid var(--brass);
+  text-align:center;font-weight:700;color:var(--brass);
+}
+
+/* ---------- ex3 error hunt ---------- */
+.err-sent{padding:16px 4px;border-bottom:1px dashed var(--line)}
+.err-sent:last-of-type{border-bottom:none}
+.err-words{font-size:18px;line-height:2}
+.w{
+  cursor:pointer;padding:2px 5px;border-radius:5px;transition:background .12s;
+}
+.w:hover{background:#F0E8D2}
+.w.found{background:#F9DCD2;color:var(--tomato);font-weight:700;text-decoration:line-through}
+.w.flash{background:#F9E2DB;animation:shake .3s}
+.w.locked{cursor:default}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+.fixrow{margin-top:8px;display:none;align-items:center;gap:10px;flex-wrap:wrap}
+.fixrow.on{display:flex}
+.fixrow .arrow{font-family:'PT Mono',monospace;color:var(--brass)}
+.fixed-ok{color:var(--ok);font-weight:700}
+.hintline{font-size:14px;color:#7A8471;margin-top:4px}
+
+/* ---------- ex4 dialogue ---------- */
+.dlg{display:flex;flex-direction:column;gap:12px}
+.line{
+  display:flex;gap:12px;align-items:flex-start;
+}
+.who{
+  flex:0 0 86px;font-family:'PT Mono',monospace;font-size:13px;
+  text-transform:uppercase;letter-spacing:.08em;padding-top:8px;
+}
+.who.waiter{color:var(--brass)}
+.who.guest{color:var(--green)}
+.bubble{
+  flex:1;background:#F7F2E6;border-radius:0 12px 12px 12px;padding:10px 16px;
+}
+.line.guest .bubble{background:#E8EFE8;border-radius:12px 0 12px 12px}
+.bubble select{margin:0 2px;padding:3px 8px;font-size:15px}
+.wordbank{
+  margin:0 0 18px;padding:12px 16px;background:#F7F2E6;border-radius:8px;
+  font-family:'PT Mono',monospace;font-size:14px;color:var(--green-soft);
+}
+
+/* ---------- ex5 menu + composer ---------- */
+.menu-card{
+  background:var(--card);border:1px solid var(--line);border-radius:10px;
+  box-shadow:var(--shadow);overflow:hidden;margin-bottom:22px;
+}
+.menu-head{
+  background:var(--green);color:#F3EEDD;text-align:center;padding:16px;
+  font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;letter-spacing:.04em;
+}
+.menu-body{padding:22px}
+.menu-sec{margin-bottom:18px}
+.menu-sec h4{
+  font-family:'PT Mono',monospace;font-size:12px;letter-spacing:.24em;
+  text-transform:uppercase;color:var(--brass);border-bottom:1px solid var(--line);
+  padding-bottom:6px;margin-bottom:10px;
+}
+.dishes{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px}
+.dish{
+  display:flex;align-items:center;gap:10px;background:#FDFBF5;
+  border:1.5px solid var(--line);border-radius:8px;padding:8px 12px;cursor:pointer;
+  transition:border-color .12s, background .12s;user-select:none;
+}
+.dish:hover{border-color:var(--brass)}
+.dish.picked{border-color:var(--green);background:#E8EFE8}
+.dish .emo{font-size:26px}
+.dish .nm{font-size:15px;line-height:1.25}
+.dish .pr{margin-left:auto;font-family:'PT Mono',monospace;font-size:13px;color:var(--brass)}
+.picked-note{font-size:14px;color:#7A8471;margin-top:6px}
+textarea#dialogueBox{
+  width:100%;min-height:220px;resize:vertical;line-height:1.6;font-size:16px;
+  font-family:'PT Mono',monospace;
+}
+.ai-answer{
+  display:none;margin-top:18px;background:#F7F2E6;border-left:4px solid var(--brass);
+  border-radius:0 8px 8px 0;padding:16px 18px;white-space:pre-wrap;
+}
+.ai-answer.on{display:block}
+.spinner{
+  display:none;width:20px;height:20px;border:3px solid var(--line);
+  border-top-color:var(--green);border-radius:50%;animation:spin .8s linear infinite;
+}
+.spinner.on{display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ---------- the bill (receipt) ---------- */
+.receipt{
+  max-width:420px;margin:60px auto 0;background:#fff;
+  padding:30px 28px 40px;
+  box-shadow:0 6px 24px rgba(34,48,31,.15);
+  font-family:'PT Mono',monospace;font-size:15px;
+  clip-path:polygon(0 0,100% 0,100% calc(100% - 8px),95% 100%,90% calc(100% - 8px),85% 100%,80% calc(100% - 8px),75% 100%,70% calc(100% - 8px),65% 100%,60% calc(100% - 8px),55% 100%,50% calc(100% - 8px),45% 100%,40% calc(100% - 8px),35% 100%,30% calc(100% - 8px),25% 100%,20% calc(100% - 8px),15% 100%,10% calc(100% - 8px),5% 100%,0 calc(100% - 8px));
+}
+.receipt h3{
+  text-align:center;font-family:'Cormorant Garamond',serif;font-size:28px;
+  color:var(--green);margin-bottom:4px;
+}
+.receipt .rc-sub{text-align:center;font-size:12px;letter-spacing:.2em;color:#8A8471;margin-bottom:16px}
+.rc-line{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed var(--line)}
+.rc-total{display:flex;justify-content:space-between;padding:12px 0 0;font-weight:700;font-size:17px;color:var(--green)}
+.rc-msg{text-align:center;margin-top:14px;color:var(--brass);font-style:italic;font-family:'Cormorant Garamond',serif;font-size:19px}
+
+@media (max-width:560px){
+  .who{flex-basis:64px}
+  .card{padding:20px 16px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">English lesson · Unit: Eating out</div>
+  <h1>At the Restaurant</h1>
+  <p class="sub">Учимся вежливо заказывать еду — от закуски до счёта</p>
+</header>
+
+<!-- ================= CHEF'S NOTES ================= -->
+<div class="notes">
+  <h2>Chef’s notes · Нюансы</h2>
+  <ul>
+    <li><span class="pill">some / any</span> — В просьбах с неисчисляемыми существительными и множественным числом используем <b>some</b>, а не any: <span class="en">Can I have <b>some</b> water, please?</span> <b>Any</b> появляется в отрицаниях: <span class="en">We don’t have <b>any</b> soup left.</span></li>
+    <li><span class="pill">the</span> — Когда заказываем конкретное блюдо <b>из меню</b>, используем <b>the</b>: <span class="en">Can I have <b>the</b> soup, please?</span> Сравни: <span class="en">Can I have <b>a</b> chair?</span> (любой стул) vs <span class="en">Can I have <b>the</b> chair?</span> (вот этот конкретный).</li>
+    <li><span class="pill">can / could / ’d like</span> — Просьбы в ресторане строим через <b>can</b>, <b>could</b> и <b>would like / ’d like</b>. <b>Could</b> звучит вежливее, чем can: <span class="en"><b>Could</b> we have a table near the window?</span> Не забывай <b>’d</b>: <span class="en">I<b>’d</b> like some soup</span>, а не <s>I like some soup</s>.</li>
+    <li><span class="pill">for</span> — «На первое / на закуску» — это предлог <b>for</b>: <span class="en"><b>For</b> a starter, can I have the soup, please?</span></li>
+  </ul>
+</div>
+
+<!-- ================= EX 1 ================= -->
+<section id="ex1">
+  <div class="course-label"><span>Starter · Упражнение 1</span><div class="rule"></div></div>
+  <h2>Меню по-русски</h2>
+  <p class="task">Подбери перевод: выбери английское слово для каждого русского.</p>
+  <div class="card">
+    <div class="match-grid" id="matchGrid"></div>
+    <div class="btnrow">
+      <button class="btn-check" onclick="checkEx1()">Проверить</button>
+      <button class="btn-show" onclick="showEx1()">Показать ответы</button>
+      <span class="score" id="score1"></span>
+    </div>
+  </div>
+</section>
+
+<!-- ================= EX 2 ================= -->
+<section id="ex2">
+  <div class="course-label"><span>Main course · Упражнение 2</span><div class="rule"></div></div>
+  <h2>Выбери правильный вариант</h2>
+  <p class="task">Нажми на подходящее слово, чтобы заполнить пропуск.</p>
+  <div class="card" id="quizCard">
+    <div class="btnrow">
+      <button class="btn-check" onclick="checkEx2()">Проверить</button>
+      <button class="btn-show" onclick="showEx2()">Показать ответы</button>
+      <span class="score" id="score2"></span>
+    </div>
+  </div>
+</section>
+
+<!-- ================= EX 3 ================= -->
+<section id="ex3">
+  <div class="course-label"><span>Side dish · Упражнение 3</span><div class="rule"></div></div>
+  <h2>Найди ошибку</h2>
+  <p class="task">В каждом предложении спрятана одна ошибка. Нажми на неправильное слово, а потом выбери исправление.</p>
+  <div class="card" id="errCard">
+    <div class="btnrow">
+      <button class="btn-show" onclick="showEx3()">Показать ответы</button>
+      <span class="score" id="score3"></span>
+    </div>
+  </div>
+</section>
+
+<!-- ================= EX 4 ================= -->
+<section id="ex4">
+  <div class="course-label"><span>Main course · Упражнение 4</span><div class="rule"></div></div>
+  <h2>Восстанови диалог</h2>
+  <p class="task">Вставь пропущенные слова в разговор официанта (Waiter) и гостя (Guest).</p>
+  <div class="card">
+    <p class="wordbank">Банк слов: can · could · ’d · like · some · any · the · a · for · near · bill · reservation</p>
+    <div class="dlg" id="dlg"></div>
+    <div class="btnrow">
+      <button class="btn-check" onclick="checkEx4()">Проверить</button>
+      <button class="btn-show" onclick="showEx4()">Показать ответы</button>
+      <span class="score" id="score4"></span>
+    </div>
+  </div>
+</section>
+
+<!-- ================= EX 5 ================= -->
+<section id="ex5">
+  <div class="course-label"><span>Dessert · Упражнение 5</span><div class="rule"></div></div>
+  <h2>Составь свой диалог</h2>
+  <p class="task">Выбери в меню блюда, которые хочешь заказать (нажми на них), и напиши диалог с официантом: попроси столик, закажи закуску, основное блюдо и напиток, попроси счёт. Используй <b>Could / Can I have…</b>, <b>I’d like…</b>, <b>some</b>, <b>the</b> и <b>For a starter…</b> Затем отправь диалог на проверку.</p>
+
+  <div class="menu-card">
+    <div class="menu-head">✦ The Green Fork · Menu ✦</div>
+    <div class="menu-body" id="menuBody"></div>
+  </div>
+
+  <div class="card">
+    <p class="picked-note" id="pickedNote">Вы пока ничего не выбрали из меню.</p>
+    <p style="margin:10px 0 8px"><b>Ваш диалог</b> (начните каждую реплику с <span style="font-family:'PT Mono',monospace">Waiter:</span> или <span style="font-family:'PT Mono',monospace">Me:</span>):</p>
+    <textarea id="dialogueBox" placeholder="Waiter: Good evening! Do you have a reservation?
+Me: ..."></textarea>
+    <div class="btnrow">
+      <button class="btn-check" onclick="sendDialogue()">Отправить на проверку</button>
+      <span class="spinner" id="spin"></span>
+    </div>
+    <div class="ai-answer" id="aiAnswer"></div>
+  </div>
+</section>
+
+<!-- ================= RECEIPT ================= -->
+<section id="bill">
+  <div class="course-label"><span>The bill · Итог</span><div class="rule"></div></div>
+  <div class="receipt">
+    <h3>The Green Fork</h3>
+    <div class="rc-sub">YOUR BILL · ВАШ СЧЁТ</div>
+    <div class="rc-line"><span>1 · Vocabulary</span><span id="rc1">— / 8</span></div>
+    <div class="rc-line"><span>2 · Multiple choice</span><span id="rc2">— / 8</span></div>
+    <div class="rc-line"><span>3 · Error hunt</span><span id="rc3">— / 5</span></div>
+    <div class="rc-line"><span>4 · Dialogue gaps</span><span id="rc4">— / 11</span></div>
+    <div class="rc-total"><span>TOTAL</span><span id="rcTotal">— / 32</span></div>
+    <div class="rc-msg" id="rcMsg">Don’t forget to leave a tip! 😉</div>
+  </div>
+</section>
+
+</div>
+
+<script>
+/* =========================================================
+   STATE
+========================================================= */
+const scores = {1:null,2:null,3:null,4:null};
+function updateReceipt(){
+  const max = {1:8,2:8,3:5,4:11};
+  let total=0, done=true;
+  for(const k of [1,2,3,4]){
+    const el=document.getElementById('rc'+k);
+    if(scores[k]===null){ el.textContent='— / '+max[k]; done=false; }
+    else { el.textContent=scores[k]+' / '+max[k]; total+=scores[k]; }
+  }
+  document.getElementById('rcTotal').textContent=(done?total:'—')+' / 32';
+  const msg=document.getElementById('rcMsg');
+  if(done){
+    msg.textContent = total>=29 ? 'Excellent! The chef is impressed! 👨‍🍳✨'
+      : total>=21 ? 'Well done! Come again soon! 🍽️'
+      : 'Keep practising — the kitchen never closes! 💪';
+  }
+}
+function setScore(n,got,max){
+  scores[n]=got;
+  document.getElementById('score'+n).textContent=got+' / '+max;
+  updateReceipt();
+}
+
+/* =========================================================
+   EX 1 — MATCHING
+========================================================= */
+const vocab = [
+  ['десерты','desserts'],
+  ['официант','waiter'],
+  ['плата за обслуживание','service charge'],
+  ['закуски (первые блюда)','starters'],
+  ['гарниры','side dishes'],
+  ['основные блюда','main courses'],
+  ['ужин на двоих','dinner for two'],
+  ['счёт','bill'],
+];
+const enWords = vocab.map(v=>v[1]).sort(()=>Math.random()-.5);
+(function buildEx1(){
+  const grid=document.getElementById('matchGrid');
+  vocab.forEach((v,i)=>{
+    const row=document.createElement('div');
+    row.className='match-row';
+    row.innerHTML=`<span class="ru">${i+1}. ${v[0]}</span>
+      <select data-ans="${v[1]}" id="m${i}">
+        <option value="">— выбери —</option>
+        ${enWords.map(w=>`<option value="${w}">${w}</option>`).join('')}
+      </select>`;
+    grid.appendChild(row);
+  });
+})();
+function checkEx1(){
+  let ok=0;
+  vocab.forEach((v,i)=>{
+    const s=document.getElementById('m'+i);
+    s.classList.remove('correct','wrong');
+    if(s.value===s.dataset.ans){s.classList.add('correct');ok++;}
+    else if(s.value){s.classList.add('wrong');}
+  });
+  setScore(1,ok,8);
+}
+function showEx1(){
+  vocab.forEach((v,i)=>{
+    const s=document.getElementById('m'+i);
+    s.value=s.dataset.ans;
+    s.classList.remove('wrong');s.classList.add('correct');
+  });
+  setScore(1,8,8);
+}
+
+/* =========================================================
+   EX 2 — MULTIPLE CHOICE
+========================================================= */
+const quiz = [
+  {pre:'Can I have',post:'water, please?',opts:['some','any','a'],ans:'some',note:'Просьба + неисчисляемое → some'},
+  {pre:'For a starter, can I have',post:'soup, please?',opts:['a','the','any'],ans:'the',note:'Заказываем блюдо из меню → the'},
+  {pre:'',post:'we have a table near the window? (максимально вежливо)',opts:['Can','Could','Do'],ans:'Could',note:'Could вежливее, чем can'},
+  {pre:'I’m sorry, we don’t have',post:'soup left.',opts:['some','any','the'],ans:'any',note:'Отрицание → any'},
+  {pre:'I’d like',post:'soup, please.',opts:['any','some','a'],ans:'some',note:'Просьба → some'},
+  {pre:'',post:'a starter, can I have the salad?',opts:['On','To','For'],ans:'For',note:'«На закуску» → For a starter'},
+  {pre:'Can I have',post:'chair? (любой, неважно какой)',opts:['a','the','some'],ans:'a',note:'Любой предмет → a'},
+  {pre:'Can I have',post:'chair? (вон тот, конкретный)',opts:['a','the','any'],ans:'the',note:'Конкретный предмет → the'},
+];
+(function buildEx2(){
+  const card=document.getElementById('quizCard');
+  const btnrow=card.querySelector('.btnrow');
+  quiz.forEach((q,i)=>{
+    const d=document.createElement('div');
+    d.className='q';d.id='q'+i;
+    d.innerHTML=`<div class="stem">${i+1}. ${q.pre?q.pre+' ':''}<span class="blank" id="b${i}">&nbsp;___&nbsp;</span> ${q.post}</div>
+      <div class="opts">${q.opts.map(o=>`<button class="opt" data-q="${i}" data-v="${o}">${o}</button>`).join('')}</div>
+      <div class="hintline" id="h${i}" style="display:none"></div>`;
+    card.insertBefore(d,btnrow);
+  });
+  card.addEventListener('click',e=>{
+    const b=e.target.closest('.opt');
+    if(!b)return;
+    const i=b.dataset.q;
+    document.querySelectorAll(`.opt[data-q="${i}"]`).forEach(x=>x.classList.remove('sel','ok','bad'));
+    b.classList.add('sel');
+    document.getElementById('b'+i).innerHTML='&nbsp;'+b.dataset.v+'&nbsp;';
+    quiz[i].chosen=b.dataset.v;
+  });
+})();
+function checkEx2(){
+  let ok=0;
+  quiz.forEach((q,i)=>{
+    const sel=document.querySelector(`.opt[data-q="${i}"].sel`);
+    const hint=document.getElementById('h'+i);
+    document.querySelectorAll(`.opt[data-q="${i}"]`).forEach(x=>x.classList.remove('ok','bad'));
+    if(sel){
+      if(sel.dataset.v===q.ans){sel.classList.add('ok');ok++;hint.style.display='none';}
+      else{sel.classList.add('bad');hint.style.display='block';hint.textContent='Подсказка: '+q.note;}
+    }
+  });
+  setScore(2,ok,8);
+}
+function showEx2(){
+  quiz.forEach((q,i)=>{
+    document.querySelectorAll(`.opt[data-q="${i}"]`).forEach(x=>{
+      x.classList.remove('sel','bad','ok');
+      if(x.dataset.v===q.ans)x.classList.add('ok');
+    });
+    document.getElementById('b'+i).innerHTML='&nbsp;'+q.ans+'&nbsp;';
+    const hint=document.getElementById('h'+i);
+    hint.style.display='block';hint.textContent=q.note;
+  });
+  setScore(2,8,8);
+}
+
+/* =========================================================
+   EX 3 — ERROR HUNT
+========================================================= */
+const errs = [
+  {words:['I','like','some','soup,','please.'],err:1,fix:'’d like',opts:['’d like','am like','liked'],why:'Нужно I’d like (= I would like)'},
+  {words:['Can','I','have','any','water,','please?'],err:3,fix:'some',opts:['some','a','no'],why:'В просьбе — some, а не any'},
+  {words:['On','a','starter,','can','I','have','the','fish?'],err:0,fix:'For',opts:['For','To','At'],why:'«На закуску» = For a starter'},
+  {words:['We','don’t','have','some','desserts','left.'],err:3,fix:'any',opts:['any','the','a'],why:'В отрицании — any'},
+  {words:['I','like','to','order','fries','and','a','salad.'],err:1,fix:'’d like',opts:['’d like','liking','likes'],why:'Вежливое желание = I’d like'},
+];
+let ex3done=0;
+(function buildEx3(){
+  const card=document.getElementById('errCard');
+  const btnrow=card.querySelector('.btnrow');
+  errs.forEach((s,i)=>{
+    const d=document.createElement('div');
+    d.className='err-sent';d.id='es'+i;
+    d.innerHTML=`<div class="err-words">${i+1}.&nbsp; ${s.words.map((w,j)=>`<span class="w" data-s="${i}" data-j="${j}">${w}</span>`).join(' ')}</div>
+      <div class="fixrow" id="fr${i}">
+        <span class="arrow">исправить на →</span>
+        <select id="fx${i}">
+          <option value="">— выбери —</option>
+          ${s.opts.map(o=>`<option value="${o}">${o}</option>`).join('')}
+        </select>
+        <span id="fs${i}"></span>
+      </div>
+      <div class="hintline" id="eh${i}" style="display:none"></div>`;
+    card.insertBefore(d,btnrow);
+  });
+  card.addEventListener('click',e=>{
+    const w=e.target.closest('.w');
+    if(!w||w.classList.contains('locked'))return;
+    const i=+w.dataset.s, j=+w.dataset.j;
+    if(j===errs[i].err){
+      w.classList.add('found');
+      document.querySelectorAll(`.w[data-s="${i}"]`).forEach(x=>x.classList.add('locked'));
+      document.getElementById('fr'+i).classList.add('on');
+    }else{
+      w.classList.remove('flash');void w.offsetWidth;w.classList.add('flash');
+    }
+  });
+  card.addEventListener('change',e=>{
+    const sel=e.target.closest('select');
+    if(!sel||!sel.id.startsWith('fx'))return;
+    const i=+sel.id.slice(2);
+    const st=document.getElementById('fs'+i);
+    const hint=document.getElementById('eh'+i);
+    sel.classList.remove('correct','wrong');
+    if(sel.value===errs[i].fix){
+      sel.classList.add('correct');
+      st.innerHTML='<span class="fixed-ok">✓ верно!</span>';
+      hint.style.display='block';hint.textContent=errs[i].why;
+      if(!errs[i].solved){errs[i].solved=true;ex3done++;setScore(3,ex3done,5);}
+    }else if(sel.value){
+      sel.classList.add('wrong');st.textContent='✗ попробуй ещё';
+    }
+  });
+})();
+function showEx3(){
+  errs.forEach((s,i)=>{
+    document.querySelectorAll(`.w[data-s="${i}"]`).forEach(x=>{
+      x.classList.add('locked');
+      if(+x.dataset.j===s.err)x.classList.add('found');
+    });
+    const fr=document.getElementById('fr'+i);fr.classList.add('on');
+    const sel=document.getElementById('fx'+i);
+    sel.value=s.fix;sel.classList.remove('wrong');sel.classList.add('correct');
+    document.getElementById('fs'+i).innerHTML='<span class="fixed-ok">✓ '+s.fix+'</span>';
+    const hint=document.getElementById('eh'+i);
+    hint.style.display='block';hint.textContent=s.why;
+    if(!s.solved){s.solved=true;}
+  });
+  ex3done=5;setScore(3,5,5);
+}
+
+/* =========================================================
+   EX 4 — DIALOGUE GAPS
+========================================================= */
+const bank=['can','could','’d','like','some','any','the','a','for','near','bill','reservation'];
+const dlgLines=[
+  {who:'waiter',parts:['Good evening! Do you have a ',{a:'reservation'},'?']},
+  {who:'guest', parts:['Yes, we have a table ',{a:'for'},' two.']},
+  {who:'guest', parts:[{a:'could',cap:true},' we have a table ',{a:'near'},' the window, please?']},
+  {who:'waiter',parts:['Yes, certainly. Here is the menu. This soup is our speciality!']},
+  {who:'guest', parts:[{a:'for',cap:true},' a starter, can I have ',{a:'the'},' soup, please?']},
+  {who:'waiter',parts:['I’m sorry, we don’t have ',{a:'any'},' soup left.']},
+  {who:'guest', parts:['OK. Then I',{a:'’d'},' like the salad. And can I have ',{a:'some'},' water, please?']},
+  {who:'waiter',parts:['Sure, no problem. Would you ',{a:'like'},' something else to drink?']},
+  {who:'guest', parts:['No, thank you. Can we have the ',{a:'bill'},', please?']},
+];
+let gapCount=0;
+(function buildEx4(){
+  const dlg=document.getElementById('dlg');
+  dlgLines.forEach(l=>{
+    const row=document.createElement('div');
+    row.className='line '+l.who;
+    let html=`<div class="who ${l.who}">${l.who==='waiter'?'Waiter':'Guest'}</div><div class="bubble">`;
+    l.parts.forEach(p=>{
+      if(typeof p==='string'){html+=p;}
+      else{
+        const id='g'+(gapCount++);
+        const opts=bank.map(w=>{
+          const disp=p.cap? w.charAt(0).toUpperCase()+w.slice(1) : w;
+          return `<option value="${w}">${disp}</option>`;
+        }).join('');
+        html+=`<select data-ans="${p.a}" id="${id}"><option value="">…</option>${opts}</select>`;
+      }
+    });
+    html+='</div>';
+    row.innerHTML=html;
+    dlg.appendChild(row);
+  });
+})();
+function checkEx4(){
+  let ok=0;
+  for(let i=0;i<gapCount;i++){
+    const s=document.getElementById('g'+i);
+    s.classList.remove('correct','wrong');
+    if(s.value===s.dataset.ans){s.classList.add('correct');ok++;}
+    else if(s.value){s.classList.add('wrong');}
+  }
+  setScore(4,ok,11);
+}
+function showEx4(){
+  for(let i=0;i<gapCount;i++){
+    const s=document.getElementById('g'+i);
+    s.value=s.dataset.ans;
+    s.classList.remove('wrong');s.classList.add('correct');
+  }
+  setScore(4,11,11);
+}
+
+/* =========================================================
+   EX 5 — MENU + AI CHECK
+========================================================= */
+const menu={
+  'Starters · Закуски':[
+    ['🍅','Tomato soup','£4.50'],
+    ['🥗','Caesar salad','£5.00'],
+    ['🍤','Garlic prawns','£6.50'],
+  ],
+  'Main courses · Основные блюда':[
+    ['🥩','Steak & fries','£14.00'],
+    ['🐟','Grilled fish','£12.50'],
+    ['🍝','Pasta with mushrooms','£10.00'],
+    ['🍕','Margherita pizza','£9.50'],
+  ],
+  'Side dishes · Гарниры':[
+    ['🍟','Fries','£3.00'],
+    ['🥦','Grilled vegetables','£3.50'],
+  ],
+  'Desserts · Десерты':[
+    ['🍰','Chocolate cake','£4.50'],
+    ['🍨','Ice cream','£3.50'],
+  ],
+  'Drinks · Напитки':[
+    ['💧','Water','£1.50'],
+    ['🧃','Orange juice','£2.50'],
+    ['☕','Coffee','£2.00'],
+  ],
+};
+const picked=new Set();
+(function buildMenu(){
+  const body=document.getElementById('menuBody');
+  for(const [sec,items] of Object.entries(menu)){
+    const d=document.createElement('div');
+    d.className='menu-sec';
+    d.innerHTML=`<h4>${sec}</h4><div class="dishes">${
+      items.map(it=>`<div class="dish" data-nm="${it[1]}" role="button" tabindex="0">
+        <span class="emo">${it[0]}</span><span class="nm">${it[1]}</span><span class="pr">${it[2]}</span>
+      </div>`).join('')}</div>`;
+    body.appendChild(d);
+  }
+  body.addEventListener('click',e=>{
+    const dish=e.target.closest('.dish');
+    if(!dish)return;
+    toggleDish(dish);
+  });
+  body.addEventListener('keydown',e=>{
+    if(e.key!=='Enter'&&e.key!==' ')return;
+    const dish=e.target.closest('.dish');
+    if(!dish)return;
+    e.preventDefault();toggleDish(dish);
+  });
+})();
+function toggleDish(dish){
+  const nm=dish.dataset.nm;
+  if(picked.has(nm)){picked.delete(nm);dish.classList.remove('picked');}
+  else{picked.add(nm);dish.classList.add('picked');}
+  const note=document.getElementById('pickedNote');
+  note.textContent = picked.size
+    ? 'Ваш заказ: '+[...picked].join(', ')+'. Теперь опишите его в диалоге!'
+    : 'Вы пока ничего не выбрали из меню.';
+}
+
+async function sendDialogue(){
+  const text=document.getElementById('dialogueBox').value.trim();
+  const out=document.getElementById('aiAnswer');
+  const spin=document.getElementById('spin');
+  if(text.length<20){
+    out.classList.add('on');
+    out.textContent='Диалог пока слишком короткий. Напишите хотя бы несколько реплик — попросите столик, закажите блюда и счёт.';
+    return;
+  }
+  spin.classList.add('on');
+  out.classList.remove('on');
+  const pickedList=[...picked].join(', ')||'(ученик не отметил блюда в меню)';
+  try{
+    const response=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-6',
+        max_tokens:1000,
+        messages:[{role:'user',content:
+`Ты — доброжелательный учитель английского языка для русскоязычного ученика (уровень A2). Ученик написал диалог в ресторане. Он должен был: попросить столик, заказать закуску, основное блюдо, напиток и попросить счёт, используя вежливые фразы: Could/Can I have..., I'd like..., some (в просьбах), the (при заказе из меню), For a starter...
+
+Блюда, которые ученик выбрал в меню: ${pickedList}
+
+Проверь диалог и ответь ПО-РУССКИ (примеры фраз оставляй на английском). Структура ответа:
+1. 👍 Что получилось хорошо (кратко).
+2. ✏️ Ошибки: процитируй фразу с ошибкой → дай исправленный вариант → одно короткое объяснение. Особенно следи за: пропущенным 'd (I'd like), some/any, артиклем the при заказе, предлогом for (For a starter), вежливостью (could).
+3. ⭐ Оценка из 10 и одно предложение-совет.
+Будь кратким и тёплым. Не переписывай весь диалог заново.
+
+Диалог ученика:
+${text}`}]
+      })
+    });
+    const data=await response.json();
+    const reply=(data.content||[]).filter(i=>i.type==='text').map(i=>i.text).join('\n');
+    out.textContent=reply||'Не удалось получить ответ. Попробуйте ещё раз.';
+  }catch(err){
+    out.textContent='Ошибка соединения с проверкой. Проверьте интернет и попробуйте ещё раз.';
+  }
+  spin.classList.remove('on');
+  out.classList.add('on');
+}
+</script>
+</body>
+</html>
