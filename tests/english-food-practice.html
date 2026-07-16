@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Еда и вкусы — тренажёр по английскому</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FBF7EC;
+    --ink:#2C3524;
+    --muted:#7A7F6E;
+    --card:#FFFFFF;
+    --green:#3E8E41;
+    --green-soft:#E4F2E1;
+    --red:#D64545;
+    --red-soft:#FBE5E3;
+    --accent:#F2A93B;
+    --accent-soft:#FDEFD4;
+    --line:#E7E1D2;
+    --tile:#FFFDF7;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family:'Nunito',sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    line-height:1.5;
+  }
+  header{
+    max-width:880px;margin:0 auto;padding:44px 20px 8px;
+  }
+  .kicker{
+    display:inline-block;background:var(--ink);color:#fff;
+    font-family:'Rubik';font-weight:700;font-size:13px;letter-spacing:.12em;
+    text-transform:uppercase;padding:6px 12px;border-radius:6px;
+  }
+  h1{
+    font-family:'Rubik';font-weight:800;font-size:clamp(30px,5vw,44px);
+    margin:14px 0 6px;line-height:1.12;
+  }
+  h1 em{font-style:normal;background:linear-gradient(transparent 62%, var(--accent-soft) 62%);padding:0 4px;}
+  .sub{color:var(--muted);font-size:17px;max-width:620px;margin:0}
+  main{max-width:880px;margin:0 auto;padding:20px 20px 80px;}
+
+  .topic{
+    display:flex;align-items:center;gap:12px;margin:44px 0 6px;
+  }
+  .topic .dot{width:12px;height:12px;border-radius:50%;background:var(--accent)}
+  .topic h2{font-family:'Rubik';font-weight:800;font-size:24px;margin:0}
+
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:16px;
+    padding:22px 22px 18px;margin:18px 0;box-shadow:0 2px 0 rgba(44,53,36,.05);
+  }
+  .card-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 14px;margin-bottom:4px}
+  .ex-num{
+    font-family:'Rubik';font-weight:800;font-size:13px;color:#fff;
+    background:var(--green);border-radius:6px;padding:4px 9px;letter-spacing:.06em;
+  }
+  .card h3{font-family:'Rubik';font-weight:700;font-size:19px;margin:0}
+  .task{color:var(--muted);font-size:15px;margin:2px 0 16px}
+
+  .rulebox{
+    background:var(--accent-soft);border-radius:10px;padding:12px 16px;
+    font-size:15px;margin:0 0 16px;
+  }
+  .rulebox b{font-family:'Rubik'}
+
+  /* items */
+  .items{display:flex;flex-direction:column;gap:12px}
+  .item{
+    display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;
+    padding:10px 12px;border-radius:12px;background:var(--tile);
+    border:1px solid var(--line);
+  }
+  .item .pic{font-size:30px;width:40px;text-align:center}
+  .item .ru{font-weight:700;min-width:150px}
+  .item .hintru{color:var(--muted);font-size:14px}
+  .word{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+  .lt, .word input{
+    width:34px;height:40px;display:flex;align-items:center;justify-content:center;
+    font-family:'Rubik';font-weight:700;font-size:19px;text-transform:lowercase;
+  }
+  .lt{
+    background:#F1EDE0;border-radius:8px;color:var(--ink);
+  }
+  .lt.space{background:transparent;width:14px}
+  .word input{
+    text-align:center;border:2px dashed #C9C2AD;border-radius:8px;background:#fff;
+    color:var(--ink);outline:none;padding:0;
+  }
+  .word input:focus{border-color:var(--accent);border-style:solid}
+
+  input.text, select{
+    font-family:'Nunito';font-weight:700;font-size:16px;color:var(--ink);
+    border:2px solid #D8D2BF;border-radius:9px;background:#fff;
+    padding:8px 12px;outline:none;min-width:170px;
+  }
+  input.text:focus, select:focus{border-color:var(--accent)}
+  select{min-width:130px;cursor:pointer}
+
+  .sentence{font-size:16.5px;display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+  .sentence input.text{min-width:150px}
+  .clock{
+    font-family:'Rubik';font-weight:800;font-size:18px;background:var(--ink);color:#fff;
+    padding:4px 10px;border-radius:8px;
+  }
+
+  .bank{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px}
+  .bank span{
+    background:var(--green-soft);border:1px solid #CBE3C6;border-radius:999px;
+    padding:5px 14px;font-weight:800;font-size:14.5px;
+  }
+  .bank span.used{opacity:.35;text-decoration:line-through}
+
+  /* result states */
+  .ok, input.ok, select.ok{background:var(--green-soft)!important;border-color:var(--green)!important;border-style:solid!important}
+  .bad, input.bad, select.bad{background:var(--red-soft)!important;border-color:var(--red)!important;border-style:solid!important}
+  .revealed, input.revealed, select.revealed{background:var(--accent-soft)!important;border-color:var(--accent)!important;border-style:solid!important}
+
+  .controls{
+    display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:18px;
+    border-top:1px dashed var(--line);padding-top:14px;
+  }
+  button{
+    font-family:'Rubik';font-weight:700;font-size:15px;border-radius:10px;
+    padding:10px 18px;cursor:pointer;border:2px solid var(--ink);
+    transition:transform .06s ease;
+  }
+  button:active{transform:translateY(1px)}
+  .btn-check{background:var(--ink);color:#fff}
+  .btn-show{background:#fff;color:var(--ink)}
+  .btn-reset{background:transparent;color:var(--muted);border-color:transparent;padding:10px 8px}
+  .score{
+    margin-left:auto;font-family:'Rubik';font-weight:800;font-size:17px;
+    padding:6px 14px;border-radius:10px;background:#F1EDE0;min-width:74px;text-align:center;
+  }
+  .score.win{background:var(--green);color:#fff}
+
+  footer{max-width:880px;margin:0 auto;padding:0 20px 60px;color:var(--muted);font-size:14px}
+  @media (max-width:560px){
+    .item .ru{min-width:0;width:100%}
+    .lt,.word input{width:30px;height:36px;font-size:17px}
+  }
+</style>
+</head>
+<body>
+<header>
+  <span class="kicker">English practice · Food &amp; Tastes</span>
+  <h1>Еда, вкусы <em>и хитрые слова</em></h1>
+  <p class="sub">9 упражнений. Впиши пропущенные буквы или слова, затем нажми «Проверить». Если совсем никак — кнопка «Показать ответы» подскажет.</p>
+</header>
+
+<main id="app"></main>
+
+<footer>Подсказка: в упражнениях с буквами клавиатура сама перескакивает на следующую клетку. Удачи! 🍀</footer>
+
+<script>
+// ---------- DATA ----------
+const EX = [];
+
+// helper for letter-gap items
+function W(emoji, ru, word, gaps){ return {emoji, ru, word, gaps}; }
+
+EX.push({
+  topic:"Тема 1 · Еда",
+  num:"Упр. 1", title:"Морепродукты и мясо",
+  task:"Впиши пропущенные буквы.",
+  type:"letters",
+  items:[
+    W("🦀","краб","crab",[1]),
+    W("🦞","лобстер, омар","lobster",[1,5]),
+    W("🦪","мидии","mussels",[1,4]),
+    W("🍣","лосось","salmon",[1,4]),
+    W("🦑","кальмар","squid",[2]),
+    W("🐙","осьминог","octopus",[3,5]),
+    W("🐟","тунец","tuna",[1]),
+    W("🥩","говядина","beef",[1,2]),
+    W("🦆","утка","duck",[1]),
+    W("🦃","индейка","turkey",[1,4]),
+  ]
+});
+
+EX.push({
+  num:"Упр. 2", title:"Овощи, фрукты и ягоды",
+  task:"Впиши пропущенные буквы.",
+  type:"letters",
+  items:[
+    W("🍆","баклажан","aubergine",[1,6]),
+    W("🥑","авокадо","avocado",[2,5]),
+    W("🥬","капуста","cabbage",[1,4]),
+    W("🍐","груша","pear",[1,2]),
+    W("🍈","дыня","melon",[1,3]),
+    W("🍉","арбуз","watermelon",[1,5]),
+    W("🍑","персик","peach",[2]),
+    W("🍇","виноград","grapes",[2]),
+    W("🫐","черника","bilberry",[1,4]),
+    W("🍓","земляника","wild strawberry",[1,8,11]),
+  ]
+});
+
+EX.push({
+  num:"Упр. 3", title:"Способы приготовления и питание",
+  task:"Переведи слово на английский. В скобках — первая буква-подсказка.",
+  type:"translate",
+  items:[
+    {ru:"отварной", hint:"b", ans:["boiled"]},
+    {ru:"приготовленный на гриле", hint:"g", ans:["grilled"]},
+    {ru:"запечённый", hint:"b", ans:["baked"]},
+    {ru:"приготовленный на пару", hint:"s", ans:["steamed"]},
+    {ru:"жареный на сковороде (в масле)", hint:"f", ans:["fried"]},
+    {ru:"клетчатка", hint:"f", ans:["fiber","fibre"]},
+    {ru:"белки", hint:"p", ans:["proteins","protein"]},
+    {ru:"углеводы", hint:"c", ans:["carbohydrates","carbohydrate"]},
+    {ru:"жиры", hint:"f", ans:["fats"]},
+    {ru:"питательный", hint:"n", ans:["nutritious"]},
+  ]
+});
+
+EX.push({
+  num:"Упр. 4", title:"Полезные фразы о еде",
+  task:"Вставь слово или фразу из банка слов. Каждая используется один раз.",
+  type:"gapfill",
+  bank:["eat out","cut down on","cut out","reduce","recipe","Overeating","full","forbids","processed","nutrients"],
+  items:[
+    {before:"We often", after:"at weekends because nobody wants to cook.", ans:["eat out"], ru:"есть вне дома"},
+    {before:"I want to", after:"sugar — just one spoon in my tea now.", ans:["cut down on"], ru:"сократить"},
+    {before:"The doctor told me to", after:"junk food completely.", ans:["cut out"], ru:"полностью исключить"},
+    {before:"You should", after:"your daily caloric intake a little.", ans:["reduce"], ru:"уменьшить"},
+    {before:"I followed a new", after:"for vegetable soup.", ans:["recipe"], ru:"рецепт"},
+    {before:"", after:"is unhealthy — stop eating in time!", ans:["overeating"], ru:"переедание"},
+    {before:"No more cake, thanks. I'm", after:".", ans:["full"], ru:"я наелся"},
+    {before:"My doctor", after:"fast food.", ans:["forbids"], ru:"запрещает"},
+    {before:"Try not to eat", after:"food like sausages and crisps.", ans:["processed"], ru:"переработанная"},
+    {before:"Fruit and greens contain important", after:".", ans:["nutrients"], ru:"питательные вещества"},
+  ]
+});
+
+EX.push({
+  topic:"Тема 2 · Вкусы",
+  num:"Упр. 5", title:"Какой это вкус?",
+  task:"Впиши пропущенные буквы.",
+  type:"letters",
+  items:[
+    W("🧂","солёный","salty",[1]),
+    W("☕","горький","bitter",[1,4]),
+    W("🍋","кислый","sour",[1,2]),
+    W("🍰","сладкий","sweet",[2,3]),
+    W("🌶️","острый","spicy",[2]),
+    W("🔥","горячий / острый","hot",[1]),
+    W("😐","безвкусный","tasteless",[1,4]),
+    W("🧀","несладкий, пикантный","savory",[1,3]),
+  ]
+});
+
+EX.push({
+  num:"Упр. 6", title:"Вкусы в предложениях",
+  task:"Выбери подходящее слово.",
+  type:"select",
+  options:["—","salty","bitter","sour","sweet","spicy","hot","tasteless","savory"],
+  items:[
+    {before:"Lemons are very", after:".", ans:["sour"]},
+    {before:"There's too much salt in this soup — it's really", after:".", ans:["salty"]},
+    {before:"Black coffee without sugar tastes", after:".", ans:["bitter"]},
+    {before:"This chocolate cake is too", after:"for me.", ans:["sweet"]},
+    {before:"Mexican food with a lot of chilli is usually", after:".", ans:["spicy"]},
+    {before:"The rice has no salt and no spices — it's completely", after:".", ans:["tasteless"]},
+    {before:"I don't like desserts; I prefer", after:"snacks like cheese and olives.", ans:["savory"]},
+    {before:"Careful! The tea is still very", after:".", ans:["hot"]},
+  ]
+});
+
+EX.push({
+  num:"Упр. 7", title:"Переведи вкус",
+  task:"Напиши слово по-английски.",
+  type:"translate",
+  items:[
+    {ru:"сладкий", hint:"s", ans:["sweet"]},
+    {ru:"кислый", hint:"s", ans:["sour"]},
+    {ru:"солёный", hint:"s", ans:["salty"]},
+    {ru:"горький", hint:"b", ans:["bitter"]},
+    {ru:"острый", hint:"s", ans:["spicy","hot"]},
+    {ru:"безвкусный", hint:"t", ans:["tasteless"]},
+    {ru:"несладкий, пикантный", hint:"s", ans:["savory","savoury"]},
+    {ru:"тяжёлая пища", hint:"h", ans:["heavy food"]},
+  ]
+});
+
+EX.push({
+  topic:"Тема 3 · Хитрые слова",
+  num:"Упр. 8", title:"to me или for me?",
+  task:"Выбери правильный предлог.",
+  rule:"<b>to me</b> — мнение или чувство (<i>It seems strange to me</i>). <b>for me</b> — польза или «для кого» (<i>This cake is for me</i>).",
+  type:"select",
+  options:["—","to","for"],
+  items:[
+    {before:"This present is very important", after:"me.", ans:["to"]},
+    {before:"", after:"me, this film is boring.", ans:["to"]},
+    {before:"Vegetables are very good", after:"you.", ans:["for"]},
+    {before:"This letter is", after:"you.", ans:["for"]},
+    {before:"It seems strange", after:"me that he didn't call.", ans:["to"]},
+    {before:"Mum made a cake", after:"me.", ans:["for"]},
+    {before:"Too much sugar is bad", after:"your teeth.", ans:["for"]},
+    {before:"", after:"me, it sounds like a great idea.", ans:["to"]},
+    {before:"Fish is useful", after:"your brain.", ans:["for"]},
+    {before:"His opinion really matters", after:"me.", ans:["to"]},
+  ]
+});
+
+EX.push({
+  num:"Упр. 9", title:"recently и время",
+  task:"1–2: вставь recently. 3–10: напиши время словами (например, half past six).",
+  rule:"<b>recently</b> — недавно. Время: <b>:15</b> → quarter past, <b>:30</b> → half past, <b>:45</b> → quarter to (следующий час), <b>:00</b> → o'clock.",
+  type:"time",
+  items:[
+    {before:"I have", after:"started eating healthy food.", ans:["recently"], kind:"word"},
+    {before:"We haven't eaten out", after:".", ans:["recently"], kind:"word"},
+    {clock:"6:30", ans:["half past six"]},
+    {clock:"7:15", ans:["quarter past seven","a quarter past seven"]},
+    {clock:"5:45", ans:["quarter to six","a quarter to six"]},
+    {clock:"8:00", ans:["eight o'clock","eight oclock"]},
+    {clock:"3:30", ans:["half past three"]},
+    {clock:"9:15", ans:["quarter past nine","a quarter past nine"]},
+    {clock:"10:45", ans:["quarter to eleven","a quarter to eleven"]},
+    {clock:"2:10", ans:["ten past two"]},
+  ]
+});
+
+// ---------- RENDER ----------
+const app = document.getElementById('app');
+
+function norm(s){
+  return (s||"").toLowerCase().trim()
+    .replace(/[’`]/g,"'")
+    .replace(/[.!?,]/g,"")
+    .replace(/^it'?s\s+/,"")
+    .replace(/\s+/g," ");
+}
+function matches(val, answers){
+  const v = norm(val);
+  return answers.some(a => norm(a) === v);
+}
+
+EX.forEach((ex, ei) => {
+  if(ex.topic){
+    const t = document.createElement('div');
+    t.className = 'topic';
+    t.innerHTML = '<span class="dot"></span><h2>'+ex.topic+'</h2>';
+    app.appendChild(t);
+  }
+  const card = document.createElement('section');
+  card.className = 'card';
+  card.dataset.ex = ei;
+
+  let html = '<div class="card-head"><span class="ex-num">'+ex.num+'</span><h3>'+ex.title+'</h3></div>';
+  html += '<p class="task">'+ex.task+'</p>';
+  if(ex.rule) html += '<div class="rulebox">'+ex.rule+'</div>';
+  if(ex.bank){
+    html += '<div class="bank">'+ex.bank.map(w=>'<span>'+w+'</span>').join('')+'</div>';
+  }
+  html += '<div class="items">';
+
+  ex.items.forEach((it, ii) => {
+    if(ex.type === 'letters'){
+      let tiles = '';
+      for(let i=0;i<it.word.length;i++){
+        const ch = it.word[i];
+        if(ch === ' '){ tiles += '<span class="lt space"></span>'; continue; }
+        if(it.gaps.includes(i)){
+          tiles += '<input maxlength="1" data-ch="'+ch+'" autocomplete="off" autocapitalize="off">';
+        } else {
+          tiles += '<span class="lt">'+ch+'</span>';
+        }
+      }
+      html += '<div class="item" data-i="'+ii+'">'+
+        '<span class="pic">'+it.emoji+'</span>'+
+        '<span class="ru">'+it.ru+'</span>'+
+        '<span class="word">'+tiles+'</span></div>';
+    }
+    else if(ex.type === 'translate'){
+      html += '<div class="item" data-i="'+ii+'">'+
+        '<span class="ru">'+it.ru+'</span>'+
+        '<span class="hintru">('+it.hint+'…)</span>'+
+        '<input class="text" autocomplete="off" autocapitalize="off" spellcheck="false">'+
+        '</div>';
+    }
+    else if(ex.type === 'gapfill'){
+      html += '<div class="item" data-i="'+ii+'"><span class="sentence">'+
+        (it.before? it.before+' ' : '')+
+        '<input class="text" autocomplete="off" autocapitalize="off" spellcheck="false"> '+
+        it.after+
+        (it.ru? ' <span class="hintru">('+it.ru+')</span>':'')+
+        '</span></div>';
+    }
+    else if(ex.type === 'select'){
+      const opts = ex.options.map(o=>'<option>'+o+'</option>').join('');
+      html += '<div class="item" data-i="'+ii+'"><span class="sentence">'+
+        (it.before? it.before+' ' : '')+
+        '<select>'+opts+'</select> '+
+        it.after+'</span></div>';
+    }
+    else if(ex.type === 'time'){
+      if(it.kind === 'word'){
+        html += '<div class="item" data-i="'+ii+'"><span class="sentence">'+
+          it.before+' <input class="text" autocomplete="off" spellcheck="false"> '+it.after+'</span></div>';
+      } else {
+        html += '<div class="item" data-i="'+ii+'"><span class="sentence">'+
+          '<span class="clock">'+it.clock+'</span> → It\u2019s '+
+          '<input class="text" style="min-width:230px" autocomplete="off" spellcheck="false">.'+
+          '</span></div>';
+      }
+    }
+  });
+
+  html += '</div>';
+  html += '<div class="controls">'+
+    '<button class="btn-check">Проверить</button>'+
+    '<button class="btn-show">Показать ответы</button>'+
+    '<button class="btn-reset">Сбросить</button>'+
+    '<span class="score">— / '+ex.items.length+'</span></div>';
+
+  card.innerHTML = html;
+  app.appendChild(card);
+
+  // letter tiles: auto-advance
+  if(ex.type === 'letters'){
+    card.querySelectorAll('.word').forEach(w=>{
+      const inputs = [...w.querySelectorAll('input')];
+      inputs.forEach((inp,k)=>{
+        inp.addEventListener('input',()=>{
+          inp.classList.remove('ok','bad','revealed');
+          if(inp.value && k < inputs.length-1) inputs[k+1].focus();
+        });
+        inp.addEventListener('keydown',e=>{
+          if(e.key==='Backspace' && !inp.value && k>0) inputs[k-1].focus();
+        });
+      });
+    });
+  } else {
+    card.querySelectorAll('input,select').forEach(f=>{
+      f.addEventListener('input',()=>f.classList.remove('ok','bad','revealed'));
+    });
+  }
+
+  const scoreEl = card.querySelector('.score');
+
+  function checkItem(itemEl, it, reveal){
+    let good = true;
+    if(ex.type === 'letters'){
+      itemEl.querySelectorAll('input').forEach(inp=>{
+        const want = inp.dataset.ch;
+        if(reveal){
+          if(norm(inp.value)!==want){ inp.value = want; inp.classList.add('revealed'); }
+          else inp.classList.add('ok');
+        } else {
+          const ok = norm(inp.value)===want;
+          inp.classList.toggle('ok', ok);
+          inp.classList.toggle('bad', !ok);
+          if(!ok) good = false;
+        }
+      });
+      return reveal ? true : good;
+    }
+    const field = itemEl.querySelector('input.text, select');
+    if(reveal){
+      if(!matches(field.value, it.ans)){
+        field.value = it.ans[0];
+        field.classList.remove('ok','bad');
+        field.classList.add('revealed');
+      } else field.classList.add('ok');
+      return true;
+    }
+    const ok = matches(field.value, it.ans);
+    field.classList.toggle('ok', ok);
+    field.classList.toggle('bad', !ok);
+    return ok;
+  }
+
+  function run(reveal){
+    let score = 0;
+    card.querySelectorAll('.item').forEach(itemEl=>{
+      const it = ex.items[+itemEl.dataset.i];
+      if(checkItem(itemEl, it, reveal)) score++;
+    });
+    scoreEl.textContent = (reveal? '✓' : score) + ' / ' + ex.items.length;
+    scoreEl.classList.toggle('win', !reveal && score === ex.items.length);
+    if(ex.bank && !reveal){
+      // mark used bank words
+      const typed = [...card.querySelectorAll('input.text')].map(f=>norm(f.value));
+      card.querySelectorAll('.bank span').forEach(sp=>{
+        sp.classList.toggle('used', typed.includes(norm(sp.textContent)));
+      });
+    }
+  }
+
+  card.querySelector('.btn-check').addEventListener('click',()=>run(false));
+  card.querySelector('.btn-show').addEventListener('click',()=>run(true));
+  card.querySelector('.btn-reset').addEventListener('click',()=>{
+    card.querySelectorAll('input').forEach(f=>{f.value='';f.classList.remove('ok','bad','revealed');});
+    card.querySelectorAll('select').forEach(s=>{s.selectedIndex=0;s.classList.remove('ok','bad','revealed');});
+    card.querySelectorAll('.bank span').forEach(sp=>sp.classList.remove('used'));
+    scoreEl.textContent = '— / '+ex.items.length;
+    scoreEl.classList.remove('win');
+  });
+});
+</script>
+</body>
+</html>
