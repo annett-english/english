@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How long does it take? — отработка (A1)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F1F5F6;
+    --card:#FFFFFF;
+    --ink:#1C2B3A;
+    --muted:#5B6B7B;
+    --border:#DDE5E9;
+    --ok:#2E9E5B;
+    --ok-bg:#EAF7EF;
+    --err:#D64550;
+    --err-bg:#FCEEF0;
+    --reveal:#8A5BD6;
+    --reveal-bg:#F3EDFC;
+    --accent:#F4A825;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:'Nunito', system-ui, sans-serif; font-size:17px; line-height:1.5;
+  }
+  .wrap{max-width:880px; margin:0 auto; padding:24px 16px 80px;}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    background:linear-gradient(135deg,#0E7C7B 0%,#0B5D6B 100%);
+    color:#fff; border-radius:22px; padding:34px 30px 30px; position:relative; overflow:hidden;
+  }
+  .hero h1{
+    font-family:'Baloo 2', sans-serif; font-weight:700; font-size:clamp(28px,5vw,44px);
+    margin:0 0 6px; letter-spacing:.3px;
+  }
+  .hero p{margin:0; opacity:.92; max-width:560px}
+  .hero .pattern{
+    margin-top:18px; font-family:'Baloo 2',sans-serif; font-size:clamp(16px,2.6vw,20px);
+    background:rgba(255,255,255,.12); border:1.5px dashed rgba(255,255,255,.5);
+    border-radius:14px; padding:12px 16px; display:inline-block;
+  }
+  .hero .pattern b{color:var(--accent)}
+  .route{
+    display:flex; align-items:center; gap:10px; margin-top:22px; flex-wrap:wrap;
+    font-size:26px;
+  }
+  .route .dash{flex:1; min-width:24px; border-top:3px dashed rgba(255,255,255,.45); height:0}
+
+  /* ---------- EXERCISE CARD ---------- */
+  .ex{
+    background:var(--card); border:1px solid var(--border); border-radius:20px;
+    margin-top:26px; padding:24px 22px; scroll-margin-top:12px;
+  }
+  .ex-head{display:flex; gap:14px; align-items:flex-start; margin-bottom:6px}
+  .badge{
+    flex:0 0 auto; width:44px; height:44px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Baloo 2',sans-serif; font-weight:700; font-size:20px; color:#fff;
+  }
+  .ex h2{
+    font-family:'Baloo 2',sans-serif; font-weight:600; font-size:22px; margin:6px 0 2px;
+  }
+  .ex .task{color:var(--muted); margin:0 0 4px}
+  .ex .example{
+    background:#F6F9FA; border-left:4px solid var(--exc,#0E7C7B);
+    border-radius:0 10px 10px 0; padding:8px 12px; margin:10px 0 4px; font-size:15.5px;
+  }
+  .wordbank{
+    display:flex; flex-wrap:wrap; gap:8px; margin:12px 0 4px;
+  }
+  .wordbank span{
+    background:#FFF6E3; border:1px solid #F0DDAE; border-radius:999px;
+    padding:3px 12px; font-weight:700; font-size:15px;
+  }
+
+  ol.items{list-style:none; counter-reset:item; margin:14px 0 0; padding:0}
+  ol.items>li{
+    counter-increment:item; position:relative; padding:14px 12px 14px 46px;
+    border-top:1px dashed var(--border);
+  }
+  ol.items>li::before{
+    content:counter(item); position:absolute; left:4px; top:16px;
+    width:28px; height:28px; border-radius:50%;
+    background:var(--exc,#0E7C7B); color:#fff; opacity:.9;
+    font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .prompt{margin-bottom:8px}
+  .prompt .pic{font-size:30px; vertical-align:middle; margin-right:6px}
+  .info-chip{
+    display:inline-block; background:#EFF6F6; border:1px solid #CFE3E3;
+    border-radius:8px; padding:2px 10px; margin:2px 4px 2px 0; font-weight:700; font-size:15.5px;
+  }
+
+  input[type=text]{
+    width:100%; padding:10px 12px; font:inherit; color:var(--ink);
+    border:2px solid var(--border); border-radius:10px; background:#FBFDFD; outline:none;
+    transition:border-color .15s;
+  }
+  input[type=text].short{max-width:260px}
+  input[type=text]:focus{border-color:#0E7C7B}
+  select{
+    font:inherit; padding:8px 10px; border:2px solid var(--border); border-radius:10px;
+    background:#FBFDFD; color:var(--ink);
+  }
+  .tf label{
+    display:inline-flex; align-items:center; gap:6px; margin-right:18px;
+    background:#FBFDFD; border:2px solid var(--border); border-radius:10px;
+    padding:7px 14px; cursor:pointer; font-weight:700;
+  }
+  .tf input{accent-color:#0E7C7B; width:17px; height:17px}
+
+  /* item states */
+  li.correct input[type=text], li.correct select, li.correct .tf label.picked{border-color:var(--ok); background:var(--ok-bg)}
+  li.wrong   input[type=text], li.wrong   select, li.wrong   .tf label.picked{border-color:var(--err); background:var(--err-bg)}
+  li.revealed input[type=text], li.revealed select, li.revealed .tf label.picked{border-color:var(--reveal); background:var(--reveal-bg)}
+  .mark{font-size:18px; font-weight:800; margin-left:8px}
+  li.correct .mark{color:var(--ok)}
+  li.wrong .mark{color:var(--err)}
+  .answer-line{
+    display:none; margin-top:8px; font-size:15.5px;
+    background:var(--reveal-bg); border:1px dashed #C9B4EE; border-radius:10px; padding:7px 12px;
+  }
+  .answer-line b{color:var(--reveal)}
+  li.show-answer .answer-line{display:block}
+
+  /* dialogue */
+  .dlg-line{display:flex; gap:12px; align-items:center}
+  .dlg-line select{flex:0 0 74px}
+  .dlg-text{flex:1}
+
+  /* footer of exercise */
+  .ex-foot{
+    display:flex; flex-wrap:wrap; gap:10px; align-items:center;
+    border-top:1px dashed var(--border); margin-top:14px; padding-top:16px;
+  }
+  button{
+    font-family:'Baloo 2',sans-serif; font-weight:600; font-size:16px;
+    border:none; border-radius:12px; padding:10px 20px; cursor:pointer;
+    transition:transform .08s, filter .15s;
+  }
+  button:hover{filter:brightness(1.06)}
+  button:active{transform:scale(.97)}
+  .btn-check{background:var(--exc,#0E7C7B); color:#fff}
+  .btn-show{background:var(--reveal-bg); color:var(--reveal); border:2px solid #C9B4EE}
+  .btn-reset{background:#EEF2F4; color:var(--muted)}
+  .score{margin-left:auto; font-weight:800; font-size:17px}
+  .score.good{color:var(--ok)}
+  .score.bad{color:var(--err)}
+
+  table.timetable{
+    border-collapse:collapse; width:100%; margin:14px 0 4px; font-size:15.5px;
+  }
+  table.timetable th, table.timetable td{
+    border:1px solid var(--border); padding:7px 10px; text-align:left;
+  }
+  table.timetable th{background:#EFF6F6; font-family:'Baloo 2',sans-serif; font-weight:600}
+  table.timetable td:first-child{font-size:20px; text-align:center}
+
+  footer.page{
+    text-align:center; color:var(--muted); margin-top:40px; font-size:14.5px;
+  }
+  @media (max-width:560px){
+    .ex{padding:18px 14px}
+    ol.items>li{padding-left:40px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <h1>How long does it take?</h1>
+    <p>Отработка конструкции для уровня A1 — 7 упражнений по 10 пунктов. Проверяй ответы кнопкой <b>«Проверить»</b> или подглядывай через <b>«Показать ответы»</b>.</p>
+    <div class="pattern">— How long does it take <b>by&nbsp;train</b> <b>from</b> London <b>to</b> Oxford?<br>— It takes <b>one hour</b>.</div>
+    <div class="route">🚶<span class="dash"></span>🚲<span class="dash"></span>🚌<span class="dash"></span>🚆<span class="dash"></span>🚢<span class="dash"></span>✈️</div>
+  </header>
+
+  <div id="exercises"></div>
+
+  <footer class="page">Удачи! Good luck! ✈️</footer>
+</div>
+
+<script>
+/* ================= DATA ================= */
+
+const EX = [];
+
+/* --- 1. Correct the mistakes --- */
+EX.push({
+  color:'#0E7C7B',
+  title:'Исправь ошибки',
+  task:'В каждом предложении есть одна ошибка. Перепиши предложение правильно (текст уже в поле — просто исправь его).',
+  example:'❌ It take two hours by bus. → ✅ It <b>takes</b> two hours by bus.',
+  type:'rewrite',
+  items:[
+    {q:'How long does it takes by bus from London to Oxford?', a:['How long does it take by bus from London to Oxford?']},
+    {q:'It take two hours by train from Paris to Lyon.', a:['It takes two hours by train from Paris to Lyon.']},
+    {q:'How long do it take by car from Moscow to Tver?', a:['How long does it take by car from Moscow to Tver?']},
+    {q:'It takes three hours on train from Rome to Florence.', a:['It takes three hours by train from Rome to Florence.']},
+    {q:'How long does it take on car from Berlin to Dresden?', a:['How long does it take by car from Berlin to Dresden?']},
+    {q:'It takes by plane two hours from Rome to Madrid.', a:['It takes two hours by plane from Rome to Madrid.']},
+    {q:'How long it takes by bike from the park to the school?', a:['How long does it take by bike from the park to the school?']},
+    {q:'It takes ten minutes by foot from my house to the shop.', a:['It takes ten minutes on foot from my house to the shop.']},
+    {q:'How long does it take by train from London and Paris?', a:['How long does it take by train from London to Paris?']},
+    {q:'It takes about one hour with bus from the airport to the hotel.', a:['It takes about one hour by bus from the airport to the hotel.']}
+  ]
+});
+
+/* --- 2. Fill in the missing word --- */
+EX.push({
+  color:'#E4762B',
+  title:'Вставь пропущенное слово',
+  task:'Впиши одно слово в пропуск. Используй слова из рамки (некоторые повторяются).',
+  wordbank:['How','long','does','take','takes','by','on','from','to','about'],
+  type:'gap',
+  items:[
+    {q:'How ______ does it take by bus from London to Oxford?', a:['long']},
+    {q:'How long ______ it take by train from Paris to Lyon?', a:['does']},
+    {q:'How long does it ______ by car from Berlin to Munich?', a:['take']},
+    {q:'It ______ two hours by plane from Rome to Athens.', a:['takes']},
+    {q:'How long does it take ______ bike from the park to the museum?', a:['by']},
+    {q:'It takes ten minutes ______ foot from my house to the school.', a:['on']},
+    {q:'How long does it take by ferry ______ Helsinki to Tallinn?', a:['from']},
+    {q:'It takes three hours by train from Madrid ______ Valencia.', a:['to']},
+    {q:'______ long does it take by metro from the station to the centre?', a:['How']},
+    {q:'It takes ______ twenty minutes by taxi from the hotel to the airport.', a:['about']}
+  ]
+});
+
+/* --- 3. Transport by picture --- */
+EX.push({
+  color:'#7E57C2',
+  title:'Вставь транспорт по картинке',
+  task:'Посмотри на картинку и впиши транспорт: <b>by + транспорт</b> или <b>on foot</b>.',
+  example:'🚌 → It takes 20 minutes <b>by bus</b> from home to school.',
+  type:'gap',
+  items:[
+    {pic:'🚌', q:'It takes twenty minutes ______ from home to school.', a:['by bus']},
+    {pic:'🚆', q:'It takes one hour ______ from London to Oxford.', a:['by train']},
+    {pic:'✈️', q:'It takes two hours ______ from Rome to Madrid.', a:['by plane']},
+    {pic:'🚗', q:'It takes three hours ______ from Berlin to Dresden.', a:['by car']},
+    {pic:'🚲', q:'It takes fifteen minutes ______ from the park to the museum.', a:['by bike','by bicycle']},
+    {pic:'🚶', q:'It takes ten minutes ______ from my house to the shop.', a:['on foot']},
+    {pic:'🚢', q:'It takes eight hours ______ from Barcelona to Ibiza.', a:['by ship','by boat','by ferry']},
+    {pic:'🚇', q:'It takes twenty minutes ______ from the station to the centre.', a:['by metro','by underground','by subway','by tube']},
+    {pic:'🚕', q:'It takes thirty minutes ______ from the hotel to the airport.', a:['by taxi']},
+    {pic:'🏍️', q:'It takes forty minutes ______ from the village to the city.', a:['by motorbike','by motorcycle']}
+  ]
+});
+
+/* --- 4. Make the answer --- */
+EX.push({
+  color:'#2E86C1',
+  title:'Составь ответ по информации',
+  task:'Напиши полный ответ по образцу: <b>It takes … by … from … to … .</b>',
+  example:'🚆 train • Paris → Lyon • 2 hours → <b>It takes two hours by train from Paris to Lyon.</b>',
+  type:'buildAnswer',
+  items:[
+    {info:['🚆 train','London → Oxford','1 hour'], a:['It takes one hour by train from London to Oxford.']},
+    {info:['🚌 bus','Warsaw → Krakow','5 hours'], a:['It takes five hours by bus from Warsaw to Krakow.']},
+    {info:['✈️ plane','Rome → Madrid','2 hours'], a:['It takes two hours by plane from Rome to Madrid.']},
+    {info:['🚗 car','Berlin → Dresden','3 hours'], a:['It takes three hours by car from Berlin to Dresden.']},
+    {info:['🚲 bike','home → school','15 minutes'], a:['It takes fifteen minutes by bike from home to school.']},
+    {info:['🚶 on foot','home → the park','10 minutes'], a:['It takes ten minutes on foot from home to the park.']},
+    {info:['🚕 taxi','the hotel → the airport','30 minutes'], a:['It takes thirty minutes by taxi from the hotel to the airport.']},
+    {info:['⛴️ ferry','Helsinki → Tallinn','2 hours'], a:['It takes two hours by ferry from Helsinki to Tallinn.']},
+    {info:['🚇 metro','the station → the centre','20 minutes'], a:['It takes twenty minutes by metro from the station to the centre.','It takes twenty minutes by metro from the station to the center.']},
+    {info:['🚢 ship','Barcelona → Ibiza','8 hours'], a:['It takes eight hours by ship from Barcelona to Ibiza.']}
+  ]
+});
+
+/* --- 5. Make the question --- */
+EX.push({
+  color:'#D81B60',
+  title:'Составь вопрос',
+  task:'Напиши вопрос по образцу: <b>How long does it take by … from … to …?</b>',
+  example:'🚌 bus • London → Oxford → <b>How long does it take by bus from London to Oxford?</b>',
+  type:'buildAnswer',
+  items:[
+    {info:['🚌 bus','London → Oxford'], a:['How long does it take by bus from London to Oxford?']},
+    {info:['🚆 train','Paris → Lyon'], a:['How long does it take by train from Paris to Lyon?']},
+    {info:['✈️ plane','Moscow → Sochi'], a:['How long does it take by plane from Moscow to Sochi?']},
+    {info:['🚗 car','Berlin → Hamburg'], a:['How long does it take by car from Berlin to Hamburg?']},
+    {info:['🚲 bike','the park → the museum'], a:['How long does it take by bike from the park to the museum?']},
+    {info:['🚶 on foot','your house → the shop'], a:['How long does it take on foot from your house to the shop?']},
+    {info:['🚕 taxi','the airport → the hotel'], a:['How long does it take by taxi from the airport to the hotel?']},
+    {info:['🚇 metro','the station → the stadium'], a:['How long does it take by metro from the station to the stadium?']},
+    {info:['⛴️ ferry','Athens → Santorini'], a:['How long does it take by ferry from Athens to Santorini?']},
+    {info:['🚢 ship','Lisbon → Madeira'], a:['How long does it take by ship from Lisbon to Madeira?']}
+  ]
+});
+
+/* --- 6. Put the dialogue in order --- */
+EX.push({
+  color:'#2E9E5B',
+  title:'Составь диалог',
+  task:'Реплики диалога перепутаны. Выбери для каждой реплики её номер по порядку (1–10).',
+  type:'dialogue',
+  correctOrder:[
+    'Hello! Can I help you?',
+    'Yes, please. I want to visit Oxford tomorrow.',
+    'Great idea! You can go by train or by bus.',
+    'How long does it take by train from London to Oxford?',
+    'It takes about one hour by train.',
+    'And how long does it take by bus?',
+    'It takes about two hours by bus.',
+    'Oh, the train is faster! How much is a train ticket?',
+    'It is twenty pounds.',
+    'Perfect! One ticket, please. Thank you!'
+  ],
+  displayOrder:[3,7,1,5,9,2,10,4,6,8] /* какие реплики (по правильному номеру) показать на экране */
+});
+
+/* --- 7. True or False (timetable) --- */
+EX.push({
+  color:'#C0392B',
+  title:'Правда или ложь? (по таблице)',
+  task:'Посмотри на таблицу и отметь: <b>True</b> (правда) или <b>False</b> (ложь).',
+  type:'tf',
+  table:[
+    ['🚌','London → Oxford','bus','2 hours'],
+    ['🚆','London → Oxford','train','1 hour'],
+    ['🚆','Paris → Lyon','train','2 hours'],
+    ['✈️','Berlin → Munich','plane','1 hour'],
+    ['🚗','Rome → Florence','car','3 hours'],
+    ['🚲','home → school','bike','15 minutes'],
+    ['🚶','home → school','on foot','40 minutes'],
+    ['🚕','the hotel → the airport','taxi','30 minutes'],
+    ['⛴️','Helsinki → Tallinn','ferry','2 hours 30 minutes']
+  ],
+  items:[
+    {q:'It takes two hours by bus from London to Oxford.', a:true},
+    {q:'It takes three hours by train from London to Oxford.', a:false},
+    {q:'The train from London to Oxford is faster than the bus.', a:true},
+    {q:'It takes two hours by train from Paris to Lyon.', a:true},
+    {q:'It takes one hour by plane from Berlin to Munich.', a:true},
+    {q:'It takes two hours by car from Rome to Florence.', a:false},
+    {q:'It takes fifteen minutes by bike from home to school.', a:true},
+    {q:'It takes thirty minutes on foot from home to school.', a:false},
+    {q:'It takes thirty minutes by taxi from the hotel to the airport.', a:true},
+    {q:'It takes three hours by ferry from Helsinki to Tallinn.', a:false}
+  ]
+});
+
+/* ================= HELPERS ================= */
+
+const NUMWORDS = {one:'1',two:'2',three:'3',four:'4',five:'5',six:'6',seven:'7',eight:'8',nine:'9',
+  ten:'10',eleven:'11',twelve:'12',thirteen:'13',fourteen:'14',fifteen:'15',sixteen:'16',
+  seventeen:'17',eighteen:'18',nineteen:'19',twenty:'20',thirty:'30',forty:'40',fifty:'50',sixty:'60'};
+
+function norm(s){
+  s = (s||'').toLowerCase()
+    .replace(/[\u2019\u2018`]/g,"'")
+    .replace(/it's/g,'it is')
+    .replace(/[.,!?;:"()\u2014\u2013-]/g,' ')
+    .replace(/\s+/g,' ').trim();
+  return s.split(' ').map(w=>NUMWORDS[w]||w).join(' ');
+}
+function matches(user, answers){
+  const u = norm(user);
+  return u !== '' && answers.some(a => norm(a) === u);
+}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;');}
+
+/* ================= RENDER ================= */
+
+const root = document.getElementById('exercises');
+
+EX.forEach((ex, ei)=>{
+  const card = document.createElement('section');
+  card.className = 'ex';
+  card.style.setProperty('--exc', ex.color);
+  card.dataset.ei = ei;
+
+  let html = `
+    <div class="ex-head">
+      <div class="badge" style="background:${ex.color}">${ei+1}</div>
+      <div>
+        <h2>${ex.title}</h2>
+        <p class="task">${ex.task}</p>
+      </div>
+    </div>`;
+
+  if (ex.example) html += `<div class="example">${ex.example}</div>`;
+  if (ex.wordbank) html += `<div class="wordbank">${ex.wordbank.map(w=>`<span>${w}</span>`).join('')}</div>`;
+
+  if (ex.type === 'tf' && ex.table){
+    html += `<table class="timetable">
+      <tr><th></th><th>Route / Маршрут</th><th>Transport</th><th>Time</th></tr>
+      ${ex.table.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td></tr>`).join('')}
+    </table>`;
+  }
+
+  html += `<ol class="items">`;
+
+  if (ex.type === 'rewrite'){
+    ex.items.forEach((it,i)=>{
+      html += `<li data-i="${i}">
+        <div class="prompt">❌ ${esc(it.q)}</div>
+        <input type="text" value="${esc(it.q)}" spellcheck="false"><span class="mark"></span>
+        <div class="answer-line">✅ Правильно: <b>${esc(it.a[0])}</b></div>
+      </li>`;
+    });
+  }
+
+  if (ex.type === 'gap'){
+    ex.items.forEach((it,i)=>{
+      const pic = it.pic ? `<span class="pic">${it.pic}</span>` : '';
+      html += `<li data-i="${i}">
+        <div class="prompt">${pic}${esc(it.q)}</div>
+        <input type="text" class="short" spellcheck="false" placeholder="..."><span class="mark"></span>
+        <div class="answer-line">✅ Правильно: <b>${esc(it.a[0])}</b></div>
+      </li>`;
+    });
+  }
+
+  if (ex.type === 'buildAnswer'){
+    ex.items.forEach((it,i)=>{
+      html += `<li data-i="${i}">
+        <div class="prompt">${it.info.map(c=>`<span class="info-chip">${esc(c)}</span>`).join('')}</div>
+        <input type="text" spellcheck="false" placeholder="Напиши предложение..."><span class="mark"></span>
+        <div class="answer-line">✅ Правильно: <b>${esc(it.a[0])}</b></div>
+      </li>`;
+    });
+  }
+
+  if (ex.type === 'dialogue'){
+    ex.displayOrder.forEach((lineNo,i)=>{
+      const text = ex.correctOrder[lineNo-1];
+      const opts = Array.from({length:10},(_,k)=>`<option value="${k+1}">${k+1}</option>`).join('');
+      html += `<li data-i="${i}" data-correct="${lineNo}">
+        <div class="dlg-line">
+          <select><option value="">—</option>${opts}</select>
+          <div class="dlg-text">${esc(text)}</div>
+          <span class="mark"></span>
+        </div>
+        <div class="answer-line">✅ Номер реплики: <b>${lineNo}</b></div>
+      </li>`;
+    });
+  }
+
+  if (ex.type === 'tf'){
+    ex.items.forEach((it,i)=>{
+      html += `<li data-i="${i}">
+        <div class="prompt">${esc(it.q)}</div>
+        <div class="tf">
+          <label><input type="radio" name="tf-${ei}-${i}" value="true"> True</label>
+          <label><input type="radio" name="tf-${ei}-${i}" value="false"> False</label>
+          <span class="mark"></span>
+        </div>
+        <div class="answer-line">✅ Правильно: <b>${it.a ? 'True' : 'False'}</b></div>
+      </li>`;
+    });
+  }
+
+  html += `</ol>
+    <div class="ex-foot">
+      <button class="btn-check">Проверить</button>
+      <button class="btn-show">Показать ответы</button>
+      <button class="btn-reset">Сбросить</button>
+      <span class="score"></span>
+    </div>`;
+
+  card.innerHTML = html;
+  root.appendChild(card);
+});
+
+/* ================= LOGIC ================= */
+
+function clearState(li){
+  li.classList.remove('correct','wrong','revealed','show-answer');
+  const mark = li.querySelector('.mark');
+  if (mark) mark.textContent = '';
+  li.querySelectorAll('.tf label').forEach(l=>l.classList.remove('picked'));
+}
+
+document.querySelectorAll('.ex').forEach(card=>{
+  const ei = +card.dataset.ei;
+  const ex = EX[ei];
+  const lis = [...card.querySelectorAll('ol.items > li')];
+  const scoreEl = card.querySelector('.score');
+
+  /* mark picked label for radios (for coloring) */
+  card.querySelectorAll('.tf input').forEach(r=>{
+    r.addEventListener('change', ()=>{
+      const li = r.closest('li');
+      li.querySelectorAll('.tf label').forEach(l=>l.classList.remove('picked'));
+      r.closest('label').classList.add('picked');
+    });
+  });
+
+  /* reset colors when user edits again */
+  card.querySelectorAll('input[type=text], select').forEach(el=>{
+    el.addEventListener('input', ()=>{
+      const li = el.closest('li');
+      li.classList.remove('correct','wrong','revealed');
+      li.querySelector('.mark').textContent = '';
+    });
+  });
+
+  card.querySelector('.btn-check').addEventListener('click', ()=>{
+    let ok = 0;
+    lis.forEach(li=>{
+      li.classList.remove('correct','wrong','revealed','show-answer');
+      const mark = li.querySelector('.mark');
+      let good = false;
+
+      if (ex.type === 'rewrite' || ex.type === 'gap' || ex.type === 'buildAnswer'){
+        const it = ex.items[+li.dataset.i];
+        good = matches(li.querySelector('input').value, it.a);
+      } else if (ex.type === 'dialogue'){
+        good = li.querySelector('select').value === li.dataset.correct;
+      } else if (ex.type === 'tf'){
+        const it = ex.items[+li.dataset.i];
+        const picked = li.querySelector('.tf input:checked');
+        good = !!picked && (picked.value === 'true') === it.a;
+      }
+
+      li.classList.add(good ? 'correct' : 'wrong');
+      mark.textContent = good ? '✓' : '✗';
+      if (good) ok++;
+    });
+    scoreEl.textContent = `Правильно: ${ok} из ${lis.length}`;
+    scoreEl.className = 'score ' + (ok === lis.length ? 'good' : (ok <= 4 ? 'bad' : ''));
+    if (ok === lis.length) scoreEl.textContent += ' 🎉';
+  });
+
+  card.querySelector('.btn-show').addEventListener('click', ()=>{
+    lis.forEach(li=>{
+      clearState(li);
+      li.classList.add('revealed','show-answer');
+      if (ex.type === 'rewrite' || ex.type === 'gap' || ex.type === 'buildAnswer'){
+        li.querySelector('input').value = ex.items[+li.dataset.i].a[0];
+      } else if (ex.type === 'dialogue'){
+        li.querySelector('select').value = li.dataset.correct;
+      } else if (ex.type === 'tf'){
+        const it = ex.items[+li.dataset.i];
+        const radio = li.querySelector(`.tf input[value="${it.a}"]`);
+        radio.checked = true;
+        radio.closest('label').classList.add('picked');
+      }
+    });
+    scoreEl.textContent = 'Ответы показаны 👀';
+    scoreEl.className = 'score';
+  });
+
+  card.querySelector('.btn-reset').addEventListener('click', ()=>{
+    lis.forEach(li=>{
+      clearState(li);
+      if (ex.type === 'rewrite'){
+        li.querySelector('input').value = ex.items[+li.dataset.i].q;
+      } else if (ex.type === 'gap' || ex.type === 'buildAnswer'){
+        li.querySelector('input').value = '';
+      } else if (ex.type === 'dialogue'){
+        li.querySelector('select').value = '';
+      } else if (ex.type === 'tf'){
+        li.querySelectorAll('.tf input').forEach(r=>r.checked = false);
+      }
+    });
+    scoreEl.textContent = '';
+    scoreEl.className = 'score';
+  });
+});
+</script>
+</body>
+</html>
