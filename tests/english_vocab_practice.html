@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Дом и окрестности — тренажёр лексики</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F2EEE0;
+    --paper-line:#e3ddc9;
+    --ink:#25302A;
+    --blue:#2B4C6F;
+    --blue-soft:#e7edf3;
+    --terracotta:#C1502E;
+    --sage:#6E8B5E;
+    --sage-soft:#e9efe3;
+    --correct:#3F7D4A;
+    --correct-bg:#e6f2e7;
+    --wrong:#C1502E;
+    --wrong-bg:#fbe9e3;
+    --muted:#7a7566;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:
+      linear-gradient(var(--paper-line) 1px, transparent 1px) 0 0/100% 32px,
+      var(--paper);
+    color:var(--ink);
+    font-family:'IBM Plex Sans', sans-serif;
+    line-height:1.5;
+    padding-bottom:60px;
+  }
+  .wrap{max-width:880px;margin:0 auto;padding:0 24px;}
+
+  header.hero{
+    padding:56px 24px 32px;
+    text-align:center;
+  }
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    font-size:12px;
+    color:var(--blue);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+  }
+  .eyebrow::before,.eyebrow::after{content:"";flex:1;max-width:60px;height:1px;background:var(--blue);opacity:.4;}
+  h1{
+    font-family:'Fraunces', serif;
+    font-weight:700;
+    font-size:clamp(32px,5vw,52px);
+    margin:14px 0 6px;
+  }
+  .sub{color:var(--muted);font-size:16px;max-width:540px;margin:0 auto;}
+
+  .blueprint{max-width:560px;margin:32px auto 0;display:block;}
+  .blueprint text{font-family:'IBM Plex Mono', monospace;font-size:11px;fill:var(--blue);}
+  .blueprint .lbl-line{stroke:var(--blue);stroke-width:1;opacity:.55;}
+  .blueprint .struct{stroke:var(--ink);stroke-width:1.6;fill:none;}
+  .blueprint .roof{stroke:var(--terracotta);stroke-width:1.6;fill:none;stroke-dasharray:4 3;}
+  .blueprint .garden{fill:var(--sage);opacity:.28;}
+  .blueprint .ground{stroke:var(--ink);stroke-width:1.2;stroke-dasharray:2 3;}
+
+  .howto{
+    background:#fff;
+    border:1px solid var(--paper-line);
+    border-left:4px solid var(--blue);
+    border-radius:4px;
+    padding:16px 20px;
+    margin:36px 0;
+    font-size:14.5px;
+  }
+  .howto b{color:var(--blue);}
+
+  main{max-width:880px;margin:0 auto;padding:0 24px;}
+
+  .exercise{
+    background:#fffdf8;
+    border:1px solid var(--paper-line);
+    border-radius:6px;
+    padding:26px 26px 20px;
+    margin-bottom:28px;
+    box-shadow:0 1px 0 rgba(37,48,42,.03);
+  }
+  .ex-head{display:flex;gap:16px;align-items:flex-start;margin-bottom:16px;}
+  .ex-num{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px;
+    color:#fff;
+    background:var(--blue);
+    border-radius:3px;
+    padding:4px 9px;
+    flex-shrink:0;
+    margin-top:4px;
+  }
+  .ex-head h2{
+    font-family:'Fraunces', serif;
+    font-size:22px;
+    margin:0 0 4px;
+    font-weight:600;
+  }
+  .ex-instruction{margin:0;color:var(--muted);font-size:14.5px;}
+
+  ol.ex-list{list-style:none;margin:0;padding:0;counter-reset:item;}
+  ol.ex-list > li{
+    counter-increment:item;
+    padding:10px 0;
+    border-bottom:1px dashed var(--paper-line);
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:8px;
+    font-size:15px;
+  }
+  ol.ex-list > li::before{
+    content:counter(item)".";
+    font-family:'IBM Plex Mono', monospace;
+    color:var(--blue);
+    font-weight:500;
+    min-width:20px;
+  }
+  ol.ex-list > li:last-child{border-bottom:none;}
+  .item-text{flex:1 1 auto;min-width:180px;}
+  .hint{color:var(--sage);font-size:13px;font-style:italic;}
+
+  .answer-input{
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:14.5px;
+    padding:6px 9px;
+    border:1.5px solid #cfc7ae;
+    border-radius:4px;
+    background:#fff;
+    color:var(--ink);
+    min-width:130px;
+  }
+  select.answer-input{min-width:150px;cursor:pointer;}
+  .inline-input{min-width:70px;text-align:center;}
+  .answer-input:focus{outline:none;border-color:var(--blue);}
+  .answer-input.correct{border-color:var(--correct);background:var(--correct-bg);}
+  .answer-input.wrong{border-color:var(--wrong);background:var(--wrong-bg);}
+  .answer-input.shown{border-color:var(--blue);background:var(--blue-soft);}
+
+  .feedback{font-weight:700;font-size:15px;width:16px;display:inline-block;}
+  .fb-correct{color:var(--correct);}
+  .fb-wrong{color:var(--wrong);}
+
+  .paragraph{font-size:16px;line-height:2.1;}
+
+  .ex-controls{margin-top:18px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  .btn{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12.5px;
+    letter-spacing:.03em;
+    padding:9px 16px;
+    border-radius:4px;
+    border:1.5px solid var(--ink);
+    background:transparent;
+    color:var(--ink);
+    cursor:pointer;
+    transition:all .15s ease;
+  }
+  .btn.check{background:var(--blue);border-color:var(--blue);color:#fff;}
+  .btn.check:hover{background:#1e3a56;}
+  .btn.show:hover{background:var(--blue-soft);border-color:var(--blue);color:var(--blue);}
+  .btn.reset:hover{background:var(--wrong-bg);border-color:var(--wrong);color:var(--wrong);}
+  .score{font-family:'IBM Plex Mono', monospace;font-size:13px;color:var(--blue);margin-left:auto;}
+
+  details.vocab-ref{
+    background:#fff;
+    border:1px solid var(--paper-line);
+    border-radius:6px;
+    padding:18px 22px;
+    margin:36px 0 10px;
+  }
+  details.vocab-ref summary{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:18px;
+    cursor:pointer;
+    color:var(--blue);
+  }
+  .vocab-grid{
+    margin-top:16px;
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(230px,1fr));
+    gap:8px 20px;
+    font-size:13.5px;
+  }
+  .vocab-grid div span{display:block;}
+  .vocab-grid .en{font-weight:600;}
+  .vocab-grid .ru{color:var(--muted);}
+
+  footer{text-align:center;color:var(--muted);font-size:13px;padding:30px 24px 0;}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="eyebrow">Practice sheet</div>
+  <h1>Дом и окрестности</h1>
+  <p class="sub">Повторение лексики: дом, окно, соседи, район. 8 заданий — предлоги, буквы, полное написание, контекст, связный текст и конструкция there is / there are.</p>
+
+  <svg class="blueprint" viewBox="0 0 560 240" xmlns="http://www.w3.org/2000/svg">
+    <rect class="garden" x="20" y="150" width="140" height="70" rx="2"></rect>
+    <line class="lbl-line" x1="90" y1="150" x2="90" y2="115"></line>
+    <text x="60" y="112">garden</text>
+
+    <polyline class="roof" points="170,110 260,50 350,110"></polyline>
+    <rect class="struct" x="180" y="110" width="160" height="100"></rect>
+
+    <rect class="struct" x="215" y="140" width="30" height="70"></rect>
+    <line class="lbl-line" x1="230" y1="140" x2="230" y2="95"></line>
+    <text x="196" y="90">front door</text>
+
+    <rect class="struct" x="300" y="150" width="24" height="60"></rect>
+    <line class="lbl-line" x1="312" y1="150" x2="380" y2="120"></line>
+    <text x="382" y="118">back door</text>
+
+    <rect class="struct" x="255" y="150" width="34" height="30"></rect>
+    <line class="lbl-line" x1="272" y1="150" x2="272" y2="130"></line>
+    <text x="255" y="126">view</text>
+
+    <line class="ground" x1="170" y1="210" x2="480" y2="210"></line>
+    <text x="345" y="228">ground floor</text>
+
+    <line class="lbl-line" x1="180" y1="150" x2="120" y2="150"></line>
+    <text x="20" y="146">entrance</text>
+  </svg>
+</header>
+
+<div class="howto wrap">
+  <b>Как пользоваться:</b> впишите ответ (или выберите вариант), затем нажмите «Проверить» — правильные поля станут зелёными, ошибочные красными. «Показать ответы» — подставит верный вариант. «Сбросить» — очистит задание.
+</div>
+
+<main>
+  <section class="exercise" id="ex1"></section>
+  <section class="exercise" id="ex2"></section>
+  <section class="exercise" id="ex3"></section>
+  <section class="exercise" id="ex4"></section>
+  <section class="exercise" id="ex5"></section>
+  <section class="exercise" id="ex6"></section>
+  <section class="exercise" id="ex7"></section>
+  <section class="exercise" id="ex8"></section>
+
+  <details class="vocab-ref">
+    <summary>Показать список слов (справка)</summary>
+    <div class="vocab-grid" id="vocabGrid"></div>
+  </details>
+</main>
+
+<footer>Тренажёр создан для повторения лексики темы «Дом и окрестности».</footer>
+
+<script>
+const VOCAB = [
+  ["look out of the window","смотреть из окна"],
+  ["back door","задняя дверь"],
+  ["playground","детская площадка"],
+  ["entrance","вход"],
+  ["view","вид"],
+  ["front door","входная дверь"],
+  ["at sunset","на закате"],
+  ["at sunrise","на рассвете"],
+  ["ground","земля"],
+  ["have a 4-bedroom house","иметь дом с четырьмя спальнями"],
+  ["ground floor","первый этаж"],
+  ["living area","жилая зона / гостиная зона"],
+  ["a spacious garden","просторный сад"],
+  ["have sth at the front and the back","иметь что-то спереди и сзади"],
+  ["childhood","детство"],
+  ["lots of / a lot of","много"],
+  ["close by / close to me","рядом / недалеко"],
+  ["noise","шум"],
+  ["traffic","движение (транспорт)"],
+  ["on the beach","на пляже"],
+  ["on vacation / on holiday","в отпуске / на каникулах"],
+  ["neighborhood","район"],
+  ["neighbor","сосед"]
+];
+
+const EXDATA = [
+  {
+    id:'ex1', num:1, type:'list',
+    title:'Предлоги',
+    instruction:'Впишите пропущенный предлог.',
+    items:[
+      {prompt:'She looked out ___ the window.', answers:['of'], placeholder:'...'},
+      {prompt:'He went ___ the back door.', answers:['through'], placeholder:'...'},
+      {prompt:'Children are playing ___ the playground.', answers:['on'], placeholder:'...'},
+      {prompt:'The entrance is ___ the left.', answers:['on'], placeholder:'...'},
+      {prompt:'We walked ___ sunset.', answers:['at'], placeholder:'...'},
+      {prompt:'He wakes up ___ sunrise.', answers:['at'], placeholder:'...'},
+      {prompt:'The ball fell ___ the ground.', answers:['to'], placeholder:'...'},
+      {prompt:'There is a park close ___.', answers:['by'], placeholder:'...'}
+    ]
+  },
+  {
+    id:'ex2', num:2, type:'list',
+    title:'Пропущенные буквы',
+    instruction:'Впишите слово полностью, ориентируясь на перевод и известные буквы.',
+    items:[
+      {prompt:'n_ighb_r', answers:['neighbor','neighbour'], hint:'сосед', placeholder:'neighbor'},
+      {prompt:'ch_ldh__d', answers:['childhood'], hint:'детство', placeholder:'childhood'},
+      {prompt:'tr_ff_c', answers:['traffic'], hint:'движение (транспорт)', placeholder:'traffic'},
+      {prompt:'n__se', answers:['noise'], hint:'шум', placeholder:'noise'},
+      {prompt:'g_rd_n', answers:['garden'], hint:'сад', placeholder:'garden'},
+      {prompt:'en_r_nce', answers:['entrance'], hint:'вход', placeholder:'entrance'},
+      {prompt:'v__w', answers:['view'], hint:'вид', placeholder:'view'},
+      {prompt:'ne_ghb_rho_d', answers:['neighborhood','neighbourhood'], hint:'район', placeholder:'neighborhood'}
+    ]
+  },
+  {
+    id:'ex3', num:3, type:'list',
+    title:'Полное написание',
+    instruction:'Переведите словосочетание на английский язык полностью.',
+    items:[
+      {prompt:'смотреть из окна', answers:['look out of the window','look out the window'], placeholder:'...'},
+      {prompt:'задняя дверь', answers:['back door'], placeholder:'...'},
+      {prompt:'детская площадка', answers:['playground'], placeholder:'...'},
+      {prompt:'вход', answers:['entrance'], placeholder:'...'},
+      {prompt:'вид', answers:['view'], placeholder:'...'},
+      {prompt:'входная дверь', answers:['front door'], placeholder:'...'},
+      {prompt:'на закате', answers:['at sunset'], placeholder:'...'},
+      {prompt:'на рассвете', answers:['at sunrise'], placeholder:'...'},
+      {prompt:'первый этаж', answers:['ground floor'], placeholder:'...'},
+      {prompt:'жилая зона', answers:['living area'], placeholder:'...'}
+    ]
+  },
+  {
+    id:'ex4', num:4, type:'list',
+    title:'Контекст',
+    instruction:'Выберите подходящее по смыслу слово (перевод предложения дан в скобках).',
+    items:[
+      {prompt:'The kitchen is on the ___ floor. (Кухня находится на первом этаже)', type:'select', options:['ground','first','top'], answers:['ground']},
+      {prompt:'They have a ___ garden with lots of trees. (У них просторный сад с множеством деревьев)', type:'select', options:['spacious','small','noisy'], answers:['spacious']},
+      {prompt:'I had a happy ___. (У меня было счастливое детство)', type:'select', options:['childhood','neighborhood','vacation'], answers:['childhood']},
+      {prompt:'There is too much ___ in the city at night. (В городе слишком много шума ночью)', type:'select', options:['traffic','noise','view'], answers:['noise']},
+      {prompt:'The ___ is heavy today, so we\'ll be late. (Сегодня сильное движение, поэтому мы опоздаем)', type:'select', options:['traffic','noise','entrance'], answers:['traffic']},
+      {prompt:'We are relaxing on the ___ this summer. (Мы отдыхаем на пляже этим летом)', type:'select', options:['beach','playground','ground'], answers:['beach']},
+      {prompt:'They are on ___ in Spain right now. (Они сейчас в отпуске в Испании)', type:'select', options:['vacation','childhood','neighborhood'], answers:['vacation']},
+      {prompt:'My ___ is very friendly and always helps me. (Мой сосед очень дружелюбный и всегда мне помогает)', type:'select', options:['neighbor','neighborhood','entrance'], answers:['neighbor']}
+    ]
+  },
+  {
+    id:'ex5', num:5, type:'paragraph',
+    title:'Связный текст',
+    instruction:'Заполните пропуски в тексте. Первая буква каждого слова уже дана.',
+    segments:[
+      {text:'Every morning, Tom wakes up at '}, {blank:0},
+      {text:' and looks '}, {blank:1},
+      {text:' of the window at the garden. His house has a '}, {blank:2},
+      {text:' door at the front and a '}, {blank:3},
+      {text:' door at the back. Behind the house, there is a spacious '}, {blank:4},
+      {text:' where children love to play. His '}, {blank:5},
+      {text:' is a friendly old man who waters the flowers every evening. There are lots of shops close '}, {blank:6},
+      {text:' to Tom\'s house, so he never has to walk far. In the evening, the family enjoys watching the sunset from the '}, {blank:7},
+      {text:' area, which has a beautiful '}, {blank:8},
+      {text:' of the garden.'}
+    ],
+    items:[
+      {answers:['sunrise'], placeholder:'s______'},
+      {answers:['out'], placeholder:'o__'},
+      {answers:['front'], placeholder:'f____'},
+      {answers:['back'], placeholder:'b___'},
+      {answers:['garden'], placeholder:'g_____'},
+      {answers:['neighbor','neighbour'], placeholder:'n_______'},
+      {answers:['by'], placeholder:'b_'},
+      {answers:['living'], placeholder:'l_____'},
+      {answers:['view'], placeholder:'v___'}
+    ]
+  },
+  {
+    id:'ex6', num:6, type:'list',
+    title:'There is / There are — much / many',
+    instruction:'Выберите правильный вариант.',
+    items:[
+      {prompt:'There ___ traffic on this road every morning.', type:'select', options:['is much','are many','is many','are much'], answers:['is much']},
+      {prompt:'There ___ shops in my neighborhood.', type:'select', options:['is much','are many','is many','are much'], answers:['are many']},
+      {prompt:'There isn\'t ___ noise here at night.', type:'select', options:['much','many'], answers:['much']},
+      {prompt:'There aren\'t ___ playgrounds near my house.', type:'select', options:['much','many'], answers:['many']},
+      {prompt:'There ___ neighbors on our street.', type:'select', options:['is many','are many','is much','are much'], answers:['are many']},
+      {prompt:'___ there much traffic in the city center?', type:'select', options:['Is','Are'], answers:['Is']},
+      {prompt:'___ there many parks close by?', type:'select', options:['Is','Are'], answers:['Are']},
+      {prompt:'There isn\'t ___ view from this window.', type:'select', options:['much','many'], answers:['much']}
+    ]
+  },
+  {
+    id:'ex7', num:7, type:'list',
+    title:'There is / There are — a lot of / lots of',
+    instruction:'Выберите is или are, чтобы предложение было согласовано.',
+    items:[
+      {prompt:'There ___ a lot of noise in this street.', type:'select', options:['is','are'], answers:['is']},
+      {prompt:'There ___ lots of neighbors here.', type:'select', options:['is','are'], answers:['are']},
+      {prompt:'There ___ a lot of traffic today.', type:'select', options:['is','are'], answers:['is']},
+      {prompt:'There ___ lots of shops close by.', type:'select', options:['is','are'], answers:['are']},
+      {prompt:'There ___ a lot of children on the playground.', type:'select', options:['is','are'], answers:['are']},
+      {prompt:'There ___ a lot of noise coming from next door.', type:'select', options:['is','are'], answers:['is']},
+      {prompt:'There ___ lots of trees in the garden.', type:'select', options:['is','are'], answers:['are']},
+      {prompt:'There ___ a lot of space in the living area.', type:'select', options:['is','are'], answers:['is']}
+    ]
+  },
+  {
+    id:'ex8', num:8, type:'list',
+    title:'Итоговый перевод',
+    instruction:'Переведите предложение на английский язык (возможны разные варианты — при сомнении нажмите «Показать ответы»).',
+    items:[
+      {prompt:'Она посмотрела в окно и улыбнулась.', answers:['she looked out of the window and smiled','she looked out the window and smiled'], placeholder:'...'},
+      {prompt:'У них дом с четырьмя спальнями и просторный сад.', answers:['they have a 4-bedroom house and a spacious garden','they have a four-bedroom house and a spacious garden'], placeholder:'...'},
+      {prompt:'В моём районе много магазинов.', answers:['there are many shops in my neighborhood','there are a lot of shops in my neighborhood','there are lots of shops in my neighborhood'], placeholder:'...'},
+      {prompt:'Здесь не так много шума.', answers:['there isn\'t much noise here','there is not much noise here'], placeholder:'...'},
+      {prompt:'Мой сосед живёт рядом.', answers:['my neighbor lives close by','my neighbour lives close by'], placeholder:'...'},
+      {prompt:'Кухня находится на первом этаже, а гостиная зона наверху.', answers:['the kitchen is on the ground floor and the living area is upstairs'], placeholder:'...'}
+    ]
+  }
+];
+
+function normalize(s){
+  return s.toLowerCase().trim()
+    .replace(/[.,!?;:"«»']/g,'')
+    .replace(/\s+/g,' ');
+}
+function isCorrect(value, answers){
+  const v = normalize(value || '');
+  return answers.some(a => normalize(a) === v);
+}
+
+function controlsHTML(exId){
+  return `<div class="ex-controls">
+    <button class="btn check" onclick="checkExercise('${exId}')">Проверить</button>
+    <button class="btn show" onclick="showAnswers('${exId}')">Показать ответы</button>
+    <button class="btn reset" onclick="resetExercise('${exId}')">Сбросить</button>
+    <span class="score" id="${exId}-score"></span>
+  </div>`;
+}
+
+function itemFieldHTML(exId, i, item){
+  const inputId = `${exId}-${i}`;
+  if(item.type === 'select'){
+    let opts = '<option value="">—</option>' + item.options.map(o=>`<option value="${o}">${o}</option>`).join('');
+    return `<select id="${inputId}" class="answer-input">${opts}</select>`;
+  }
+  return `<input type="text" id="${inputId}" class="answer-input" placeholder="${item.placeholder||'...'}" autocomplete="off">`;
+}
+
+function renderExercise(ex){
+  const container = document.getElementById(ex.id);
+  let html = `<div class="ex-head"><span class="ex-num">${String(ex.num).padStart(2,'0')}</span>
+    <div><h2>${ex.title}</h2><p class="ex-instruction">${ex.instruction}</p></div></div>`;
+  html += '<ol class="ex-list">';
+  ex.items.forEach((item,i)=>{
+    const inputId = `${ex.id}-${i}`;
+    html += `<li><span class="item-text">${item.prompt}</span> ${itemFieldHTML(ex.id,i,item)}
+      ${item.hint ? `<span class="hint">${item.hint}</span>` : ''}
+      <span class="feedback" id="${inputId}-fb"></span></li>`;
+  });
+  html += '</ol>';
+  html += controlsHTML(ex.id);
+  container.innerHTML = html;
+}
+
+function renderParagraphExercise(ex){
+  const container = document.getElementById(ex.id);
+  let html = `<div class="ex-head"><span class="ex-num">${String(ex.num).padStart(2,'0')}</span>
+    <div><h2>${ex.title}</h2><p class="ex-instruction">${ex.instruction}</p></div></div>`;
+  html += '<p class="paragraph">';
+  let blankIndex = 0;
+  ex.segments.forEach(seg=>{
+    if(seg.text !== undefined){
+      html += seg.text;
+    } else if(seg.blank !== undefined){
+      const item = ex.items[blankIndex];
+      const inputId = `${ex.id}-${blankIndex}`;
+      html += `<input type="text" id="${inputId}" class="answer-input inline-input" placeholder="${item.placeholder}" autocomplete="off"><span class="feedback" id="${inputId}-fb"></span>`;
+      blankIndex++;
+    }
+  });
+  html += '</p>';
+  html += controlsHTML(ex.id);
+  container.innerHTML = html;
+}
+
+function checkExercise(exId){
+  const ex = EXDATA.find(e=>e.id===exId);
+  let correctCount = 0;
+  ex.items.forEach((item,i)=>{
+    const inputId = `${exId}-${i}`;
+    const el = document.getElementById(inputId);
+    const fb = document.getElementById(inputId+'-fb');
+    const ok = isCorrect(el.value, item.answers);
+    el.classList.remove('correct','wrong','shown');
+    el.classList.add(ok ? 'correct' : 'wrong');
+    fb.textContent = ok ? '✓' : '✗';
+    fb.className = 'feedback ' + (ok ? 'fb-correct' : 'fb-wrong');
+    if(ok) correctCount++;
+  });
+  document.getElementById(exId+'-score').textContent = `${correctCount} из ${ex.items.length} правильно`;
+}
+
+function showAnswers(exId){
+  const ex = EXDATA.find(e=>e.id===exId);
+  ex.items.forEach((item,i)=>{
+    const inputId = `${exId}-${i}`;
+    const el = document.getElementById(inputId);
+    el.value = item.answers[0];
+    el.classList.remove('correct','wrong');
+    el.classList.add('shown');
+    const fb = document.getElementById(inputId+'-fb');
+    fb.textContent = '';
+    fb.className = 'feedback';
+  });
+  document.getElementById(exId+'-score').textContent = 'Показаны правильные ответы';
+}
+
+function resetExercise(exId){
+  const ex = EXDATA.find(e=>e.id===exId);
+  ex.items.forEach((item,i)=>{
+    const inputId = `${exId}-${i}`;
+    const el = document.getElementById(inputId);
+    el.value = '';
+    el.classList.remove('correct','wrong','shown');
+    document.getElementById(inputId+'-fb').textContent = '';
+  });
+  document.getElementById(exId+'-score').textContent = '';
+}
+
+EXDATA.forEach(ex=>{
+  if(ex.type === 'paragraph') renderParagraphExercise(ex);
+  else renderExercise(ex);
+});
+
+const vocabGrid = document.getElementById('vocabGrid');
+vocabGrid.innerHTML = VOCAB.map(([en,ru])=>`<div><span class="en">${en}</span><span class="ru">${ru}</span></div>`).join('');
+</script>
+</body>
+</html>
