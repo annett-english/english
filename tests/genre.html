@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Практика: Containers</title>
+<style>
+  :root{
+    --bg:#f4f6fb;
+    --card:#ffffff;
+    --ink:#1f2937;
+    --muted:#6b7280;
+    --accent:#4f46e5;
+    --accent-light:#eef2ff;
+    --good:#16a34a;
+    --good-bg:#dcfce7;
+    --bad:#dc2626;
+    --bad-bg:#fee2e2;
+    --border:#e5e7eb;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family: "Segoe UI", Arial, sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    padding-bottom:60px;
+  }
+  header{
+    background:linear-gradient(135deg,#4f46e5,#7c3aed);
+    color:#fff;
+    padding:36px 20px 28px;
+    text-align:center;
+  }
+  header h1{margin:0 0 8px; font-size:28px;}
+  header p{margin:0; opacity:.9; font-size:15px;}
+
+  .container{max-width:900px; margin:0 auto; padding:0 18px;}
+
+  nav.toc{
+    max-width:900px; margin:-18px auto 30px; background:#fff;
+    border-radius:14px; box-shadow:0 6px 18px rgba(0,0,0,.06);
+    padding:14px 20px; display:flex; flex-wrap:wrap; gap:10px; justify-content:center;
+  }
+  nav.toc a{
+    color:var(--accent); text-decoration:none; font-size:14px; font-weight:600;
+    padding:6px 12px; border-radius:20px; background:var(--accent-light);
+  }
+  nav.toc a:hover{background:#e0e7ff;}
+
+  .section-title{
+    font-size:22px; font-weight:800; margin:40px 0 6px; color:var(--ink);
+    display:flex; align-items:center; gap:10px;
+  }
+  .section-title .badge{
+    background:var(--accent); color:#fff; font-size:12px; padding:4px 10px;
+    border-radius:20px; font-weight:700;
+  }
+  .section-sub{color:var(--muted); margin:0 0 20px; font-size:14.5px;}
+
+  .notes{
+    background:#fffbeb; border:1px solid #fde68a; border-radius:14px;
+    padding:18px 20px; margin-bottom:26px;
+  }
+  .notes h3{margin:0 0 12px; color:#92400e; font-size:16px;}
+  .notes ul{margin:0; padding-left:20px;}
+  .notes li{margin-bottom:10px; line-height:1.5; font-size:14.5px;}
+  .notes li b{color:#92400e;}
+  .notes .wrong{color:#dc2626; text-decoration:line-through;}
+  .notes .right{color:#16a34a; font-weight:700;}
+
+  .vocab-table{
+    width:100%; border-collapse:collapse; font-size:14px; margin-top:6px;
+  }
+  .vocab-table th, .vocab-table td{
+    border:1px solid var(--border); padding:8px 10px; text-align:left; vertical-align:top;
+  }
+  .vocab-table th{background:#f3f4f6;}
+
+  .card{
+    background:var(--card); border-radius:16px; box-shadow:0 4px 14px rgba(0,0,0,.05);
+    padding:22px 22px 20px; margin-bottom:28px; border:1px solid var(--border);
+  }
+  .card h3{margin:0 0 4px; font-size:17px;}
+  .card .instr{color:var(--muted); font-size:13.5px; margin:0 0 16px;}
+
+  .item{
+    display:flex; align-items:flex-start; gap:10px; margin-bottom:12px; flex-wrap:wrap;
+  }
+  .item .num{
+    min-width:24px; height:24px; border-radius:50%; background:var(--accent-light);
+    color:var(--accent); font-size:12.5px; font-weight:700; display:flex; align-items:center;
+    justify-content:center; flex-shrink:0; margin-top:3px;
+  }
+  .item .text{flex:1; min-width:220px; font-size:14.5px; line-height:1.5;}
+  .item input[type=text]{
+    padding:8px 10px; border:1.5px solid var(--border); border-radius:8px;
+    font-size:14px; width:220px; max-width:100%;
+  }
+  .item input[type=text]:focus{outline:none; border-color:var(--accent);}
+  .item.correct input{border-color:var(--good); background:var(--good-bg);}
+  .item.incorrect input{border-color:var(--bad); background:var(--bad-bg);}
+  .answer-line{
+    display:none; font-size:13px; margin-top:4px; padding:6px 10px; border-radius:8px;
+    background:var(--accent-light); color:#3730a3; width:100%;
+  }
+  .answer-line.show{display:block;}
+
+  .btn-row{display:flex; gap:10px; flex-wrap:wrap; margin-top:16px;}
+  button{
+    border:none; padding:10px 18px; border-radius:10px; font-size:14px; font-weight:700;
+    cursor:pointer; transition:.15s;
+  }
+  .btn-check{background:var(--accent); color:#fff;}
+  .btn-check:hover{background:#4338ca;}
+  .btn-show{background:#f3f4f6; color:var(--ink); border:1.5px solid var(--border);}
+  .btn-show:hover{background:#e5e7eb;}
+  .btn-reset{background:transparent; color:var(--muted); border:1.5px solid var(--border);}
+  .btn-reset:hover{background:#f9fafb;}
+
+  .score{
+    margin-top:12px; font-weight:700; font-size:14.5px; display:none;
+  }
+  .score.show{display:block;}
+
+  .miro-box{
+    background:#eef2ff; border:1px dashed var(--accent); border-radius:14px;
+    padding:18px 20px; margin-top:6px; font-size:14.5px; line-height:1.6;
+  }
+  .miro-box b{color:var(--accent);}
+
+  footer{text-align:center; color:var(--muted); font-size:13px; margin-top:40px;}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>📦 Practice: Containers</h1>
+  <p>Заполняйте пропуски, переводите, подбирайте слова по контексту — потом проверяйте себя</p>
+</header>
+
+<nav class="toc">
+  <a href="#notes-containers">Памятка: Containers</a>
+  <a href="#ex1">Упр. 1</a>
+  <a href="#ex2">Упр. 2</a>
+  <a href="#ex3">Упр. 3</a>
+</nav>
+
+<div class="container">
+
+  <!-- ===================== CONTAINERS ===================== -->
+  <div class="section-title" id="notes-containers"><span class="badge">Тема</span> Containers</div>
+  <p class="section-sub">Повторяем слова для ёмкостей/упаковок, затем закрепляем в упражнениях.</p>
+
+  <div class="notes">
+    <h3>📦 Словарь Containers</h3>
+    <table class="vocab-table">
+      <tr><th>Word</th><th>Перевод</th><th>Example</th></tr>
+      <tr><td>a glass</td><td>стакан</td><td>Can I have a glass of water?</td></tr>
+      <tr><td>a carton</td><td>пакет (молока и т.п.)</td><td>She bought a carton of milk.</td></tr>
+      <tr><td>a jar</td><td>стеклянная банка</td><td>There is honey in the jar.</td></tr>
+      <tr><td>a bag</td><td>пакет/мешок</td><td>I have a bag of apples.</td></tr>
+      <tr><td>a plastic bag</td><td>пластиковый пакет</td><td>Use a plastic bag.</td></tr>
+      <tr><td>a box</td><td>коробка</td><td>The shoes are in a box.</td></tr>
+      <tr><td>a tin / a can</td><td>консервная/жестяная банка</td><td>Open the tin of beans. / I drank a can of soda.</td></tr>
+      <tr><td>a bowl</td><td>миска</td><td>She ate soup from a bowl.</td></tr>
+      <tr><td>a cup</td><td>чашка</td><td>I drink tea from a cup.</td></tr>
+      <tr><td>a mug</td><td>кружка</td><td>He has a coffee mug.</td></tr>
+      <tr><td>a packet</td><td>упаковка/пачка</td><td>Buy a packet of chips.</td></tr>
+      <tr><td>a bar of chocolate / a bar of soap</td><td>плитка шоколада / кусок мыла</td><td>She ate a bar of chocolate.</td></tr>
+      <tr><td>a loaf of bread (2 loaves)</td><td>буханка хлеба</td><td>We bought a loaf of bread.</td></tr>
+      <tr><td>a kilo / a kilogram</td><td>килограмм</td><td>I need a kilo of apples.</td></tr>
+      <tr><td>biscuits / cookies</td><td>печенье</td><td>I like biscuits.</td></tr>
+      <tr><td>a liter</td><td>литр</td><td>One liter of water.</td></tr>
+      <tr><td>a basket</td><td>корзина</td><td>She carried a basket.</td></tr>
+      <tr><td>a slice</td><td>кусок/ломтик</td><td>Give me a slice of cake.</td></tr>
+      <tr><td>a piece</td><td>кусок</td><td>A piece of cheese.</td></tr>
+      <tr><td>cocoa</td><td>какао</td><td>I drink cocoa in winter.</td></tr>
+      <tr><td>a tray</td><td>поднос</td><td>She brought drinks on a tray.</td></tr>
+    </table>
+  </div>
+
+  <!-- Exercise 1 -->
+  <div class="card" id="ex1" data-exercise>
+    <h3>Упражнение 1. Вставь нужное слово-контейнер</h3>
+    <p class="instr">Впиши подходящее слово из словаря (без артикля a/an).</p>
+    <div class="item" data-answer="glass"><div class="num">1</div><div class="text">Can I have a <input type="text"> of water?
+      <div class="answer-line">Ответ: glass</div></div></div>
+    <div class="item" data-answer="carton"><div class="num">2</div><div class="text">She bought a <input type="text"> of milk.
+      <div class="answer-line">Ответ: carton</div></div></div>
+    <div class="item" data-answer="jar"><div class="num">3</div><div class="text">There is honey in the <input type="text">.
+      <div class="answer-line">Ответ: jar</div></div></div>
+    <div class="item" data-answer="bag"><div class="num">4</div><div class="text">I have a <input type="text"> of apples.
+      <div class="answer-line">Ответ: bag</div></div></div>
+    <div class="item" data-answer="box"><div class="num">5</div><div class="text">The shoes are in a <input type="text">.
+      <div class="answer-line">Ответ: box</div></div></div>
+    <div class="item" data-answer="tin|can"><div class="num">6</div><div class="text">Open the <input type="text"> of beans.
+      <div class="answer-line">Ответ: tin (или can)</div></div></div>
+    <div class="item" data-answer="bowl"><div class="num">7</div><div class="text">She ate soup from a <input type="text">.
+      <div class="answer-line">Ответ: bowl</div></div></div>
+    <div class="item" data-answer="cup"><div class="num">8</div><div class="text">I drink tea from a <input type="text">.
+      <div class="answer-line">Ответ: cup</div></div></div>
+    <div class="item" data-answer="mug"><div class="num">9</div><div class="text">He has a coffee <input type="text">.
+      <div class="answer-line">Ответ: mug</div></div></div>
+    <div class="item" data-answer="can"><div class="num">10</div><div class="text">I drank a <input type="text"> of soda.
+      <div class="answer-line">Ответ: can</div></div></div>
+
+    <div class="btn-row">
+      <button class="btn-check">✅ Проверить</button>
+      <button class="btn-show">👁 Показать ответы</button>
+      <button class="btn-reset">↺ Сбросить</button>
+    </div>
+    <div class="score"></div>
+  </div>
+
+  <!-- Exercise 2 -->
+  <div class="card" id="ex2" data-exercise>
+    <h3>Упражнение 2. Переведи на английский</h3>
+    <p class="instr">Используй слова из словаря Containers.</p>
+    <div class="item" data-answer="buy a packet of chips"><div class="num">1</div><div class="text">Купи пачку чипсов.
+      <input type="text"><div class="answer-line">Ответ: Buy a packet of chips.</div></div></div>
+    <div class="item" data-answer="she ate a bar of chocolate"><div class="num">2</div><div class="text">Она съела плитку шоколада.
+      <input type="text"><div class="answer-line">Ответ: She ate a bar of chocolate.</div></div></div>
+    <div class="item" data-answer="use a bar of soap"><div class="num">3</div><div class="text">Используй кусок мыла.
+      <input type="text"><div class="answer-line">Ответ: Use a bar of soap.</div></div></div>
+    <div class="item" data-answer="we bought a loaf of bread"><div class="num">4</div><div class="text">Мы купили буханку хлеба.
+      <input type="text"><div class="answer-line">Ответ: We bought a loaf of bread.</div></div></div>
+    <div class="item" data-answer="i need a kilo of apples"><div class="num">5</div><div class="text">Мне нужен килограмм яблок.
+      <input type="text"><div class="answer-line">Ответ: I need a kilo of apples.</div></div></div>
+    <div class="item" data-answer="i like biscuits|i like cookies"><div class="num">6</div><div class="text">Мне нравится печенье.
+      <input type="text"><div class="answer-line">Ответ: I like biscuits / I like cookies.</div></div></div>
+    <div class="item" data-answer="one liter of water"><div class="num">7</div><div class="text">Один литр воды.
+      <input type="text"><div class="answer-line">Ответ: One liter of water.</div></div></div>
+    <div class="item" data-answer="she carried a basket"><div class="num">8</div><div class="text">Она несла корзину.
+      <input type="text"><div class="answer-line">Ответ: She carried a basket.</div></div></div>
+    <div class="item" data-answer="give me a slice of cake"><div class="num">9</div><div class="text">Дай мне кусок торта.
+      <input type="text"><div class="answer-line">Ответ: Give me a slice of cake.</div></div></div>
+    <div class="item" data-answer="i drink cocoa in winter"><div class="num">10</div><div class="text">Я пью какао зимой.
+      <input type="text"><div class="answer-line">Ответ: I drink cocoa in winter.</div></div></div>
+
+    <div class="btn-row">
+      <button class="btn-check">✅ Проверить</button>
+      <button class="btn-show">👁 Показать ответы</button>
+      <button class="btn-reset">↺ Сбросить</button>
+    </div>
+    <div class="score"></div>
+  </div>
+
+  <!-- Exercise 3 -->
+  <div class="card" id="ex3" data-exercise>
+    <h3>Упражнение 3. Подбери контейнер по контексту</h3>
+    <p class="instr">Впиши подходящее слово-контейнер (одно слово).</p>
+    <div class="item" data-answer="piece"><div class="num">1</div><div class="text">A <input type="text"> of cheese, please.
+      <div class="answer-line">Ответ: piece</div></div></div>
+    <div class="item" data-answer="tray"><div class="num">2</div><div class="text">She brought drinks on a <input type="text">.
+      <div class="answer-line">Ответ: tray</div></div></div>
+    <div class="item" data-answer="plastic"><div class="num">3</div><div class="text">Use a <input type="text"> bag, not a paper one.
+      <div class="answer-line">Ответ: plastic</div></div></div>
+    <div class="item" data-answer="tin|can"><div class="num">4</div><div class="text">Open the <input type="text"> of beans for dinner.
+      <div class="answer-line">Ответ: tin (или can)</div></div></div>
+    <div class="item" data-answer="packet"><div class="num">5</div><div class="text">There is a <input type="text"> of biscuits in the cupboard.
+      <div class="answer-line">Ответ: packet</div></div></div>
+    <div class="item" data-answer="bar"><div class="num">6</div><div class="text">Buy me a <input type="text"> of soap from the shop.
+      <div class="answer-line">Ответ: bar</div></div></div>
+    <div class="item" data-answer="loaf"><div class="num">7</div><div class="text">We need a <input type="text"> of bread for breakfast.
+      <div class="answer-line">Ответ: loaf</div></div></div>
+    <div class="item" data-answer="kilo|kilogram"><div class="num">8</div><div class="text">Please give me a <input type="text"> of potatoes.
+      <div class="answer-line">Ответ: kilo / kilogram</div></div></div>
+    <div class="item" data-answer="liter"><div class="num">9</div><div class="text">Buy a <input type="text"> of milk.
+      <div class="answer-line">Ответ: liter</div></div></div>
+    <div class="item" data-answer="basket"><div class="num">10</div><div class="text">Put the fruit in the <input type="text">.
+      <div class="answer-line">Ответ: basket</div></div></div>
+
+    <div class="btn-row">
+      <button class="btn-check">✅ Проверить</button>
+      <button class="btn-show">👁 Показать ответы</button>
+      <button class="btn-reset">↺ Сбросить</button>
+    </div>
+    <div class="score"></div>
+  </div>
+
+</div>
+
+<footer>Сделано для повторения темы Containers 🌟</footer>
+
+<script>
+function normalize(s){
+  return s.toLowerCase()
+    .trim()
+    .replace(/[.,!?;:]+$/,'')
+    .replace(/\s+/g,' ');
+}
+
+document.querySelectorAll('[data-exercise]').forEach(function(card){
+  const items = card.querySelectorAll('.item');
+  const checkBtn = card.querySelector('.btn-check');
+  const showBtn = card.querySelector('.btn-show');
+  const resetBtn = card.querySelector('.btn-reset');
+  const scoreEl = card.querySelector('.score');
+
+  checkBtn.addEventListener('click', function(){
+    let correctCount = 0;
+    items.forEach(function(item){
+      const input = item.querySelector('input');
+      const accepted = item.getAttribute('data-answer').split('|').map(normalize);
+      const userVal = normalize(input.value);
+      item.classList.remove('correct','incorrect');
+      if(userVal.length === 0){
+        return;
+      }
+      if(accepted.includes(userVal)){
+        item.classList.add('correct');
+        correctCount++;
+      } else {
+        item.classList.add('incorrect');
+      }
+    });
+    scoreEl.textContent = 'Результат: ' + correctCount + ' из ' + items.length;
+    scoreEl.classList.add('show');
+  });
+
+  showBtn.addEventListener('click', function(){
+    const isShown = showBtn.getAttribute('data-shown') === 'true';
+    items.forEach(function(item){
+      const line = item.querySelector('.answer-line');
+      if(isShown){
+        line.classList.remove('show');
+      } else {
+        line.classList.add('show');
+      }
+    });
+    showBtn.setAttribute('data-shown', (!isShown).toString());
+    showBtn.textContent = isShown ? '👁 Показать ответы' : '🙈 Скрыть ответы';
+  });
+
+  resetBtn.addEventListener('click', function(){
+    items.forEach(function(item){
+      item.querySelector('input').value = '';
+      item.classList.remove('correct','incorrect');
+      item.querySelector('.answer-line').classList.remove('show');
+    });
+    scoreEl.classList.remove('show');
+    showBtn.setAttribute('data-shown','false');
+    showBtn.textContent = '👁 Показать ответы';
+  });
+});
+</script>
+
+</body>
+</html>
