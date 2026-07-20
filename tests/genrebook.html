@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Book Genres & Verbs — упражнения</title>
+<style>
+  :root{
+    --bg: #faf7f2;
+    --card: #ffffff;
+    --ink: #2b2620;
+    --muted: #7a7368;
+    --accent: #b5563c;
+    --accent-soft: #f3e3da;
+    --good: #4c7a52;
+    --good-bg: #e7f2e7;
+    --bad: #b5563c;
+    --bad-bg: #fbe6e0;
+    --line: #e8e1d6;
+    --shadow: 0 2px 10px rgba(43,38,32,.06);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family: "Georgia", "Iowan Old Style", serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height:1.55;
+    padding: 32px 16px 80px;
+  }
+  .wrap{max-width: 880px; margin:0 auto;}
+  header.top{ text-align:center; margin-bottom: 28px; }
+  header.top h1{ font-size: 1.9rem; margin: 0 0 6px; letter-spacing: .3px; }
+  header.top p{color:var(--muted); margin:0; font-family: Arial, sans-serif; font-size:.95rem;}
+
+  .genre-strip{ display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin: 22px 0 36px; }
+  .genre-chip{
+    background: var(--accent-soft); border-radius: 999px; padding: 7px 14px;
+    font-size: .92rem; font-family: Arial, sans-serif; color: var(--ink); border:1px solid #e6cdbf;
+  }
+
+  section.exercise{
+    background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+    padding: 26px 28px 22px; margin-bottom: 34px; box-shadow: var(--shadow);
+  }
+  .ex-head{
+    display:flex; align-items:baseline; justify-content:space-between; gap:10px; flex-wrap:wrap;
+    border-bottom: 1px dashed var(--line); padding-bottom: 12px; margin-bottom: 18px;
+  }
+  .ex-head h2{ margin:0; font-size: 1.25rem; color: var(--accent); }
+  .ex-head .badge{
+    font-family: Arial, sans-serif; font-size: .78rem; color: var(--muted);
+    background: #f2efe9; padding: 3px 10px; border-radius: 999px;
+  }
+  .instructions{ font-family: Arial, sans-serif; font-size: .92rem; color: var(--muted); margin: -6px 0 16px; }
+
+  ol.items{ list-style:none; counter-reset: item; margin:0; padding:0; }
+  ol.items > li{ counter-increment: item; margin-bottom: 16px; padding-left: 34px; position: relative; }
+  ol.items > li::before{
+    content: counter(item) "."; position:absolute; left:0; top:0;
+    font-weight:bold; color: var(--accent); font-family: Arial, sans-serif;
+  }
+
+  .word-line{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; font-size: 1.05rem; }
+  .emoji{font-size:1.2rem;}
+  .rus{color:var(--muted); font-family:Arial, sans-serif; font-size:.9rem;}
+
+  input.blank{
+    font-family: "Courier New", monospace; font-size: 1rem; border: none;
+    border-bottom: 2px solid #c9bfae; background: transparent; padding: 3px 4px;
+    width: 170px; color: var(--ink);
+  }
+  input.blank:focus{ outline:none; border-bottom-color: var(--accent);}
+  input.blank.correct{ border-bottom-color: var(--good); background: var(--good-bg); }
+  input.blank.incorrect{ border-bottom-color: var(--bad); background: var(--bad-bg); }
+
+  textarea.freeform{
+    width:100%; min-height: 54px; font-family: Arial, sans-serif; font-size: .95rem;
+    border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; resize: vertical; background: #fffdfa;
+  }
+  textarea.freeform:focus{ outline:none; border-color: var(--accent); }
+
+  .reveal{ display:none; font-family: Arial, sans-serif; font-size: .87rem; color: var(--good); margin-top: 4px; padding-left: 2px; }
+  .reveal.show{ display:block; }
+  .reveal .def{ color: var(--muted); display:block; margin-top:2px;}
+  .reveal .ctx{ color: var(--muted); display:block; font-style: italic; }
+
+  .btn-row{ display:flex; gap:10px; margin-top: 18px; flex-wrap:wrap; font-family: Arial, sans-serif; }
+  button{
+    border:none; cursor:pointer; border-radius: 8px; padding: 9px 18px; font-size: .9rem;
+    font-family: Arial, sans-serif; font-weight:600; transition: transform .05s ease;
+  }
+  button:active{ transform: scale(.97); }
+  .btn-check{ background: var(--accent); color:#fff; }
+  .btn-check:hover{ background:#9c4832; }
+  .btn-show{ background: #efe9e0; color: var(--ink); }
+  .btn-show:hover{ background:#e3dbcd; }
+  .btn-reset{ background: transparent; color: var(--muted); border:1px solid var(--line); }
+  .btn-reset:hover{ background:#f2efe9; }
+
+  .score{ font-family: Arial, sans-serif; font-size: .88rem; color: var(--muted); align-self:center; margin-left:auto; }
+
+  table.verbs{ width:100%; border-collapse: collapse; font-size: 1rem; }
+  table.verbs th, table.verbs td{ border-bottom: 1px solid var(--line); padding: 9px 8px; text-align:left; }
+  table.verbs th{ font-family: Arial, sans-serif; font-size: .8rem; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+  table.verbs input.blank{ width: 130px; }
+
+  .miro-note{
+    font-family: Arial, sans-serif; font-size: .85rem; background: #f3ece1;
+    border: 1px dashed #d9c6ad; border-radius: 10px; padding: 10px 14px; margin-top: 14px; color:#6b5a3d;
+  }
+
+  .tf-row{ display:flex; gap:18px; align-items:center; margin-top:6px; font-family: Arial, sans-serif; font-size:.92rem; }
+  .tf-row label{ display:flex; align-items:center; gap:5px; cursor:pointer; }
+  .tf-row input[type=radio]{ accent-color: var(--accent); }
+  .tf-item.correct .word-line, .tf-item.correct { color: var(--good); }
+  .tf-item.incorrect { color: var(--bad); }
+
+  footer{ text-align:center; color: var(--muted); font-family: Arial, sans-serif; font-size: .8rem; margin-top: 30px; }
+
+  @media (max-width:560px){
+    section.exercise{ padding: 18px 16px 16px; }
+    input.blank{ width: 130px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <h1>📖 Book Genres & Verbs</h1>
+    <p>Комплект упражнений: словарь жанров книг, глаголы в Past Simple и творческие идеи</p>
+  </header>
+
+  <div class="genre-strip">
+    <span class="genre-chip">📖 adventure</span>
+    <span class="genre-chip">😂 comedy</span>
+    <span class="genre-chip">❤️ romance</span>
+    <span class="genre-chip">🕵️ mystery</span>
+    <span class="genre-chip">👻 horror</span>
+    <span class="genre-chip">🚀 science fiction</span>
+    <span class="genre-chip">📚 biographies</span>
+    <span class="genre-chip">🧙 fantasy</span>
+    <span class="genre-chip">😱 thriller</span>
+    <span class="genre-chip">🧚 fairy tale</span>
+  </div>
+
+  <!-- EXERCISE 1: spelling -->
+  <section class="exercise" id="ex1">
+    <div class="ex-head">
+      <h2>Упражнение 1. Жанры — вставь пропущенные буквы</h2>
+      <span class="badge">10 пунктов</span>
+    </div>
+    <p class="instructions">Вставь пропущенные буквы в название жанра. Нажми «Показать ответы», чтобы увидеть перевод, определение и пример употребления в контексте.</p>
+    <ol class="items" id="ex1-list"></ol>
+    <div class="btn-row">
+      <button class="btn-check" onclick="checkExercise('ex1-list')">Проверить</button>
+      <button class="btn-show" onclick="showAnswers('ex1-list')">Показать ответы</button>
+      <button class="btn-reset" onclick="resetExercise('ex1-list')">Сбросить</button>
+      <span class="score" id="ex1-score"></span>
+    </div>
+  </section>
+
+  <!-- EXERCISE 2: genre by definition -->
+  <section class="exercise" id="ex2">
+    <div class="ex-head">
+      <h2>Упражнение 2. Угадай жанр по определению</h2>
+      <span class="badge">10 пунктов</span>
+    </div>
+    <p class="instructions">Прочитай определение на английском и напиши, о каком жанре идёт речь.</p>
+    <ol class="items" id="ex2-list"></ol>
+    <div class="btn-row">
+      <button class="btn-check" onclick="checkExercise('ex2-list')">Проверить</button>
+      <button class="btn-show" onclick="showAnswers('ex2-list')">Показать ответы</button>
+      <button class="btn-reset" onclick="resetExercise('ex2-list')">Сбросить</button>
+      <span class="score" id="ex2-score"></span>
+    </div>
+  </section>
+
+  <!-- EXERCISE 3: genre by context -->
+  <section class="exercise" id="ex3">
+    <div class="ex-head">
+      <h2>Упражнение 3. Определи жанр по описанию книги</h2>
+      <span class="badge">10 пунктов</span>
+    </div>
+    <p class="instructions">Прочитай предложение о книге и напиши, к какому жанру она относится.</p>
+    <ol class="items" id="ex3-list"></ol>
+    <div class="btn-row">
+      <button class="btn-check" onclick="checkExercise('ex3-list')">Проверить</button>
+      <button class="btn-show" onclick="showAnswers('ex3-list')">Показать ответы</button>
+      <button class="btn-reset" onclick="resetExercise('ex3-list')">Сбросить</button>
+      <span class="score" id="ex3-score"></span>
+    </div>
+  </section>
+
+  <!-- EXERCISE 4: true/false -->
+  <section class="exercise" id="ex4">
+    <div class="ex-head">
+      <h2>Упражнение 4. Правда или ложь</h2>
+      <span class="badge">10 пунктов</span>
+    </div>
+    <p class="instructions">Прочитай утверждение о жанре и отметь True или False.</p>
+    <ol class="items" id="ex4-list"></ol>
+    <div class="btn-row">
+      <button class="btn-check" onclick="checkTF()">Проверить</button>
+      <button class="btn-show" onclick="showTF()">Показать ответы</button>
+      <button class="btn-reset" onclick="resetTF()">Сбросить</button>
+      <span class="score" id="ex4-score"></span>
+    </div>
+  </section>
+
+  <!-- EXERCISE 5: sentence completion -->
+  <section class="exercise" id="ex5">
+    <div class="ex-head">
+      <h2>Упражнение 5. Заверши предложение своими словами</h2>
+      <span class="badge">8 пунктов</span>
+    </div>
+    <p class="instructions">Допиши предложения, используя название любого жанра и свою идею. Здесь нет «правильного» ответа — сравни свой вариант с примером и не забудь скопировать готовые предложения на доску Miro.</p>
+    <ol class="items" id="ex5-list"></ol>
+    <div class="btn-row">
+      <button class="btn-show" onclick="showAnswers('ex5-list')">Показать пример ответа</button>
+      <button class="btn-reset" onclick="resetExercise('ex5-list')">Сбросить</button>
+    </div>
+    <div class="miro-note">📌 Не забудь скопировать свои готовые предложения и прикрепить их на доску Miro!</div>
+  </section>
+
+  <!-- EXERCISE 6: verbs in context -->
+  <section class="exercise" id="ex6">
+    <div class="ex-head">
+      <h2>Упражнение 6. Глаголы в контексте (Past Simple)</h2>
+      <span class="badge">10 пунктов</span>
+    </div>
+    <p class="instructions">Поставь глагол в скобках в форму Past Simple.</p>
+    <ol class="items" id="ex6-list"></ol>
+    <div class="btn-row">
+      <button class="btn-check" onclick="checkExercise('ex6-list')">Проверить</button>
+      <button class="btn-show" onclick="showAnswers('ex6-list')">Показать ответы</button>
+      <button class="btn-reset" onclick="resetExercise('ex6-list')">Сбросить</button>
+      <span class="score" id="ex6-score"></span>
+    </div>
+  </section>
+
+  <!-- EXERCISE 7: past forms table -->
+  <section class="exercise" id="ex7">
+    <div class="ex-head">
+      <h2>Упражнение 7. Таблица неправильных глаголов</h2>
+      <span class="badge">10 пунктов</span>
+    </div>
+    <p class="instructions">Заполни вторую колонку формой Past Simple.</p>
+    <table class="verbs">
+      <thead><tr><th style="width:40px">#</th><th>Verb</th><th>Past Simple</th></tr></thead>
+      <tbody id="ex7-body"></tbody>
+    </table>
+    <div class="btn-row">
+      <button class="btn-check" onclick="checkExercise('ex7-body')">Проверить</button>
+      <button class="btn-show" onclick="showAnswers('ex7-body')">Показать ответы</button>
+      <button class="btn-reset" onclick="resetExercise('ex7-body')">Сбросить</button>
+      <span class="score" id="ex7-score"></span>
+    </div>
+  </section>
+
+  <footer>Сделано для практики лексики и грамматики · English Exercises</footer>
+</div>
+
+<script>
+/* ---------- DATA ---------- */
+
+const genres = [
+  {word:"adventure", blanked:"adv_nt_re", ru:"приключения", def:"a story about exciting or dangerous journeys and events", ctx:"The adventure novel keeps you on the edge of your seat as the heroes travel across the jungle."},
+  {word:"comedy", blanked:"com_dy", ru:"комедия", def:"a funny story that makes you laugh", ctx:"This comedy book had me laughing out loud on every page."},
+  {word:"romance", blanked:"rom_nce", ru:"романтика", def:"a story about love between people", ctx:"The romance novel tells the love story of two childhood friends."},
+  {word:"mystery", blanked:"myst_ry", ru:"детектив/тайна", def:"a story about solving a crime or a puzzle", ctx:"In this mystery, the detective must find out who committed the crime."},
+  {word:"horror", blanked:"hor_or", ru:"ужасы", def:"a scary story meant to frighten the reader", ctx:"The horror story was so scary I couldn't sleep at night."},
+  {word:"science fiction", blanked:"sci_nce fic_ion", ru:"научная фантастика", def:"a story based on imagined future science and technology", ctx:"The science fiction novel is set on a spaceship travelling to Mars."},
+  {word:"biography", blanked:"bio_raphy", ru:"биография", def:"a true story of a person's life written by someone else", ctx:"I'm reading a biography about a famous scientist."},
+  {word:"fantasy", blanked:"fan_asy", ru:"фэнтези", def:"a story with magic, imaginary worlds and creatures", ctx:"The fantasy book has dragons and wizards."},
+  {word:"thriller", blanked:"thri_ler", ru:"триллер", def:"an exciting story full of danger and suspense", ctx:"The thriller kept me guessing until the very last page."},
+  {word:"fairy tale", blanked:"fai_y tale", ru:"сказка", def:"a traditional story for children, often with magic", ctx:"She read her daughter a fairy tale before bed."}
+];
+
+// Exercise 2: definition -> genre (shuffled order, own wording)
+const genreDefs = [
+  {def:"This kind of book is written mainly to make you laugh.", answer:"comedy", ru:"комедия"},
+  {def:"This kind of book tells the real story of a real person's life.", answer:"biography", ru:"биография"},
+  {def:"This kind of book is full of magic, dragons and imaginary worlds.", answer:"fantasy", ru:"фэнтези"},
+  {def:"This kind of book is written to frighten and scare the reader.", answer:"horror", ru:"ужасы"},
+  {def:"This kind of book focuses on love and relationships between people.", answer:"romance", ru:"романтика"},
+  {def:"This kind of book usually involves a crime that a detective must solve.", answer:"mystery", ru:"детектив"},
+  {def:"This kind of book is set in the future and involves science and technology.", answer:"science fiction", ru:"научная фантастика"},
+  {def:"This kind of book describes exciting and often dangerous journeys.", answer:"adventure", ru:"приключения"},
+  {def:"This kind of book is full of suspense and keeps you guessing until the end.", answer:"thriller", ru:"триллер"},
+  {def:"This kind of story is traditional, often for children, and usually has magic.", answer:"fairy tale", ru:"сказка"}
+];
+
+// Exercise 3: context sentence -> genre
+const genreContexts = [
+  {ctx:"The detective spent the whole book trying to find out who the thief really was.", answer:"mystery"},
+  {ctx:"The main character travelled through the jungle, facing danger at every turn.", answer:"adventure"},
+  {ctx:"Every chapter made me laugh so hard I couldn't stop smiling.", answer:"comedy"},
+  {ctx:"This book tells the true life story of a famous painter.", answer:"biography"},
+  {ctx:"Two robots fell in love on a spaceship travelling to a distant planet.", answer:"science fiction"},
+  {ctx:"I had to sleep with the light on after reading about the ghost in the old house.", answer:"horror"},
+  {ctx:"The wizard used his magic staff to defeat the dragon guarding the castle.", answer:"fantasy"},
+  {ctx:"The two childhood friends finally admitted their feelings for each other.", answer:"romance"},
+  {ctx:"Every page kept me guessing who the killer really was until the very end.", answer:"thriller"},
+  {ctx:"Once upon a time, a princess was saved by a brave knight and a bit of magic.", answer:"fairy tale"}
+];
+
+// Exercise 4: true/false statements about genres
+const genreTF = [
+  {statement:"Comedy books are written to make readers laugh.", answer:"true"},
+  {statement:"A biography tells a story that never really happened.", answer:"false"},
+  {statement:"Horror stories are meant to scare the reader.", answer:"true"},
+  {statement:"Science fiction is usually set in the past.", answer:"false"},
+  {statement:"Mystery novels often involve solving a crime.", answer:"true"},
+  {statement:"Fantasy books never include magic or imaginary creatures.", answer:"false"},
+  {statement:"Romance novels focus on the relationship between people in love.", answer:"true"},
+  {statement:"A thriller is usually calm and relaxing to read.", answer:"false"},
+  {statement:"Adventure stories often involve exciting or dangerous journeys.", answer:"true"},
+  {statement:"Fairy tales are only written for adult readers.", answer:"false"}
+];
+
+const prompts2 = [
+  {start:"I prefer", tail:"books because…", example:"I prefer mystery books because I love trying to guess the ending before the detective does."},
+  {start:"I would like to read a", tail:"novel because…", example:"I would like to read a science fiction novel because I'm curious about the future."},
+  {start:"I think", tail:"books are interesting because…", example:"I think adventure books are interesting because they take you to places you've never been."},
+  {start:"I think", tail:"books are boring because…", example:"I think romance books are boring because the plot is always the same."},
+  {start:"My favourite genre is", tail:"because…", example:"My favourite genre is fantasy because I love imagining magical worlds."},
+  {start:"I have never read a", tail:"book, but I would like to because…", example:"I have never read a biography, but I would like to because I want to learn about real people's lives."},
+  {start:"If I could meet a character from a", tail:"book, I would choose…", example:"If I could meet a character from a horror book, I would choose the brave girl from my favourite ghost story."},
+  {start:"The best", tail:"book I've ever read is… because…", example:"The best comedy book I've ever read is a funny diary of a schoolboy, because every page made me laugh."}
+];
+
+const verbsCtx = [
+  {verb:"buy", sentence:"Yesterday I ___ a new book at the shop.", answer:"bought"},
+  {verb:"draw", sentence:"She ___ a beautiful picture of the sea.", answer:"drew"},
+  {verb:"call/phone", sentence:"He ___ his friend to tell the good news.", answer:"called"},
+  {verb:"dance", sentence:"We ___ at the party all night.", answer:"danced"},
+  {verb:"find", sentence:"They ___ an old map in the attic.", answer:"found"},
+  {verb:"forget", sentence:"I ___ my umbrella at home.", answer:"forgot"},
+  {verb:"give", sentence:"My grandmother ___ me this book for my birthday.", answer:"gave"},
+  {verb:"send", sentence:"He ___ an email to his teacher.", answer:"sent"},
+  {verb:"see", sentence:"I ___ a great film last week.", answer:"saw"},
+  {verb:"swim", sentence:"She ___ across the lake.", answer:"swam"}
+];
+
+const verbsTable = [
+  {verb:"run", answer:"ran"},
+  {verb:"take", answer:"took"},
+  {verb:"live", answer:"lived"},
+  {verb:"hear", answer:"heard"},
+  {verb:"leave", answer:"left"},
+  {verb:"meet", answer:"met"},
+  {verb:"try", answer:"tried"},
+  {verb:"sing", answer:"sang"},
+  {verb:"tell", answer:"told"},
+  {verb:"wait for", answer:"waited for"}
+];
+
+/* ---------- RENDER ---------- */
+
+function renderEx1(){
+  const list = document.getElementById('ex1-list');
+  genres.forEach((g,i)=>{
+    const li = document.createElement('li');
+    li.innerHTML = `
+      <div class="word-line">
+        <span class="rus">(${g.ru})</span>
+        <input class="blank" data-answer="${g.word}" placeholder="${g.blanked}" autocomplete="off">
+      </div>
+      <div class="reveal" id="ex1-reveal-${i}">
+        ✓ <strong>${g.word}</strong> — ${g.ru}
+        <span class="def">Definition: ${g.def}</span>
+        <span class="ctx">e.g. "${g.ctx}"</span>
+      </div>`;
+    list.appendChild(li);
+  });
+}
+
+function renderEx2(){
+  const list = document.getElementById('ex2-list');
+  genreDefs.forEach((g,i)=>{
+    const li = document.createElement('li');
+    li.innerHTML = `
+      <div class="word-line">
+        <span>${g.def}</span>
+        <input class="blank" data-answer="${g.answer}" placeholder="genre" autocomplete="off">
+      </div>
+      <div class="reveal" id="ex2-reveal-${i}">✓ <strong>${g.answer}</strong> — ${g.ru}</div>`;
+    list.appendChild(li);
+  });
+}
+
+function renderEx3(){
+  const list = document.getElementById('ex3-list');
+  genreContexts.forEach((g,i)=>{
+    const li = document.createElement('li');
+    li.innerHTML = `
+      <div class="word-line">
+        <span class="ctx" style="font-style:italic;">"${g.ctx}"</span>
+      </div>
+      <div class="word-line" style="margin-top:4px;">
+        <span class="rus">genre:</span>
+        <input class="blank" data-answer="${g.answer}" placeholder="type genre" autocomplete="off">
+      </div>
+      <div class="reveal" id="ex3-reveal-${i}">✓ <strong>${g.answer}</strong></div>`;
+    list.appendChild(li);
+  });
+}
+
+function renderEx4(){
+  const list = document.getElementById('ex4-list');
+  genreTF.forEach((g,i)=>{
+    const li = document.createElement('li');
+    li.className = "tf-item";
+    li.id = `ex4-item-${i}`;
+    li.innerHTML = `
+      <div class="word-line">${g.statement}</div>
+      <div class="tf-row">
+        <label><input type="radio" name="tf-${i}" value="true" data-answer="${g.answer}"> True</label>
+        <label><input type="radio" name="tf-${i}" value="false" data-answer="${g.answer}"> False</label>
+      </div>
+      <div class="reveal" id="ex4-reveal-${i}">✓ Correct answer: <strong>${g.answer === 'true' ? 'True' : 'False'}</strong></div>`;
+    list.appendChild(li);
+  });
+}
+
+function renderEx5(){
+  const list = document.getElementById('ex5-list');
+  prompts2.forEach((p,i)=>{
+    const li = document.createElement('li');
+    li.innerHTML = `
+      <div>${p.start} <strong>__________</strong> ${p.tail}</div>
+      <textarea class="freeform" placeholder="Напиши свою идею здесь..."></textarea>
+      <div class="reveal" id="ex5-reveal-${i}">💡 Пример: "${p.example}"</div>`;
+    list.appendChild(li);
+  });
+}
+
+function renderEx6(){
+  const list = document.getElementById('ex6-list');
+  verbsCtx.forEach((v,i)=>{
+    const parts = v.sentence.split('___');
+    const li = document.createElement('li');
+    li.innerHTML = `
+      <div class="word-line">
+        <span>${parts[0]}</span>
+        <input class="blank" data-answer="${v.answer}" placeholder="(${v.verb})" autocomplete="off">
+        <span>${parts[1]}</span>
+      </div>
+      <div class="reveal" id="ex6-reveal-${i}">✓ <strong>${v.answer}</strong></div>`;
+    list.appendChild(li);
+  });
+}
+
+function renderEx7(){
+  const body = document.getElementById('ex7-body');
+  verbsTable.forEach((v,i)=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${i+1}</td>
+      <td>${v.verb}</td>
+      <td><input class="blank" data-answer="${v.answer}" autocomplete="off"></td>`;
+    body.appendChild(tr);
+  });
+}
+
+renderEx1(); renderEx2(); renderEx3(); renderEx4(); renderEx5(); renderEx6(); renderEx7();
+
+/* ---------- LOGIC (fill-blank exercises) ---------- */
+
+function normalize(s){
+  return s.trim().toLowerCase().replace(/\s+/g,' ');
+}
+
+function scoreIdFor(containerId){
+  if(containerId.includes('-list')) return containerId.replace('-list','-score');
+  if(containerId.includes('-body')) return containerId.replace('-body','-score');
+  return null;
+}
+
+function checkExercise(containerId){
+  const container = document.getElementById(containerId);
+  const inputs = container.querySelectorAll('input.blank');
+  let correct = 0;
+  inputs.forEach(inp=>{
+    const ans = normalize(inp.dataset.answer);
+    const val = normalize(inp.value);
+    inp.classList.remove('correct','incorrect');
+    if(val.length === 0){ return; }
+    if(val === ans){ inp.classList.add('correct'); correct++; }
+    else{ inp.classList.add('incorrect'); }
+  });
+  const scoreEl = document.getElementById(scoreIdFor(containerId));
+  if(scoreEl) scoreEl.textContent = `Правильно: ${correct} из ${inputs.length}`;
+}
+
+function showAnswers(containerId){
+  const container = document.getElementById(containerId);
+  const inputs = container.querySelectorAll('input.blank');
+  inputs.forEach(inp=>{
+    inp.value = inp.dataset.answer;
+    inp.classList.remove('incorrect');
+    inp.classList.add('correct');
+  });
+  container.querySelectorAll('.reveal').forEach(r=> r.classList.add('show'));
+  const scoreEl = document.getElementById(scoreIdFor(containerId));
+  if(scoreEl && inputs.length) scoreEl.textContent = `Показаны все ответы (${inputs.length})`;
+}
+
+function resetExercise(containerId){
+  const container = document.getElementById(containerId);
+  container.querySelectorAll('input.blank').forEach(inp=>{
+    inp.value=''; inp.classList.remove('correct','incorrect');
+  });
+  container.querySelectorAll('textarea.freeform').forEach(t=> t.value='');
+  container.querySelectorAll('.reveal').forEach(r=> r.classList.remove('show'));
+  const scoreEl = document.getElementById(scoreIdFor(containerId));
+  if(scoreEl) scoreEl.textContent='';
+}
+
+/* ---------- LOGIC (true/false exercise) ---------- */
+
+function checkTF(){
+  let correct = 0;
+  genreTF.forEach((g,i)=>{
+    const item = document.getElementById(`ex4-item-${i}`);
+    const selected = item.querySelector(`input[name="tf-${i}"]:checked`);
+    item.classList.remove('correct','incorrect');
+    if(!selected) return;
+    if(selected.value === g.answer){ item.classList.add('correct'); correct++; }
+    else{ item.classList.add('incorrect'); }
+  });
+  document.getElementById('ex4-score').textContent = `Правильно: ${correct} из ${genreTF.length}`;
+}
+
+function showTF(){
+  genreTF.forEach((g,i)=>{
+    const item = document.getElementById(`ex4-item-${i}`);
+    const radio = item.querySelector(`input[name="tf-${i}"][value="${g.answer}"]`);
+    if(radio) radio.checked = true;
+    item.classList.remove('incorrect');
+    item.classList.add('correct');
+    document.getElementById(`ex4-reveal-${i}`).classList.add('show');
+  });
+  document.getElementById('ex4-score').textContent = `Показаны все ответы (${genreTF.length})`;
+}
+
+function resetTF(){
+  genreTF.forEach((g,i)=>{
+    const item = document.getElementById(`ex4-item-${i}`);
+    item.querySelectorAll('input[type=radio]').forEach(r=> r.checked = false);
+    item.classList.remove('correct','incorrect');
+    document.getElementById(`ex4-reveal-${i}`).classList.remove('show');
+  });
+  document.getElementById('ex4-score').textContent = '';
+}
+</script>
+</body>
+</html>
