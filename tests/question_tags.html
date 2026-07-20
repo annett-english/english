@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Question Tags — практика</title>
+<style>
+  :root{
+    --bg:#f4f6f9;
+    --card:#ffffff;
+    --ink:#1f2937;
+    --muted:#6b7280;
+    --accent:#3b56d9;
+    --accent-dark:#2b3fa8;
+    --good:#1a9e5c;
+    --good-bg:#e6f7ee;
+    --bad:#d1453b;
+    --bad-bg:#fdecea;
+    --border:#e2e5ec;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Segoe UI', Roboto, Arial, sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    padding-bottom:60px;
+  }
+  header{
+    background:linear-gradient(135deg,var(--accent),var(--accent-dark));
+    color:#fff;
+    padding:28px 20px 22px;
+    text-align:center;
+  }
+  header h1{margin:0 0 6px; font-size:1.6em;}
+  header p{margin:0; opacity:.9; font-size:.95em;}
+
+  .rules{
+    max-width:900px;
+    margin:20px auto 0;
+    padding:0 16px;
+  }
+  .rules details{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:10px 16px;
+    margin-bottom:8px;
+  }
+  .rules summary{
+    cursor:pointer;
+    font-weight:600;
+    color:var(--accent-dark);
+  }
+  .rules .rule-body{margin-top:8px; font-size:.92em; line-height:1.5; color:var(--muted);}
+  .rules code{background:#eef0f7;padding:1px 5px;border-radius:4px;color:var(--accent-dark);}
+
+  nav.tabs{
+    max-width:900px;
+    margin:24px auto 0;
+    padding:0 16px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    justify-content:center;
+  }
+  nav.tabs button{
+    border:1px solid var(--border);
+    background:var(--card);
+    color:var(--ink);
+    padding:8px 14px;
+    border-radius:20px;
+    cursor:pointer;
+    font-size:.85em;
+    transition:.15s;
+  }
+  nav.tabs button:hover{border-color:var(--accent);}
+  nav.tabs button.active{
+    background:var(--accent);
+    color:#fff;
+    border-color:var(--accent);
+  }
+
+  main{max-width:900px;margin:20px auto; padding:0 16px;}
+  .exercise{display:none;}
+  .exercise.active{display:block; animation:fade .25s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(6px);} to{opacity:1;transform:translateY(0);}}
+
+  .ex-card{
+    background:var(--card);
+    border-radius:14px;
+    border:1px solid var(--border);
+    padding:22px 24px;
+    box-shadow:0 2px 10px rgba(20,30,60,.04);
+  }
+  .ex-card h2{margin-top:0; font-size:1.25em; color:var(--accent-dark);}
+  .ex-card .instructions{color:var(--muted); font-size:.92em; margin-bottom:16px;}
+
+  .item{
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    padding:10px 0;
+    border-bottom:1px dashed var(--border);
+    flex-wrap:wrap;
+  }
+  .item:last-of-type{border-bottom:none;}
+  .item-num{
+    min-width:24px;
+    font-weight:600;
+    color:var(--accent-dark);
+  }
+  .item-text{flex:1; min-width:220px; line-height:1.7;}
+  .item-text input.blank{
+    width:150px;
+    padding:5px 8px;
+    border:1px solid var(--border);
+    border-radius:6px;
+    font-size:.95em;
+    font-family:inherit;
+  }
+  .mistake-block{flex:1; min-width:260px;}
+  .mistake-sentence{margin-bottom:6px;}
+  .mistake-block label{font-size:.82em; color:var(--muted); display:block; margin-bottom:3px;}
+  .mistake-block input.blank{width:160px;}
+
+  input.blank.correct{border-color:var(--good); background:var(--good-bg);}
+  input.blank.wrong{border-color:var(--bad); background:var(--bad-bg);}
+
+  .answer-reveal{
+    font-size:.85em;
+    color:var(--good);
+    margin-left:6px;
+    font-weight:600;
+  }
+
+  .controls{
+    margin-top:20px;
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    align-items:center;
+  }
+  .controls button{
+    padding:10px 18px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:.9em;
+    font-weight:600;
+  }
+  .btn-check{background:var(--accent); color:#fff;}
+  .btn-check:hover{background:var(--accent-dark);}
+  .btn-show{background:#eef0f7; color:var(--accent-dark);}
+  .btn-show:hover{background:#dfe3f5;}
+  .btn-reset{background:#f3f4f6; color:var(--muted);}
+  .btn-reset:hover{background:#e5e7eb;}
+
+  .score{
+    margin-left:auto;
+    font-weight:700;
+    font-size:.95em;
+  }
+  .score.good{color:var(--good);}
+  .score.bad{color:var(--bad);}
+
+  footer{
+    text-align:center;
+    color:var(--muted);
+    font-size:.8em;
+    margin-top:30px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Question Tags</h1>
+  <p>Разделительные вопросы: 7 правил × 10 упражнений + 2 упражнения на микс (включая «найди ошибку»)</p>
+</header>
+
+<div class="rules">
+  <details>
+    <summary>📘 Открыть краткую справку по правилам</summary>
+    <div class="rule-body">
+      1️⃣ <code>I am</code> → <code>aren't I?</code> &nbsp;|&nbsp; <code>I'm not</code> → <code>am I?</code><br>
+      2️⃣ <code>Let's</code> / <code>Let's not</code> → <code>shall we?</code><br>
+      3️⃣ Повелительное наклонение (утв. и отриц.) → <code>will you?</code><br>
+      4️⃣ <code>everyone/somebody/someone/anybody</code> → <code>they</code>; <code>nothing/something/everything</code> → <code>it</code><br>
+      5️⃣ <code>nobody/no one/nothing</code> (отрицательный смысл без "not") → положительный тег<br>
+      6️⃣ <code>this/that</code> → <code>it</code><br>
+      7️⃣ <code>there is/there are</code> → <code>there</code> сохраняется
+    </div>
+  </details>
+</div>
+
+<nav class="tabs" id="tabs"></nav>
+
+<main id="main"></main>
+
+<footer>Введите тег в поле и нажмите «Проверить». Кнопка «Показать ответы» откроет правильные варианты.</footer>
+
+<script>
+const exercises = [
+  {
+    title: "1. I am / I'm not",
+    instructions: "Допишите разделительный вопрос (question tag).",
+    type: "fill",
+    items: [
+      {text:"I am right, ___", answer:"aren't I"},
+      {text:"I'm late, ___", answer:"aren't I"},
+      {text:"I'm not wrong, ___", answer:"am I"},
+      {text:"I am a real geek about computers, ___", answer:"aren't I"},
+      {text:"I'm not being ridiculous, ___", answer:"am I"},
+      {text:"I am on board with the idea, ___", answer:"aren't I"},
+      {text:"I'm not in your way, ___", answer:"am I"},
+      {text:"I am the new job-seeker here, ___", answer:"aren't I"},
+      {text:"I'm not embarrassed, ___", answer:"am I"},
+      {text:"I am reincarnated as a cat in this story, ___", answer:"aren't I"}
+    ]
+  },
+  {
+    title: "2. Let's / Let's not + Imperatives (микс)",
+    instructions: "Допишите разделительный вопрос — здесь вперемешку предложения с Let's / Let's not и повелительное наклонение.",
+    type: "fill",
+    items: [
+      {text:"Let's check the clues, ___", answer:"shall we"},
+      {text:"Don't lose the distress call, ___", answer:"will you"},
+      {text:"Let's not be ridiculous, ___", answer:"shall we"},
+      {text:"Send a light-hearted response, ___", answer:"will you"},
+      {text:"Let's find a foolproof plan, ___", answer:"shall we"},
+      {text:"Help me with this, ___", answer:"will you"},
+      {text:"Let's not get embarrassed, ___", answer:"shall we"},
+      {text:"Don't puzzle over it too long, ___", answer:"will you"},
+      {text:"Let's not copy the advertising agency's idea, ___", answer:"shall we"},
+      {text:"Keep everything in order, ___", answer:"will you"}
+    ]
+  },
+  {
+    title: "3. Everyone / somebody / anybody → they; nothing / something / everything → it",
+    instructions: "Допишите разделительный вопрос.",
+    type: "fill",
+    items: [
+      {text:"Everyone is ready, ___", answer:"aren't they"},
+      {text:"Somebody called you, ___", answer:"didn't they"},
+      {text:"Anybody can join the agency, ___", answer:"can't they"},
+      {text:"Someone found the clues, ___", answer:"didn't they"},
+      {text:"Everything is fine, ___", answer:"isn't it"},
+      {text:"Something puzzled you, ___", answer:"didn't it"},
+      {text:"Everybody has a gut feeling about this, ___", answer:"don't they"},
+      {text:"Somebody works at the advertising agency, ___", answer:"don't they"},
+      {text:"Anyone saw the distress call, ___", answer:"didn't they"},
+      {text:"Everything seems foolproof, ___", answer:"doesn't it"}
+    ]
+  },
+  {
+    title: "4. Nobody / no one / nothing → положительный тег",
+    instructions: "Эти слова уже отрицательные по смыслу, поэтому тег — положительный. Допишите его.",
+    type: "fill",
+    items: [
+      {text:"Nobody came, ___", answer:"did they"},
+      {text:"No one knows the truth, ___", answer:"do they"},
+      {text:"Nothing happened, ___", answer:"did it"},
+      {text:"Nobody solved the puzzle, ___", answer:"did they"},
+      {text:"No one saw the investigator, ___", answer:"did they"},
+      {text:"Nothing was found, ___", answer:"was it"},
+      {text:"Nobody is on board with this, ___", answer:"are they"},
+      {text:"No one sent a distress call, ___", answer:"did they"},
+      {text:"Nothing baffled her, ___", answer:"did it"},
+      {text:"Nobody disappeared without a trace, ___", answer:"did they"}
+    ]
+  },
+  {
+    title: "5. This / that → it + There is / there are → there (микс)",
+    instructions: "Допишите разделительный вопрос — здесь вперемешку предложения с this/that и there is/there are.",
+    type: "fill",
+    items: [
+      {text:"This is your book, ___", answer:"isn't it"},
+      {text:"There is a problem, ___", answer:"isn't there"},
+      {text:"That was a good-natured rivalry, ___", answer:"wasn't it"},
+      {text:"There are many job-seekers, ___", answer:"aren't there"},
+      {text:"This isn't foolproof, ___", answer:"is it"},
+      {text:"There isn't a clue, ___", answer:"is there"},
+      {text:"That wasn't embarrassing, ___", answer:"was it"},
+      {text:"There aren't any mistakes, ___", answer:"are there"},
+      {text:"This was a ridiculous idea, ___", answer:"wasn't it"},
+      {text:"There is something baffling about this, ___", answer:"isn't there"}
+    ]
+  },
+  {
+    title: "6. Микс: все правила вместе",
+    instructions: "Допишите разделительный вопрос — правило может быть любое из семи выше.",
+    type: "fill",
+    items: [
+      {text:"I am the best job-seeker, ___", answer:"aren't I"},
+      {text:"Let's not argue about it, ___", answer:"shall we"},
+      {text:"Don't forget the clues, ___", answer:"will you"},
+      {text:"Somebody baffled the investigator, ___", answer:"didn't they"},
+      {text:"Nothing is foolproof, ___", answer:"is it"},
+      {text:"That was a ridiculous response, ___", answer:"wasn't it"},
+      {text:"There isn't a good-natured rivalry here, ___", answer:"is there"},
+      {text:"I'm not a geek, ___", answer:"am I"},
+      {text:"Everybody disappeared without a trace, ___", answer:"didn't they"},
+      {text:"There are many clues, ___", answer:"aren't there"}
+    ]
+  },
+  {
+    title: "7. Микс: найди ошибку",
+    instructions: "В каждом предложении уже есть тег. Если он верный — впишите его же в поле. Если ошибка — впишите правильный вариант.",
+    type: "mistake",
+    items: [
+      {text:"I am late, aren't I?", answer:"aren't I"},
+      {text:"Let's go, will we?", answer:"shall we"},
+      {text:"Open the door, do you?", answer:"will you"},
+      {text:"Everyone is here, isn't it?", answer:"aren't they"},
+      {text:"Nobody called, did they?", answer:"did they"},
+      {text:"This is yours, isn't it?", answer:"isn't it"},
+      {text:"There are many students, isn't there?", answer:"aren't there"},
+      {text:"I'm not wrong, am I?", answer:"am I"},
+      {text:"Let's not be silly, will we?", answer:"shall we"},
+      {text:"Something happened, doesn't it?", answer:"didn't it"}
+    ]
+  }
+];
+
+function normalize(s){
+  return s.toLowerCase()
+    .replace(/[’‘]/g,"'")
+    .replace(/[?.!]/g,"")
+    .trim()
+    .replace(/\s+/g," ");
+}
+
+const tabsEl = document.getElementById('tabs');
+const mainEl = document.getElementById('main');
+
+exercises.forEach((ex, idx)=>{
+  const btn = document.createElement('button');
+  btn.textContent = ex.title.split('.')[0] + '.';
+  btn.title = ex.title;
+  btn.onclick = ()=>showExercise(idx);
+  tabsEl.appendChild(btn);
+
+  const wrap = document.createElement('div');
+  wrap.className = 'exercise';
+  wrap.id = 'ex-'+idx;
+
+  let itemsHtml = '';
+  ex.items.forEach((item,i)=>{
+    if(ex.type === 'fill'){
+      const parts = item.text.split('___');
+      itemsHtml += `
+        <div class="item">
+          <div class="item-num">${i+1}.</div>
+          <div class="item-text">
+            ${parts[0]}<input type="text" class="blank" data-idx="${i}" placeholder="tag">${parts[1]}
+            <span class="answer-reveal" data-reveal="${i}"></span>
+          </div>
+        </div>`;
+    } else {
+      itemsHtml += `
+        <div class="item">
+          <div class="item-num">${i+1}.</div>
+          <div class="mistake-block">
+            <div class="mistake-sentence">${item.text}</div>
+            <label>Правильный тег:</label>
+            <input type="text" class="blank" data-idx="${i}" placeholder="tag">
+            <span class="answer-reveal" data-reveal="${i}"></span>
+          </div>
+        </div>`;
+    }
+  });
+
+  wrap.innerHTML = `
+    <div class="ex-card">
+      <h2>${ex.title}</h2>
+      <div class="instructions">${ex.instructions}</div>
+      <div class="item-list">${itemsHtml}</div>
+      <div class="controls">
+        <button class="btn-check" onclick="checkExercise(${idx})">✅ Проверить</button>
+        <button class="btn-show" onclick="showAnswers(${idx})">👁 Показать ответы</button>
+        <button class="btn-reset" onclick="resetExercise(${idx})">↺ Сбросить</button>
+        <span class="score" id="score-${idx}"></span>
+      </div>
+    </div>`;
+
+  mainEl.appendChild(wrap);
+});
+
+function showExercise(idx){
+  document.querySelectorAll('.exercise').forEach(e=>e.classList.remove('active'));
+  document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.remove('active'));
+  document.getElementById('ex-'+idx).classList.add('active');
+  tabsEl.children[idx].classList.add('active');
+}
+
+function checkExercise(idx){
+  const ex = exercises[idx];
+  const container = document.getElementById('ex-'+idx);
+  let correctCount = 0;
+  ex.items.forEach((item,i)=>{
+    const input = container.querySelector(`input[data-idx="${i}"]`);
+    input.classList.remove('correct','wrong');
+    const userVal = normalize(input.value || '');
+    const correctVal = normalize(item.answer);
+    if(userVal === correctVal){
+      input.classList.add('correct');
+      correctCount++;
+    } else {
+      input.classList.add('wrong');
+    }
+  });
+  const scoreEl = document.getElementById('score-'+idx);
+  scoreEl.textContent = `Результат: ${correctCount} / ${ex.items.length}`;
+  scoreEl.className = 'score ' + (correctCount === ex.items.length ? 'good' : (correctCount===0 ? 'bad':''));
+}
+
+function showAnswers(idx){
+  const ex = exercises[idx];
+  const container = document.getElementById('ex-'+idx);
+  ex.items.forEach((item,i)=>{
+    const reveal = container.querySelector(`span[data-reveal="${i}"]`);
+    reveal.textContent = '→ ' + item.answer;
+  });
+}
+
+function resetExercise(idx){
+  const ex = exercises[idx];
+  const container = document.getElementById('ex-'+idx);
+  ex.items.forEach((item,i)=>{
+    const input = container.querySelector(`input[data-idx="${i}"]`);
+    input.value = '';
+    input.classList.remove('correct','wrong');
+    const reveal = container.querySelector(`span[data-reveal="${i}"]`);
+    reveal.textContent = '';
+  });
+  document.getElementById('score-'+idx).textContent = '';
+}
+
+showExercise(0);
+</script>
+
+</body>
+</html>
