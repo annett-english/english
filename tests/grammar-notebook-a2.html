@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grammar Notebook · A2 Practice</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Space+Grotesk:wght@400;500;600;700&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#eef1f6;
+    --paper-line:#d7dde8;
+    --ink:#26314a;
+    --navy:#2f4b7c;
+    --navy-deep:#1c2f52;
+    --red:#c94f4f;
+    --yellow:#ffd23f;
+    --green:#3f8f5f;
+    --card:#ffffff;
+    --tab1:#2f4b7c;
+    --tab2:#3f8f5f;
+    --tab3:#c9824f;
+    --tab4:#8a4fc9;
+    --tab5:#c94f4f;
+    --tab6:#2694a3;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Space Grotesk', sans-serif;
+    color:var(--ink);
+    background:
+      repeating-linear-gradient(var(--paper) 0px, var(--paper) 31px, var(--paper-line) 32px),
+      var(--paper);
+    min-height:100vh;
+  }
+  .margin-line{
+    position:fixed;
+    top:0; bottom:0; left:64px;
+    width:2px;
+    background:rgba(201,79,79,0.35);
+    z-index:0;
+  }
+  header{
+    position:relative;
+    z-index:1;
+    padding:38px 24px 18px 88px;
+  }
+  header h1{
+    font-family:'Fraunces', serif;
+    font-weight:700;
+    font-size:clamp(28px, 4vw, 44px);
+    margin:0;
+    color:var(--navy-deep);
+    letter-spacing:-0.5px;
+  }
+  header .sub{
+    font-family:'Caveat', cursive;
+    font-size:22px;
+    color:var(--red);
+    margin-top:4px;
+    font-weight:700;
+  }
+  header .meta{
+    margin-top:10px;
+    font-size:14px;
+    color:#5a6788;
+    max-width:680px;
+    line-height:1.5;
+  }
+
+  .binder{
+    position:relative;
+    z-index:1;
+    display:flex;
+    gap:6px;
+    padding:0 24px 0 88px;
+    flex-wrap:wrap;
+  }
+  .tab-btn{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:600;
+    font-size:14px;
+    padding:12px 18px 14px;
+    border:none;
+    border-radius:10px 10px 0 0;
+    cursor:pointer;
+    color:#fff;
+    opacity:0.55;
+    transform:translateY(6px);
+    transition:transform .18s ease, opacity .18s ease;
+    box-shadow: 0 -2px 0 rgba(0,0,0,0.05) inset;
+  }
+  .tab-btn:hover{ opacity:0.85; }
+  .tab-btn.active{
+    opacity:1;
+    transform:translateY(0);
+    box-shadow:0 -6px 14px rgba(0,0,0,0.12);
+  }
+  .tab-btn[data-tab="1"]{background:var(--tab1);}
+  .tab-btn[data-tab="2"]{background:var(--tab2);}
+  .tab-btn[data-tab="3"]{background:var(--tab3);}
+  .tab-btn[data-tab="4"]{background:var(--tab4);}
+  .tab-btn[data-tab="5"]{background:var(--tab5);}
+  .tab-btn[data-tab="6"]{background:var(--tab6);}
+
+  main{
+    position:relative;
+    z-index:1;
+    padding:0 24px 60px 88px;
+  }
+  .sheet{
+    background:var(--card);
+    border-radius:4px 16px 16px 16px;
+    box-shadow:0 18px 40px rgba(28,47,82,0.12), 0 2px 6px rgba(28,47,82,0.06);
+    padding:32px clamp(18px,4vw,44px) 40px;
+    max-width:920px;
+    display:none;
+  }
+  .sheet.active{ display:block; animation:fadeIn .25s ease; }
+  @keyframes fadeIn{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
+
+  .sheet h2{
+    font-family:'Fraunces', serif;
+    font-size:26px;
+    margin:0 0 4px;
+    color:var(--navy-deep);
+  }
+  .instructions{
+    font-size:14.5px;
+    color:#5a6788;
+    margin-bottom:22px;
+    line-height:1.55;
+    padding-left:14px;
+    border-left:3px solid var(--yellow);
+  }
+
+  .item{
+    display:flex;
+    align-items:flex-start;
+    gap:12px;
+    padding:14px 0;
+    border-bottom:1px dashed #dde3ee;
+  }
+  .item:last-of-type{ border-bottom:none; }
+  .num{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:15px;
+    color:#9aa6c2;
+    min-width:22px;
+    padding-top:2px;
+  }
+  .item-body{ flex:1; font-size:15.5px; line-height:1.6; }
+  .item-body select, .item-body input[type=text]{
+    font-family:'Space Grotesk', sans-serif;
+    font-size:15px;
+    padding:5px 9px;
+    border:2px solid #cdd6e8;
+    border-radius:7px;
+    background:#f7f9fc;
+    color:var(--ink);
+    outline:none;
+    transition:border-color .15s;
+  }
+  .item-body input[type=text]{ min-width:180px; }
+  .item-body select:focus, .item-body input[type=text]:focus{ border-color:var(--navy); }
+
+  .group-choice{ display:flex; gap:14px; margin-top:6px; flex-wrap:wrap; }
+  .group-choice label{
+    display:flex; align-items:center; gap:5px;
+    font-size:14px;
+    padding:5px 11px;
+    border-radius:20px;
+    border:1.5px solid #cdd6e8;
+    cursor:pointer;
+    background:#f7f9fc;
+  }
+  .group-choice input{ accent-color:var(--navy); }
+
+  .item.correct .item-body{ position:relative; }
+  .item.correct select, .item.correct input[type=text]{
+    border-color:var(--green);
+    background:#eefaf1;
+  }
+  .item.incorrect select, .item.incorrect input[type=text]{
+    border-color:var(--red);
+    background:#fdeeee;
+  }
+  .item.correct .group-choice label.picked{ border-color:var(--green); background:#eefaf1; }
+  .item.incorrect .group-choice label.picked{ border-color:var(--red); background:#fdeeee; }
+  .mark{ font-weight:700; margin-left:8px; font-size:14px; }
+  .mark.ok{ color:var(--green); }
+  .mark.no{ color:var(--red); }
+  .answer-reveal{
+    display:none;
+    margin-top:5px;
+    font-size:13.5px;
+    color:var(--navy);
+    font-style:italic;
+  }
+  .answer-reveal.show{ display:block; }
+
+  .controls{
+    display:flex;
+    gap:12px;
+    margin-top:26px;
+    flex-wrap:wrap;
+    align-items:center;
+  }
+  .btn{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:600;
+    font-size:14px;
+    padding:11px 20px;
+    border-radius:9px;
+    border:none;
+    cursor:pointer;
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .btn:active{ transform:scale(0.97); }
+  .btn-primary{ background:var(--navy); color:#fff; box-shadow:0 4px 0 var(--navy-deep); }
+  .btn-primary:hover{ box-shadow:0 5px 0 var(--navy-deep); transform:translateY(-1px); }
+  .btn-secondary{ background:#fff; color:var(--navy); border:2px solid var(--navy); }
+  .btn-ghost{ background:#fff; color:#5a6788; border:2px solid #dde3ee; }
+  .score{
+    margin-left:auto;
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:16px;
+    color:var(--navy-deep);
+  }
+  .score .num-big{ font-size:20px; color:var(--red); }
+
+  .q-list{ counter-reset:q; }
+  .q-item{
+    padding:10px 0;
+    font-size:16px;
+    border-bottom:1px dashed #dde3ee;
+  }
+  .copy-bar{
+    display:flex; gap:12px; margin-top:24px; flex-wrap:wrap; align-items:center;
+  }
+  .copy-hint{ font-size:13px; color:#5a6788; font-style:italic; }
+  .toast{
+    position:fixed; bottom:26px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:var(--navy-deep); color:#fff; padding:12px 20px; border-radius:9px;
+    font-size:14px; opacity:0; transition:opacity .25s ease, transform .25s ease;
+    pointer-events:none; z-index:10;
+  }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+  @media (max-width:640px){
+    .margin-line{ display:none; }
+    header, .binder, main{ padding-left:20px; }
+  }
+</style>
+</head>
+<body>
+<div class="margin-line"></div>
+
+<header>
+  <h1>Grammar Notebook</h1>
+  <div class="sub">Present &amp; Past · level A2</div>
+  <div class="meta">Шесть блоков упражнений на времена группы Simple / Continuous и указатели времени. В каждом блоке — 10 пунктов, кнопка «Проверить» подсвечивает ответы, кнопка «Показать ответы» открывает правильные варианты.</div>
+</header>
+
+<nav class="binder">
+  <button class="tab-btn active" data-tab="1">1 · Time markers</button>
+  <button class="tab-btn" data-tab="2">2 · Present ↔ Past Simple</button>
+  <button class="tab-btn" data-tab="3">3 · Present Simple ↔ Continuous</button>
+  <button class="tab-btn" data-tab="4">4 · Микс</button>
+  <button class="tab-btn" data-tab="5">5 · Найди ошибку</button>
+  <button class="tab-btn" data-tab="6">6 · Questions (Miro)</button>
+</nav>
+
+<main>
+
+  <!-- EXERCISE 1 -->
+  <section class="sheet active" id="sheet-1">
+    <h2>1. Time expressions</h2>
+    <div class="instructions">Распредели указатель времени по группе: <b>Past</b>, <b>Present</b> или <b>Future</b>.</div>
+    <div id="ex1-list"></div>
+    <div class="controls">
+      <button class="btn btn-primary" onclick="checkEx(1)">Проверить</button>
+      <button class="btn btn-secondary" onclick="showAnswers(1)">Показать ответы</button>
+      <button class="btn btn-ghost" onclick="resetEx(1)">Сбросить</button>
+      <div class="score" id="score-1"></div>
+    </div>
+  </section>
+
+  <!-- EXERCISE 2 -->
+  <section class="sheet" id="sheet-2">
+    <h2>2. Present Simple ↔ Past Simple</h2>
+    <div class="instructions">Выбери правильную форму глагола в скобках.</div>
+    <div id="ex2-list"></div>
+    <div class="controls">
+      <button class="btn btn-primary" onclick="checkEx(2)">Проверить</button>
+      <button class="btn btn-secondary" onclick="showAnswers(2)">Показать ответы</button>
+      <button class="btn btn-ghost" onclick="resetEx(2)">Сбросить</button>
+      <div class="score" id="score-2"></div>
+    </div>
+  </section>
+
+  <!-- EXERCISE 3 -->
+  <section class="sheet" id="sheet-3">
+    <h2>3. Present Simple ↔ Present Continuous</h2>
+    <div class="instructions">Выбери правильную форму глагола в скобках.</div>
+    <div id="ex3-list"></div>
+    <div class="controls">
+      <button class="btn btn-primary" onclick="checkEx(3)">Проверить</button>
+      <button class="btn btn-secondary" onclick="showAnswers(3)">Показать ответы</button>
+      <button class="btn btn-ghost" onclick="resetEx(3)">Сбросить</button>
+      <div class="score" id="score-3"></div>
+    </div>
+  </section>
+
+  <!-- EXERCISE 4 -->
+  <section class="sheet" id="sheet-4">
+    <h2>4. Микс: времена и time markers</h2>
+    <div class="instructions">Выбери правильную форму глагола — вариант зависит от указателя времени в предложении.</div>
+    <div id="ex4-list"></div>
+    <div class="controls">
+      <button class="btn btn-primary" onclick="checkEx(4)">Проверить</button>
+      <button class="btn btn-secondary" onclick="showAnswers(4)">Показать ответы</button>
+      <button class="btn btn-ghost" onclick="resetEx(4)">Сбросить</button>
+      <div class="score" id="score-4"></div>
+    </div>
+  </section>
+
+  <!-- EXERCISE 5 -->
+  <section class="sheet" id="sheet-5">
+    <h2>5. Найди ошибку</h2>
+    <div class="instructions">В каждом предложении есть одна ошибка в форме глагола. Впиши <b>исправленное слово (или фразу)</b> в поле — например, для "She go" впиши <i>goes</i>.</div>
+    <div id="ex5-list"></div>
+    <div class="controls">
+      <button class="btn btn-primary" onclick="checkEx(5)">Проверить</button>
+      <button class="btn btn-secondary" onclick="showAnswers(5)">Показать ответы</button>
+      <button class="btn btn-ghost" onclick="resetEx(5)">Сбросить</button>
+      <div class="score" id="score-5"></div>
+    </div>
+  </section>
+
+  <!-- EXERCISE 6 -->
+  <section class="sheet" id="sheet-6">
+    <h2>6. Questions — для обсуждения на Miro</h2>
+    <div class="instructions">Эти вопросы не проверяются автоматически: скопируй их и вставь в доску Miro, ученик отвечает сам (устно или письменно).</div>
+    <div class="q-list" id="ex6-list"></div>
+    <div class="copy-bar">
+      <button class="btn btn-primary" onclick="copyQuestions()">Скопировать все вопросы</button>
+      <span class="copy-hint">Скопируется список без номеров — удобно вставлять как отдельные стикеры в Miro.</span>
+    </div>
+  </section>
+
+</main>
+
+<div class="toast" id="toast">Скопировано!</div>
+
+<script>
+/* ---------- DATA ---------- */
+
+const ex1 = [
+  {text:"yesterday", ans:"Past"},
+  {text:"every day", ans:"Present"},
+  {text:"right now", ans:"Present"},
+  {text:"next week", ans:"Future"},
+  {text:"two years ago", ans:"Past"},
+  {text:"usually", ans:"Present"},
+  {text:"tomorrow", ans:"Future"},
+  {text:"last month", ans:"Past"},
+  {text:"at the moment", ans:"Present"},
+  {text:"soon", ans:"Future"},
+];
+
+const ex2 = [
+  {pre:"Yesterday, I", verb:"watch", options:["watch","watched"], ans:"watched", post:"a good film."},
+  {pre:"She", verb:"not watch", options:["doesn't watch","didn't watch"], ans:"doesn't watch", post:"TV every day."},
+  {pre:"We", verb:"visit", options:["visit","visited"], ans:"visited", post:"our grandparents last weekend."},
+  {pre:"He usually", verb:"get up", options:["gets up","got up"], ans:"gets up", post:"early."},
+  {pre:"Two days ago, they", verb:"play", options:["play","played"], ans:"played", post:"football."},
+  {pre:"My brother", verb:"work", options:["works","worked"], ans:"works", post:"in a bank."},
+  {pre:"Did you", verb:"finish", options:["finish","finished"], ans:"finish", post:"your homework yesterday?"},
+  {pre:"I", verb:"not go", options:["don't go","didn't go"], ans:"didn't go", post:"to the party last night."},
+  {pre:"She", verb:"study", options:["studies","studied"], ans:"studies", post:"English every week."},
+  {pre:"Last summer, we", verb:"travel", options:["travel","travelled"], ans:"travelled", post:"to Italy."},
+];
+
+const ex3 = [
+  {pre:"Look! It", verb:"rain", options:["rains","is raining"], ans:"is raining", post:"outside."},
+  {pre:"I usually", verb:"drink", options:["drink","am drinking"], ans:"drink", post:"coffee in the morning."},
+  {pre:"She", verb:"read", options:["reads","is reading"], ans:"is reading", post:"a book right now."},
+  {pre:"He", verb:"not like", options:["doesn't like","isn't liking"], ans:"doesn't like", post:"spicy food."},
+  {pre:"We", verb:"study", options:["study","are studying"], ans:"are studying", post:"English at the moment."},
+  {pre:"My sister", verb:"work", options:["works","is working"], ans:"works", post:"in a hospital."},
+  {pre:"Listen! Someone", verb:"sing", options:["sings","is singing"], ans:"is singing", post:"in the next room."},
+  {pre:"My parents", verb:"not watch", options:["don't watch","aren't watching"], ans:"don't watch", post:"TV every evening."},
+  {pre:"I", verb:"not understand", options:["don't understand","am not understanding"], ans:"don't understand", post:"this rule."},
+  {pre:"The children", verb:"play", options:["play","are playing"], ans:"are playing", post:"in the garden now."},
+];
+
+const ex4 = [
+  {pre:"Yesterday, my friend", verb:"call", options:["calls","called"], ans:"called", post:"me."},
+  {pre:"Look! The dog", verb:"run", options:["runs","is running"], ans:"is running", post:"in the park now."},
+  {pre:"We usually", verb:"have", options:["have","are having"], ans:"have", post:"lunch at 1 o'clock."},
+  {pre:"Last year, she", verb:"not live", options:["doesn't live","didn't live"], ans:"didn't live", post:"in Warsaw."},
+  {pre:"At the moment, I", verb:"write", options:["write","am writing"], ans:"am writing", post:"an email."},
+  {pre:"He", verb:"not go", options:["doesn't go","isn't going"], ans:"doesn't go", post:"to school on Sundays."},
+  {pre:"Two hours ago, they", verb:"finish", options:["finish","finished"], ans:"finished", post:"the project."},
+  {pre:"Right now, we", verb:"wait", options:["wait","are waiting"], ans:"are waiting", post:"for the bus."},
+  {pre:"My mother always", verb:"cook", options:["cooks","is cooking"], ans:"cooks", post:"dinner in the evening."},
+  {pre:"Did you", verb:"see", options:["see","saw"], ans:"see", post:"John yesterday?"},
+];
+
+const ex5 = [
+  {text:"She go to school every day.", accept:["goes"]},
+  {text:"Yesterday I go to the cinema.", accept:["went"]},
+  {text:"Look! He is run very fast.", accept:["is running","running"]},
+  {text:"They doesn't like pizza.", accept:["don't like","dont like"]},
+  {text:"Right now she read a book.", accept:["is reading"]},
+  {text:"We visited Paris next year.", accept:["last year"]},
+  {text:"My brother working in a shop.", accept:["is working"]},
+  {text:"Did you saw that film?", accept:["see"]},
+  {text:"I am not understand this exercise.", accept:["don't understand","do not understand"]},
+  {text:"He usually have breakfast at 8.", accept:["has"]},
+];
+
+const ex6 = [
+  "What do you usually do at the weekend?",
+  "What time do you usually get up?",
+  "What did you do yesterday evening?",
+  "Where were you last summer?",
+  "What are you doing right now?",
+  "How often do you play sport?",
+  "What did you have for breakfast this morning?",
+  "What is your favourite free-time activity?",
+  "Did you watch TV yesterday?",
+  "What are your plans for tomorrow?",
+];
+
+/* ---------- RENDER ---------- */
+
+function renderEx1(){
+  const box = document.getElementById('ex1-list');
+  ex1.forEach((item,i)=>{
+    const div = document.createElement('div');
+    div.className = 'item';
+    div.id = 'ex1-item-'+i;
+    div.innerHTML = `
+      <div class="num">${i+1}</div>
+      <div class="item-body">
+        <b>${item.text}</b>
+        <div class="group-choice">
+          ${['Past','Present','Future'].map(g=>`
+            <label data-g="${g}">
+              <input type="radio" name="ex1-${i}" value="${g}"> ${g}
+            </label>`).join('')}
+        </div>
+        <div class="answer-reveal" id="ex1-ans-${i}">Правильный ответ: <b>${item.ans}</b></div>
+      </div>`;
+    box.appendChild(div);
+  });
+}
+
+function renderSelectEx(list, containerId, prefix){
+  const box = document.getElementById(containerId);
+  list.forEach((item,i)=>{
+    const div = document.createElement('div');
+    div.className = 'item';
+    div.id = prefix+'-item-'+i;
+    const opts = item.options.map(o=>`<option value="${o}">${o}</option>`).join('');
+    div.innerHTML = `
+      <div class="num">${i+1}</div>
+      <div class="item-body">
+        ${item.pre} <i>(${item.verb})</i>
+        <select id="${prefix}-sel-${i}">
+          <option value="" selected disabled>choose…</option>
+          ${opts}
+        </select>
+        ${item.post}
+        <span class="mark" id="${prefix}-mark-${i}"></span>
+        <div class="answer-reveal" id="${prefix}-ans-${i}">Правильный ответ: <b>${item.ans}</b></div>
+      </div>`;
+    box.appendChild(div);
+  });
+}
+
+function renderEx5(){
+  const box = document.getElementById('ex5-list');
+  ex5.forEach((item,i)=>{
+    const div = document.createElement('div');
+    div.className = 'item';
+    div.id = 'ex5-item-'+i;
+    div.innerHTML = `
+      <div class="num">${i+1}</div>
+      <div class="item-body">
+        ${item.text}
+        <br>
+        <input type="text" id="ex5-inp-${i}" placeholder="исправление...">
+        <span class="mark" id="ex5-mark-${i}"></span>
+        <div class="answer-reveal" id="ex5-ans-${i}">Правильный ответ: <b>${item.accept[0]}</b></div>
+      </div>`;
+    box.appendChild(div);
+  });
+}
+
+function renderEx6(){
+  const box = document.getElementById('ex6-list');
+  ex6.forEach((q,i)=>{
+    const div = document.createElement('div');
+    div.className = 'q-item';
+    div.innerHTML = `${i+1}. ${q}`;
+    box.appendChild(div);
+  });
+}
+
+renderEx1();
+renderSelectEx(ex2,'ex2-list','ex2');
+renderSelectEx(ex3,'ex3-list','ex3');
+renderSelectEx(ex4,'ex4-list','ex4');
+renderEx5();
+renderEx6();
+
+/* ---------- TABS ---------- */
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.sheet').forEach(s=>s.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('sheet-'+btn.dataset.tab).classList.add('active');
+  });
+});
+
+/* ---------- CHECK LOGIC ---------- */
+
+function checkEx(n){
+  if(n===1) return checkEx1();
+  if(n===5) return checkEx5();
+  return checkSelectEx(n);
+}
+
+function checkEx1(){
+  let correct = 0;
+  ex1.forEach((item,i)=>{
+    const div = document.getElementById('ex1-item-'+i);
+    const picked = div.querySelector('input[name="ex1-'+i+'"]:checked');
+    div.querySelectorAll('.group-choice label').forEach(l=>l.classList.remove('picked'));
+    if(!picked){
+      div.classList.remove('correct','incorrect');
+      return;
+    }
+    picked.closest('label').classList.add('picked');
+    const isCorrect = picked.value === item.ans;
+    div.classList.toggle('correct', isCorrect);
+    div.classList.toggle('incorrect', !isCorrect);
+    if(isCorrect) correct++;
+  });
+  document.getElementById('score-1').innerHTML = `<span class="num-big">${correct}</span> / ${ex1.length}`;
+}
+
+function checkSelectEx(n){
+  const list = {2:ex2,3:ex3,4:ex4}[n];
+  const prefix = 'ex'+n;
+  let correct = 0;
+  list.forEach((item,i)=>{
+    const sel = document.getElementById(prefix+'-sel-'+i);
+    const div = document.getElementById(prefix+'-item-'+i);
+    const mark = document.getElementById(prefix+'-mark-'+i);
+    if(!sel.value){
+      div.classList.remove('correct','incorrect');
+      mark.textContent = '';
+      return;
+    }
+    const isCorrect = sel.value === item.ans;
+    div.classList.toggle('correct', isCorrect);
+    div.classList.toggle('incorrect', !isCorrect);
+    mark.textContent = isCorrect ? '✓' : '✕';
+    mark.className = 'mark ' + (isCorrect ? 'ok':'no');
+    if(isCorrect) correct++;
+  });
+  document.getElementById('score-'+n).innerHTML = `<span class="num-big">${correct}</span> / ${list.length}`;
+}
+
+function checkEx5(){
+  let correct = 0;
+  ex5.forEach((item,i)=>{
+    const inp = document.getElementById('ex5-inp-'+i);
+    const div = document.getElementById('ex5-item-'+i);
+    const mark = document.getElementById('ex5-mark-'+i);
+    const val = inp.value.trim().toLowerCase().replace(/['’]/g,"'");
+    if(!val){
+      div.classList.remove('correct','incorrect');
+      mark.textContent = '';
+      return;
+    }
+    const isCorrect = item.accept.some(a=>a.toLowerCase() === val);
+    div.classList.toggle('correct', isCorrect);
+    div.classList.toggle('incorrect', !isCorrect);
+    mark.textContent = isCorrect ? '✓' : '✕';
+    mark.className = 'mark ' + (isCorrect ? 'ok':'no');
+    if(isCorrect) correct++;
+  });
+  document.getElementById('score-5').innerHTML = `<span class="num-big">${correct}</span> / ${ex5.length}`;
+}
+
+/* ---------- SHOW ANSWERS ---------- */
+
+function showAnswers(n){
+  const prefix = 'ex'+n;
+  const count = {1:ex1.length,2:ex2.length,3:ex3.length,4:ex4.length,5:ex5.length}[n];
+  for(let i=0;i<count;i++){
+    document.getElementById(prefix+'-ans-'+i).classList.add('show');
+  }
+}
+
+/* ---------- RESET ---------- */
+
+function resetEx(n){
+  const prefix = 'ex'+n;
+  const count = {1:ex1.length,2:ex2.length,3:ex3.length,4:ex4.length,5:ex5.length}[n];
+  for(let i=0;i<count;i++){
+    const div = document.getElementById(prefix+'-item-'+i);
+    div.classList.remove('correct','incorrect');
+    document.getElementById(prefix+'-ans-'+i).classList.remove('show');
+    if(n===1){
+      const radios = div.querySelectorAll('input[type=radio]');
+      radios.forEach(r=>r.checked=false);
+      div.querySelectorAll('.group-choice label').forEach(l=>l.classList.remove('picked'));
+    } else if(n===5){
+      document.getElementById(prefix+'-inp-'+i).value = '';
+      document.getElementById(prefix+'-mark-'+i).textContent = '';
+    } else {
+      document.getElementById(prefix+'-sel-'+i).selectedIndex = 0;
+      document.getElementById(prefix+'-mark-'+i).textContent = '';
+    }
+  }
+  document.getElementById('score-'+n).innerHTML = '';
+}
+
+/* ---------- COPY QUESTIONS ---------- */
+
+function copyQuestions(){
+  const text = ex6.join('\n');
+  navigator.clipboard.writeText(text).then(()=>{
+    const toast = document.getElementById('toast');
+    toast.classList.add('show');
+    setTimeout(()=>toast.classList.remove('show'), 1800);
+  });
+}
+</script>
+</body>
+</html>
