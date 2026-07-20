@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Be going to — тренажёр для будущих планов</title>
+<style>
+  :root{
+    --ink:#16213E;
+    --muted:#5B6478;
+    --paper:#F3F6FB;
+    --card:#FFFFFF;
+    --primary:#2E4FE0;
+    --primary-dark:#1D36A8;
+    --accent:#F0A93A;
+    --success:#2E9E6D;
+    --success-bg:#E7F6EE;
+    --danger:#D6483D;
+    --danger-bg:#FBEAE8;
+    --border:#E1E5F0;
+    --radius:14px;
+    --font-display: Georgia, 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', serif;
+    --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--font-body);
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:880px;margin:0 auto;padding:20px 16px 60px;}
+
+  /* ---------- Boarding-pass header ---------- */
+  .pass{
+    position:relative;
+    background:linear-gradient(135deg,var(--ink) 0%, #263a72 100%);
+    color:#fff;
+    border-radius:var(--radius);
+    padding:30px clamp(20px,5vw,44px) 26px;
+    overflow:hidden;
+    margin-bottom:18px;
+  }
+  .pass::before,.pass::after{
+    content:"";
+    position:absolute;
+    width:26px;height:26px;
+    background:var(--paper);
+    border-radius:50%;
+    top:50%;
+    transform:translateY(-50%);
+  }
+  .pass::before{left:-13px;}
+  .pass::after{right:-13px;}
+  .eyebrow{
+    font-family:var(--font-mono);
+    text-transform:uppercase;
+    letter-spacing:.14em;
+    font-size:11.5px;
+    color:rgba(255,255,255,.65);
+    margin:0 0 8px;
+  }
+  .pass h1{
+    font-family:var(--font-display);
+    font-style:italic;
+    font-weight:700;
+    font-size:clamp(2rem,5vw,2.7rem);
+    margin:0 0 4px;
+  }
+  .pass .sub{
+    font-size:1rem;
+    color:rgba(255,255,255,.82);
+    margin:0 0 20px;
+  }
+  .perforation{
+    border-top:2px dashed rgba(255,255,255,.28);
+    margin:6px 0 18px;
+  }
+  .fields{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+    gap:14px;
+  }
+  .field-label{
+    font-family:var(--font-mono);
+    font-size:10.5px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--accent);
+    margin-bottom:3px;
+  }
+  .field-value{font-size:.92rem;color:rgba(255,255,255,.92);}
+  .field-value code{
+    background:rgba(255,255,255,.12);
+    padding:1px 5px;
+    border-radius:4px;
+    font-family:var(--font-mono);
+    font-size:.85em;
+  }
+
+  /* ---------- Rule cards ---------- */
+  .card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:22px clamp(18px,4vw,28px);
+    margin-bottom:18px;
+  }
+  .card h3{
+    font-family:var(--font-display);
+    font-size:1.15rem;
+    margin:0 0 12px;
+  }
+  .tag-row{display:flex;flex-wrap:wrap;gap:10px;}
+  .time-tag{
+    font-family:var(--font-mono);
+    font-size:12px;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+    background:#EEF1FD;
+    border:1px dashed var(--primary);
+    color:var(--primary-dark);
+    border-radius:999px;
+    padding:7px 14px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:1px;
+  }
+  .time-tag small{
+    text-transform:none;
+    letter-spacing:0;
+    font-family:var(--font-body);
+    color:var(--muted);
+    font-size:10.5px;
+  }
+  table.ref{width:100%;border-collapse:collapse;font-size:.88rem;}
+  table.ref th, table.ref td{border:1px solid var(--border);padding:8px 10px;text-align:left;}
+  table.ref th{background:#F7F8FC;font-family:var(--font-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);}
+
+  /* ---------- Quick nav ---------- */
+  .quick-nav{
+    position:sticky;top:0;z-index:5;
+    display:flex;gap:8px;overflow-x:auto;
+    background:var(--paper);
+    padding:10px 0 16px;
+    margin-bottom:4px;
+  }
+  .quick-nav a{
+    flex:0 0 auto;
+    font-family:var(--font-mono);
+    font-size:12px;
+    text-decoration:none;
+    color:var(--ink);
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:999px;
+    padding:7px 13px;
+    white-space:nowrap;
+  }
+  .quick-nav a:hover{border-color:var(--primary);color:var(--primary);}
+
+  /* ---------- Exercise cards ---------- */
+  .exercise{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:24px clamp(18px,4vw,30px);
+    margin-bottom:22px;
+    scroll-margin-top:64px;
+  }
+  .exercise .eyebrow{color:var(--primary);margin-bottom:6px;}
+  .exercise h2{
+    font-family:var(--font-display);
+    font-size:1.45rem;
+    margin:0 0 8px;
+  }
+  .instructions{color:var(--muted);font-size:.93rem;margin:0 0 16px;}
+
+  .item{
+    display:flex;flex-wrap:wrap;align-items:center;gap:8px;
+    padding:11px 0;border-bottom:1px dashed var(--border);
+  }
+  .item:last-child{border-bottom:none;}
+  .num{font-family:var(--font-mono);color:var(--muted);min-width:24px;}
+  .item input[type=text]{
+    flex:1;min-width:180px;
+    border:1.5px solid var(--border);border-radius:8px;
+    padding:8px 10px;font-family:var(--font-body);font-size:.95rem;
+    background:#fff;color:var(--ink);
+  }
+  .item input[type=text]:focus{outline:2px solid var(--primary);outline-offset:1px;border-color:var(--primary);}
+  .item.correct input[type=text]{border-color:var(--success);background:var(--success-bg);}
+  .item.incorrect input[type=text]{border-color:var(--danger);background:var(--danger-bg);}
+  .feedback-icon{font-size:1.05rem;width:20px;text-align:center;}
+
+  .tag-badge{
+    font-family:var(--font-mono);font-size:11px;font-weight:700;
+    border-radius:6px;padding:3px 7px;letter-spacing:.03em;
+  }
+  .tag-badge.plus{background:var(--success-bg);color:var(--success);}
+  .tag-badge.minus{background:var(--danger-bg);color:var(--danger);}
+  .tag-badge.q{background:#EEF1FD;color:var(--primary-dark);}
+
+  .transform-body{flex:1;min-width:220px;display:flex;flex-direction:column;gap:6px;}
+  .prompt-line{font-size:.95rem;}
+  .prompt-line .tag-badge{margin-right:6px;}
+  .wrong-sentence{font-size:.95rem;}
+  .wrong-sentence .warn{margin-right:4px;}
+
+  .answer-reveal{
+    display:none;width:100%;font-size:.87rem;color:var(--primary-dark);
+    background:#EEF1FD;padding:7px 11px;border-radius:8px;margin-top:2px;
+  }
+  .answer-reveal.show{display:block;}
+
+  .mc-item{padding:14px 0;border-bottom:1px dashed var(--border);}
+  .mc-item:last-child{border-bottom:none;}
+  .mc-sentence{font-size:.97rem;margin-bottom:9px;}
+  .mc-options{display:flex;flex-wrap:wrap;gap:8px;}
+  .mc-option{
+    font-family:var(--font-body);font-size:.88rem;
+    border:1.5px solid var(--border);border-radius:999px;
+    padding:6px 14px;background:#fff;cursor:pointer;color:var(--ink);
+  }
+  .mc-option.selected{border-color:var(--primary);background:#EEF1FD;}
+  .mc-option.correct{border-color:var(--success);background:var(--success-bg);color:var(--success);}
+  .mc-option.incorrect{border-color:var(--danger);background:var(--danger-bg);color:var(--danger);}
+
+  .pic-item{display:flex;gap:14px;align-items:flex-start;padding:14px 0;border-bottom:1px dashed var(--border);}
+  .pic-item:last-child{border-bottom:none;}
+  .pic-emoji{font-size:1.9rem;line-height:1;flex:0 0 auto;}
+  .pic-body{flex:1;display:flex;flex-direction:column;gap:6px;min-width:200px;}
+  .pic-context{color:var(--muted);font-size:.86rem;}
+
+  .open-item{padding:12px 0;border-bottom:1px dashed var(--border);}
+  .open-item:last-child{border-bottom:none;}
+  .open-item textarea{
+    width:100%;margin-top:6px;min-height:44px;resize:vertical;
+    border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;
+    font-family:var(--font-body);font-size:.95rem;color:var(--ink);
+  }
+  .open-item textarea:focus{outline:2px solid var(--primary);outline-offset:1px;border-color:var(--primary);}
+
+  .actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:16px;}
+  .btn{
+    font-family:var(--font-body);font-weight:600;border:none;border-radius:999px;
+    padding:9px 18px;cursor:pointer;font-size:.88rem;
+    transition:transform .1s ease;
+  }
+  .btn:hover{transform:translateY(-1px);}
+  .btn:active{transform:translateY(0);}
+  .btn-primary{background:var(--primary);color:#fff;}
+  .btn-outline{background:#fff;border:1.5px solid var(--primary);color:var(--primary);}
+  .score{
+    font-family:var(--font-mono);font-weight:700;font-size:.88rem;
+    padding:7px 13px;border-radius:8px;background:#EEF1FD;color:var(--primary-dark);
+  }
+  .copy-status{font-size:.85rem;color:var(--success);}
+
+  footer{text-align:center;color:var(--muted);font-size:.82rem;margin-top:30px;}
+
+  @media print{
+    .quick-nav,.btn,.score,.answer-reveal,.feedback-icon{display:none !important;}
+    body{background:#fff;}
+    .exercise,.card,.pass{border:1px solid #ccc;}
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{transition:none !important;}
+  }
+  @media (max-width:600px){
+    .item{flex-direction:column;align-items:stretch;}
+    .item .num{align-self:flex-start;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ===== Header: boarding-pass style ===== -->
+  <div class="pass">
+    <p class="eyebrow">Grammar · Plan · Intention</p>
+    <h1>Be going to</h1>
+    <p class="sub">Планы и намерения на будущее — тренажёр с самопроверкой</p>
+    <div class="perforation"></div>
+    <div class="fields">
+      <div>
+        <div class="field-label">Форма (+)</div>
+        <div class="field-value"><code>am / is / are + going to + V</code></div>
+      </div>
+      <div>
+        <div class="field-label">Отрицание (−)</div>
+        <div class="field-value"><code>am not / isn't / aren't + going to + V</code></div>
+      </div>
+      <div>
+        <div class="field-label">Вопрос (?)</div>
+        <div class="field-value"><code>Am / Is / Are + подл. + going to + V?</code></div>
+      </div>
+      <div>
+        <div class="field-label">Пример</div>
+        <div class="field-value">I'm going to have a holiday next month.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Rule card ===== -->
+  <div class="card">
+    <h3>✅ Когда используем?</h3>
+    <p style="margin:0 0 14px;color:var(--muted);">
+      <strong style="color:var(--ink);">be going to + глагол</strong> — когда говорим о планах и намерениях на будущее.
+      <br>✔️ I'm going to have a holiday next month.
+      <br>✔️ She's going to start a new job.
+    </p>
+    <table class="ref">
+      <tr><th>Подлежащее</th><th>+ Утверждение</th><th>− Отрицание</th><th>? Вопрос</th></tr>
+      <tr><td>I</td><td>I'm going to work</td><td>I'm not going to work</td><td>Am I going to work?</td></tr>
+      <tr><td>He / She / It</td><td>He's going to work</td><td>He isn't going to work</td><td>Is he going to work?</td></tr>
+      <tr><td>We / You / They</td><td>We're going to work</td><td>We aren't going to work</td><td>Are we going to work?</td></tr>
+    </table>
+  </div>
+
+  <!-- ===== Time expressions card ===== -->
+  <div class="card">
+    <h3>🕐 Маркеры времени будущего</h3>
+    <div class="tag-row">
+      <span class="time-tag">tomorrow<small>завтра</small></span>
+      <span class="time-tag">next week<small>на след. неделе</small></span>
+      <span class="time-tag">next month<small>в след. месяце</small></span>
+      <span class="time-tag">next year<small>в след. году</small></span>
+      <span class="time-tag">this weekend<small>в эти выходные</small></span>
+      <span class="time-tag">tonight<small>сегодня вечером</small></span>
+      <span class="time-tag">in two days<small>через два дня</small></span>
+    </div>
+  </div>
+
+  <!-- ===== Quick nav ===== -->
+  <nav class="quick-nav">
+    <a href="#ex1">1 · Утверждения</a>
+    <a href="#ex2">2 · Отриц/Вопрос</a>
+    <a href="#ex3">3 · Микс +/−/?</a>
+    <a href="#ex4">4 · Маркеры времени</a>
+    <a href="#ex5">5 · Найди ошибку</a>
+    <a href="#ex6">6 · Смотри и продолжай</a>
+    <a href="#ex7">7 · Твои идеи</a>
+  </nav>
+
+  <!-- ===== EXERCISE 1 ===== -->
+  <section class="exercise" id="ex1">
+    <p class="eyebrow">Задание 01 · Утвердительная форма (+)</p>
+    <h2>Complete the sentences</h2>
+    <p class="instructions">Заполни пропуск правильной утвердительной формой <strong>be going to</strong> + глагол в скобках.</p>
+    <div id="ex1-list"></div>
+    <div class="actions">
+      <button class="btn btn-primary" onclick="checkText('ex1-list',EX1)">✅ Проверить</button>
+      <button class="btn btn-outline" id="ex1-list-toggle-btn" onclick="toggleAnswers('ex1-list')">👁 Показать ответы</button>
+      <span class="score" id="ex1-list-score">Результат: — / 10</span>
+    </div>
+  </section>
+
+  <!-- ===== EXERCISE 2 ===== -->
+  <section class="exercise" id="ex2">
+    <p class="eyebrow">Задание 02 · Отрицания и вопросы (−/?)</p>
+    <h2>Make it negative or a question</h2>
+    <p class="instructions">Преобразуй предложение в указанную форму: <span class="tag-badge minus">−</span> отрицание или <span class="tag-badge q">?</span> вопрос.</p>
+    <div id="ex2-list"></div>
+    <div class="actions">
+      <button class="btn btn-primary" onclick="checkText('ex2-list',EX2)">✅ Проверить</button>
+      <button class="btn btn-outline" id="ex2-list-toggle-btn" onclick="toggleAnswers('ex2-list')">👁 Показать ответы</button>
+      <span class="score" id="ex2-list-score">Результат: — / 10</span>
+    </div>
+  </section>
+
+  <!-- ===== EXERCISE 3 ===== -->
+  <section class="exercise" id="ex3">
+    <p class="eyebrow">Задание 03 · Микс +/−/?</p>
+    <h2>Mix it up: +, − or ?</h2>
+    <p class="instructions">Составь полное предложение из слов, используя нужную форму: <span class="tag-badge plus">+</span> <span class="tag-badge minus">−</span> <span class="tag-badge q">?</span></p>
+    <div id="ex3-list"></div>
+    <div class="actions">
+      <button class="btn btn-primary" onclick="checkText('ex3-list',EX3)">✅ Проверить</button>
+      <button class="btn btn-outline" id="ex3-list-toggle-btn" onclick="toggleAnswers('ex3-list')">👁 Показать ответы</button>
+      <span class="score" id="ex3-list-score">Результат: — / 10</span>
+    </div>
+  </section>
+
+  <!-- ===== EXERCISE 4 ===== -->
+  <section class="exercise" id="ex4">
+    <p class="eyebrow">Задание 04 · Маркеры времени</p>
+    <h2>Choose the correct time expression</h2>
+    <p class="instructions">Выбери маркер времени, который подходит к <strong>be going to</strong>. Среди вариантов есть слова из других времён (always, usually, last year…) — будь внимателен!</p>
+    <div id="ex4-list"></div>
+    <div class="actions">
+      <button class="btn btn-primary" onclick="checkMC('ex4-list',EX4)">✅ Проверить</button>
+      <button class="btn btn-outline" id="ex4-list-toggle-btn" onclick="toggleAnswers('ex4-list')">👁 Показать ответы</button>
+      <span class="score" id="ex4-list-score">Результат: — / 10</span>
+    </div>
+  </section>
+
+  <!-- ===== EXERCISE 5 ===== -->
+  <section class="exercise" id="ex5">
+    <p class="eyebrow">Задание 05 · Найди ошибку</p>
+    <h2>Find and correct the mistake</h2>
+    <p class="instructions">В каждом предложении есть одна ошибка. Найди её и напиши предложение правильно, полностью.</p>
+    <div id="ex5-list"></div>
+    <div class="actions">
+      <button class="btn btn-primary" onclick="checkText('ex5-list',EX5)">✅ Проверить</button>
+      <button class="btn btn-outline" id="ex5-list-toggle-btn" onclick="toggleAnswers('ex5-list')">👁 Показать ответы</button>
+      <span class="score" id="ex5-list-score">Результат: — / 10</span>
+    </div>
+  </section>
+
+  <!-- ===== EXERCISE 6 ===== -->
+  <section class="exercise" id="ex6">
+    <p class="eyebrow">Задание 06 · Смотри и продолжай</p>
+    <h2>Look at the picture and continue</h2>
+    <p class="instructions">Посмотри на подсказку (эмодзи + ситуация) и закончи предложение с <strong>be going to</strong> — что вот-вот произойдёт? Здесь нет единственного правильного ответа — сверься с примером.</p>
+    <div id="ex6-list"></div>
+    <div class="actions">
+      <button class="btn btn-outline" id="ex6-list-toggle-btn" onclick="toggleAnswers('ex6-list')">💡 Показать пример</button>
+    </div>
+  </section>
+
+  <!-- ===== EXERCISE 7 ===== -->
+  <section class="exercise" id="ex7">
+    <p class="eyebrow">Задание 07 · Твои идеи (для Miro)</p>
+    <h2>Finish the sentences with your own ideas</h2>
+    <p class="instructions">Закончи предложения своими идеями (это творческое задание — правильных/неправильных ответов нет). Когда закончишь, нажми «Скопировать ответы» и вставь их на доску Miro (Ctrl+V / Cmd+V).</p>
+    <div id="ex7-list"></div>
+    <div class="actions">
+      <button class="btn btn-primary" onclick="copyAnswers('ex7-list')">📋 Скопировать ответы</button>
+      <button class="btn btn-outline" id="ex7-list-toggle-btn" onclick="toggleAnswers('ex7-list')">💡 Показать примеры идей</button>
+      <span class="copy-status" id="ex7-list-copy-status"></span>
+    </div>
+  </section>
+
+  <footer>Тренажёр «Be going to» · создано для практики грамматики английского языка</footer>
+</div>
+
+<script>
+/* ================= DATA ================= */
+
+const EX1 = [
+  {before:"I", after:"(visit) my grandmother next week.", answer:"am going to visit"},
+  {before:"She", after:"(start) a new job next month.", answer:"is going to start"},
+  {before:"They", after:"(buy) a new car this year.", answer:"are going to buy"},
+  {before:"We", after:"(have) a party this weekend.", answer:"are going to have"},
+  {before:"He", after:"(watch) a football match tonight.", answer:"is going to watch"},
+  {before:"My parents", after:"(travel) to Spain next summer.", answer:"are going to travel"},
+  {before:"I", after:"(learn) to drive next year.", answer:"am going to learn"},
+  {before:"The children", after:"(play) in the park tomorrow.", answer:"are going to play"},
+  {before:"My sister", after:"(get married) next spring.", answer:"is going to get married"},
+  {before:"We", after:"(move) to a new house next month.", answer:"are going to move"}
+];
+
+const EX2 = [
+  {tag:"−", label:"I am going to buy a new phone.", answer:"I'm not going to buy a new phone."},
+  {tag:"?", label:"He is going to start a diet.", answer:"Is he going to start a diet?"},
+  {tag:"−", label:"They are going to move to London.", answer:"They aren't going to move to London."},
+  {tag:"?", label:"She is going to finish the report today.", answer:"Is she going to finish the report today?"},
+  {tag:"−", label:"We are going to have a picnic this weekend.", answer:"We aren't going to have a picnic this weekend."},
+  {tag:"?", label:"You are going to visit your friend tomorrow.", answer:"Are you going to visit your friend tomorrow?"},
+  {tag:"−", label:"I am going to watch this film tonight.", answer:"I'm not going to watch this film tonight."},
+  {tag:"?", label:"They are going to arrive on time.", answer:"Are they going to arrive on time?"},
+  {tag:"−", label:"My brother is going to sell his car.", answer:"My brother isn't going to sell his car."},
+  {tag:"?", label:"We are going to meet at five tomorrow.", answer:"Are we going to meet at five tomorrow?"}
+];
+
+const EX3 = [
+  {tag:"+", label:"I / go / to the gym / tomorrow", answer:"I am going to go to the gym tomorrow."},
+  {tag:"−", label:"she / not / come / to the meeting", answer:"She isn't going to come to the meeting."},
+  {tag:"?", label:"you / help / me / with my homework", answer:"Are you going to help me with my homework?"},
+  {tag:"−", label:"we / not / travel / abroad this year", answer:"We aren't going to travel abroad this year."},
+  {tag:"+", label:"he / start / his own business / soon", answer:"He is going to start his own business soon."},
+  {tag:"?", label:"they / move / to a new flat", answer:"Are they going to move to a new flat?"},
+  {tag:"−", label:"I / not / be / late again", answer:"I'm not going to be late again."},
+  {tag:"+", label:"my brother / buy / a new laptop", answer:"My brother is going to buy a new laptop."},
+  {tag:"?", label:"she / study / abroad / next year", answer:"Is she going to study abroad next year?"},
+  {tag:"−", label:"we / not / have / time for lunch today", answer:"We aren't going to have time for lunch today."}
+];
+
+const EX4 = [
+  {sentence:"I'm going to visit my aunt ___.", options:["yesterday","next week","always","every day"], correct:1},
+  {sentence:"She's going to start her new job ___.", options:["last month","usually","next Monday","every morning"], correct:2},
+  {sentence:"We're going to have a party ___.", options:["this weekend","last weekend","sometimes","never"], correct:0},
+  {sentence:"They're going to travel to Italy ___.", options:["last summer","often","next summer","usually"], correct:2},
+  {sentence:"He's going to call you ___.", options:["tonight","last night","every night","always"], correct:0},
+  {sentence:"I'm going to finish this project ___.", options:["two days ago","every day","in two days","usually"], correct:2},
+  {sentence:"My parents are going to visit us ___.", options:["next month","last month","sometimes","rarely"], correct:0},
+  {sentence:"We're going to meet ___.", options:["yesterday","tomorrow","always","never"], correct:1},
+  {sentence:"She's going to buy a new car ___.", options:["last year","usually","next year","every year"], correct:2},
+  {sentence:"I'm going to see a doctor ___.", options:["yesterday afternoon","this afternoon","always","often"], correct:1}
+];
+
+const EX5 = [
+  {wrong:"She going to visit her grandmother next week.", answer:"She is going to visit her grandmother next week."},
+  {wrong:"I am go to buy a new phone.", answer:"I am going to buy a new phone."},
+  {wrong:"They is going to travel to France.", answer:"They are going to travel to France."},
+  {wrong:"We going to have a party this weekend.", answer:"We are going to have a party this weekend."},
+  {wrong:"He are going to start a new job.", answer:"He is going to start a new job."},
+  {wrong:"I amn't going to watch TV tonight.", answer:"I'm not going to watch TV tonight."},
+  {wrong:"Are she going to call you tomorrow?", answer:"Is she going to call you tomorrow?"},
+  {wrong:"We not going to move to a new house.", answer:"We are not going to move to a new house."},
+  {wrong:"Is you going to help me tomorrow?", answer:"Are you going to help me tomorrow?"},
+  {wrong:"She is going to finish her homework yesterday.",
+    answer:(norm)=> norm.includes("she is going to finish her homework") && !norm.includes("yesterday"),
+    displayAnswer:"She is going to finish her homework tomorrow. (подойдёт любой маркер будущего времени)"}
+];
+
+const EX6 = [
+  {emoji:"🌧️☁️", context:"Посмотри на небо.", starter:"It ___ soon.", sample:"It's going to rain soon."},
+  {emoji:"🎂🎉", context:"Завтра у неё день рождения.", starter:"She ___ .", sample:"She's going to have a birthday party."},
+  {emoji:"🧳✈️", context:"Их чемоданы уже собраны.", starter:"They ___ .", sample:"They're going to go on a trip."},
+  {emoji:"📚✏️", context:"Завтра у него экзамен.", starter:"He ___ tonight.", sample:"He's going to study tonight."},
+  {emoji:"👟🏃", context:"Она в спортивной форме и кроссовках.", starter:"She ___ .", sample:"She's going to go jogging."},
+  {emoji:"🍳☕", context:"Воскресное утро, мама на кухне.", starter:"She ___ .", sample:"She's going to cook breakfast."},
+  {emoji:"🌳🔨", context:"Рядом с деревом лежат доски и молоток.", starter:"Dad ___ .", sample:"Dad's going to build a treehouse."},
+  {emoji:"📦🚚", context:"Машина полна коробок и вещей.", starter:"They ___ .", sample:"They're going to move house."},
+  {emoji:"🎓📖", context:"Том только что закончил школу.", starter:"He ___ .", sample:"He's going to go to university."},
+  {emoji:"⚽🥅", context:"Мальчики стоят на поле с мячом.", starter:"They ___ .", sample:"They're going to play football."}
+];
+
+const EX7 = [
+  {starter:"This weekend, I'm going to ___.", sample:"This weekend, I'm going to visit my friends."},
+  {starter:"Next year, I'm going to ___.", sample:"Next year, I'm going to learn a new language."},
+  {starter:"After this lesson, I'm going to ___.", sample:"After this lesson, I'm going to do my homework."},
+  {starter:"My best friend is going to ___ next month.", sample:"My best friend is going to travel to Italy next month."},
+  {starter:"Next summer, my family is going to ___.", sample:"Next summer, my family is going to go to the seaside."},
+  {starter:"Tonight, I'm going to ___.", sample:"Tonight, I'm going to watch a film."},
+  {starter:"In five years, I'm going to ___.", sample:"In five years, I'm going to have my own business."},
+  {starter:"Next Saturday, I'm not going to ___.", sample:"Next Saturday, I'm not going to work."},
+  {starter:"This evening, my friends and I are going to ___.", sample:"This evening, my friends and I are going to play video games."},
+  {starter:"Someday, I'm going to ___.", sample:"Someday, I'm going to travel around the world."}
+];
+
+/* ================= HELPERS ================= */
+
+function normalize(s){
+  return String(s).toLowerCase()
+    .replace(/n't/g," not")
+    .replace(/'m/g," am")
+    .replace(/'re/g," are")
+    .replace(/'s/g," is")
+    .replace(/[.,!?;:]/g,"")
+    .replace(/\s+/g," ")
+    .trim();
+}
+
+function isCorrect(userVal, answer){
+  const norm = normalize(userVal || "");
+  if (typeof answer === "function") return answer(norm);
+  if (Array.isArray(answer)) return answer.some(a => normalize(a) === norm);
+  return normalize(answer) === norm;
+}
+
+function getDisplayAnswer(item){
+  return typeof item.answer === "function" ? item.displayAnswer : item.answer;
+}
+
+function toggleAnswers(containerId){
+  const el = document.getElementById(containerId);
+  const reveals = el.querySelectorAll(".answer-reveal");
+  const anyHidden = Array.from(reveals).some(r => !r.classList.contains("show"));
+  reveals.forEach(r => r.classList.toggle("show", anyHidden));
+  const btn = document.getElementById(containerId + "-toggle-btn");
+  if(btn){
+    const isSample = btn.textContent.includes("пример");
+    if(isSample){
+      btn.textContent = anyHidden ? "🙈 Скрыть пример" : "💡 Показать пример";
+      if(btn.textContent.indexOf("идей") === -1 && containerId === "ex7-list"){
+        btn.textContent = anyHidden ? "🙈 Скрыть примеры идей" : "💡 Показать примеры идей";
+      }
+    } else {
+      btn.textContent = anyHidden ? "🙈 Скрыть ответы" : "👁 Показать ответы";
+    }
+  }
+}
+
+/* ================= RENDER ================= */
+
+function renderGap(containerId, items){
+  document.getElementById(containerId).innerHTML = items.map((it,i)=>`
+    <div class="item">
+      <span class="num">${i+1}.</span>
+      <span>${it.before}</span>
+      <input type="text" aria-label="Ответ ${i+1}">
+      <span>${it.after}</span>
+      <span class="feedback-icon"></span>
+      <div class="answer-reveal">Правильный ответ: <strong>${it.before} ${it.answer} ${it.after}</strong></div>
+    </div>
+  `).join("");
+}
+
+function tagClass(tag){
+  if(tag === "+") return "plus";
+  if(tag === "−" || tag === "-") return "minus";
+  return "q";
+}
+
+function renderTransform(containerId, items){
+  document.getElementById(containerId).innerHTML = items.map((it,i)=>`
+    <div class="item">
+      <span class="num">${i+1}.</span>
+      <div class="transform-body">
+        <div class="prompt-line"><span class="tag-badge ${tagClass(it.tag)}">${it.tag}</span>${it.label}</div>
+        <input type="text" aria-label="Ответ ${i+1}" placeholder="Напиши предложение полностью...">
+      </div>
+      <span class="feedback-icon"></span>
+      <div class="answer-reveal">Правильный ответ: <strong>${it.answer}</strong></div>
+    </div>
+  `).join("");
+}
+
+function renderMistake(containerId, items){
+  document.getElementById(containerId).innerHTML = items.map((it,i)=>`
+    <div class="item">
+      <span class="num">${i+1}.</span>
+      <div class="transform-body">
+        <div class="wrong-sentence"><span class="warn">⚠️</span>${it.wrong}</div>
+        <input type="text" aria-label="Исправление ${i+1}" placeholder="Напиши правильный вариант...">
+      </div>
+      <span class="feedback-icon"></span>
+      <div class="answer-reveal">Правильный ответ: <strong>${getDisplayAnswer(it)}</strong></div>
+    </div>
+  `).join("");
+}
+
+function renderMC(containerId, items){
+  document.getElementById(containerId).innerHTML = items.map((it,i)=>`
+    <div class="mc-item" data-selected="">
+      <div class="mc-sentence"><span class="num">${i+1}.</span> ${it.sentence}</div>
+      <div class="mc-options">
+        ${it.options.map((opt,j)=>`<button type="button" class="mc-option" data-j="${j}" onclick="selectOption(this)">${opt}</button>`).join("")}
+      </div>
+      <div class="answer-reveal">Правильный ответ: <strong>${it.options[it.correct]}</strong></div>
+    </div>
+  `).join("");
+}
+
+function selectOption(btn){
+  const options = btn.parentElement;
+  options.querySelectorAll(".mc-option").forEach(b=>b.classList.remove("selected"));
+  btn.classList.add("selected");
+  options.closest(".mc-item").dataset.selected = btn.dataset.j;
+}
+
+function renderPicture(containerId, items){
+  document.getElementById(containerId).innerHTML = items.map((it,i)=>`
+    <div class="pic-item">
+      <span class="pic-emoji">${it.emoji}</span>
+      <div class="pic-body">
+        <span class="num">${i+1}.</span> <span class="pic-context">${it.context}</span>
+        <input type="text" aria-label="Ответ ${i+1}" placeholder="${it.starter}">
+        <div class="answer-reveal">Пример ответа: <strong>${it.sample}</strong></div>
+      </div>
+    </div>
+  `).join("");
+}
+
+function renderOpen(containerId, items){
+  document.getElementById(containerId).innerHTML = items.map((it,i)=>`
+    <div class="open-item">
+      <span class="num">${i+1}.</span> ${it.starter}
+      <textarea aria-label="Твоя идея ${i+1}" placeholder="Напиши свою идею..."></textarea>
+      <div class="answer-reveal">Пример: <strong>${it.sample}</strong></div>
+    </div>
+  `).join("");
+}
+
+/* ================= CHECK ================= */
+
+function checkText(containerId, items){
+  const el = document.getElementById(containerId);
+  const rows = el.querySelectorAll(".item");
+  let score = 0;
+  rows.forEach((row,i)=>{
+    const input = row.querySelector("input[type=text]");
+    const ok = isCorrect(input.value, items[i].answer);
+    row.classList.remove("correct","incorrect");
+    row.classList.add(ok ? "correct" : "incorrect");
+    const icon = row.querySelector(".feedback-icon");
+    if(icon) icon.textContent = ok ? "✅" : "❌";
+    if(ok) score++;
+  });
+  const scoreEl = document.getElementById(containerId + "-score");
+  if(scoreEl) scoreEl.textContent = `Результат: ${score} / ${items.length}`;
+}
+
+function checkMC(containerId, items){
+  const el = document.getElementById(containerId);
+  const rows = el.querySelectorAll(".mc-item");
+  let score = 0;
+  rows.forEach((row,i)=>{
+    const selected = row.dataset.selected;
+    const correctIdx = items[i].correct;
+    const options = row.querySelectorAll(".mc-option");
+    options.forEach(o=>o.classList.remove("correct","incorrect"));
+    if(selected !== undefined && selected !== ""){
+      const selIdx = parseInt(selected,10);
+      if(selIdx === correctIdx){
+        options[selIdx].classList.add("correct");
+        score++;
+      } else {
+        options[selIdx].classList.add("incorrect");
+        options[correctIdx].classList.add("correct");
+      }
+    } else {
+      options[correctIdx].classList.add("correct");
+    }
+  });
+  const scoreEl = document.getElementById(containerId + "-score");
+  if(scoreEl) scoreEl.textContent = `Результат: ${score} / ${items.length}`;
+}
+
+function copyAnswers(containerId){
+  const el = document.getElementById(containerId);
+  const textareas = el.querySelectorAll("textarea");
+  const lines = Array.from(textareas).map((ta,i)=> `${i+1}. ${ta.value.trim() || "(не заполнено)"}`);
+  const text = lines.join("\n");
+  const statusEl = document.getElementById(containerId + "-copy-status");
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(()=>{
+      if(statusEl){ statusEl.textContent = "Скопировано! Вставьте на доску Miro (Ctrl+V / Cmd+V)."; setTimeout(()=>statusEl.textContent="",4000);}
+    }).catch(()=>{
+      if(statusEl) statusEl.textContent = "Не удалось скопировать автоматически — выделите текст вручную.";
+    });
+  } else if(statusEl){
+    statusEl.textContent = "Копирование не поддерживается в этом браузере — выделите текст вручную.";
+  }
+}
+
+/* ================= INIT ================= */
+
+renderGap("ex1-list", EX1);
+renderTransform("ex2-list", EX2);
+renderTransform("ex3-list", EX3);
+renderMC("ex4-list", EX4);
+renderMistake("ex5-list", EX5);
+renderPicture("ex6-list", EX6);
+renderOpen("ex7-list", EX7);
+</script>
+</body>
+</html>
