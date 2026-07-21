@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Extreme Adjectives — тренажёр</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700;800&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#11151c;
+    --panel:#1a212b;
+    --panel-alt:#212a37;
+    --text:#ece7dd;
+    --text-dim:#98a2b3;
+    --accent:#e7a33e;
+    --rose:#e2637e;
+    --blue:#5b8def;
+    --rust:#c98a3b;
+    --teal:#49b4ae;
+    --success:#6fcf97;
+    --error:#e8615a;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:radial-gradient(ellipse at top left, #171d27 0%, var(--bg) 55%);
+    color:var(--text);
+    font-family:'Manrope',sans-serif;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:960px;margin:0 auto;padding:2.5rem 1.5rem 4rem;}
+
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace;
+    text-transform:uppercase;
+    letter-spacing:.14em;
+    font-size:.72rem;
+    color:var(--accent);
+    display:inline-flex;align-items:center;gap:.5rem;
+  }
+  .eyebrow::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--accent);display:inline-block;}
+  h1{
+    font-family:'Unbounded',sans-serif;
+    font-weight:800;
+    font-size:clamp(2rem,6vw,3.2rem);
+    line-height:1.05;
+    margin:.6rem 0 .8rem;
+    letter-spacing:-.01em;
+  }
+  h1 em{font-style:normal;color:var(--accent);}
+  .sub{color:var(--text-dim);max-width:62ch;font-size:.98rem;}
+
+  /* signature: intensity strip */
+  .intensity{margin:2.2rem 0 2.6rem;}
+  .pairs{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:.7rem;}
+  .pair-pill{
+    background:var(--panel-alt);
+    border:1px solid rgba(255,255,255,.08);
+    padding:.32rem .75rem;border-radius:999px;
+    font-family:'JetBrains Mono',monospace;font-size:.76rem;color:var(--text-dim);
+    white-space:nowrap;
+  }
+  .pair-pill b{color:var(--accent);font-weight:600;}
+  .gradient-bar{height:8px;border-radius:999px;background:linear-gradient(90deg,#3a4150 0%, var(--rust) 40%, var(--accent) 70%, var(--rose) 100%);}
+  .scale-labels{display:flex;justify-content:space-between;font-size:.68rem;color:var(--text-dim);margin-top:.4rem;text-transform:uppercase;letter-spacing:.08em;font-family:'JetBrains Mono',monospace;}
+
+  /* tabs */
+  .tabs{display:flex;gap:.3rem;flex-wrap:wrap;border-bottom:1px solid rgba(255,255,255,.09);margin:1rem 0 1.8rem;padding-bottom:0;}
+  .tab-btn{
+    background:none;border:none;color:var(--text-dim);
+    font-family:'Unbounded',sans-serif;font-size:.78rem;
+    padding:.75rem .95rem;cursor:pointer;
+    border-bottom:2px solid transparent;transition:color .15s,border-color .15s;
+  }
+  .tab-btn:hover{color:var(--text);}
+  .tab-btn.active{color:var(--text);border-bottom-color:var(--accent);}
+
+  .panel{display:none;}
+  .panel.active{display:block;animation:fadeIn .35s ease;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+  /* legend */
+  .legend{display:flex;gap:1.1rem;flex-wrap:wrap;margin-bottom:1.4rem;font-size:.78rem;color:var(--text-dim);}
+  .legend-dot{width:.6rem;height:.6rem;border-radius:50%;display:inline-block;margin-right:.35rem;vertical-align:middle;}
+
+  /* glossary */
+  .glossary-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:.9rem;}
+  .g-card{background:var(--panel);border-left:4px solid var(--accent);border-radius:var(--radius);padding:1rem 1.15rem;}
+  .g-card[data-cat="emotion"]{border-left-color:var(--rose);}
+  .g-card[data-cat="opinion"]{border-left-color:var(--teal);}
+  .g-card[data-cat="size"]{border-left-color:var(--blue);}
+  .g-card[data-cat="state"]{border-left-color:var(--rust);}
+  .g-word{font-family:'Unbounded',sans-serif;font-weight:700;font-size:1.02rem;}
+  .g-word span.alt{color:var(--text-dim);font-weight:400;font-size:.85rem;}
+  .g-ru{color:var(--accent);font-size:.87rem;margin:.35rem 0;}
+  .g-def{color:var(--text-dim);font-size:.83rem;font-style:italic;}
+  .g-example{font-family:'JetBrains Mono',monospace;font-size:.76rem;color:var(--text-dim);margin-top:.55rem;padding-top:.5rem;border-top:1px dashed rgba(255,255,255,.09);}
+
+  /* exercise header */
+  .ex-head{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:1rem;margin-bottom:1.5rem;}
+  .ex-title{font-family:'Unbounded',sans-serif;font-size:1.15rem;margin:0 0 .35rem;}
+  .ex-instructions{color:var(--text-dim);font-size:.87rem;max-width:56ch;margin:0;}
+  .ex-controls{display:flex;gap:.55rem;flex-wrap:wrap;align-items:center;}
+  .score-row{display:flex;gap:.5rem;flex-wrap:wrap;}
+  .score-badge{font-family:'JetBrains Mono',monospace;background:var(--panel-alt);padding:.4rem .8rem;border-radius:999px;font-size:.76rem;white-space:nowrap;}
+  .score-badge b{color:var(--accent);}
+
+  .btn{
+    font-family:'Manrope',sans-serif;font-weight:700;border:none;border-radius:999px;
+    padding:.55rem 1.1rem;cursor:pointer;font-size:.82rem;transition:transform .12s,border-color .12s,color .12s;
+  }
+  .btn-primary{background:var(--accent);color:#1b1206;}
+  .btn-primary:hover{transform:translateY(-1px);}
+  .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,.2);color:var(--text);}
+  .btn-ghost:hover{border-color:var(--accent);color:var(--accent);}
+
+  /* items */
+  .item{display:grid;grid-template-columns:2rem 1fr;gap:.7rem;padding:.95rem 0;border-bottom:1px solid rgba(255,255,255,.07);align-items:start;}
+  .item:last-child{border-bottom:none;}
+  .item-num{font-family:'JetBrains Mono',monospace;color:var(--text-dim);font-size:.8rem;padding-top:.4rem;}
+  .item-body{display:flex;flex-direction:column;gap:.4rem;}
+  .item-prompt{font-size:.95rem;}
+  .item-prompt .cat-dot{width:.5rem;height:.5rem;border-radius:50%;display:inline-block;margin-right:.4rem;}
+  .item-mask{font-family:'JetBrains Mono',monospace;letter-spacing:.14em;color:var(--accent);font-size:1rem;}
+  .item-hint{font-size:.79rem;color:var(--text-dim);}
+  .item-input-row{display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;}
+  input[type="text"], select{
+    background:var(--panel-alt);border:1px solid rgba(255,255,255,.16);border-radius:.5rem;
+    padding:.5rem .7rem;color:var(--text);font-family:'Manrope',sans-serif;font-size:.88rem;min-width:190px;
+  }
+  input[type="text"]:focus, select:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent);}
+  .item.correct{background:rgba(111,207,151,.06);border-radius:8px;}
+  .item.correct input, .item.correct select{border-color:var(--success);}
+  .item.incorrect input, .item.incorrect select{border-color:var(--error);}
+  .answer-key{font-family:'JetBrains Mono',monospace;color:var(--success);font-size:.82rem;display:none;}
+  .show-answers .answer-key{display:inline-flex;align-items:center;gap:.3rem;}
+  .show-answers .answer-key::before{content:"→";color:var(--text-dim);}
+
+  .wordbank{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1.6rem;background:var(--panel);padding:.9rem 1rem;border-radius:var(--radius);}
+  .chip{background:var(--panel-alt);border:1px solid rgba(255,255,255,.1);border-radius:999px;padding:.3rem .8rem;font-size:.78rem;font-family:'JetBrains Mono',monospace;color:var(--text-dim);}
+
+  .tricky-section{margin-top:2.2rem;padding-top:1.6rem;border-top:1px dashed var(--error);}
+  .tricky-title{font-family:'Unbounded',sans-serif;color:var(--error);font-size:.95rem;display:flex;align-items:center;gap:.5rem;margin:0 0 .3rem;}
+  .tricky-intro{font-size:.82rem;color:var(--text-dim);margin:0 0 1rem;}
+  .tricky-note{font-size:.78rem;color:var(--text-dim);display:none;margin-top:.35rem;line-height:1.45;}
+  .show-answers .tricky-note{display:block;}
+
+  footer{margin-top:3rem;padding-top:1.5rem;border-top:1px solid rgba(255,255,255,.08);color:var(--text-dim);font-size:.78rem;text-align:center;}
+
+  @media (max-width:640px){
+    .item{grid-template-columns:1.4rem 1fr;}
+    .ex-head{flex-direction:column;align-items:flex-start;}
+    input[type="text"], select{min-width:150px;flex:1;}
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important;transition:none !important;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="eyebrow">тренажёр лексики · advanced adjectives</span>
+  <h1>Extreme <em>English</em></h1>
+  <p class="sub">13 сильных прилагательных, которые заменяют конструкцию «very + adjective»: <b>huge</b> вместо «very big», <b>starving</b> вместо «very hungry». Изучи слова, а затем пройди 4 упражнения — проверяй себя или смотри ответы в любой момент.</p>
+
+  <div class="intensity">
+    <div class="pairs">
+      <span class="pair-pill">big <b>→</b> huge</span>
+      <span class="pair-pill">hot <b>→</b> boiling</span>
+      <span class="pair-pill">tired <b>→</b> exhausted</span>
+      <span class="pair-pill">funny <b>→</b> hilarious</span>
+      <span class="pair-pill">angry <b>→</b> furious</span>
+      <span class="pair-pill">small <b>→</b> tiny</span>
+    </div>
+    <div class="gradient-bar"></div>
+    <div class="scale-labels"><span>обычное</span><span>экстремальное</span></div>
+  </div>
+
+  <nav class="tabs">
+    <button class="tab-btn active" data-target="panel-glossary">Словарь</button>
+    <button class="tab-btn" data-target="panel-ex1">1. Буквы</button>
+    <button class="tab-btn" data-target="panel-ex2">2. Перевод</button>
+    <button class="tab-btn" data-target="panel-ex3">3. Дефиниция</button>
+    <button class="tab-btn" data-target="panel-ex4">4. Контекст</button>
+  </nav>
+
+  <!-- GLOSSARY -->
+  <section class="panel active" id="panel-glossary">
+    <div class="legend">
+      <span><span class="legend-dot" style="background:var(--rose)"></span>эмоции</span>
+      <span><span class="legend-dot" style="background:var(--teal)"></span>оценка/мнение</span>
+      <span><span class="legend-dot" style="background:var(--blue)"></span>размер</span>
+      <span><span class="legend-dot" style="background:var(--rust)"></span>физ. состояние</span>
+    </div>
+    <div class="glossary-grid" id="glossary-grid"></div>
+  </section>
+
+  <!-- EXERCISE 1 -->
+  <section class="panel" id="panel-ex1">
+    <div class="ex-head">
+      <div>
+        <p class="ex-title">Упражнение 1 · Вставь пропущенные буквы</p>
+        <p class="ex-instructions">Впиши слово целиком, используя буквенную подсказку и перевод. Внизу — отдельно случаи, в которых у тебя раньше были ошибки (предлоги и превосходная степень).</p>
+      </div>
+      <div class="ex-controls">
+        <div class="score-row">
+          <span class="score-badge" data-group="main">слова: <b>— / 13</b></span>
+          <span class="score-badge" data-group="tricky">ловушки: <b>— / 4</b></span>
+        </div>
+        <button class="btn btn-primary" data-action="check" data-panel="panel-ex1">Проверить</button>
+        <button class="btn btn-ghost" data-action="show" data-panel="panel-ex1">Показать ответы</button>
+        <button class="btn btn-ghost" data-action="reset" data-panel="panel-ex1">Сбросить</button>
+      </div>
+    </div>
+    <div class="items-main" id="ex1-main"></div>
+
+    <div class="tricky-section" id="ex1-tricky-wrap">
+      <p class="tricky-title">⚠ Особые случаи из твоих ошибок</p>
+      <p class="tricky-intro">Превосходная степень: <b>of all</b> / <b>of the three...</b> (внутри группы) — но <b>in</b> + место/сфера (in nature, in the world, in the city). И отдельно: <b>go to</b> a place — не <i>in</i>.</p>
+      <div class="items-tricky" id="ex1-tricky"></div>
+    </div>
+  </section>
+
+  <!-- EXERCISE 2 -->
+  <section class="panel" id="panel-ex2">
+    <div class="ex-head">
+      <div>
+        <p class="ex-title">Упражнение 2 · Перевод с русского на английский</p>
+        <p class="ex-instructions">Переведи слово на английский.</p>
+      </div>
+      <div class="ex-controls">
+        <div class="score-row"><span class="score-badge" data-group="main">результат: <b>— / 13</b></span></div>
+        <button class="btn btn-primary" data-action="check" data-panel="panel-ex2">Проверить</button>
+        <button class="btn btn-ghost" data-action="show" data-panel="panel-ex2">Показать ответы</button>
+        <button class="btn btn-ghost" data-action="reset" data-panel="panel-ex2">Сбросить</button>
+      </div>
+    </div>
+    <div class="items-main" id="ex2-main"></div>
+  </section>
+
+  <!-- EXERCISE 3 -->
+  <section class="panel" id="panel-ex3">
+    <div class="ex-head">
+      <div>
+        <p class="ex-title">Упражнение 3 · Дефиниция</p>
+        <p class="ex-instructions">Выбери слово, которое соответствует английскому определению.</p>
+      </div>
+      <div class="ex-controls">
+        <div class="score-row"><span class="score-badge" data-group="main">результат: <b>— / 13</b></span></div>
+        <button class="btn btn-primary" data-action="check" data-panel="panel-ex3">Проверить</button>
+        <button class="btn btn-ghost" data-action="show" data-panel="panel-ex3">Показать ответы</button>
+        <button class="btn btn-ghost" data-action="reset" data-panel="panel-ex3">Сбросить</button>
+      </div>
+    </div>
+    <div class="items-main" id="ex3-main"></div>
+  </section>
+
+  <!-- EXERCISE 4 -->
+  <section class="panel" id="panel-ex4">
+    <div class="ex-head">
+      <div>
+        <p class="ex-title">Упражнение 4 · Слово в контексте</p>
+        <p class="ex-instructions">Впиши подходящее слово в пропуск. Каждое слово из банка используется один раз.</p>
+      </div>
+      <div class="ex-controls">
+        <div class="score-row"><span class="score-badge" data-group="main">результат: <b>— / 13</b></span></div>
+        <button class="btn btn-primary" data-action="check" data-panel="panel-ex4">Проверить</button>
+        <button class="btn btn-ghost" data-action="show" data-panel="panel-ex4">Показать ответы</button>
+        <button class="btn btn-ghost" data-action="reset" data-panel="panel-ex4">Сбросить</button>
+      </div>
+    </div>
+    <div class="wordbank" id="ex4-bank"></div>
+    <div class="items-main" id="ex4-main"></div>
+  </section>
+
+  <footer>Extreme Adjectives Trainer · 13 слов · 4 упражнения</footer>
+</div>
+
+<script>
+const WORDS = [
+  {word:"amazed", alt:[], ru:"поражённый / изумлённый", def:"extremely surprised", example:"I was amazed by the view.", mask:"am_z_d", context:"We were all ______ by the magician's tricks.", cat:"emotion"},
+  {word:"fascinating", alt:[], ru:"увлекательный / захватывающий", def:"extremely interesting", example:"The book is fascinating.", mask:"f_sc_n_t_ng", context:"Marine biology is a truly ______ subject to study.", cat:"opinion"},
+  {word:"huge", alt:["enormous"], ru:"огромный", def:"extremely big", example:"They live in a huge house.", mask:"h_ge", context:"The elephant took a ______ step over the fence.", cat:"size"},
+  {word:"furious", alt:[], ru:"в ярости / очень злой", def:"extremely angry", example:"She was furious with him.", mask:"f_ri_us", context:"My dad was ______ when he saw the scratch on his car.", cat:"emotion"},
+  {word:"hilarious", alt:[], ru:"очень смешной", def:"extremely funny", example:"The film was hilarious.", mask:"h_l_ri_us", context:"My uncle tells the most ______ jokes at parties.", cat:"opinion"},
+  {word:"starving", alt:[], ru:"ужасно голодный", def:"extremely hungry", example:"I'm starving.", mask:"st_rv_ng", context:"Can we eat now? I'm absolutely ______!", cat:"state"},
+  {word:"boiling", alt:[], ru:"очень жарко", def:"extremely hot", example:"It's boiling today.", mask:"b_il_ng", context:"Turn on the fan, it's ______ in here.", cat:"state"},
+  {word:"filthy", alt:[], ru:"очень грязный", def:"extremely dirty", example:"My shoes are filthy.", mask:"f_lthy", context:"Don't sit on that bench, it's ______.", cat:"state"},
+  {word:"delighted", alt:[], ru:"очень рад / в восторге", def:"extremely pleased", example:"I'm delighted to see you.", mask:"del_ght_d", context:"Grandma was ______ when we visited unexpectedly.", cat:"emotion"},
+  {word:"terrified", alt:[], ru:"в ужасе / очень испуганный", def:"extremely frightened", example:"She was terrified of spiders.", mask:"t_rrif_ed", context:"He is ______ of flying, so he never takes planes.", cat:"emotion"},
+  {word:"tiny", alt:[], ru:"крошечный", def:"extremely small", example:"They live in a tiny flat.", mask:"t_ny", context:"The kitten was so ______ it fit in my palm.", cat:"size"},
+  {word:"exhausted", alt:[], ru:"совершенно измученный / очень уставший", def:"extremely tired", example:"I'm exhausted after work.", mask:"exh_ust_d", context:"After the exam, all the students looked ______.", cat:"state"},
+  {word:"positive", alt:[], ru:"уверенный (= sure)", def:"completely sure", example:"I'm positive she'll come.", mask:"p_sit_ve", context:"I'm ______ I locked the front door before leaving.", cat:"opinion"}
+];
+
+const TRICKY = [
+  {prompt:"This is the most beautiful place ___ nature.", answer:"in", note:"Превосходная степень + IN + место/сфера: in nature, in the world, in the city, in the class."},
+  {prompt:"She is the kindest ___ all my friends.", answer:"of", note:"Превосходная степень + OF + all / the three... — сравнение внутри перечисленной группы."},
+  {prompt:"He is the tallest ___ the three brothers.", answer:"of", note:"OF + the three... — та же модель, что и of all."},
+  {prompt:"Let's go ___ the city tomorrow — I need some new shoes.", answer:"to", note:"GO TO a place (не in!). Сравни: They live IN the city (нахождение), но go TO the city (движение)."}
+];
+
+const EX3_ORDER = ["delighted","fascinating","positive","starving","furious","tiny","amazed","boiling","terrified","huge","hilarious","exhausted","filthy"];
+const EX4_ORDER = ["huge","terrified","amazed","filthy","exhausted","hilarious","fascinating","delighted","starving","positive","furious","boiling","tiny"];
+
+const CAT_LABEL = {emotion:"эмоция", opinion:"оценка", size:"размер", state:"состояние"};
+const CAT_VAR = {emotion:"var(--rose)", opinion:"var(--teal)", size:"var(--blue)", state:"var(--rust)"};
+
+function byWord(w){ return WORDS.find(x => x.word === w); }
+function blank(sentence, word){
+  const re = new RegExp("\\b" + word + "\\b", "i");
+  return sentence.replace(re, "______");
+}
+function esc(s){ return s.replace(/&/g,"&amp;").replace(/</g,"&lt;"); }
+
+/* ---------- render: glossary ---------- */
+function renderGlossary(){
+  const grid = document.getElementById("glossary-grid");
+  grid.innerHTML = WORDS.map(w => `
+    <div class="g-card" data-cat="${w.cat}">
+      <div class="g-word">${esc(w.word)}${w.alt.length ? ` <span class="alt">/ ${esc(w.alt.join(", "))}</span>` : ""}</div>
+      <div class="g-ru">${esc(w.ru)}</div>
+      <div class="g-def">${esc(w.def)}</div>
+      <div class="g-example">${esc(w.example)}</div>
+    </div>
+  `).join("");
+}
+
+/* ---------- render: exercise 1 ---------- */
+function renderEx1(){
+  const main = document.getElementById("ex1-main");
+  main.innerHTML = WORDS.map((w, i) => `
+    <div class="item" data-answer="${esc(w.word)}">
+      <div class="item-num">${i+1}.</div>
+      <div class="item-body">
+        <div class="item-prompt"><span class="cat-dot" style="background:${CAT_VAR[w.cat]}"></span>${esc(w.ru)}</div>
+        <div class="item-mask">${esc(w.mask)}</div>
+        <div class="item-hint">${esc(blank(w.example, w.word))}</div>
+        <div class="item-input-row">
+          <input type="text" autocomplete="off" spellcheck="false" aria-label="Впиши слово: ${esc(w.ru)}">
+          <span class="answer-key">${esc(w.word)}</span>
+        </div>
+      </div>
+    </div>
+  `).join("");
+
+  const tricky = document.getElementById("ex1-tricky");
+  tricky.innerHTML = TRICKY.map((t, i) => `
+    <div class="item" data-answer="${esc(t.answer)}">
+      <div class="item-num">T${i+1}.</div>
+      <div class="item-body">
+        <div class="item-prompt">${esc(t.prompt.replace("___", "▢▢▢"))}</div>
+        <div class="item-input-row">
+          <input type="text" autocomplete="off" spellcheck="false" style="min-width:100px" aria-label="Впиши предлог">
+          <span class="answer-key">${esc(t.answer)}</span>
+        </div>
+        <div class="tricky-note">${esc(t.note)}</div>
+      </div>
+    </div>
+  `).join("");
+}
+
+/* ---------- render: exercise 2 ---------- */
+function renderEx2(){
+  const main = document.getElementById("ex2-main");
+  main.innerHTML = WORDS.map((w, i) => {
+    const answers = [w.word, ...w.alt].join("|");
+    return `
+    <div class="item" data-answer="${esc(answers)}">
+      <div class="item-num">${i+1}.</div>
+      <div class="item-body">
+        <div class="item-prompt"><span class="cat-dot" style="background:${CAT_VAR[w.cat]}"></span>${esc(w.ru)}</div>
+        <div class="item-input-row">
+          <input type="text" autocomplete="off" spellcheck="false" aria-label="Переведи: ${esc(w.ru)}">
+          <span class="answer-key">${esc(w.word)}${w.alt.length ? " / " + esc(w.alt.join(" / ")) : ""}</span>
+        </div>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+/* ---------- render: exercise 3 ---------- */
+function renderEx3(){
+  const main = document.getElementById("ex3-main");
+  const optionsHtml = WORDS.map(w => w.word).sort().map(word => `<option value="${esc(word)}">${esc(word)}</option>`).join("");
+  main.innerHTML = EX3_ORDER.map((wordId, i) => {
+    const w = byWord(wordId);
+    return `
+    <div class="item" data-answer="${esc(w.word)}">
+      <div class="item-num">${i+1}.</div>
+      <div class="item-body">
+        <div class="item-prompt">${esc(w.def)}</div>
+        <div class="item-input-row">
+          <select aria-label="Выбери слово для: ${esc(w.def)}">
+            <option value="">— выбери слово —</option>
+            ${optionsHtml}
+          </select>
+          <span class="answer-key">${esc(w.word)}</span>
+        </div>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+/* ---------- render: exercise 4 ---------- */
+function renderEx4(){
+  const bank = document.getElementById("ex4-bank");
+  bank.innerHTML = WORDS.map(w => `<span class="chip">${esc(w.word)}</span>`).join("");
+
+  const main = document.getElementById("ex4-main");
+  main.innerHTML = EX4_ORDER.map((wordId, i) => {
+    const w = byWord(wordId);
+    const answers = [w.word, ...w.alt].join("|");
+    return `
+    <div class="item" data-answer="${esc(answers)}">
+      <div class="item-num">${i+1}.</div>
+      <div class="item-body">
+        <div class="item-prompt">${esc(w.context)}</div>
+        <div class="item-input-row">
+          <input type="text" autocomplete="off" spellcheck="false" aria-label="Заполни пропуск">
+          <span class="answer-key">${esc(w.word)}${w.alt.length ? " / " + esc(w.alt.join(" / ")) : ""}</span>
+        </div>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+/* ---------- checking logic ---------- */
+function normalize(s){
+  return (s || "").trim().toLowerCase().replace(/[.!?]+$/,"");
+}
+function isCorrect(userVal, correctList){
+  const v = normalize(userVal);
+  if(!v) return false;
+  return correctList.map(normalize).includes(v);
+}
+function checkGroup(container, scoreEl){
+  if(!container) return;
+  const items = container.querySelectorAll(".item");
+  let correct = 0;
+  items.forEach(item => {
+    const field = item.querySelector("input[type='text'], select");
+    if(!field) return;
+    const answers = (item.dataset.answer || "").split("|");
+    const ok = isCorrect(field.value, answers);
+    item.classList.toggle("correct", ok);
+    item.classList.toggle("incorrect", !ok);
+    if(ok) correct++;
+  });
+  if(scoreEl){
+    const b = scoreEl.querySelector("b");
+    if(b) b.textContent = `${correct} / ${items.length}`;
+  }
+}
+function resetPanel(panel){
+  panel.querySelectorAll("input[type='text']").forEach(i => i.value = "");
+  panel.querySelectorAll("select").forEach(s => s.value = "");
+  panel.querySelectorAll(".item").forEach(i => i.classList.remove("correct","incorrect"));
+  panel.classList.remove("show-answers");
+  panel.querySelectorAll(".score-badge b").forEach(b => {
+    const total = b.textContent.split("/")[1] ? b.textContent.split("/")[1].trim() : b.textContent;
+    b.textContent = `— / ${total.replace(/[^0-9]/g,"") || "13"}`;
+  });
+  const showBtn = panel.parentElement.querySelector(`[data-action="show"][data-panel="${panel.id}"]`) || document.querySelector(`[data-action="show"][data-panel="${panel.id}"]`);
+  if(showBtn) showBtn.textContent = "Показать ответы";
+}
+
+/* ---------- wiring ---------- */
+document.querySelectorAll(".tab-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+    document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById(btn.dataset.target).classList.add("active");
+  });
+});
+
+document.querySelectorAll('[data-action="check"]').forEach(btn => {
+  btn.addEventListener("click", () => {
+    const panel = document.getElementById(btn.dataset.panel);
+    checkGroup(panel.querySelector("#" + panel.id.replace("panel-","") + "-main") || panel.querySelector(".items-main"), panel.querySelector('.score-badge[data-group="main"]'));
+    const trickyContainer = panel.querySelector(".items-tricky");
+    if(trickyContainer) checkGroup(trickyContainer, panel.querySelector('.score-badge[data-group="tricky"]'));
+  });
+});
+
+document.querySelectorAll('[data-action="show"]').forEach(btn => {
+  btn.addEventListener("click", () => {
+    const panel = document.getElementById(btn.dataset.panel);
+    const showing = panel.classList.toggle("show-answers");
+    btn.textContent = showing ? "Скрыть ответы" : "Показать ответы";
+  });
+});
+
+document.querySelectorAll('[data-action="reset"]').forEach(btn => {
+  btn.addEventListener("click", () => {
+    const panel = document.getElementById(btn.dataset.panel);
+    resetPanel(panel);
+  });
+});
+
+renderGlossary();
+renderEx1();
+renderEx2();
+renderEx3();
+renderEx4();
+</script>
+</body>
+</html>
