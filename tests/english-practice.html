@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Рабочая тетрадь: разбор ошибок и практика</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Literata:opsz,wght@18..144,400;18..144,500;18..144,600;18..144,700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper: #eef1f6;
+    --paper-line: #d4dceb;
+    --margin-red: #b3372c;
+    --ink: #1f2a44;
+    --ink-soft: #5b6577;
+    --ink-faint: #8992a3;
+    --teal: #1e8a72;
+    --teal-bg: #e4f3ef;
+    --amber: #c08a1e;
+    --amber-bg: #faf1dd;
+    --wrong: #b3372c;
+    --wrong-bg: #fbe9e6;
+    --card-bg: #ffffff;
+    --shadow: 0 2px 10px rgba(31,42,68,0.07), 0 1px 2px rgba(31,42,68,0.06);
+  }
+
+  *{ box-sizing: border-box; }
+
+  html{ scroll-behavior: smooth; }
+
+  body{
+    margin:0;
+    font-family: 'Literata', Georgia, serif;
+    color: var(--ink);
+    background-color: var(--paper);
+    background-image: repeating-linear-gradient(
+      to bottom,
+      transparent 0px,
+      transparent 37px,
+      var(--paper-line) 38px
+    );
+    min-height: 100vh;
+  }
+
+  .notebook{
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 44px 40px 100px 84px;
+    position: relative;
+  }
+
+  .notebook::before{
+    content:"";
+    position:absolute;
+    top:0; bottom:0;
+    left:52px;
+    width:2px;
+    background: var(--margin-red);
+    opacity:0.55;
+  }
+
+  header.hero{
+    margin-bottom: 34px;
+  }
+
+  .eyebrow{
+    font-family:'Caveat', cursive;
+    font-size: 1.5rem;
+    font-weight:600;
+    color: var(--margin-red);
+    display:inline-block;
+    transform: rotate(-2deg);
+    margin-bottom: 2px;
+  }
+
+  h1{
+    font-size: 2.1rem;
+    font-weight:700;
+    margin: 2px 0 8px;
+    letter-spacing: -0.01em;
+  }
+
+  .hero p{
+    color: var(--ink-soft);
+    font-size: 1.02rem;
+    max-width: 60ch;
+    line-height:1.55;
+  }
+
+  nav.tabs{
+    display:flex;
+    gap:6px;
+    flex-wrap: wrap;
+    margin: 28px 0 30px;
+    border-bottom: 2px solid var(--paper-line);
+    padding-bottom: 0;
+  }
+
+  nav.tabs button{
+    font-family:'Literata', Georgia, serif;
+    font-size: 0.92rem;
+    font-weight:600;
+    color: var(--ink-soft);
+    background: transparent;
+    border: none;
+    padding: 10px 16px;
+    cursor:pointer;
+    border-radius: 8px 8px 0 0;
+    position: relative;
+    top: 2px;
+  }
+
+  nav.tabs button.active{
+    color: var(--ink);
+    background: var(--card-bg);
+    box-shadow: var(--shadow);
+    border-bottom: 2px solid var(--card-bg);
+  }
+
+  nav.tabs button:hover:not(.active){
+    color: var(--ink);
+  }
+
+  section.panel{ display:none; }
+  section.panel.active{ display:block; animation: fade .25s ease; }
+
+  @keyframes fade{ from{ opacity:0; transform: translateY(4px);} to{opacity:1; transform:none;} }
+
+  h2.section-title{
+    font-size: 1.5rem;
+    margin: 0 0 4px;
+  }
+  .section-sub{
+    color: var(--ink-soft);
+    font-size: 0.95rem;
+    margin: 0 0 22px;
+  }
+
+  h3.block-title{
+    font-size: 1.1rem;
+    margin: 36px 0 4px;
+    display:flex;
+    align-items:baseline;
+    gap:8px;
+  }
+  h3.block-title .badge{
+    font-family: 'Caveat', cursive;
+    font-size:1.15rem;
+    color: var(--teal);
+    font-weight:600;
+  }
+  .block-instruction{
+    color: var(--ink-soft);
+    font-size: 0.92rem;
+    margin: 0 0 16px;
+  }
+
+  /* Correction notes cards */
+  .notes-grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+    margin: 18px 0 8px;
+  }
+  .note-card{
+    background: var(--card-bg);
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    padding: 16px 18px;
+    transform: rotate(var(--r, 0deg));
+  }
+  .note-card:nth-child(odd){ --r: -0.6deg; }
+  .note-card:nth-child(even){ --r: 0.6deg; }
+
+  .note-mistake{
+    font-size: 0.95rem;
+    color: var(--ink-faint);
+    text-decoration: line-through;
+    text-decoration-color: var(--wrong);
+    text-decoration-thickness: 1.5px;
+  }
+  .note-correct{
+    font-family:'Caveat', cursive;
+    font-size: 1.35rem;
+    font-weight:600;
+    color: var(--teal);
+    line-height: 1.15;
+    margin: 2px 0 8px;
+  }
+  .note-explain{
+    font-size: 0.86rem;
+    color: var(--ink-soft);
+    line-height:1.4;
+  }
+
+  /* Word bank */
+  .word-bank{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin: 0 0 18px;
+  }
+  .word-bank span{
+    background: var(--amber-bg);
+    color: var(--amber);
+    border-radius: 20px;
+    padding: 5px 13px;
+    font-size: 0.85rem;
+    font-weight:600;
+    font-family: 'Literata', serif;
+  }
+
+  /* Exercise card */
+  .exercise{
+    background: var(--card-bg);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    padding: 20px 24px 22px;
+    margin-bottom: 8px;
+  }
+
+  .gap-item, .mcq-item, .open-item{
+    padding: 12px 0;
+    border-bottom: 1px dashed var(--paper-line);
+  }
+  .gap-item:last-child, .mcq-item:last-child, .open-item:last-child{ border-bottom:none; }
+
+  .item-num{
+    font-weight:700;
+    color: var(--ink-faint);
+    margin-right:4px;
+  }
+
+  .sentence{ font-size: 1rem; line-height:1.7; }
+
+  input.gap-input{
+    font-family:'Literata', serif;
+    font-size: 1rem;
+    border: none;
+    border-bottom: 2px solid var(--ink-faint);
+    background: transparent;
+    padding: 2px 4px;
+    width: 130px;
+    color: var(--ink);
+    text-align:center;
+  }
+  input.gap-input:focus{ outline:none; border-bottom-color: var(--teal); }
+
+  input.open-input{
+    font-family:'Literata', serif;
+    font-size: 1rem;
+    border:none;
+    border-bottom: 2px solid var(--ink-faint);
+    background: transparent;
+    padding: 4px 4px;
+    width: 100%;
+    margin-top:6px;
+    color: var(--ink);
+  }
+  input.open-input:focus{ outline:none; border-bottom-color: var(--teal); }
+
+  .feedback{
+    font-weight:700;
+    margin-left:8px;
+    font-size: 1rem;
+  }
+  .feedback.ok{ color: var(--teal); }
+  .feedback.no{ color: var(--wrong); }
+
+  .answer-reveal{
+    display:block;
+    font-family:'Caveat', cursive;
+    color: var(--teal);
+    font-size: 1.15rem;
+    margin-top: 3px;
+  }
+  .answer-reveal.wrong-tone{ color: var(--wrong); }
+
+  .mcq-options{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    margin-top:8px;
+  }
+  .mcq-options label{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size: 0.98rem;
+    cursor:pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
+  }
+  .mcq-options label.correct-mark{ background: var(--teal-bg); }
+  .mcq-options label.wrong-mark{ background: var(--wrong-bg); }
+  .mcq-options input{ accent-color: var(--teal); }
+
+  .exercise-controls{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin: 4px 0 16px;
+    flex-wrap:wrap;
+  }
+
+  button.btn{
+    font-family:'Literata', serif;
+    font-weight:600;
+    font-size: 0.9rem;
+    border-radius: 8px;
+    padding: 9px 18px;
+    cursor:pointer;
+    border: 2px solid var(--ink);
+    background: var(--ink);
+    color:#fff;
+    transition: transform .12s ease;
+  }
+  button.btn:active{ transform: scale(0.97); }
+  button.btn.secondary{
+    background: transparent;
+    color: var(--ink);
+  }
+  button.btn.small{
+    padding: 6px 14px;
+    font-size: 0.82rem;
+  }
+
+  .score-tag{
+    font-family:'Caveat', cursive;
+    font-size: 1.25rem;
+    font-weight:700;
+    color: var(--ink-soft);
+  }
+  .score-tag.good{ color: var(--teal); }
+  .score-tag.mid{ color: var(--amber); }
+  .score-tag.low{ color: var(--wrong); }
+
+  /* Own sentences */
+  .own-sentences{
+    background: var(--card-bg);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    padding: 20px 24px 24px;
+    margin-top: 36px;
+  }
+  .own-row{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    padding: 8px 0;
+    border-bottom: 1px dashed var(--paper-line);
+  }
+  .own-row:last-of-type{ border-bottom:none; }
+  .own-label{
+    flex: 0 0 210px;
+    font-weight:600;
+    font-size: 0.92rem;
+    color: var(--ink);
+  }
+  .own-row input{
+    flex:1;
+    font-family:'Literata', serif;
+    font-size: 0.98rem;
+    border:none;
+    border-bottom: 2px solid var(--ink-faint);
+    background: transparent;
+    padding: 6px 4px;
+    color: var(--ink);
+  }
+  .own-row input:focus{ outline:none; border-bottom-color: var(--teal); }
+
+  .copy-row{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-top: 18px;
+  }
+  .copy-confirm{
+    font-family:'Caveat', cursive;
+    font-size: 1.15rem;
+    color: var(--teal);
+    opacity:0;
+    transition: opacity .2s ease;
+  }
+  .copy-confirm.show{ opacity:1; }
+
+  footer{
+    text-align:center;
+    color: var(--ink-faint);
+    font-size: 0.8rem;
+    margin-top: 50px;
+  }
+
+  @media (max-width: 600px){
+    .notebook{ padding: 30px 18px 80px 46px; }
+    .notebook::before{ left: 24px; }
+    .own-label{ flex-basis: 140px; font-size: 0.82rem; }
+    input.gap-input{ width: 100px; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="notebook">
+
+  <header class="hero">
+    <span class="eyebrow">рабочая тетрадь · English</span>
+    <h1>Разбор ошибок и практика</h1>
+    <p>Слова и обороты, с которыми были сложности — с пометками и упражнениями. Плюс повторение тем: сравнения, наречия времени и согласие с высказыванием.</p>
+  </header>
+
+  <nav class="tabs" id="tabs">
+    <button class="tab-btn active" data-target="panel-1">Проблемные слова</button>
+    <button class="tab-btn" data-target="panel-2">Сравнения</button>
+    <button class="tab-btn" data-target="panel-3">Наречия времени</button>
+    <button class="tab-btn" data-target="panel-4">Согласие</button>
+  </nav>
+
+  <!-- ============ PANEL 1 ============ -->
+  <section class="panel active" id="panel-1">
+    <h2 class="section-title">Проблемные слова</h2>
+    <p class="section-sub">Слова и обороты, в которых были ошибки — с разбором и практикой.</p>
+
+    <div class="notes-grid" id="notes-1"></div>
+
+    <h3 class="block-title">Упражнение 1 <span class="badge">— вставьте слово</span></h3>
+    <p class="block-instruction">Заполните пропуск нужным словом.</p>
+    <div class="exercise-controls">
+      <button class="btn" data-check="ex11">Проверить</button>
+      <button class="btn secondary" data-show="ex11">Показать ответы</button>
+      <span class="score-tag" id="score-ex11"></span>
+    </div>
+    <div class="exercise" data-exercise="ex11"><div class="items"></div></div>
+
+    <h3 class="block-title">Упражнение 2 <span class="badge">— выберите верный вариант</span></h3>
+    <p class="block-instruction">Отметьте предложение (или произношение) без ошибки.</p>
+    <div class="exercise-controls">
+      <button class="btn" data-check="ex12">Проверить</button>
+      <button class="btn secondary" data-show="ex12">Показать ответы</button>
+      <span class="score-tag" id="score-ex12"></span>
+    </div>
+    <div class="exercise" data-exercise="ex12"><div class="items"></div></div>
+
+    <div class="own-sentences">
+      <h3 class="block-title" style="margin-top:0">Мои предложения <span class="badge">— напишите сами</span></h3>
+      <p class="block-instruction">Составьте своё предложение с каждым словом/оборотом. Затем можно скопировать всё сразу.</p>
+      <div id="own-list"></div>
+      <div class="copy-row">
+        <button class="btn secondary" id="copy-btn">Скопировать все предложения</button>
+        <span class="copy-confirm" id="copy-confirm">Скопировано ✓</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PANEL 2 ============ -->
+  <section class="panel" id="panel-2">
+    <h2 class="section-title">Сравнения: похоже / одинаково</h2>
+    <p class="section-sub">be the same ... as · be similar to · both · be like sb · identical</p>
+
+    <div class="notes-grid" id="notes-2"></div>
+
+    <h3 class="block-title">Упражнение 1 <span class="badge">— вставьте слово</span></h3>
+    <p class="block-instruction">Заполните пропуск подходящим словом/оборотом из списка ниже.</p>
+    <div class="word-bank">
+      <span>the same...as</span><span>similar to</span><span>both</span><span>like</span><span>identical</span>
+    </div>
+    <div class="exercise-controls">
+      <button class="btn" data-check="ex21">Проверить</button>
+      <button class="btn secondary" data-show="ex21">Показать ответы</button>
+      <span class="score-tag" id="score-ex21"></span>
+    </div>
+    <div class="exercise" data-exercise="ex21"><div class="items"></div></div>
+
+    <h3 class="block-title">Упражнение 2 <span class="badge">— перефразируйте</span></h3>
+    <p class="block-instruction">Перепишите предложение, используя слово в скобках, сохранив смысл.</p>
+    <div class="exercise-controls">
+      <button class="btn" data-check="ex22">Проверить</button>
+      <button class="btn secondary" data-show="ex22">Показать ответы</button>
+      <span class="score-tag" id="score-ex22"></span>
+    </div>
+    <div class="exercise" data-exercise="ex22"><div class="items"></div></div>
+  </section>
+
+  <!-- ============ PANEL 3 ============ -->
+  <section class="panel" id="panel-3">
+    <h2 class="section-title">Наречия времени</h2>
+    <p class="section-sub">eventually · meanwhile · immediately · straight away · suddenly</p>
+
+    <div class="notes-grid" id="notes-3"></div>
+
+    <h3 class="block-title">Упражнение 1 <span class="badge">— вставьте слово</span></h3>
+    <p class="block-instruction">Заполните пропуск подходящим наречием из списка ниже.</p>
+    <div class="word-bank">
+      <span>eventually</span><span>meanwhile</span><span>immediately</span><span>straight away</span><span>suddenly</span>
+    </div>
+    <div class="exercise-controls">
+      <button class="btn" data-check="ex31">Проверить</button>
+      <button class="btn secondary" data-show="ex31">Показать ответы</button>
+      <span class="score-tag" id="score-ex31"></span>
+    </div>
+    <div class="exercise" data-exercise="ex31"><div class="items"></div></div>
+
+    <h3 class="block-title">Упражнение 2 <span class="badge">— синоним</span></h3>
+    <p class="block-instruction">Замените выделенное слово синонимом, не меняя смысла предложения.</p>
+    <div class="exercise-controls">
+      <button class="btn" data-check="ex32">Проверить</button>
+      <button class="btn secondary" data-show="ex32">Показать ответы</button>
+      <span class="score-tag" id="score-ex32"></span>
+    </div>
+    <div class="exercise" data-exercise="ex32"><div class="items"></div></div>
+
+    <h3 class="block-title">Упражнение 3 <span class="badge">— выберите верное слово</span></h3>
+    <p class="block-instruction">Выберите слово, которое лучше всего подходит по смыслу.</p>
+    <div class="exercise-controls">
+      <button class="btn" data-check="ex33">Проверить</button>
+      <button class="btn secondary" data-show="ex33">Показать ответы</button>
+      <span class="score-tag" id="score-ex33"></span>
+    </div>
+    <div class="exercise" data-exercise="ex33"><div class="items"></div></div>
+  </section>
+
+  <!-- ============ PANEL 4 ============ -->
+  <section class="panel" id="panel-4">
+    <h2 class="section-title">Согласие с высказыванием</h2>
+    <p class="section-sub">So / Neither ... I · ...too / ...either</p>
+
+    <div class="notes-grid" id="notes-4"></div>
+
+    <h3 class="block-title">Упражнение 1 <span class="badge">— So или Neither?</span></h3>
+    <p class="block-instruction">Заполните пропуск словом So или Neither.</p>
+    <div class="exercise-controls">
+      <button class="btn" data-check="ex41">Проверить</button>
+      <button class="btn secondary" data-show="ex41">Показать ответы</button>
+      <span class="score-tag" id="score-ex41"></span>
+    </div>
+    <div class="exercise" data-exercise="ex41"><div class="items"></div></div>
+
+    <h3 class="block-title">Упражнение 2 <span class="badge">— перепишите с too / either</span></h3>
+    <p class="block-instruction">Перепишите ответ B, используя too или either вместо so/neither.</p>
+    <div class="exercise-controls">
+      <button class="btn" data-check="ex42">Проверить</button>
+      <button class="btn secondary" data-show="ex42">Показать ответы</button>
+      <span class="score-tag" id="score-ex42"></span>
+    </div>
+    <div class="exercise" data-exercise="ex42"><div class="items"></div></div>
+
+    <h3 class="block-title">Упражнение 3 <span class="badge">— выберите верный вариант</span></h3>
+    <p class="block-instruction">Выберите грамматически верный ответ.</p>
+    <div class="exercise-controls">
+      <button class="btn" data-check="ex43">Проверить</button>
+      <button class="btn secondary" data-show="ex43">Показать ответы</button>
+      <span class="score-tag" id="score-ex43"></span>
+    </div>
+    <div class="exercise" data-exercise="ex43"><div class="items"></div></div>
+  </section>
+
+  <footer>Рабочая тетрадь для практики английского</footer>
+</div>
+
+<script>
+/* ============================================================
+   DATA
+   ============================================================ */
+
+const NOTES = {
+  notes1: [
+    { mistake:"He was late to work.", correct:"late FOR work", explain:"late FOR + место/событие, не «to»." },
+    { mistake:"Please fill on the form.", correct:"fill IN the form", explain:"fill in a form (брит.), fill out (амер.)." },
+    { mistake:"Playing on the playground.", correct:"in the playground", explain:"на детской площадке — IN, не «on»." },
+    { mistake:"I need to do a choice.", correct:"make a choice", explain:"choice — сущ.: make a choice. Глагол — to choose." },
+    { mistake:"«INspire» (1‑й слог)", correct:"inSPIRE /ɪnˈspaɪər/", explain:"ударение на 2‑й слог." },
+    { mistake:"gossip / do the same amount", correct:"gossip; the same amount (of...)", explain:"gossip (гл./сущ.) — сплетничать/сплетни. do the same amount — делать одинаковое количество (чего‑л.)." },
+    { mistake:"«mosk»", correct:"mosque /mɒsk/", explain:"пишется mosque, читается «маск»." },
+    { mistake:"sweatshirt как «свИтшот»", correct:"sweatshirt /ˈswetʃɜːt/", explain:"«ea» здесь = звук как в bread, не «и»." },
+  ],
+  notes2: [
+    { mistake:"", correct:"be the same...as", explain:"полностью совпадать с чем‑л.: My bag is the same as yours." },
+    { mistake:"", correct:"be similar to", explain:"похож, но не идентичен: This plan is similar to the last one." },
+    { mistake:"", correct:"both", explain:"оба: both + сущ. во мн.ч. / both of us." },
+    { mistake:"", correct:"be like sb", explain:"быть похожим на кого‑то (характер/внешность): She's like her mother." },
+    { mistake:"", correct:"identical", explain:"совершенно одинаковый, без различий: identical twins." },
+  ],
+  notes3: [
+    { mistake:"", correct:"eventually", explain:"в конце концов, спустя долгое время. Не путать с actually («на самом деле»)!" },
+    { mistake:"", correct:"meanwhile", explain:"тем временем, параллельно с другим действием." },
+    { mistake:"", correct:"immediately", explain:"немедленно, без задержки." },
+    { mistake:"", correct:"straight away", explain:"тотчас же — синоним immediately, более разговорный." },
+    { mistake:"", correct:"suddenly", explain:"внезапно, неожиданно." },
+  ],
+  notes4: [
+    { mistake:"", correct:"So + aux + I", explain:"согласие с утвердительным высказыванием: “I love tea.” — “So do I.”" },
+    { mistake:"", correct:"Neither/Nor + aux + I", explain:"согласие с отрицательным высказыванием: “I don't like coffee.” — “Neither do I.”" },
+    { mistake:"", correct:"...too", explain:"в конце утвердительного предложения: I like it too." },
+    { mistake:"", correct:"...either", explain:"в конце отрицательного предложения: I don't like it either." },
+  ],
+};
+
+const OWN_WORDS = ["be late FOR work","fill IN the form","in the playground","make a choice","inspire","gossip","do the same amount","mosque","sweatshirt"];
+
+const EXERCISES = {
+  ex11: { type:'gap', items:[
+    { pre:"Yesterday I was late", suf:"work because of the traffic.", ans:["for"] },
+    { pre:"Could you please fill", suf:"this form with your personal details?", ans:["in"] },
+    { pre:"The kids love spending time", suf:"the playground after school.", ans:["in"] },
+    { pre:"Choosing a university is a big", suf:"— think carefully before you decide.", ans:["choice"] },
+    { pre:"Her enthusiasm managed to", suf:"everyone in the room.", ans:["inspire"] },
+    { pre:"I don't like people who", suf:"about their friends behind their backs.", ans:["gossip"] },
+    { pre:"Both students did the same", suf:"of homework this week.", ans:["amount"] },
+    { pre:"There's a stunning 500-year-old", suf:"near the old town.", ans:["mosque"] },
+    { pre:"It's quite cold today — you should wear a warm", suf:".", ans:["sweatshirt"] },
+    { pre:"I need to leave now or I'll be late", suf:"my flight.", ans:["for"] },
+  ]},
+  ex12: { type:'mcq', items:[
+    { q:"", options:["He was late to work again.","He was late for work again."], correct:1 },
+    { q:"", options:["Please fill in the form.","Please fill on the form."], correct:0 },
+    { q:"", options:["The children are playing on the playground.","The children are playing in the playground."], correct:1 },
+    { q:"", options:["I need to do a choice.","I need to make a choice."], correct:1 },
+    { q:"Где ударение в слове 'inspire'?", options:["INspire (1‑й слог)","inSPIRE (2‑й слог)"], correct:1 },
+    { q:"", options:["They do the same amount of work.","They make the same amount of work."], correct:0 },
+    { q:"", options:["There's a big mosk in this city.","There's a big mosque in this city."], correct:1 },
+    { q:"Как звучит 'sweatshirt'?", options:["Как sweet + shirt","Как wet (короткое e) + shirt"], correct:1 },
+  ]},
+  ex21: { type:'gap', items:[
+    { pre:"This bag is", suf:"mine — I think we bought them in the same shop.", ans:["the same as"] },
+    { pre:"Their new logo is very", suf:"their old one; barely anyone can tell the difference.", ans:["similar to"] },
+    { pre:"", suf:"of my brothers work in finance.", ans:["both"] },
+    { pre:"He really is", suf:"his father — same sense of humour, same walk.", ans:["like"] },
+    { pre:"The two paintings are", suf:"— you can't spot a single difference.", ans:["identical"] },
+    { pre:"My opinion on this topic is", suf:"yours — I don't think we disagree at all.", ans:["the same as"] },
+    { pre:"This restaurant's menu is", suf:"the one next door, but a bit more expensive.", ans:["similar to"] },
+    { pre:"", suf:"sisters study at the same university.", ans:["both"] },
+    { pre:"Their voices sound so", suf:"that I always mix them up on the phone.", ans:["identical"] },
+    { pre:"Don't worry, everyone makes mistakes — I'm", suf:"you in that respect.", ans:["like"] },
+  ]},
+  ex22: { type:'open', items:[
+    { text:"Tom and his brother look exactly the same.", hint:"(identical)", keys:["identical"], model:"Tom and his brother look identical." },
+    { text:"Her dress looks like mine, but it's not exactly the same.", hint:"(similar to)", keys:["similar to"], model:"Her dress is similar to mine." },
+    { text:"My brother and I both play the guitar.", hint:"(both)", keys:["both"], model:"Both my brother and I play the guitar." },
+    { text:"He has the same sense of humour as his dad.", hint:"(like)", keys:["like"], model:"He's like his dad." },
+    { text:"These two phones have exactly the same features — there's no difference at all.", hint:"(identical)", keys:["identical"], model:"These two phones are identical." },
+    { text:"My timetable this term looks a lot like last term's, though it's not exactly the same.", hint:"(similar to)", keys:["similar to"], model:"My timetable this term is similar to last term's." },
+    { text:"You and I have exactly the same opinion about this film.", hint:"(the same as)", keys:["the same as"], model:"My opinion is the same as yours." },
+    { text:"My mum and my aunt laugh in exactly the same way — you can't tell them apart on the phone.", hint:"(like)", keys:["like"], model:"My mum is like my aunt — they laugh the same way." },
+  ]},
+  ex31: { type:'gap', items:[
+    { pre:"I waited for hours, but", suf:"the bus arrived.", ans:["eventually"] },
+    { pre:"Call an ambulance", suf:"!", ans:["immediately","straight away"] },
+    { pre:"I'll start cooking dinner;", suf:", could you set the table?", ans:["meanwhile"] },
+    { pre:"The lights went out", suf:", and the whole street went dark.", ans:["suddenly"] },
+    { pre:"He looked everywhere for his keys and", suf:"found them in his coat pocket.", ans:["eventually"] },
+    { pre:"She finished her exam and left the room", suf:".", ans:["immediately","straight away"] },
+    { pre:"We were walking calmly through the park when,", suf:", a dog jumped out at us.", ans:["suddenly"] },
+    { pre:"Please reply to this email", suf:"— it's urgent.", ans:["immediately","straight away"] },
+    { pre:"The negotiations lasted for months, but they", suf:"reached an agreement.", ans:["eventually"] },
+    { pre:"He is preparing the presentation;", suf:", the rest of the team is checking the numbers.", ans:["meanwhile"] },
+  ]},
+  ex32: { type:'open', items:[
+    { text:"We got lost twice, but <mark>eventually</mark> we found the hotel.", hint:"", keys:["in the end","finally"], model:"in the end / finally" },
+    { text:"You should call the doctor <mark>immediately</mark>.", hint:"", keys:["straight away","at once"], model:"straight away / at once" },
+    { text:"I'll finish this report; <mark>meanwhile</mark>, please answer the phone.", hint:"", keys:["in the meantime","at the same time"], model:"in the meantime / at the same time" },
+    { text:"The alarm went off, and everyone left the building <mark>straight away</mark>.", hint:"", keys:["immediately","at once"], model:"immediately / at once" },
+    { text:"It was a calm evening until, <mark>suddenly</mark>, thunder crashed overhead.", hint:"", keys:["all of a sudden","unexpectedly"], model:"all of a sudden / unexpectedly" },
+    { text:"After years of hard work, she <mark>eventually</mark> became a partner at the firm.", hint:"", keys:["finally","in the end"], model:"finally / in the end" },
+    { text:"Take this medicine <mark>straight away</mark>, before the pain gets worse.", hint:"", keys:["immediately","at once"], model:"immediately / at once" },
+    { text:"He was smiling one second, and <mark>suddenly</mark> his face went pale.", hint:"", keys:["all of a sudden","unexpectedly"], model:"all of a sudden / unexpectedly" },
+  ]},
+  ex33: { type:'mcq', items:[
+    { q:"I studied English for ten years, and ___ I passed the Cambridge exam.", options:["eventually","meanwhile","suddenly"], correct:0 },
+    { q:"Stop the car ___! There's a child on the road!", options:["meanwhile","immediately","eventually"], correct:1 },
+    { q:"I'm cooking the pasta; ___, can you chop the salad?", options:["meanwhile","suddenly","eventually"], correct:0 },
+    { q:"The plane was flying smoothly when ___ it hit turbulence.", options:["eventually","suddenly","meanwhile"], correct:1 },
+    { q:"Please send me the documents ___, I need them today.", options:["eventually","straight away","meanwhile"], correct:1 },
+    { q:"It took three years, but we ___ finished building the house.", options:["eventually","suddenly","immediately"], correct:0 },
+    { q:"He heard the news and ___ burst into tears.", options:["meanwhile","suddenly","eventually"], correct:1 },
+    { q:"Turn off the gas ___ if you smell smoke.", options:["eventually","immediately","meanwhile"], correct:1 },
+  ]},
+  ex41: { type:'gap', items:[
+    { pre:"A: “I love travelling.”  B:", suf:"do I.", ans:["so"] },
+    { pre:"A: “I can't swim.”  B:", suf:"can I.", ans:["neither","nor"] },
+    { pre:"A: “I've never been to Japan.”  B:", suf:"have I.", ans:["neither","nor"] },
+    { pre:"A: “I'm really tired today.”  B:", suf:"am I.", ans:["so"] },
+    { pre:"A: “I don't eat meat.”  B:", suf:"do I.", ans:["neither","nor"] },
+    { pre:"A: “I'll be there at six.”  B:", suf:"will I.", ans:["so"] },
+    { pre:"A: “I didn't understand the lecture.”  B:", suf:"did I.", ans:["neither","nor"] },
+    { pre:"A: “I was born in April.”  B:", suf:"was I.", ans:["so"] },
+    { pre:"A: “I haven't finished my homework yet.”  B:", suf:"have I.", ans:["neither","nor"] },
+    { pre:"A: “I really enjoy this song.”  B:", suf:"do I.", ans:["so"] },
+  ]},
+  ex42: { type:'open', items:[
+    { text:"A: “I love chocolate.”  B: “So do I.”", hint:"→ перепишите B с too", keys:["too"], model:"I love chocolate too." },
+    { text:"A: “I can't drive.”  B: “Neither can I.”", hint:"→ перепишите B с either", keys:["either"], model:"I can't drive either." },
+    { text:"A: “I'm from Poland.”  B: “So am I.”", hint:"→ перепишите B с too", keys:["too"], model:"I'm from Poland too." },
+    { text:"A: “I don't like horror films.”  B: “Neither do I.”", hint:"→ перепишите B с either", keys:["either"], model:"I don't like horror films either." },
+    { text:"A: “I'll come to the party.”  B: “So will I.”", hint:"→ перепишите B с too", keys:["too"], model:"I'll come to the party too." },
+    { text:"A: “I haven't seen that movie.”  B: “Neither have I.”", hint:"→ перепишите B с either", keys:["either"], model:"I haven't seen that movie either." },
+    { text:"A: “I was late this morning.”  B: “So was I.”", hint:"→ перепишите B с too", keys:["too"], model:"I was late this morning too." },
+    { text:"A: “I didn't sleep well.”  B: “Neither did I.”", hint:"→ перепишите B с either", keys:["either"], model:"I didn't sleep well either." },
+  ]},
+  ex43: { type:'mcq', items:[
+    { q:"“I'm not hungry.” — “___”", options:["So am I not","Neither am I","Neither I am"], correct:1 },
+    { q:"“I speak French.” — “___”", options:["So do I","So I do","Neither do I"], correct:0 },
+    { q:"“I've never tried sushi.” — “___”", options:["So have I","Neither have I","Neither I have"], correct:1 },
+    { q:"“I can play the piano.” — “___”", options:["So can I","Neither can I","So I can"], correct:0 },
+    { q:"“I don't have any siblings.” — “___”", options:["Neither do I","So do I","Neither I do"], correct:0 },
+    { q:"“I'm going on holiday next week.” — “___”", options:["So am I","Neither am I","So I am"], correct:0 },
+    { q:"“I hate getting up early.” — “___”", options:["So do I","Neither do I","Neither I do"], correct:1 },
+    { q:"“I've already had lunch.” — “___”", options:["So have I","Neither have I","So I have"], correct:0 },
+  ]},
+};
+
+/* ============================================================
+   HELPERS
+   ============================================================ */
+
+function norm(s){
+  return (s || "").toLowerCase().trim().replace(/[.,!?;:"'`]/g,'').replace(/\s+/g,' ');
+}
+
+function scoreTag(el, correctCount, total){
+  el.textContent = correctCount + " / " + total;
+  el.classList.remove('good','mid','low');
+  const ratio = correctCount / total;
+  if (ratio >= 0.8) el.classList.add('good');
+  else if (ratio >= 0.5) el.classList.add('mid');
+  else el.classList.add('low');
+}
+
+/* ============================================================
+   RENDERERS
+   ============================================================ */
+
+function renderNotes(containerId, list){
+  const el = document.getElementById(containerId);
+  el.innerHTML = list.map(n => `
+    <div class="note-card">
+      ${n.mistake ? `<div class="note-mistake">${n.mistake}</div>` : ''}
+      <div class="note-correct">${n.correct}</div>
+      <div class="note-explain">${n.explain}</div>
+    </div>
+  `).join('');
+}
+
+function renderGap(key){
+  const root = document.querySelector(`[data-exercise="${key}"] .items`);
+  const items = EXERCISES[key].items;
+  root.innerHTML = items.map((it, i) => `
+    <div class="gap-item">
+      <span class="item-num">${i+1}.</span>
+      <span class="sentence">${it.pre} <input type="text" class="gap-input" data-key="${key}" data-idx="${i}" autocomplete="off" spellcheck="false"> ${it.suf}</span>
+      <span class="feedback" data-fb="${key}-${i}"></span>
+      <span class="answer-reveal" data-rev="${key}-${i}" style="display:none"></span>
+    </div>
+  `).join('');
+}
+
+function renderMcq(key){
+  const root = document.querySelector(`[data-exercise="${key}"] .items`);
+  const items = EXERCISES[key].items;
+  root.innerHTML = items.map((it, i) => `
+    <div class="mcq-item">
+      <span class="item-num">${i+1}.</span>
+      <span class="sentence">${it.q}</span>
+      <div class="mcq-options" data-mcq="${key}-${i}">
+        ${it.options.map((opt, oi) => `
+          <label data-opt="${oi}">
+            <input type="radio" name="${key}_${i}" value="${oi}">
+            <span>${opt}</span>
+          </label>
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderOpen(key){
+  const root = document.querySelector(`[data-exercise="${key}"] .items`);
+  const items = EXERCISES[key].items;
+  root.innerHTML = items.map((it, i) => `
+    <div class="open-item">
+      <span class="item-num">${i+1}.</span>
+      <span class="sentence">${it.text} ${it.hint ? `<i style="color:var(--ink-faint)">${it.hint}</i>` : ''}</span>
+      <input type="text" class="open-input" data-key="${key}" data-idx="${i}" autocomplete="off" spellcheck="false" placeholder="Ваш вариант...">
+      <span class="feedback" data-fb="${key}-${i}"></span>
+      <span class="answer-reveal" data-rev="${key}-${i}" style="display:none"></span>
+    </div>
+  `).join('');
+}
+
+function renderExercise(key){
+  const type = EXERCISES[key].type;
+  if (type === 'gap') renderGap(key);
+  else if (type === 'mcq') renderMcq(key);
+  else if (type === 'open') renderOpen(key);
+}
+
+/* ============================================================
+   CHECK / SHOW LOGIC
+   ============================================================ */
+
+function checkExercise(key){
+  const type = EXERCISES[key].type;
+  const items = EXERCISES[key].items;
+  let correctCount = 0;
+
+  if (type === 'gap' || type === 'open'){
+    items.forEach((it, i) => {
+      const input = document.querySelector(`input[data-key="${key}"][data-idx="${i}"]`);
+      const fb = document.querySelector(`[data-fb="${key}-${i}"]`);
+      const rev = document.querySelector(`[data-rev="${key}-${i}"]`);
+      const val = norm(input.value);
+      const answers = type === 'gap' ? it.ans : it.keys;
+      const isCorrect = type === 'gap'
+        ? answers.some(a => norm(a) === val)
+        : (val.length > 0 && answers.some(a => val.includes(norm(a))));
+
+      fb.classList.remove('ok','no');
+      if (val.length === 0){
+        fb.textContent = '';
+      } else if (isCorrect){
+        fb.textContent = '✓';
+        fb.classList.add('ok');
+        correctCount++;
+        rev.style.display = 'none';
+      } else {
+        fb.textContent = '✗';
+        fb.classList.add('no');
+        rev.style.display = 'inline';
+        rev.classList.add('wrong-tone');
+        rev.textContent = '→ ' + (type === 'gap' ? it.ans.join(' / ') : it.model);
+      }
+    });
+  } else if (type === 'mcq'){
+    items.forEach((it, i) => {
+      const checked = document.querySelector(`input[name="${key}_${i}"]:checked`);
+      const labels = document.querySelectorAll(`[data-mcq="${key}-${i}"] label`);
+      labels.forEach(l => l.classList.remove('correct-mark','wrong-mark'));
+      if (checked){
+        const val = parseInt(checked.value, 10);
+        if (val === it.correct){
+          correctCount++;
+          labels[val].classList.add('correct-mark');
+        } else {
+          labels[val].classList.add('wrong-mark');
+          labels[it.correct].classList.add('correct-mark');
+        }
+      }
+    });
+  }
+
+  scoreTag(document.getElementById('score-' + key), correctCount, items.length);
+}
+
+function showAnswers(key){
+  const type = EXERCISES[key].type;
+  const items = EXERCISES[key].items;
+
+  if (type === 'gap' || type === 'open'){
+    items.forEach((it, i) => {
+      const rev = document.querySelector(`[data-rev="${key}-${i}"]`);
+      rev.classList.remove('wrong-tone');
+      rev.style.display = 'inline';
+      rev.textContent = '→ ' + (type === 'gap' ? it.ans.join(' / ') : it.model);
+    });
+  } else if (type === 'mcq'){
+    items.forEach((it, i) => {
+      const labels = document.querySelectorAll(`[data-mcq="${key}-${i}"] label`);
+      labels.forEach(l => l.classList.remove('correct-mark','wrong-mark'));
+      labels[it.correct].classList.add('correct-mark');
+    });
+  }
+}
+
+/* ============================================================
+   OWN SENTENCES
+   ============================================================ */
+
+function renderOwnSentences(){
+  const el = document.getElementById('own-list');
+  el.innerHTML = OWN_WORDS.map((w, i) => `
+    <div class="own-row">
+      <span class="own-label">${w}</span>
+      <input type="text" data-own="${i}" placeholder="Ваше предложение...">
+    </div>
+  `).join('');
+}
+
+function copyAllSentences(){
+  const rows = document.querySelectorAll('#own-list input[data-own]');
+  const lines = [];
+  rows.forEach((input, i) => {
+    const val = input.value.trim();
+    if (val.length > 0){
+      lines.push(`${OWN_WORDS[i]} — ${val}`);
+    }
+  });
+  const text = lines.join('\n');
+  const confirmEl = document.getElementById('copy-confirm');
+
+  function flashConfirm(){
+    confirmEl.classList.add('show');
+    setTimeout(() => confirmEl.classList.remove('show'), 1800);
+  }
+
+  if (!text){
+    confirmEl.textContent = 'Сначала напишите хотя бы одно предложение';
+    flashConfirm();
+    setTimeout(() => { confirmEl.textContent = 'Скопировано ✓'; }, 1900);
+    return;
+  }
+
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(flashConfirm).catch(() => fallbackCopy(text, flashConfirm));
+  } else {
+    fallbackCopy(text, flashConfirm);
+  }
+}
+
+function fallbackCopy(text, cb){
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); } catch(e) {}
+  document.body.removeChild(ta);
+  cb();
+}
+
+/* ============================================================
+   TABS
+   ============================================================ */
+
+function initTabs(){
+  const buttons = document.querySelectorAll('.tab-btn');
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      buttons.forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(btn.dataset.target).classList.add('active');
+    });
+  });
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+
+document.addEventListener('DOMContentLoaded', () => {
+  renderNotes('notes-1', NOTES.notes1);
+  renderNotes('notes-2', NOTES.notes2);
+  renderNotes('notes-3', NOTES.notes3);
+  renderNotes('notes-4', NOTES.notes4);
+
+  Object.keys(EXERCISES).forEach(renderExercise);
+
+  document.querySelectorAll('[data-check]').forEach(btn => {
+    btn.addEventListener('click', () => checkExercise(btn.dataset.check));
+  });
+  document.querySelectorAll('[data-show]').forEach(btn => {
+    btn.addEventListener('click', () => showAnswers(btn.dataset.show));
+  });
+
+  renderOwnSentences();
+  document.getElementById('copy-btn').addEventListener('click', copyAllSentences);
+
+  initTabs();
+});
+</script>
+</body>
+</html>
