@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reported Speech — тренажёр по косвенной речи</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+
+:root{
+  --board:#173029;
+  --board-dark:#0d1e19;
+  --paper:#FBF6E9;
+  --paper-line:#E7DEC4;
+  --ink:#22322B;
+  --ink-soft:#5B6B62;
+  --chalk-yellow:#EAC468;
+  --chalk-coral:#DE7C86;
+  --chalk-blue:#84B8CB;
+  --chalk-mint:#8FCB9B;
+  --chalk-red:#CB6459;
+  --white-chalk:#F3EFE2;
+
+  --font-display:'Permanent Marker', cursive, sans-serif;
+  --font-body:'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono:'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+}
+
+*{ box-sizing:border-box; }
+
+html{ scroll-behavior:smooth; }
+
+body{
+  margin:0;
+  background:var(--board);
+  color:var(--white-chalk);
+  font-family:var(--font-body);
+  line-height:1.5;
+  min-height:100vh;
+}
+
+.board{
+  position:relative;
+  max-width:920px;
+  margin:0 auto;
+  padding:0 20px 60px;
+  overflow:hidden;
+}
+
+.board::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  opacity:.5;
+  mix-blend-mode:overlay;
+  background-image:
+    radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,.35) 0, transparent 60%),
+    radial-gradient(1px 1px at 80% 10%, rgba(255,255,255,.3) 0, transparent 60%),
+    radial-gradient(1.5px 1.5px at 40% 70%, rgba(255,255,255,.3) 0, transparent 60%),
+    radial-gradient(1px 1px at 65% 85%, rgba(255,255,255,.3) 0, transparent 60%),
+    radial-gradient(1px 1px at 25% 55%, rgba(255,255,255,.25) 0, transparent 60%),
+    radial-gradient(1.5px 1.5px at 90% 60%, rgba(255,255,255,.25) 0, transparent 60%);
+  background-size:400px 400px;
+  z-index:0;
+}
+
+/* ---------- Sticky score bar ---------- */
+.scorebar{
+  position:sticky;
+  top:0;
+  z-index:20;
+  display:flex;
+  align-items:center;
+  gap:14px;
+  justify-content:space-between;
+  padding:10px 16px;
+  margin:0 -20px 0;
+  background:rgba(13,30,25,.92);
+  backdrop-filter:blur(4px);
+  border-bottom:1px dashed rgba(243,239,226,.25);
+}
+
+.scorebar .label{
+  font-family:var(--font-mono);
+  font-size:.85rem;
+  color:var(--white-chalk);
+  letter-spacing:.02em;
+}
+
+.scorebar .label strong{
+  color:var(--chalk-yellow);
+  font-size:1rem;
+}
+
+.reset-btn{
+  border:1px solid rgba(243,239,226,.4);
+  background:transparent;
+  color:var(--white-chalk);
+  font-family:var(--font-mono);
+  font-size:.8rem;
+  padding:6px 12px;
+  border-radius:20px;
+  cursor:pointer;
+  transition:.15s;
+  white-space:nowrap;
+}
+.reset-btn:hover{ background:rgba(243,239,226,.12); border-color:var(--chalk-coral); }
+
+/* ---------- Hero ---------- */
+.hero{
+  position:relative;
+  z-index:1;
+  text-align:center;
+  padding:52px 10px 34px;
+}
+
+.hero .eyebrow{
+  font-family:var(--font-mono);
+  font-size:.78rem;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:var(--chalk-blue);
+  display:inline-block;
+  margin-bottom:10px;
+}
+
+.hero h1{
+  font-family:var(--font-display);
+  font-weight:400;
+  font-size:clamp(2.4rem, 6vw, 3.6rem);
+  margin:0 0 6px;
+  color:var(--white-chalk);
+  text-shadow:0 0 18px rgba(243,239,226,.15);
+  letter-spacing:.01em;
+}
+
+.hero p{
+  font-size:1rem;
+  color:rgba(243,239,226,.75);
+  max-width:520px;
+  margin:0 auto;
+}
+
+.arrow-wrap{
+  display:flex;
+  justify-content:center;
+  margin:18px 0 6px;
+}
+
+.arrow-wrap svg{ width:180px; height:56px; overflow:visible; }
+.arrow-path{
+  fill:none;
+  stroke:var(--chalk-coral);
+  stroke-width:3;
+  stroke-linecap:round;
+  stroke-dasharray:220;
+  stroke-dashoffset:220;
+  animation:draw 1.6s ease forwards .3s;
+}
+.arrow-txt{
+  font-family:var(--font-mono);
+  font-size:11px;
+  fill:rgba(243,239,226,.7);
+}
+@keyframes draw{ to{ stroke-dashoffset:0; } }
+@media (prefers-reduced-motion:reduce){
+  .arrow-path{ animation:none; stroke-dashoffset:0; }
+}
+
+/* ---------- Card (paper pinned to board) ---------- */
+main{ position:relative; z-index:1; display:flex; flex-direction:column; gap:44px; }
+
+.card{
+  position:relative;
+  background:var(--paper);
+  color:var(--ink);
+  border-radius:6px;
+  padding:34px 30px 26px;
+  box-shadow:0 18px 38px rgba(0,0,0,.35), 0 2px 0 rgba(0,0,0,.15);
+  background-image:repeating-linear-gradient(
+    to bottom, transparent 0 34px, var(--paper-line) 34px 35px
+  );
+}
+.card:nth-of-type(odd){ transform:rotate(-.35deg); }
+.card:nth-of-type(even){ transform:rotate(.35deg); }
+
+.card::before{
+  content:"";
+  position:absolute;
+  top:-14px;
+  left:34px;
+  width:74px;
+  height:26px;
+  background:rgba(234,196,104,.55);
+  border:1px solid rgba(234,196,104,.7);
+  transform:rotate(-7deg);
+  box-shadow:0 3px 6px rgba(0,0,0,.2);
+}
+.card:nth-of-type(even)::before{ left:auto; right:34px; transform:rotate(6deg); background:rgba(132,184,203,.55); border-color:rgba(132,184,203,.75); }
+
+.card-head{
+  display:flex;
+  align-items:flex-start;
+  gap:16px;
+  margin-bottom:6px;
+}
+
+.badge{
+  flex:none;
+  width:46px; height:46px;
+  border-radius:50%;
+  border:2.5px solid var(--ink);
+  display:flex; align-items:center; justify-content:center;
+  font-family:var(--font-mono);
+  font-weight:700;
+  font-size:1.1rem;
+  color:var(--ink);
+}
+
+.card-head h2{
+  font-family:var(--font-display);
+  font-weight:400;
+  font-size:1.5rem;
+  margin:2px 0 4px;
+  color:var(--ink);
+}
+
+.card-head .instr{
+  font-size:.92rem;
+  color:var(--ink-soft);
+  font-style:italic;
+  margin:0;
+}
+
+/* ---------- Rule sheet (details) ---------- */
+details.rules{
+  margin:18px 0 22px;
+  border:1.5px dashed var(--ink-soft);
+  border-radius:8px;
+  padding:14px 18px;
+  background:rgba(234,196,104,.12);
+}
+details.rules summary{
+  cursor:pointer;
+  font-family:var(--font-mono);
+  font-weight:700;
+  font-size:.85rem;
+  letter-spacing:.03em;
+  color:var(--ink);
+  list-style:none;
+}
+details.rules summary::-webkit-details-marker{ display:none; }
+details.rules summary::before{
+  content:"▸ ";
+  color:var(--chalk-coral);
+}
+details.rules[open] summary::before{ content:"▾ "; }
+
+.rule-grid{
+  margin-top:12px;
+  display:grid;
+  grid-template-columns:1fr auto 1fr;
+  gap:6px 10px;
+  font-size:.88rem;
+}
+.rule-grid .g-src{ text-align:right; color:var(--ink); }
+.rule-grid .g-tgt{ color:#3a5c46; font-weight:600; }
+.rule-grid .g-arrow{ color:var(--chalk-coral); font-weight:700; }
+.rule-grid .g-div{
+  grid-column:1/-1;
+  border-top:1px dashed var(--paper-line);
+  margin:4px 0;
+}
+
+/* ---------- Question blocks ---------- */
+.items{ display:flex; flex-direction:column; gap:18px; margin-top:8px; }
+
+.q-block{
+  padding:14px 16px;
+  border-radius:8px;
+  border:1.5px solid transparent;
+  transition:background .2s, border-color .2s;
+}
+.q-block.correct{ background:rgba(143,203,155,.22); border-color:var(--chalk-mint); }
+.q-block.incorrect{ background:rgba(203,100,89,.16); border-color:var(--chalk-red); }
+.q-block.unanswered{ border-color:var(--chalk-yellow); }
+
+.q-head{
+  display:flex;
+  align-items:baseline;
+  gap:10px;
+  margin-bottom:10px;
+}
+.q-num{
+  font-family:var(--font-mono);
+  font-size:.78rem;
+  color:var(--ink-soft);
+  flex:none;
+}
+.q-text{ font-weight:600; font-size:.98rem; }
+.q-status{
+  margin-left:auto;
+  font-weight:800;
+  font-size:1rem;
+}
+.q-block.correct .q-status{ color:#3a7a4a; }
+.q-block.incorrect .q-status{ color:#a13d33; }
+
+.choice-row{ display:flex; flex-wrap:wrap; gap:8px; }
+
+.choice-btn{
+  font-family:var(--font-body);
+  font-weight:600;
+  font-size:.86rem;
+  padding:7px 14px;
+  border-radius:8px;
+  border:2px solid var(--paper-line);
+  background:#fff;
+  color:var(--ink);
+  cursor:pointer;
+  transition:.12s;
+}
+.choice-btn:hover{ border-color:var(--chalk-blue); }
+.choice-btn:focus-visible{ outline:3px solid var(--chalk-blue); outline-offset:1px; }
+.choice-btn.selected{ background:var(--chalk-blue); border-color:#4d8298; color:#0e2530; }
+.q-block.correct .choice-btn.selected{ background:var(--chalk-mint); border-color:#4d9760; color:#173321; }
+.q-block.incorrect .choice-btn.selected{ background:var(--chalk-red); border-color:#8f382e; color:#fff; }
+.choice-btn.correct-answer{ box-shadow:0 0 0 3px var(--chalk-mint) inset; }
+
+.hint{
+  font-size:.82rem;
+  color:var(--ink-soft);
+  margin-bottom:8px;
+}
+
+.text-input{
+  width:100%;
+  font-family:var(--font-body);
+  font-size:.95rem;
+  padding:9px 12px;
+  border-radius:8px;
+  border:2px solid var(--paper-line);
+  background:#fff;
+  color:var(--ink);
+}
+.text-input:focus-visible{ outline:none; border-color:var(--chalk-blue); box-shadow:0 0 0 3px rgba(132,184,203,.35); }
+.q-block.correct .text-input{ border-color:var(--chalk-mint); }
+.q-block.incorrect .text-input{ border-color:var(--chalk-red); }
+
+.answer-line{
+  margin-top:8px;
+  font-size:.86rem;
+  padding:6px 10px;
+  border-radius:6px;
+  background:rgba(234,196,104,.25);
+  color:#5c4a1c;
+}
+.answer-line strong{ color:#3a2f10; }
+
+/* ---------- Controls ---------- */
+.controls{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:12px;
+  margin-top:22px;
+  padding-top:16px;
+  border-top:1.5px dashed var(--paper-line);
+}
+
+.btn{
+  font-family:var(--font-body);
+  font-weight:700;
+  font-size:.88rem;
+  padding:9px 18px;
+  border-radius:24px;
+  border:2px solid var(--ink);
+  cursor:pointer;
+  transition:.15s;
+}
+.btn-check{ background:var(--ink); color:var(--paper); }
+.btn-check:hover{ background:#0e1712; }
+.btn-show{ background:transparent; color:var(--ink); }
+.btn-show:hover{ background:rgba(34,50,43,.08); }
+
+.score-badge{
+  margin-left:auto;
+  font-family:var(--font-mono);
+  font-weight:700;
+  font-size:.85rem;
+  color:var(--ink-soft);
+  background:rgba(34,50,43,.06);
+  padding:6px 12px;
+  border-radius:20px;
+}
+
+/* ---------- Footer ---------- */
+footer{
+  position:relative;
+  z-index:1;
+  text-align:center;
+  margin-top:50px;
+  color:rgba(243,239,226,.5);
+  font-size:.82rem;
+}
+
+@media (max-width:600px){
+  .card{ padding:26px 18px 20px; transform:none !important; }
+  .card::before{ display:none; }
+  .rule-grid{ grid-template-columns:1fr auto 1fr; font-size:.8rem; }
+  .score-badge{ margin-left:0; }
+  .scorebar{ flex-wrap:wrap; }
+}
+</style>
+</head>
+<body>
+
+<div class="board">
+
+  <div class="scorebar">
+    <span class="label">Общий счёт: <strong id="totalScore">0/38</strong></span>
+    <button class="reset-btn" id="resetAllBtn" type="button">↺ начать заново</button>
+  </div>
+
+  <header class="hero">
+    <span class="eyebrow">Grammar Refresher</span>
+    <h1>Reported Speech</h1>
+    <p>Повторяем косвенную речь: правило согласования времён, разницу say/tell и превращение прямой речи в косвенную — и обратно.</p>
+    <div class="arrow-wrap" aria-hidden="true">
+      <svg viewBox="0 0 180 56">
+        <path class="arrow-path" d="M170 14 C 110 14, 70 44, 12 34"/>
+        <path class="arrow-path" d="M22 24 L10 34 L24 42" style="animation-delay:1.1s"/>
+        <text x="60" y="52" class="arrow-txt" text-anchor="middle">время сдвигается назад</text>
+      </svg>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ================= EXERCISE 1 ================= -->
+    <section class="card" id="card-ex1">
+      <div class="card-head">
+        <span class="badge">1</span>
+        <div>
+          <h2>Вспоминаем правило</h2>
+          <p class="instr">Сначала — таблица согласования времён (можно свернуть), затем проверьте себя: во что превращается каждое время или слово в косвенной речи.</p>
+        </div>
+      </div>
+
+      <details class="rules" open>
+        <summary>Таблица согласования времён</summary>
+        <div class="rule-grid">
+          <span class="g-src">Present Simple</span><span class="g-arrow">→</span><span class="g-tgt">Past Simple</span>
+          <span class="g-src">Present Continuous</span><span class="g-arrow">→</span><span class="g-tgt">Past Continuous</span>
+          <span class="g-src">Present Perfect</span><span class="g-arrow">→</span><span class="g-tgt">Past Perfect</span>
+          <span class="g-src">Past Simple</span><span class="g-arrow">→</span><span class="g-tgt">Past Perfect</span>
+          <div class="g-div"></div>
+          <span class="g-src">will</span><span class="g-arrow">→</span><span class="g-tgt">would</span>
+          <span class="g-src">can</span><span class="g-arrow">→</span><span class="g-tgt">could</span>
+          <span class="g-src">may</span><span class="g-arrow">→</span><span class="g-tgt">might</span>
+          <span class="g-src">must</span><span class="g-arrow">→</span><span class="g-tgt">had to</span>
+        </div>
+      </details>
+
+      <div class="items" id="ex1-items"></div>
+
+      <div class="controls">
+        <button class="btn btn-check" data-check="1">Проверить</button>
+        <button class="btn btn-show" data-show="1">Показать ответы</button>
+        <span class="score-badge" id="score-ex1">Результат: —/8</span>
+      </div>
+    </section>
+
+    <!-- ================= EXERCISE 2 ================= -->
+    <section class="card" id="card-ex2">
+      <div class="card-head">
+        <span class="badge">2</span>
+        <div>
+          <h2>Say или tell?</h2>
+          <p class="instr">Выберите правильный вариант глагола в каждом предложении.</p>
+        </div>
+      </div>
+
+      <div class="items" id="ex2-items"></div>
+
+      <div class="controls">
+        <button class="btn btn-check" data-check="2">Проверить</button>
+        <button class="btn btn-show" data-show="2">Показать ответы</button>
+        <span class="score-badge" id="score-ex2">Результат: —/10</span>
+      </div>
+    </section>
+
+    <!-- ================= EXERCISE 3 ================= -->
+    <section class="card" id="card-ex3">
+      <div class="card-head">
+        <span class="badge">3</span>
+        <div>
+          <h2>Прямая речь → косвенная</h2>
+          <p class="instr">Перепишите предложение в косвенной речи на английском. Слово that можно не писать — на проверку это не влияет.</p>
+        </div>
+      </div>
+
+      <div class="items" id="ex3-items"></div>
+
+      <div class="controls">
+        <button class="btn btn-check" data-check="3">Проверить</button>
+        <button class="btn btn-show" data-show="3">Показать ответы</button>
+        <span class="score-badge" id="score-ex3">Результат: —/10</span>
+      </div>
+    </section>
+
+    <!-- ================= EXERCISE 4 ================= -->
+    <section class="card" id="card-ex4">
+      <div class="card-head">
+        <span class="badge">4</span>
+        <div>
+          <h2>Косвенная речь → прямая</h2>
+          <p class="instr">Восстановите прямую речь: верните исходное время и местоимения. Кавычки можно не ставить.</p>
+        </div>
+      </div>
+
+      <div class="items" id="ex4-items"></div>
+
+      <div class="controls">
+        <button class="btn btn-check" data-check="4">Проверить</button>
+        <button class="btn btn-show" data-show="4">Показать ответы</button>
+        <span class="score-badge" id="score-ex4">Результат: —/10</span>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>Reported Speech · тренажёр для самопроверки</footer>
+</div>
+
+<script>
+(function(){
+
+/* ================= DATA ================= */
+
+const ex1Items = [
+  { q:'Present Simple → ?', opts:['Past Simple','Past Continuous','Present Perfect','Future Simple'], a:'Past Simple' },
+  { q:'Present Continuous → ?', opts:['Past Continuous','Past Simple','Present Perfect','Future Simple'], a:'Past Continuous' },
+  { q:'Present Perfect → ?', opts:['Past Perfect','Past Simple','Past Continuous','Future Simple'], a:'Past Perfect' },
+  { q:'Past Simple → ?', opts:['Past Perfect','Past Continuous','Present Perfect','Future Simple'], a:'Past Perfect' },
+  { q:'will → ?', opts:['would','should','could','might'], a:'would' },
+  { q:'can → ?', opts:['could','might','would','should'], a:'could' },
+  { q:'may → ?', opts:['might','should','would','could'], a:'might' },
+  { q:'must → ?', opts:['had to','would','could','might'], a:'had to' }
+];
+
+const ex2Items = [
+  { q:'He ___ me that he was busy.', opts:['said','told','says','tells'], a:'told' },
+  { q:'She ___ (that) she would call later.', opts:['told','said','says','tells'], a:'said' },
+  { q:'Can you ___ me the time, please?', opts:['tell','say','told','said'], a:'tell' },
+  { q:'He ___ "hello" to everyone.', opts:['told','said','tells','says'], a:'said' },
+  { q:'Please ___ your name.', opts:['tell','say','told','said'], a:'say' },
+  { q:'She ___ us an interesting story.', opts:['said','told','says','tells'], a:'told' },
+  { q:'He ___ goodbye and left.', opts:['told','said','tells','says'], a:'said' },
+  { q:'The teacher ___ the students to be quiet.', opts:['said','told','says','tells'], a:'told' },
+  { q:'Did she ___ anything about the meeting?', opts:['tell','say','told','said'], a:'say' },
+  { q:'He ___ the truth to the police.', opts:['said','told','says','tells'], a:'told' }
+];
+
+const ex3Items = [
+  { q:'"I am tired," she said.', hint:'Начните с: She said (that) …', display:'She said (that) she was tired.',
+    accept:['she said she was tired'] },
+  { q:'"I have finished my homework," he said.', hint:'Начните с: He said (that) …', display:'He said (that) he had finished his homework.',
+    accept:['he said he had finished his homework','he said he\'d finished his homework'] },
+  { q:'"We are having dinner now," they said.', hint:'Начните с: They said (that) … (обратите внимание на now)', display:'They said (that) they were having dinner then.',
+    accept:['they said they were having dinner then','they said they were having dinner at that moment','they said they were having dinner at the moment'] },
+  { q:'"I will call you tomorrow," she said to me.', hint:'She said (that) … — she это «I», me это «you»', display:'She said (that) she would call me the next day.',
+    accept:['she said she would call me the next day','she said she\'d call me the next day','she said she would call me the following day'] },
+  { q:'"I can speak French," he said.', hint:'Начните с: He said (that) …', display:'He said (that) he could speak French.',
+    accept:['he said he could speak french'] },
+  { q:'"I saw him yesterday," she said.', hint:'Начните с: She said (that) … (yesterday → ?)', display:'She said (that) she had seen him the day before.',
+    accept:['she said she had seen him the day before','she said she\'d seen him the day before','she said she had seen him the previous day'] },
+  { q:'"Do you like coffee?" she asked me.', hint:'Общий вопрос: She asked me if / whether …', display:'She asked me if I liked coffee.',
+    accept:['she asked me if i liked coffee','she asked me whether i liked coffee'] },
+  { q:'"Where do you live?" he asked me.', hint:'Специальный вопрос: He asked me where …', display:'He asked me where I lived.',
+    accept:['he asked me where i lived'] },
+  { q:'"Close the door," he told her.', hint:'Просьба/приказ: He told her to …', display:'He told her to close the door.',
+    accept:['he told her to close the door'] },
+  { q:'"Don\'t be late," she told him.', hint:'Отрицательный приказ: She told him not to …', display:'She told him not to be late.',
+    accept:['she told him not to be late'] }
+];
+
+const ex4Items = [
+  { q:'He said (that) he was hungry.', hint:'was → am', display:'"I am hungry," he said.',
+    accept:['i am hungry','i\'m hungry'] },
+  { q:'She said (that) she had already eaten breakfast.', hint:'had eaten → have eaten', display:'"I have already eaten breakfast," she said.',
+    accept:['i have already eaten breakfast','i\'ve already eaten breakfast'] },
+  { q:'They said (that) they were playing football at that moment.', hint:'were playing → are playing, at that moment → now', display:'"We are playing football now," they said.',
+    accept:['we are playing football now','we\'re playing football now','we are playing football at the moment'] },
+  { q:'She said to me (that) she would help me the next day.', hint:'would → will, the next day → tomorrow', display:'"I will help you tomorrow," she said.',
+    accept:['i will help you tomorrow','i\'ll help you tomorrow'] },
+  { q:'He said (that) he could drive a car.', hint:'could → can', display:'"I can drive a car," he said.',
+    accept:['i can drive a car'] },
+  { q:'She said (that) she had visited Paris the year before.', hint:'had visited → visited, the year before → last year', display:'"I visited Paris last year," she said.',
+    accept:['i visited paris last year'] },
+  { q:'He asked me if I was ready.', hint:'Вопрос Yes/No: восстановите порядок слов', display:'"Are you ready?" he asked me.',
+    accept:['are you ready'] },
+  { q:'She asked him what his name was.', hint:'Специальный вопрос: what + is + your name?', display:'"What is your name?" she asked him.',
+    accept:['what is your name','what\'s your name'] },
+  { q:'He told her to open the window.', hint:'Просьба → повелительное наклонение', display:'"Open the window," he told her.',
+    accept:['open the window'] },
+  { q:'She told him not to shout.', hint:'Отрицательный приказ: Don\'t + глагол', display:'"Don\'t shout," she told him.',
+    accept:['don\'t shout','do not shout'] }
+];
+
+/* ================= STATE ================= */
+
+const scoreState = { ex1:0, ex2:0, ex3:0, ex4:0 };
+const maxTotal = ex1Items.length + ex2Items.length + ex3Items.length + ex4Items.length;
+
+/* ================= HELPERS ================= */
+
+function escapeHtml(str){
+  return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function normalize(s){
+  return s.toLowerCase()
+    .replace(/[“”"]/g,'')
+    .replace(/[.,!?;:]/g,'')
+    .replace(/\bthat\b/g,'')
+    .replace(/\s+/g,' ')
+    .trim();
+}
+
+function pad(n){ return String(n+1).padStart(2,'0'); }
+
+function updateScoreBadge(exKey, correct, total){
+  document.getElementById('score-'+exKey).textContent = 'Результат: ' + correct + '/' + total;
+}
+
+function updateTotalScore(){
+  const total = scoreState.ex1 + scoreState.ex2 + scoreState.ex3 + scoreState.ex4;
+  document.getElementById('totalScore').textContent = total + '/' + maxTotal;
+}
+
+/* ================= RENDER: multiple choice ================= */
+
+function renderChoice(containerId, items){
+  const el = document.getElementById(containerId);
+  el.innerHTML = items.map((item, idx) => `
+    <div class="q-block" data-idx="${idx}">
+      <div class="q-head">
+        <span class="q-num">${pad(idx)}</span>
+        <span class="q-text">${escapeHtml(item.q)}</span>
+        <span class="q-status"></span>
+      </div>
+      <div class="choice-row">
+        ${item.opts.map(opt => `<button type="button" class="choice-btn" data-value="${escapeHtml(opt)}">${escapeHtml(opt)}</button>`).join('')}
+      </div>
+    </div>
+  `).join('');
+
+  el.addEventListener('click', e => {
+    const btn = e.target.closest('.choice-btn');
+    if(!btn) return;
+    const block = btn.closest('.q-block');
+    block.querySelectorAll('.choice-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+  });
+}
+
+function checkChoice(containerId, items, exKey){
+  const el = document.getElementById(containerId);
+  let correct = 0;
+  el.querySelectorAll('.q-block').forEach((block, idx) => {
+    block.classList.remove('correct','incorrect','unanswered');
+    const selected = block.querySelector('.choice-btn.selected');
+    const status = block.querySelector('.q-status');
+    if(!selected){ block.classList.add('unanswered'); status.textContent = '?'; return; }
+    if(selected.dataset.value === items[idx].a){
+      block.classList.add('correct'); status.textContent = '✓'; correct++;
+    } else {
+      block.classList.add('incorrect'); status.textContent = '✗';
+    }
+  });
+  scoreState[exKey] = correct;
+  updateScoreBadge(exKey, correct, items.length);
+  updateTotalScore();
+}
+
+function toggleAnswersChoice(containerId, items, btnEl){
+  const el = document.getElementById(containerId);
+  const showing = el.classList.toggle('showing-answers');
+  el.querySelectorAll('.q-block').forEach((block, idx) => {
+    block.querySelectorAll('.choice-btn').forEach(b => {
+      b.classList.toggle('correct-answer', showing && b.dataset.value === items[idx].a);
+    });
+  });
+  btnEl.textContent = showing ? 'Скрыть ответы' : 'Показать ответы';
+}
+
+/* ================= RENDER: free text ================= */
+
+function renderText(containerId, items){
+  const el = document.getElementById(containerId);
+  el.innerHTML = items.map((item, idx) => `
+    <div class="q-block" data-idx="${idx}">
+      <div class="q-head">
+        <span class="q-num">${pad(idx)}</span>
+        <span class="q-text">${escapeHtml(item.q)}</span>
+        <span class="q-status"></span>
+      </div>
+      <div class="hint">${escapeHtml(item.hint)}</div>
+      <input type="text" class="text-input" placeholder="Введите ответ на английском..." autocomplete="off" spellcheck="false">
+      <div class="answer-line" hidden>Ответ: <strong>${escapeHtml(item.display)}</strong></div>
+    </div>
+  `).join('');
+}
+
+function checkText(containerId, items, exKey){
+  const el = document.getElementById(containerId);
+  let correct = 0;
+  el.querySelectorAll('.q-block').forEach((block, idx) => {
+    block.classList.remove('correct','incorrect','unanswered');
+    const input = block.querySelector('.text-input');
+    const status = block.querySelector('.q-status');
+    const val = input.value.trim();
+    if(!val){ block.classList.add('unanswered'); status.textContent = '?'; return; }
+    const norm = normalize(val);
+    const ok = items[idx].accept.some(a => normalize(a) === norm);
+    if(ok){ block.classList.add('correct'); status.textContent = '✓'; correct++; }
+    else { block.classList.add('incorrect'); status.textContent = '✗'; }
+  });
+  scoreState[exKey] = correct;
+  updateScoreBadge(exKey, correct, items.length);
+  updateTotalScore();
+}
+
+function toggleAnswersText(containerId, btnEl){
+  const el = document.getElementById(containerId);
+  const showing = el.classList.toggle('showing-answers');
+  el.querySelectorAll('.answer-line').forEach(line => { line.hidden = !showing; });
+  btnEl.textContent = showing ? 'Скрыть ответы' : 'Показать ответы';
+}
+
+/* ================= INIT ================= */
+
+renderChoice('ex1-items', ex1Items);
+renderChoice('ex2-items', ex2Items);
+renderText('ex3-items', ex3Items);
+renderText('ex4-items', ex4Items);
+
+document.querySelectorAll('[data-check]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const n = btn.dataset.check;
+    if(n === '1') checkChoice('ex1-items', ex1Items, 'ex1');
+    if(n === '2') checkChoice('ex2-items', ex2Items, 'ex2');
+    if(n === '3') checkText('ex3-items', ex3Items, 'ex3');
+    if(n === '4') checkText('ex4-items', ex4Items, 'ex4');
+  });
+});
+
+document.querySelectorAll('[data-show]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const n = btn.dataset.show;
+    if(n === '1') toggleAnswersChoice('ex1-items', ex1Items, btn);
+    if(n === '2') toggleAnswersChoice('ex2-items', ex2Items, btn);
+    if(n === '3') toggleAnswersText('ex3-items', btn);
+    if(n === '4') toggleAnswersText('ex4-items', btn);
+  });
+});
+
+document.getElementById('resetAllBtn').addEventListener('click', () => location.reload());
+
+})();
+</script>
+</body>
+</html>
