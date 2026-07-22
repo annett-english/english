@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>State Verbs — тренажёр B1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;0,700;0,900;1,500&family=Source+Sans+3:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#fbfbf6;
+    --grid-blue:#c3d5e8;
+    --margin-red:#d1495b;
+    --ink:#233045;
+    --ink-soft:#5b6577;
+    --teal:#1f6f6b;
+    --teal-dark:#144e4b;
+    --amber:#e2a63b;
+    --green:#2e8b57;
+    --green-bg:#e7f4ec;
+    --red-bg:#fdeaec;
+    --rail-bg:#1c2a3a;
+    --rail-bg-soft:#26384c;
+    --radius:10px;
+    --shadow:0 6px 18px rgba(28,42,58,.10);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:#e9e4d6;
+    color:var(--ink);
+    font-family:'Source Sans 3', sans-serif;
+    line-height:1.5;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:28px 18px 60px;}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    padding:38px 34px 30px;
+    background:var(--rail-bg);
+    background-image:radial-gradient(circle at 85% -10%, #2c4457 0%, transparent 55%);
+    color:#f4f1e8;
+    border-radius:18px;
+    margin-bottom:22px;
+    position:relative;
+    overflow:hidden;
+  }
+  .hero .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12.5px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--amber);
+    margin:0 0 10px;
+  }
+  .hero h1{
+    font-family:'Fraunces', serif;
+    font-weight:700;
+    font-size:clamp(32px,5vw,52px);
+    margin:0 0 8px;
+    letter-spacing:-.01em;
+  }
+  .hero h1 em{color:#8fd0c6;font-style:italic;font-weight:500;}
+  .hero p.sub{
+    margin:0 0 20px;
+    max-width:640px;
+    color:#cfd6dd;
+    font-size:16px;
+  }
+  .rule-toggle{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    background:rgba(244,241,232,.1);
+    border:1px solid rgba(244,241,232,.35);
+    color:#f4f1e8;
+    font-family:'Source Sans 3',sans-serif;
+    font-size:14.5px;
+    font-weight:600;
+    padding:9px 16px;
+    border-radius:100px;
+    cursor:pointer;
+    transition:background .15s ease;
+  }
+  .rule-toggle:hover{background:rgba(244,241,232,.18);}
+  .rule-toggle .chev{transition:transform .2s ease;}
+  .rule-toggle.open .chev{transform:rotate(180deg);}
+
+  .rule-panel{
+    max-height:0;
+    overflow:hidden;
+    transition:max-height .28s ease;
+  }
+  .rule-panel.open{max-height:900px;}
+  .rule-inner{
+    margin-top:18px;
+    background:rgba(251,251,246,.06);
+    border:1px solid rgba(244,241,232,.22);
+    border-radius:12px;
+    padding:18px 20px 6px;
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+    gap:4px 26px;
+  }
+  .rule-inner h3{
+    font-family:'Fraunces',serif;
+    font-size:15.5px;
+    color:var(--amber);
+    margin:0 0 6px;
+  }
+  .rule-inner p{font-size:14px;color:#dfe4e8;margin:0 0 16px;}
+  .rule-inner .note{
+    grid-column:1/-1;
+    font-size:13.5px;
+    color:#a9e2d4;
+    border-top:1px dashed rgba(244,241,232,.25);
+    padding-top:12px;
+    margin-top:2px;
+  }
+
+  /* ---------- BOARD (rail + page) ---------- */
+  .board{display:flex;gap:20px;align-items:flex-start;}
+  .rail{
+    flex:0 0 208px;
+    background:var(--rail-bg);
+    border-radius:16px;
+    padding:14px;
+    position:sticky;
+    top:16px;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+  }
+  .tab{
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    text-align:left;
+    background:transparent;
+    border:none;
+    color:#b7c1cd;
+    padding:11px 12px;
+    border-radius:10px;
+    cursor:pointer;
+    font-family:'Source Sans 3',sans-serif;
+    font-size:14px;
+    line-height:1.3;
+    transition:background .15s ease, color .15s ease;
+  }
+  .tab .num{
+    font-family:'IBM Plex Mono',monospace;
+    font-weight:600;
+    font-size:12px;
+    color:var(--amber);
+    background:rgba(226,166,59,.12);
+    border-radius:5px;
+    padding:2px 6px;
+    flex:0 0 auto;
+  }
+  .tab .lbl small{display:block;color:#8993a3;font-size:11.5px;margin-top:2px;}
+  .tab:hover{background:var(--rail-bg-soft);color:#f4f1e8;}
+  .tab.active{background:var(--teal);color:#fff;}
+  .tab.active .num{background:rgba(255,255,255,.2);color:#fff;}
+  .tab.active .lbl small{color:#d8ece8;}
+
+  .page{
+    flex:1 1 auto;
+    min-width:0;
+    background:
+      linear-gradient(rgba(251,251,246,.985), rgba(251,251,246,.985)),
+      repeating-linear-gradient(var(--paper) 0 31px, var(--grid-blue) 31px 32px);
+    border-radius:16px;
+    box-shadow:var(--shadow);
+    position:relative;
+    padding:30px 32px 30px 46px;
+    border-left:3px solid var(--margin-red);
+  }
+  .exercise-page{display:none;}
+  .exercise-page.active{display:block;animation:fade .25s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
+
+  .page-head{margin-bottom:22px;}
+  .page-head .ex-tag{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    color:var(--teal);
+    letter-spacing:.08em;
+    text-transform:uppercase;
+  }
+  .page-head h2{
+    font-family:'Fraunces',serif;
+    font-weight:700;
+    font-size:26px;
+    margin:4px 0 8px;
+    color:var(--ink);
+  }
+  .page-head p{
+    margin:0;
+    color:var(--ink-soft);
+    font-size:15px;
+    max-width:640px;
+  }
+
+  ol.items{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:16px;}
+  .item{
+    padding:14px 16px;
+    border-radius:var(--radius);
+    background:rgba(255,255,255,.55);
+    border:1px solid rgba(35,48,69,.08);
+    display:flex;
+    gap:12px;
+    align-items:flex-start;
+    transition:background .15s ease, border-color .15s ease;
+  }
+  .item .n{
+    font-family:'IBM Plex Mono',monospace;
+    font-weight:600;
+    font-size:13px;
+    color:#fff;
+    background:var(--ink-soft);
+    min-width:26px;
+    height:26px;
+    border-radius:7px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex:0 0 auto;
+    margin-top:1px;
+  }
+  .item.correct{background:var(--green-bg);border-color:#bfe3cd;}
+  .item.correct .n{background:var(--green);}
+  .item.wrong{background:var(--red-bg);border-color:#f2c3c9;}
+  .item.wrong .n{background:var(--margin-red);}
+  .item.revealed{border-style:dashed;border-color:var(--amber);}
+
+  .item-body{flex:1 1 auto;min-width:0;}
+  .sent{font-size:15.5px;color:var(--ink);}
+  .sent .wrong-part{
+    background:#fde2e2;
+    color:#a3283a;
+    text-decoration:line-through;
+    text-decoration-color:#a3283a;
+    padding:1px 4px;
+    border-radius:4px;
+    font-weight:600;
+  }
+  .sent .base{color:var(--ink-soft);font-style:italic;}
+  .blank-line{
+    border:none;
+    border-bottom:2px solid #b7c1cd;
+    background:transparent;
+    font-family:'Source Sans 3',sans-serif;
+    font-size:15px;
+    padding:3px 2px;
+    min-width:150px;
+    color:var(--ink);
+    outline-offset:3px;
+  }
+  .blank-line:focus-visible{border-bottom-color:var(--teal);}
+  .row-inline{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:6px;}
+  .row-inline .lead{color:var(--ink-soft);font-size:13.5px;font-family:'IBM Plex Mono',monospace;}
+
+  .fb-icon{
+    font-family:'Caveat',cursive;
+    font-weight:700;
+    font-size:26px;
+    margin-left:6px;
+    display:inline-block;
+    transform:rotate(-6deg);
+  }
+  .fb-icon.ok{color:var(--green);}
+  .fb-icon.no{color:var(--margin-red);}
+  .correct-note{
+    font-family:'Caveat',cursive;
+    font-weight:700;
+    font-size:19px;
+    color:var(--margin-red);
+    margin-left:4px;
+  }
+
+  /* choice pills */
+  .choices{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;}
+  .choice{
+    border:1.5px solid #c7cfda;
+    background:#fff;
+    padding:7px 14px;
+    border-radius:100px;
+    font-size:14.5px;
+    cursor:pointer;
+    color:var(--ink);
+    transition:all .12s ease;
+  }
+  .choice:hover{border-color:var(--teal);}
+  .choice input{position:absolute;opacity:0;pointer-events:none;}
+  .choice.picked{background:var(--teal);border-color:var(--teal);color:#fff;}
+  .item.correct .choice.picked{background:var(--green);border-color:var(--green);}
+  .item.wrong .choice.picked{background:var(--margin-red);border-color:var(--margin-red);}
+  .item.revealed .choice.is-answer{background:var(--amber);border-color:var(--amber);color:#3a2c0d;}
+
+  select.match-select{
+    font-family:'Source Sans 3',sans-serif;
+    font-size:14.5px;
+    padding:7px 10px;
+    border-radius:8px;
+    border:1.5px solid #c7cfda;
+    background:#fff;
+    color:var(--ink);
+    max-width:100%;
+  }
+  select.match-select:focus-visible{outline:2px solid var(--teal);}
+
+  .dual{display:flex;flex-direction:column;gap:10px;}
+  .dual .verb-chip{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    font-weight:600;
+    letter-spacing:.05em;
+    color:var(--teal-dark);
+    background:#e3efee;
+    display:inline-block;
+    padding:2px 9px;
+    border-radius:6px;
+    margin-bottom:2px;
+  }
+  .sub-row{display:flex;align-items:flex-start;gap:8px;}
+  .sub-row .tag{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    color:var(--ink-soft);
+    margin-top:5px;
+  }
+  .sub-row.sub-wrong .blank-line{border-bottom-color:var(--margin-red);}
+  .sub-row.sub-correct .blank-line{border-bottom-color:var(--green);}
+
+  /* controls */
+  .controls{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:10px;
+    margin-top:24px;
+    padding-top:18px;
+    border-top:1px dashed #cfd6dd;
+  }
+  button.btn{
+    font-family:'Source Sans 3',sans-serif;
+    font-weight:700;
+    font-size:14.5px;
+    padding:10px 20px;
+    border-radius:9px;
+    border:none;
+    cursor:pointer;
+    transition:transform .08s ease, box-shadow .12s ease, background .12s ease;
+  }
+  button.btn:active{transform:translateY(1px);}
+  .btn-check{background:var(--teal);color:#fff;}
+  .btn-check:hover{background:var(--teal-dark);}
+  .btn-show{background:#fff;color:var(--ink);border:1.5px solid var(--amber);}
+  .btn-show:hover{background:#fdf3e2;}
+  .btn-reset{background:transparent;color:var(--ink-soft);border:1.5px solid #d3d9e0;}
+  .btn-reset:hover{background:#f1f1ea;}
+  .score{
+    margin-left:auto;
+    font-family:'IBM Plex Mono',monospace;
+    font-weight:600;
+    font-size:14px;
+    background:#eef1ea;
+    border:1px solid #d3d9c8;
+    color:var(--ink);
+    padding:8px 14px;
+    border-radius:100px;
+  }
+  .score.good{background:var(--green-bg);border-color:#bfe3cd;color:#1e6a41;}
+
+  :focus-visible{outline:2px solid var(--teal);outline-offset:2px;}
+
+  /* mobile */
+  @media (max-width:880px){
+    .board{flex-direction:column;}
+    .rail{
+      position:static;
+      flex-direction:row;
+      overflow-x:auto;
+      width:100%;
+      gap:8px;
+    }
+    .tab{flex:0 0 auto;min-width:150px;}
+    .page{padding:24px 18px 24px 26px;}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none !important;transition:none !important;}
+    html{scroll-behavior:auto;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <p class="eyebrow">Grammar workbook · Present Simple vs Present Continuous</p>
+    <h1>State <em>Verbs</em></h1>
+    <p class="sub">Тренажёр по глаголам состояния — уровень B1. Шесть упражнений, в каждом по 10 заданий: ошибки, выбор формы, сопоставление значений и разбор глаголов, которые бывают и состоянием, и действием.</p>
+    <button class="rule-toggle" id="ruleToggle" aria-expanded="false">
+      <span>Показать правило</span><span class="chev">▾</span>
+    </button>
+    <div class="rule-panel" id="rulePanel">
+      <div class="rule-inner">
+        <div>
+          <h3>Что такое state verbs</h3>
+          <p>Это глаголы, которые называют состояние, а не действие, поэтому обычно у них нет форм Continuous: чувства и предпочтения (like, love, hate, prefer), органы чувств (see, hear, smell, taste), восприятие и мышление (know, believe, understand, remember, think), а также be, have, own, need, cost, belong, weigh, fit и другие.</p>
+        </div>
+        <div>
+          <h3>Одно и то же слово — два значения</h3>
+          <p>Некоторые из этих глаголов употребляются и в Continuous, но тогда они означают уже не состояние, а конкретное действие: taste (иметь вкус / пробовать на вкус), have (иметь / проводить время), see (видеть / встречаться с кем-то), think (считать / обдумывать), look (выглядеть / смотреть) и т.д.</p>
+        </div>
+        <div class="note">Подсказка: если глагол описывает то, что <em>есть</em> (свойство, признак, оценку), — это состояние → Simple. Если описывает то, что кто-то <em>делает</em> прямо сейчас, — это действие → Continuous.</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="board">
+    <nav class="rail" id="rail"></nav>
+    <main class="page" id="pageRoot"></main>
+  </div>
+</div>
+
+<script>
+/* ============================= DATA ============================= */
+
+const EXERCISES = [
+  {
+    id: 1,
+    tag: "Упражнение 1",
+    title: "Найди и исправь ошибку",
+    instructions: "В каждом предложении подчёркнутая часть — ошибка (глагол состояния стоит в Continuous). Впиши только исправленную форму глагола (не всё предложение).",
+    type: "correction",
+    items: [
+      { pre:"I ", wrong:"am loving", post:" this song.", answers:["love"] },
+      { pre:"She ", wrong:"is not believing", post:" you.", answers:["doesn't believe","does not believe"] },
+      { pre:"He ", wrong:"is having", post:" a car.", answers:["has"] },
+      { pre:"This soup ", wrong:"is tasting", post:" salty.", answers:["tastes"] },
+      { pre:"I ", wrong:"am knowing", post:" the answer.", answers:["know"] },
+      { pre:"The bag ", wrong:"is weighing", post:" 5 kilos.", answers:["weighs"] },
+      { pre:"We ", wrong:"are owning", post:" this house.", answers:["own"] },
+      { pre:"I ", wrong:"am understanding", post:" the problem now.", answers:["understand"] },
+      { pre:"This box ", wrong:"is containing", post:" old books.", answers:["contains"] },
+      { pre:"She ", wrong:"is wanting", post:" a new phone.", answers:["wants"] }
+    ]
+  },
+  {
+    id: 2,
+    tag: "Упражнение 2",
+    title: "Выбери правильную форму",
+    instructions: "Выбери вариант, который подходит по смыслу: глагол называет состояние (Simple) или конкретное действие сейчас / в этот период (Continuous).",
+    type: "choice",
+    items: [
+      { pre:"Mmm, this cake ", post:" amazing!", options:["tastes","is tasting"], correct:0 },
+      { pre:"The chef ", post:" the soup to check the seasoning right now.", options:["tastes","is tasting"], correct:1 },
+      { pre:"I ", post:" you are right.", options:["think","am thinking"], correct:0 },
+      { pre:"She ", post:" about her future plans right now.", options:["thinks","is thinking"], correct:1 },
+      { pre:"He ", post:" three brothers.", options:["has","is having"], correct:0 },
+      { pre:"They ", post:" dinner at the moment.", options:["have","are having"], correct:1 },
+      { pre:"This jacket ", post:" me perfectly.", options:["fits","is fitting"], correct:0 },
+      { pre:"The tailor ", post:" the suit for tomorrow's wedding.", options:["fits","is fitting"], correct:1 },
+      { pre:"He ", post:" nervous about the interview.", options:["appears","is appearing"], correct:0 },
+      { pre:"The actor ", post:" in a new movie this year.", options:["appears","is appearing"], correct:1 }
+    ]
+  },
+  {
+    id: 3,
+    tag: "Упражнение 3",
+    title: "Сопоставь предложение со значением",
+    instructions: "Выбери из списка значение, которое соответствует каждому предложению.",
+    type: "match",
+    items: [
+      { sentence:"This perfume smells nice.", meaning:"has a nice smell" },
+      { sentence:"He is smelling the milk.", meaning:"is sniffing it" },
+      { sentence:"The baby's hair feels like silk.", meaning:"has the texture of silk" },
+      { sentence:"She is feeling the baby's forehead.", meaning:"is touching it to check" },
+      { sentence:"Bob has a Porsche.", meaning:"possesses it" },
+      { sentence:"He's having a shower at the moment.", meaning:"is taking a shower" },
+      { sentence:"The chicken weighs 2 kilos.", meaning:"has a weight of 2 kilos" },
+      { sentence:"The butcher is weighing the meat.", meaning:"is measuring how heavy it is" },
+      { sentence:"This dress fits you perfectly.", meaning:"is the right size for you" },
+      { sentence:"He appears to be nervous.", meaning:"seems nervous" }
+    ]
+  },
+  {
+    id: 4,
+    tag: "Упражнение 4",
+    title: "Один глагол — состояние и действие",
+    instructions: "Один и тот же глагол используется дважды: (a) как глагол состояния — Simple, и (b) как обычное действие — Continuous. Впиши нужную форму в каждый пропуск.",
+    type: "dual",
+    items: [
+      { verb:"TASTE",
+        a:{ pre:"This coffee ", post:" too sweet.", answers:["tastes"] },
+        b:{ pre:"He ", post:" the wine before buying it.", answers:["is tasting"] } },
+      { verb:"SMELL",
+        a:{ pre:"These flowers ", post:" wonderful.", answers:["smell"] },
+        b:{ pre:"He ", post:" the milk to check if it's fresh.", answers:["is smelling"] } },
+      { verb:"FEEL",
+        a:{ pre:"This blanket ", post:" so soft.", answers:["feels"] },
+        b:{ pre:"The doctor ", post:" her arm to check for injuries.", answers:["is feeling"] } },
+      { verb:"HAVE",
+        a:{ pre:"My sister ", post:" two cats.", answers:["has"] },
+        b:{ pre:"We ", post:" lunch right now.", answers:["are having"] } },
+      { verb:"WEIGH",
+        a:{ pre:"This parcel ", post:" 3 kilos.", answers:["weighs"] },
+        b:{ pre:"The nurse ", post:" the baby at the moment.", answers:["is weighing"] } },
+      { verb:"FIT",
+        a:{ pre:"These shoes ", post:" me well.", answers:["fit"] },
+        b:{ pre:"The workers ", post:" new windows this week.", answers:["are fitting"] } },
+      { verb:"APPEAR",
+        a:{ pre:"He ", post:" upset about something.", answers:["appears"] },
+        b:{ pre:"She ", post:" on TV tonight.", answers:["is appearing"] } },
+      { verb:"BE",
+        a:{ pre:"My grandfather ", post:" a very patient man.", answers:["is"] },
+        b:{ pre:"Why ", post:" you so rude to her today?", answers:["are you being","are being"] } },
+      { verb:"THINK",
+        a:{ pre:"I ", post:" this plan is a good idea.", answers:["think"] },
+        b:{ pre:"She ", post:" about moving to another city.", answers:["is thinking"] } },
+      { verb:"SEE",
+        a:{ pre:"I ", post:" what you mean now.", answers:["see"] },
+        b:{ pre:"He ", post:" the dentist tomorrow morning.", answers:["is seeing"] } }
+    ]
+  },
+  {
+    id: 5,
+    tag: "Упражнение 5",
+    title: "Выбери правильную форму (чистые глаголы состояния)",
+    instructions: "Эти глаголы почти никогда не бывают действием — выбери верный вариант.",
+    type: "choice",
+    items: [
+      { pre:"This book ", post:" to my brother.", options:["belongs","is belonging"], correct:0 },
+      { pre:"I ", post:" in ghosts.", options:["don't believe","am not believing"], correct:0 },
+      { pre:"The tickets ", post:" $50 each.", options:["cost","are costing"], correct:0 },
+      { pre:"Sorry, I ", post:" the question.", options:["don't understand","am not understanding"], correct:0 },
+      { pre:"He ", post:" three restaurants in the city.", options:["owns","is owning"], correct:0 },
+      { pre:"The price ", post:" breakfast and taxes.", options:["includes","is including"], correct:0 },
+      { pre:"I ", post:" you $20.", options:["owe","am owing"], correct:0 },
+      { pre:"It ", post:" what you wear.", options:["doesn't matter","isn't mattering"], correct:0 },
+      { pre:"She ", post:" more time to finish.", options:["needs","is needing"], correct:0 },
+      { pre:"I ", post:" tea to coffee.", options:["prefer","am preferring"], correct:0 }
+    ]
+  },
+  {
+    id: 6,
+    tag: "Упражнение 6",
+    title: "Смешанная практика",
+    instructions: "Впиши глагол из скобок в правильной форме — Present Simple или Present Continuous. Не забывай про отрицания.",
+    type: "gapfill",
+    items: [
+      { pre:"Listen! Someone ", base:"knock", post:" at the door.", answers:["is knocking"] },
+      { pre:"I ", base:"not / know", post:" his phone number.", answers:["don't know","do not know"] },
+      { pre:"She ", base:"cook", post:" dinner right now.", answers:["is cooking"] },
+      { pre:"This soup ", base:"need", post:" more salt.", answers:["needs"] },
+      { pre:"They ", base:"watch", post:" a movie at the moment.", answers:["are watching"] },
+      { pre:"He ", base:"not / like", post:" loud music.", answers:["doesn't like","does not like"] },
+      { pre:"We ", base:"study", post:" for our exams this week.", answers:["are studying"] },
+      { pre:"This backpack ", base:"belong", post:" to Tom.", answers:["belongs"] },
+      { pre:"Look! The children ", base:"play", post:" in the garden.", answers:["are playing"] },
+      { pre:"I ", base:"think", post:" she is a great teacher.", answers:["think"] }
+    ]
+  }
+];
+
+/* ============================= HELPERS ============================= */
+
+function normalize(str){
+  return String(str)
+    .toLowerCase()
+    .replace(/['’]/g,"")
+    .replace(/[.!?,;:]/g,"")
+    .replace(/\s+/g," ")
+    .trim();
+}
+function isCorrectText(value, answers){
+  const v = normalize(value);
+  if(!v) return false;
+  return answers.some(a => normalize(a) === v);
+}
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+function el(tag, cls, html){
+  const e = document.createElement(tag);
+  if(cls) e.className = cls;
+  if(html !== undefined) e.innerHTML = html;
+  return e;
+}
+
+/* ============================= RENDER ============================= */
+
+const pageRoot = document.getElementById("pageRoot");
+const rail = document.getElementById("rail");
+
+EXERCISES.forEach((ex, idx) => {
+  // tab
+  const tab = el("button","tab"+(idx===0?" active":""));
+  tab.dataset.ex = ex.id;
+  tab.setAttribute("type","button");
+  tab.innerHTML = `<span class="num">${String(ex.id).padStart(2,"0")}</span><span class="lbl">${ex.title}<small>${ex.tag}</small></span>`;
+  tab.addEventListener("click", () => showExercise(ex.id));
+  rail.appendChild(tab);
+
+  // page section
+  const section = el("section","exercise-page"+(idx===0?" active":""));
+  section.id = "ex-"+ex.id;
+
+  const head = el("div","page-head");
+  head.innerHTML = `<div class="ex-tag">${ex.tag} · 10 заданий</div><h2>${ex.title}</h2><p>${ex.instructions}</p>`;
+  section.appendChild(head);
+
+  const list = el("ol","items");
+  list.id = "list-"+ex.id;
+
+  ex.items.forEach((item, i) => {
+    const li = el("li","item");
+    li.dataset.index = i;
+
+    const nEl = el("span","n", String(i+1));
+    li.appendChild(nEl);
+
+    const body = el("div","item-body");
+
+    if(ex.type === "correction"){
+      body.innerHTML = `<div class="sent">${item.pre}<span class="wrong-part">${item.wrong}</span>${item.post}</div>
+        <div class="row-inline">
+          <span class="lead">Исправление:</span>
+          <input type="text" class="blank-line" data-role="answer" autocomplete="off" placeholder="верная форма">
+          <span class="fb-slot"></span>
+        </div>`;
+    } else if(ex.type === "gapfill"){
+      body.innerHTML = `<div class="sent">${item.pre}<input type="text" class="blank-line" data-role="answer" autocomplete="off" placeholder="…">${item.post} <span class="base">(${item.base})</span>
+        <span class="fb-slot"></span></div>`;
+    } else if(ex.type === "choice"){
+      const optsHtml = item.options.map((opt,oi)=>`
+        <label class="choice" data-oi="${oi}">
+          <input type="radio" name="ex${ex.id}-q${i}" value="${oi}">
+          ${opt}
+        </label>`).join("");
+      body.innerHTML = `<div class="sent">${item.pre}<span class="base">______</span>${item.post}</div>
+        <div class="choices">${optsHtml}</div>`;
+    } else if(ex.type === "match"){
+      body.innerHTML = `<div class="sent">${item.sentence}</div>
+        <div class="row-inline">
+          <span class="lead">Значение:</span>
+          <select class="match-select" data-role="answer"><option value="">— выбери —</option></select>
+          <span class="fb-slot"></span>
+        </div>`;
+    } else if(ex.type === "dual"){
+      body.innerHTML = `<div class="dual">
+        <span class="verb-chip">${item.verb}</span>
+        <div class="sub-row" data-sub="a">
+          <span class="tag">a)</span>
+          <div class="sent">${item.a.pre}<input type="text" class="blank-line" data-role="answer" autocomplete="off" placeholder="…">${item.a.post}<span class="fb-slot"></span></div>
+        </div>
+        <div class="sub-row" data-sub="b">
+          <span class="tag">b)</span>
+          <div class="sent">${item.b.pre}<input type="text" class="blank-line" data-role="answer" autocomplete="off" placeholder="…">${item.b.post}<span class="fb-slot"></span></div>
+        </div>
+      </div>`;
+    }
+
+    li.appendChild(body);
+    list.appendChild(li);
+  });
+
+  section.appendChild(list);
+
+  // controls
+  const controls = el("div","controls");
+  controls.innerHTML = `
+    <button class="btn btn-check" data-action="check">Проверить</button>
+    <button class="btn btn-show" data-action="show">Показать ответы</button>
+    <button class="btn btn-reset" data-action="reset">Сбросить</button>
+    <span class="score" id="score-${ex.id}">0 / 10</span>
+  `;
+  section.appendChild(controls);
+
+  pageRoot.appendChild(section);
+
+  // choice click behaviour (toggle picked class)
+  list.querySelectorAll('input[type="radio"]').forEach(r => {
+    r.addEventListener("change", () => {
+      const item = r.closest(".item");
+      item.querySelectorAll(".choice").forEach(c => c.classList.remove("picked"));
+      r.closest(".choice").classList.add("picked");
+    });
+  });
+
+  // populate match selects with shuffled shared meaning pool
+  if(ex.type === "match"){
+    const pool = shuffle(ex.items.map(it => it.meaning));
+    list.querySelectorAll("select.match-select").forEach(sel => {
+      pool.forEach(m => {
+        const o = document.createElement("option");
+        o.value = m; o.textContent = m;
+        sel.appendChild(o);
+      });
+    });
+  }
+
+  controls.querySelector('[data-action="check"]').addEventListener("click", () => checkExercise(ex));
+  controls.querySelector('[data-action="show"]').addEventListener("click", () => showAnswers(ex));
+  controls.querySelector('[data-action="reset"]').addEventListener("click", () => resetExercise(ex));
+});
+
+function showExercise(id){
+  document.querySelectorAll(".exercise-page").forEach(s => s.classList.toggle("active", s.id === "ex-"+id));
+  document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", Number(t.dataset.ex) === id));
+}
+
+/* ============================= CHECK / SHOW / RESET ============================= */
+
+function setScore(ex, correctCount){
+  const badge = document.getElementById("score-"+ex.id);
+  badge.textContent = `${correctCount} / ${ex.items.length}`;
+  badge.classList.toggle("good", correctCount === ex.items.length);
+}
+
+function clearFeedback(li){
+  li.classList.remove("correct","wrong","revealed");
+  li.querySelectorAll(".fb-slot").forEach(s => s.innerHTML = "");
+  li.querySelectorAll(".sub-row").forEach(s => s.classList.remove("sub-correct","sub-wrong"));
+  li.querySelectorAll(".choice").forEach(c => c.classList.remove("is-answer"));
+}
+
+function checkExercise(ex){
+  const list = document.getElementById("list-"+ex.id);
+  let correctCount = 0;
+
+  ex.items.forEach((item, i) => {
+    const li = list.querySelector(`.item[data-index="${i}"]`);
+    clearFeedback(li);
+
+    if(ex.type === "correction" || ex.type === "gapfill"){
+      const input = li.querySelector('input[data-role="answer"]');
+      const ok = isCorrectText(input.value, item.answers);
+      li.classList.add(ok ? "correct" : "wrong");
+      const slot = li.querySelector(".fb-slot");
+      slot.innerHTML = ok
+        ? `<span class="fb-icon ok">✓</span>`
+        : `<span class="fb-icon no">✗</span><span class="correct-note">${item.answers[0]}</span>`;
+      if(ok) correctCount++;
+
+    } else if(ex.type === "choice"){
+      const checked = li.querySelector('input[type="radio"]:checked');
+      const ok = checked && Number(checked.value) === item.correct;
+      li.classList.add(ok ? "correct" : "wrong");
+      if(!ok){
+        const answerChoice = li.querySelector(`.choice[data-oi="${item.correct}"]`);
+        if(answerChoice) answerChoice.classList.add("is-answer");
+      }
+      if(ok) correctCount++;
+
+    } else if(ex.type === "match"){
+      const sel = li.querySelector("select");
+      const ok = sel.value === item.meaning;
+      li.classList.add(ok ? "correct" : "wrong");
+      const slot = li.querySelector(".fb-slot");
+      slot.innerHTML = ok
+        ? `<span class="fb-icon ok">✓</span>`
+        : `<span class="fb-icon no">✗</span><span class="correct-note">${item.meaning}</span>`;
+      if(ok) correctCount++;
+
+    } else if(ex.type === "dual"){
+      const rows = li.querySelectorAll(".sub-row");
+      let bothOk = true;
+      rows.forEach(row => {
+        const key = row.dataset.sub;
+        const sub = item[key];
+        const input = row.querySelector('input[data-role="answer"]');
+        const ok = isCorrectText(input.value, sub.answers);
+        row.classList.add(ok ? "sub-correct" : "sub-wrong");
+        const slot = row.querySelector(".fb-slot");
+        slot.innerHTML = ok
+          ? `<span class="fb-icon ok">✓</span>`
+          : `<span class="fb-icon no">✗</span><span class="correct-note">${sub.answers[0]}</span>`;
+        if(!ok) bothOk = false;
+      });
+      li.classList.add(bothOk ? "correct" : "wrong");
+      if(bothOk) correctCount++;
+    }
+  });
+
+  setScore(ex, correctCount);
+}
+
+function showAnswers(ex){
+  const list = document.getElementById("list-"+ex.id);
+
+  ex.items.forEach((item, i) => {
+    const li = list.querySelector(`.item[data-index="${i}"]`);
+    clearFeedback(li);
+    li.classList.add("revealed");
+
+    if(ex.type === "correction" || ex.type === "gapfill"){
+      li.querySelector('input[data-role="answer"]').value = item.answers[0];
+    } else if(ex.type === "choice"){
+      const radios = li.querySelectorAll('input[type="radio"]');
+      radios.forEach((r,ri)=>{ r.checked = (ri === item.correct); });
+      li.querySelectorAll(".choice").forEach(c=>c.classList.remove("picked"));
+      const answerChoice = li.querySelector(`.choice[data-oi="${item.correct}"]`);
+      if(answerChoice) answerChoice.classList.add("picked","is-answer");
+    } else if(ex.type === "match"){
+      li.querySelector("select").value = item.meaning;
+    } else if(ex.type === "dual"){
+      li.querySelectorAll(".sub-row").forEach(row=>{
+        const key = row.dataset.sub;
+        row.querySelector('input[data-role="answer"]').value = item[key].answers[0];
+      });
+    }
+  });
+
+  const badge = document.getElementById("score-"+ex.id);
+  badge.textContent = "показаны ответы";
+  badge.classList.remove("good");
+}
+
+function resetExercise(ex){
+  const list = document.getElementById("list-"+ex.id);
+  ex.items.forEach((item, i) => {
+    const li = list.querySelector(`.item[data-index="${i}"]`);
+    clearFeedback(li);
+    li.querySelectorAll('input[type="text"]').forEach(inp => inp.value = "");
+    li.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
+    li.querySelectorAll(".choice").forEach(c => c.classList.remove("picked","is-answer"));
+    const sel = li.querySelector("select");
+    if(sel) sel.value = "";
+  });
+  setScore(ex, 0);
+  document.getElementById("score-"+ex.id).textContent = "0 / " + ex.items.length;
+}
+
+/* ============================= RULE PANEL ============================= */
+const ruleToggle = document.getElementById("ruleToggle");
+const rulePanel = document.getElementById("rulePanel");
+ruleToggle.addEventListener("click", () => {
+  const open = rulePanel.classList.toggle("open");
+  ruleToggle.classList.toggle("open", open);
+  ruleToggle.setAttribute("aria-expanded", String(open));
+  ruleToggle.querySelector("span").textContent = open ? "Скрыть правило" : "Показать правило";
+});
+</script>
+</body>
+</html>
