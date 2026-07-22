@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Работа над ошибками — практика</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Kalam:wght@400;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,500&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper: #f7f2e9;
+    --paper-line: #e3d9c4;
+    --ink: #2c2a26;
+    --ink-soft: #5b5648;
+    --red: #b8442f;
+    --red-dark: #8f341f;
+    --green: #4f7a4a;
+    --green-bg: #e6ede2;
+    --red-bg: #f6e3de;
+    --yellow: #e8b64d;
+    --tab1: #b8442f;
+    --tab2: #3c6e5e;
+    --tab3: #a5762f;
+    --tab4: #4a5a8f;
+    --card: #fffdf8;
+    --shadow: rgba(44,42,38,0.12);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background: var(--paper);
+    background-image:
+      repeating-linear-gradient(to bottom, transparent, transparent 37px, var(--paper-line) 38px);
+    color: var(--ink);
+    font-family: 'Source Serif 4', Georgia, serif;
+    line-height:1.5;
+    padding-bottom:60px;
+  }
+  .margin-line{
+    position:fixed;
+    top:0; bottom:0; left:64px;
+    width:2px;
+    background: rgba(184,68,47,0.35);
+    z-index:0;
+  }
+  @media (max-width: 700px){ .margin-line{ left:28px; } }
+
+  header.hero{
+    position:relative;
+    z-index:1;
+    padding:56px 80px 32px 96px;
+  }
+  @media (max-width: 700px){ header.hero{ padding:40px 20px 24px 44px; } }
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color: var(--red);
+    margin:0 0 10px 0;
+  }
+  h1{
+    font-family:'Caveat', cursive;
+    font-size:64px;
+    font-weight:700;
+    margin:0 0 8px 0;
+    color: var(--ink);
+    line-height:1;
+  }
+  header.hero p.sub{
+    max-width:640px;
+    color: var(--ink-soft);
+    font-size:17px;
+    margin:0;
+  }
+  nav.tabs{
+    position:relative; z-index:1;
+    display:flex; flex-wrap:wrap; gap:10px;
+    padding:0 80px 24px 96px;
+  }
+  @media (max-width: 700px){ nav.tabs{ padding:0 20px 24px 44px; } }
+  nav.tabs a{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12.5px;
+    text-decoration:none;
+    color:var(--ink);
+    background: var(--card);
+    border:1px solid var(--paper-line);
+    border-radius:3px 3px 0 0;
+    padding:7px 12px;
+    box-shadow: 0 2px 0 var(--shadow);
+  }
+  main{
+    position:relative; z-index:1;
+    padding:0 80px 0 96px;
+  }
+  @media (max-width: 700px){ main{ padding:0 20px 0 44px; } }
+
+  section.block{
+    margin-bottom:54px;
+  }
+  .block-head{
+    display:flex; align-items:baseline; gap:14px;
+    border-bottom:2px solid var(--ink);
+    padding-bottom:8px;
+    margin-bottom:22px;
+  }
+  .block-head .tag{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    color:#fff;
+    padding:3px 8px;
+    border-radius:2px;
+    letter-spacing:.05em;
+  }
+  .block-head h2{
+    font-family:'Kalam', cursive;
+    font-size:26px;
+    margin:0;
+  }
+  .block-head .count{
+    margin-left:auto;
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    color:var(--ink-soft);
+  }
+
+  .card{
+    background: var(--card);
+    border:1px solid var(--paper-line);
+    border-radius:6px;
+    padding:22px 24px;
+    margin-bottom:22px;
+    box-shadow: 0 3px 10px var(--shadow);
+  }
+  .card h3{
+    font-family:'Kalam',cursive;
+    font-size:19px;
+    margin:0 0 4px 0;
+  }
+  .card .instr{
+    color: var(--ink-soft);
+    font-size:14.5px;
+    margin:0 0 16px 0;
+    font-style:italic;
+  }
+  .qrow{
+    display:flex;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:8px;
+    padding:10px 0;
+    border-top:1px dashed var(--paper-line);
+  }
+  .qrow:first-of-type{ border-top:none; }
+  .qnum{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    color:#fff;
+    background:var(--ink-soft);
+    border-radius:50%;
+    width:22px; height:22px;
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+  }
+  .qtext{ font-size:15.5px; }
+  .qtext em.blank{ font-style:normal; border-bottom:1px solid var(--ink-soft); padding:0 3px;}
+  input.answer-input{
+    font-family:'Source Serif 4', serif;
+    font-size:15px;
+    border:none;
+    border-bottom:2px solid var(--ink-soft);
+    background:transparent;
+    padding:3px 4px;
+    min-width:150px;
+    outline:none;
+    color:var(--ink);
+  }
+  input.answer-input:focus{ border-bottom-color: var(--red); }
+  input.answer-input.correct{ border-bottom-color: var(--green); background:var(--green-bg); }
+  input.answer-input.wrong{ border-bottom-color: var(--red); background:var(--red-bg); }
+
+  select.answer-select{
+    font-family:'JetBrains Mono',monospace;
+    font-size:13.5px;
+    padding:4px 6px;
+    border:1px solid var(--ink-soft);
+    border-radius:3px;
+    background:#fff;
+    color:var(--ink);
+  }
+  select.answer-select.correct{ border-color:var(--green); background:var(--green-bg); }
+  select.answer-select.wrong{ border-color:var(--red); background:var(--red-bg); }
+
+  .choice-group{ display:inline-flex; gap:6px; flex-wrap:wrap; }
+  .choice-btn{
+    font-family:'JetBrains Mono',monospace;
+    font-size:13px;
+    padding:6px 12px;
+    border:1.5px solid var(--ink-soft);
+    background:#fff;
+    border-radius:16px;
+    cursor:pointer;
+    transition: all .12s;
+    color:var(--ink);
+  }
+  .choice-btn:hover{ border-color: var(--red); }
+  .choice-btn.selected{ background: var(--ink); color:#fff; border-color:var(--ink); }
+  .choice-btn.correct{ background: var(--green); color:#fff; border-color:var(--green); }
+  .choice-btn.wrong{ background: var(--red); color:#fff; border-color:var(--red); }
+
+  .card-actions{
+    display:flex; gap:10px; align-items:center;
+    margin-top:18px;
+    padding-top:14px;
+    border-top:1px solid var(--paper-line);
+    flex-wrap:wrap;
+  }
+  button.act{
+    font-family:'JetBrains Mono',monospace;
+    font-size:13px;
+    padding:9px 16px;
+    border-radius:4px;
+    border:none;
+    cursor:pointer;
+    font-weight:600;
+  }
+  button.check{ background: var(--ink); color:#fff; }
+  button.check:hover{ background:#000; }
+  button.reveal{ background:transparent; color:var(--red); border:1.5px solid var(--red); }
+  button.reveal:hover{ background: var(--red); color:#fff; }
+  .score{
+    font-family:'JetBrains Mono',monospace;
+    font-size:13px;
+    color:var(--ink-soft);
+  }
+  .score.good{ color:var(--green); font-weight:600; }
+  .score.bad{ color:var(--red); font-weight:600; }
+
+  .answers-panel{
+    display:none;
+    margin-top:14px;
+    background:#fbf6ec;
+    border-left:3px solid var(--yellow);
+    padding:12px 16px;
+    font-size:14px;
+    border-radius:0 4px 4px 0;
+  }
+  .answers-panel.show{ display:block; }
+  .answers-panel ol{ margin:0; padding-left:20px; }
+  .answers-panel li{ margin-bottom:6px; }
+  .answers-panel .note{ color:var(--ink-soft); font-size:12.5px; }
+
+  .info-box{
+    background:#fff;
+    border:1px dashed var(--ink-soft);
+    border-radius:6px;
+    padding:18px 20px;
+    margin-bottom:22px;
+    font-size:15px;
+  }
+  .info-box .word{
+    font-family:'JetBrains Mono',monospace;
+    font-weight:600;
+    font-size:17px;
+  }
+  .stress{ color:var(--red); font-weight:700; }
+  .ipa{ color: var(--ink-soft); }
+
+  footer{
+    padding:30px 80px 10px 96px;
+    color:var(--ink-soft);
+    font-size:12.5px;
+    font-family:'JetBrains Mono',monospace;
+  }
+  @media (max-width: 700px){ footer{ padding:20px 20px 10px 44px; } }
+</style>
+</head>
+<body>
+<div class="margin-line"></div>
+
+<header class="hero">
+  <p class="eyebrow">work on mistakes · practice sheet</p>
+  <h1>Работа над ошибками</h1>
+  <p class="sub">Слова и фразы, с которыми были сложности, плюс повтор темы <strong>GO</strong>. В каждом упражнении: нажми «Проверить», чтобы увидеть свои ошибки, и «Показать ответы», чтобы свериться с ключом.</p>
+</header>
+
+<nav class="tabs">
+  <a href="#thank">thank/thanks</a>
+  <a href="#communicate">communicate</a>
+  <a href="#latefor">late for</a>
+  <a href="#speak">speak English</a>
+  <a href="#also-least">also / at least</a>
+  <a href="#rent-hire">rent / hire</a>
+  <a href="#spend">spend on</a>
+  <a href="#vocab">building/market/forest</a>
+  <a href="#depends">depends on</a>
+  <a href="#pron">произношение</a>
+  <a href="#go1">GO — упр. 1</a>
+  <a href="#go2">GO — упр. 2</a>
+  <a href="#go3">GO — упр. 3</a>
+</nav>
+
+<main>
+
+<!-- ============ SECTION 1: PROBLEM WORDS ============ -->
+<section class="block" id="words-section">
+  <div class="block-head">
+    <span class="tag" style="background:var(--tab1)">01</span>
+    <h2>Слова и выражения, вызвавшие трудности</h2>
+    <span class="count">4 упражнения</span>
+  </div>
+
+  <!-- EXERCISE 1: ERROR CORRECTION -->
+  <div class="card" id="ex1" data-exercise="ex1">
+    <h3>Упражнение 1 — Найди и исправь ошибку</h3>
+    <p class="instr">В каждом предложении есть одна ошибка (грамматика или выбор слова). Впиши исправленный вариант предложения целиком.</p>
+
+    <div class="qrow"><span class="qnum">1</span><span class="qtext">Thank for helping me yesterday.</span>
+      <input class="answer-input" data-answers="thanks for helping me yesterday" placeholder="исправленный вариант"></div>
+
+    <div class="qrow"><span class="qnum">2</span><span class="qtext">We have communication with our clients every day.</span>
+      <input class="answer-input" data-answers="we communicate with our clients every day" placeholder="исправленный вариант"></div>
+
+    <div class="qrow"><span class="qnum">3</span><span class="qtext">Sorry, we were late to the train.</span>
+      <input class="answer-input" data-answers="sorry, we were late for the train|we were late for the train" placeholder="исправленный вариант"></div>
+
+    <div class="qrow"><span class="qnum">4</span><span class="qtext">She doesn't speak on English very well.</span>
+      <input class="answer-input" data-answers="she doesn't speak english very well" placeholder="исправленный вариант"></div>
+
+    <div class="qrow"><span class="qnum">5</span><span class="qtext">I like tea. Also, I like coffee.</span>
+      <input class="answer-input" data-answers="i also like coffee|i like tea. i also like coffee|i like coffee too|i like tea, and i like coffee too" placeholder="исправленный вариант"></div>
+
+    <div class="qrow"><span class="qnum">6</span><span class="qtext">We need at last three people to finish this on time.</span>
+      <input class="answer-input" data-answers="we need at least three people to finish this on time" placeholder="исправленный вариант"></div>
+
+    <div class="qrow"><span class="qnum">7</span><span class="qtext">Every summer we hire a flat in the city for a whole year.</span>
+      <input class="answer-input" data-answers="every summer we rent a flat in the city for a whole year" placeholder="исправленный вариант"></div>
+
+    <div class="qrow"><span class="qnum">8</span><span class="qtext">She spent a lot of money for new shoes.</span>
+      <input class="answer-input" data-answers="she spent a lot of money on new shoes" placeholder="исправленный вариант"></div>
+
+    <div class="qrow"><span class="qnum">9</span><span class="qtext">It depends of the weather.</span>
+      <input class="answer-input" data-answers="it depends on the weather" placeholder="исправленный вариант"></div>
+
+    <div class="card-actions">
+      <button class="act check" onclick="checkExercise('ex1')">Проверить</button>
+      <button class="act reveal" onclick="toggleAnswers('ex1')">Показать ответы</button>
+      <span class="score" id="score-ex1"></span>
+    </div>
+    <div class="answers-panel" id="answers-ex1">
+      <ol>
+        <li><strong>Thanks</strong> for helping me yesterday. <span class="note">— «thank» без -s не используется как отдельное слово-благодарность; либо «Thanks», либо «Thank you».</span></li>
+        <li>We <strong>communicate</strong> with our clients every day. <span class="note">— «communicate» уже глагол, «have communication» не говорят.</span></li>
+        <li>We were late <strong>for</strong> the train. <span class="note">— be late for something (не to).</span></li>
+        <li>She doesn't speak English very well. <span class="note">— speak + язык, без предлога.</span></li>
+        <li>I like tea. I <strong>also</strong> like coffee. <span class="note">— «also» обычно стоит перед смысловым глаголом внутри предложения, а не в начале как отдельное вводное слово.</span></li>
+        <li>We need <strong>at least</strong> three people... <span class="note">— «at last» = наконец-то; «at least» = как минимум.</span></li>
+        <li>Every summer we <strong>rent</strong> a flat... <span class="note">— rent для длительной аренды (год, месяцы); hire — для краткосрочной.</span></li>
+        <li>She spent a lot of money <strong>on</strong> new shoes. <span class="note">— spend money/time ON something.</span></li>
+        <li>It depends <strong>on</strong> the weather. <span class="note">— depend ON, не of.</span></li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- EXERCISE 2: COLLOCATIONS (prepositions) -->
+  <div class="card" id="ex2" data-exercise="ex2">
+    <h3>Упражнение 2 — Сочетаемость: выбери правильный предлог</h3>
+    <p class="instr">Выбери из списка предлог (или «—», если предлог не нужен).</p>
+
+    <div class="qrow"><span class="qnum">1</span><span class="qtext">It depends <select class="answer-select" data-correct="on"><option value="">—выбери—</option><option value="on">on</option><option value="of">of</option><option value="—">—</option><option value="for">for</option></select> the traffic.</span></div>
+
+    <div class="qrow"><span class="qnum">2</span><span class="qtext">We were late <select class="answer-select" data-correct="for"><option value="">—выбери—</option><option value="to">to</option><option value="for">for</option><option value="of">of</option><option value="—">—</option></select> the meeting.</span></div>
+
+    <div class="qrow"><span class="qnum">3</span><span class="qtext">I spend a lot of time <select class="answer-select" data-correct="on"><option value="">—выбери—</option><option value="for">for</option><option value="on">on</option><option value="in">in</option><option value="—">—</option></select> social media.</span></div>
+
+    <div class="qrow"><span class="qnum">4</span><span class="qtext">She spends too much money <select class="answer-select" data-correct="on"><option value="">—выбери—</option><option value="for">for</option><option value="on">on</option><option value="of">of</option><option value="—">—</option></select> clothes.</span></div>
+
+    <div class="qrow"><span class="qnum">5</span><span class="qtext">He can speak <select class="answer-select" data-correct="—"><option value="">—выбери—</option><option value="on">on</option><option value="in">in</option><option value="of">of</option><option value="—">— (без предлога)</option></select> English fluently.</span></div>
+
+    <div class="qrow"><span class="qnum">6</span><span class="qtext">Thank you <select class="answer-select" data-correct="for"><option value="">—выбери—</option><option value="for">for</option><option value="of">of</option><option value="to">to</option><option value="—">—</option></select> your help.</span></div>
+
+    <div class="qrow"><span class="qnum">7</span><span class="qtext">They communicate <select class="answer-select" data-correct="—"><option value="">—выбери—</option><option value="on">on</option><option value="—">— (with sb, no extra prep here)</option><option value="of">of</option><option value="for">for</option></select> mainly by email.</span></div>
+
+    <div class="card-actions">
+      <button class="act check" onclick="checkExercise('ex2')">Проверить</button>
+      <button class="act reveal" onclick="toggleAnswers('ex2')">Показать ответы</button>
+      <span class="score" id="score-ex2"></span>
+    </div>
+    <div class="answers-panel" id="answers-ex2">
+      <ol>
+        <li>It depends <strong>on</strong> the traffic.</li>
+        <li>We were late <strong>for</strong> the meeting.</li>
+        <li>I spend a lot of time <strong>on</strong> social media.</li>
+        <li>She spends too much money <strong>on</strong> clothes.</li>
+        <li>He can speak English fluently — <strong>без предлога</strong>.</li>
+        <li>Thank you <strong>for</strong> your help.</li>
+        <li>They communicate mainly by email — глагол уже содержит смысл «общаться», доп. предлог здесь не нужен.</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- EXERCISE 3: CONTEXT / WORD CHOICE -->
+  <div class="card" id="ex3" data-exercise="ex3">
+    <h3>Упражнение 3 — Выбери подходящее слово по контексту</h3>
+    <p class="instr">Нажми на правильный вариант.</p>
+
+    <div class="qrow"><span class="qnum">1</span><span class="qtext">"___ so much for the birthday present!" — "You're welcome."</span>
+      <span class="choice-group" data-correct="Thank you">
+        <button class="choice-btn" onclick="selectChoice(this)">Thank you</button>
+        <button class="choice-btn" onclick="selectChoice(this)">Thanks you</button>
+      </span></div>
+
+    <div class="qrow"><span class="qnum">2</span><span class="qtext">There's a big new shopping ___ near my house where I buy vegetables.</span>
+      <span class="choice-group" data-correct="market">
+        <button class="choice-btn" onclick="selectChoice(this)">market</button>
+        <button class="choice-btn" onclick="selectChoice(this)">forest</button>
+        <button class="choice-btn" onclick="selectChoice(this)">building</button>
+      </span></div>
+
+    <div class="qrow"><span class="qnum">3</span><span class="qtext">They are building a new office ___ downtown — it'll have 30 floors.</span>
+      <span class="choice-group" data-correct="building">
+        <button class="choice-btn" onclick="selectChoice(this)">market</button>
+        <button class="choice-btn" onclick="selectChoice(this)">building</button>
+        <button class="choice-btn" onclick="selectChoice(this)">forest</button>
+      </span></div>
+
+    <div class="qrow"><span class="qnum">4</span><span class="qtext">We went for a walk in the ___ and saw deer and wild boars.</span>
+      <span class="choice-group" data-correct="forest">
+        <button class="choice-btn" onclick="selectChoice(this)">building</button>
+        <button class="choice-btn" onclick="selectChoice(this)">market</button>
+        <button class="choice-btn" onclick="selectChoice(this)">forest</button>
+      </span></div>
+
+    <div class="qrow"><span class="qnum">5</span><span class="qtext">We only need it for the weekend, so let's just ___ a car instead of buying one.</span>
+      <span class="choice-group" data-correct="hire">
+        <button class="choice-btn" onclick="selectChoice(this)">rent</button>
+        <button class="choice-btn" onclick="selectChoice(this)">hire</button>
+      </span>
+      <span class="qtext" style="font-size:12.5px;color:var(--ink-soft)">(brit. English, краткосрочно — оба варианта принимаются в реальной жизни, но здесь тренируем hire)</span></div>
+
+    <div class="qrow"><span class="qnum">6</span><span class="qtext">We've ___ this flat for the last three years.</span>
+      <span class="choice-group" data-correct="rented">
+        <button class="choice-btn" onclick="selectChoice(this)">rented</button>
+        <button class="choice-btn" onclick="selectChoice(this)">hired</button>
+      </span></div>
+
+    <div class="qrow"><span class="qnum">7</span><span class="qtext">Our team mostly ___ by video calls and email, not in person.</span>
+      <span class="choice-group" data-correct="communicates">
+        <button class="choice-btn" onclick="selectChoice(this)">has communication</button>
+        <button class="choice-btn" onclick="selectChoice(this)">communicates</button>
+      </span></div>
+
+    <div class="card-actions">
+      <button class="act check" onclick="checkExercise('ex3')">Проверить</button>
+      <button class="act reveal" onclick="toggleAnswers('ex3')">Показать ответы</button>
+      <span class="score" id="score-ex3"></span>
+    </div>
+    <div class="answers-panel" id="answers-ex3">
+      <ol>
+        <li><strong>Thank you</strong> so much... <span class="note">«thanks» — существительное во множественном числе (thanks a lot), а «thank you» — устойчивая фраза-благодарность; «thanks you» не бывает.</span></li>
+        <li><strong>market</strong></li>
+        <li><strong>building</strong></li>
+        <li><strong>forest</strong></li>
+        <li><strong>hire</strong> a car (кратко, на выходные)</li>
+        <li>We've <strong>rented</strong> this flat for three years <span class="note">— долгосрочно.</span></li>
+        <li>Our team mostly <strong>communicates</strong> <span class="note">— «have communication» звучит неестественно.</span></li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- EXERCISE 4: COMPLETE THE SENTENCE -->
+  <div class="card" id="ex4" data-exercise="ex4">
+    <h3>Упражнение 4 — Закончи предложение</h3>
+    <p class="instr">Допиши предложение своими словами так, чтобы получилась логичная фраза (проверка не строгая — сверься с примером ответа).</p>
+
+    <div class="qrow"><span class="qnum">1</span><span class="qtext">It depends on</span>
+      <input class="answer-input" data-answers="__free__" placeholder="закончи предложение..."></div>
+
+    <div class="qrow"><span class="qnum">2</span><span class="qtext">I spend too much time on</span>
+      <input class="answer-input" data-answers="__free__" placeholder="закончи предложение..."></div>
+
+    <div class="qrow"><span class="qnum">3</span><span class="qtext">We were late for</span>
+      <input class="answer-input" data-answers="__free__" placeholder="закончи предложение..."></div>
+
+    <div class="qrow"><span class="qnum">4</span><span class="qtext">I don't like tea. I also</span>
+      <input class="answer-input" data-answers="__free__" placeholder="закончи предложение..."></div>
+
+    <div class="qrow"><span class="qnum">5</span><span class="qtext">We need at least</span>
+      <input class="answer-input" data-answers="__free__" placeholder="закончи предложение..."></div>
+
+    <div class="qrow"><span class="qnum">6</span><span class="qtext">Thanks for</span>
+      <input class="answer-input" data-answers="__free__" placeholder="закончи предложение..."></div>
+
+    <div class="card-actions">
+      <button class="act reveal" onclick="toggleAnswers('ex4')">Показать примеры ответов</button>
+    </div>
+    <div class="answers-panel" id="answers-ex4">
+      <ol>
+        <li>It depends <strong>on the weather / on how much time we have.</strong></li>
+        <li>I spend too much time <strong>on my phone / on social media.</strong></li>
+        <li>We were late for <strong>the flight / the meeting.</strong></li>
+        <li>I don't like tea. I also <strong>don't like coffee.</strong></li>
+        <li>We need at least <strong>three days to finish this.</strong></li>
+        <li>Thanks for <strong>inviting me / your help.</strong></li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- PRONUNCIATION INFO -->
+  <div class="info-box" id="pron">
+    <p style="margin-top:0"><strong>Произношение и ударение</strong></p>
+    <p><span class="word">go skiing</span> — <span class="ipa">/ɡəʊ ˈskiːɪŋ/</span>. Долгий звук [iː] в «ski», ударение падает на «ski», окончание -ing безударное: goʊ-SKI-ing.</p>
+    <p><span class="word">comfortable</span> — <span class="ipa">/ˈkʌmf.tə.bəl/</span> — ударение на первый слог: <span class="stress">COM</span>fortable. Обычно произносится в 3 слога (не «com-for-ta-ble»).</p>
+    <p><span class="word">uncomfortable</span> — <span class="ipa">/ʌnˈkʌmf.tə.bəl/</span> — ударение смещается на второй слог: un-<span class="stress">COM</span>fortable.</p>
+  </div>
+</section>
+
+<!-- ============ SECTION 2: GO ============ -->
+<section class="block" id="go-section">
+  <div class="block-head">
+    <span class="tag" style="background:var(--tab2)">02</span>
+    <h2>Повтор темы: GO + ...</h2>
+    <span class="count">3 упражнения</span>
+  </div>
+
+  <div class="info-box">
+    <p style="margin-top:0"><strong>Шпаргалка</strong></p>
+    <p>go for a walk / a drink / a meal / a swim &nbsp;·&nbsp; go by car / plane / train / bus &nbsp;·&nbsp; <strong>go on foot</strong> (не by foot!) &nbsp;·&nbsp; go to + место &nbsp;·&nbsp; <strong>go home</strong> (без предлога!) &nbsp;·&nbsp; go on holiday / vacation &nbsp;·&nbsp; go on a trip &nbsp;·&nbsp; go + ...ing (go skiing, go swimming, go shopping)</p>
+  </div>
+
+  <!-- GO EXERCISE 1: preposition choice -->
+  <div class="card" id="go1" data-exercise="go1">
+    <h3>GO — Упражнение 1: выбери правильный предлог (или «—»)</h3>
+    <p class="instr">Некоторые сочетания идут вообще без предлога — будь внимателен.</p>
+
+    <div class="qrow"><span class="qnum">1</span><span class="qtext">Let's go <select class="answer-select" data-correct="for"><option value="">—выбери—</option><option value="for">for</option><option value="on">on</option><option value="—">—</option></select> a walk after dinner.</span></div>
+
+    <div class="qrow"><span class="qnum">2</span><span class="qtext">Do you want to go <select class="answer-select" data-correct="for"><option value="">—выбери—</option><option value="for">for</option><option value="to">to</option><option value="on">on</option></select> a drink tonight?</span></div>
+
+    <div class="qrow"><span class="qnum">3</span><span class="qtext">It's not far, we can go <select class="answer-select" data-correct="on"><option value="">—выбери—</option><option value="by">by</option><option value="on">on</option><option value="—">—</option></select> foot.</span></div>
+
+    <div class="qrow"><span class="qnum">4</span><span class="qtext">I'm tired, I just want to go <select class="answer-select" data-correct="—"><option value="">—выбери—</option><option value="to">to</option><option value="on">on</option><option value="—">— (без предлога)</option></select> home.</span></div>
+
+    <div class="qrow"><span class="qnum">5</span><span class="qtext">We usually go <select class="answer-select" data-correct="on"><option value="">—выбери—</option><option value="for">for</option><option value="on">on</option><option value="in">in</option></select> holiday in August.</span></div>
+
+    <div class="qrow"><span class="qnum">6</span><span class="qtext">Next month we're going <select class="answer-select" data-correct="on"><option value="">—выбери—</option><option value="for">for</option><option value="on">on</option><option value="to">to</option></select> a trip to Italy.</span></div>
+
+    <div class="qrow"><span class="qnum">7</span><span class="qtext">We went <select class="answer-select" data-correct="by"><option value="">—выбери—</option><option value="by">by</option><option value="on">on</option><option value="with">with</option></select> car because it was raining.</span></div>
+
+    <div class="card-actions">
+      <button class="act check" onclick="checkExercise('go1')">Проверить</button>
+      <button class="act reveal" onclick="toggleAnswers('go1')">Показать ответы</button>
+      <span class="score" id="score-go1"></span>
+    </div>
+    <div class="answers-panel" id="answers-go1">
+      <ol>
+        <li>go <strong>for</strong> a walk</li>
+        <li>go <strong>for</strong> a drink</li>
+        <li>go <strong>on</strong> foot</li>
+        <li>go <strong>home</strong> — без предлога</li>
+        <li>go <strong>on</strong> holiday</li>
+        <li>go <strong>on</strong> a trip</li>
+        <li>go <strong>by</strong> car</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- GO EXERCISE 2: error correction -->
+  <div class="card" id="go2" data-exercise="go2">
+    <h3>GO — Упражнение 2: найди и исправь ошибку</h3>
+    <p class="instr">В каждом предложении одна ошибка, связанная с «go». Впиши исправленный вариант.</p>
+
+    <div class="qrow"><span class="qnum">1</span><span class="qtext">We went by foot to school because the bus didn't come.</span>
+      <input class="answer-input" data-answers="we went on foot to school because the bus didn't come" placeholder="исправленный вариант"></div>
+
+    <div class="qrow"><span class="qnum">2</span><span class="qtext">I'm really tired, let's go to home now.</span>
+      <input class="answer-input" data-answers="i'm really tired, let's go home now" placeholder="исправленный вариант"></div>
+
+    <div class="qrow"><span class="qnum">3</span><span class="qtext">She went in holiday to Spain last week.</span>
+      <input class="answer-input" data-answers="she went on holiday to spain last week" placeholder="исправленный вариант"></div>
+
+    <div class="qrow"><span class="qnum">4</span><span class="qtext">He goes to swimming every Sunday morning.</span>
+      <input class="answer-input" data-answers="he goes swimming every sunday morning" placeholder="исправленный вариант"></div>
+
+    <div class="qrow"><span class="qnum">5</span><span class="qtext">They go for walk every evening after dinner.</span>
+      <input class="answer-input" data-answers="they go for a walk every evening after dinner" placeholder="исправленный вариант"></div>
+
+    <div class="qrow"><span class="qnum">6</span><span class="qtext">We're going to a trip to Spain next summer.</span>
+      <input class="answer-input" data-answers="we're going on a trip to spain next summer" placeholder="исправленный вариант"></div>
+
+    <div class="card-actions">
+      <button class="act check" onclick="checkExercise('go2')">Проверить</button>
+      <button class="act reveal" onclick="toggleAnswers('go2')">Показать ответы</button>
+      <span class="score" id="score-go2"></span>
+    </div>
+    <div class="answers-panel" id="answers-go2">
+      <ol>
+        <li>We went <strong>on foot</strong> to school...</li>
+        <li>...let's go <strong>home</strong> now. <span class="note">(без «to»)</span></li>
+        <li>She went <strong>on holiday</strong> to Spain...</li>
+        <li>He goes <strong>swimming</strong> every Sunday morning. <span class="note">(go + ...ing, без «to»)</span></li>
+        <li>They go for <strong>a</strong> walk every evening. <span class="note">(нужен артикль)</span></li>
+        <li>We're going <strong>on a trip</strong> to Spain...</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- GO EXERCISE 3: context / choice -->
+  <div class="card" id="go3" data-exercise="go3">
+    <h3>GO — Упражнение 3: выбери правильное продолжение</h3>
+    <p class="instr">Выбери вариант, который используется в естественной речи.</p>
+
+    <div class="qrow"><span class="qnum">1</span><span class="qtext">Every Saturday we go</span>
+      <span class="choice-group" data-correct="to the market">
+        <button class="choice-btn" onclick="selectChoice(this)">to the market</button>
+        <button class="choice-btn" onclick="selectChoice(this)">on the market</button>
+      </span></div>
+
+    <div class="qrow"><span class="qnum">2</span><span class="qtext">In winter we love to</span>
+      <span class="choice-group" data-correct="go skiing">
+        <button class="choice-btn" onclick="selectChoice(this)">go skiing</button>
+        <button class="choice-btn" onclick="selectChoice(this)">go to ski</button>
+      </span></div>
+
+    <div class="qrow"><span class="qnum">3</span><span class="qtext">It's too far to walk, let's</span>
+      <span class="choice-group" data-correct="go by taxi">
+        <button class="choice-btn" onclick="selectChoice(this)">go by taxi</button>
+        <button class="choice-btn" onclick="selectChoice(this)">go on taxi</button>
+      </span></div>
+
+    <div class="qrow"><span class="qnum">4</span><span class="qtext">After work, do you want to</span>
+      <span class="choice-group" data-correct="go for a meal">
+        <button class="choice-btn" onclick="selectChoice(this)">go for a meal</button>
+        <button class="choice-btn" onclick="selectChoice(this)">go to a meal</button>
+      </span></div>
+
+    <div class="qrow"><span class="qnum">5</span><span class="qtext">It's so hot today, let's</span>
+      <span class="choice-group" data-correct="go for a swim">
+        <button class="choice-btn" onclick="selectChoice(this)">go for a swim</button>
+        <button class="choice-btn" onclick="selectChoice(this)">go on a swim</button>
+      </span></div>
+
+    <div class="qrow"><span class="qnum">6</span><span class="qtext">We usually</span>
+      <span class="choice-group" data-correct="go home by bus">
+        <button class="choice-btn" onclick="selectChoice(this)">go home by bus</button>
+        <button class="choice-btn" onclick="selectChoice(this)">go to home by bus</button>
+      </span></div>
+
+    <div class="card-actions">
+      <button class="act check" onclick="checkExercise('go3')">Проверить</button>
+      <button class="act reveal" onclick="toggleAnswers('go3')">Показать ответы</button>
+      <span class="score" id="score-go3"></span>
+    </div>
+    <div class="answers-panel" id="answers-go3">
+      <ol>
+        <li>go <strong>to the market</strong> <span class="note">(go to + место)</span></li>
+        <li><strong>go skiing</strong> <span class="note">(go + ...ing)</span></li>
+        <li>go <strong>by</strong> taxi</li>
+        <li>go <strong>for</strong> a meal</li>
+        <li>go <strong>for</strong> a swim</li>
+        <li>go <strong>home</strong> by bus <span class="note">(home без предлога)</span></li>
+      </ol>
+    </div>
+  </div>
+
+</section>
+
+</main>
+
+<footer>practice sheet · английские слова, вызвавшие трудности + тема GO</footer>
+
+<script>
+function normalize(s){
+  return s.trim().toLowerCase().replace(/\s+/g,' ').replace(/[.!?]+$/,'');
+}
+
+function checkExercise(id){
+  const card = document.getElementById(id);
+  let total = 0, correct = 0, hasFree = false;
+
+  // text inputs
+  card.querySelectorAll('input.answer-input').forEach(inp=>{
+    const raw = inp.getAttribute('data-answers');
+    if(raw === '__free__'){ hasFree = true; return; }
+    total++;
+    const accepted = raw.split('|').map(a=>normalize(a));
+    const val = normalize(inp.value);
+    inp.classList.remove('correct','wrong');
+    if(val.length>0 && accepted.includes(val)){
+      inp.classList.add('correct'); correct++;
+    } else {
+      inp.classList.add('wrong');
+    }
+  });
+
+  // selects
+  card.querySelectorAll('select.answer-select').forEach(sel=>{
+    total++;
+    sel.classList.remove('correct','wrong');
+    if(sel.value === sel.getAttribute('data-correct')){
+      sel.classList.add('correct'); correct++;
+    } else {
+      sel.classList.add('wrong');
+    }
+  });
+
+  // choice groups
+  card.querySelectorAll('.choice-group').forEach(grp=>{
+    total++;
+    const correctVal = grp.getAttribute('data-correct');
+    const buttons = grp.querySelectorAll('.choice-btn');
+    let chosen = null;
+    buttons.forEach(b=>{ b.classList.remove('correct','wrong'); if(b.classList.contains('selected')) chosen = b; });
+    if(chosen){
+      if(chosen.textContent.trim() === correctVal){ chosen.classList.add('correct'); correct++; }
+      else {
+        chosen.classList.add('wrong');
+        buttons.forEach(b=>{ if(b.textContent.trim()===correctVal) b.classList.add('correct'); });
+      }
+    } else {
+      buttons.forEach(b=>{ if(b.textContent.trim()===correctVal) b.classList.add('correct'); });
+    }
+  });
+
+  const scoreEl = document.getElementById('score-'+id);
+  if(scoreEl){
+    if(total===0){ scoreEl.textContent=''; return; }
+    scoreEl.textContent = `Результат: ${correct} / ${total}`;
+    scoreEl.classList.remove('good','bad');
+    scoreEl.classList.add(correct===total ? 'good' : 'bad');
+  }
+}
+
+function toggleAnswers(id){
+  const panel = document.getElementById('answers-'+id);
+  panel.classList.toggle('show');
+}
+
+function selectChoice(btn){
+  const group = btn.closest('.choice-group');
+  group.querySelectorAll('.choice-btn').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+</script>
+</body>
+</html>
