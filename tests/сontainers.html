@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Кладовая слов · Food &amp; Containers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --oat:#F1ECDD;
+    --oat-deep:#E7DFC9;
+    --olive:#3A4A34;
+    --olive-deep:#28331F;
+    --mustard:#D9A441;
+    --mustard-deep:#B9822B;
+    --rust:#B5502D;
+    --sage:#6E8B5D;
+    --ink:#2B2A28;
+    --paper:#FBF8F1;
+    --line: rgba(43,42,40,0.14);
+    --shadow: 0 6px 18px rgba(40,51,31,0.12);
+    --radius: 14px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(ellipse at top left, rgba(217,164,65,0.10), transparent 55%),
+      var(--oat);
+    color:var(--ink);
+    font-family:'Manrope', sans-serif;
+    line-height:1.5;
+    min-height:100vh;
+    padding-bottom:60px;
+  }
+  h1,h2,h3,.brand{font-family:'Fraunces', serif;}
+
+  /* ---------- Header / shelf ---------- */
+  header.top{
+    background: linear-gradient(180deg, var(--olive) 0%, var(--olive-deep) 100%);
+    color:var(--oat);
+    padding:34px 20px 22px;
+    position:relative;
+    overflow:hidden;
+  }
+  header.top::after{
+    content:"";
+    position:absolute; left:0; right:0; bottom:0; height:10px;
+    background: repeating-linear-gradient(90deg, var(--mustard) 0 26px, var(--mustard-deep) 26px 30px);
+    opacity:.85;
+  }
+  .brandbar{
+    max-width:980px; margin:0 auto; display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+  }
+  .jarmark{
+    width:46px;height:46px;border-radius:50% 50% 6px 6px/60% 60% 6px 6px;
+    background: var(--mustard);
+    display:flex;align-items:center;justify-content:center;
+    font-size:22px; box-shadow: inset 0 -6px 0 rgba(0,0,0,0.12);
+    flex:none;
+  }
+  h1.brand{font-size:clamp(26px,4vw,36px); margin:0; font-weight:700; letter-spacing:.2px;}
+  header.top p{margin:6px 0 0; color:rgba(241,236,221,0.85); font-size:15px; max-width:640px;}
+
+  /* ---------- Nav shelf tabs ---------- */
+  nav.shelf{
+    max-width:980px; margin:-16px auto 0; padding:0 20px; position:relative; z-index:2;
+    display:flex; gap:8px; flex-wrap:wrap;
+  }
+  nav.shelf button{
+    font-family:'Manrope',sans-serif; font-weight:700; font-size:13.5px;
+    background:var(--paper); color:var(--olive-deep);
+    border:1px solid var(--line); border-bottom-width:3px;
+    padding:10px 14px 8px; border-radius:10px 10px 4px 4px;
+    cursor:pointer; box-shadow: var(--shadow);
+    transition: transform .12s ease, background .15s ease;
+    white-space:nowrap;
+  }
+  nav.shelf button:hover{ transform: translateY(-2px); }
+  nav.shelf button.active{
+    background:var(--mustard); color:var(--olive-deep); border-color: var(--mustard-deep);
+  }
+
+  main{max-width:980px; margin:26px auto; padding:0 20px;}
+
+  .exercise{
+    display:none;
+    background: var(--paper);
+    border:1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 26px 26px 22px;
+    box-shadow: var(--shadow);
+    margin-bottom:20px;
+    animation: fade .35s ease;
+  }
+  .exercise.active{display:block;}
+  @keyframes fade{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;} }
+
+  .ex-head{ display:flex; justify-content:space-between; align-items:flex-start; gap:14px; flex-wrap:wrap; border-bottom:1px dashed var(--line); padding-bottom:14px; margin-bottom:18px;}
+  .ex-eyebrow{ font-size:12.5px; letter-spacing:1.5px; text-transform:uppercase; color:var(--mustard-deep); font-weight:800; }
+  .ex-head h2{ margin:4px 0 6px; font-size:24px; color:var(--olive-deep);}
+  .ex-head p.instr{ margin:0; color:#5b5850; font-size:14.5px; max-width:640px;}
+  .scorebadge{
+    background:var(--olive); color:var(--oat); border-radius:999px; padding:8px 16px;
+    font-weight:800; font-size:14px; white-space:nowrap; box-shadow: inset 0 -3px 0 rgba(0,0,0,.15);
+  }
+  .scorebadge.hidden{display:none;}
+
+  ol.items{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:14px;}
+  li.item{
+    display:flex; gap:12px; align-items:flex-start; padding:12px 14px;
+    background: var(--oat); border-radius:10px; border:1px solid var(--line);
+  }
+  li.item .num{
+    flex:none; width:26px; height:26px; border-radius:50%;
+    background:var(--mustard); color:var(--olive-deep); font-weight:800; font-size:12.5px;
+    display:flex; align-items:center; justify-content:center; margin-top:2px;
+  }
+  .item .body{flex:1; min-width:0;}
+  .item .prompt{font-size:15px; margin-bottom:8px;}
+  .item .prompt b{color:var(--olive-deep);}
+  .emoji-clue{font-size:22px; margin-right:6px;}
+  .hint{ font-family: monospace; letter-spacing:3px; font-size:16px; color:var(--rust); font-weight:700;}
+
+  input[type=text], select, textarea{
+    width:100%; max-width:420px; font-family:'Manrope',sans-serif; font-size:14.5px;
+    padding:9px 12px; border-radius:8px; border:1.5px solid var(--line); background:#fff; color:var(--ink);
+  }
+  textarea{max-width:100%; min-height:56px; resize:vertical;}
+  input[type=text]:focus, select:focus, textarea:focus{ outline:2px solid var(--mustard); border-color:var(--mustard-deep);}
+
+  .item.correct{ border-color: var(--sage); background:#eef4ea; }
+  .item.correct input, .item.correct select{ border-color:var(--sage); color:var(--olive-deep); font-weight:700;}
+  .item.incorrect{ border-color: var(--rust); background:#f8ecE7;}
+  .item.incorrect input, .item.incorrect select{ border-color:var(--rust);}
+  .item .correct-answer-note{ font-size:13px; color:var(--rust); margin-top:6px; font-weight:600;}
+  .item.revealed{ border-color: var(--mustard-deep); background:#fbf1dd;}
+  .item.revealed input, .item.revealed select{ color: var(--mustard-deep); font-weight:800; border-color:var(--mustard-deep);}
+
+  .tf-buttons{ display:flex; gap:8px; }
+  .tf-buttons button{
+    padding:7px 16px; border-radius:8px; border:1.5px solid var(--line); background:#fff;
+    cursor:pointer; font-weight:700; font-size:13.5px; color:var(--ink);
+  }
+  .tf-buttons button.selected{ background:var(--olive); color:var(--oat); border-color:var(--olive-deep); }
+  .tf-buttons button.selected.wrong-pick{ background:var(--rust); border-color:#8a3a1f;}
+
+  .actions{ display:flex; gap:10px; margin-top:20px; flex-wrap:wrap; align-items:center; }
+  button.main-btn{
+    font-family:'Manrope',sans-serif; font-weight:800; font-size:14px;
+    padding:11px 20px; border-radius:9px; border:none; cursor:pointer;
+    background: var(--olive); color:var(--oat); box-shadow: inset 0 -3px 0 rgba(0,0,0,.18);
+    transition: transform .1s ease, background .15s ease;
+  }
+  button.main-btn:hover{ transform: translateY(-1px); background: var(--olive-deep);}
+  button.main-btn.secondary{ background:transparent; color:var(--olive-deep); border:1.5px solid var(--olive); box-shadow:none;}
+  button.main-btn.secondary:hover{ background: rgba(58,74,52,0.08); }
+  button.main-btn.copy{ background: var(--mustard); color:var(--olive-deep); }
+  button.main-btn.copy:hover{ background: var(--mustard-deep); color:var(--paper);}
+  .toast{
+    margin-left:auto; font-weight:700; color:var(--sage); font-size:13.5px; opacity:0; transition:opacity .25s ease;
+  }
+  .toast.show{opacity:1;}
+
+  .prevnext{ display:flex; justify-content:space-between; max-width:980px; margin:0 auto 40px; padding:0 20px;}
+  .prevnext button{
+    background:var(--paper); border:1px solid var(--line); border-bottom-width:3px; border-radius:10px;
+    padding:10px 18px; font-weight:800; font-family:'Manrope'; cursor:pointer; color:var(--olive-deep);
+  }
+  .prevnext button:disabled{ opacity:.35; cursor:default; }
+
+  footer{ text-align:center; color:#7a7668; font-size:12.5px; padding:10px 20px 30px;}
+
+  @media (max-width:560px){
+    .ex-head{flex-direction:column;}
+    li.item{flex-direction:column;}
+    li.item .num{margin-bottom:2px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="brandbar">
+    <div class="jarmark">🫙</div>
+    <div>
+      <h1 class="brand">Кладовая слов</h1>
+      <p>Food &amp; Containers · практика лексики: контейнеры, упаковки и продукты. 7 упражнений, в каждом по 10 заданий.</p>
+    </div>
+  </div>
+</header>
+
+<nav class="shelf" id="tabs"></nav>
+
+<main id="exercises"></main>
+
+<div class="prevnext">
+  <button id="prevBtn">← Назад</button>
+  <button id="nextBtn">Дальше →</button>
+</div>
+
+<footer>Кладовая слов — тренажёр лексики по теме еды и упаковок. Все ответы проверяются локально, в браузере.</footer>
+
+<script>
+/* ============ DATA ============ */
+
+const EX = [];
+
+// ---------- Exercise 1: Fill in the missing letters (with picture clue) ----------
+EX.push({
+  id:'ex1', title:'Вставь пропущенные буквы', eyebrow:'Упражнение 1 · Spelling',
+  instr:'Посмотри на картинку-подсказку и слово с пропущенными буквами. Впиши слово полностью.',
+  type:'gapfill',
+  items:[
+    {emoji:'🍾', hint:'b_tt_e', answer:['bottle']},
+    {emoji:'🥛', hint:'c_rt_n', answer:['carton']},
+    {emoji:'🍯', hint:'j_r', answer:['jar']},
+    {emoji:'🥫', hint:'t_n', answer:['tin']},
+    {emoji:'🥣', hint:'b_wl', answer:['bowl']},
+    {emoji:'🍽️', hint:'pl_t_', answer:['plate']},
+    {emoji:'🥤', hint:'c_n', answer:['can']},
+    {emoji:'🍟', hint:'p_ck_t', answer:['packet']},
+    {emoji:'🫖', hint:'j_g', answer:['jug']},
+    {emoji:'🥄', hint:'sp__n', answer:['spoon']},
+  ]
+});
+
+// ---------- Exercise 2: Translate RU -> EN ----------
+EX.push({
+  id:'ex2', title:'Переведи с русского на английский', eyebrow:'Упражнение 2 · Translation',
+  instr:'Переведи словосочетание на английский язык. Пиши полную фразу (например: a jar of jam).',
+  type:'translate',
+  items:[
+    {ru:'банка варенья', answer:['a jar of jam','jar of jam']},
+    {ru:'пакет молока', answer:['a carton of milk','carton of milk']},
+    {ru:'дюжина яиц', answer:['a dozen eggs','dozen eggs']},
+    {ru:'лоток яиц', answer:['a tray of eggs','tray of eggs']},
+    {ru:'буханка хлеба', answer:['a loaf of bread','loaf of bread']},
+    {ru:'плитка шоколада', answer:['a bar of chocolate','bar of chocolate']},
+    {ru:'ломтик сыра', answer:['a slice of cheese','slice of cheese']},
+    {ru:'кусок торта', answer:['a piece of cake','piece of cake']},
+    {ru:'банка горошка', answer:['a tin of peas','tin of peas']},
+    {ru:'пачка чипсов', answer:['a packet of chips','packet of chips']},
+  ]
+});
+
+// ---------- Exercise 3: Match word to definition ----------
+const ex3words = ['jar','plate','tin','jug','spoon','carton','bowl','packet','can','box'];
+EX.push({
+  id:'ex3', title:'Соотнеси слово с определением', eyebrow:'Упражнение 3 · Definitions',
+  instr:'Выбери из списка слово, которое подходит под определение.',
+  type:'select',
+  options: ex3words,
+  items:[
+    {def:'A glass container, usually used for jam, honey or pickles.', answer:'jar'},
+    {def:'A flat round dish that you put food on.', answer:'plate'},
+    {def:'A sealed metal container that holds food like peas or corn.', answer:'tin'},
+    {def:'A container with a handle and a spout, used for pouring water or juice.', answer:'jug'},
+    {def:'A small tool with a handle, used for eating soup or stirring tea.', answer:'spoon'},
+    {def:'A cardboard container used to hold milk or juice.', answer:'carton'},
+    {def:'A round, deep dish used for soup or cereal.', answer:'bowl'},
+    {def:'A small bag containing snacks, like chips.', answer:'packet'},
+    {def:'A sealed metal container for drinks, like coke.', answer:'can'},
+    {def:'A rectangular container, often made of cardboard, used to store or send things.', answer:'box'},
+  ]
+});
+
+// ---------- Exercise 4: Choose the correct word (context/collocation) ----------
+EX.push({
+  id:'ex4', title:'Выбери подходящее слово', eyebrow:'Упражнение 4 · Context & Collocation',
+  instr:'Выбери слово, которое правильно сочетается с остальной частью предложения.',
+  type:'choice',
+  items:[
+    {before:'I always drink my morning coffee from a', after:'.', options:['cup','plate'], answer:'cup'},
+    {before:'She bought a', after:'of chocolate for dessert.', options:['bar','slice'], answer:'bar'},
+    {before:'Can you pass me a', after:'of bread from the shelf?', options:['loaf','piece'], answer:'loaf'},
+    {before:'We need a', after:'of eggs for the cake — twelve should be enough.', options:['dozen','tray'], answer:'dozen'},
+    {before:'He poured milk from the', after:'into his cereal bowl.', options:['carton','jar'], answer:'carton'},
+    {before:'There is a', after:'of jam in the fridge door.', options:['jar','can'], answer:'jar'},
+    {before:'I bought a', after:'of chips for the party.', options:['packet','bottle'], answer:'packet'},
+    {before:'Add a', after:'of cheese to the sandwich.', options:['slice','bar'], answer:'slice'},
+    {before:'Grandma keeps her sugar in a', after:'on the shelf.', options:['jar','plate'], answer:'jar'},
+    {before:'Could you get a', after:'of coke from the fridge?', options:['can','cup'], answer:'can'},
+  ]
+});
+
+// ---------- Exercise 5: Match the halves of expressions ----------
+const ex5rights = ['chocolate','bread','jam','peas','chips','cheese','cake','soup','coffee','juice'];
+EX.push({
+  id:'ex5', title:'Собери выражения из двух половинок', eyebrow:'Упражнение 5 · Match the halves',
+  instr:'Соедини начало выражения (a bar of...) с правильным продолжением.',
+  type:'select',
+  options: ex5rights,
+  items:[
+    {def:'a bar of ___', answer:'chocolate'},
+    {def:'a loaf of ___', answer:'bread'},
+    {def:'a jar of ___', answer:'jam'},
+    {def:'a tin of ___', answer:'peas'},
+    {def:'a packet of ___', answer:'chips'},
+    {def:'a slice of ___', answer:'cheese'},
+    {def:'a piece of ___', answer:'cake'},
+    {def:'a bowl of ___', answer:'soup'},
+    {def:'a cup of ___', answer:'coffee'},
+    {def:'a glass of ___', answer:'juice'},
+  ]
+});
+
+// ---------- Exercise 6: True / False ----------
+EX.push({
+  id:'ex6', title:'Верно или неверно?', eyebrow:'Упражнение 6 · True or False',
+  instr:'Прочитай утверждение и выбери True или False.',
+  type:'tf',
+  items:[
+    {stmt:'A jar is usually made of glass.', answer:true},
+    {stmt:'People usually drink coffee from a plate.', answer:false},
+    {stmt:'A dozen means ten items.', answer:false},
+    {stmt:'A loaf of bread is a whole, uncut piece of bread.', answer:true},
+    {stmt:'A carton is often used for milk or juice.', answer:true},
+    {stmt:'A tin and a can are basically the same thing — a sealed metal container.', answer:true},
+    {stmt:'A spoon is normally used for cutting meat.', answer:false},
+    {stmt:'A jug has a handle and a spout for pouring liquids.', answer:true},
+    {stmt:'A tray of eggs usually holds just two eggs.', answer:false},
+    {stmt:'A packet of chips is a small bag of crisps.', answer:true},
+  ]
+});
+
+// ---------- Exercise 7: Finish the sentences with your own ideas ----------
+EX.push({
+  id:'ex7', title:'Закончи предложения своими идеями', eyebrow:'Упражнение 7 · Your own ideas',
+  instr:'Никаких правильных/неправильных ответов — пиши своё! В конце нажми «Скопировать ответы», чтобы скопировать все свои ответы одной кнопкой.',
+  type:'open',
+  items:[
+    {stem:'In my fridge, there is always a jar of ... because...'},
+    {stem:'If I could keep only one container in my kitchen, it would be a ... because...'},
+    {stem:'My favourite way to eat a piece of cake is...'},
+    {stem:'I usually buy a dozen eggs when...'},
+    {stem:'A perfect gift for a food-lover would be a box of...'},
+    {stem:'I never buy a bottle of ... because...'},
+    {stem:'On a cold or rainy day, I love a bowl of...'},
+    {stem:'The strangest thing I have ever seen kept in a jar is...'},
+    {stem:'If I had a loaf of bread and a jar of jam, I would make...'},
+    {stem:'I think plastic containers are / are not good for the environment because...'},
+  ]
+});
+
+/* ============ RENDER ============ */
+
+function normalize(s){
+  return (s||'').toLowerCase().trim()
+    .replace(/^(a |an |the )/,'')
+    .replace(/[.,!?]+$/,'')
+    .replace(/\s+/g,' ');
+}
+
+function shuffled(arr){
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+
+const tabsEl = document.getElementById('tabs');
+const exercisesEl = document.getElementById('exercises');
+
+EX.forEach((ex, exIndex)=>{
+  // tab button
+  const tabBtn = document.createElement('button');
+  tabBtn.textContent = 'Упр. ' + (exIndex+1);
+  tabBtn.dataset.target = ex.id;
+  tabBtn.addEventListener('click', ()=> showExercise(exIndex));
+  tabsEl.appendChild(tabBtn);
+
+  // exercise container
+  const wrap = document.createElement('section');
+  wrap.className = 'exercise';
+  wrap.id = ex.id;
+
+  const list = document.createElement('ol');
+  list.className = 'items';
+
+  ex.items.forEach((it, i)=>{
+    const li = document.createElement('li');
+    li.className = 'item';
+    li.dataset.index = i;
+    const num = document.createElement('div');
+    num.className = 'num';
+    num.textContent = i+1;
+    li.appendChild(num);
+
+    const body = document.createElement('div');
+    body.className = 'body';
+
+    if(ex.type === 'gapfill'){
+      body.innerHTML = `<div class="prompt"><span class="emoji-clue">${it.emoji}</span> <span class="hint">${it.hint}</span></div>`;
+      const inp = document.createElement('input');
+      inp.type='text'; inp.placeholder='введи слово полностью'; inp.dataset.role='answer';
+      body.appendChild(inp);
+    }
+    else if(ex.type === 'translate'){
+      body.innerHTML = `<div class="prompt">${it.ru}</div>`;
+      const inp = document.createElement('input');
+      inp.type='text'; inp.placeholder='your answer in English'; inp.dataset.role='answer';
+      body.appendChild(inp);
+    }
+    else if(ex.type === 'select'){
+      body.innerHTML = `<div class="prompt">${it.def}</div>`;
+      const sel = document.createElement('select');
+      sel.dataset.role='answer';
+      sel.innerHTML = '<option value="">-- выбери --</option>' +
+        shuffled(ex.options).map(o=>`<option value="${o}">${o}</option>`).join('');
+      body.appendChild(sel);
+    }
+    else if(ex.type === 'choice'){
+      body.innerHTML = `<div class="prompt">${it.before} ___ ${it.after}</div>`;
+      const sel = document.createElement('select');
+      sel.dataset.role='answer';
+      sel.innerHTML = '<option value="">-- выбери --</option>' +
+        shuffled(it.options).map(o=>`<option value="${o}">${o}</option>`).join('');
+      body.appendChild(sel);
+    }
+    else if(ex.type === 'tf'){
+      body.innerHTML = `<div class="prompt">${it.stmt}</div>`;
+      const btns = document.createElement('div');
+      btns.className='tf-buttons';
+      btns.dataset.role='answer';
+      btns.dataset.value='';
+      const tBtn = document.createElement('button');
+      tBtn.type='button'; tBtn.textContent='True'; tBtn.dataset.val='true';
+      const fBtn = document.createElement('button');
+      fBtn.type='button'; fBtn.textContent='False'; fBtn.dataset.val='false';
+      [tBtn,fBtn].forEach(b=>{
+        b.addEventListener('click', ()=>{
+          [tBtn,fBtn].forEach(x=>x.classList.remove('selected','wrong-pick'));
+          b.classList.add('selected');
+          btns.dataset.value = b.dataset.val;
+        });
+      });
+      btns.appendChild(tBtn); btns.appendChild(fBtn);
+      body.appendChild(btns);
+    }
+    else if(ex.type === 'open'){
+      body.innerHTML = `<div class="prompt">${it.stem}</div>`;
+      const ta = document.createElement('textarea');
+      ta.placeholder='пиши свой ответ здесь...'; ta.dataset.role='answer';
+      body.appendChild(ta);
+    }
+
+    li.appendChild(body);
+    list.appendChild(li);
+  });
+
+  const head = document.createElement('div');
+  head.className='ex-head';
+  head.innerHTML = `<div>
+      <div class="ex-eyebrow">${ex.eyebrow}</div>
+      <h2>${ex.title}</h2>
+      <p class="instr">${ex.instr}</p>
+    </div>
+    <div class="scorebadge hidden" data-role="score">0 / ${ex.items.length}</div>`;
+
+  const actions = document.createElement('div');
+  actions.className='actions';
+  if(ex.type !== 'open'){
+    const checkBtn = document.createElement('button');
+    checkBtn.className='main-btn'; checkBtn.textContent='Проверить ответы';
+    checkBtn.addEventListener('click', ()=> checkExercise(ex, wrap));
+    const showBtn = document.createElement('button');
+    showBtn.className='main-btn secondary'; showBtn.textContent='Показать ответы';
+    showBtn.addEventListener('click', ()=> revealExercise(ex, wrap));
+    const resetBtn = document.createElement('button');
+    resetBtn.className='main-btn secondary'; resetBtn.textContent='Сбросить';
+    resetBtn.addEventListener('click', ()=> resetExercise(ex, wrap));
+    actions.appendChild(checkBtn);
+    actions.appendChild(showBtn);
+    actions.appendChild(resetBtn);
+  } else {
+    const copyBtn = document.createElement('button');
+    copyBtn.className='main-btn copy'; copyBtn.textContent='📋 Скопировать ответы';
+    copyBtn.addEventListener('click', ()=> copyOpenAnswers(ex, wrap));
+    const toast = document.createElement('span');
+    toast.className='toast'; toast.dataset.role='toast'; toast.textContent='Скопировано!';
+    actions.appendChild(copyBtn);
+    actions.appendChild(toast);
+  }
+
+  wrap.appendChild(head);
+  wrap.appendChild(list);
+  wrap.appendChild(actions);
+  exercisesEl.appendChild(wrap);
+});
+
+/* ============ LOGIC ============ */
+
+function getAnswerValue(ex, li){
+  if(ex.type === 'tf'){
+    const el = li.querySelector('[data-role="answer"]');
+    return el.dataset.value;
+  }
+  const el = li.querySelector('[data-role="answer"]');
+  return el.value;
+}
+
+function isCorrect(ex, it, raw){
+  if(ex.type === 'gapfill' || ex.type === 'translate'){
+    const norm = normalize(raw);
+    return it.answer.some(a => normalize(a) === norm);
+  }
+  if(ex.type === 'select'){
+    return raw === it.answer;
+  }
+  if(ex.type === 'choice'){
+    return raw === it.answer;
+  }
+  if(ex.type === 'tf'){
+    return (raw === 'true') === it.answer;
+  }
+  return false;
+}
+
+function correctAnswerText(ex, it){
+  if(ex.type==='gapfill' || ex.type==='translate') return it.answer[0];
+  if(ex.type==='select' || ex.type==='choice') return it.answer;
+  if(ex.type==='tf') return it.answer ? 'True' : 'False';
+  return '';
+}
+
+function checkExercise(ex, wrap){
+  const lis = wrap.querySelectorAll('li.item');
+  let score = 0;
+  lis.forEach((li, i)=>{
+    li.classList.remove('correct','incorrect','revealed');
+    const note = li.querySelector('.correct-answer-note');
+    if(note) note.remove();
+    const raw = getAnswerValue(ex, li);
+    const it = ex.items[i];
+    const ok = isCorrect(ex, it, raw);
+    if(ok){ li.classList.add('correct'); score++; }
+    else{
+      li.classList.add('incorrect');
+      if(ex.type==='tf'){
+        const btns = li.querySelectorAll('.tf-buttons button');
+        btns.forEach(b=>{ if(b.dataset.val === String(it.answer)){} });
+      }
+      const noteEl = document.createElement('div');
+      noteEl.className='correct-answer-note';
+      noteEl.textContent = 'Правильный ответ: ' + correctAnswerText(ex, it);
+      li.querySelector('.body').appendChild(noteEl);
+    }
+  });
+  const badge = wrap.querySelector('[data-role="score"]');
+  badge.textContent = score + ' / ' + ex.items.length;
+  badge.classList.remove('hidden');
+}
+
+function revealExercise(ex, wrap){
+  const lis = wrap.querySelectorAll('li.item');
+  lis.forEach((li,i)=>{
+    li.classList.remove('correct','incorrect');
+    li.classList.add('revealed');
+    const note = li.querySelector('.correct-answer-note');
+    if(note) note.remove();
+    const it = ex.items[i];
+    if(ex.type==='gapfill' || ex.type==='translate'){
+      li.querySelector('input').value = it.answer[0];
+    } else if(ex.type==='select' || ex.type==='choice'){
+      li.querySelector('select').value = it.answer;
+    } else if(ex.type==='tf'){
+      const btns = li.querySelectorAll('.tf-buttons button');
+      btns.forEach(b=>{
+        b.classList.remove('selected');
+        if(b.dataset.val === String(it.answer)) b.classList.add('selected');
+      });
+      li.querySelector('.tf-buttons').dataset.value = String(it.answer);
+    }
+  });
+  const badge = wrap.querySelector('[data-role="score"]');
+  badge.textContent = 'ответы показаны';
+  badge.classList.remove('hidden');
+}
+
+function resetExercise(ex, wrap){
+  const lis = wrap.querySelectorAll('li.item');
+  lis.forEach(li=>{
+    li.classList.remove('correct','incorrect','revealed');
+    const note = li.querySelector('.correct-answer-note');
+    if(note) note.remove();
+    const input = li.querySelector('input');
+    const select = li.querySelector('select');
+    if(input) input.value='';
+    if(select) select.value='';
+    const tf = li.querySelector('.tf-buttons');
+    if(tf){
+      tf.dataset.value='';
+      tf.querySelectorAll('button').forEach(b=>b.classList.remove('selected','wrong-pick'));
+    }
+  });
+  const badge = wrap.querySelector('[data-role="score"]');
+  badge.classList.add('hidden');
+}
+
+function copyOpenAnswers(ex, wrap){
+  const lis = wrap.querySelectorAll('li.item');
+  let out = 'Упражнение 7 — Закончи предложения своими идеями\n\n';
+  lis.forEach((li,i)=>{
+    const it = ex.items[i];
+    const ta = li.querySelector('textarea');
+    out += (i+1) + '. ' + it.stem + '\n   → ' + (ta.value.trim() || '(пусто)') + '\n\n';
+  });
+  const finish = ()=>{
+    const toast = wrap.querySelector('[data-role="toast"]');
+    toast.classList.add('show');
+    setTimeout(()=> toast.classList.remove('show'), 1800);
+  };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(out).then(finish).catch(()=>{
+      fallbackCopy(out); finish();
+    });
+  } else {
+    fallbackCopy(out); finish();
+  }
+}
+
+function fallbackCopy(text){
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position='fixed'; ta.style.opacity='0';
+  document.body.appendChild(ta);
+  ta.select();
+  try{ document.execCommand('copy'); }catch(e){}
+  document.body.removeChild(ta);
+}
+
+/* ============ TABS / NAV ============ */
+
+let current = 0;
+function showExercise(index){
+  current = index;
+  document.querySelectorAll('.exercise').forEach((el,i)=>{
+    el.classList.toggle('active', i===index);
+  });
+  document.querySelectorAll('nav.shelf button').forEach((btn,i)=>{
+    btn.classList.toggle('active', i===index);
+  });
+  document.getElementById('prevBtn').disabled = index===0;
+  document.getElementById('nextBtn').disabled = index===EX.length-1;
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+document.getElementById('prevBtn').addEventListener('click', ()=>{
+  if(current>0) showExercise(current-1);
+});
+document.getElementById('nextBtn').addEventListener('click', ()=>{
+  if(current<EX.length-1) showExercise(current+1);
+});
+
+showExercise(0);
+</script>
+</body>
+</html>
