@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Дом англичанина · Тренажёр лексики</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #F6F1E7;
+    --paper: #FFFDF9;
+    --ink: #2B2A28;
+    --ink-soft: #635C51;
+    --brick: #B5482F;
+    --brick-deep: #8C3821;
+    --sage: #4F6B52;
+    --sage-deep: #3B5240;
+    --mustard: #D8A73D;
+    --line: #E2D6C3;
+    --correct: #3B7A45;
+    --correct-bg: #E6F0E3;
+    --wrong: #B5482F;
+    --wrong-bg: #FBEAE5;
+    --radius: 14px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    line-height:1.5;
+  }
+  h1,h2,h3{font-family:'Fraunces',serif; margin:0;}
+  .wrap{max-width:920px; margin:0 auto; padding:0 20px 100px;}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    background:linear-gradient(180deg, #FBF7EF 0%, var(--bg) 100%);
+    border-bottom:1px solid var(--line);
+    padding:48px 20px 32px;
+  }
+  .hero-inner{max-width:920px; margin:0 auto; display:grid; grid-template-columns:1fr; gap:24px;}
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12.5px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--brick-deep);
+    margin-bottom:10px;
+    display:block;
+  }
+  .hero h1{font-size:clamp(28px,5vw,42px); font-weight:600; color:var(--ink); max-width:14ch;}
+  .hero p{color:var(--ink-soft); max-width:56ch; font-size:15.5px; margin-top:10px;}
+  .house-svg{width:100%; max-width:640px; height:auto; margin:8px auto 0; display:block;}
+  .house-svg text{font-family:'IBM Plex Mono', monospace; font-size:11px; fill:var(--ink-soft);}
+  .house-svg .label-strong{fill:var(--brick-deep); font-weight:600;}
+
+  /* ---------- ROOMS ---------- */
+  .room{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    margin-top:28px;
+    padding:26px 26px 22px;
+    box-shadow:0 1px 0 rgba(0,0,0,0.02);
+  }
+  .room-head{display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; justify-content:space-between; border-bottom:1px dashed var(--line); padding-bottom:14px; margin-bottom:18px;}
+  .room-head .titles{display:flex; align-items:baseline; gap:12px;}
+  .room-num{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px; color:#fff; background:var(--sage);
+    border-radius:999px; padding:3px 11px; font-weight:600;
+  }
+  .room h2{font-size:20px; font-weight:600;}
+  .room .sub{color:var(--ink-soft); font-size:13.5px; margin-top:2px;}
+  .task-list{display:flex; flex-direction:column; gap:14px; margin-top:6px;}
+  .task-row{
+    display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+    padding:10px 12px; border-radius:10px; background:#FBF9F4; border:1px solid var(--line);
+  }
+  .task-idx{font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--ink-soft); min-width:18px;}
+  .task-text{flex:1 1 260px; font-size:15px;}
+  .task-text .ru{color:var(--brick-deep); font-weight:600;}
+  .hint{font-size:12.5px; color:var(--ink-soft); font-style:italic;}
+  input.text-input, select.match-select{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:14.5px;
+    padding:7px 10px;
+    border:1.5px solid var(--line);
+    border-radius:8px;
+    background:#fff;
+    color:var(--ink);
+    min-width:170px;
+  }
+  input.text-input:focus, select.match-select:focus{outline:2px solid var(--sage); outline-offset:1px;}
+  .task-row.correct{background:var(--correct-bg); border-color:var(--correct);}
+  .task-row.wrong{background:var(--wrong-bg); border-color:var(--wrong);}
+  .mark{font-size:16px; min-width:20px; text-align:center;}
+  .mark.ok{color:var(--correct);}
+  .mark.no{color:var(--wrong);}
+  .answer-reveal{
+    font-family:'IBM Plex Mono', monospace; font-size:13px; color:var(--sage-deep);
+    background:#EFF3EC; border:1px dashed var(--sage); border-radius:6px; padding:3px 8px; display:none;
+  }
+  .answer-reveal.show{display:inline-block;}
+
+  .room-actions{display:flex; gap:10px; flex-wrap:wrap; margin-top:18px; align-items:center;}
+  button{
+    font-family:'Inter',sans-serif; font-weight:600; font-size:14px;
+    border-radius:8px; padding:9px 16px; cursor:pointer; border:1.5px solid transparent;
+    transition:transform .05s ease;
+  }
+  button:active{transform:translateY(1px);}
+  .btn-primary{background:var(--sage); color:#fff;}
+  .btn-primary:hover{background:var(--sage-deep);}
+  .btn-ghost{background:transparent; color:var(--brick-deep); border-color:var(--brick-deep);}
+  .btn-ghost:hover{background:var(--brick-deep); color:#fff;}
+  .btn-copy{background:var(--mustard); color:#2B2A28;}
+  .btn-copy:hover{filter:brightness(0.94);}
+  .score{font-family:'IBM Plex Mono', monospace; font-size:13.5px; color:var(--ink-soft);}
+
+  /* picture cards */
+  .pic-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(180px,1fr)); gap:14px; margin-top:6px;}
+  .pic-card{background:#FBF9F4; border:1px solid var(--line); border-radius:12px; padding:14px; text-align:center;}
+  .pic-card svg{width:74px; height:74px; margin-bottom:6px;}
+  .pic-card input{width:100%; text-align:center; margin-top:8px;}
+  .wordbank{
+    font-family:'IBM Plex Mono', monospace; font-size:12.5px; color:var(--ink-soft);
+    background:#FBF9F4; border:1px dashed var(--line); border-radius:8px; padding:10px 12px; margin-bottom:14px;
+  }
+
+  /* finish sentences */
+  .sentence-block{margin-bottom:14px;}
+  .sentence-block label{display:block; font-size:15px; margin-bottom:6px;}
+  .sentence-block label .ru{color:var(--brick-deep); font-weight:600;}
+  textarea{
+    width:100%; font-family:'Inter',sans-serif; font-size:14.5px; padding:9px 11px;
+    border:1.5px solid var(--line); border-radius:8px; resize:vertical; min-height:44px;
+  }
+  textarea:focus{outline:2px solid var(--sage); outline-offset:1px;}
+  .sample{
+    font-size:13px; color:var(--sage-deep); background:#EFF3EC; border:1px dashed var(--sage);
+    border-radius:6px; padding:6px 9px; margin-top:5px; display:none;
+  }
+  .sample.show{display:block;}
+  .copy-toast{
+    position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:var(--ink); color:#fff; padding:10px 18px; border-radius:8px; font-size:14px;
+    opacity:0; transition:all .25s ease; pointer-events:none; font-family:'Inter',sans-serif;
+  }
+  .copy-toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+
+  footer{max-width:920px; margin:36px auto 0; padding:0 20px; color:var(--ink-soft); font-size:12.5px; text-align:center;}
+
+  @media (max-width:560px){
+    .task-row{flex-direction:column; align-items:stretch;}
+    input.text-input, select.match-select{width:100%;}
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <span class="eyebrow">House vocabulary · практикум</span>
+    <h1>Дом англичанина: путешествие по комнатам</h1>
+    <p>Семь заданий — семь «комнат» дома. В каждой по 8 пунктов: впишите пропущенные буквы, переведите, подберите определения, соедините половинки, отгадайте слово по картинке, определите правда/ложь и закончите мысль своими словами.</p>
+
+    <svg class="house-svg" viewBox="0 0 600 340" xmlns="http://www.w3.org/2000/svg">
+      <!-- roof -->
+      <polygon points="300,20 480,140 120,140" fill="none" stroke="#B5482F" stroke-width="2.5"/>
+      <!-- chimney -->
+      <rect x="360" y="45" width="22" height="55" fill="none" stroke="#8C3821" stroke-width="2"/>
+      <path d="M382 45 q10 -18 -2 -30" fill="none" stroke="#8C3821" stroke-width="1.5" stroke-dasharray="3 3"/>
+      <text x="390" y="35" class="label-strong">chimney</text>
+      <!-- attic dashed line inside roof -->
+      <text x="270" y="105" class="label-strong">attic</text>
+      <!-- main house body -->
+      <rect x="120" y="140" width="360" height="160" fill="none" stroke="#2B2A28" stroke-width="2"/>
+      <line x1="120" y1="195" x2="480" y2="195" stroke="#635C51" stroke-width="1" stroke-dasharray="4 4"/>
+      <line x1="120" y1="250" x2="480" y2="250" stroke="#635C51" stroke-width="1" stroke-dasharray="4 4"/>
+      <text x="440" y="172" class="label-strong">top floor</text>
+      <text x="415" y="227" class="label-strong">ground floor</text>
+      <text x="425" y="282" class="label-strong">basement</text>
+      <text x="130" y="160" class="label-strong">wall</text>
+      <!-- balcony -->
+      <rect x="330" y="185" width="55" height="10" fill="none" stroke="#4F6B52" stroke-width="2"/>
+      <line x1="330" y1="185" x2="330" y2="165" stroke="#4F6B52" stroke-width="1.5"/>
+      <line x1="385" y1="185" x2="385" y2="165" stroke="#4F6B52" stroke-width="1.5"/>
+      <text x="335" y="180" class="label-strong">balcony</text>
+      <!-- entrance + steps -->
+      <rect x="205" y="245" width="34" height="55" fill="none" stroke="#8C3821" stroke-width="2"/>
+      <text x="185" y="240" class="label-strong">entrance</text>
+      <line x1="205" y1="300" x2="195" y2="310" stroke="#635C51" stroke-width="2"/>
+      <line x1="195" y1="310" x2="185" y2="320" stroke="#635C51" stroke-width="2"/>
+      <text x="145" y="322" class="label-strong">steps</text>
+      <!-- terrace/patio -->
+      <rect x="390" y="270" width="80" height="30" fill="none" stroke="#4F6B52" stroke-width="2" stroke-dasharray="2 3"/>
+      <text x="392" y="296" class="label-strong" font-size="10.5">terrace / patio</text>
+      <!-- path + gate -->
+      <path d="M190 320 q10 -4 20 -8 q30 -10 55 -12" fill="none" stroke="#D8A73D" stroke-width="3" stroke-dasharray="1 6" stroke-linecap="round"/>
+      <text x="60" y="316" class="label-strong">path</text>
+      <rect x="40" y="290" width="16" height="26" fill="none" stroke="#3B5240" stroke-width="2"/>
+      <text x="18" y="330" class="label-strong">gate</text>
+      <!-- roof label -->
+      <text x="290" y="70" class="label-strong">roof</text>
+    </svg>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- ROOM 1: MISSING LETTERS + CONTEXT -->
+  <section class="room" id="room1">
+    <div class="room-head">
+      <div class="titles">
+        <span class="room-num">Комната 1</span>
+        <h2>Впиши пропущенные буквы</h2>
+      </div>
+      <span class="score" id="score1"></span>
+    </div>
+    <p class="sub">Прочитай предложение и допиши слово целиком в поле ответа.</p>
+    <div class="task-list" id="list1"></div>
+    <div class="room-actions">
+      <button class="btn-primary" onclick="checkRoom(1)">Проверить</button>
+      <button class="btn-ghost" onclick="revealRoom(1)">Показать ответы</button>
+    </div>
+  </section>
+
+  <!-- ROOM 2: TRANSLATION -->
+  <section class="room" id="room2">
+    <div class="room-head">
+      <div class="titles">
+        <span class="room-num">Комната 2</span>
+        <h2>Переведи с русского на английский</h2>
+      </div>
+      <span class="score" id="score2"></span>
+    </div>
+    <p class="sub">Обрати внимание: слово <b>space</b> подходит сразу к двум значениям — космос и пространство.</p>
+    <div class="task-list" id="list2"></div>
+    <div class="room-actions">
+      <button class="btn-primary" onclick="checkRoom(2)">Проверить</button>
+      <button class="btn-ghost" onclick="revealRoom(2)">Показать ответы</button>
+    </div>
+  </section>
+
+  <!-- ROOM 3: DEFINITIONS -->
+  <section class="room" id="room3">
+    <div class="room-head">
+      <div class="titles">
+        <span class="room-num">Комната 3</span>
+        <h2>Подбери определение к слову</h2>
+      </div>
+      <span class="score" id="score3"></span>
+    </div>
+    <p class="sub">Выбери из списка определение, которое подходит слову.</p>
+    <div class="task-list" id="list3"></div>
+    <div class="room-actions">
+      <button class="btn-primary" onclick="checkRoom(3)">Проверить</button>
+      <button class="btn-ghost" onclick="revealRoom(3)">Показать ответы</button>
+    </div>
+  </section>
+
+  <!-- ROOM 4: MATCH HALVES / COLLOCATIONS -->
+  <section class="room" id="room4">
+    <div class="room-head">
+      <div class="titles">
+        <span class="room-num">Комната 4</span>
+        <h2>Соедини половинки выражений</h2>
+      </div>
+      <span class="score" id="score4"></span>
+    </div>
+    <p class="sub">Подбери вторую часть словосочетания.</p>
+    <div class="task-list" id="list4"></div>
+    <div class="room-actions">
+      <button class="btn-primary" onclick="checkRoom(4)">Проверить</button>
+      <button class="btn-ghost" onclick="revealRoom(4)">Показать ответы</button>
+    </div>
+  </section>
+
+  <!-- ROOM 5: GUESS THE WORD FROM PICTURE -->
+  <section class="room" id="room5">
+    <div class="room-head">
+      <div class="titles">
+        <span class="room-num">Комната 5</span>
+        <h2>Отгадай слово по картинке</h2>
+      </div>
+      <span class="score" id="score5"></span>
+    </div>
+    <p class="sub">Посмотри на схематичный рисунок и впиши английское слово.</p>
+    <div class="wordbank" id="bank5"></div>
+    <div class="pic-grid" id="list5"></div>
+    <div class="room-actions">
+      <button class="btn-primary" onclick="checkRoom(5)">Проверить</button>
+      <button class="btn-ghost" onclick="revealRoom(5)">Показать ответы</button>
+    </div>
+  </section>
+
+  <!-- ROOM 6: TRUE / FALSE -->
+  <section class="room" id="room6">
+    <div class="room-head">
+      <div class="titles">
+        <span class="room-num">Комната 6</span>
+        <h2>Правда или ложь?</h2>
+      </div>
+      <span class="score" id="score6"></span>
+    </div>
+    <p class="sub">Выбери True или False для каждого утверждения.</p>
+    <div class="task-list" id="list6"></div>
+    <div class="room-actions">
+      <button class="btn-primary" onclick="checkRoom(6)">Проверить</button>
+      <button class="btn-ghost" onclick="revealRoom(6)">Показать ответы</button>
+    </div>
+  </section>
+
+  <!-- ROOM 7: FINISH THE SENTENCE (open-ended) -->
+  <section class="room" id="room7">
+    <div class="room-head">
+      <div class="titles">
+        <span class="room-num">Комната 7</span>
+        <h2>Закончи предложение своими словами</h2>
+      </div>
+    </div>
+    <p class="sub">Здесь нет «правильного» ответа — пиши что думаешь. Можно посмотреть пример идеи или скопировать все свои ответы одной кнопкой.</p>
+    <div id="list7"></div>
+    <div class="room-actions">
+      <button class="btn-ghost" onclick="revealRoom(7)">Показать примеры идей</button>
+      <button class="btn-copy" onclick="copyLastRoom()">📋 Скопировать мои ответы</button>
+    </div>
+  </section>
+
+</div>
+
+<footer>Материалы для практики домашней лексики · сделай упражнения по порядку, как будто идёшь по дому от крыши до сада.</footer>
+<div class="copy-toast" id="toast">Ответы скопированы в буфер обмена ✓</div>
+
+<script>
+/* ---------------------------------------------------------
+   DATA
+--------------------------------------------------------- */
+
+// ROOM 1 — missing letters + context
+const room1Data = [
+  {sentence:"We keep old boxes and furniture in the ______ downstairs.", word:"basement", masked:"b_s_m_nt"},
+  {sentence:"Smoke from the fireplace goes up through the ______ on the roof.", word:"chimney", masked:"ch_mn_y"},
+  {sentence:"In summer we have breakfast on the ______, right outside the kitchen door.", word:"terrace", masked:"t_rr_ce"},
+  {sentence:"She stood on the ______ and watched the sunset over the garden.", word:"balcony", masked:"b_lc_ny"},
+  {sentence:"Please wipe your feet before you come through the ______.", word:"entrance", masked:"_ntr_nce"},
+  {sentence:"A narrow ______ leads from the gate to the front door.", word:"path", masked:"p_th"},
+  {sentence:"The garden is surrounded by an old stone ______.", word:"wall", masked:"w_ll"},
+  {sentence:"High ______ make the living room feel much bigger.", word:"ceilings", masked:"c_il_ngs"}
+];
+
+// ROOM 2 — RU -> EN translation
+const room2Data = [
+  {ru:"дымоход", answers:["chimney"]},
+  {ru:"чердак", answers:["attic"]},
+  {ru:"калитка / ворота", answers:["gate"]},
+  {ru:"ступеньки", answers:["steps"]},
+  {ru:"просторный", answers:["spacious"]},
+  {ru:"деревянный пол", answers:["wooden floor"]},
+  {ru:"открытый камин", answers:["an open fire","open fire"]},
+  {ru:"1. космос  2. пространство (одно слово для обоих значений)", answers:["space"]}
+];
+
+// ROOM 3 — definitions (word fixed, choose definition)
+const room3Data = [
+  {word:"basement", correct:"A room or level of a building that is partly or entirely below ground level.",
+   options:["A room or level of a building that is partly or entirely below ground level.","The highest level of a building.","A paved outdoor area next to a house."]},
+  {word:"attic", correct:"A space right under the roof of a house, often used for storage.",
+   options:["A space right under the roof of a house, often used for storage.","A vertical pipe that carries smoke out of a house.","A small gate leading into the garden."]},
+  {word:"terrace / patio", correct:"A paved outdoor area next to a house, used for sitting or eating outside.",
+   options:["A paved outdoor area next to a house, used for sitting or eating outside.","A room below ground level.","A platform outside an upstairs window."]},
+  {word:"balcony", correct:"A platform enclosed by a rail on the outside of a building, reached from an upper floor.",
+   options:["A platform enclosed by a rail on the outside of a building, reached from an upper floor.","The floor of a building at ground level.","A narrow track leading to the front door."]},
+  {word:"roof", correct:"The structure that covers the top of a building.",
+   options:["The structure that covers the top of a building.","A room used for storing things under the house.","A small gate at the entrance to a garden."]},
+  {word:"top floor", correct:"The highest level of a building.",
+   options:["The highest level of a building.","A level that is below ground.","An outdoor paved sitting area."]},
+  {word:"ground floor", correct:"The floor of a building at street/ground level.",
+   options:["The floor of a building at street/ground level.","The space just under the roof.","A rail-enclosed platform outside a window."]},
+  {word:"chimney", correct:"A vertical pipe that carries smoke from a fire up through the roof.",
+   options:["A vertical pipe that carries smoke from a fire up through the roof.","A paved area for sitting outside.","A set of stairs leading to the front door."]}
+];
+
+// ROOM 4 — match halves / collocations
+const room4Data = [
+  {first:"open", correct:"fire", options:["fire","floor","gate","path"]},
+  {first:"wooden", correct:"floor", options:["floor","wall","steps","entrance"]},
+  {first:"high", correct:"ceilings", options:["ceilings","gate","fire","wall"]},
+  {first:"garden", correct:"path", options:["path","entrance","steps","ceilings"]},
+  {first:"front", correct:"entrance", options:["entrance","floor","wall","fire"]},
+  {first:"stone", correct:"wall", options:["wall","path","gate","steps"]},
+  {first:"iron", correct:"gate", options:["gate","ceilings","floor","entrance"]},
+  {first:"spiral", correct:"steps", options:["steps","fire","wall","path"]}
+];
+
+// ROOM 5 — guess the word from a simple picture (SVG icons)
+const room5Data = [
+  {name:"chimney", answers:["chimney"], svg:`<rect x="30" y="8" width="14" height="26" fill="none" stroke="#8C3821" stroke-width="2.5"/><path d="M44 8 q8 -14 -2 -22" fill="none" stroke="#635C51" stroke-width="2" stroke-dasharray="2 4"/><polygon points="4,60 37,30 70,60" fill="none" stroke="#B5482F" stroke-width="2.5"/>`},
+  {name:"roof", answers:["roof"], svg:`<polygon points="4,55 37,15 70,55" fill="none" stroke="#B5482F" stroke-width="3"/><line x1="37" y1="15" x2="37" y2="55" stroke="#B5482F" stroke-width="1" stroke-dasharray="3 3"/>`},
+  {name:"gate", answers:["gate"], svg:`<rect x="12" y="18" width="50" height="42" fill="none" stroke="#3B5240" stroke-width="2.5"/><line x1="12" y1="18" x2="62" y2="60" stroke="#3B5240" stroke-width="2"/><line x1="62" y1="18" x2="12" y2="60" stroke="#3B5240" stroke-width="2"/>`},
+  {name:"entrance", answers:["entrance","door","entrance door"], svg:`<rect x="20" y="10" width="34" height="55" fill="none" stroke="#8C3821" stroke-width="2.5"/><circle cx="48" cy="38" r="2.2" fill="#8C3821"/>`},
+  {name:"steps", answers:["steps","stairs"], svg:`<polyline points="6,64 6,50 22,50 22,38 38,38 38,26 54,26 54,14 70,14" fill="none" stroke="#635C51" stroke-width="3" stroke-linejoin="miter"/>`},
+  {name:"an open fire", answers:["an open fire","open fire","fireplace"], svg:`<rect x="10" y="10" width="54" height="50" fill="none" stroke="#8C3821" stroke-width="2.5"/><path d="M30 55 q-4 -14 4 -20 q2 10 8 8 q-2 -12 6 -20 q4 16 -2 22 q6 0 6 8 q0 8 -10 8 q-14 0 -12 -6z" fill="none" stroke="#B5482F" stroke-width="2"/>`},
+  {name:"balcony", answers:["balcony"], svg:`<rect x="8" y="45" width="58" height="10" fill="none" stroke="#4F6B52" stroke-width="2.5"/><line x1="8" y1="45" x2="8" y2="20" stroke="#4F6B52" stroke-width="2"/><line x1="66" y1="45" x2="66" y2="20" stroke="#4F6B52" stroke-width="2"/><line x1="20" y1="45" x2="20" y2="20" stroke="#4F6B52" stroke-width="1.4"/><line x1="37" y1="45" x2="37" y2="20" stroke="#4F6B52" stroke-width="1.4"/><line x1="54" y1="45" x2="54" y2="20" stroke="#4F6B52" stroke-width="1.4"/>`},
+  {name:"attic", answers:["attic"], svg:`<polygon points="4,40 37,10 70,40" fill="none" stroke="#B5482F" stroke-width="2.5"/><line x1="14" y1="40" x2="14" y2="60" stroke="#635C51" stroke-width="2"/><line x1="60" y1="40" x2="60" y2="60" stroke="#635C51" stroke-width="2"/><line x1="14" y1="60" x2="60" y2="60" stroke="#635C51" stroke-width="2"/><rect x="30" y="46" width="14" height="10" fill="none" stroke="#635C51" stroke-width="1.5"/>`}
+];
+
+// ROOM 6 — true / false
+const room6Data = [
+  {statement:"An attic is usually found right under the roof.", correct:true},
+  {statement:"A basement is normally located above the roof.", correct:false},
+  {statement:"A patio is always an indoor room with no windows.", correct:false},
+  {statement:"High ceilings usually make a room feel more spacious.", correct:true},
+  {statement:"A chimney lets smoke from a fire escape through the roof.", correct:true},
+  {statement:"The ground floor is the highest level of a building.", correct:false},
+  {statement:"A balcony always has a roof built over it.", correct:false},
+  {statement:"Steps usually connect a path to a front door at a different level.", correct:true}
+];
+
+// ROOM 7 — finish the sentence (open-ended, own ideas)
+const room7Data = [
+  {prompt:"My dream house would have a/an ______ because ______.", sample:"...a big terrace, because I love having breakfast outside."},
+  {prompt:"If I had a garden path, I would use it to ______.", sample:"...walk to a little vegetable garden every morning."},
+  {prompt:"The best thing about a spacious living room is ______.", sample:"...that you can invite a lot of friends over."},
+  {prompt:"I would love a balcony that looks out onto ______.", sample:"...the sea, so I could watch the sunset every evening."},
+  {prompt:"In the attic, I would keep ______.", sample:"...old photo albums and my grandmother's furniture."},
+  {prompt:"A cosy corner in my home always has ______.", sample:"...a soft blanket, a lamp and a good book."},
+  {prompt:"If I could choose the height of the ceilings, I would make them ______ because ______.", sample:"...very high, because it makes the room feel airy."},
+  {prompt:"The most important room in a house, for me, is ______ because ______.", sample:"...the kitchen, because that's where the whole family gathers."}
+];
+
+/* ---------------------------------------------------------
+   RENDER
+--------------------------------------------------------- */
+
+function el(html){ const d=document.createElement('div'); d.innerHTML=html.trim(); return d.firstElementChild; }
+
+function renderRoom1(){
+  const list = document.getElementById('list1');
+  room1Data.forEach((item,i)=>{
+    const row = el(`<div class="task-row" data-index="${i}">
+      <span class="task-idx">${i+1}.</span>
+      <span class="task-text">${item.sentence.replace('______', `<span class="hint">(${item.masked})</span>`)}</span>
+      <input class="text-input" type="text" placeholder="слово целиком">
+      <span class="mark"></span>
+      <span class="answer-reveal"></span>
+    </div>`);
+    list.appendChild(row);
+  });
+}
+
+function renderRoom2(){
+  const list = document.getElementById('list2');
+  room2Data.forEach((item,i)=>{
+    const row = el(`<div class="task-row" data-index="${i}">
+      <span class="task-idx">${i+1}.</span>
+      <span class="task-text"><span class="ru">${item.ru}</span></span>
+      <input class="text-input" type="text" placeholder="in English">
+      <span class="mark"></span>
+      <span class="answer-reveal"></span>
+    </div>`);
+    list.appendChild(row);
+  });
+}
+
+function renderRoom3(){
+  const list = document.getElementById('list3');
+  room3Data.forEach((item,i)=>{
+    const opts = item.options.map(o=>`<option value="${o.replace(/"/g,'&quot;')}">${o}</option>`).join('');
+    const row = el(`<div class="task-row" data-index="${i}">
+      <span class="task-idx">${i+1}.</span>
+      <span class="task-text"><b>${item.word}</b></span>
+      <select class="match-select">
+        <option value="">— выбери определение —</option>
+        ${opts}
+      </select>
+      <span class="mark"></span>
+      <span class="answer-reveal"></span>
+    </div>`);
+    list.appendChild(row);
+  });
+}
+
+function renderRoom4(){
+  const list = document.getElementById('list4');
+  room4Data.forEach((item,i)=>{
+    const opts = item.options.map(o=>`<option value="${o}">${o}</option>`).join('');
+    const row = el(`<div class="task-row" data-index="${i}">
+      <span class="task-idx">${i+1}.</span>
+      <span class="task-text"><b>${item.first}</b> ___</span>
+      <select class="match-select">
+        <option value="">— выбери слово —</option>
+        ${opts}
+      </select>
+      <span class="mark"></span>
+      <span class="answer-reveal"></span>
+    </div>`);
+    list.appendChild(row);
+  });
+}
+
+function renderRoom5(){
+  const bank = document.getElementById('bank5');
+  const shuffled = room5Data.map(d=>d.name).sort(()=>Math.random()-0.5);
+  bank.textContent = "Банк слов: " + shuffled.join(" · ");
+  const list = document.getElementById('list5');
+  room5Data.forEach((item,i)=>{
+    const card = el(`<div class="pic-card" data-index="${i}">
+      <svg viewBox="0 0 74 74" xmlns="http://www.w3.org/2000/svg">${item.svg}</svg>
+      <input class="text-input" type="text" placeholder="word">
+      <div class="mark"></div>
+      <span class="answer-reveal"></span>
+    </div>`);
+    list.appendChild(card);
+  });
+}
+
+function renderRoom6(){
+  const list = document.getElementById('list6');
+  room6Data.forEach((item,i)=>{
+    const row = el(`<div class="task-row" data-index="${i}">
+      <span class="task-idx">${i+1}.</span>
+      <span class="task-text">${item.statement}</span>
+      <select class="match-select">
+        <option value="">— выбери —</option>
+        <option value="true">True</option>
+        <option value="false">False</option>
+      </select>
+      <span class="mark"></span>
+      <span class="answer-reveal"></span>
+    </div>`);
+    list.appendChild(row);
+  });
+}
+
+function renderRoom7(){
+  const list = document.getElementById('list7');
+  room7Data.forEach((item,i)=>{
+    const block = el(`<div class="sentence-block" data-index="${i}">
+      <label><span class="ru">${i+1}.</span> ${item.prompt}</label>
+      <textarea rows="2" placeholder="напиши свою идею..."></textarea>
+      <div class="sample">Пример идеи: ${item.sample}</div>
+    </div>`);
+    list.appendChild(block);
+  });
+}
+
+renderRoom1(); renderRoom2(); renderRoom3(); renderRoom4(); renderRoom5(); renderRoom6(); renderRoom7();
+
+/* ---------------------------------------------------------
+   CHECK / REVEAL LOGIC
+--------------------------------------------------------- */
+
+function normalize(s){
+  return s.toLowerCase().trim().replace(/\s+/g,' ').replace(/^(a|an|the)\s+/,'').replace(/[.,!?]/g,'');
+}
+
+function checkRoom(n){
+  let correctCount = 0;
+  let total = 0;
+
+  if(n===1){
+    document.querySelectorAll('#list1 .task-row').forEach((row,i)=>{
+      total++;
+      const input = row.querySelector('input');
+      const mark = row.querySelector('.mark');
+      const ok = normalize(input.value) === normalize(room1Data[i].word);
+      row.classList.toggle('correct', ok); row.classList.toggle('wrong', !ok && input.value.trim()!=='');
+      mark.textContent = input.value.trim()==='' ? '' : (ok ? '✓' : '✕');
+      mark.className = 'mark ' + (ok?'ok':'no');
+      if(ok) correctCount++;
+    });
+  }
+  if(n===2){
+    document.querySelectorAll('#list2 .task-row').forEach((row,i)=>{
+      total++;
+      const input = row.querySelector('input');
+      const mark = row.querySelector('.mark');
+      const ok = room2Data[i].answers.some(a=>normalize(a)===normalize(input.value));
+      row.classList.toggle('correct', ok); row.classList.toggle('wrong', !ok && input.value.trim()!=='');
+      mark.textContent = input.value.trim()==='' ? '' : (ok ? '✓' : '✕');
+      mark.className = 'mark ' + (ok?'ok':'no');
+      if(ok) correctCount++;
+    });
+  }
+  if(n===3){
+    document.querySelectorAll('#list3 .task-row').forEach((row,i)=>{
+      total++;
+      const sel = row.querySelector('select');
+      const mark = row.querySelector('.mark');
+      const ok = sel.value === room3Data[i].correct;
+      row.classList.toggle('correct', ok); row.classList.toggle('wrong', !ok && sel.value!=='');
+      mark.textContent = sel.value==='' ? '' : (ok ? '✓' : '✕');
+      mark.className = 'mark ' + (ok?'ok':'no');
+      if(ok) correctCount++;
+    });
+  }
+  if(n===4){
+    document.querySelectorAll('#list4 .task-row').forEach((row,i)=>{
+      total++;
+      const sel = row.querySelector('select');
+      const mark = row.querySelector('.mark');
+      const ok = sel.value === room4Data[i].correct;
+      row.classList.toggle('correct', ok); row.classList.toggle('wrong', !ok && sel.value!=='');
+      mark.textContent = sel.value==='' ? '' : (ok ? '✓' : '✕');
+      mark.className = 'mark ' + (ok?'ok':'no');
+      if(ok) correctCount++;
+    });
+  }
+  if(n===5){
+    document.querySelectorAll('#list5 .pic-card').forEach((card,i)=>{
+      total++;
+      const input = card.querySelector('input');
+      const mark = card.querySelector('.mark');
+      const ok = room5Data[i].answers.some(a=>normalize(a)===normalize(input.value));
+      card.classList.toggle('correct', ok); card.classList.toggle('wrong', !ok && input.value.trim()!=='');
+      mark.textContent = input.value.trim()==='' ? '' : (ok ? '✓' : '✕');
+      mark.className = 'mark ' + (ok?'ok':'no');
+      if(ok) correctCount++;
+    });
+  }
+  if(n===6){
+    document.querySelectorAll('#list6 .task-row').forEach((row,i)=>{
+      total++;
+      const sel = row.querySelector('select');
+      const mark = row.querySelector('.mark');
+      const ok = sel.value === String(room6Data[i].correct);
+      row.classList.toggle('correct', ok); row.classList.toggle('wrong', !ok && sel.value!=='');
+      mark.textContent = sel.value==='' ? '' : (ok ? '✓' : '✕');
+      mark.className = 'mark ' + (ok?'ok':'no');
+      if(ok) correctCount++;
+    });
+  }
+
+  const scoreEl = document.getElementById('score'+n);
+  if(scoreEl) scoreEl.textContent = `${correctCount} из ${total}`;
+}
+
+function revealRoom(n){
+  if(n===1){
+    document.querySelectorAll('#list1 .task-row').forEach((row,i)=>{
+      const rev = row.querySelector('.answer-reveal');
+      rev.textContent = room1Data[i].word; rev.classList.add('show');
+    });
+  }
+  if(n===2){
+    document.querySelectorAll('#list2 .task-row').forEach((row,i)=>{
+      const rev = row.querySelector('.answer-reveal');
+      rev.textContent = room2Data[i].answers[0]; rev.classList.add('show');
+    });
+  }
+  if(n===3){
+    document.querySelectorAll('#list3 .task-row').forEach((row,i)=>{
+      const rev = row.querySelector('.answer-reveal');
+      rev.textContent = room3Data[i].correct; rev.classList.add('show');
+    });
+  }
+  if(n===4){
+    document.querySelectorAll('#list4 .task-row').forEach((row,i)=>{
+      const rev = row.querySelector('.answer-reveal');
+      rev.textContent = room4Data[i].first + ' ' + room4Data[i].correct; rev.classList.add('show');
+    });
+  }
+  if(n===5){
+    document.querySelectorAll('#list5 .pic-card').forEach((card,i)=>{
+      const rev = card.querySelector('.answer-reveal');
+      rev.textContent = room5Data[i].name; rev.classList.add('show');
+    });
+  }
+  if(n===6){
+    document.querySelectorAll('#list6 .task-row').forEach((row,i)=>{
+      const rev = row.querySelector('.answer-reveal');
+      rev.textContent = room6Data[i].correct ? 'True' : 'False'; rev.classList.add('show');
+    });
+  }
+  if(n===7){
+    document.querySelectorAll('#list7 .sentence-block .sample').forEach(s=>s.classList.add('show'));
+  }
+}
+
+function copyLastRoom(){
+  const blocks = document.querySelectorAll('#list7 .sentence-block');
+  let text = "Мои ответы — Комната 7 (закончи предложение):\n\n";
+  blocks.forEach((b,i)=>{
+    const prompt = room7Data[i].prompt.replace(/______/g,'…');
+    const answer = b.querySelector('textarea').value.trim() || '(пусто)';
+    text += `${i+1}. ${prompt}\n   → ${answer}\n\n`;
+  });
+  navigator.clipboard.writeText(text).then(()=>{
+    const toast = document.getElementById('toast');
+    toast.classList.add('show');
+    setTimeout(()=>toast.classList.remove('show'), 2200);
+  }).catch(()=>{
+    alert('Не удалось скопировать автоматически. Вот текст:\n\n' + text);
+  });
+}
+</script>
+</body>
+</html>
