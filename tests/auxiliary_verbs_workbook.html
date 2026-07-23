@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Auxiliary Echoes — практикум по вспомогательным глаголам</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --board:#1f3a34;
+    --board-dark:#162925;
+    --chalk:#f2ede2;
+    --chalk-dim:#c9d6cf;
+    --amber:#e8b74b;
+    --amber-dim:#e8b74b55;
+    --coral:#e8795a;
+    --sage:#7fae95;
+    --line:#3c5e55;
+    --card:#24443d;
+    --good:#8fd19e;
+    --bad:#e8795a;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(ellipse at top left, #2a4a43 0%, var(--board) 55%),
+      var(--board);
+    color:var(--chalk);
+    font-family:'Inter',sans-serif;
+    padding-bottom:80px;
+  }
+  ::selection{background:var(--amber); color:var(--board-dark);}
+
+  /* chalk dust texture */
+  body::before{
+    content:"";
+    position:fixed; inset:0;
+    background-image:
+      radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.05) 1px, transparent 0),
+      radial-gradient(1px 1px at 80% 60%, rgba(255,255,255,0.04) 1px, transparent 0),
+      radial-gradient(1px 1px at 40% 80%, rgba(255,255,255,0.05) 1px, transparent 0);
+    background-size: 300px 300px;
+    pointer-events:none;
+    z-index:0;
+  }
+
+  header{
+    text-align:center;
+    padding:56px 20px 34px;
+    position:relative;
+  }
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    font-size:12px;
+    color:var(--amber);
+    opacity:.9;
+  }
+  h1{
+    font-family:'Caveat',cursive;
+    font-weight:700;
+    font-size:clamp(2.6rem, 6vw, 4.2rem);
+    margin:8px 0 6px;
+    color:var(--chalk);
+    text-shadow: 0 0 18px rgba(232,183,75,0.15);
+  }
+  header p.sub{
+    max-width:640px;
+    margin:0 auto;
+    color:var(--chalk-dim);
+    font-size:15px;
+    line-height:1.6;
+  }
+  .underline-doodle{
+    width:220px; height:14px;
+    margin:2px auto 0;
+    opacity:.85;
+  }
+
+  nav.toc{
+    max-width:920px;
+    margin:0 auto 40px;
+    padding:0 20px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    justify-content:center;
+    position:relative;
+    z-index:1;
+  }
+  nav.toc a{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12.5px;
+    color:var(--chalk-dim);
+    text-decoration:none;
+    border:1px solid var(--line);
+    padding:7px 12px;
+    border-radius:999px;
+    transition:.2s;
+    white-space:nowrap;
+  }
+  nav.toc a:hover{ border-color:var(--amber); color:var(--amber); }
+
+  main{
+    max-width:820px;
+    margin:0 auto;
+    padding:0 20px;
+    position:relative;
+    z-index:1;
+  }
+
+  section.ex{
+    background:linear-gradient(180deg, var(--card), var(--board-dark));
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:30px 28px 26px;
+    margin-bottom:34px;
+    scroll-margin-top:20px;
+    box-shadow:0 12px 30px rgba(0,0,0,0.25);
+  }
+  .ex-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:16px;
+    flex-wrap:wrap;
+    border-bottom:1px dashed var(--line);
+    padding-bottom:16px;
+    margin-bottom:20px;
+  }
+  .ex-head h2{
+    font-family:'Caveat', cursive;
+    font-size:2rem;
+    margin:0 0 6px;
+    color:var(--amber);
+  }
+  .ex-head .rule{
+    font-size:13.5px;
+    color:var(--chalk-dim);
+    line-height:1.55;
+    max-width:520px;
+  }
+  .ex-head .rule b{ color:var(--sage); font-weight:600;}
+  .score-badge{
+    font-family:'JetBrains Mono',monospace;
+    font-size:13px;
+    color:var(--chalk-dim);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:8px 12px;
+    min-width:86px;
+    text-align:center;
+  }
+  .score-badge .num{
+    display:block;
+    font-size:20px;
+    color:var(--amber);
+    font-weight:600;
+  }
+
+  .item{
+    display:flex;
+    gap:12px;
+    align-items:flex-start;
+    padding:12px 0;
+    border-bottom:1px solid var(--line);
+  }
+  .item:last-of-type{ border-bottom:none; }
+  .item .idx{
+    font-family:'JetBrains Mono',monospace;
+    color:var(--sage);
+    font-size:13px;
+    padding-top:9px;
+    width:20px;
+    flex-shrink:0;
+  }
+  .item .body{ flex:1; min-width:0; }
+  .item .sentence{
+    font-size:15.5px;
+    line-height:1.65;
+    color:var(--chalk);
+  }
+  .item .sentence .ctx{ color:var(--chalk-dim); font-style:italic; }
+  .item .row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-top:8px;
+    flex-wrap:wrap;
+  }
+  .item input[type=text]{
+    background:var(--board-dark);
+    border:1px solid var(--line);
+    color:var(--chalk);
+    font-family:'JetBrains Mono',monospace;
+    font-size:14px;
+    padding:8px 10px;
+    border-radius:8px;
+    min-width:150px;
+    flex:1;
+    max-width:260px;
+    outline:none;
+    transition:.15s;
+  }
+  .item input[type=text]:focus{
+    border-color:var(--amber);
+    box-shadow:0 0 0 3px var(--amber-dim);
+  }
+  .item input.correct{ border-color:var(--good); box-shadow:0 0 0 3px #8fd19e33; }
+  .item input.wrong{ border-color:var(--bad); box-shadow:0 0 0 3px #e8795a33; }
+
+  .fb{
+    font-size:13px;
+    font-family:'JetBrains Mono',monospace;
+    min-height:18px;
+  }
+  .fb.ok{ color:var(--good); }
+  .fb.no{ color:var(--bad); }
+  .fb .answer-reveal{ color:var(--amber); }
+
+  .ex-actions{
+    display:flex;
+    gap:10px;
+    margin-top:22px;
+    flex-wrap:wrap;
+  }
+  button{
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:13.5px;
+    padding:10px 18px;
+    border-radius:9px;
+    border:1px solid transparent;
+    cursor:pointer;
+    transition:.15s;
+  }
+  button.primary{
+    background:var(--amber);
+    color:var(--board-dark);
+  }
+  button.primary:hover{ filter:brightness(1.08); }
+  button.ghost{
+    background:transparent;
+    border-color:var(--line);
+    color:var(--chalk-dim);
+  }
+  button.ghost:hover{ border-color:var(--sage); color:var(--sage); }
+
+  footer{
+    text-align:center;
+    color:var(--chalk-dim);
+    font-size:12.5px;
+    padding:30px 20px 10px;
+    opacity:.7;
+  }
+
+  @media (prefers-reduced-motion:no-preference){
+    section.ex{ animation: rise .5s ease both; }
+  }
+  @keyframes rise{ from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
+
+  :focus-visible{ outline:2px solid var(--amber); outline-offset:2px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">grammar workbook</div>
+  <h1>Auxiliary Echoes</h1>
+  <svg class="underline-doodle" viewBox="0 0 220 14" xmlns="http://www.w3.org/2000/svg">
+    <path d="M4 8 Q 40 2, 70 8 T 140 8 T 216 6" stroke="#e8b74b" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  </svg>
+  <p class="sub">7 упражнений по 8 заданий: отказ от повторения глагола, reply questions, so/neither, эмфатическое do, question tags и смешанные примеры. Впишите ответ и нажмите «Проверить» — или сразу «Показать ответы».</p>
+</header>
+
+<nav class="toc" id="toc"></nav>
+
+<main id="main"></main>
+
+<footer>Auxiliary Echoes · практикум по вспомогательным и модальным глаголам</footer>
+
+<script>
+const EXERCISES = [
+{
+  title: "Упр. 1 — Avoid repetition",
+  rule: "Вместо повторения смыслового глагола используйте <b>вспомогательный/модальный глагол</b> (do/does/did, is/are/was/were, have/has, will, can и т.д.).",
+  items: [
+    { text: "She likes tea, but I ___.", answers: ["don't","do not"] },
+    { text: "He can drive, but she ___.", answers: ["can't","cannot","can not"] },
+    { text: "I've seen that film, and they ___ too.", answers: ["have"] },
+    { text: "We didn't go to the party, and they ___ either.", answers: ["didn't","did not"] },
+    { text: "I'm not hungry, but he ___.", answers: ["is"] },
+    { text: "They will help us, and she ___ too.", answers: ["will"] },
+    { text: "I was late, but you ___.", answers: ["weren't","were not"] },
+    { text: "She hasn't finished, and I ___ either.", answers: ["haven't","have not"] },
+  ]
+},
+{
+  title: "Упр. 2 — Reply questions / Difference / So & Neither",
+  rule: "Реагируйте на реплику: <b>reply question</b> (интерес/удивление), <b>difference</b> (другое мнение) или <b>so/neither + auxiliary</b> (то же самое).",
+  items: [
+    { text: "A: I haven't passed the exam. B: <span class='ctx'>(удивление)</span> ___?", answers: ["haven't you"] },
+    { text: "A: I love coffee. B: <span class='ctx'>(а я нет)</span> ___.", answers: ["i don't","i do not","don't"] },
+    { text: "A: I love coffee. B: <span class='ctx'>(и я тоже)</span> ___ I.", answers: ["so do"] },
+    { text: "A: I don't like spinach. B: <span class='ctx'>(и я тоже не люблю)</span> ___ I.", answers: ["neither do","nor do"] },
+    { text: "A: She works at a bank. B: <span class='ctx'>(интерес)</span> ___?", answers: ["does she"] },
+    { text: "A: I can't swim. B: <span class='ctx'>(а я умею)</span> ___.", answers: ["i can","i can."] },
+    { text: "A: We've never been to Paris. B: <span class='ctx'>(мы тоже не были)</span> ___ we.", answers: ["neither have","nor have"] },
+    { text: "A: He is coming tonight. B: <span class='ctx'>(удивление)</span> ___?", answers: ["is he"] },
+  ]
+},
+{
+  title: "Упр. 3 — Emphasis",
+  rule: "Добавьте эмфатическое <b>do/does/did</b>, чтобы подчеркнуть или опровергнуть утверждение.",
+  items: [
+    { text: "I like it. → <span class='ctx'>(emphasize)</span> I ___ like it.", answers: ["do"] },
+    { text: "He works hard. → He ___ work hard.", answers: ["does"] },
+    { text: "They finished the race. → They ___ finish the race.", answers: ["did"] },
+    { text: "She wants to help. → She ___ want to help.", answers: ["does"] },
+    { text: "We tried our best. → We ___ try our best.", answers: ["did"] },
+    { text: "I told the truth. → I ___ tell the truth.", answers: ["did"] },
+    { text: "He believes you. → He ___ believe you.", answers: ["does"] },
+    { text: "You look tired. → You ___ look tired.", answers: ["do"] },
+  ]
+},
+{
+  title: "Упр. 4 — Question tags (базовые + let's / there / imperative / aren't I)",
+  rule: "Постройте разделительный вопрос: положительное предложение → отрицательный хвостик, отрицательное → положительный.",
+  items: [
+    { text: "You are coming, ___?", answers: ["aren't you"] },
+    { text: "She can't swim, ___?", answers: ["can she"] },
+    { text: "Let's go, ___?", answers: ["shall we"] },
+    { text: "I am late, ___?", answers: ["aren't i"] },
+    { text: "There is a problem, ___?", answers: ["isn't there"] },
+    { text: "Open the window, ___?", answers: ["will you","would you","won't you"] },
+    { text: "He has finished, ___?", answers: ["hasn't he"] },
+    { text: "They don't like it, ___?", answers: ["do they"] },
+  ]
+},
+{
+  title: "Упр. 5 — Question tags: сложные случаи (nobody, nothing, everybody, let's not…)",
+  rule: "Для nobody/nothing → <b>they/it</b>; для everybody/somebody → <b>they</b>; хвостик всегда следует смыслу, а не грамматическому лицу подлежащего.",
+  items: [
+    { text: "Nobody called, ___?", answers: ["did they"] },
+    { text: "Nothing happened, ___?", answers: ["did it"] },
+    { text: "Everybody knows the answer, ___?", answers: ["don't they"] },
+    { text: "Somebody left the door open, ___?", answers: ["didn't they"] },
+    { text: "Let's not be late, ___?", answers: ["shall we"] },
+    { text: "This isn't your book, ___?", answers: ["is it"] },
+    { text: "You've never been there, ___?", answers: ["have you"] },
+    { text: "He'd better leave now, ___?", answers: ["hadn't he"] },
+  ]
+},
+{
+  title: "Упр. 6 — Смешанный обзор I",
+  rule: "Определите, какое правило нужно (reply question / difference / so-neither / emphasis / tag), и впишите нужную форму.",
+  items: [
+    { text: "A: I really enjoy hiking. B: So ___ I.", answers: ["do"] },
+    { text: "He said he'd call, but he ___.", answers: ["didn't","did not"] },
+    { text: "You haven't met her, ___?", answers: ["have you"] },
+    { text: "He thinks he's right, and actually he ___!", answers: ["does"] },
+    { text: "Nobody is perfect, ___?", answers: ["are they"] },
+    { text: "A: I can't cook well. B: Neither ___ I.", answers: ["can"] },
+    { text: "Let's start now, ___?", answers: ["shall we"] },
+    { text: "She said she liked it, and she really ___.", answers: ["did"] },
+  ]
+},
+{
+  title: "Упр. 7 — Смешанный обзор II",
+  rule: "Финальный микс: reply questions, so/neither, emphasis и question tags вместе.",
+  items: [
+    { text: "A: I'm not ready. B: <span class='ctx'>(удивление)</span> ___?", answers: ["aren't you"] },
+    { text: "We went there last summer, and so ___ they.", answers: ["did"] },
+    { text: "There isn't much time left, ___?", answers: ["is there"] },
+    { text: "He never listens, ___?", answers: ["does he"] },
+    { text: "A: I love this song! B: <span class='ctx'>(а я нет)</span> ___.", answers: ["i don't","i do not","don't"] },
+    { text: "He said nothing, but he ___ know the truth.", answers: ["did"] },
+    { text: "Everybody enjoyed the party, ___?", answers: ["didn't they"] },
+    { text: "A: I haven't tried sushi. B: <span class='ctx'>(и я не пробовал)</span> ___ I.", answers: ["neither have","nor have"] },
+  ]
+},
+];
+
+function norm(s){
+  return s.toLowerCase().trim().replace(/[.!?]+$/,'').replace(/\s+/g,' ');
+}
+
+function slugify(str){
+  return str.toLowerCase().replace(/[^\w]+/g,'-').replace(/^-+|-+$/g,'');
+}
+
+const main = document.getElementById('main');
+const toc = document.getElementById('toc');
+
+EXERCISES.forEach((ex, exIdx) => {
+  const id = 'ex-' + (exIdx+1);
+  const section = document.createElement('section');
+  section.className = 'ex';
+  section.id = id;
+
+  const tocLink = document.createElement('a');
+  tocLink.href = '#' + id;
+  tocLink.textContent = 'Упр ' + (exIdx+1);
+  toc.appendChild(tocLink);
+
+  const head = document.createElement('div');
+  head.className = 'ex-head';
+  head.innerHTML = `
+    <div>
+      <h2>${ex.title}</h2>
+      <div class="rule">${ex.rule}</div>
+    </div>
+    <div class="score-badge" id="${id}-score"><span class="num">0/8</span>верно</div>
+  `;
+  section.appendChild(head);
+
+  ex.items.forEach((item, i) => {
+    const row = document.createElement('div');
+    row.className = 'item';
+    row.innerHTML = `
+      <div class="idx">${i+1}.</div>
+      <div class="body">
+        <div class="sentence">${item.text}</div>
+        <div class="row">
+          <input type="text" id="${id}-i${i}" autocomplete="off" spellcheck="false" placeholder="ваш ответ">
+        </div>
+        <div class="fb" id="${id}-f${i}"></div>
+      </div>
+    `;
+    section.appendChild(row);
+  });
+
+  const actions = document.createElement('div');
+  actions.className = 'ex-actions';
+  actions.innerHTML = `
+    <button class="primary" data-action="check" data-ex="${exIdx}">Проверить</button>
+    <button class="ghost" data-action="reveal" data-ex="${exIdx}">Показать ответы</button>
+    <button class="ghost" data-action="reset" data-ex="${exIdx}">Сбросить</button>
+  `;
+  section.appendChild(actions);
+
+  main.appendChild(section);
+});
+
+main.addEventListener('click', (e) => {
+  const btn = e.target.closest('button');
+  if(!btn) return;
+  const exIdx = parseInt(btn.dataset.ex, 10);
+  const ex = EXERCISES[exIdx];
+  const id = 'ex-' + (exIdx+1);
+
+  if(btn.dataset.action === 'check'){
+    let correctCount = 0;
+    ex.items.forEach((item, i) => {
+      const input = document.getElementById(`${id}-i${i}`);
+      const fb = document.getElementById(`${id}-f${i}`);
+      const val = norm(input.value);
+      const isCorrect = val.length > 0 && item.answers.some(a => norm(a) === val);
+      input.classList.remove('correct','wrong');
+      if(isCorrect){
+        input.classList.add('correct');
+        fb.className = 'fb ok';
+        fb.textContent = '✓ верно';
+        correctCount++;
+      } else {
+        input.classList.add('wrong');
+        fb.className = 'fb no';
+        fb.innerHTML = '✗ верный ответ: <span class="answer-reveal">' + item.answers[0] + '</span>';
+      }
+    });
+    document.querySelector(`#${id}-score .num`).textContent = correctCount + '/8';
+  }
+
+  if(btn.dataset.action === 'reveal'){
+    ex.items.forEach((item, i) => {
+      const input = document.getElementById(`${id}-i${i}`);
+      const fb = document.getElementById(`${id}-f${i}`);
+      input.value = item.answers[0];
+      input.classList.remove('wrong');
+      input.classList.add('correct');
+      fb.className = 'fb ok';
+      fb.textContent = '✓ показано';
+    });
+    document.querySelector(`#${id}-score .num`).textContent = '8/8';
+  }
+
+  if(btn.dataset.action === 'reset'){
+    ex.items.forEach((item, i) => {
+      const input = document.getElementById(`${id}-i${i}`);
+      const fb = document.getElementById(`${id}-f${i}`);
+      input.value = '';
+      input.classList.remove('correct','wrong');
+      fb.textContent = '';
+    });
+    document.querySelector(`#${id}-score .num`).textContent = '0/8';
+  }
+});
+
+// Enter key moves to next input / checks exercise on last field
+main.addEventListener('keydown', (e) => {
+  if(e.key !== 'Enter') return;
+  const input = e.target;
+  if(input.tagName !== 'INPUT') return;
+  const section = input.closest('section.ex');
+  const inputs = Array.from(section.querySelectorAll('input[type=text]'));
+  const idx = inputs.indexOf(input);
+  if(idx < inputs.length - 1){
+    inputs[idx+1].focus();
+  } else {
+    section.querySelector('button[data-action="check"]').click();
+  }
+});
+</script>
+
+</body>
+</html>
