@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Сильные прилагательные — интерактивная практика</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EEEAE2;
+    --paper-2:#E4DFD4;
+    --ink:#20242C;
+    --ink-soft:#565C66;
+    --ember:#D9542E;
+    --ember-soft:#F1D3C6;
+    --glacier:#2E7EA1;
+    --glacier-soft:#CFE3EC;
+    --good:#2F7A52;
+    --good-bg:#DCEEE1;
+    --bad:#C4402F;
+    --bad-bg:#F5DCD7;
+    --line:#D3CDC0;
+    --radius:14px;
+    --shadow: 0 1px 2px rgba(32,36,44,0.06), 0 8px 24px rgba(32,36,44,0.05);
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'IBM Plex Sans', sans-serif;
+    line-height:1.5;
+  }
+  h1,h2,h3{font-family:'Fraunces', serif; font-weight:600; margin:0;}
+
+  /* --- layout --- */
+  .shell{display:grid; grid-template-columns:250px 1fr; max-width:1180px; margin:0 auto;}
+  @media (max-width:880px){ .shell{grid-template-columns:1fr;} }
+
+  /* --- header / gauge --- */
+  .hero{
+    grid-column:1/-1;
+    padding:56px 32px 40px;
+    position:relative;
+    overflow:hidden;
+    border-bottom:1px solid var(--line);
+  }
+  .hero .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    margin-bottom:14px;
+  }
+  .hero h1{font-size:clamp(30px,4vw,46px); letter-spacing:-0.01em; max-width:640px;}
+  .hero p.sub{max-width:560px; color:var(--ink-soft); margin-top:14px; font-size:16px;}
+  .gauge{
+    margin-top:28px;
+    height:10px;
+    border-radius:999px;
+    background:linear-gradient(90deg,var(--glacier),#B9CBB0 45%,var(--ember));
+    position:relative;
+    max-width:520px;
+  }
+  .gauge-labels{display:flex; justify-content:space-between; max-width:520px; margin-top:6px; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.06em;}
+  .overall-score{
+    position:absolute; top:48px; right:32px;
+    text-align:right;
+    font-family:'IBM Plex Mono', monospace;
+  }
+  .overall-score .num{font-family:'Fraunces',serif; font-size:40px; font-weight:700; color:var(--ember);}
+  .overall-score .lbl{font-size:11px; text-transform:uppercase; letter-spacing:.1em; color:var(--ink-soft);}
+  @media (max-width:600px){ .overall-score{position:static; margin-top:20px; text-align:left;} }
+
+  /* --- nav --- */
+  nav.side{
+    padding:28px 20px;
+    border-right:1px solid var(--line);
+    position:sticky; top:0; align-self:start; height:100vh;
+    overflow-y:auto;
+  }
+  @media (max-width:880px){
+    nav.side{position:static; height:auto; border-right:none; border-bottom:1px solid var(--line);
+      display:flex; overflow-x:auto; gap:8px; padding:14px 20px;}
+    nav.side a{white-space:nowrap;}
+  }
+  nav.side a{
+    display:flex; align-items:center; gap:10px;
+    padding:10px 12px; border-radius:10px;
+    text-decoration:none; color:var(--ink);
+    font-size:14px; font-weight:500;
+    margin-bottom:2px;
+  }
+  nav.side a:hover{background:var(--paper-2);}
+  nav.side a .dot{
+    width:22px; height:22px; border-radius:50%;
+    background:var(--paper-2); color:var(--ink-soft);
+    font-family:'IBM Plex Mono',monospace; font-size:11px;
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+  }
+  nav.side a .dot.done{background:var(--good); color:#fff;}
+
+  /* --- main --- */
+  main{padding:40px 32px 100px;}
+  section.exercise{
+    margin-bottom:56px;
+    scroll-margin-top:20px;
+  }
+  .ex-head{display:flex; align-items:baseline; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:6px;}
+  .ex-head h2{font-size:24px;}
+  .ex-num{font-family:'IBM Plex Mono',monospace; color:var(--ember); font-size:14px; margin-right:8px;}
+  .ex-instructions{color:var(--ink-soft); font-size:14.5px; margin-bottom:18px; max-width:680px;}
+  .heatbar{height:5px; border-radius:99px; background:var(--paper-2); overflow:hidden; margin-bottom:22px;}
+  .heatbar > i{display:block; height:100%; width:0%; background:linear-gradient(90deg,var(--glacier),var(--ember)); transition:width .4s ease;}
+
+  .item{
+    display:grid;
+    grid-template-columns:28px 1fr;
+    gap:12px;
+    padding:14px 16px;
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    margin-bottom:10px;
+    transition:border-color .2s, background .2s;
+  }
+  .item .idx{font-family:'IBM Plex Mono',monospace; color:var(--ink-soft); font-size:13px; padding-top:2px;}
+  .item .clue{font-size:15.5px; margin-bottom:8px;}
+  .item .clue b{font-family:'IBM Plex Mono',monospace; letter-spacing:.03em; background:var(--paper-2); padding:1px 6px; border-radius:6px;}
+  .item input[type="text"], .item select, .item textarea{
+    width:100%; max-width:360px;
+    font-family:'IBM Plex Sans',sans-serif; font-size:14.5px;
+    padding:9px 10px; border-radius:8px; border:1px solid var(--line);
+    background:var(--paper);
+    color:var(--ink);
+  }
+  .item textarea{max-width:100%; min-height:56px; resize:vertical;}
+  .item input:focus, .item select:focus, .item textarea:focus{
+    outline:2px solid var(--glacier); outline-offset:1px; border-color:var(--glacier);
+  }
+  .item.correct{border-color:var(--good); background:var(--good-bg);}
+  .item.incorrect{border-color:var(--bad); background:var(--bad-bg);}
+  .answer-reveal{
+    display:none; margin-top:8px; font-size:13.5px; color:var(--glacier);
+    font-family:'IBM Plex Mono',monospace;
+  }
+  .answer-reveal.show{display:block;}
+
+  .tf-row{display:flex; gap:8px; margin-top:4px;}
+  .tf-btn{
+    padding:7px 16px; border-radius:8px; border:1px solid var(--line);
+    background:var(--paper); font-size:14px; cursor:pointer; font-weight:500;
+    font-family:'IBM Plex Sans',sans-serif;
+  }
+  .tf-btn.selected{background:var(--ink); color:#fff; border-color:var(--ink);}
+  .tf-btn.selected.tf-correct{background:var(--good); border-color:var(--good);}
+  .tf-btn.selected.tf-incorrect{background:var(--bad); border-color:var(--bad);}
+
+  .controls{display:flex; align-items:center; gap:12px; margin-top:18px; flex-wrap:wrap;}
+  button.primary, button.ghost{
+    font-family:'IBM Plex Sans',sans-serif; font-weight:600; font-size:14px;
+    padding:11px 20px; border-radius:9px; cursor:pointer; border:1px solid transparent;
+  }
+  button.primary{background:var(--ink); color:#fff;}
+  button.primary:hover{background:#000;}
+  button.ghost{background:transparent; color:var(--ink); border-color:var(--ink);}
+  button.ghost:hover{background:var(--paper-2);}
+  .score-badge{
+    font-family:'IBM Plex Mono',monospace; font-size:14px; color:var(--ink-soft);
+    padding:9px 14px; border:1px dashed var(--line); border-radius:9px;
+  }
+  .score-badge b{color:var(--ink);}
+
+  .copy-toast{
+    position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
+    background:var(--ink); color:#fff; padding:10px 18px; border-radius:9px;
+    font-size:14px; opacity:0; pointer-events:none; transition:opacity .25s;
+    font-family:'IBM Plex Sans',sans-serif;
+  }
+  .copy-toast.show{opacity:1;}
+
+  footer{
+    grid-column:1/-1;
+    text-align:center; padding:30px; color:var(--ink-soft);
+    font-size:13px; border-top:1px solid var(--line);
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <div class="hero">
+    <div class="eyebrow">Boiling, not just hot</div>
+    <h1>Сильные прилагательные</h1>
+    <p class="sub">6 упражнений по 10 заданий: буквы, перевод, соответствия, определения, грамматика сочетаемости и собственные предложения. Проверяйте себя или смотрите правильные ответы в любой момент.</p>
+    <div class="gauge"></div>
+    <div class="gauge-labels"><span>Freezing</span><span>Very / Absolutely</span><span>Boiling</span></div>
+    <div class="overall-score">
+      <div class="num" id="overallNum">0/60</div>
+      <div class="lbl">Общий результат</div>
+    </div>
+  </div>
+
+  <nav class="side">
+    <a href="#ex1"><span class="dot" id="dot1">1</span> Буквы</a>
+    <a href="#ex2"><span class="dot" id="dot2">2</span> Перевод</a>
+    <a href="#ex3"><span class="dot" id="dot3">3</span> Половинки</a>
+    <a href="#ex4"><span class="dot" id="dot4">4</span> Дефиниции</a>
+    <a href="#ex5"><span class="dot" id="dot5">5</span> Верно/Неверно</a>
+    <a href="#ex6"><span class="dot" id="dot6">6</span> Свои идеи</a>
+  </nav>
+
+  <main>
+
+    <!-- EXERCISE 1 -->
+    <section class="exercise" id="ex1">
+      <div class="ex-head"><h2><span class="ex-num">01</span>Вставьте пропущенные буквы</h2></div>
+      <p class="ex-instructions">Впишите слово полностью. Все слова — «сильные» прилагательные (крайняя степень качества).</p>
+      <div class="heatbar"><i id="bar1"></i></div>
+      <div id="list1"></div>
+      <div class="controls">
+        <button class="primary" onclick="checkExercise(1)">Проверить</button>
+        <button class="ghost" onclick="revealExercise(1)">Показать ответы</button>
+        <span class="score-badge">Результат: <b id="score1">—</b>/10</span>
+      </div>
+    </section>
+
+    <!-- EXERCISE 2 -->
+    <section class="exercise" id="ex2">
+      <div class="ex-head"><h2><span class="ex-num">02</span>Перевод с русского на английский</h2></div>
+      <p class="ex-instructions">Переведите фразу одним словом (сильным прилагательным).</p>
+      <div class="heatbar"><i id="bar2"></i></div>
+      <div id="list2"></div>
+      <div class="controls">
+        <button class="primary" onclick="checkExercise(2)">Проверить</button>
+        <button class="ghost" onclick="revealExercise(2)">Показать ответы</button>
+        <span class="score-badge">Результат: <b id="score2">—</b>/10</span>
+      </div>
+    </section>
+
+    <!-- EXERCISE 3 -->
+    <section class="exercise" id="ex3">
+      <div class="ex-head"><h2><span class="ex-num">03</span>Соедините половинки</h2></div>
+      <p class="ex-instructions">Выберите из списка сильное прилагательное, соответствующее обычному.</p>
+      <div class="heatbar"><i id="bar3"></i></div>
+      <div id="list3"></div>
+      <div class="controls">
+        <button class="primary" onclick="checkExercise(3)">Проверить</button>
+        <button class="ghost" onclick="revealExercise(3)">Показать ответы</button>
+        <span class="score-badge">Результат: <b id="score3">—</b>/10</span>
+      </div>
+    </section>
+
+    <!-- EXERCISE 4 -->
+    <section class="exercise" id="ex4">
+      <div class="ex-head"><h2><span class="ex-num">04</span>Определения (definitions)</h2></div>
+      <p class="ex-instructions">Выберите правильное определение для каждого слова.</p>
+      <div class="heatbar"><i id="bar4"></i></div>
+      <div id="list4"></div>
+      <div class="controls">
+        <button class="primary" onclick="checkExercise(4)">Проверить</button>
+        <button class="ghost" onclick="revealExercise(4)">Показать ответы</button>
+        <span class="score-badge">Результат: <b id="score4">—</b>/10</span>
+      </div>
+    </section>
+
+    <!-- EXERCISE 5 -->
+    <section class="exercise" id="ex5">
+      <div class="ex-head"><h2><span class="ex-num">05</span>Верно / Неверно (сочетаемость)</h2></div>
+      <p class="ex-instructions">Правило: обычные прилагательные (tired, hot, hungry…) сочетаются с <b>very</b>. Сильные (exhausted, boiling, starving…) сочетаются с <b>absolutely / really / totally / completely</b>, но НЕ с very. Отметьте, верно ли предложение.</p>
+      <div class="heatbar"><i id="bar5"></i></div>
+      <div id="list5"></div>
+      <div class="controls">
+        <button class="primary" onclick="checkExercise(5)">Проверить</button>
+        <button class="ghost" onclick="revealExercise(5)">Показать ответы</button>
+        <span class="score-badge">Результат: <b id="score5">—</b>/10</span>
+      </div>
+    </section>
+
+    <!-- EXERCISE 6 -->
+    <section class="exercise" id="ex6">
+      <div class="ex-head"><h2><span class="ex-num">06</span>Закончите предложения своими идеями</h2></div>
+      <p class="ex-instructions">Здесь нет «правильного» ответа — пишите своё. Можно посмотреть пример для вдохновения, а затем скопировать все свои ответы одной кнопкой.</p>
+      <div class="heatbar" style="background:linear-gradient(90deg,var(--glacier),var(--ember)); "><i style="width:100%"></i></div>
+      <div id="list6"></div>
+      <div class="controls">
+        <button class="ghost" onclick="revealExercise(6)">Показать примеры</button>
+        <button class="primary" onclick="copyAnswers()">Скопировать все мои ответы</button>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>Практика: сильные прилагательные и интенсификаторы (very / absolutely, really, totally, completely). Сделано для самостоятельной проверки.</footer>
+</div>
+
+<div class="copy-toast" id="toast">Ответы скопированы ✓</div>
+
+<script>
+/* ---------------- DATA ---------------- */
+
+const data1 = [ // fill in the letters
+  {clue:"b_il_ng", answer:["boiling"]},
+  {clue:"ex_aus_ed", answer:["exhausted"]},
+  {clue:"fil_h_", answer:["filthy"]},
+  {clue:"t_n_", answer:["tiny"]},
+  {clue:"te_rifi_d", answer:["terrified"]},
+  {clue:"p_siti_e", answer:["positive"]},
+  {clue:"st_rvi_g", answer:["starving"]},
+  {clue:"am_z_d", answer:["amazed"]},
+  {clue:"fasc_nati_g", answer:["fascinating"]},
+  {clue:"fur_o_s", answer:["furious"]},
+];
+
+const data2 = [ // translation
+  {clue:"уставший, изнеможденный (очень сильно)", answer:["exhausted"]},
+  {clue:"кипящий, очень горячий", answer:["boiling"]},
+  {clue:"крошечный", answer:["tiny"]},
+  {clue:"в ужасе, очень напуганный", answer:["terrified"]},
+  {clue:"очень голодный", answer:["starving"]},
+  {clue:"поражённый, изумлённый", answer:["amazed"]},
+  {clue:"яростный, очень злой", answer:["furious"]},
+  {clue:"очень грязный", answer:["filthy"]},
+  {clue:"увлекательный, захватывающий", answer:["fascinating"]},
+  {clue:"я абсолютно уверен", answer:["positive","i'm positive","im positive"]},
+];
+
+const opts3 = ["Amazed","Boiling","Exhausted","Filthy","Freezing","Furious","Hilarious","Starving","Terrified","Tiny"];
+const data3 = [ // match halves
+  {left:"Hot", answer:"Boiling"},
+  {left:"Tired", answer:"Exhausted"},
+  {left:"Dirty", answer:"Filthy"},
+  {left:"Small", answer:"Tiny"},
+  {left:"Afraid", answer:"Terrified"},
+  {left:"Hungry", answer:"Starving"},
+  {left:"Surprised", answer:"Amazed"},
+  {left:"Angry", answer:"Furious"},
+  {left:"Funny", answer:"Hilarious"},
+  {left:"Cold", answer:"Freezing"},
+];
+
+const opts4 = ["extremely afraid","extremely angry","extremely big","extremely cold","extremely dirty","extremely funny","extremely happy","extremely hungry","extremely interesting","extremely small"];
+const data4 = [ // definitions
+  {left:"Enormous", answer:"extremely big"},
+  {left:"Delighted", answer:"extremely happy"},
+  {left:"Hilarious", answer:"extremely funny"},
+  {left:"Freezing", answer:"extremely cold"},
+  {left:"Fascinating", answer:"extremely interesting"},
+  {left:"Furious", answer:"extremely angry"},
+  {left:"Starving", answer:"extremely hungry"},
+  {left:"Terrified", answer:"extremely afraid"},
+  {left:"Filthy", answer:"extremely dirty"},
+  {left:"Tiny", answer:"extremely small"},
+];
+
+const data5 = [ // true/false
+  {text:"«It's very boiling today.»", answer:false},
+  {text:"«She's very tired.»", answer:true},
+  {text:"«He's absolutely hungry.»", answer:false},
+  {text:"«The room is absolutely filthy.»", answer:true},
+  {text:"«I'm very starving.»", answer:false},
+  {text:"«This film is really fascinating.»", answer:true},
+  {text:"«The bag is very tiny.»", answer:false},
+  {text:"«The soup is very hot.»", answer:true},
+  {text:"«We were absolutely delighted.»", answer:true},
+  {text:"«The water is very freezing.»", answer:false},
+];
+
+const data6 = [ // open sentences
+  {prompt:"I was absolutely terrified when …", sample:"I was absolutely terrified when the lights suddenly went out during the storm."},
+  {prompt:"My room is completely filthy because …", sample:"My room is completely filthy because I haven't cleaned it for two weeks."},
+  {prompt:"The film I watched last week was totally fascinating — …", sample:"The film I watched last week was totally fascinating — it changed the way I see history."},
+  {prompt:"I felt utterly exhausted after …", sample:"I felt utterly exhausted after running the marathon."},
+  {prompt:"The soup was boiling hot, so …", sample:"The soup was boiling hot, so I had to wait before eating it."},
+  {prompt:"My best friend was absolutely delighted when …", sample:"My best friend was absolutely delighted when she got the job offer."},
+  {prompt:"The joke was so hilarious that …", sample:"The joke was so hilarious that everyone at the table burst out laughing."},
+  {prompt:"I was starving by the time …", sample:"I was starving by the time we finally found a restaurant."},
+  {prompt:"From the plane, the city looked absolutely tiny — …", sample:"From the plane, the city looked absolutely tiny, like a toy model."},
+  {prompt:"Winter here is freezing, especially when …", sample:"Winter here is freezing, especially when the wind blows from the north."},
+];
+
+/* ---------------- RENDER ---------------- */
+
+function norm(s){ return s.trim().toLowerCase().replace(/[.!?']/g,""); }
+
+function renderTextItems(containerId, data, prefix){
+  const el = document.getElementById(containerId);
+  el.innerHTML = data.map((d,i)=>`
+    <div class="item" id="${prefix}_item${i}">
+      <div class="idx">${i+1}</div>
+      <div>
+        <div class="clue">${d.clue.includes("_") ? `<b>${d.clue}</b>` : d.clue}</div>
+        <input type="text" id="${prefix}_${i}" autocomplete="off" placeholder="Ваш ответ...">
+        <div class="answer-reveal" id="${prefix}_ans${i}">Ответ: ${d.answer[0]}</div>
+      </div>
+    </div>`).join("");
+}
+
+function renderSelectItems(containerId, data, options, prefix){
+  const el = document.getElementById(containerId);
+  el.innerHTML = data.map((d,i)=>`
+    <div class="item" id="${prefix}_item${i}">
+      <div class="idx">${i+1}</div>
+      <div>
+        <div class="clue">${d.left}</div>
+        <select id="${prefix}_${i}">
+          <option value="">— выбрать —</option>
+          ${options.map(o=>`<option value="${o}">${o}</option>`).join("")}
+        </select>
+        <div class="answer-reveal" id="${prefix}_ans${i}">Ответ: ${d.answer}</div>
+      </div>
+    </div>`).join("");
+}
+
+function renderTF(containerId, data, prefix){
+  const el = document.getElementById(containerId);
+  el.innerHTML = data.map((d,i)=>`
+    <div class="item" id="${prefix}_item${i}">
+      <div class="idx">${i+1}</div>
+      <div>
+        <div class="clue">${d.text}</div>
+        <div class="tf-row" data-val="" id="${prefix}_${i}">
+          <button type="button" class="tf-btn" onclick="setTF('${prefix}',${i},true)">Верно</button>
+          <button type="button" class="tf-btn" onclick="setTF('${prefix}',${i},false)">Неверно</button>
+        </div>
+        <div class="answer-reveal" id="${prefix}_ans${i}">Ответ: ${d.answer ? "Верно" : "Неверно"}</div>
+      </div>
+    </div>`).join("");
+}
+
+function setTF(prefix, i, val){
+  const row = document.getElementById(`${prefix}_${i}`);
+  row.dataset.val = val;
+  row.querySelectorAll(".tf-btn").forEach((b,idx)=>{
+    b.classList.remove("selected","tf-correct","tf-incorrect");
+    const isTrueBtn = idx===0;
+    if((isTrueBtn && val===true) || (!isTrueBtn && val===false)) b.classList.add("selected");
+  });
+}
+
+function renderOpenItems(containerId, data, prefix){
+  const el = document.getElementById(containerId);
+  el.innerHTML = data.map((d,i)=>`
+    <div class="item" id="${prefix}_item${i}">
+      <div class="idx">${i+1}</div>
+      <div>
+        <div class="clue">${d.prompt}</div>
+        <textarea id="${prefix}_${i}" placeholder="Ваша идея..."></textarea>
+        <div class="answer-reveal" id="${prefix}_ans${i}">Пример: ${d.sample}</div>
+      </div>
+    </div>`).join("");
+}
+
+renderTextItems("list1", data1, "e1");
+renderTextItems("list2", data2, "e2");
+renderSelectItems("list3", data3, opts3, "e3");
+renderSelectItems("list4", data4, opts4, "e4");
+renderTF("list5", data5, "e5");
+renderOpenItems("list6", data6, "e6");
+
+/* ---------------- CHECK / REVEAL ---------------- */
+
+const scores = {1:0,2:0,3:0,4:0,5:0};
+
+function checkExercise(n){
+  let dataSet, prefix, isSelect=false, isTF=false;
+  if(n===1){dataSet=data1; prefix="e1";}
+  if(n===2){dataSet=data2; prefix="e2";}
+  if(n===3){dataSet=data3; prefix="e3"; isSelect=true;}
+  if(n===4){dataSet=data4; prefix="e4"; isSelect=true;}
+  if(n===5){dataSet=data5; prefix="e5"; isTF=true;}
+
+  let correctCount = 0;
+
+  dataSet.forEach((d,i)=>{
+    const itemEl = document.getElementById(`${prefix}_item${i}`);
+    let isCorrect = false;
+
+    if(isTF){
+      const row = document.getElementById(`${prefix}_${i}`);
+      const val = row.dataset.val;
+      if(val === "true" || val === "false"){
+        isCorrect = (val === String(d.answer));
+      }
+      row.querySelectorAll(".tf-btn").forEach((b,idx)=>{
+        b.classList.remove("tf-correct","tf-incorrect");
+        if(b.classList.contains("selected")){
+          b.classList.add(isCorrect ? "tf-correct" : "tf-incorrect");
+        }
+      });
+    } else if(isSelect){
+      const sel = document.getElementById(`${prefix}_${i}`);
+      isCorrect = sel.value !== "" && sel.value === d.answer;
+    } else {
+      const input = document.getElementById(`${prefix}_${i}`);
+      isCorrect = d.answer.some(a => norm(a) === norm(input.value));
+    }
+
+    itemEl.classList.remove("correct","incorrect");
+    itemEl.classList.add(isCorrect ? "correct" : "incorrect");
+    if(isCorrect) correctCount++;
+  });
+
+  scores[n] = correctCount;
+  document.getElementById(`score${n}`).textContent = correctCount;
+  document.getElementById(`bar${n}`).style.width = (correctCount*10)+"%";
+  document.getElementById(`dot${n}`).classList.toggle("done", correctCount===10);
+  updateOverall();
+}
+
+function revealExercise(n){
+  const prefix = "e"+n;
+  const count = n===6 ? data6.length : (n===1?data1.length:n===2?data2.length:n===3?data3.length:n===4?data4.length:data5.length);
+  for(let i=0;i<count;i++){
+    const ans = document.getElementById(`${prefix}_ans${i}`);
+    ans.classList.toggle("show");
+  }
+}
+
+function updateOverall(){
+  const total = scores[1]+scores[2]+scores[3]+scores[4]+scores[5];
+  document.getElementById("overallNum").textContent = total+"/50";
+}
+
+function copyAnswers(){
+  let out = "Мои ответы — упражнение 6 (закончи предложение своими идеями):\n\n";
+  data6.forEach((d,i)=>{
+    const val = document.getElementById(`e6_${i}`).value.trim();
+    out += `${i+1}. ${d.prompt}\n${val ? val : "(пусто)"}\n\n`;
+  });
+  navigator.clipboard.writeText(out).then(()=>{
+    const toast = document.getElementById("toast");
+    toast.classList.add("show");
+    setTimeout(()=>toast.classList.remove("show"),1800);
+  });
+}
+</script>
+</body>
+</html>
