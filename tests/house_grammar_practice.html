@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Дом в горах — грамматическая практика</title>
+<style>
+  :root{
+    --ink:#233238;
+    --paper:#f6f2e9;
+    --paper-line:#e2d9c5;
+    --slate:#2f4550;
+    --slate-deep:#1c2b33;
+    --gold:#b8873c;
+    --pine:#4c6b52;
+    --pine-deep:#33473a;
+    --brick:#a94a3a;
+    --ok-bg:#e6efe4;
+    --ok-bd:#4c6b52;
+    --bad-bg:#f7e6e2;
+    --bad-bd:#a94a3a;
+  }
+
+  *{box-sizing:border-box;}
+
+  body{
+    margin:0;
+    font-family:'Georgia', 'Iowan Old Style', serif;
+    background:
+      radial-gradient(ellipse at top, #3a5460 0%, var(--slate-deep) 65%);
+    color:var(--ink);
+    min-height:100vh;
+    padding:0 0 80px 0;
+  }
+
+  /* ---------- Header / hero ---------- */
+  .hero{
+    position:relative;
+    padding:64px 24px 88px;
+    text-align:center;
+    color:#f3ede0;
+    overflow:hidden;
+  }
+  .hero svg.mountains{
+    position:absolute;
+    bottom:-2px; left:0; width:100%; height:140px;
+    z-index:0;
+  }
+  .hero-content{position:relative; z-index:1;}
+  .eyebrow{
+    font-family:'Courier New', monospace;
+    letter-spacing:.28em;
+    text-transform:uppercase;
+    font-size:12px;
+    color:var(--gold);
+    margin-bottom:14px;
+  }
+  .hero h1{
+    font-size:clamp(32px,5vw,52px);
+    margin:0 0 14px;
+    font-weight:400;
+    letter-spacing:.01em;
+  }
+  .hero h1 em{ font-style:italic; color:var(--gold); }
+  .hero p{
+    max-width:560px;
+    margin:0 auto;
+    font-size:16px;
+    line-height:1.6;
+    color:#d9d2c2;
+  }
+  .smoke{
+    position:absolute;
+    width:6px;height:6px;border-radius:50%;
+    background:rgba(243,237,224,.5);
+    animation:rise 6s linear infinite;
+  }
+  @keyframes rise{
+    0%{transform:translateY(0) translateX(0) scale(.6); opacity:0;}
+    15%{opacity:.7;}
+    100%{transform:translateY(-140px) translateX(18px) scale(1.6); opacity:0;}
+  }
+
+  /* ---------- Layout ---------- */
+  .wrap{
+    max-width:840px;
+    margin:-48px auto 0;
+    padding:0 20px;
+    position:relative;
+    z-index:2;
+  }
+
+  .scoreboard{
+    background:var(--slate);
+    color:#f3ede0;
+    border-radius:14px;
+    padding:18px 24px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    box-shadow:0 18px 40px -18px rgba(0,0,0,.55);
+    margin-bottom:36px;
+    font-family:'Courier New', monospace;
+    font-size:14px;
+    letter-spacing:.04em;
+  }
+  .scoreboard .label{ color:#a9bcc2; text-transform:uppercase; font-size:11px; letter-spacing:.18em;}
+  .scoreboard .value{ font-size:20px; color:var(--gold); font-weight:bold;}
+
+  /* ---------- Exercise card (paper) ---------- */
+  .exercise{
+    background:var(--paper);
+    background-image:
+      repeating-linear-gradient(transparent, transparent 37px, var(--paper-line) 38px);
+    border-radius:4px;
+    padding:36px 40px 30px;
+    margin-bottom:38px;
+    box-shadow:0 24px 50px -24px rgba(0,0,0,.55), 0 0 0 1px rgba(0,0,0,.04);
+    position:relative;
+  }
+  .exercise::before{
+    content:attr(data-num);
+    position:absolute;
+    top:-18px; left:32px;
+    background:var(--pine-deep);
+    color:#f3ede0;
+    font-family:'Courier New',monospace;
+    font-size:13px;
+    letter-spacing:.1em;
+    padding:6px 14px;
+    border-radius:3px;
+    box-shadow:0 6px 14px -6px rgba(0,0,0,.5);
+  }
+  .ex-head{
+    margin:6px 0 6px;
+  }
+  .ex-head h2{
+    font-size:22px;
+    margin:0 0 6px;
+    color:var(--slate-deep);
+    font-weight:400;
+  }
+  .ex-head .ex-note{
+    font-size:14px;
+    color:#5b6b5f;
+    font-style:italic;
+    margin-bottom:22px;
+  }
+  .ex-head .rule-box{
+    background:#efe6cf;
+    border-left:3px solid var(--gold);
+    padding:10px 14px;
+    font-size:13.5px;
+    line-height:1.55;
+    color:#4a3d24;
+    margin-bottom:22px;
+    border-radius:0 4px 4px 0;
+  }
+
+  .item{
+    display:flex;
+    gap:14px;
+    align-items:flex-start;
+    padding:14px 0;
+    border-bottom:1px dashed #d8cdb2;
+  }
+  .item:last-child{ border-bottom:none; }
+  .item .num{
+    font-family:'Courier New',monospace;
+    font-weight:bold;
+    color:var(--gold);
+    min-width:22px;
+    padding-top:4px;
+  }
+  .item .body{ flex:1; }
+  .item .sentence{
+    font-size:16.5px;
+    line-height:1.7;
+  }
+  .item .sentence .ru{
+    display:block;
+    font-size:13px;
+    color:#77705c;
+    font-family:'Courier New',monospace;
+    margin-top:2px;
+  }
+
+  input[type="text"]{
+    font-family:'Courier New', monospace;
+    font-size:15px;
+    padding:5px 8px;
+    border:none;
+    border-bottom:2px solid var(--slate);
+    background:transparent;
+    width:150px;
+    color:var(--slate-deep);
+    outline:none;
+  }
+  input[type="text"]:focus{ border-bottom-color:var(--gold); }
+  input[type="text"].correct{ border-bottom-color:var(--pine); background:var(--ok-bg); }
+  input[type="text"].incorrect{ border-bottom-color:var(--brick); background:var(--bad-bg); }
+
+  .choices{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-top:8px;
+  }
+  .choice-btn{
+    font-family:'Courier New', monospace;
+    font-size:14px;
+    padding:7px 14px;
+    border-radius:20px;
+    border:1.5px solid #b6ab8c;
+    background:#fbf8f0;
+    cursor:pointer;
+    transition:all .15s ease;
+    color:var(--slate-deep);
+  }
+  .choice-btn:hover{ border-color:var(--slate); }
+  .choice-btn.selected{
+    background:var(--slate);
+    color:#f3ede0;
+    border-color:var(--slate);
+  }
+  .choice-btn.correct{
+    background:var(--ok-bg);
+    border-color:var(--ok-bd);
+    color:var(--pine-deep);
+  }
+  .choice-btn.incorrect{
+    background:var(--bad-bg);
+    border-color:var(--bad-bd);
+    color:var(--brick);
+  }
+
+  .feedback-icon{
+    display:inline-block;
+    margin-left:8px;
+    font-size:14px;
+    font-family:'Courier New',monospace;
+  }
+  .feedback-icon.ok{ color:var(--pine); }
+  .feedback-icon.bad{ color:var(--brick); }
+
+  .answer-key{
+    display:none;
+    margin-top:6px;
+    font-size:13.5px;
+    color:var(--pine-deep);
+    font-family:'Courier New', monospace;
+    background:var(--ok-bg);
+    padding:4px 10px;
+    border-radius:4px;
+    border-left:3px solid var(--pine);
+  }
+  .answer-key.show{ display:inline-block; }
+
+  .ex-actions{
+    margin-top:26px;
+    display:flex;
+    gap:12px;
+    align-items:center;
+    flex-wrap:wrap;
+  }
+  button.action{
+    font-family:'Courier New', monospace;
+    font-size:13.5px;
+    letter-spacing:.05em;
+    text-transform:uppercase;
+    padding:11px 22px;
+    border-radius:24px;
+    border:none;
+    cursor:pointer;
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  button.action:active{ transform:translateY(1px); }
+  .btn-check{
+    background:var(--slate);
+    color:#f3ede0;
+    box-shadow:0 10px 22px -10px rgba(47,69,80,.7);
+  }
+  .btn-check:hover{ box-shadow:0 12px 26px -8px rgba(47,69,80,.85); }
+  .btn-reveal{
+    background:transparent;
+    color:var(--brick);
+    border:1.5px solid var(--brick);
+  }
+  .btn-reveal:hover{ background:var(--bad-bg); }
+  .btn-reset{
+    background:transparent;
+    color:#5b6b5f;
+    border:1.5px solid #b6ab8c;
+  }
+  .btn-reset:hover{ background:#efe6cf; }
+
+  .ex-result{
+    margin-left:auto;
+    font-family:'Courier New', monospace;
+    font-size:14px;
+    color:var(--slate-deep);
+    font-weight:bold;
+  }
+
+  footer{
+    text-align:center;
+    color:#8a99a1;
+    font-family:'Courier New', monospace;
+    font-size:12px;
+    margin-top:20px;
+    letter-spacing:.05em;
+  }
+
+  @media (max-width:600px){
+    .exercise{ padding:28px 20px 24px; }
+    input[type="text"]{ width:120px; }
+    .ex-result{ margin-left:0; width:100%; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .smoke{ animation:none; opacity:0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <svg class="mountains" viewBox="0 0 1200 140" preserveAspectRatio="none">
+    <polygon points="0,140 0,90 180,20 340,90 500,10 680,80 860,30 1040,90 1200,50 1200,140" fill="#26363d"/>
+    <polygon points="0,140 0,110 220,60 420,110 620,50 820,105 1000,60 1200,100 1200,140" fill="#1c2b33"/>
+    <polygon points="150,30 180,20 210,30 195,32 165,32" fill="#f3ede0" opacity="0.9"/>
+    <polygon points="470,20 500,10 530,20 515,22 485,22" fill="#f3ede0" opacity="0.85"/>
+  </svg>
+  <div class="hero-content">
+    <div class="eyebrow">Grammar Cottage · English Practice</div>
+    <h1>Дом <em>в горах</em></h1>
+    <p>Четыре упражнения по мотивам ваших реальных ошибок: формы слов, предлоги и артикли, степени сравнения и устойчивые сочетания. В каждом — 8 заданий. Проверяйте ответы или сразу смотрите решение.</p>
+  </div>
+  <span class="smoke" style="left:46%; animation-delay:0s;"></span>
+  <span class="smoke" style="left:47%; animation-delay:1.5s;"></span>
+  <span class="smoke" style="left:45%; animation-delay:3s;"></span>
+  <span class="smoke" style="left:65.5%; animation-delay:.8s;"></span>
+  <span class="smoke" style="left:66.5%; animation-delay:2.3s;"></span>
+</div>
+
+<div class="wrap">
+
+  <div class="scoreboard">
+    <div>
+      <div class="label">Общий счёт</div>
+      <div class="value" id="totalScore">0 / 32</div>
+    </div>
+    <div style="text-align:right;">
+      <div class="label">Упражнений пройдено</div>
+      <div class="value" id="totalDone">0 / 4</div>
+    </div>
+  </div>
+
+  <!-- ================= EXERCISE 1 ================= -->
+  <div class="exercise" data-num="Упр. 1 / 8 пунктов" id="ex1">
+    <div class="ex-head">
+      <h2>Существительное или прилагательное?</h2>
+      <div class="ex-note">patience / patient — не путайте части речи</div>
+      <div class="rule-box">
+        <strong>Помните:</strong> patience (терпение) — существительное, patient (терпеливый) — прилагательное. Та же логика для пар comfort/comfortable, warmth/warm и т.д. Выберите правильное слово.
+      </div>
+    </div>
+    <div id="items1"></div>
+    <div class="ex-actions">
+      <button class="action btn-check" onclick="checkExercise(1)">Проверить</button>
+      <button class="action btn-reveal" onclick="revealExercise(1)">Показать ответы</button>
+      <button class="action btn-reset" onclick="resetExercise(1)">Сбросить</button>
+      <div class="ex-result" id="result1"></div>
+    </div>
+  </div>
+
+  <!-- ================= EXERCISE 2 ================= -->
+  <div class="exercise" data-num="Упр. 2 / 8 пунктов" id="ex2">
+    <div class="ex-head">
+      <h2>Предлоги и артикли</h2>
+      <div class="ex-note">at the top of the mountain · there is a chimney</div>
+      <div class="rule-box">
+        <strong>Помните:</strong> «на вершине» — <em>at the top of</em> (+ обяз. артикль <em>the</em>). Про новый, ещё не упомянутый предмет говорим <em>there is a chimney</em> (артикль <em>a</em>), а не просто «chimney» без артикля. Впишите пропущенное слово (один предлог/артикль в каждый пропуск).
+      </div>
+    </div>
+    <div id="items2"></div>
+    <div class="ex-actions">
+      <button class="action btn-check" onclick="checkExercise(2)">Проверить</button>
+      <button class="action btn-reveal" onclick="revealExercise(2)">Показать ответы</button>
+      <button class="action btn-reset" onclick="resetExercise(2)">Сбросить</button>
+      <div class="ex-result" id="result2"></div>
+    </div>
+  </div>
+
+  <!-- ================= EXERCISE 3 ================= -->
+  <div class="exercise" data-num="Упр. 3 / 8 пунктов" id="ex3">
+    <div class="ex-head">
+      <h2>Степени сравнения прилагательных</h2>
+      <div class="ex-note">more cozy → cozier — короткие прилагательные не берут more</div>
+      <div class="rule-box">
+        <strong>Помните:</strong> у коротких прилагательных (1 слог, иногда 2 с окончанием -y) сравнительная степень образуется через <em>-er</em>, а не через <em>more</em>: cozy → cozier, big → bigger, happy → happier. Впишите правильную форму сравнительной степени.
+      </div>
+    </div>
+    <div id="items3"></div>
+    <div class="ex-actions">
+      <button class="action btn-check" onclick="checkExercise(3)">Проверить</button>
+      <button class="action btn-reveal" onclick="revealExercise(3)">Показать ответы</button>
+      <button class="action btn-reset" onclick="resetExercise(3)">Сбросить</button>
+      <div class="ex-result" id="result3"></div>
+    </div>
+  </div>
+
+  <!-- ================= EXERCISE 4 ================= -->
+  <div class="exercise" data-num="Упр. 4 / 8 пунктов" id="ex4">
+    <div class="ex-head">
+      <h2>Устойчивые сочетания и модальные глаголы</h2>
+      <div class="ex-note">make a choice · must choose (без to)</div>
+      <div class="rule-box">
+        <strong>Помните:</strong> «сделать выбор» = <em>make a choice</em> (не «do a choice»). После модального глагола <em>must</em> инфинитив идёт БЕЗ частицы to: <em>must choose</em>, а не «must to choose». То же для can, may, should. Выберите правильный вариант.
+      </div>
+    </div>
+    <div id="items4"></div>
+    <div class="ex-actions">
+      <button class="action btn-check" onclick="checkExercise(4)">Проверить</button>
+      <button class="action btn-reveal" onclick="revealExercise(4)">Показать ответы</button>
+      <button class="action btn-reset" onclick="resetExercise(4)">Сбросить</button>
+      <div class="ex-result" id="result4"></div>
+    </div>
+  </div>
+
+  <footer>Grammar Cottage — практика по вашим типичным ошибкам</footer>
+</div>
+
+<script>
+/* ============================================================
+   DATA
+   ============================================================ */
+
+// Exercise 1 — word choice (noun vs adjective), click buttons
+const data1 = [
+  { pre:"She waited for the bus for an hour without complaining — she has a lot of", ru:"У неё много терпения.", options:["patience","patient"], answer:"patience", post:"." },
+  { pre:"My grandmother is a very", ru:"Моя бабушка очень терпеливая женщина.", options:["patient","patience"], answer:"patient", post:"woman." },
+  { pre:"The soft blanket and warm fire gave the room a feeling of", ru:"Огонь придал комнате ощущение тепла.", options:["warmth","warm"], answer:"warmth", post:"." },
+  { pre:"In winter this cottage stays surprisingly", ru:"Зимой этот коттедж остаётся на удивление тёплым.", options:["warm","warmth"], answer:"warm", post:"even without the fireplace." },
+  { pre:"The old sofa by the window is famous for its", ru:"Диван известен своим удобством.", options:["comfort","comfortable"], answer:"comfort", post:"." },
+  { pre:"After a long hike, the bed felt incredibly", ru:"Кровать казалась невероятно удобной.", options:["comfortable","comfort"], answer:"comfortable", post:"." },
+  { pre:"Everyone in the village admired the", ru:"Все в деревне восхищались красотой дома.", options:["beauty","beautiful"], answer:"beauty", post:"of the house." },
+  { pre:"From the porch you can see a truly", ru:"С крыльца открывается по-настоящему красивый вид.", options:["beautiful","beauty"], answer:"beautiful", post:"view of the valley." },
+];
+
+// Exercise 2 — fill in preposition/article (text input, case-insensitive, may allow small variants)
+const data2 = [
+  { pre:"There is a small cabin", ru:"На вершине горы стоит маленькая хижина.", post:"the mountain.", answers:["at the top of"] },
+  { pre:"", ru:"На крыше есть труба.", post:"chimney on the roof.", answers:["there is a"] },
+  { pre:"The house is painted white — it is white", ru:"Дом белого цвета.", post:"colour.", answers:["in"] },
+  { pre:"", ru:"Есть камин в гостиной.", post:"fireplace in the living room.", answers:["there is a"] },
+  { pre:"You can enjoy the sunrise", ru:"На вершине холма можно любоваться рассветом.", post:"the hill.", answers:["at the top of"] },
+  { pre:"", ru:"Рядом с домом есть сад.", post:"garden next to the house.", answers:["there is a"] },
+  { pre:"The roof of this cottage is dark grey", ru:"Крыша этого коттеджа тёмно-серого цвета.", post:"colour.", answers:["in"] },
+  { pre:"A narrow path leads", ru:"Узкая тропинка ведёт к вершине скалы.", post:"the cliff.", answers:["to the top of"] },
+];
+
+// Exercise 3 — comparative forms (text input)
+const data3 = [
+  { adj:"cozy", ru:"Эта комната уютнее, чем прошлая.", pre:"This room is", post:"than the last one.", answer:"cozier" },
+  { adj:"big", ru:"Эта гора выше и больше.", pre:"This mountain is", post:"than that hill.", answer:"bigger" },
+  { adj:"warm", ru:"Наверху теплее, чем внизу.", pre:"It's", post:"upstairs than downstairs.", answer:"warmer" },
+  { adj:"quiet", ru:"В деревне тише, чем в городе.", pre:"The village is much", post:"than the city.", answer:"quieter" },
+  { adj:"tall", ru:"Эта башня выше соседней.", pre:"This tower is", post:"than the one next door.", answer:"taller" },
+  { adj:"happy", ru:"Дома я чувствую себя счастливее.", pre:"I feel", post:"at home than anywhere else.", answer:"happier" },
+  { adj:"sunny", ru:"Южная сторона более солнечная.", pre:"The south side of the house is", post:"than the north side.", answer:"sunnier" },
+  { adj:"comfortable", ru:"Новый диван удобнее старого. (длинное прилагательное — с more)", pre:"The new sofa is", post:"than the old one.", answer:"more comfortable" },
+];
+
+// Exercise 4 — collocations & modal verbs (click buttons)
+const data4 = [
+  { pre:"Before we build the house, we need to", ru:"Нужно сделать выбор.", options:["make a choice","do a choice"], answer:"make a choice", post:"." },
+  { pre:"You", ru:"Вы должны выбрать цвет крыши.", options:["must choose","must to choose"], answer:"must choose", post:"the colour of the roof." },
+  { pre:"It's hard to", ru:"Трудно принять решение так быстро.", options:["make a decision","do a decision"], answer:"make a decision", post:"so quickly." },
+  { pre:"Children", ru:"Дети должны слушаться родителей.", options:["must obey","must to obey"], answer:"must obey", post:"their parents." },
+  { pre:"We always try to", ru:"Мы всегда стараемся сделать усилие.", options:["make an effort","do an effort"], answer:"make an effort", post:"to keep the garden tidy." },
+  { pre:"You", ru:"Вы можете выбрать любую комнату.", options:["can choose","can to choose"], answer:"can choose", post:"any room you like." },
+  { pre:"He decided to", ru:"Он решил навести порядок в чердаке.", options:["make the bed","do the bed"], answer:"make the bed", post:"before the guests arrived." },
+  { pre:"Guests", ru:"Гости должны снять обувь у двери.", options:["should take off","should to take off"], answer:"should take off", post:"their shoes at the door." },
+];
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+
+function renderChoiceItem(container, idx, item, exNum){
+  const div = document.createElement('div');
+  div.className = 'item';
+  const opts = item.options.map(o =>
+    `<button type="button" class="choice-btn" data-value="${o}" onclick="selectChoice(${exNum},${idx},this)">${o}</button>`
+  ).join('');
+  div.innerHTML = `
+    <div class="num">${idx+1}.</div>
+    <div class="body">
+      <div class="sentence">
+        ${item.pre} <span id="q${exNum}-${idx}-blank">____</span> ${item.post}
+        <span class="ru">${item.ru}</span>
+      </div>
+      <div class="choices" id="q${exNum}-${idx}-choices">${opts}</div>
+      <div class="answer-key" id="key${exNum}-${idx}">Ответ: ${item.answer}</div>
+    </div>`;
+  container.appendChild(div);
+}
+
+function renderTextItem(container, idx, item, exNum, placeholder){
+  const div = document.createElement('div');
+  div.className = 'item';
+  div.innerHTML = `
+    <div class="num">${idx+1}.</div>
+    <div class="body">
+      <div class="sentence">
+        ${item.pre} <input type="text" id="q${exNum}-${idx}" placeholder="${placeholder}" autocomplete="off"> ${item.post}
+        <span class="feedback-icon" id="fb${exNum}-${idx}"></span>
+        <span class="ru">${item.ru}</span>
+      </div>
+      <div class="answer-key" id="key${exNum}-${idx}">Ответ: ${(item.answers?item.answers[0]:item.answer)}</div>
+    </div>`;
+  container.appendChild(div);
+}
+
+const containers = {
+  1: document.getElementById('items1'),
+  2: document.getElementById('items2'),
+  3: document.getElementById('items3'),
+  4: document.getElementById('items4'),
+};
+
+data1.forEach((item,idx)=> renderChoiceItem(containers[1], idx, item, 1));
+data2.forEach((item,idx)=> renderTextItem(containers[2], idx, item, 2, "предлог / артикль"));
+data3.forEach((item,idx)=> {
+  const wrapped = {pre:item.pre, ru:item.ru, post:item.post, answers:[item.answer]};
+  renderTextItem(containers[3], idx, wrapped, 3, item.adj+"...");
+});
+data4.forEach((item,idx)=> renderChoiceItem(containers[4], idx, item, 4));
+
+/* ============================================================
+   INTERACTION
+   ============================================================ */
+
+const state = {1:{},2:{},3:{},4:{}};
+const scores = {1:null,2:null,3:null,4:null};
+
+function selectChoice(exNum, idx, btn){
+  const group = document.getElementById(`q${exNum}-${idx}-choices`);
+  [...group.children].forEach(b=>b.classList.remove('selected','correct','incorrect'));
+  btn.classList.add('selected');
+  state[exNum][idx] = btn.dataset.value;
+}
+
+function normalize(s){
+  return s.trim().toLowerCase().replace(/\s+/g,' ');
+}
+
+function checkExercise(exNum){
+  let correctCount = 0;
+  let dataArr, total;
+  if(exNum===1){ dataArr = data1; total = dataArr.length; }
+  if(exNum===2){ dataArr = data2; total = dataArr.length; }
+  if(exNum===3){ dataArr = data3; total = dataArr.length; }
+  if(exNum===4){ dataArr = data4; total = dataArr.length; }
+
+  dataArr.forEach((item, idx) => {
+    if(exNum===1 || exNum===4){
+      const group = document.getElementById(`q${exNum}-${idx}-choices`);
+      const selected = group.querySelector('.selected');
+      [...group.children].forEach(b=>b.classList.remove('correct','incorrect'));
+      if(selected){
+        const val = selected.dataset.value;
+        if(val === item.answer){
+          selected.classList.add('correct');
+          correctCount++;
+        } else {
+          selected.classList.add('incorrect');
+          [...group.children].forEach(b=>{ if(b.dataset.value===item.answer) b.classList.add('correct'); });
+        }
+      } else {
+        [...group.children].forEach(b=>{ if(b.dataset.value===item.answer) b.classList.add('correct'); });
+      }
+    } else {
+      const input = document.getElementById(`q${exNum}-${idx}`);
+      const fb = document.getElementById(`fb${exNum}-${idx}`);
+      const validAnswers = (item.answers || [item.answer]).map(normalize);
+      const val = normalize(input.value);
+      input.classList.remove('correct','incorrect');
+      if(validAnswers.includes(val) && val !== ''){
+        input.classList.add('correct');
+        fb.textContent = '✓';
+        fb.className = 'feedback-icon ok';
+        correctCount++;
+      } else {
+        input.classList.add('incorrect');
+        fb.textContent = '✗';
+        fb.className = 'feedback-icon bad';
+      }
+    }
+  });
+
+  scores[exNum] = correctCount;
+  document.getElementById(`result${exNum}`).textContent = `${correctCount} / ${total}`;
+  updateScoreboard();
+}
+
+function revealExercise(exNum){
+  let dataArr;
+  if(exNum===1) dataArr = data1;
+  if(exNum===2) dataArr = data2;
+  if(exNum===3) dataArr = data3;
+  if(exNum===4) dataArr = data4;
+
+  dataArr.forEach((item, idx) => {
+    const key = document.getElementById(`key${exNum}-${idx}`);
+    key.classList.add('show');
+    if(exNum===1 || exNum===4){
+      const group = document.getElementById(`q${exNum}-${idx}-choices`);
+      [...group.children].forEach(b=>{
+        if(b.dataset.value===item.answer) b.classList.add('correct');
+      });
+    } else {
+      const input = document.getElementById(`q${exNum}-${idx}`);
+      if(!input.value){
+        input.value = (item.answers ? item.answers[0] : item.answer);
+      }
+    }
+  });
+}
+
+function resetExercise(exNum){
+  let dataArr;
+  if(exNum===1) dataArr = data1;
+  if(exNum===2) dataArr = data2;
+  if(exNum===3) dataArr = data3;
+  if(exNum===4) dataArr = data4;
+
+  dataArr.forEach((item, idx) => {
+    const key = document.getElementById(`key${exNum}-${idx}`);
+    key.classList.remove('show');
+    if(exNum===1 || exNum===4){
+      const group = document.getElementById(`q${exNum}-${idx}-choices`);
+      [...group.children].forEach(b=>b.classList.remove('selected','correct','incorrect'));
+      state[exNum][idx] = undefined;
+    } else {
+      const input = document.getElementById(`q${exNum}-${idx}`);
+      input.value = '';
+      input.classList.remove('correct','incorrect');
+      const fb = document.getElementById(`fb${exNum}-${idx}`);
+      fb.textContent = '';
+    }
+  });
+  scores[exNum] = null;
+  document.getElementById(`result${exNum}`).textContent = '';
+  updateScoreboard();
+}
+
+function updateScoreboard(){
+  let total = 0, done = 0;
+  const totals = {1:8,2:8,3:8,4:8};
+  Object.keys(scores).forEach(k=>{
+    if(scores[k] !== null){
+      total += scores[k];
+      done++;
+    }
+  });
+  document.getElementById('totalScore').textContent = `${total} / 32`;
+  document.getElementById('totalDone').textContent = `${done} / 4`;
+}
+</script>
+
+</body>
+</html>
