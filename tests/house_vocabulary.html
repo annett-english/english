@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Дом: словарный практикум</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --blueprint: #17324a;
+    --blueprint-deep:#0f2438;
+    --line: #8fd3ff;
+    --line-soft: rgba(143,211,255,0.35);
+    --paper:#fbf7ee;
+    --paper-line:#e7ded0;
+    --gold:#c9973b;
+    --gold-deep:#a97a24;
+    --good:#4f9d69;
+    --bad:#d1594c;
+    --ink:#1c2b36;
+    --muted:#5c6b76;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--blueprint);
+    background-image:
+      linear-gradient(var(--line-soft) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
+    background-size: 34px 34px;
+    color:var(--ink);
+    font-family:'Inter', sans-serif;
+    padding-bottom:80px;
+  }
+  .mono{font-family:'IBM Plex Mono', monospace;}
+  header.hero{
+    position:relative;
+    padding:56px 24px 40px;
+    color:#eaf6ff;
+    text-align:center;
+    overflow:hidden;
+  }
+  header.hero h1{
+    font-family:'Fraunces', serif;
+    font-weight:700;
+    font-size:clamp(2rem, 5vw, 3.4rem);
+    margin:0 0 8px;
+    letter-spacing:0.5px;
+  }
+  header.hero .tag{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.8rem;
+    letter-spacing:3px;
+    text-transform:uppercase;
+    color:var(--gold);
+    margin-bottom:18px;
+  }
+  header.hero p.sub{
+    max-width:640px;
+    margin:0 auto;
+    color:#cfe6f5;
+    font-size:1rem;
+    line-height:1.5;
+  }
+  .house-svg{ margin:28px auto 0; display:block; max-width:640px; width:100%; height:auto; }
+  .house-svg text{ font-family:'IBM Plex Mono', monospace; fill:#eaf6ff; }
+  .house-svg .lbl{ font-size:12px; letter-spacing:0.5px; }
+  .house-svg line, .house-svg path, .house-svg rect, .house-svg circle{
+    stroke:var(--line); fill:none; stroke-width:1.4;
+  }
+  .house-svg .fill-dim{ fill:rgba(143,211,255,0.06); stroke:var(--line); }
+
+  main{
+    max-width:900px;
+    margin:0 auto;
+    padding:0 20px;
+  }
+
+  .toc{
+    background:rgba(255,255,255,0.06);
+    border:1px solid var(--line-soft);
+    border-radius:10px;
+    padding:16px 20px;
+    margin:0 0 40px;
+    color:#eaf6ff;
+  }
+  .toc .mono{ color:var(--gold); font-size:0.75rem; letter-spacing:2px; text-transform:uppercase; display:block; margin-bottom:10px;}
+  .toc ul{ list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:6px 18px;}
+  .toc a{ color:#dff0ff; text-decoration:none; font-size:0.92rem; border-bottom:1px dashed transparent; }
+  .toc a:hover{ border-bottom-color:var(--gold); color:#fff; }
+
+  section.card{
+    background:var(--paper);
+    background-image: linear-gradient(var(--paper-line) 1px, transparent 1px);
+    background-size: 100% 32px;
+    border-radius:14px;
+    border:1px solid rgba(0,0,0,0.06);
+    box-shadow:0 12px 30px -12px rgba(0,0,0,0.35);
+    padding:28px 28px 26px;
+    margin-bottom:36px;
+    scroll-margin-top:20px;
+  }
+  .ex-eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.72rem;
+    letter-spacing:2.5px;
+    text-transform:uppercase;
+    color:var(--gold-deep);
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:6px;
+  }
+  .ex-eyebrow::before{
+    content:"";
+    width:22px; height:1px; background:var(--gold-deep);
+  }
+  .card h2{
+    font-family:'Fraunces', serif;
+    font-size:1.5rem;
+    margin:0 0 6px;
+    color:var(--ink);
+  }
+  .card p.instr{
+    color:var(--muted);
+    margin:0 0 18px;
+    font-size:0.96rem;
+  }
+  .wordbank{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-bottom:20px;
+  }
+  .wordbank span{
+    background:#efe6d2;
+    border:1px solid #d9c9a3;
+    color:#5a4620;
+    padding:4px 11px;
+    border-radius:999px;
+    font-size:0.82rem;
+    font-family:'IBM Plex Mono', monospace;
+  }
+  ol.items{ list-style:none; margin:0; padding:0; counter-reset:it; }
+  ol.items > li{
+    counter-increment:it;
+    display:grid;
+    grid-template-columns:34px 1fr;
+    gap:6px 12px;
+    align-items:start;
+    padding:12px 0;
+    border-top:1px solid var(--paper-line);
+  }
+  ol.items > li:first-child{ border-top:none; }
+  ol.items > li::before{
+    content: counter(it);
+    font-family:'IBM Plex Mono', monospace;
+    color:var(--gold-deep);
+    font-weight:600;
+    font-size:0.95rem;
+    padding-top:8px;
+  }
+  .item-body{ display:flex; flex-direction:column; gap:8px; }
+  .prompt{ font-size:0.98rem; line-height:1.5; }
+  .prompt b{ color:var(--blueprint); }
+  .row-input{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  input[type=text], select, textarea{
+    font-family:'Inter', sans-serif;
+    font-size:0.95rem;
+    padding:8px 10px;
+    border-radius:7px;
+    border:1.5px solid #cdbfa0;
+    background:#fffdf7;
+    color:var(--ink);
+    outline:none;
+  }
+  input[type=text]{ min-width:180px; flex:1; max-width:320px; }
+  select{ min-width:170px; }
+  textarea{ width:100%; min-height:56px; resize:vertical; font-size:0.95rem; }
+  input[type=text]:focus, select:focus, textarea:focus{ border-color:var(--gold-deep); box-shadow:0 0 0 3px rgba(201,151,59,0.18); }
+  .fb{ font-size:0.85rem; font-weight:600; min-width:20px; }
+  .fb.ok{ color:var(--good); }
+  .fb.no{ color:var(--bad); }
+  .correct-reveal{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.82rem;
+    color:var(--blueprint);
+    background:#e7f0fa;
+    border:1px dashed #a9c6de;
+    padding:3px 8px;
+    border-radius:6px;
+    display:none;
+  }
+  .correct-reveal.show{ display:inline-block; }
+  input.answered-correct{ border-color:var(--good); background:#f1faf3; }
+  input.answered-wrong, select.answered-wrong{ border-color:var(--bad); background:#fdf2f1; }
+  select.answered-correct{ border-color:var(--good); background:#f1faf3; }
+
+  .tf-toggle{ display:flex; gap:8px; }
+  .tf-toggle button{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.82rem;
+    padding:6px 14px;
+    border-radius:7px;
+    border:1.5px solid #cdbfa0;
+    background:#fffdf7;
+    cursor:pointer;
+    color:var(--ink);
+  }
+  .tf-toggle button.selected{ background:var(--blueprint); color:#fff; border-color:var(--blueprint); }
+
+  .actions{
+    display:flex;
+    gap:12px;
+    margin-top:22px;
+    flex-wrap:wrap;
+    align-items:center;
+  }
+  button.btn{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.82rem;
+    letter-spacing:0.5px;
+    padding:10px 18px;
+    border-radius:8px;
+    border:none;
+    cursor:pointer;
+    transition:transform 0.08s ease, opacity 0.15s ease;
+  }
+  button.btn:active{ transform:scale(0.97); }
+  .btn-check{ background:var(--blueprint); color:#fff; }
+  .btn-check:hover{ background:var(--blueprint-deep); }
+  .btn-show{ background:transparent; color:var(--blueprint); border:1.5px solid var(--blueprint); }
+  .btn-show:hover{ background:rgba(23,50,74,0.06); }
+  .btn-copy{ background:var(--gold); color:#3a2a05; }
+  .btn-copy:hover{ background:var(--gold-deep); color:#fff; }
+  .score{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.85rem;
+    color:var(--muted);
+    margin-left:auto;
+  }
+  .score b{ color:var(--ink); }
+
+  .reminder{
+    background:#fff8ea;
+    border:1.5px solid var(--gold);
+    border-radius:12px;
+    padding:20px 22px;
+    margin-bottom:30px;
+  }
+  .reminder h3{ margin:0 0 10px; font-family:'Fraunces', serif; font-size:1.25rem; color:var(--gold-deep); }
+  .reminder .pair{ display:grid; grid-template-columns: 1fr 1fr; gap:16px; margin-top:12px;}
+  .reminder .pair div{ background:#fffdf6; border:1px solid #eadfc2; border-radius:9px; padding:12px 14px; }
+  .reminder .pair strong{ display:block; font-family:'IBM Plex Mono', monospace; color:var(--blueprint); margin-bottom:4px; font-size:0.85rem; letter-spacing:1px;}
+  .reminder .pair p{ margin:0; font-size:0.92rem; color:var(--ink); line-height:1.45;}
+  .reminder .pair em{ color:var(--muted); }
+  @media (max-width:600px){ .reminder .pair{ grid-template-columns:1fr; } }
+
+  footer.note{
+    text-align:center;
+    color:#bcd7ea;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.78rem;
+    letter-spacing:1px;
+    margin-top:40px;
+    padding:0 20px;
+  }
+
+  .copybox{ display:none; margin-top:16px; }
+  .copybox.show{ display:block; }
+  .copybox textarea{ background:#f4f4ee; font-family:'IBM Plex Mono', monospace; font-size:0.82rem; min-height:160px; }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="tag">Vocabulary Workshop &middot; The House</div>
+  <h1>Дом снаружи и внутри</h1>
+  <p class="sub">9 упражнений на слова о доме + мини-грамматика <b>made of / made from</b>. Впишите ответ или выберите вариант, нажмите «Проверить» — и сразу увидите, что получилось. Если не знаете — жмите «Показать ответы».</p>
+
+  <svg class="house-svg" viewBox="0 0 640 360" xmlns="http://www.w3.org/2000/svg">
+    <!-- ground line -->
+    <line x1="20" y1="270" x2="620" y2="270"></line>
+    <!-- roof -->
+    <path d="M120 150 L320 50 L520 150"></path>
+    <rect class="fill-dim" x="150" y="150" width="340" height="10"></rect>
+    <!-- chimney -->
+    <line x1="420" y1="70" x2="420" y2="115"></line>
+    <line x1="420" y1="70" x2="450" y2="70"></line>
+    <line x1="450" y1="70" x2="450" y2="130"></line>
+    <path d="M418 68 q3 -14 8 -18 q5 4 8 18" ></path>
+    <!-- top floor / attic box -->
+    <rect x="180" y="150" width="260" height="60"></rect>
+    <!-- ground floor box -->
+    <rect x="150" y="210" width="320" height="60"></rect>
+    <!-- basement box (below ground) -->
+    <rect x="150" y="270" width="320" height="55" stroke-dasharray="4 3"></rect>
+    <!-- balcony -->
+    <line x1="330" y1="210" x2="400" y2="210"></line>
+    <rect x="330" y="200" width="70" height="10"></rect>
+    <line x1="330" y1="200" x2="330" y2="210"></line>
+    <line x1="400" y1="200" x2="400" y2="210"></line>
+    <!-- entrance door -->
+    <rect x="200" y="235" width="26" height="35"></rect>
+    <!-- path -->
+    <path d="M120 325 q60 -25 100 -55"></path>
+    <!-- gate -->
+    <line x1="95" y1="300" x2="95" y2="325"></line>
+    <line x1="120" y1="300" x2="120" y2="325"></line>
+    <line x1="95" y1="300" x2="120" y2="300"></line>
+    <!-- terrace -->
+    <rect x="460" y="255" width="90" height="15"></rect>
+
+    <text class="lbl" x="440" y="90">chimney</text>
+    <text class="lbl" x="270" y="145">roof</text>
+    <text class="lbl" x="190" y="175">attic / top floor</text>
+    <text class="lbl" x="405" y="205">balcony</text>
+    <text class="lbl" x="490" y="240">ground floor</text>
+    <text class="lbl" x="470" y="250">terrace</text>
+    <text class="lbl" x="232" y="255">entrance</text>
+    <text class="lbl" x="160" y="300">basement</text>
+    <text class="lbl" x="60" y="345">gate</text>
+    <text class="lbl" x="140" y="345">path</text>
+  </svg>
+</header>
+
+<main>
+
+  <nav class="toc">
+    <span class="mono">Содержание</span>
+    <ul id="toc-list"></ul>
+  </nav>
+
+  <div id="exercises"></div>
+
+  <section class="card" id="made-of-from">
+    <div class="ex-eyebrow">Грамматика</div>
+    <h2>Made of / Made from</h2>
+    <div class="reminder">
+      <h3>Коротко о разнице</h3>
+      <div class="pair">
+        <div>
+          <strong>MADE OF</strong>
+          <p>Материал не меняется, его видно и легко узнать в готовом предмете.<br><em>The wall is made <b>of</b> brick.</em></p>
+        </div>
+        <div>
+          <strong>MADE FROM</strong>
+          <p>Материал превращается во что-то другое, узнать исходное вещество в готовом продукте сложно.<br><em>Paper is made <b>from</b> wood.</em></p>
+        </div>
+      </div>
+    </div>
+    <div id="of-from-exercises"></div>
+  </section>
+
+</main>
+
+<footer class="note">HOUSE VOCABULARY WORKSHEET &middot; сделайте упражнения по порядку, от простого к творческому</footer>
+
+<script>
+/* ---------------------------------------------------------
+   DATA
+--------------------------------------------------------- */
+const exercises = [
+  {
+    id: "ex1", num:"01", title:"Вставьте пропущенные буквы",
+    instr:"Впишите слово целиком (пропущенные буквы восстановите по контексту).",
+    type:"text",
+    items:[
+      {prompt:"ch_mn_y", answer:"chimney"},
+      {prompt:"b_s_ment", answer:"basement"},
+      {prompt:"_tt_c", answer:"attic"},
+      {prompt:"b_lc_ny", answer:"balcony"},
+      {prompt:"terr_ce", answer:"terrace"},
+      {prompt:"entr_nce", answer:"entrance"},
+      {prompt:"sp_c_ous", answer:"spacious"},
+      {prompt:"c_iling(s)", answer:"ceiling|ceilings"},
+    ]
+  },
+  {
+    id:"ex2", num:"02", title:"Переведите с русского на английский",
+    instr:"Напишите английское слово или словосочетание.",
+    type:"text",
+    items:[
+      {prompt:"дымоход", answer:"chimney"},
+      {prompt:"подвал", answer:"basement"},
+      {prompt:"чердак", answer:"attic"},
+      {prompt:"балкон", answer:"balcony"},
+      {prompt:"терраса", answer:"terrace"},
+      {prompt:"калитка / ворота", answer:"gate"},
+      {prompt:"вход", answer:"entrance"},
+      {prompt:"первый (нижний) этаж", answer:"ground floor"},
+    ]
+  },
+  {
+    id:"ex3", num:"03", title:"Дефиниции",
+    instr:"Выберите слово, которое подходит к определению.",
+    type:"select",
+    options:["chimney","attic","balcony","terrace","path","roof","gate","cosy"],
+    items:[
+      {prompt:"a structure through which smoke goes up and out of a building", answer:"chimney"},
+      {prompt:"the space just under the roof of a house, often used for storage", answer:"attic"},
+      {prompt:"a platform on the outside of a building, usually with a rail, reached from an upstairs room", answer:"balcony"},
+      {prompt:"a flat, paved area next to a house where you can sit outside", answer:"terrace"},
+      {prompt:"a narrow way for walking, for example through a garden", answer:"path"},
+      {prompt:"the covering on top of a building", answer:"roof"},
+      {prompt:"a barrier, like a door, in a wall or fence that you open to go in or out", answer:"gate"},
+      {prompt:"warm, comfortable and pleasant to be in", answer:"cosy"},
+    ]
+  },
+  {
+    id:"ex4", num:"04", title:"Сочетаемость слов",
+    instr:"Выберите слово, которое естественно сочетается в словосочетании.",
+    type:"select",
+    items:[
+      {prompt:"an open ___", options:["fire","light","roof"], answer:"fire"},
+      {prompt:"___ floor", options:["wooden","spacious","modern"], answer:"wooden"},
+      {prompt:"high ___", options:["ceilings","attic","gate"], answer:"ceilings"},
+      {prompt:"___ apartment", options:["spacious","path","roof"], answer:"spacious"},
+      {prompt:"front ___", options:["gate","attic","terrace"], answer:"gate"},
+      {prompt:"main ___", options:["entrance","basement","ceiling"], answer:"entrance"},
+      {prompt:"___ house", options:["modern","top","wooden"], answer:"modern"},
+      {prompt:"___ kitchen", options:["cosy","top","ground"], answer:"cosy"},
+    ]
+  },
+  {
+    id:"ex5", num:"05", title:"Контекст",
+    instr:"Заполните пропуск подходящим словом из рамки.",
+    wordbank:["chimney","basement","balcony","path","terrace","gate","spacious","an open fire"],
+    type:"text",
+    items:[
+      {prompt:"We keep our old furniture in the ___.", answer:"basement"},
+      {prompt:"Smoke was coming out of the ___.", answer:"chimney"},
+      {prompt:"Their new flat has a lovely ___ where they can sit outside with a coffee.", answer:"balcony"},
+      {prompt:"A stone ___ leads from the gate to the front door.", answer:"path"},
+      {prompt:"In summer we like to have dinner on the ___.", answer:"terrace"},
+      {prompt:"The dog ran through the open ___ into the street.", answer:"gate"},
+      {prompt:"Their living room is very ___ — there's room for a big sofa and a piano.", answer:"spacious"},
+      {prompt:"The old cottage has a real fireplace with ___.", answer:"an open fire|open fire"},
+    ]
+  },
+  {
+    id:"ex6", num:"06", title:"Соедините половинки выражений",
+    instr:"Выберите вторую часть выражения.",
+    type:"select",
+    optionsList:["fire","floor","ceilings","floor","floor","gate","entrance","atmosphere"],
+    items:[
+      {prompt:"an open ___", options:["fire","floor","ceilings","gate","entrance","atmosphere"], answer:"fire"},
+      {prompt:"wooden ___", options:["floor","ceilings","gate","entrance"], answer:"floor"},
+      {prompt:"high ___", options:["ceilings","floor","gate","fire"], answer:"ceilings"},
+      {prompt:"top ___", options:["floor","gate","entrance","fire"], answer:"floor"},
+      {prompt:"ground ___", options:["floor","ceilings","gate","fire"], answer:"floor"},
+      {prompt:"front ___", options:["gate","floor","fire","atmosphere"], answer:"gate"},
+      {prompt:"main ___", options:["entrance","floor","gate","fire"], answer:"entrance"},
+      {prompt:"cosy ___", options:["atmosphere","gate","floor","entrance"], answer:"atmosphere"},
+    ]
+  },
+  {
+    id:"ex7", num:"07", title:"Guess the word (по картинке-подсказке)",
+    instr:"Прочитайте описание/эмодзи-подсказку и напишите слово.",
+    type:"text",
+    items:[
+      {prompt:"🔥 no glass, right in the living room wall — you can see the real flames", answer:"an open fire|open fire"},
+      {prompt:"📦🕸️ the room right under the roof, full of old boxes", answer:"attic"},
+      {prompt:"⬇️🧱 the room below ground level, often used for storage", answer:"basement"},
+      {prompt:"🚪👋 where you step into the building for the first time", answer:"entrance"},
+      {prompt:"🚧 a small barrier in a fence that opens and closes", answer:"gate"},
+      {prompt:"🪵👣 you walk on this every day, and it creaks a little", answer:"wooden floor"},
+      {prompt:"☕🪑 an outdoor paved spot right next to the house, perfect for a coffee", answer:"terrace"},
+      {prompt:"💨⬆️ smoke travels up through this and out of the roof", answer:"chimney"},
+    ]
+  },
+  {
+    id:"ex8", num:"08", title:"True or False",
+    instr:"Определите, верно утверждение или нет.",
+    type:"tf",
+    items:[
+      {prompt:"A basement is usually located above the ground floor.", answer:"false"},
+      {prompt:"An attic is the space just under the roof.", answer:"true"},
+      {prompt:"A balcony is always inside the house, not outside.", answer:"false"},
+      {prompt:"A path can lead from the gate to the entrance of a house.", answer:"true"},
+      {prompt:"The ground floor and the top floor are the same thing.", answer:"false"},
+      {prompt:"'Cosy' means big, empty and spacious.", answer:"false"},
+      {prompt:"A terrace is often used for sitting outside.", answer:"true"},
+      {prompt:"A chimney lets smoke rise out of a fireplace.", answer:"true"},
+    ]
+  },
+  {
+    id:"ex9", num:"09", title:"Закончите предложения своими идеями",
+    instr:"Здесь нет «правильного» ответа — пишите то, что думаете. Можно посмотреть пример идеи, а в конце скопировать все свои ответы одной кнопкой.",
+    type:"open",
+    items:[
+      {prompt:"If my house had an open fire, I would…", sample:"...spend every winter evening reading next to it."},
+      {prompt:"My ideal balcony would have…", sample:"...a small table, two chairs and a lot of plants."},
+      {prompt:"I would use my attic to…", sample:"...store old furniture and my childhood toys."},
+      {prompt:"The perfect garden path should be made of…", sample:"...flat stone, so it doesn't get muddy in the rain."},
+      {prompt:"A cosy room, for me, needs…", sample:"...soft lighting, a blanket and a wooden floor."},
+      {prompt:"If my house had a basement, I would…", sample:"...turn it into a small home cinema."},
+      {prompt:"My dream ground floor would include…", sample:"...an open kitchen and a spacious living room."},
+      {prompt:"On my terrace, I'd love to…", sample:"...have breakfast outside every morning in summer."},
+    ]
+  },
+];
+
+const ofFromExercises = [
+  {
+    id:"of1", num:"A", title:"Of или from? — Дом",
+    instr:"Выберите правильный предлог.",
+    type:"select", options:["of","from"],
+    items:[
+      {prompt:"This wall is made ___ brick.", answer:"of"},
+      {prompt:"Paper is made ___ wood.", answer:"from"},
+      {prompt:"The roof is made ___ tiles.", answer:"of"},
+      {prompt:"Wine is made ___ grapes.", answer:"from"},
+      {prompt:"This floor is made ___ wood.", answer:"of"},
+      {prompt:"Cheese is made ___ milk.", answer:"from"},
+      {prompt:"The gate is made ___ metal.", answer:"of"},
+      {prompt:"Bread is made ___ flour.", answer:"from"},
+    ]
+  },
+  {
+    id:"of2", num:"B", title:"Of или from? — Материалы вокруг нас",
+    instr:"Выберите правильный предлог.",
+    type:"select", options:["of","from"],
+    items:[
+      {prompt:"The chimney is made ___ brick.", answer:"of"},
+      {prompt:"Glass is made ___ sand.", answer:"from"},
+      {prompt:"This table is made ___ solid oak.", answer:"of"},
+      {prompt:"Butter is made ___ cream.", answer:"from"},
+      {prompt:"The path is made ___ stone.", answer:"of"},
+      {prompt:"Plastic is made ___ oil.", answer:"from"},
+      {prompt:"The balcony railing is made ___ iron.", answer:"of"},
+      {prompt:"Orange juice is made ___ oranges.", answer:"from"},
+    ]
+  },
+  {
+    id:"of3", num:"C", title:"Of или from? — Смешанная практика",
+    instr:"Впишите of или from.",
+    type:"text",
+    items:[
+      {prompt:"Statues are often made ___ marble.", answer:"of"},
+      {prompt:"Yoghurt is made ___ milk.", answer:"from"},
+      {prompt:"The terrace floor is made ___ stone tiles.", answer:"of"},
+      {prompt:"Paper used to be made ___ old cloth.", answer:"from"},
+      {prompt:"Her ring is made ___ gold.", answer:"of"},
+      {prompt:"Chocolate is made ___ cocoa beans.", answer:"from"},
+    ]
+  },
+];
+
+/* ---------------------------------------------------------
+   RENDERING
+--------------------------------------------------------- */
+function el(tag, cls, html){
+  const e = document.createElement(tag);
+  if(cls) e.className = cls;
+  if(html !== undefined) e.innerHTML = html;
+  return e;
+}
+
+function renderItemControl(ex, item, idx){
+  const wrap = el("div", "row-input");
+
+  if(ex.type === "text"){
+    const input = el("input");
+    input.type = "text";
+    input.autocomplete = "off";
+    input.spellcheck = false;
+    input.dataset.answer = item.answer;
+    input.id = `${ex.id}-i${idx}`;
+    wrap.appendChild(input);
+    const fb = el("span","fb"); fb.id = `${ex.id}-fb${idx}`;
+    wrap.appendChild(fb);
+    const rev = el("span","correct-reveal"); rev.id = `${ex.id}-rev${idx}`;
+    wrap.appendChild(rev);
+  }
+
+  else if(ex.type === "select"){
+    const select = el("select");
+    select.id = `${ex.id}-i${idx}`;
+    select.dataset.answer = item.answer;
+    const opts = item.options || ex.options;
+    const blank = el("option","","— выберите —");
+    blank.value = "";
+    select.appendChild(blank);
+    opts.forEach(o=>{
+      const op = el("option","",o);
+      op.value = o;
+      select.appendChild(op);
+    });
+    wrap.appendChild(select);
+    const fb = el("span","fb"); fb.id = `${ex.id}-fb${idx}`;
+    wrap.appendChild(fb);
+    const rev = el("span","correct-reveal"); rev.id = `${ex.id}-rev${idx}`;
+    wrap.appendChild(rev);
+  }
+
+  else if(ex.type === "tf"){
+    const toggle = el("div","tf-toggle");
+    toggle.id = `${ex.id}-i${idx}`;
+    toggle.dataset.answer = item.answer;
+    toggle.dataset.value = "";
+    const bT = el("button","","True");
+    const bF = el("button","","False");
+    bT.type="button"; bF.type="button";
+    bT.onclick = ()=>{ toggle.dataset.value="true"; bT.classList.add("selected"); bF.classList.remove("selected"); };
+    bF.onclick = ()=>{ toggle.dataset.value="false"; bF.classList.add("selected"); bT.classList.remove("selected"); };
+    toggle.appendChild(bT); toggle.appendChild(bF);
+    wrap.appendChild(toggle);
+    const fb = el("span","fb"); fb.id = `${ex.id}-fb${idx}`;
+    wrap.appendChild(fb);
+    const rev = el("span","correct-reveal"); rev.id = `${ex.id}-rev${idx}`;
+    wrap.appendChild(rev);
+  }
+
+  else if(ex.type === "open"){
+    const ta = el("textarea");
+    ta.id = `${ex.id}-i${idx}`;
+    ta.placeholder = "Ваша идея на английском…";
+    ta.dataset.sample = item.sample || "";
+    wrap.style.flexDirection = "column";
+    wrap.style.alignItems = "stretch";
+    wrap.appendChild(ta);
+    const rev = el("div","correct-reveal"); rev.id = `${ex.id}-rev${idx}`;
+    rev.style.marginTop = "4px";
+    wrap.appendChild(rev);
+  }
+
+  return wrap;
+}
+
+function renderExercise(ex, mountId){
+  const section = el("section","card");
+  section.id = ex.id;
+  section.appendChild(el("div","ex-eyebrow", `Упражнение ${ex.num}`));
+  section.appendChild(el("h2","", ex.title));
+  section.appendChild(el("p","instr", ex.instr));
+
+  if(ex.wordbank){
+    const wb = el("div","wordbank");
+    ex.wordbank.forEach(w=> wb.appendChild(el("span","",w)));
+    section.appendChild(wb);
+  }
+
+  const ol = el("ol","items");
+  ex.items.forEach((item, idx)=>{
+    const li = el("li");
+    const body = el("div","item-body");
+    const p = el("div","prompt", item.prompt.replace(/___/g,"<b>___</b>"));
+    body.appendChild(p);
+    body.appendChild(renderItemControl(ex, item, idx));
+    li.appendChild(body);
+    ol.appendChild(li);
+  });
+  section.appendChild(ol);
+
+  const actions = el("div","actions");
+  if(ex.type === "open"){
+    const btnShow = el("button","btn btn-show","Показать пример идеи");
+    btnShow.onclick = ()=> showOpenSamples(ex);
+    const btnCopy = el("button","btn btn-copy","Скопировать мои ответы");
+    btnCopy.onclick = ()=> copyOpenAnswers(ex);
+    actions.appendChild(btnShow);
+    actions.appendChild(btnCopy);
+    const copybox = el("div","copybox");
+    copybox.id = `${ex.id}-copybox`;
+    const ta = el("textarea"); ta.readOnly = true; ta.id = `${ex.id}-copytext`;
+    copybox.appendChild(ta);
+    section.appendChild(actions);
+    section.appendChild(copybox);
+  } else {
+    const btnCheck = el("button","btn btn-check","Проверить");
+    btnCheck.onclick = ()=> checkExercise(ex);
+    const btnShow = el("button","btn btn-show","Показать ответы");
+    btnShow.onclick = ()=> showAnswers(ex);
+    const score = el("span","score"); score.id = `${ex.id}-score`;
+    actions.appendChild(btnCheck);
+    actions.appendChild(btnShow);
+    actions.appendChild(score);
+    section.appendChild(actions);
+  }
+
+  document.getElementById(mountId).appendChild(section);
+}
+
+/* ---------------------------------------------------------
+   CHECKING LOGIC
+--------------------------------------------------------- */
+function normalize(s){
+  return (s || "").toString().trim().toLowerCase().replace(/\s+/g," ");
+}
+
+function isCorrect(userVal, answerStr){
+  const accepted = answerStr.split("|").map(normalize);
+  return accepted.includes(normalize(userVal));
+}
+
+function checkExercise(ex){
+  let correctCount = 0;
+  ex.items.forEach((item, idx)=>{
+    const fb = document.getElementById(`${ex.id}-fb${idx}`);
+    const rev = document.getElementById(`${ex.id}-rev${idx}`);
+    let userVal, controlEl;
+
+    if(ex.type === "tf"){
+      controlEl = document.getElementById(`${ex.id}-i${idx}`);
+      userVal = controlEl.dataset.value;
+    } else {
+      controlEl = document.getElementById(`${ex.id}-i${idx}`);
+      userVal = controlEl.value;
+    }
+
+    const ok = userVal && isCorrect(userVal, item.answer);
+    if(ok){
+      correctCount++;
+      fb.textContent = "✓";
+      fb.className = "fb ok";
+      rev.classList.remove("show");
+      if(controlEl.tagName !== "DIV"){
+        controlEl.classList.remove("answered-wrong");
+        controlEl.classList.add("answered-correct");
+      }
+    } else {
+      fb.textContent = userVal ? "✕" : "…";
+      fb.className = userVal ? "fb no" : "fb";
+      if(userVal){
+        rev.textContent = `правильно: ${item.answer.split("|")[0]}`;
+        rev.classList.add("show");
+        if(controlEl.tagName !== "DIV"){
+          controlEl.classList.remove("answered-correct");
+          controlEl.classList.add("answered-wrong");
+        }
+      }
+    }
+  });
+  const score = document.getElementById(`${ex.id}-score`);
+  score.innerHTML = `<b>${correctCount}</b> / ${ex.items.length} верно`;
+}
+
+function showAnswers(ex){
+  ex.items.forEach((item, idx)=>{
+    const rev = document.getElementById(`${ex.id}-rev${idx}`);
+    const fb = document.getElementById(`${ex.id}-fb${idx}`);
+    rev.textContent = `ответ: ${item.answer.split("|")[0]}`;
+    rev.classList.add("show");
+    fb.textContent = "";
+    fb.className = "fb";
+
+    if(ex.type === "tf"){
+      const toggle = document.getElementById(`${ex.id}-i${idx}`);
+      const [bT, bF] = toggle.querySelectorAll("button");
+      toggle.dataset.value = item.answer;
+      bT.classList.toggle("selected", item.answer === "true");
+      bF.classList.toggle("selected", item.answer === "false");
+    } else {
+      const control = document.getElementById(`${ex.id}-i${idx}`);
+      control.value = item.answer.split("|")[0];
+      control.classList.remove("answered-wrong");
+      control.classList.add("answered-correct");
+    }
+  });
+  const score = document.getElementById(`${ex.id}-score`);
+  if(score) score.innerHTML = `<b>ответы показаны</b>`;
+}
+
+function showOpenSamples(ex){
+  ex.items.forEach((item, idx)=>{
+    const rev = document.getElementById(`${ex.id}-rev${idx}`);
+    rev.textContent = `пример: ${item.sample}`;
+    rev.classList.add("show");
+  });
+}
+
+function copyOpenAnswers(ex){
+  let text = `${ex.title}\n\n`;
+  ex.items.forEach((item, idx)=>{
+    const ta = document.getElementById(`${ex.id}-i${idx}`);
+    const val = ta.value.trim() || "(пусто)";
+    text += `${idx+1}. ${item.prompt}\n   → ${val}\n\n`;
+  });
+  const box = document.getElementById(`${ex.id}-copybox`);
+  const out = document.getElementById(`${ex.id}-copytext`);
+  out.value = text;
+  box.classList.add("show");
+
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(()=>{
+      out.placeholder = "Скопировано!";
+    }).catch(()=>{
+      out.select();
+    });
+  } else {
+    out.select();
+    try{ document.execCommand("copy"); }catch(e){}
+  }
+}
+
+/* ---------------------------------------------------------
+   BUILD PAGE
+--------------------------------------------------------- */
+const tocList = document.getElementById("toc-list");
+exercises.forEach(ex=>{
+  renderExercise(ex, "exercises");
+  const li = document.createElement("li");
+  const a = document.createElement("a");
+  a.href = `#${ex.id}`;
+  a.textContent = `${ex.num} · ${ex.title}`;
+  li.appendChild(a);
+  tocList.appendChild(li);
+});
+ofFromExercises.forEach(ex=>{
+  renderExercise(ex, "of-from-exercises");
+  const li = document.createElement("li");
+  const a = document.createElement("a");
+  a.href = `#${ex.id}`;
+  a.textContent = `${ex.num} · ${ex.title}`;
+  li.appendChild(a);
+  tocList.appendChild(li);
+});
+</script>
+</body>
+</html>
