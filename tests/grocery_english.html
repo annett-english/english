@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grocery English — интерактивная тетрадь</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F6F1E4;
+    --paper-dark:#EDE4CF;
+    --ink:#2B2B26;
+    --ink-soft:#5B5648;
+    --green:#3F6B4F;
+    --green-dark:#2C4E38;
+    --tomato:#C1442E;
+    --tomato-dark:#9E3221;
+    --card:#FFFFFF;
+    --card-line:#E3D9BF;
+    --ok:#2E7D46;
+    --ok-bg:#E4F3E7;
+    --bad:#B3301F;
+    --bad-bg:#FBE7E3;
+    --shadow: 0 2px 0 rgba(43,43,38,0.06), 0 10px 24px rgba(43,43,38,0.08);
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(1200px 600px at 10% -10%, #FBF7EC 0%, transparent 60%),
+      var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    line-height:1.5;
+    padding-bottom:80px;
+  }
+
+  /* ===== Header (receipt / market sign) ===== */
+  header{
+    max-width:820px;
+    margin:36px auto 28px;
+    padding:0 20px;
+  }
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12.5px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--green-dark);
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .eyebrow::before{
+    content:"";
+    width:8px;height:8px;border-radius:50%;
+    background:var(--tomato);
+    display:inline-block;
+  }
+  h1{
+    font-family:'Caveat',cursive;
+    font-weight:700;
+    font-size:clamp(42px,7vw,64px);
+    margin:6px 0 4px;
+    color:var(--green-dark);
+    line-height:1;
+  }
+  header p.sub{
+    color:var(--ink-soft);
+    font-size:15.5px;
+    max-width:56ch;
+    margin:6px 0 0;
+  }
+
+  .basket-score{
+    margin-top:18px;
+    display:flex;
+    gap:14px;
+    flex-wrap:wrap;
+    align-items:center;
+  }
+  .receipt{
+    font-family:'JetBrains Mono',monospace;
+    background:var(--card);
+    border:1px dashed var(--card-line);
+    border-radius:10px;
+    padding:10px 16px;
+    font-size:13px;
+    color:var(--ink-soft);
+    box-shadow:var(--shadow);
+  }
+  .receipt b{color:var(--green-dark);}
+
+  /* ===== Section (grocery aisle) ===== */
+  main{max-width:820px;margin:0 auto;padding:0 20px;}
+  section.aisle{
+    margin-bottom:34px;
+    background:var(--card);
+    border:1px solid var(--card-line);
+    border-radius:18px;
+    padding:26px 26px 22px;
+    box-shadow:var(--shadow);
+    position:relative;
+  }
+  .aisle-num{
+    position:absolute;
+    top:-14px; left:22px;
+    background:var(--green);
+    color:#fff;
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    font-weight:600;
+    padding:5px 11px;
+    border-radius:999px;
+    letter-spacing:.04em;
+    box-shadow:0 3px 8px rgba(44,78,56,.35);
+  }
+  h2{
+    font-family:'Caveat',cursive;
+    font-size:30px;
+    color:var(--green-dark);
+    margin:10px 0 4px;
+  }
+  .task-hint{
+    color:var(--ink-soft);
+    font-size:14px;
+    margin:0 0 16px;
+  }
+
+  /* ===== word bank ===== */
+  .wordbank{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin:0 0 18px;
+    padding:12px 14px;
+    background:var(--paper-dark);
+    border-radius:12px;
+    border:1px solid var(--card-line);
+  }
+  .wordbank span{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12.5px;
+    background:#fff;
+    border:1px solid var(--card-line);
+    padding:4px 9px;
+    border-radius:7px;
+    color:var(--green-dark);
+  }
+
+  /* ===== rows ===== */
+  .row{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:9px 0;
+    border-bottom:1px solid #F0EAD9;
+    flex-wrap:wrap;
+  }
+  .row:last-child{border-bottom:none;}
+  .row .en{
+    min-width:230px;
+    font-weight:600;
+    color:var(--ink);
+    flex:0 0 auto;
+  }
+  .row .en small{display:block;font-weight:400;color:var(--ink-soft);font-size:12px;}
+  .row .stem{flex:1 1 260px; color:var(--ink);}
+  .blank-word{
+    font-weight:700;
+    color:var(--green-dark);
+    letter-spacing:.03em;
+  }
+
+  input[type=text]{
+    font-family:'Inter',sans-serif;
+    font-size:14.5px;
+    padding:8px 11px;
+    border-radius:9px;
+    border:1.5px solid var(--card-line);
+    background:#FCFAF3;
+    color:var(--ink);
+    min-width:180px;
+    flex:1 1 180px;
+    outline:none;
+    transition:border-color .15s, background .15s;
+  }
+  input[type=text]:focus{border-color:var(--green);background:#fff;}
+  input.short{min-width:120px;flex:0 0 120px;}
+  input.letters{
+    min-width:150px;flex:0 0 auto;
+    font-family:'JetBrains Mono',monospace;
+    letter-spacing:.05em;
+    text-align:center;
+  }
+
+  input.correct{border-color:var(--ok);background:var(--ok-bg);}
+  input.incorrect{border-color:var(--bad);background:var(--bad-bg);}
+
+  select{
+    font-family:'Inter',sans-serif;
+    font-size:14px;
+    padding:7px 9px;
+    border-radius:9px;
+    border:1.5px solid var(--card-line);
+    background:#FCFAF3;
+    color:var(--ink);
+    min-width:200px;
+  }
+  select.correct{border-color:var(--ok);background:var(--ok-bg);}
+  select.incorrect{border-color:var(--bad);background:var(--bad-bg);}
+
+  .mcq-options{display:flex;gap:8px;flex-wrap:wrap;}
+  .mcq-btn{
+    font-family:'Inter',sans-serif;
+    font-size:14px;
+    padding:7px 13px;
+    border-radius:999px;
+    border:1.5px solid var(--card-line);
+    background:#FCFAF3;
+    cursor:pointer;
+    color:var(--ink);
+    transition:all .15s;
+  }
+  .mcq-btn:hover{border-color:var(--green);}
+  .mcq-btn.selected{border-color:var(--green); background:#EAF3EC; font-weight:600;}
+  .mcq-btn.correct{border-color:var(--ok); background:var(--ok-bg); color:var(--ok); font-weight:700;}
+  .mcq-btn.incorrect{border-color:var(--bad); background:var(--bad-bg); color:var(--bad); font-weight:700;}
+
+  textarea{
+    width:100%;
+    font-family:'Inter',sans-serif;
+    font-size:14.5px;
+    padding:10px 12px;
+    border-radius:9px;
+    border:1.5px solid var(--card-line);
+    background:#FCFAF3;
+    color:var(--ink);
+    resize:vertical;
+    min-height:44px;
+  }
+
+  .num{
+    font-family:'JetBrains Mono',monospace;
+    color:var(--ink-soft);
+    font-size:13px;
+    min-width:22px;
+  }
+
+  .feedback-icon{
+    font-size:16px;
+    min-width:20px;
+    text-align:center;
+  }
+
+  /* ===== buttons ===== */
+  .aisle-actions{
+    display:flex;
+    gap:10px;
+    margin-top:18px;
+    flex-wrap:wrap;
+    align-items:center;
+  }
+  button.btn{
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:14px;
+    padding:10px 18px;
+    border-radius:10px;
+    border:none;
+    cursor:pointer;
+    transition:transform .1s, filter .15s;
+  }
+  button.btn:active{transform:translateY(1px);}
+  .btn-check{background:var(--green); color:#fff;}
+  .btn-check:hover{filter:brightness(1.08);}
+  .btn-answers{background:transparent; color:var(--tomato-dark); border:1.5px solid var(--tomato); background:#FFF6F3;}
+  .btn-answers:hover{filter:brightness(0.98);}
+  .btn-reset{background:transparent;color:var(--ink-soft);border:1.5px solid var(--card-line);}
+
+  .aisle-result{
+    font-family:'JetBrains Mono',monospace;
+    font-size:13.5px;
+    color:var(--ink-soft);
+    margin-left:auto;
+  }
+  .aisle-result b{color:var(--green-dark);}
+
+  .answer-reveal{
+    display:none;
+    margin-top:14px;
+    padding:12px 14px;
+    background:#FFF9EE;
+    border:1px dashed #E7CE8C;
+    border-radius:10px;
+    font-size:13.5px;
+    color:var(--ink-soft);
+  }
+  .answer-reveal.show{display:block;}
+  .answer-reveal b{color:var(--green-dark);}
+  .answer-reveal ol{margin:6px 0 0; padding-left:18px;}
+  .answer-reveal li{margin-bottom:4px;}
+
+  .transcript{
+    background:var(--paper-dark);
+    border:1px solid var(--card-line);
+    border-radius:12px;
+    padding:16px 18px;
+    font-size:14.5px;
+    color:var(--ink);
+    margin-bottom:18px;
+    line-height:1.65;
+  }
+  .transcript summary{
+    cursor:pointer;
+    font-weight:600;
+    color:var(--green-dark);
+    font-family:'Caveat',cursive;
+    font-size:20px;
+  }
+  .transcript-body{margin-top:10px;}
+
+  .match-row{display:flex; align-items:center; gap:10px; padding:8px 0; flex-wrap:wrap;}
+  .match-left{
+    flex:1 1 260px;
+    background:#FCFAF3;
+    border:1px solid var(--card-line);
+    border-radius:9px;
+    padding:8px 12px;
+    font-weight:600;
+  }
+  .match-arrow{color:var(--ink-soft);}
+
+  footer{
+    max-width:820px;
+    margin:10px auto 0;
+    padding:0 20px;
+    color:var(--ink-soft);
+    font-size:13px;
+    text-align:center;
+  }
+
+  @media (max-width:560px){
+    .row .en{min-width:100%;}
+    .aisle-result{margin-left:0;}
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto;}
+    *{transition:none!important;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">Unit · Grocery Shopping &amp; Quantifiers</div>
+  <h1>Grocery English 🥬</h1>
+  <p class="sub">Интерактивная тетрадь: лексика похода за продуктами и quantifiers (a lot of / a few / plenty of / not much). Проверяйте ответы кнопкой «Проверить» или сразу смотрите правильные — кнопкой «Показать ответы».</p>
+  <div class="basket-score">
+    <div class="receipt">TOTAL SCORE&nbsp; <b id="total-score">0 / 0</b></div>
+    <div class="receipt">EXERCISES DONE&nbsp; <b id="total-done">0 / 10</b></div>
+  </div>
+</header>
+
+<main>
+
+<!-- ================= EXERCISE 1 ================= -->
+<section class="aisle" id="ex1">
+  <span class="aisle-num">Упр. 1</span>
+  <h2>Translate the words</h2>
+  <p class="task-hint">Переведите слова и выражения на русский язык.</p>
+
+  <div id="ex1-rows"></div>
+
+  <div class="aisle-actions">
+    <button class="btn btn-check" onclick="checkExercise('ex1')">Проверить</button>
+    <button class="btn btn-answers" onclick="toggleAnswers('ex1')">Показать ответы</button>
+    <span class="aisle-result" id="ex1-result"></span>
+  </div>
+  <div class="answer-reveal" id="ex1-answers"></div>
+</section>
+
+<!-- ================= EXERCISE 2 ================= -->
+<section class="aisle" id="ex2">
+  <span class="aisle-num">Упр. 2</span>
+  <h2>Fill in the missing letters</h2>
+  <p class="task-hint">Вставьте пропущенные буквы в слова из упр. 1.</p>
+
+  <div id="ex2-rows"></div>
+
+  <div class="aisle-actions">
+    <button class="btn btn-check" onclick="checkExercise('ex2')">Проверить</button>
+    <button class="btn btn-answers" onclick="toggleAnswers('ex2')">Показать ответы</button>
+    <span class="aisle-result" id="ex2-result"></span>
+  </div>
+  <div class="answer-reveal" id="ex2-answers"></div>
+</section>
+
+<!-- ================= EXERCISE 3 ================= -->
+<section class="aisle" id="ex3">
+  <span class="aisle-num">Упр. 3</span>
+  <h2>Translate into English</h2>
+  <p class="task-hint">Переведите словосочетания с русского на английский.</p>
+
+  <div id="ex3-rows"></div>
+
+  <div class="aisle-actions">
+    <button class="btn btn-check" onclick="checkExercise('ex3')">Проверить</button>
+    <button class="btn btn-answers" onclick="toggleAnswers('ex3')">Показать ответы</button>
+    <span class="aisle-result" id="ex3-result"></span>
+  </div>
+  <div class="answer-reveal" id="ex3-answers"></div>
+</section>
+
+<!-- ================= EXERCISE 4: definitions ================= -->
+<section class="aisle" id="ex4">
+  <span class="aisle-num">Упр. 4</span>
+  <h2>Match the definition</h2>
+  <p class="task-hint">Выберите слово, которое соответствует определению.</p>
+
+  <div id="ex4-rows"></div>
+
+  <div class="aisle-actions">
+    <button class="btn btn-check" onclick="checkExercise('ex4')">Проверить</button>
+    <button class="btn btn-answers" onclick="toggleAnswers('ex4')">Показать ответы</button>
+    <span class="aisle-result" id="ex4-result"></span>
+  </div>
+  <div class="answer-reveal" id="ex4-answers"></div>
+</section>
+
+<!-- ================= EXERCISE 5: context ================= -->
+<section class="aisle" id="ex5">
+  <span class="aisle-num">Упр. 5</span>
+  <h2>Complete the sentences</h2>
+  <p class="task-hint">Вставьте подходящее слово/выражение из рамки в контекст.</p>
+  <div class="wordbank" id="ex5-bank"></div>
+
+  <div id="ex5-rows"></div>
+
+  <div class="aisle-actions">
+    <button class="btn btn-check" onclick="checkExercise('ex5')">Проверить</button>
+    <button class="btn btn-answers" onclick="toggleAnswers('ex5')">Показать ответы</button>
+    <span class="aisle-result" id="ex5-result"></span>
+  </div>
+  <div class="answer-reveal" id="ex5-answers"></div>
+</section>
+
+<!-- ================= EXERCISE 6: match halves ================= -->
+<section class="aisle" id="ex6">
+  <span class="aisle-num">Упр. 6</span>
+  <h2>Match the halves</h2>
+  <p class="task-hint">Соедините половинки выражений: выберите правильное окончание для каждого начала.</p>
+
+  <div id="ex6-rows"></div>
+
+  <div class="aisle-actions">
+    <button class="btn btn-check" onclick="checkExercise('ex6')">Проверить</button>
+    <button class="btn btn-answers" onclick="toggleAnswers('ex6')">Показать ответы</button>
+    <span class="aisle-result" id="ex6-result"></span>
+  </div>
+  <div class="answer-reveal" id="ex6-answers"></div>
+</section>
+
+<!-- ================= EXERCISE 7: listening ================= -->
+<section class="aisle" id="ex7">
+  <span class="aisle-num">Упр. 7</span>
+  <h2>Listen &amp; answer</h2>
+  <p class="task-hint">Посмотрите видео-подкаст «Jessica's Grocery Routine» и ответьте на вопросы своими словами. Затем сверьтесь с примерным ответом.</p>
+
+  <div id="ex7-rows"></div>
+
+  <div class="aisle-actions">
+    <button class="btn btn-answers" onclick="toggleAnswers('ex7')">Показать примерные ответы</button>
+  </div>
+  <div class="answer-reveal" id="ex7-answers"></div>
+</section>
+
+<!-- ================= EXERCISE 8: choose the correct option ================= -->
+<section class="aisle" id="ex8">
+  <span class="aisle-num">Упр. 8</span>
+  <h2>Choose the correct option</h2>
+  <p class="task-hint">Выберите правильный вариант.</p>
+
+  <div id="ex8-rows"></div>
+
+  <div class="aisle-actions">
+    <button class="btn btn-check" onclick="checkExercise('ex8')">Проверить</button>
+    <button class="btn btn-answers" onclick="toggleAnswers('ex8')">Показать ответы</button>
+    <span class="aisle-result" id="ex8-result"></span>
+  </div>
+  <div class="answer-reveal" id="ex8-answers"></div>
+</section>
+
+<!-- ================= EXERCISE 9: correct the mistake ================= -->
+<section class="aisle" id="ex9">
+  <span class="aisle-num">Упр. 9</span>
+  <h2>Correct the mistake</h2>
+  <p class="task-hint">Найдите и исправьте ошибку, напишите верный вариант целиком.</p>
+
+  <div id="ex9-rows"></div>
+
+  <div class="aisle-actions">
+    <button class="btn btn-check" onclick="checkExercise('ex9')">Проверить</button>
+    <button class="btn btn-answers" onclick="toggleAnswers('ex9')">Показать ответы</button>
+    <span class="aisle-result" id="ex9-result"></span>
+  </div>
+  <div class="answer-reveal" id="ex9-answers"></div>
+</section>
+
+<!-- ================= PERSONAL QUESTIONS ================= -->
+<section class="aisle" id="ex10">
+  <span class="aisle-num">Упр. 10</span>
+  <h2>About you</h2>
+  <p class="task-hint">Личные вопросы — готового ответа нет, ответьте о себе своими словами.</p>
+
+  <div id="ex8b-rows"></div>
+  <div class="aisle-actions">
+    <button class="btn btn-answers" onclick="toggleAnswers('ex8b')">Показать примеры ответов</button>
+  </div>
+  <div class="answer-reveal" id="ex8b-answers"></div>
+</section>
+
+</main>
+
+<footer>Grocery English · сделано для практики quantifiers и лексики похода по магазину 🛒</footer>
+
+<script>
+/* ============================================================
+   DATA
+   ============================================================ */
+
+const vocab = [
+  {en:"a plenty of", ru:["очень много","больше чем a lot of","очень много (больше чем a lot of)"]},
+  {en:"grocery shopping", ru:["поход за продуктами","поход в магазин за продуктами"]},
+  {en:"plan ahead", ru:["планировать заранее"]},
+  {en:"produce section", ru:["отдел овощей и фруктов","овощной отдел"]},
+  {en:"several bunches of spinach", ru:["несколько пучков шпината"]},
+  {en:"a few heads of broccoli", ru:["несколько кочанов брокколи"]},
+  {en:"a bunch of bananas", ru:["гроздь бананов","связка бананов"]},
+  {en:"a moderate amount of meat", ru:["умеренное количество мяса"]},
+  {en:"chicken breast", ru:["куриная грудка"]},
+  {en:"dairy section", ru:["молочный отдел"]},
+  {en:"a tub of Greek yogurt", ru:["баночка греческого йогурта","упаковка греческого йогурта"]},
+  {en:"grains", ru:["крупы","зерновые"]},
+  {en:"whole-grain bread", ru:["хлеб из цельного зерна","цельнозерновой хлеб"]},
+  {en:"processed foods", ru:["обработанные продукты","переработанные продукты"]}
+];
+
+// letters-exercise: word, blanked pattern (use _ for missing), answer
+const lettersEx = [
+  {shown:"gr_c_ry sh_pp_ng", answer:"grocery shopping"},
+  {shown:"pl_n _h_ _d", answer:"plan ahead"},
+  {shown:"pr_d_ce s_ct_on", answer:"produce section"},
+  {shown:"sp_n_ch", answer:"spinach"},
+  {shown:"br_cc_li", answer:"broccoli"},
+  {shown:"b_n_n_s", answer:"bananas"},
+  {shown:"m_d_r_te _m_unt", answer:"moderate amount"},
+  {shown:"ch_ck_n br_ _st", answer:"chicken breast"},
+  {shown:"d_ _ry s_ct_on", answer:"dairy section"},
+  {shown:"G_e_k y_g_rt", answer:"greek yogurt"},
+  {shown:"gr__ns", answer:"grains"},
+  {shown:"wh_le-gr_ _n br_ _d", answer:"whole-grain bread"},
+  {shown:"pr_c_ssed f__ds", answer:"processed foods"}
+];
+
+const ru2en = [
+  {ru:"планировать заранее", en:["plan ahead"]},
+  {ru:"отдел овощей и фруктов", en:["produce section"]},
+  {ru:"куриная грудка", en:["chicken breast"]},
+  {ru:"молочный отдел", en:["dairy section"]},
+  {ru:"цельнозерновой хлеб", en:["whole-grain bread","whole grain bread"]},
+  {ru:"обработанные продукты", en:["processed foods"]},
+  {ru:"гроздь бананов", en:["a bunch of bananas","bunch of bananas"]},
+  {ru:"умеренное количество мяса", en:["a moderate amount of meat","moderate amount of meat"]}
+];
+
+const definitions = [
+  {def:"A part of the supermarket where you find fruit and vegetables.", options:["produce section","dairy section","grains"], answer:"produce section"},
+  {def:"To think about and organise something before it happens.", options:["plan ahead","grocery shopping","a moderate amount"], answer:"plan ahead"},
+  {def:"A small closed container, often used for yogurt or butter.", options:["a bunch","a tub","a head"], answer:"a tub"},
+  {def:"Food that has been changed a lot from its natural state, often with added chemicals.", options:["processed foods","whole-grain bread","dairy section"], answer:"processed foods"},
+  {def:"A group of the same fruit joined together, like bananas or grapes.", options:["a bunch of","a head of","a tub of"], answer:"a bunch of"},
+  {def:"A word meaning 'not too much and not too little'.", options:["moderate","plenty","processed"], answer:"moderate"}
+];
+
+const contextBank = ["plan ahead","produce section","plenty of","a moderate amount of","dairy section","processed foods"];
+const contextEx = [
+  {stem:"I always ___ before I go shopping, so I make a list first.", answer:["plan ahead"]},
+  {stem:"You'll find fresh apples and carrots in the ___ .", answer:["produce section"]},
+  {stem:"She has ___ vegetables at home — the fridge is full.", answer:["plenty of"]},
+  {stem:"He eats ___ meat — not too much, not too little.", answer:["a moderate amount of"]},
+  {stem:"We buy milk and yogurt in the ___ .", answer:["dairy section"]},
+  {stem:"Try to avoid ___ ; fresh food is healthier.", answer:["processed foods"]}
+];
+
+const matchHalves = [
+  {left:"a bunch of", options:["bananas","broccoli","yogurt","bread"], answer:"bananas"},
+  {left:"a tub of", options:["Greek yogurt","spinach","bananas","meat"], answer:"Greek yogurt"},
+  {left:"a few heads of", options:["broccoli","bananas","bread","yogurt"], answer:"broccoli"},
+  {left:"several bunches of", options:["spinach","chicken","bread","yogurt"], answer:"spinach"},
+  {left:"a moderate amount of", options:["meat","bananas","bread","spinach"], answer:"meat"},
+  {left:"whole-grain", options:["bread","yogurt","meat","spinach"], answer:"bread"}
+];
+
+const ex7questions = [
+  {q:"Why does she make a shopping list?", a:"Чтобы покупать только то, что нужно, и не тратить деньги впустую (to buy only what she needs and not waste money)."},
+  {q:"Where does she start shopping in the supermarket?", a:"В отделе овощей и фруктов (in the produce section)."},
+  {q:"What does she always have plenty of?", a:"Свежих овощей (fresh vegetables)."},
+  {q:"How much meat does she eat?", a:"Немного, умеренное количество (not a lot — a moderate amount)."},
+  {q:"What does she buy in the dairy section?", a:"Баночку греческого йогурта и молоко (a tub of Greek yogurt and some milk)."}
+];
+
+const mcq = [
+  {stem:"I buy", options:["a lot of","not much"], tail:"vegetables every week.", answer:"a lot of"},
+  {stem:"She has", options:["a few","plenty of"], tail:"eggs in the fridge (→ много).", answer:"plenty of"},
+  {stem:"We don't eat", options:["not much","a lot of"], tail:"junk food.", answer:"not much"},
+  {stem:"There are", options:["a few","quite a lot of"], tail:"apples on the table (→ немного).", answer:"a few"},
+  {stem:"He drinks", options:["any","not much"], tail:"coffee in the evening.", answer:"not much"}
+];
+
+const ex8bQuestions = [
+  {q:"11. Do you buy a lot of vegetables like Jessica?", a:"Открытый вопрос — ответьте о себе, например: “Yes, I buy a lot of vegetables too” / “No, I don't buy many vegetables.”"},
+  {q:"12. Do you buy a few snacks or a lot of snacks?", a:"Открытый вопрос — ответьте о себе, например: “I buy a few snacks” / “I buy a lot of snacks.”"},
+  {q:"13. What do you not buy much of?", a:"Открытый вопрос — ответьте о себе, например: “I don't buy much junk food.”"}
+];
+
+const mistakes = [
+  {wrong:"I have a few money.", answer:["i have a little money"]},
+  {wrong:"There is a lot apples.", answer:["there are a lot of apples"]},
+  {wrong:"I don't have many time.", answer:["i don't have much time","i dont have much time"]},
+  {wrong:"She has not much friends.", answer:["she doesn't have many friends","she does not have many friends"]},
+  {wrong:"We bought some breads.", answer:["we bought some bread"]}
+];
+
+/* ============================================================
+   HELPERS
+   ============================================================ */
+function normalize(s){
+  return (s||"")
+    .toLowerCase()
+    .trim()
+    .replace(/[.,!?;:"']/g,"")
+    .replace(/\s+/g," ");
+}
+
+function matchAny(value, answers){
+  const v = normalize(value);
+  return answers.some(a => normalize(a) === v);
+}
+
+const exerciseState = {}; // ex1..ex9 -> {correct, total}
+const totalExercises = 10;
+let doneExercises = new Set();
+
+function updateTotals(){
+  let correct=0, total=0;
+  Object.values(exerciseState).forEach(s=>{correct+=s.correct; total+=s.total;});
+  document.getElementById('total-score').textContent = correct + " / " + total;
+  document.getElementById('total-done').textContent = doneExercises.size + " / " + totalExercises;
+}
+
+function toggleAnswers(id){
+  const box = document.getElementById(id+'-answers');
+  box.classList.toggle('show');
+}
+
+/* ============================================================
+   BUILD EX1 — translate EN->RU
+   ============================================================ */
+(function buildEx1(){
+  const wrap = document.getElementById('ex1-rows');
+  vocab.forEach((item,i)=>{
+    const row = document.createElement('div');
+    row.className='row';
+    row.innerHTML = `
+      <span class="num">${i+1}.</span>
+      <span class="en">${item.en}</span>
+      <input type="text" class="ans" data-idx="${i}" placeholder="перевод на русском">
+      <span class="feedback-icon" id="ex1-icon-${i}"></span>
+    `;
+    wrap.appendChild(row);
+  });
+})();
+
+function checkEx1(){
+  let correct=0;
+  vocab.forEach((item,i)=>{
+    const input = document.querySelector(`#ex1-rows input[data-idx="${i}"]`);
+    const icon = document.getElementById(`ex1-icon-${i}`);
+    const ok = matchAny(input.value, item.ru);
+    input.classList.remove('correct','incorrect');
+    input.classList.add(ok?'correct':'incorrect');
+    icon.textContent = ok ? '✅' : '❌';
+    if(ok) correct++;
+  });
+  exerciseState.ex1 = {correct, total:vocab.length};
+  document.getElementById('ex1-result').innerHTML = `Результат: <b>${correct}/${vocab.length}</b>`;
+  doneExercises.add('ex1'); updateTotals();
+}
+
+function showAnswersEx1(){
+  const box = document.getElementById('ex1-answers');
+  box.innerHTML = '<b>Ответы:</b><ol>'+vocab.map(v=>`<li>${v.en} — ${v.ru[0]}</li>`).join('')+'</ol>';
+}
+
+/* ============================================================
+   BUILD EX2 — missing letters
+   ============================================================ */
+(function buildEx2(){
+  const wrap = document.getElementById('ex2-rows');
+  lettersEx.forEach((item,i)=>{
+    const row = document.createElement('div');
+    row.className='row';
+    row.innerHTML = `
+      <span class="num">${i+1}.</span>
+      <span class="en">${item.shown}</span>
+      <input type="text" class="letters ans" data-idx="${i}" placeholder="слово целиком">
+      <span class="feedback-icon" id="ex2-icon-${i}"></span>
+    `;
+    wrap.appendChild(row);
+  });
+})();
+
+function checkEx2(){
+  let correct=0;
+  lettersEx.forEach((item,i)=>{
+    const input = document.querySelector(`#ex2-rows input[data-idx="${i}"]`);
+    const icon = document.getElementById(`ex2-icon-${i}`);
+    const ok = matchAny(input.value,[item.answer]);
+    input.classList.remove('correct','incorrect');
+    input.classList.add(ok?'correct':'incorrect');
+    icon.textContent = ok ? '✅' : '❌';
+    if(ok) correct++;
+  });
+  exerciseState.ex2 = {correct, total:lettersEx.length};
+  document.getElementById('ex2-result').innerHTML = `Результат: <b>${correct}/${lettersEx.length}</b>`;
+  doneExercises.add('ex2'); updateTotals();
+}
+
+function showAnswersEx2(){
+  const box = document.getElementById('ex2-answers');
+  box.innerHTML = '<b>Ответы:</b><ol>'+lettersEx.map(v=>`<li>${v.shown} → ${v.answer}</li>`).join('')+'</ol>';
+}
+
+/* ============================================================
+   BUILD EX3 — translate RU->EN
+   ============================================================ */
+(function buildEx3(){
+  const wrap = document.getElementById('ex3-rows');
+  ru2en.forEach((item,i)=>{
+    const row = document.createElement('div');
+    row.className='row';
+    row.innerHTML = `
+      <span class="num">${i+1}.</span>
+      <span class="en">${item.ru}</span>
+      <input type="text" class="ans" data-idx="${i}" placeholder="translation in English">
+      <span class="feedback-icon" id="ex3-icon-${i}"></span>
+    `;
+    wrap.appendChild(row);
+  });
+})();
+
+function checkEx3(){
+  let correct=0;
+  ru2en.forEach((item,i)=>{
+    const input = document.querySelector(`#ex3-rows input[data-idx="${i}"]`);
+    const icon = document.getElementById(`ex3-icon-${i}`);
+    const ok = matchAny(input.value, item.en);
+    input.classList.remove('correct','incorrect');
+    input.classList.add(ok?'correct':'incorrect');
+    icon.textContent = ok ? '✅' : '❌';
+    if(ok) correct++;
+  });
+  exerciseState.ex3 = {correct, total:ru2en.length};
+  document.getElementById('ex3-result').innerHTML = `Результат: <b>${correct}/${ru2en.length}</b>`;
+  doneExercises.add('ex3'); updateTotals();
+}
+
+function showAnswersEx3(){
+  const box = document.getElementById('ex3-answers');
+  box.innerHTML = '<b>Ответы:</b><ol>'+ru2en.map(v=>`<li>${v.ru} — ${v.en[0]}</li>`).join('')+'</ol>';
+}
+
+/* ============================================================
+   BUILD EX4 — definitions (select)
+   ============================================================ */
+(function buildEx4(){
+  const wrap = document.getElementById('ex4-rows');
+  definitions.forEach((item,i)=>{
+    const row = document.createElement('div');
+    row.className='row';
+    const opts = item.options.map(o=>`<option value="${o}">${o}</option>`).join('');
+    row.innerHTML = `
+      <span class="num">${i+1}.</span>
+      <span class="stem">${item.def}</span>
+      <select class="ans" data-idx="${i}">
+        <option value="">— выберите —</option>
+        ${opts}
+      </select>
+      <span class="feedback-icon" id="ex4-icon-${i}"></span>
+    `;
+    wrap.appendChild(row);
+  });
+})();
+
+function checkEx4(){
+  let correct=0;
+  definitions.forEach((item,i)=>{
+    const sel = document.querySelector(`#ex4-rows select[data-idx="${i}"]`);
+    const icon = document.getElementById(`ex4-icon-${i}`);
+    const ok = sel.value === item.answer;
+    sel.classList.remove('correct','incorrect');
+    sel.classList.add(ok?'correct':'incorrect');
+    icon.textContent = ok ? '✅' : '❌';
+    if(ok) correct++;
+  });
+  exerciseState.ex4 = {correct, total:definitions.length};
+  document.getElementById('ex4-result').innerHTML = `Результат: <b>${correct}/${definitions.length}</b>`;
+  doneExercises.add('ex4'); updateTotals();
+}
+
+function showAnswersEx4(){
+  const box = document.getElementById('ex4-answers');
+  box.innerHTML = '<b>Ответы:</b><ol>'+definitions.map(v=>`<li>${v.def} → <b>${v.answer}</b></li>`).join('')+'</ol>';
+}
+
+/* ============================================================
+   BUILD EX5 — context fill-in
+   ============================================================ */
+(function buildEx5(){
+  const bank = document.getElementById('ex5-bank');
+  contextBank.forEach(w=>{
+    const s = document.createElement('span');
+    s.textContent = w;
+    bank.appendChild(s);
+  });
+  const wrap = document.getElementById('ex5-rows');
+  contextEx.forEach((item,i)=>{
+    const row = document.createElement('div');
+    row.className='row';
+    row.innerHTML = `
+      <span class="num">${i+1}.</span>
+      <span class="stem">${item.stem}</span>
+      <input type="text" class="ans" data-idx="${i}" placeholder="впишите слово/фразу">
+      <span class="feedback-icon" id="ex5-icon-${i}"></span>
+    `;
+    wrap.appendChild(row);
+  });
+})();
+
+function checkEx5(){
+  let correct=0;
+  contextEx.forEach((item,i)=>{
+    const input = document.querySelector(`#ex5-rows input[data-idx="${i}"]`);
+    const icon = document.getElementById(`ex5-icon-${i}`);
+    const ok = matchAny(input.value, item.answer);
+    input.classList.remove('correct','incorrect');
+    input.classList.add(ok?'correct':'incorrect');
+    icon.textContent = ok ? '✅' : '❌';
+    if(ok) correct++;
+  });
+  exerciseState.ex5 = {correct, total:contextEx.length};
+  document.getElementById('ex5-result').innerHTML = `Результат: <b>${correct}/${contextEx.length}</b>`;
+  doneExercises.add('ex5'); updateTotals();
+}
+
+function showAnswersEx5(){
+  const box = document.getElementById('ex5-answers');
+  box.innerHTML = '<b>Ответы:</b><ol>'+contextEx.map(v=>`<li>${v.stem.replace('___','<b>'+v.answer[0]+'</b>')}</li>`).join('')+'</ol>';
+}
+
+/* ============================================================
+   BUILD EX6 — match halves
+   ============================================================ */
+(function buildEx6(){
+  const wrap = document.getElementById('ex6-rows');
+  matchHalves.forEach((item,i)=>{
+    const row = document.createElement('div');
+    row.className='match-row';
+    const opts = item.options.map(o=>`<option value="${o}">${o}</option>`).join('');
+    row.innerHTML = `
+      <span class="num">${i+1}.</span>
+      <span class="match-left">${item.left} …</span>
+      <span class="match-arrow">→</span>
+      <select class="ans" data-idx="${i}">
+        <option value="">— выберите окончание —</option>
+        ${opts}
+      </select>
+      <span class="feedback-icon" id="ex6-icon-${i}"></span>
+    `;
+    wrap.appendChild(row);
+  });
+})();
+
+function checkEx6(){
+  let correct=0;
+  matchHalves.forEach((item,i)=>{
+    const sel = document.querySelector(`#ex6-rows select[data-idx="${i}"]`);
+    const icon = document.getElementById(`ex6-icon-${i}`);
+    const ok = sel.value === item.answer;
+    sel.classList.remove('correct','incorrect');
+    sel.classList.add(ok?'correct':'incorrect');
+    icon.textContent = ok ? '✅' : '❌';
+    if(ok) correct++;
+  });
+  exerciseState.ex6 = {correct, total:matchHalves.length};
+  document.getElementById('ex6-result').innerHTML = `Результат: <b>${correct}/${matchHalves.length}</b>`;
+  doneExercises.add('ex6'); updateTotals();
+}
+
+function showAnswersEx6(){
+  const box = document.getElementById('ex6-answers');
+  box.innerHTML = '<b>Ответы:</b><ol>'+matchHalves.map(v=>`<li>${v.left} … → <b>${v.answer}</b></li>`).join('')+'</ol>';
+}
+
+/* ============================================================
+   BUILD EX7 — listening comprehension (open questions)
+   ============================================================ */
+(function buildEx7(){
+  const wrap = document.getElementById('ex7-rows');
+  ex7questions.forEach((item,i)=>{
+    const row = document.createElement('div');
+    row.className='row';
+    row.style.flexDirection='column';
+    row.style.alignItems='stretch';
+    row.innerHTML = `
+      <div style="display:flex; gap:10px; align-items:baseline;">
+        <span class="num">${i+1}.</span>
+        <span class="stem">${item.q}</span>
+      </div>
+      <textarea placeholder="ваш ответ на английском…"></textarea>
+    `;
+    wrap.appendChild(row);
+  });
+})();
+
+function showAnswersEx7(){
+  const box = document.getElementById('ex7-answers');
+  box.innerHTML = '<b>Примерные ответы:</b><ol>'+ex7questions.map(v=>`<li>${v.q} — ${v.a}</li>`).join('')+'</ol>';
+}
+
+/* ============================================================
+   BUILD EX8 — MCQ + comprehension
+   ============================================================ */
+(function buildEx8(){
+  const wrap = document.getElementById('ex8-rows');
+  mcq.forEach((item,i)=>{
+    const row = document.createElement('div');
+    row.className='row';
+    row.style.flexDirection='column';
+    row.style.alignItems='stretch';
+    const btns = item.options.map(o=>`<button type="button" class="mcq-btn" data-value="${o}" onclick="selectMcq(${i}, this)">${o}</button>`).join('');
+    row.innerHTML = `
+      <div style="display:flex; gap:10px; align-items:baseline;">
+        <span class="num">${i+1}.</span>
+        <span class="stem">${item.stem} (<span style="color:var(--ink-soft)">choose</span>) ${item.tail}</span>
+      </div>
+      <div class="mcq-options" id="ex8-opts-${i}">${btns}</div>
+    `;
+    wrap.appendChild(row);
+  });
+
+  const wrap2 = document.getElementById('ex8b-rows');
+  ex8bQuestions.forEach((item)=>{
+    const row = document.createElement('div');
+    row.className='row';
+    row.style.flexDirection='column';
+    row.style.alignItems='stretch';
+    row.innerHTML = `
+      <div class="stem">${item.q}</div>
+      <textarea placeholder="ваш ответ…"></textarea>
+    `;
+    wrap2.appendChild(row);
+  });
+})();
+
+const mcqSelections = {};
+function selectMcq(i, btn){
+  mcqSelections[i] = btn.getAttribute('data-value');
+  const container = document.getElementById(`ex8-opts-${i}`);
+  container.querySelectorAll('.mcq-btn').forEach(b=>{
+    b.classList.remove('selected','correct','incorrect');
+  });
+  btn.classList.add('selected');
+}
+
+function checkEx8(){
+  let correct=0;
+  mcq.forEach((item,i)=>{
+    const container = document.getElementById(`ex8-opts-${i}`);
+    const ok = mcqSelections[i] === item.answer;
+    container.querySelectorAll('.mcq-btn').forEach(b=>{
+      b.classList.remove('correct','incorrect');
+      if(b.getAttribute('data-value') === item.answer){
+        b.classList.add('correct');
+      } else if(b.getAttribute('data-value') === mcqSelections[i] && !ok){
+        b.classList.add('incorrect');
+      }
+    });
+    if(ok) correct++;
+  });
+  exerciseState.ex8 = {correct, total:mcq.length};
+  document.getElementById('ex8-result').innerHTML = `Результат: <b>${correct}/${mcq.length}</b>`;
+  doneExercises.add('ex8'); updateTotals();
+}
+
+function showAnswersEx8(){
+  const box = document.getElementById('ex8-answers');
+  box.innerHTML = '<b>Ответы:</b><ol>'+mcq.map(v=>`<li>${v.stem} <b>${v.answer}</b> ${v.tail}</li>`).join('')+'</ol>';
+}
+
+function showAnswersEx8b(){
+  const box = document.getElementById('ex8b-answers');
+  box.innerHTML = '<b>Примерные ответы:</b><ol>'+ex8bQuestions.map(v=>`<li>${v.q} — ${v.a}</li>`).join('')+'</ol>';
+}
+
+/* ============================================================
+   BUILD EX9 — correct the mistake
+   ============================================================ */
+(function buildEx9(){
+  const wrap = document.getElementById('ex9-rows');
+  mistakes.forEach((item,i)=>{
+    const row = document.createElement('div');
+    row.className='row';
+    row.innerHTML = `
+      <span class="num">${i+1}.</span>
+      <span class="en">${item.wrong}</span>
+      <input type="text" class="ans" data-idx="${i}" placeholder="исправленное предложение">
+      <span class="feedback-icon" id="ex9-icon-${i}"></span>
+    `;
+    wrap.appendChild(row);
+  });
+})();
+
+function checkEx9(){
+  let correct=0;
+  mistakes.forEach((item,i)=>{
+    const input = document.querySelector(`#ex9-rows input[data-idx="${i}"]`);
+    const icon = document.getElementById(`ex9-icon-${i}`);
+    const ok = matchAny(input.value, item.answer);
+    input.classList.remove('correct','incorrect');
+    input.classList.add(ok?'correct':'incorrect');
+    icon.textContent = ok ? '✅' : '❌';
+    if(ok) correct++;
+  });
+  exerciseState.ex9 = {correct, total:mistakes.length};
+  document.getElementById('ex9-result').innerHTML = `Результат: <b>${correct}/${mistakes.length}</b>`;
+  doneExercises.add('ex9'); updateTotals();
+}
+
+function showAnswersEx9(){
+  const box = document.getElementById('ex9-answers');
+  box.innerHTML = '<b>Ответы:</b><ol>'+mistakes.map(v=>`<li>${v.wrong} → <b>${v.answer[0]}</b></li>`).join('')+'</ol>';
+}
+
+/* ============================================================
+   DISPATCH — generic checkExercise / toggleAnswers wiring
+   ============================================================ */
+function checkExercise(id){
+  const fns = {
+    ex1: checkEx1, ex2: checkEx2, ex3: checkEx3, ex4: checkEx4,
+    ex5: checkEx5, ex6: checkEx6, ex8: checkEx8, ex9: checkEx9
+  };
+  if(fns[id]) fns[id]();
+}
+
+const answerFns = {
+  ex1: showAnswersEx1, ex2: showAnswersEx2, ex3: showAnswersEx3, ex4: showAnswersEx4,
+  ex5: showAnswersEx5, ex6: showAnswersEx6, ex7: showAnswersEx7,
+  ex8: showAnswersEx8, ex8b: showAnswersEx8b, ex9: showAnswersEx9
+};
+
+const originalToggle = toggleAnswers;
+toggleAnswers = function(id){
+  const box = document.getElementById(id+'-answers');
+  if(!box.classList.contains('show') && answerFns[id]){
+    answerFns[id]();
+  }
+  box.classList.toggle('show');
+};
+
+updateTotals();
+</script>
+</body>
+</html>
