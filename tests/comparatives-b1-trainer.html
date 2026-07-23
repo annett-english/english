@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Comparatives · B1 Тренажёр</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500;1,9..144,600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EEF1EA;
+    --card:#FFFFFF;
+    --ink:#1B2A38;
+    --ink-soft:#5C6A76;
+    --line:#D8DCD2;
+    --more:#1F7A6C;
+    --more-soft:#DCEEE9;
+    --less:#7A4869;
+    --less-soft:#EFE1E9;
+    --amber:#E2A63B;
+    --amber-dark:#B9832A;
+    --wrong:#C1432D;
+    --wrong-soft:#F7E2DD;
+    --radius:14px;
+    --shadow:0 1px 2px rgba(27,42,56,.06), 0 8px 24px -12px rgba(27,42,56,.18);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto;}
+    *{animation:none !important; transition:none !important;}
+  }
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Space Grotesk',sans-serif;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.display{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    letter-spacing:-0.01em;
+    color:var(--ink);
+    margin:0;
+  }
+  a{color:inherit;}
+  .wrap{max-width:880px;margin:0 auto;padding:0 20px;}
+
+  /* ---------- Header / scoreboard ---------- */
+  header.top{
+    position:sticky; top:0; z-index:50;
+    background:rgba(238,241,234,.92);
+    backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--line);
+  }
+  .top-inner{
+    display:flex; align-items:center; gap:16px;
+    padding:10px 20px; max-width:880px; margin:0 auto;
+  }
+  .brand{display:flex; flex-direction:column; gap:1px; flex:1; min-width:0;}
+  .brand .name{font-size:1.05rem; font-weight:700;}
+  .brand .sub{font-size:.72rem; color:var(--ink-soft); font-family:'Space Grotesk',sans-serif;}
+  .scale-wrap{display:flex; align-items:center; gap:10px; flex-shrink:0;}
+  #scaleSvg{width:64px; height:auto; display:block;}
+  #scaleBeam{transform-origin:120px 46px; transition:transform .7s cubic-bezier(.34,1.56,.64,1);}
+  .score-box{
+    font-family:'Space Grotesk',sans-serif; font-size:.78rem; color:var(--ink-soft);
+    text-align:right; line-height:1.25;
+  }
+  .score-box b{color:var(--ink); font-size:.95rem;}
+  .reset-btn{
+    background:none; border:1px solid var(--line); color:var(--ink-soft);
+    font-family:'Space Grotesk',sans-serif; font-size:.72rem; padding:6px 10px;
+    border-radius:100px; cursor:pointer; white-space:nowrap;
+  }
+  .reset-btn:hover{border-color:var(--ink-soft); color:var(--ink);}
+
+  nav.pills{
+    display:flex; gap:6px; overflow-x:auto; padding:8px 20px 10px;
+    max-width:880px; margin:0 auto; scrollbar-width:none;
+  }
+  nav.pills::-webkit-scrollbar{display:none;}
+  nav.pills a{
+    flex-shrink:0; font-size:.74rem; font-weight:600; text-decoration:none;
+    padding:5px 12px; border-radius:100px; background:var(--card);
+    border:1px solid var(--line); color:var(--ink-soft);
+  }
+  nav.pills a:hover{border-color:var(--amber-dark); color:var(--ink);}
+
+  /* ---------- Hero ---------- */
+  .hero{padding:38px 0 18px;}
+  .hero .eyebrow{
+    font-size:.72rem; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--more); font-weight:700; margin-bottom:10px; display:block;
+  }
+  .hero h1{font-size:clamp(2.1rem,6vw,3.2rem); font-style:italic; line-height:1.02;}
+  .hero p.lead{max-width:56ch; color:var(--ink-soft); margin-top:12px; font-size:.98rem;}
+
+  /* ---------- Rule cards ---------- */
+  .rule-toggle{
+    width:100%; text-align:left; background:var(--card); border:1px solid var(--line);
+    border-radius:var(--radius); padding:14px 18px; cursor:pointer;
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:.92rem;
+    color:var(--ink); box-shadow:var(--shadow); margin-bottom:14px;
+  }
+  .rule-toggle .chev{transition:transform .3s ease; color:var(--ink-soft);}
+  .rule-toggle[aria-expanded="true"] .chev{transform:rotate(180deg);}
+  .rule-body{display:none; margin-bottom:34px;}
+  .rule-body.open{display:block;}
+  .rule-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+  @media (max-width:680px){.rule-grid{grid-template-columns:1fr;}}
+  .rule-card{
+    background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+    padding:20px; box-shadow:var(--shadow);
+  }
+  .rule-card h3{font-size:1.05rem; margin-bottom:10px; display:flex; align-items:center; gap:8px;}
+  .tag-dot{width:9px; height:9px; border-radius:50%; display:inline-block;}
+  .tag-dot.more{background:var(--more);} .tag-dot.less{background:var(--less);}
+  .rule-card ol,.rule-card ul{padding-left:18px; margin:8px 0 14px; font-size:.87rem; color:var(--ink);}
+  .rule-card li{margin-bottom:8px;}
+  .rule-card .arrow{color:var(--ink-soft); font-family:'Space Grotesk',sans-serif;}
+  .callout{
+    background:var(--paper); border-left:3px solid var(--amber); border-radius:6px;
+    padding:10px 12px; font-size:.83rem; margin:10px 0;
+  }
+  .ok{color:var(--more); font-weight:600;} .no{color:var(--wrong); font-weight:600;}
+  code.ex{background:var(--paper); padding:1px 5px; border-radius:4px; font-family:'Space Grotesk',sans-serif; font-size:.83em;}
+
+  /* ---------- Exercise cards ---------- */
+  section.exercise{margin-bottom:40px; scroll-margin-top:130px;}
+  .ex-card{
+    background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+    box-shadow:var(--shadow); overflow:hidden;
+  }
+  .ex-head{padding:20px 22px 16px; border-bottom:1px solid var(--line);}
+  .ex-eyebrow{
+    font-size:.7rem; letter-spacing:.12em; text-transform:uppercase; font-weight:700;
+    color:var(--less); display:block; margin-bottom:6px;
+  }
+  .ex-head h2{font-size:1.3rem; margin-bottom:6px;}
+  .ex-instructions{font-size:.86rem; color:var(--ink-soft); max-width:64ch;}
+  .ex-controls{
+    display:flex; align-items:center; gap:10px; flex-wrap:wrap; padding:14px 22px;
+    background:var(--paper); border-bottom:1px solid var(--line);
+  }
+  .btn{
+    font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:.82rem;
+    padding:8px 16px; border-radius:100px; cursor:pointer; border:1px solid transparent;
+  }
+  .btn-primary{background:var(--ink); color:#fff;}
+  .btn-primary:hover{background:#0f1a24;}
+  .btn-outline{background:transparent; border-color:var(--ink); color:var(--ink);}
+  .btn-outline:hover{background:var(--ink); color:#fff;}
+  .ex-score{
+    margin-left:auto; font-size:.8rem; font-weight:600; color:var(--ink-soft);
+    background:var(--card); border:1px solid var(--line); padding:5px 12px; border-radius:100px;
+  }
+  .items{padding:6px 22px 20px;}
+  .item{
+    display:flex; align-items:flex-start; gap:10px; padding:14px 0;
+    border-bottom:1px dashed var(--line); font-size:.94rem;
+  }
+  .item:last-child{border-bottom:none;}
+  .item-num{color:var(--ink-soft); font-weight:600; min-width:20px; padding-top:2px;}
+  .item-body{flex:1; min-width:0;}
+  .item-text{line-height:1.7;}
+  .item-hint{color:var(--ink-soft); font-style:italic; font-size:.85em;}
+  .gap-input{
+    font-family:'Space Grotesk',sans-serif; font-size:.95em; border:none; border-bottom:2px solid var(--amber);
+    background:var(--paper); border-radius:4px 4px 0 0; padding:2px 8px; width:150px;
+    color:var(--ink); outline:none;
+  }
+  .gap-input:focus{background:#fff; box-shadow:0 0 0 2px var(--amber);}
+  .gap-input.correct{border-bottom-color:var(--more); background:var(--more-soft);}
+  .gap-input.incorrect{border-bottom-color:var(--wrong); background:var(--wrong-soft);}
+  .result-icon{font-size:1.05rem; margin-left:6px;}
+  .reveal-answer{
+    display:none; margin-top:6px; font-size:.85em; color:var(--more); font-weight:600;
+  }
+  .items.show-answers .reveal-answer{display:block;}
+  .rewrite-wrong{
+    display:block; color:var(--wrong); font-size:.9em; margin-bottom:6px;
+  }
+  .rewrite-wrong::before{content:"⚠ "; }
+  .rewrite-input{
+    width:100%; font-family:'Space Grotesk',sans-serif; font-size:.94rem;
+    padding:8px 10px; border:1px solid var(--line); border-radius:8px; background:var(--paper);
+    color:var(--ink); outline:none;
+  }
+  .rewrite-input:focus{border-color:var(--amber); background:#fff; box-shadow:0 0 0 2px rgba(226,166,59,.35);}
+  .rewrite-input.correct{border-color:var(--more); background:var(--more-soft);}
+  .rewrite-input.incorrect{border-color:var(--wrong); background:var(--wrong-soft);}
+  .mc-options{display:flex; flex-wrap:wrap; gap:8px; margin-top:8px;}
+  .mc-option{
+    display:flex; align-items:center; gap:6px; border:1px solid var(--line); border-radius:100px;
+    padding:6px 14px; cursor:pointer; font-size:.88rem; background:var(--paper);
+  }
+  .mc-option input{accent-color:var(--ink);}
+  .mc-option.chosen{border-color:var(--ink);}
+  .mc-option.mark-correct{border-color:var(--more); background:var(--more-soft); font-weight:600;}
+  .mc-option.mark-wrong{border-color:var(--wrong); background:var(--wrong-soft);}
+  .open-textarea{
+    width:100%; min-height:56px; font-family:'Space Grotesk',sans-serif; font-size:.94rem;
+    padding:9px 12px; border:1px solid var(--line); border-radius:8px; background:var(--paper);
+    color:var(--ink); outline:none; resize:vertical;
+  }
+  .open-textarea:focus{border-color:var(--amber); background:#fff; box-shadow:0 0 0 2px rgba(226,166,59,.35);}
+  .sample-text{
+    display:none; margin-top:8px; font-size:.87em; color:var(--more); font-weight:600;
+  }
+  .items.show-samples .sample-text{display:block;}
+  .emoji-row{display:flex; gap:6px; margin-top:8px;}
+  .emoji-btn{
+    font-size:1.15rem; background:var(--paper); border:1px solid var(--line); border-radius:10px;
+    padding:4px 9px; cursor:pointer; line-height:1;
+  }
+  .emoji-btn.active{border-color:var(--amber-dark); background:#fff; box-shadow:0 0 0 2px rgba(226,166,59,.4);}
+
+  .answer-key{
+    display:none; margin:0 22px 22px; padding:16px 18px;
+    background:var(--more-soft); border:1px solid var(--more); border-radius:10px;
+  }
+  .key-title{font-weight:700; font-size:.82rem; letter-spacing:.02em; color:var(--more); margin-bottom:8px;}
+  .key-list{margin:0; padding-left:20px; font-size:.87rem; color:var(--ink); columns:1;}
+  .key-list li{margin-bottom:7px; line-height:1.45;}
+  @media (min-width:640px){ .key-list{columns:2; column-gap:24px;} .key-list li{break-inside:avoid;} }
+
+  .mood-badge{
+    font-size:.78rem; font-weight:600; color:var(--ink-soft); background:var(--card);
+    border:1px solid var(--line); padding:5px 12px; border-radius:100px; margin-left:auto;
+  }
+
+  /* ---------- Footer summary ---------- */
+  .summary{
+    background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+    box-shadow:var(--shadow); padding:26px; margin:44px 0 60px; text-align:center;
+  }
+  .summary h2{font-size:1.4rem; margin-bottom:8px;}
+  .summary p{color:var(--ink-soft); font-size:.92rem; max-width:52ch; margin:0 auto;}
+  footer.credit{text-align:center; padding:24px 20px 50px; color:var(--ink-soft); font-size:.76rem;}
+
+  @media (max-width:560px){
+    .scale-wrap{display:none;}
+    .brand .sub{display:none;}
+    .ex-controls{gap:8px;}
+    .ex-score{margin-left:0; order:3; width:100%;}
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-inner">
+    <div class="brand">
+      <span class="name">Comparatives · B1</span>
+      <span class="sub">Тренажёр по сравнительным конструкциям</span>
+    </div>
+    <div class="scale-wrap">
+      <svg id="scaleSvg" viewBox="0 0 240 160" aria-hidden="true">
+        <line x1="120" y1="46" x2="120" y2="140" stroke="var(--ink)" stroke-width="6" stroke-linecap="round"/>
+        <path d="M96 140 L144 140 L134 150 L106 150 Z" fill="var(--ink)"/>
+        <g id="scaleBeam">
+          <line x1="40" y1="46" x2="200" y2="46" stroke="var(--ink)" stroke-width="5" stroke-linecap="round"/>
+          <line x1="40" y1="46" x2="40" y2="80" stroke="var(--ink-soft)" stroke-width="2.5"/>
+          <line x1="200" y1="46" x2="200" y2="80" stroke="var(--ink-soft)" stroke-width="2.5"/>
+          <path d="M22 80 Q40 104 58 80 Z" fill="var(--more)"/>
+          <path d="M182 80 Q200 104 218 80 Z" fill="var(--less)"/>
+        </g>
+        <circle cx="120" cy="46" r="6" fill="var(--amber)"/>
+      </svg>
+    </div>
+    <div class="score-box">
+      <b id="headerScore">0 / 40</b><br>верно
+    </div>
+    <button class="reset-btn" onclick="location.reload()">Сбросить</button>
+  </div>
+  <nav class="pills">
+    <a href="#rule">Правило</a>
+    <a href="#ex1">1 · Пропуски</a>
+    <a href="#ex2">2 · Пропуски</a>
+    <a href="#ex3">3 · Ошибки</a>
+    <a href="#ex4">4 · Выбор</a>
+    <a href="#ex5">5 · Свой вариант</a>
+    <a href="#ex6">6 · Перевод</a>
+  </nav>
+</header>
+
+<div class="wrap">
+
+  <section class="hero">
+    <span class="eyebrow">Grammar · B1 · Comparatives</span>
+    <h1>Больше, меньше,<br>такой же</h1>
+    <p class="lead">Сравнительная степень прилагательных и наречий, конструкции as…as, the same as и less…than. Повтори правило, затем пройди 6 упражнений по 10 заданий — с проверкой, ответами и самооценкой по эмодзи.</p>
+  </section>
+
+  <button class="rule-toggle" id="ruleToggle" aria-expanded="true">
+    <span>📖 Открыть/скрыть правило</span>
+    <span class="chev">▾</span>
+  </button>
+
+  <div class="rule-body open" id="ruleBody">
+    <div class="rule-grid">
+      <div class="rule-card">
+        <h3><span class="tag-dot more"></span>Прилагательные</h3>
+        <p style="font-size:.87rem;">Comparative adjectives + <b>than</b> — сравниваем двух людей, места, предметы.</p>
+        <ul>
+          <li><b>Regular:</b> <span class="arrow">old → older, big → bigger, easy → easier, modern → more modern, difficult → more difficult</span></li>
+          <li><b>Irregular:</b> <span class="arrow">good → better, bad → worse, far → further / farther</span></li>
+          <li><b>Прил. на -ed (1 слог):</b> <span class="arrow">bored → more bored, stressed → more stressed, tired → more tired</span></li>
+        </ul>
+        <p style="font-size:.87rem;"><b>(not) as + adjective + as</b> — тоже способ сравнения.</p>
+        <div class="callout">
+          После <b>than</b> и <b>as</b>:<br>
+          <span class="ok">✅</span> object pronoun (me, him, her, us, them)<br>
+          <span class="ok">✅</span> subject pronoun + aux (I am, he is, we are)<br>
+          <code class="ex">She's taller than me.</code> · <code class="ex">She's taller than I am.</code><br>
+          <span class="no">❌ She's taller than I.</span>
+        </div>
+        <p style="font-size:.87rem;"><b>The same as</b> — предметы идентичны или очень похожи: <code class="ex">Her dress is the same as mine.</code></p>
+        <p style="font-size:.87rem;"><b>Less</b> (меньше) + adjective + than = менее … чем: <code class="ex">This car is less expensive than that one.</code></p>
+      </div>
+      <div class="rule-card">
+        <h3><span class="tag-dot less"></span>Наречия</h3>
+        <p style="font-size:.87rem;">Comparative adverbs — сравниваем два действия.</p>
+        <ul>
+          <li><b>Regular:</b> <span class="arrow">fast → faster, slowly → more slowly, carefully → more carefully</span></li>
+          <li><b>Irregular:</b> <span class="arrow">well → better, badly → worse</span></li>
+        </ul>
+        <p style="font-size:.87rem;"><b>(not) as + adverb + as</b> — тоже сравнение действий.</p>
+        <p style="font-size:.87rem;"><b>Less + adverb + than</b> — сравниваем, как совершается действие:</p>
+        <div class="callout">
+          <code class="ex">She speaks less confidently than her sister.</code><br>
+          <code class="ex">He drives less carefully than his father.</code>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXERCISE 1 -->
+  <section class="exercise" id="ex1">
+    <div class="ex-card">
+      <div class="ex-head">
+        <span class="ex-eyebrow">Упражнение 01 · Заполни пропуск</span>
+        <h2>Сравнительная степень прилагательных</h2>
+        <p class="ex-instructions">Поставь прилагательное в скобках в сравнительную степень.</p>
+      </div>
+      <div class="ex-controls">
+        <button class="btn btn-primary" onclick="checkGap('ex1-items','ex1')">Проверить всё</button>
+        <button class="btn btn-outline" onclick="toggleAnswers('ex1-items')">Показать ответы</button>
+        <span class="ex-score" id="ex1-score">0 / 10</span>
+      </div>
+      <div class="items" id="ex1-items"></div>
+      <div class="answer-key" id="ex1-key"></div>
+    </div>
+  </section>
+
+  <!-- EXERCISE 2 -->
+  <section class="exercise" id="ex2">
+    <div class="ex-card">
+      <div class="ex-head">
+        <span class="ex-eyebrow">Упражнение 02 · Заполни пропуск</span>
+        <h2>Наречия, as…as, the same as, less…than</h2>
+        <p class="ex-instructions">Заполни пропуски: сравнительная степень наречия или нужное слово (as / than / the same as / less).</p>
+      </div>
+      <div class="ex-controls">
+        <button class="btn btn-primary" onclick="checkGap('ex2-items','ex2')">Проверить всё</button>
+        <button class="btn btn-outline" onclick="toggleAnswers('ex2-items')">Показать ответы</button>
+        <span class="ex-score" id="ex2-score">0 / 10</span>
+      </div>
+      <div class="items" id="ex2-items"></div>
+      <div class="answer-key" id="ex2-key"></div>
+    </div>
+  </section>
+
+  <!-- EXERCISE 3 -->
+  <section class="exercise" id="ex3">
+    <div class="ex-card">
+      <div class="ex-head">
+        <span class="ex-eyebrow">Упражнение 03 · Найди ошибку</span>
+        <h2>Исправь предложение</h2>
+        <p class="ex-instructions">В каждом предложении одна ошибка на пройденное правило. Введи исправленный вариант целиком.</p>
+      </div>
+      <div class="ex-controls">
+        <button class="btn btn-primary" onclick="checkRewrite('ex3-items','ex3')">Проверить всё</button>
+        <button class="btn btn-outline" onclick="toggleAnswers('ex3-items')">Показать ответы</button>
+        <span class="ex-score" id="ex3-score">0 / 10</span>
+      </div>
+      <div class="items" id="ex3-items"></div>
+      <div class="answer-key" id="ex3-key"></div>
+    </div>
+  </section>
+
+  <!-- EXERCISE 4 -->
+  <section class="exercise" id="ex4">
+    <div class="ex-card">
+      <div class="ex-head">
+        <span class="ex-eyebrow">Упражнение 04 · Выбери вариант</span>
+        <h2>Найди правильный вариант</h2>
+        <p class="ex-instructions">Выбери правильное слово или фразу.</p>
+      </div>
+      <div class="ex-controls">
+        <button class="btn btn-primary" onclick="checkMC('ex4-items','ex4')">Проверить всё</button>
+        <button class="btn btn-outline" onclick="toggleAnswers('ex4-items')">Показать ответы</button>
+        <span class="ex-score" id="ex4-score">0 / 10</span>
+      </div>
+      <div class="items" id="ex4-items"></div>
+      <div class="answer-key" id="ex4-key"></div>
+    </div>
+  </section>
+
+  <!-- EXERCISE 5 -->
+  <section class="exercise" id="ex5">
+    <div class="ex-card">
+      <div class="ex-head">
+        <span class="ex-eyebrow">Упражнение 05 · Свой вариант</span>
+        <h2>Составь своё предложение</h2>
+        <p class="ex-instructions">Напиши свой пример на каждую конструкцию. Затем открой пример-образец, сравни и оцени себя эмодзи.</p>
+      </div>
+      <div class="ex-controls">
+        <button class="btn btn-outline" onclick="toggleSamples('ex5-items')">Показать примеры</button>
+        <span class="mood-badge" id="ex5-mood">Самооценка: —</span>
+      </div>
+      <div class="items" id="ex5-items"></div>
+    </div>
+  </section>
+
+  <!-- EXERCISE 6 -->
+  <section class="exercise" id="ex6">
+    <div class="ex-card">
+      <div class="ex-head">
+        <span class="ex-eyebrow">Упражнение 06 · Перевод</span>
+        <h2>Смешанный обзор: переведи на английский</h2>
+        <p class="ex-instructions">Переведи предложения, используя грамматику урока. Открой ответ и оцени себя эмодзи.</p>
+      </div>
+      <div class="ex-controls">
+        <button class="btn btn-outline" onclick="toggleSamples('ex6-items')">Показать ответы</button>
+        <span class="mood-badge" id="ex6-mood">Самооценка: —</span>
+      </div>
+      <div class="items" id="ex6-items"></div>
+    </div>
+  </section>
+
+  <div class="summary">
+    <h2 id="summaryTitle">Пройди упражнения 1–4, чтобы увидеть результат</h2>
+    <p id="summaryText">Результат появится здесь после того, как ты нажмёшь «Проверить всё» хотя бы в одном упражнении.</p>
+  </div>
+
+</div>
+
+<footer class="credit">Comparatives · B1 · интерактивный тренажёр для практики грамматики</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  function norm(s){
+    return String(s).toLowerCase().trim()
+      .replace(/’/g,"'")
+      .replace(/[.!?,;:]+$/,'')
+      .replace(/\s+/g,' ');
+  }
+
+  /* ================= DATA ================= */
+
+  var EX1 = [
+    {html:"This bridge is much __B0__ than the old one.", hint:"(long)", answers:[["longer"]], full:"This bridge is much longer than the old one."},
+    {html:"I think History is __B0__ than Chemistry.", hint:"(interesting)", answers:[["more interesting"]], full:"I think History is more interesting than Chemistry."},
+    {html:"My grades this term are __B0__ than last term.", hint:"(good)", answers:[["better"]], full:"My grades this term are better than last term."},
+    {html:"The traffic today is __B0__ than yesterday.", hint:"(bad)", answers:[["worse"]], full:"The traffic today is worse than yesterday."},
+    {html:"Their new office is __B0__ than the previous one.", hint:"(modern)", answers:[["more modern"]], full:"Their new office is more modern than the previous one."},
+    {html:"This exercise is __B0__ than the last one.", hint:"(easy)", answers:[["easier"]], full:"This exercise is easier than the last one."},
+    {html:"He lives __B0__ from the city centre than we do.", hint:"(far)", answers:[["further","farther"]], full:"He lives further / farther from the city centre than we do."},
+    {html:"I feel __B0__ now than I did this morning.", hint:"(tired)", answers:[["more tired"]], full:"I feel more tired now than I did this morning."},
+    {html:"This laptop is __B0__ than my old one.", hint:"(light)", answers:[["lighter"]], full:"This laptop is lighter than my old one."},
+    {html:"Her second novel was __B0__ to write than her first.", hint:"(difficult)", answers:[["more difficult"]], full:"Her second novel was more difficult to write than her first."}
+  ];
+
+  var EX2 = [
+    {html:"She reacted __B0__ than I expected.", hint:"(calm)", answers:[["more calmly"]], full:"She reacted more calmly than I expected."},
+    {html:"He runs __B0__ than anyone else in the team.", hint:"(fast)", answers:[["faster"]], full:"He runs faster than anyone else in the team."},
+    {html:"My grandmother cooks __B0__ than my mother.", hint:"(well)", answers:[["better"]], full:"My grandmother cooks better than my mother."},
+    {html:"He behaved __B0__ than his brother at the party.", hint:"(bad)", answers:[["worse"]], full:"He behaved worse than his brother at the party."},
+    {html:"Please explain it __B0__ than before — I didn't understand anything.", hint:"(slow)", answers:[["more slowly","slower"]], full:"Please explain it more slowly than before — I didn't understand anything."},
+    {html:"This exercise isn't as __B0__ as the previous one.", hint:"(difficult)", answers:[["difficult"]], full:"This exercise isn't as difficult as the previous one."},
+    {html:"Her flat is __B0__ mine — we bought them in the same building.", hint:"", answers:[["the same as"]], full:"Her flat is the same as mine — we bought them in the same building."},
+    {html:"He doesn't drive as __B0__ as his sister.", hint:"(careful)", answers:[["carefully"]], full:"He doesn't drive as carefully as his sister."},
+    {html:"This bag is __B0__ expensive __B1__ that one, so I'll buy this one.", hint:"", answers:[["less"],["than"]], full:"This bag is less expensive than that one, so I'll buy this one."},
+    {html:"She speaks Spanish __B0__ confidently __B1__ her brother, who lived in Madrid for years.", hint:"", answers:[["less"],["than"]], full:"She speaks Spanish less confidently than her brother, who lived in Madrid for years."}
+  ];
+
+  var EX3 = [
+    {wrong:"She is more tall than her sister.", answers:["she is taller than her sister"], full:"She is taller than her sister."},
+    {wrong:"This phone is same as yours.", answers:["this phone is the same as yours"], full:"This phone is the same as yours."},
+    {wrong:"He is more good at football than me.", answers:["he is better at football than me"], full:"He is better at football than me."},
+    {wrong:"My homework is more easy than yours.", answers:["my homework is easier than yours"], full:"My homework is easier than yours."},
+    {wrong:"She's taller than I.", answers:["she's taller than me","she is taller than me","she's taller than i am","she is taller than i am"], full:"She's taller than me. (или She's taller than I am.)"},
+    {wrong:"This car is less expensiver than that one.", answers:["this car is less expensive than that one"], full:"This car is less expensive than that one."},
+    {wrong:"He drives more careful than his father.", answers:["he drives more carefully than his father"], full:"He drives more carefully than his father."},
+    {wrong:"He lives more far than us.", answers:["he lives further than us","he lives farther than us"], full:"He lives further / farther than us."},
+    {wrong:"She sings more better than her brother.", answers:["she sings better than her brother"], full:"She sings better than her brother."},
+    {wrong:"They aren't as busy than us.", answers:["they aren't as busy as us","they are not as busy as us"], full:"They aren't as busy as us."}
+  ];
+
+  var EX4 = [
+    {q:"She is taller than ___.", opts:["I","me","my"], correct:1},
+    {q:"This dress is ___ as mine.", opts:["same","the same","more same"], correct:1},
+    {q:"He is ___ at tennis than his brother.", opts:["gooder","more good","better"], correct:2},
+    {q:"This flat is ___ expensive than ours.", opts:["less","more less","as less"], correct:0},
+    {q:"My results are not as good ___ hers.", opts:["than","as","that"], correct:1},
+    {q:"He drives ___ than his father.", opts:["carefuller","more careful","more carefully"], correct:2},
+    {q:"This test is far ___ than the last one.", opts:["difficult","more difficult","most difficult"], correct:1},
+    {q:"They aren't as busy ___ us.", opts:["than","as","so"], correct:1},
+    {q:"I think Biology is ___ than Chemistry.", opts:["interesting","more interesting","interestinger"], correct:1},
+    {q:"She speaks French ___ confidently than her sister.", opts:["less","least","more less"], correct:0}
+  ];
+
+  var EX5 = [
+    {p:"Сравни два города (свой родной и любой другой), используя сравнительную степень прилагательного, например big/busy/old.", sample:"My home city is smaller than London, but it's much quieter."},
+    {p:"Сравни себя и кого-то из семьи, используя (not) as + adjective + as.", sample:"I'm not as tall as my older brother."},
+    {p:"Напиши предложение про скорость/манеру действия, используя сравнительное наречие (faster / more carefully / more slowly).", sample:"My dad drives more carefully than my mum."},
+    {p:"Сравни двух людей, используя неправильное сравнительное прилагательное good/bad (better/worse).", sample:"My cooking is worse than my grandmother's."},
+    {p:"Составь предложение с конструкцией the same as.", sample:"My backpack is the same as my classmate's."},
+    {p:"Составь предложение с less + adjective + than.", sample:"This app is less complicated than the old one."},
+    {p:"Составь предложение с less + adverb + than.", sample:"He replies to emails less quickly than his colleague."},
+    {p:"Сравни двух людей, используя than + местоимение в объектном падеже (me/him/her/us/them).", sample:"She is more patient than him."},
+    {p:"Сравни двух людей, используя than + подлежащее + вспомогательный глагол (I am / he is / we are).", sample:"He is more confident than she is."},
+    {p:"Напиши о себе: как ты делаешь что-то сейчас по сравнению с прошлым, используя сравнительное наречие.", sample:"I speak English more confidently than I did a year ago."}
+  ];
+
+  var EX6 = [
+    {p:"Этот дом дороже, чем тот.", sample:"This house is more expensive than that one."},
+    {p:"Она поёт лучше, чем её сестра.", sample:"She sings better than her sister."},
+    {p:"Эта сумка не такая тяжёлая, как та.", sample:"This bag isn't as heavy as that one."},
+    {p:"Его телефон такой же, как мой.", sample:"His phone is the same as mine."},
+    {p:"Эта машина менее удобная, чем та.", sample:"This car is less comfortable than that one."},
+    {p:"Он бегает быстрее, чем я.", sample:"He runs faster than me. (или than I do)"},
+    {p:"Мы живём дальше от центра, чем они.", sample:"We live further from the centre than they do. (или farther)"},
+    {p:"Она объясняет менее подробно, чем учитель.", sample:"She explains less thoroughly than the teacher."},
+    {p:"Этот тест сложнее, чем предыдущий.", sample:"This test is more difficult than the previous one."},
+    {p:"Я устал(а) больше, чем вчера.", sample:"I'm more tired than I was yesterday."}
+  ];
+
+  /* ================= RENDER ================= */
+
+  function renderGap(containerId, items){
+    var container = document.getElementById(containerId);
+    items.forEach(function(item, i){
+      var row = document.createElement('div'); row.className = 'item';
+      var num = document.createElement('span'); num.className = 'item-num'; num.textContent = (i+1) + '.';
+      row.appendChild(num);
+
+      var body = document.createElement('div'); body.className = 'item-body';
+      var textSpan = document.createElement('span'); textSpan.className = 'item-text';
+      var parts = item.html.split(/(__B\d__)/g);
+      var blankIdx = 0;
+      parts.forEach(function(seg){
+        var m = seg.match(/__B(\d)__/);
+        if(m){
+          var input = document.createElement('input');
+          input.type = 'text'; input.className = 'gap-input'; input.autocomplete = 'off'; input.spellcheck = false;
+          input.dataset.answers = JSON.stringify(item.answers[blankIdx]);
+          textSpan.appendChild(input);
+          blankIdx++;
+        } else if(seg){
+          textSpan.appendChild(document.createTextNode(seg));
+        }
+      });
+      if(item.hint){
+        var hint = document.createElement('span'); hint.className = 'item-hint';
+        hint.textContent = ' ' + item.hint;
+        textSpan.appendChild(hint);
+      }
+      body.appendChild(textSpan);
+
+      var reveal = document.createElement('div'); reveal.className = 'reveal-answer';
+      reveal.textContent = '✅ ' + item.full;
+      body.appendChild(reveal);
+
+      row.appendChild(body);
+      var icon = document.createElement('span'); icon.className = 'result-icon';
+      row.appendChild(icon);
+      container.appendChild(row);
+    });
+  }
+
+  function renderRewrite(containerId, items){
+    var container = document.getElementById(containerId);
+    items.forEach(function(item, i){
+      var row = document.createElement('div'); row.className = 'item';
+      var num = document.createElement('span'); num.className = 'item-num'; num.textContent = (i+1) + '.';
+      row.appendChild(num);
+
+      var body = document.createElement('div'); body.className = 'item-body';
+      var wrongEl = document.createElement('span'); wrongEl.className = 'rewrite-wrong';
+      wrongEl.textContent = item.wrong;
+      body.appendChild(wrongEl);
+
+      var input = document.createElement('input');
+      input.type = 'text'; input.className = 'rewrite-input'; input.autocomplete = 'off';
+      input.placeholder = 'Введи исправленный вариант…';
+      input.dataset.answers = JSON.stringify(item.answers);
+      body.appendChild(input);
+
+      var reveal = document.createElement('div'); reveal.className = 'reveal-answer';
+      reveal.textContent = '✅ ' + item.full;
+      body.appendChild(reveal);
+
+      row.appendChild(body);
+      var icon = document.createElement('span'); icon.className = 'result-icon';
+      row.appendChild(icon);
+      container.appendChild(row);
+    });
+  }
+
+  function renderMC(containerId, items){
+    var container = document.getElementById(containerId);
+    items.forEach(function(item, i){
+      var row = document.createElement('div'); row.className = 'item';
+      var num = document.createElement('span'); num.className = 'item-num'; num.textContent = (i+1) + '.';
+      row.appendChild(num);
+
+      var body = document.createElement('div'); body.className = 'item-body';
+      var qEl = document.createElement('div'); qEl.className = 'item-text'; qEl.textContent = item.q;
+      body.appendChild(qEl);
+
+      var opts = document.createElement('div'); opts.className = 'mc-options';
+      opts.dataset.correct = item.correct;
+      item.opts.forEach(function(optText, oi){
+        var label = document.createElement('label'); label.className = 'mc-option';
+        var radio = document.createElement('input');
+        radio.type = 'radio'; radio.name = containerId + '-q' + i; radio.value = oi;
+        radio.addEventListener('change', function(){
+          opts.querySelectorAll('.mc-option').forEach(function(l){ l.classList.remove('chosen'); });
+          label.classList.add('chosen');
+        });
+        var span = document.createElement('span'); span.textContent = optText;
+        label.appendChild(radio); label.appendChild(span);
+        opts.appendChild(label);
+      });
+      body.appendChild(opts);
+
+      var reveal = document.createElement('div'); reveal.className = 'reveal-answer';
+      reveal.textContent = '✅ ' + item.opts[item.correct];
+      body.appendChild(reveal);
+
+      row.appendChild(body);
+      var icon = document.createElement('span'); icon.className = 'result-icon';
+      row.appendChild(icon);
+      container.appendChild(row);
+    });
+  }
+
+  function renderOpen(containerId, items, moodKey){
+    var container = document.getElementById(containerId);
+    items.forEach(function(item, i){
+      var row = document.createElement('div'); row.className = 'item';
+      var num = document.createElement('span'); num.className = 'item-num'; num.textContent = (i+1) + '.';
+      row.appendChild(num);
+
+      var body = document.createElement('div'); body.className = 'item-body';
+      var pEl = document.createElement('div'); pEl.className = 'item-text'; pEl.textContent = item.p;
+      body.appendChild(pEl);
+
+      var ta = document.createElement('textarea');
+      ta.className = 'open-textarea'; ta.placeholder = 'Твой вариант…';
+      body.appendChild(ta);
+
+      var sample = document.createElement('div'); sample.className = 'sample-text';
+      sample.textContent = '💡 ' + item.sample;
+      body.appendChild(sample);
+
+      var emojiRow = document.createElement('div'); emojiRow.className = 'emoji-row';
+      var faces = ['😕','😐','🙂','🤩'];
+      faces.forEach(function(f, vi){
+        var b = document.createElement('button');
+        b.type = 'button'; b.className = 'emoji-btn'; b.textContent = f;
+        b.addEventListener('click', function(){
+          emojiRow.querySelectorAll('.emoji-btn').forEach(function(x){ x.classList.remove('active'); });
+          b.classList.add('active');
+          recordMood(moodKey, vi + 1);
+        });
+        emojiRow.appendChild(b);
+      });
+      body.appendChild(emojiRow);
+
+      row.appendChild(body);
+      container.appendChild(row);
+    });
+  }
+
+  /* ================= CHECK / REVEAL ================= */
+
+  var results = {ex1:{c:0,t:0}, ex2:{c:0,t:0}, ex3:{c:0,t:0}, ex4:{c:0,t:0}};
+  var checkedAny = {ex1:false, ex2:false, ex3:false, ex4:false};
+
+  function checkGap(containerId, key){
+    var container = document.getElementById(containerId);
+    var rows = container.querySelectorAll('.item');
+    var correct = 0, total = rows.length;
+    rows.forEach(function(row){
+      var inputs = row.querySelectorAll('.gap-input');
+      var ok = true;
+      inputs.forEach(function(inp){
+        var answers = JSON.parse(inp.dataset.answers).map(norm);
+        var good = answers.indexOf(norm(inp.value)) !== -1;
+        inp.classList.remove('correct','incorrect');
+        inp.classList.add(good ? 'correct' : 'incorrect');
+        if(!good) ok = false;
+      });
+      row.querySelector('.result-icon').textContent = ok ? '✅' : '❌';
+      if(ok) correct++;
+    });
+    finishCheck(containerId, key, correct, total);
+  }
+
+  function checkRewrite(containerId, key){
+    var container = document.getElementById(containerId);
+    var rows = container.querySelectorAll('.item');
+    var correct = 0, total = rows.length;
+    rows.forEach(function(row){
+      var input = row.querySelector('.rewrite-input');
+      var answers = JSON.parse(input.dataset.answers).map(norm);
+      var good = answers.indexOf(norm(input.value)) !== -1;
+      input.classList.remove('correct','incorrect');
+      input.classList.add(good ? 'correct' : 'incorrect');
+      row.querySelector('.result-icon').textContent = good ? '✅' : '❌';
+      if(good) correct++;
+    });
+    finishCheck(containerId, key, correct, total);
+  }
+
+  function checkMC(containerId, key){
+    var container = document.getElementById(containerId);
+    var rows = container.querySelectorAll('.item');
+    var correct = 0, total = rows.length;
+    rows.forEach(function(row){
+      var optsWrap = row.querySelector('.mc-options');
+      var correctIdx = parseInt(optsWrap.dataset.correct, 10);
+      var chosen = optsWrap.querySelector('input:checked');
+      var chosenIdx = chosen ? parseInt(chosen.value, 10) : -1;
+      var good = chosenIdx === correctIdx;
+      optsWrap.querySelectorAll('.mc-option').forEach(function(label, oi){
+        label.classList.remove('mark-correct','mark-wrong');
+        if(oi === correctIdx) label.classList.add('mark-correct');
+        else if(oi === chosenIdx) label.classList.add('mark-wrong');
+      });
+      row.querySelector('.result-icon').textContent = good ? '✅' : '❌';
+      if(good) correct++;
+    });
+    finishCheck(containerId, key, correct, total);
+  }
+
+  function finishCheck(containerId, key, correct, total){
+    results[key] = {c: correct, t: total};
+    checkedAny[key] = true;
+    document.getElementById(key + '-score').textContent = correct + ' / ' + total;
+    updateHeader();
+  }
+
+  function toggleAnswers(containerId){
+    var container = document.getElementById(containerId);
+    var show = container.classList.toggle('show-answers');
+    var key = document.getElementById(containerId.replace('-items', '-key'));
+    if(key) key.style.display = show ? 'block' : 'none';
+  }
+
+  function buildKey(id, list){
+    var el = document.getElementById(id);
+    if(!el) return;
+    var title = document.createElement('div');
+    title.className = 'key-title';
+    title.textContent = '🔑 Ключ ответов';
+    el.appendChild(title);
+    var ol = document.createElement('ol');
+    ol.className = 'key-list';
+    list.forEach(function(t){
+      var li = document.createElement('li');
+      li.textContent = t;
+      ol.appendChild(li);
+    });
+    el.appendChild(ol);
+  }
+
+  function toggleSamples(containerId){
+    var container = document.getElementById(containerId);
+    container.classList.toggle('show-samples');
+  }
+
+  /* ================= HEADER / SCALE ================= */
+
+  function updateHeader(){
+    var c = 0, t = 0, anyChecked = false;
+    ['ex1','ex2','ex3','ex4'].forEach(function(k){
+      if(checkedAny[k]){ c += results[k].c; t += results[k].t; anyChecked = true; }
+    });
+    document.getElementById('headerScore').textContent = c + ' / 40';
+
+    var pct = anyChecked ? (t ? (c / t * 100) : 0) : 50;
+    var angle = anyChecked ? ((pct - 50) / 50) * 16 : 0;
+    document.getElementById('scaleBeam').style.transform = 'rotate(' + (-angle) + 'deg)';
+
+    var summaryTitle = document.getElementById('summaryTitle');
+    var summaryText = document.getElementById('summaryText');
+    if(anyChecked){
+      var allDone = ['ex1','ex2','ex3','ex4'].every(function(k){ return checkedAny[k]; });
+      if(allDone){
+        if(pct >= 90){
+          summaryTitle.textContent = 'Отлично! ' + c + ' / 40';
+          summaryText.textContent = 'Правило усвоено уверенно. Можно переходить к упражнениям 5–6 и творческой практике.';
+        } else if(pct >= 70){
+          summaryTitle.textContent = 'Хороший результат: ' + c + ' / 40';
+          summaryText.textContent = 'Есть отдельные пробелы — загляни в раздел «Правило» и посмотри ответы там, где были ошибки.';
+        } else {
+          summaryTitle.textContent = 'Пока ' + c + ' / 40 — стоит повторить правило';
+          summaryText.textContent = 'Открой раздел «Правило» вверху страницы и разбери примеры ✅ / ❌, затем попробуй упражнения ещё раз.';
+        }
+      } else {
+        summaryTitle.textContent = 'Промежуточный результат: ' + c + ' / ' + t;
+        summaryText.textContent = 'Пройди оставшиеся упражнения 1–4, чтобы увидеть общий итог.';
+      }
+    }
+  }
+
+  /* ================= MOOD (emoji self-check) ================= */
+
+  var moods = {ex5:[], ex6:[]};
+  var moodLabels = {1:'😕 стоит повторить', 2:'😐 неплохо', 3:'🙂 хорошо', 4:'🤩 отлично'};
+
+  function recordMood(key, value){
+    moods[key].push(value);
+    var arr = moods[key];
+    var avg = arr.reduce(function(a,b){return a+b;},0) / arr.length;
+    var rounded = Math.round(avg);
+    document.getElementById(key + '-mood').textContent = 'Самооценка: ' + moodLabels[rounded] + ' (' + arr.length + '/10)';
+  }
+
+  /* ================= INIT ================= */
+
+  renderGap('ex1-items', EX1);
+  renderGap('ex2-items', EX2);
+  renderRewrite('ex3-items', EX3);
+  renderMC('ex4-items', EX4);
+  renderOpen('ex5-items', EX5, 'ex5');
+  renderOpen('ex6-items', EX6, 'ex6');
+
+  buildKey('ex1-key', EX1.map(function(i){ return i.full; }));
+  buildKey('ex2-key', EX2.map(function(i){ return i.full; }));
+  buildKey('ex3-key', EX3.map(function(i){ return i.full; }));
+  buildKey('ex4-key', EX4.map(function(i){ return i.q.replace('___', i.opts[i.correct]); }));
+
+  document.getElementById('ruleToggle').addEventListener('click', function(){
+    var body = document.getElementById('ruleBody');
+    var open = body.classList.toggle('open');
+    this.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+
+  // expose handlers used inline in HTML
+  window.checkGap = checkGap;
+  window.checkRewrite = checkRewrite;
+  window.checkMC = checkMC;
+  window.toggleAnswers = toggleAnswers;
+  window.toggleSamples = toggleSamples;
+
+})();
+</script>
+</body>
+</html>
