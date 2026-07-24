@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Casefile: Unanswered Questions — рабочий лист</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Literata:opsz,wght@6..72,400;6..72,500;6..72,600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0E1A;
+    --surface:#131829;
+    --surface2:#1A2137;
+    --line:#2A3252;
+    --text:#EDEAE0;
+    --muted:#8891AB;
+    --gold:#C9A76B;
+    --blue:#7FA8D9;
+    --good:#7FBF8F;
+    --bad:#D97A6C;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Literata', serif;
+    line-height:1.6;
+    position:relative;
+    overflow-x:hidden;
+  }
+  /* starfield */
+  body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    background-image:
+      radial-gradient(1px 1px at 20% 30%, rgba(237,234,224,0.5) 0, transparent 100%),
+      radial-gradient(1px 1px at 65% 15%, rgba(237,234,224,0.35) 0, transparent 100%),
+      radial-gradient(1.5px 1.5px at 80% 60%, rgba(201,167,107,0.4) 0, transparent 100%),
+      radial-gradient(1px 1px at 40% 80%, rgba(237,234,224,0.3) 0, transparent 100%),
+      radial-gradient(1px 1px at 10% 65%, rgba(127,168,217,0.4) 0, transparent 100%),
+      radial-gradient(1.5px 1.5px at 90% 90%, rgba(237,234,224,0.3) 0, transparent 100%),
+      radial-gradient(1px 1px at 55% 45%, rgba(201,167,107,0.3) 0, transparent 100%);
+    pointer-events:none;
+    z-index:0;
+  }
+  .wrap{
+    position:relative;
+    z-index:1;
+    max-width:760px;
+    margin:0 auto;
+    padding:64px 24px 120px;
+  }
+  header.hero{
+    margin-bottom:56px;
+    border-bottom:1px solid var(--line);
+    padding-bottom:40px;
+  }
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    color:var(--gold);
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:18px;
+  }
+  .eyebrow::before{
+    content:"";
+    width:7px;height:7px;border-radius:50%;
+    background:var(--gold);
+    box-shadow:0 0 8px var(--gold);
+  }
+  h1{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:clamp(30px,5vw,46px);
+    line-height:1.08;
+    margin:0 0 18px;
+    color:var(--text);
+  }
+  h1 em{
+    font-style:italic;
+    font-weight:500;
+    color:var(--gold);
+  }
+  .hero p{
+    color:var(--muted);
+    font-size:16px;
+    max-width:60ch;
+    margin:0 0 8px;
+  }
+  .hero-meta{
+    margin-top:22px;
+    display:flex;
+    gap:22px;
+    flex-wrap:wrap;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    color:var(--muted);
+  }
+  .hero-meta strong{color:var(--text);font-weight:500;}
+
+  section.exercise{
+    margin-bottom:64px;
+  }
+  .ex-head{
+    display:flex;
+    align-items:baseline;
+    gap:14px;
+    margin-bottom:6px;
+  }
+  .ex-num{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px;
+    color:var(--gold);
+    border:1px solid var(--line);
+    padding:3px 9px;
+    border-radius:3px;
+    white-space:nowrap;
+  }
+  .ex-title{
+    font-family:'Fraunces', serif;
+    font-size:24px;
+    font-weight:600;
+    margin:0;
+  }
+  .ex-instructions{
+    color:var(--muted);
+    font-size:15px;
+    margin:6px 0 26px;
+    max-width:62ch;
+  }
+  .bank{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px;
+    color:var(--blue);
+    background:var(--surface);
+    border:1px dashed var(--line);
+    border-radius:6px;
+    padding:12px 16px;
+    margin-bottom:24px;
+  }
+
+  .item{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:18px 20px;
+    margin-bottom:14px;
+    transition:border-color .2s ease;
+  }
+  .item.correct{border-color:var(--good);}
+  .item.incorrect{border-color:var(--bad);}
+  .item-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:14px;
+    margin-bottom:12px;
+  }
+  .q-text{
+    font-size:16px;
+    flex:1;
+  }
+  .q-text .direct{
+    font-style:italic;
+    color:var(--text);
+  }
+  .status{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--muted);
+    border:1px solid var(--line);
+    padding:2px 8px;
+    border-radius:20px;
+    white-space:nowrap;
+  }
+  .status.correct{color:var(--good);border-color:var(--good);}
+  .status.incorrect{color:var(--bad);border-color:var(--bad);}
+
+  .tf-options{display:flex;gap:10px;margin-top:8px;}
+  .tf-btn{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px;
+    background:var(--surface2);
+    color:var(--text);
+    border:1px solid var(--line);
+    border-radius:5px;
+    padding:7px 16px;
+    cursor:pointer;
+    transition:all .15s ease;
+  }
+  .tf-btn:hover{border-color:var(--gold);}
+  .tf-btn.selected{background:var(--gold);color:#1a1206;border-color:var(--gold);}
+
+  input[type=text], textarea{
+    width:100%;
+    background:var(--surface2);
+    border:1px solid var(--line);
+    border-radius:6px;
+    color:var(--text);
+    font-family:'Literata', serif;
+    font-size:15px;
+    padding:10px 12px;
+    margin-top:6px;
+    resize:vertical;
+  }
+  textarea{min-height:64px;}
+  input[type=text]:focus, textarea:focus{
+    outline:none;
+    border-color:var(--blue);
+  }
+
+  .answer-box{
+    display:none;
+    margin-top:12px;
+    padding:12px 14px;
+    background:rgba(201,167,107,.08);
+    border-left:2px solid var(--gold);
+    border-radius:0 6px 6px 0;
+    font-size:14px;
+    color:var(--text);
+  }
+  .answer-box.show{display:block;}
+  .answer-box .label{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:var(--gold);
+    display:block;
+    margin-bottom:5px;
+  }
+
+  .item-actions{
+    display:flex;
+    gap:10px;
+    margin-top:10px;
+    flex-wrap:wrap;
+  }
+  .mini-btn{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    background:transparent;
+    color:var(--muted);
+    border:1px solid var(--line);
+    border-radius:5px;
+    padding:6px 12px;
+    cursor:pointer;
+    transition:all .15s ease;
+  }
+  .mini-btn:hover{color:var(--text);border-color:var(--muted);}
+  .mini-btn.primary{color:var(--blue);border-color:var(--blue);}
+  .mini-btn.primary:hover{background:rgba(127,168,217,.1);}
+
+  .ex-footer{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-top:22px;
+    padding-top:16px;
+    border-top:1px solid var(--line);
+  }
+  .score{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px;
+    color:var(--muted);
+  }
+  .score strong{color:var(--gold);}
+  .check-all{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px;
+    background:var(--gold);
+    color:#1a1206;
+    border:none;
+    border-radius:6px;
+    padding:10px 20px;
+    cursor:pointer;
+    font-weight:600;
+    letter-spacing:.02em;
+    transition:transform .1s ease, opacity .15s ease;
+  }
+  .check-all:hover{opacity:.9;}
+  .check-all:active{transform:scale(.97);}
+
+  .personal .item{border-style:dashed;}
+  .personal .status{display:none;}
+
+  footer.end{
+    text-align:center;
+    margin-top:70px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    color:var(--muted);
+    letter-spacing:.05em;
+  }
+
+  @media (max-width:520px){
+    .wrap{padding:40px 16px 90px;}
+    .item-top{flex-direction:column;}
+    .ex-footer{flex-direction:column;gap:14px;align-items:stretch;}
+    .check-all{width:100%;}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="eyebrow">Casefile · открытые вопросы</div>
+    <h1>Questions <em>no one</em> can answer</h1>
+    <p>Рабочий лист по видео о вопросах, на которые никто не знает ответа: детские сомнения, сознание, свобода воли, Большой взрыв и инопланетяне.</p>
+    <p>Сначала посмотрите видео целиком, затем выполните упражнения. Кнопка «Проверить» оценивает ответ, «Показать ответ» открывает верный вариант.</p>
+    <div class="hero-meta">
+      <span><strong>4</strong> упражнения</span>
+      <span><strong>22</strong> вопроса</span>
+      <span>Уровень: <strong>B1–B2</strong></span>
+    </div>
+  </header>
+
+  <!-- EXERCISE 1: TRUE / FALSE -->
+  <section class="exercise" id="ex1">
+    <div class="ex-head">
+      <span class="ex-num">УПР. 1</span>
+      <h2 class="ex-title">True or False</h2>
+    </div>
+    <p class="ex-instructions">Посмотрите видео и отметьте, верно (True) или неверно (False) каждое утверждение.</p>
+
+    <div class="item" data-answer="true">
+      <div class="item-top">
+        <div class="q-text">1. At school, students usually spend their time learning the answers to questions.</div>
+        <span class="status">не проверено</span>
+      </div>
+      <div class="tf-options">
+        <button class="tf-btn" data-val="true">True</button>
+        <button class="tf-btn" data-val="false">False</button>
+      </div>
+      <div class="answer-box"><span class="label">Ответ</span>True — на типичный день в школе уходят часы на изучение ответов на вопросы.</div>
+    </div>
+
+    <div class="item" data-answer="false">
+      <div class="item-top">
+        <div class="q-text">2. As a boy, the narrator never wondered about big philosophical questions.</div>
+        <span class="status">не проверено</span>
+      </div>
+      <div class="tf-options">
+        <button class="tf-btn" data-val="true">True</button>
+        <button class="tf-btn" data-val="false">False</button>
+      </div>
+      <div class="answer-box"><span class="label">Ответ</span>False — он говорит: «I used to puzzle about a lot of things as a boy».</div>
+    </div>
+
+    <div class="item" data-answer="true">
+      <div class="item-top">
+        <div class="q-text">3. He wondered whether fish and insects can feel pain.</div>
+        <span class="status">не проверено</span>
+      </div>
+      <div class="tf-options">
+        <button class="tf-btn" data-val="true">True</button>
+        <button class="tf-btn" data-val="false">False</button>
+      </div>
+      <div class="answer-box"><span class="label">Ответ</span>True — «Do fish feel pain? How about insects?»</div>
+    </div>
+
+    <div class="item" data-answer="false">
+      <div class="item-top">
+        <div class="q-text">4. He was completely sure that God, if real, must be male.</div>
+        <span class="status">не проверено</span>
+      </div>
+      <div class="tf-options">
+        <button class="tf-btn" data-val="true">True</button>
+        <button class="tf-btn" data-val="false">False</button>
+      </div>
+      <div class="answer-box"><span class="label">Ответ</span>False — он спрашивает, откуда мы вообще знаем, что Бог — «He», а не «She».</div>
+    </div>
+
+    <div class="item" data-answer="false">
+      <div class="item-top">
+        <div class="q-text">5. Now that he is an adult, someone has finally told him all the answers.</div>
+        <span class="status">не проверено</span>
+      </div>
+      <div class="tf-options">
+        <button class="tf-btn" data-val="true">True</button>
+        <button class="tf-btn" data-val="false">False</button>
+      </div>
+      <div class="answer-box"><span class="label">Ответ</span>False — «Guess what? No one knows.» Многие вопросы мучают его теперь ещё сильнее.</div>
+    </div>
+
+    <div class="item" data-answer="true">
+      <div class="item-top">
+        <div class="q-text">6. He finds it exciting to explore questions at the edge of knowledge.</div>
+        <span class="status">не проверено</span>
+      </div>
+      <div class="tf-options">
+        <button class="tf-btn" data-val="true">True</button>
+        <button class="tf-btn" data-val="false">False</button>
+      </div>
+      <div class="answer-box"><span class="label">Ответ</span>True — «diving into them is exciting because it takes you to the edge of knowledge».
+      </div>
+    </div>
+
+    <div class="ex-footer">
+      <button class="check-all" data-target="ex1">Проверить упражнение</button>
+      <span class="score" id="score-ex1">0 / 6 правильно</span>
+    </div>
+  </section>
+
+  <!-- EXERCISE 2: VOCABULARY GAP-FILL -->
+  <section class="exercise" id="ex2">
+    <div class="ex-head">
+      <span class="ex-num">УПР. 2</span>
+      <h2 class="ex-title">Vocabulary: fill the gaps</h2>
+    </div>
+    <p class="ex-instructions">Заполните пропуски словами из рамки. Одно слово используется один раз. Введите слово и нажмите «Проверить».</p>
+    <div class="bank">puzzle · accident · innocent · conscious · edge · evidence</div>
+
+    <div class="item" data-answer="puzzle,puzzled">
+      <div class="item-top">
+        <div class="q-text">1. I used to ______ about a lot of things as a boy.</div>
+        <span class="status">не проверено</span>
+      </div>
+      <input type="text" placeholder="введите слово">
+      <div class="answer-box"><span class="label">Ответ</span>puzzle</div>
+    </div>
+
+    <div class="item" data-answer="accident">
+      <div class="item-top">
+        <div class="q-text">2. Was the Big Bang just an ______, or did it have a cause?</div>
+        <span class="status">не проверено</span>
+      </div>
+      <input type="text" placeholder="введите слово">
+      <div class="answer-box"><span class="label">Ответ</span>accident</div>
+    </div>
+
+    <div class="item" data-answer="innocent">
+      <div class="item-top">
+        <div class="q-text">3. Why do so many ______ people and animals suffer terrible things?</div>
+        <span class="status">не проверено</span>
+      </div>
+      <input type="text" placeholder="введите слово">
+      <div class="answer-box"><span class="label">Ответ</span>innocent</div>
+    </div>
+
+    <div class="item" data-answer="conscious">
+      <div class="item-top">
+        <div class="q-text">4. Why am I ______? What is consciousness?</div>
+        <span class="status">не проверено</span>
+      </div>
+      <input type="text" placeholder="введите слово">
+      <div class="answer-box"><span class="label">Ответ</span>conscious</div>
+    </div>
+
+    <div class="item" data-answer="edge">
+      <div class="item-top">
+        <div class="q-text">5. Unanswered questions take you to the ______ of knowledge.</div>
+        <span class="status">не проверено</span>
+      </div>
+      <input type="text" placeholder="введите слово">
+      <div class="answer-box"><span class="label">Ответ</span>edge</div>
+    </div>
+
+    <div class="item" data-answer="evidence">
+      <div class="item-top">
+        <div class="q-text">6. Why can't we see ______ of alien life?</div>
+        <span class="status">не проверено</span>
+      </div>
+      <input type="text" placeholder="введите слово">
+      <div class="answer-box"><span class="label">Ответ</span>evidence</div>
+    </div>
+
+    <div class="ex-footer">
+      <button class="check-all" data-target="ex2">Проверить упражнение</button>
+      <span class="score" id="score-ex2">0 / 6 правильно</span>
+    </div>
+  </section>
+
+  <!-- EXERCISE 3: DIRECT -> REPORTED (INDIRECT) QUESTIONS -->
+  <section class="exercise" id="ex3">
+    <div class="ex-head">
+      <span class="ex-num">УПР. 3</span>
+      <h2 class="ex-title">Direct → Reported questions</h2>
+    </div>
+    <p class="ex-instructions">Перепишите вопросы мальчика из видео как косвенные (reported questions). Начинайте с <em>He wondered…</em> Не забудьте: порядок слов как в утверждении, без вопросительного знака, <em>do/does/did</em> исчезает, время сдвигается назад (backshift). Нажмите «Проверить», чтобы получить обратную связь, или «Показать ответ».</p>
+
+    <div class="item" data-answer="he wondered what it would feel like to be a dog">
+      <div class="item-top">
+        <div class="q-text">1. Direct: <span class="direct">"What would it feel like to be a dog?"</span></div>
+        <span class="status">не проверено</span>
+      </div>
+      <input type="text" placeholder="He wondered ...">
+      <div class="item-actions">
+        <button class="mini-btn check-one">Проверить</button>
+        <button class="mini-btn primary show-answer">Показать ответ</button>
+      </div>
+      <div class="answer-box"><span class="label">Модельный ответ</span>He wondered what it would feel like to be a dog.</div>
+    </div>
+
+    <div class="item" data-answer="he wondered whether fish felt pain">
+      <div class="item-top">
+        <div class="q-text">2. Direct: <span class="direct">"Do fish feel pain?"</span></div>
+        <span class="status">не проверено</span>
+      </div>
+      <input type="text" placeholder="He wondered ...">
+      <div class="item-actions">
+        <button class="mini-btn check-one">Проверить</button>
+        <button class="mini-btn primary show-answer">Показать ответ</button>
+      </div>
+      <div class="answer-box"><span class="label">Модельный ответ</span>He wondered whether/if fish felt pain.</div>
+    </div>
+
+    <div class="item" data-answer="he wondered whether the big bang had been just an accident">
+      <div class="item-top">
+        <div class="q-text">3. Direct: <span class="direct">"Was the Big Bang just an accident?"</span></div>
+        <span class="status">не проверено</span>
+      </div>
+      <input type="text" placeholder="He wondered ...">
+      <div class="item-actions">
+        <button class="mini-btn check-one">Проверить</button>
+        <button class="mini-btn primary show-answer">Показать ответ</button>
+      </div>
+      <div class="answer-box"><span class="label">Модельный ответ</span>He wondered whether/if the Big Bang had been just an accident.</div>
+    </div>
+
+    <div class="item" data-answer="he wondered if there was a god">
+      <div class="item-top">
+        <div class="q-text">4. Direct: <span class="direct">"Is there a God?"</span></div>
+        <span class="status">не проверено</span>
+      </div>
+      <input type="text" placeholder="He wondered ...">
+      <div class="item-actions">
+        <button class="mini-btn check-one">Проверить</button>
+        <button class="mini-btn primary show-answer">Показать ответ</button>
+      </div>
+      <div class="answer-box"><span class="label">Модельный ответ</span>He wondered if/whether there was a God.</div>
+    </div>
+
+    <div class="item" data-answer="he wondered why so many innocent people and animals suffered terrible things">
+      <div class="item-top">
+        <div class="q-text">5. Direct: <span class="direct">"Why do so many innocent people and animals suffer terrible things?"</span></div>
+        <span class="status">не проверено</span>
+      </div>
+      <input type="text" placeholder="He wondered ...">
+      <div class="item-actions">
+        <button class="mini-btn check-one">Проверить</button>
+        <button class="mini-btn primary show-answer">Показать ответ</button>
+      </div>
+      <div class="answer-box"><span class="label">Модельный ответ</span>He wondered why so many innocent people and animals suffered terrible things.</div>
+    </div>
+
+    <div class="item" data-answer="he wondered whether he was just a biological machine">
+      <div class="item-top">
+        <div class="q-text">6. Direct: <span class="direct">"Am I just a biological machine?"</span></div>
+        <span class="status">не проверено</span>
+      </div>
+      <input type="text" placeholder="He wondered ...">
+      <div class="item-actions">
+        <button class="mini-btn check-one">Проверить</button>
+        <button class="mini-btn primary show-answer">Показать ответ</button>
+      </div>
+      <div class="answer-box"><span class="label">Модельный ответ</span>He wondered whether/if he was just a biological machine.</div>
+    </div>
+
+    <div class="ex-footer">
+      <button class="check-all" data-target="ex3">Проверить всё упражнение</button>
+      <span class="score" id="score-ex3">0 / 6 правильно</span>
+    </div>
+  </section>
+
+  <!-- EXERCISE 4: PERSONAL / DISCUSSION QUESTIONS -->
+  <section class="exercise personal" id="ex4">
+    <div class="ex-head">
+      <span class="ex-num">УПР. 4</span>
+      <h2 class="ex-title">Personal questions</h2>
+    </div>
+    <p class="ex-instructions">Ответьте на вопросы своими словами (2–3 предложения). Здесь нет «правильного» ответа — кнопка «Пример ответа» просто показывает идею для вдохновения.</p>
+
+    <div class="item">
+      <div class="item-top">
+        <div class="q-text">1. What questions did <em>you</em> puzzle about as a child?</div>
+      </div>
+      <textarea placeholder="Ваш ответ..."></textarea>
+      <div class="item-actions"><button class="mini-btn primary show-answer">Пример ответа</button></div>
+      <div class="answer-box"><span class="label">Пример</span>When I was a child, I often wondered why the sky was blue and what happened before time began.</div>
+    </div>
+
+    <div class="item">
+      <div class="item-top">
+        <div class="q-text">2. Do you think animals feel emotions the way humans do?</div>
+      </div>
+      <textarea placeholder="Ваш ответ..."></textarea>
+      <div class="item-actions"><button class="mini-btn primary show-answer">Пример ответа</button></div>
+      <div class="answer-box"><span class="label">Пример</span>I think animals feel basic emotions like fear and joy, but I'm not sure they experience them exactly like we do.</div>
+    </div>
+
+    <div class="item">
+      <div class="item-top">
+        <div class="q-text">3. Do you believe the future is already "written," or do we have free will? Why?</div>
+      </div>
+      <textarea placeholder="Ваш ответ..."></textarea>
+      <div class="item-actions"><button class="mini-btn primary show-answer">Пример ответа</button></div>
+      <div class="answer-box"><span class="label">Пример</span>I believe we have free will, because otherwise our choices and effort would have no real meaning.</div>
+    </div>
+
+    <div class="item">
+      <div class="item-top">
+        <div class="q-text">4. What does "consciousness" mean to you, in your own words?</div>
+      </div>
+      <textarea placeholder="Ваш ответ..."></textarea>
+      <div class="item-actions"><button class="mini-btn primary show-answer">Пример ответа</button></div>
+      <div class="answer-box"><span class="label">Пример</span>To me, consciousness is the ability to be aware of yourself and your own thoughts, not just to react to the world.</div>
+    </div>
+
+    <div class="item">
+      <div class="item-top">
+        <div class="q-text">5. Do you think robots could ever become conscious? Why or why not?</div>
+      </div>
+      <textarea placeholder="Ваш ответ..."></textarea>
+      <div class="item-actions"><button class="mini-btn primary show-answer">Пример ответа</button></div>
+      <div class="answer-box"><span class="label">Пример</span>Maybe one day, but right now I think robots only imitate intelligence rather than truly experiencing anything.</div>
+    </div>
+
+    <div class="item">
+      <div class="item-top">
+        <div class="q-text">6. Which of the "big questions" from the video interests you the most, and why?</div>
+      </div>
+      <textarea placeholder="Ваш ответ..."></textarea>
+      <div class="item-actions"><button class="mini-btn primary show-answer">Пример ответа</button></div>
+      <div class="answer-box"><span class="label">Пример</span>The question about alien life interests me most, because it changes how small or significant we think we are.</div>
+    </div>
+  </section>
+
+  <footer class="end">— конец рабочего листа —</footer>
+</div>
+
+<script>
+function normalize(str){
+  return str.toLowerCase()
+    .replace(/['’]/g,"")
+    .replace(/[.?!,;:]/g,"")
+    .replace(/\s+/g," ")
+    .trim();
+}
+
+// TRUE/FALSE buttons
+document.querySelectorAll('#ex1 .tf-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const item = btn.closest('.item');
+    item.querySelectorAll('.tf-btn').forEach(b=>b.classList.remove('selected'));
+    btn.classList.add('selected');
+    item.dataset.chosen = btn.dataset.val;
+  });
+});
+
+function evaluateItem(item, type){
+  const status = item.querySelector('.status');
+  let ok = null;
+
+  if(type==='tf'){
+    if(!item.dataset.chosen) return null;
+    ok = item.dataset.chosen === item.dataset.answer;
+  } else if(type==='gap'){
+    const input = item.querySelector('input[type=text]');
+    const given = normalize(input.value);
+    if(!given) return null;
+    const accepted = item.dataset.answer.split(',').map(a=>normalize(a));
+    ok = accepted.includes(given);
+  } else if(type==='reported'){
+    const input = item.querySelector('input[type=text]');
+    const given = normalize(input.value);
+    if(!given) return null;
+    // flexible check: must start with "he wondered", contain no question mark logic already stripped,
+    // and share enough key words with the model answer
+    const model = normalize(item.dataset.answer);
+    const modelWords = model.split(' ').filter(w=>!['whether','if','he','wondered'].includes(w));
+    const hits = modelWords.filter(w=>given.includes(w)).length;
+    const coverage = hits / modelWords.length;
+    const startsRight = given.startsWith('he wondered');
+    const noQMark = !item.querySelector('input').value.includes('?');
+    ok = startsRight && noQMark && coverage >= 0.7;
+  }
+
+  item.classList.remove('correct','incorrect');
+  if(ok===true){
+    item.classList.add('correct');
+    status.textContent = '✓ верно';
+    status.classList.add('correct');
+    status.classList.remove('incorrect');
+  } else if(ok===false){
+    item.classList.add('incorrect');
+    status.textContent = '✕ неверно';
+    status.classList.add('incorrect');
+    status.classList.remove('correct');
+  }
+  return ok;
+}
+
+function checkExercise(exId, type){
+  const ex = document.getElementById(exId);
+  const items = ex.querySelectorAll('.item');
+  let correct = 0, answered = 0;
+  items.forEach(item=>{
+    const res = evaluateItem(item, type);
+    if(res!==null) answered++;
+    if(res===true) correct++;
+  });
+  const scoreEl = document.getElementById('score-'+exId);
+  if(scoreEl) scoreEl.textContent = correct+' / '+items.length+' правильно';
+  return {correct, total: items.length, answered};
+}
+
+document.querySelectorAll('.check-all').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const target = btn.dataset.target;
+    const type = target==='ex1' ? 'tf' : target==='ex2' ? 'gap' : 'reported';
+    checkExercise(target, type);
+  });
+});
+
+// individual check buttons in ex3
+document.querySelectorAll('#ex3 .check-one').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const item = btn.closest('.item');
+    evaluateItem(item, 'reported');
+    const ex = document.getElementById('ex3');
+    const items = ex.querySelectorAll('.item');
+    let correct = 0;
+    items.forEach(i=>{ if(i.classList.contains('correct')) correct++; });
+    document.getElementById('score-ex3').textContent = correct+' / '+items.length+' правильно';
+  });
+});
+
+// show answer toggles
+document.querySelectorAll('.show-answer').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const box = btn.closest('.item').querySelector('.answer-box');
+    box.classList.toggle('show');
+    btn.textContent = box.classList.contains('show') ? 'Скрыть ответ' : (btn.closest('#ex4') ? 'Пример ответа' : 'Показать ответ');
+  });
+});
+</script>
+</body>
+</html>
