@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Food & Feelings — Menu of Exercises</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700;9..144,900&family=Work+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --board:#28362f;
+    --board-2:#324338;
+    --cream:#faf3e4;
+    --card:#fffdf8;
+    --mustard:#d9a441;
+    --mustard-dark:#b8842a;
+    --sage:#6b8f71;
+    --clay:#c1613f;
+    --ink:#2b2b26;
+    --chalk:#efe7d3;
+    --correct:#5c8a5c;
+    --correct-bg:#e6f1e2;
+    --incorrect:#b5533c;
+    --incorrect-bg:#fbe8e2;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--cream);
+    font-family:'Work Sans', sans-serif;
+    color:var(--ink);
+    padding-bottom:80px;
+  }
+  header.board{
+    background:
+      radial-gradient(circle at 15% 20%, rgba(255,255,255,0.03), transparent 40%),
+      linear-gradient(180deg, var(--board), var(--board-2));
+    color:var(--chalk);
+    padding:56px 24px 64px;
+    text-align:center;
+    position:relative;
+    border-bottom:6px solid var(--mustard);
+  }
+  header.board::after{
+    content:"";
+    position:absolute;
+    bottom:-6px; left:0; right:0;
+    height:6px;
+  }
+  header.board h1{
+    font-family:'Fraunces', serif;
+    font-weight:900;
+    font-size:clamp(2rem, 5vw, 3.4rem);
+    margin:0 0 10px;
+    letter-spacing:0.5px;
+  }
+  header.board p.sub{
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.85rem;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    color:var(--mustard);
+    margin:0;
+  }
+  header.board p.desc{
+    max-width:560px;
+    margin:18px auto 0;
+    font-size:0.98rem;
+    line-height:1.5;
+    color:#d8d0bd;
+  }
+
+  nav.menu{
+    max-width:920px;
+    margin:-32px auto 40px;
+    background:var(--card);
+    border-radius:14px;
+    box-shadow:0 12px 30px rgba(40,54,47,0.18);
+    padding:18px 22px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px 14px;
+    justify-content:center;
+    position:relative;
+    z-index:2;
+  }
+  nav.menu a{
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.78rem;
+    color:var(--board);
+    text-decoration:none;
+    border:1px solid #d8cdb0;
+    padding:6px 10px;
+    border-radius:20px;
+    transition:all .15s ease;
+    white-space:nowrap;
+  }
+  nav.menu a:hover{ background:var(--mustard); border-color:var(--mustard); color:#fff; }
+
+  main{ max-width:920px; margin:0 auto; padding:0 18px; }
+
+  .exercise{
+    background:var(--card);
+    border-radius:16px;
+    padding:30px 28px 26px;
+    margin-bottom:36px;
+    box-shadow:0 4px 18px rgba(40,54,47,0.08);
+    border-left:6px solid var(--sage);
+    position:relative;
+  }
+  .exercise.script{ border-left-color:var(--clay); }
+
+  .ex-eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.72rem;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    color:var(--sage);
+  }
+  .exercise.script .ex-eyebrow{ color:var(--clay); }
+
+  .exercise h2{
+    font-family:'Fraunces', serif;
+    font-size:1.5rem;
+    margin:2px 0 6px;
+    font-weight:700;
+  }
+  .exercise p.instructions{
+    margin:0 0 18px;
+    color:#5c584e;
+    font-size:0.94rem;
+    line-height:1.5;
+  }
+
+  .item{
+    margin-bottom:14px;
+    padding:12px 14px;
+    background:#fbf8f0;
+    border-radius:10px;
+    line-height:1.7;
+    font-size:0.98rem;
+  }
+  .item .num{
+    font-family:'JetBrains Mono', monospace;
+    color:var(--mustard-dark);
+    font-weight:600;
+    margin-right:6px;
+  }
+  .item input[type="text"]{
+    border:none;
+    border-bottom:2px solid #cdbf9c;
+    background:transparent;
+    font-family:'Work Sans', sans-serif;
+    font-size:0.97rem;
+    padding:3px 6px;
+    min-width:150px;
+    outline:none;
+    color:var(--ink);
+  }
+  .item input[type="text"]:focus{ border-bottom-color:var(--mustard-dark); }
+  .item select{
+    font-family:'Work Sans', sans-serif;
+    font-size:0.94rem;
+    padding:4px 6px;
+    border-radius:6px;
+    border:2px solid #cdbf9c;
+    background:#fff;
+    color:var(--ink);
+  }
+  .item.correct{ background:var(--correct-bg); }
+  .item.incorrect{ background:var(--incorrect-bg); }
+  input.correct, select.correct{ border-bottom-color:var(--correct); color:var(--correct); font-weight:600; }
+  input.incorrect, select.incorrect{ border-bottom-color:var(--incorrect); }
+
+  .defs-list{
+    background:#f2ebd9;
+    border-radius:10px;
+    padding:14px 18px;
+    margin-bottom:18px;
+    font-size:0.92rem;
+    line-height:1.8;
+  }
+  .defs-list strong{ font-family:'JetBrains Mono', monospace; color:var(--mustard-dark); }
+
+  .ex-controls{
+    margin-top:20px;
+    display:flex;
+    gap:10px;
+    align-items:center;
+    flex-wrap:wrap;
+  }
+  button{
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.78rem;
+    letter-spacing:0.5px;
+    text-transform:uppercase;
+    padding:9px 16px;
+    border-radius:22px;
+    border:none;
+    cursor:pointer;
+    transition:transform .1s ease, box-shadow .1s ease;
+  }
+  button:active{ transform:scale(0.96); }
+  .btn-check{ background:var(--sage); color:#fff; }
+  .btn-show{ background:var(--mustard); color:#fff; }
+  .btn-copy{ background:var(--board); color:var(--chalk); }
+  .exercise.script .btn-check{ background:var(--clay); }
+  .score{
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.82rem;
+    color:#5c584e;
+  }
+  .hint{
+    display:none;
+    margin-top:6px;
+    font-size:0.87rem;
+    color:var(--sage);
+    font-style:italic;
+  }
+  .hint.show{ display:block; }
+
+  .script-box{
+    background:#f2ebd9;
+    border-radius:10px;
+    padding:14px 18px;
+    margin-bottom:18px;
+    font-size:0.88rem;
+    line-height:1.6;
+    color:#6a6555;
+  }
+  .script-box em{ color:var(--clay); }
+
+  .copy-flash{
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.78rem;
+    color:var(--sage);
+    opacity:0;
+    transition:opacity .3s ease;
+  }
+  .copy-flash.show{ opacity:1; }
+
+  footer{
+    text-align:center;
+    color:#a89f88;
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.75rem;
+    padding:30px 0 10px;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    button{ transition:none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="board">
+  <p class="sub">Vocabulary Menu · Food & Feelings</p>
+  <h1>10 блюд для отработки лексики</h1>
+  <p class="desc">Топпинги, начинки, аллергии и непереносимости, готовая еда на вынос — плюс два упражнения по аудио-скрипту. Проверяй себя или сразу смотри ответы.</p>
+</header>
+
+<nav class="menu">
+  <a href="#ex1">1. Буквы</a>
+  <a href="#ex2">2. Перевод</a>
+  <a href="#ex3">3. Дефиниции</a>
+  <a href="#ex4">4. Ошибки</a>
+  <a href="#ex5">5. Сочетаемость</a>
+  <a href="#ex6">6. Контекст</a>
+  <a href="#ex7">7. Половинки</a>
+  <a href="#ex8">8. Свои идеи</a>
+  <a href="#ex9">9. Скрипт: слова</a>
+  <a href="#ex10">10. Скрипт: фразы</a>
+</nav>
+
+<main>
+
+<!-- EXERCISE 1 -->
+<section class="exercise" id="ex1">
+  <p class="ex-eyebrow">Упражнение 1 / Spelling</p>
+  <h2>Вставь пропущенные буквы</h2>
+  <p class="instructions">Впиши слово полностью.</p>
+
+  <div class="item"><span class="num">1.</span>Ice cream is delicious with a chocolate <strong>t_pp_ng</strong>. <input type="text" data-answer="topping"></div>
+  <div class="item"><span class="num">2.</span>My favourite pie has an apple <strong>f_ll_ng</strong>. <input type="text" data-answer="filling"></div>
+  <div class="item"><span class="num">3.</span>When I'm sad, chocolate helps me <strong>ch__r</strong> myself up. <input type="text" data-answer="cheer"></div>
+  <div class="item"><span class="num">4.</span>My sister is <strong>all_rg_c</strong> to cats. <input type="text" data-answer="allergic"></div>
+  <div class="item"><span class="num">5.</span>He is <strong>int_l_rant</strong> to dairy products. <input type="text" data-answer="intolerant"></div>
+  <div class="item"><span class="num">6.</span>We often buy <strong>r_ady-m_de</strong> meals from the supermarket. <input type="text" data-answer="ready-made|ready made"></div>
+  <div class="item"><span class="num">7.</span>Last night we ordered <strong>t_ke-away</strong> food. <input type="text" data-answer="take-away|take away|takeaway"></div>
+  <div class="item"><span class="num">8.</span>Bread contains <strong>gl_ten</strong>. <input type="text" data-answer="gluten"></div>
+
+  <div class="ex-controls">
+    <button class="btn-check" onclick="checkExercise('ex1')">Проверить</button>
+    <button class="btn-show" onclick="showAnswers('ex1')">Показать ответы</button>
+    <span class="score" id="ex1-score"></span>
+  </div>
+</section>
+
+<!-- EXERCISE 2 -->
+<section class="exercise" id="ex2">
+  <p class="ex-eyebrow">Упражнение 2 / Translation</p>
+  <h2>Переведи с русского на английский</h2>
+  <p class="instructions">Пиши по-английски. Для фраз-предложений допустимо несколько вариантов.</p>
+
+  <div class="item"><span class="num">1.</span>начинка (для пирога) — <input type="text" data-answer="filling"></div>
+  <div class="item"><span class="num">2.</span>посыпка / топпинг (для пиццы) — <input type="text" data-answer="topping"></div>
+  <div class="item"><span class="num">3.</span>поднимать себе настроение — <input type="text" data-answer="cheer yourself up|cheer up|cheer myself up"></div>
+  <div class="item"><span class="num">4.</span>У меня аллергия на орехи. — <input type="text" data-answer="i'm allergic to nuts|i am allergic to nuts|i have an allergy to nuts" style="min-width:260px;"></div>
+  <div class="item"><span class="num">5.</span>У него непереносимость лактозы. — <input type="text" data-answer="he is intolerant to lactose|he has an intolerance to lactose" style="min-width:260px;"></div>
+  <div class="item"><span class="num">6.</span>готовая еда — <input type="text" data-answer="ready-made food|ready made food"></div>
+  <div class="item"><span class="num">7.</span>еда на вынос — <input type="text" data-answer="take-away food|takeaway food|take away food"></div>
+  <div class="item"><span class="num">8.</span>глютен — <input type="text" data-answer="gluten"></div>
+
+  <div class="ex-controls">
+    <button class="btn-check" onclick="checkExercise('ex2')">Проверить</button>
+    <button class="btn-show" onclick="showAnswers('ex2')">Показать ответы</button>
+    <span class="score" id="ex2-score"></span>
+  </div>
+</section>
+
+<!-- EXERCISE 3 -->
+<section class="exercise" id="ex3">
+  <p class="ex-eyebrow">Упражнение 3 / Definitions</p>
+  <h2>Подбери определение</h2>
+  <p class="instructions">Выбери букву правильного определения для каждого слова.</p>
+
+  <div class="defs-list">
+    <strong>a)</strong> food put on top of another dish, e.g. cheese on a pizza<br>
+    <strong>b)</strong> food or mixture put inside something, e.g. a pie or sandwich<br>
+    <strong>c)</strong> to do something enjoyable to feel happier when you're sad<br>
+    <strong>d)</strong> having a bad physical reaction to a certain substance (medical condition)<br>
+    <strong>e)</strong> unable to digest a certain substance without feeling ill<br>
+    <strong>f)</strong> food that is already prepared and just needs heating<br>
+    <strong>g)</strong> food bought at a restaurant/shop to eat somewhere else<br>
+    <strong>h)</strong> a protein found in wheat, barley and rye
+  </div>
+
+  <div class="item"><span class="num">1.</span>topping — 
+    <select data-answer="a"><option value="">—</option><option>a</option><option>b</option><option>c</option><option>d</option><option>e</option><option>f</option><option>g</option><option>h</option></select>
+  </div>
+  <div class="item"><span class="num">2.</span>filling — 
+    <select data-answer="b"><option value="">—</option><option>a</option><option>b</option><option>c</option><option>d</option><option>e</option><option>f</option><option>g</option><option>h</option></select>
+  </div>
+  <div class="item"><span class="num">3.</span>cheer yourself up — 
+    <select data-answer="c"><option value="">—</option><option>a</option><option>b</option><option>c</option><option>d</option><option>e</option><option>f</option><option>g</option><option>h</option></select>
+  </div>
+  <div class="item"><span class="num">4.</span>allergic — 
+    <select data-answer="d"><option value="">—</option><option>a</option><option>b</option><option>c</option><option>d</option><option>e</option><option>f</option><option>g</option><option>h</option></select>
+  </div>
+  <div class="item"><span class="num">5.</span>intolerant — 
+    <select data-answer="e"><option value="">—</option><option>a</option><option>b</option><option>c</option><option>d</option><option>e</option><option>f</option><option>g</option><option>h</option></select>
+  </div>
+  <div class="item"><span class="num">6.</span>ready-made food — 
+    <select data-answer="f"><option value="">—</option><option>a</option><option>b</option><option>c</option><option>d</option><option>e</option><option>f</option><option>g</option><option>h</option></select>
+  </div>
+  <div class="item"><span class="num">7.</span>take-away food — 
+    <select data-answer="g"><option value="">—</option><option>a</option><option>b</option><option>c</option><option>d</option><option>e</option><option>f</option><option>g</option><option>h</option></select>
+  </div>
+  <div class="item"><span class="num">8.</span>gluten — 
+    <select data-answer="h"><option value="">—</option><option>a</option><option>b</option><option>c</option><option>d</option><option>e</option><option>f</option><option>g</option><option>h</option></select>
+  </div>
+
+  <div class="ex-controls">
+    <button class="btn-check" onclick="checkExercise('ex3')">Проверить</button>
+    <button class="btn-show" onclick="showAnswers('ex3')">Показать ответы</button>
+    <span class="score" id="ex3-score"></span>
+  </div>
+</section>
+
+<!-- EXERCISE 4 -->
+<section class="exercise" id="ex4">
+  <p class="ex-eyebrow">Упражнение 4 / Error correction</p>
+  <h2>Найди и исправь ошибку</h2>
+  <p class="instructions">В каждом предложении есть ошибка в выделенном слове. Впиши правильный вариант.</p>
+
+  <div class="item"><span class="num">1.</span>I am <strong>allergy</strong> to peanuts. → <input type="text" data-answer="allergic"></div>
+  <div class="item"><span class="num">2.</span>She <strong>have</strong> an allergy to shellfish. → <input type="text" data-answer="has"></div>
+  <div class="item"><span class="num">3.</span>He is <strong>intolerance</strong> to lactose. → <input type="text" data-answer="intolerant"></div>
+  <div class="item"><span class="num">4.</span>They <strong>has</strong> an intolerance to gluten. → <input type="text" data-answer="have"></div>
+  <div class="item"><span class="num">5.</span>My brother is allergic <strong>on</strong> bees. → <input type="text" data-answer="to"></div>
+  <div class="item"><span class="num">6.</span>I've got <strong>intolerant</strong> of dairy. → <input type="text" data-answer="an intolerance"></div>
+
+  <div class="ex-controls">
+    <button class="btn-check" onclick="checkExercise('ex4')">Проверить</button>
+    <button class="btn-show" onclick="showAnswers('ex4')">Показать ответы</button>
+    <span class="score" id="ex4-score"></span>
+  </div>
+</section>
+
+<!-- EXERCISE 5 -->
+<section class="exercise" id="ex5">
+  <p class="ex-eyebrow">Упражнение 5 / Collocations</p>
+  <h2>Сочетаемость слов</h2>
+  <p class="instructions">Выбери слово, которое сочетается с данным.</p>
+
+  <div class="item"><span class="num">1.</span>cheese ___ (on a pizza) — 
+    <select data-answer="topping"><option value="">—</option><option value="topping">topping</option><option value="filling">filling</option></select>
+  </div>
+  <div class="item"><span class="num">2.</span>apple pie ___ — 
+    <select data-answer="filling"><option value="">—</option><option value="topping">topping</option><option value="filling">filling</option></select>
+  </div>
+  <div class="item"><span class="num">3.</span>___ yourself up — 
+    <select data-answer="cheer"><option value="">—</option><option value="cheer">cheer</option><option value="lift">lift</option><option value="rise">rise</option></select>
+  </div>
+  <div class="item"><span class="num">4.</span>gluten-___ bread — 
+    <select data-answer="free"><option value="">—</option><option value="free">free</option><option value="less">less</option><option value="without">without</option></select>
+  </div>
+  <div class="item"><span class="num">5.</span>lactose-___ milk — 
+    <select data-answer="free"><option value="">—</option><option value="free">free</option><option value="less">less</option><option value="without">without</option></select>
+  </div>
+  <div class="item"><span class="num">6.</span>___-made meal — 
+    <select data-answer="ready"><option value="">—</option><option value="ready">ready</option><option value="done">done</option><option value="fast">fast</option></select>
+  </div>
+  <div class="item"><span class="num">7.</span>___-away pizza — 
+    <select data-answer="take"><option value="">—</option><option value="take">take</option><option value="carry">carry</option><option value="bring">bring</option></select>
+  </div>
+  <div class="item"><span class="num">8.</span>peanut ___ — 
+    <select data-answer="allergy"><option value="">—</option><option value="allergy">allergy</option><option value="allergic">allergic</option><option value="intolerant">intolerant</option></select>
+  </div>
+
+  <div class="ex-controls">
+    <button class="btn-check" onclick="checkExercise('ex5')">Проверить</button>
+    <button class="btn-show" onclick="showAnswers('ex5')">Показать ответы</button>
+    <span class="score" id="ex5-score"></span>
+  </div>
+</section>
+
+<!-- EXERCISE 6 -->
+<section class="exercise" id="ex6">
+  <p class="ex-eyebrow">Упражнение 6 / Context</p>
+  <h2>Вставь слово по контексту</h2>
+  <p class="instructions">Впиши подходящее слово из темы урока.</p>
+
+  <div class="item"><span class="num">1.</span>I can't eat this cake because I'm <input type="text" data-answer="allergic"> to gluten.</div>
+  <div class="item"><span class="num">2.</span>She always <input type="text" data-answer="cheers"> herself up by watching comedies when she's upset.</div>
+  <div class="item"><span class="num">3.</span>This pizza has cheese and mushroom <input type="text" data-answer="topping|toppings">.</div>
+  <div class="item"><span class="num">4.</span>The pie has a sweet cherry <input type="text" data-answer="filling">.</div>
+  <div class="item"><span class="num">5.</span>He has a milk <input type="text" data-answer="intolerance">, so he avoids dairy completely.</div>
+  <div class="item"><span class="num">6.</span>We didn't have time to cook, so we ordered <input type="text" data-answer="take-away|takeaway|take away"> food.</div>
+  <div class="item"><span class="num">7.</span>Many people avoid wheat because of <input type="text" data-answer="gluten"> sensitivity.</div>
+  <div class="item"><span class="num">8.</span>Instead of cooking, we just heated up some <input type="text" data-answer="ready-made|ready made"> meals.</div>
+
+  <div class="ex-controls">
+    <button class="btn-check" onclick="checkExercise('ex6')">Проверить</button>
+    <button class="btn-show" onclick="showAnswers('ex6')">Показать ответы</button>
+    <span class="score" id="ex6-score"></span>
+  </div>
+</section>
+
+<!-- EXERCISE 7 -->
+<section class="exercise" id="ex7">
+  <p class="ex-eyebrow">Упражнение 7 / Matching</p>
+  <h2>Соедини половинки выражений</h2>
+  <p class="instructions">Выбери вторую половинку для каждого начала.</p>
+
+  <div class="item"><span class="num">1.</span>be allergic to — 
+    <select data-answer="nuts"><option value="">—</option><option value="nuts">nuts</option><option value="bee stings">bee stings</option><option value="lactose">lactose</option><option value="gluten">gluten</option><option value="yourself up">yourself up</option><option value="meal">meal</option><option value="pizza">pizza</option><option value="milk">milk</option></select>
+  </div>
+  <div class="item"><span class="num">2.</span>have an allergy to — 
+    <select data-answer="bee stings"><option value="">—</option><option value="nuts">nuts</option><option value="bee stings">bee stings</option><option value="lactose">lactose</option><option value="gluten">gluten</option><option value="yourself up">yourself up</option><option value="meal">meal</option><option value="pizza">pizza</option><option value="milk">milk</option></select>
+  </div>
+  <div class="item"><span class="num">3.</span>be intolerant to — 
+    <select data-answer="lactose"><option value="">—</option><option value="nuts">nuts</option><option value="bee stings">bee stings</option><option value="lactose">lactose</option><option value="gluten">gluten</option><option value="yourself up">yourself up</option><option value="meal">meal</option><option value="pizza">pizza</option><option value="milk">milk</option></select>
+  </div>
+  <div class="item"><span class="num">4.</span>have an intolerance to — 
+    <select data-answer="gluten"><option value="">—</option><option value="nuts">nuts</option><option value="bee stings">bee stings</option><option value="lactose">lactose</option><option value="gluten">gluten</option><option value="yourself up">yourself up</option><option value="meal">meal</option><option value="pizza">pizza</option><option value="milk">milk</option></select>
+  </div>
+  <div class="item"><span class="num">5.</span>cheer — 
+    <select data-answer="yourself up"><option value="">—</option><option value="nuts">nuts</option><option value="bee stings">bee stings</option><option value="lactose">lactose</option><option value="gluten">gluten</option><option value="yourself up">yourself up</option><option value="meal">meal</option><option value="pizza">pizza</option><option value="milk">milk</option></select>
+  </div>
+  <div class="item"><span class="num">6.</span>ready-made — 
+    <select data-answer="meal"><option value="">—</option><option value="nuts">nuts</option><option value="bee stings">bee stings</option><option value="lactose">lactose</option><option value="gluten">gluten</option><option value="yourself up">yourself up</option><option value="meal">meal</option><option value="pizza">pizza</option><option value="milk">milk</option></select>
+  </div>
+  <div class="item"><span class="num">7.</span>take-away — 
+    <select data-answer="pizza"><option value="">—</option><option value="nuts">nuts</option><option value="bee stings">bee stings</option><option value="lactose">lactose</option><option value="gluten">gluten</option><option value="yourself up">yourself up</option><option value="meal">meal</option><option value="pizza">pizza</option><option value="milk">milk</option></select>
+  </div>
+  <div class="item"><span class="num">8.</span>lactose-free — 
+    <select data-answer="milk"><option value="">—</option><option value="nuts">nuts</option><option value="bee stings">bee stings</option><option value="lactose">lactose</option><option value="gluten">gluten</option><option value="yourself up">yourself up</option><option value="meal">meal</option><option value="pizza">pizza</option><option value="milk">milk</option></select>
+  </div>
+
+  <div class="ex-controls">
+    <button class="btn-check" onclick="checkExercise('ex7')">Проверить</button>
+    <button class="btn-show" onclick="showAnswers('ex7')">Показать ответы</button>
+    <span class="score" id="ex7-score"></span>
+  </div>
+</section>
+
+<!-- EXERCISE 8 -->
+<section class="exercise" id="ex8">
+  <p class="ex-eyebrow">Упражнение 8 / Open practice</p>
+  <h2>Закончи предложения своими идеями</h2>
+  <p class="instructions">Здесь нет единственно верного ответа — просто допиши мысль. Нажми «Пример ответа», чтобы увидеть образец.</p>
+
+  <div class="item">
+    <span class="num">1.</span>I'm allergic to... <input type="text" style="min-width:220px;">
+    <div class="hint" id="h8-1">Пример: I'm allergic to cats, so I can't visit my friend's house.</div>
+    <div><button class="btn-show" style="margin-top:6px;" onclick="toggleHint('h8-1')">Пример ответа</button></div>
+  </div>
+  <div class="item">
+    <span class="num">2.</span>When I feel sad, I usually cheer myself up by... <input type="text" style="min-width:220px;">
+    <div class="hint" id="h8-2">Пример: ...by listening to music and calling a friend.</div>
+    <div><button class="btn-show" style="margin-top:6px;" onclick="toggleHint('h8-2')">Пример ответа</button></div>
+  </div>
+  <div class="item">
+    <span class="num">3.</span>I never eat gluten because... <input type="text" style="min-width:220px;">
+    <div class="hint" id="h8-3">Пример: ...it gives me a stomach ache.</div>
+    <div><button class="btn-show" style="margin-top:6px;" onclick="toggleHint('h8-3')">Пример ответа</button></div>
+  </div>
+  <div class="item">
+    <span class="num">4.</span>My favourite pizza topping is... <input type="text" style="min-width:220px;">
+    <div class="hint" id="h8-4">Пример: ...mushrooms and extra cheese.</div>
+    <div><button class="btn-show" style="margin-top:6px;" onclick="toggleHint('h8-4')">Пример ответа</button></div>
+  </div>
+  <div class="item">
+    <span class="num">5.</span>I prefer ready-made food when... <input type="text" style="min-width:220px;">
+    <div class="hint" id="h8-5">Пример: ...I'm too tired to cook after work.</div>
+    <div><button class="btn-show" style="margin-top:6px;" onclick="toggleHint('h8-5')">Пример ответа</button></div>
+  </div>
+  <div class="item">
+    <span class="num">6.</span>Last time I ordered take-away food was... <input type="text" style="min-width:220px;">
+    <div class="hint" id="h8-6">Пример: ...last Friday — I ordered sushi.</div>
+    <div><button class="btn-show" style="margin-top:6px;" onclick="toggleHint('h8-6')">Пример ответа</button></div>
+  </div>
+</section>
+
+<!-- EXERCISE 9 -->
+<section class="exercise script" id="ex9">
+  <p class="ex-eyebrow">Упражнение 9 / Listening — script A</p>
+  <h2>Прослушай аудио и впиши слово</h2>
+  <p class="instructions">Послушай аудио с высказываниями Emma, Sarah, John, Rob, James и Sean о еде. Впиши пропущенное слово из каждой цитаты.</p>
+
+  <div class="script-box">Speakers discuss food they couldn't live without, spicy food, and things they eat when they feel upset.</div>
+
+  <div class="item"><span class="num">1.</span>Emma: "<input type="text" data-answer="definitely"> tea."</div>
+  <div class="item"><span class="num">2.</span>Emma: "I really <input type="text" data-answer="missed"> it in the mornings."</div>
+  <div class="item"><span class="num">3.</span>Sarah: "I <input type="text" data-answer="absolutely"> love pasta."</div>
+  <div class="item"><span class="num">4.</span>Sarah: "I would find it really difficult to <input type="text" data-answer="live"> without pasta."</div>
+  <div class="item"><span class="num">5.</span>John: "Yes, <input type="text" data-answer="quite"> often."</div>
+  <div class="item"><span class="num">6.</span>Rob: "I <input type="text" data-answer="tend"> to eat chocolate in that situation."</div>
+  <div class="item"><span class="num">7.</span>James: "I <input type="text" data-answer="used"> to drink a lot of coffee."</div>
+  <div class="item"><span class="num">8.</span>Sean: "That's what I always <input type="text" data-answer="end"> up ordering."</div>
+
+  <div class="ex-controls">
+    <button class="btn-check" onclick="checkExercise('ex9')">Проверить</button>
+    <button class="btn-show" onclick="showAnswers('ex9')">Показать ответы</button>
+    <span class="score" id="ex9-score"></span>
+  </div>
+</section>
+
+<!-- EXERCISE 10 -->
+<section class="exercise script" id="ex10">
+  <p class="ex-eyebrow">Упражнение 10 / Listening — script B</p>
+  <h2>Вставь выражение из банка слов</h2>
+  <p class="instructions">Выбери подходящее выражение для каждого предложения по смыслу скрипта (два пункта используют лексику из упр. 1–7).</p>
+
+  <div class="script-box">Word bank: <em>absolutely, tend to, used to, quite often, at least, end up, find it difficult, cheer himself up, intolerant</em></div>
+
+  <div class="item"><span class="num">1.</span>Sarah eats pasta ___ twice a week. — 
+    <select data-answer="at least"><option value="">—</option><option value="absolutely">absolutely</option><option value="tend to">tend to</option><option value="used to">used to</option><option value="quite often">quite often</option><option value="at least">at least</option><option value="end up">end up</option><option value="find it difficult">find it difficult</option><option value="cheer himself up">cheer himself up</option><option value="intolerant">intolerant</option></select>
+  </div>
+  <div class="item"><span class="num">2.</span>James ___ drink a lot of coffee, but he stopped. — 
+    <select data-answer="used to"><option value="">—</option><option value="absolutely">absolutely</option><option value="tend to">tend to</option><option value="used to">used to</option><option value="quite often">quite often</option><option value="at least">at least</option><option value="end up">end up</option><option value="find it difficult">find it difficult</option><option value="cheer himself up">cheer himself up</option><option value="intolerant">intolerant</option></select>
+  </div>
+  <div class="item"><span class="num">3.</span>Rob eats chocolate to ___ when he's sad. — 
+    <select data-answer="cheer himself up"><option value="">—</option><option value="absolutely">absolutely</option><option value="tend to">tend to</option><option value="used to">used to</option><option value="quite often">quite often</option><option value="at least">at least</option><option value="end up">end up</option><option value="find it difficult">find it difficult</option><option value="cheer himself up">cheer himself up</option><option value="intolerant">intolerant</option></select>
+  </div>
+  <div class="item"><span class="num">4.</span>Sarah says she would ___ to live without pasta. — 
+    <select data-answer="find it difficult"><option value="">—</option><option value="absolutely">absolutely</option><option value="tend to">tend to</option><option value="used to">used to</option><option value="quite often">quite often</option><option value="at least">at least</option><option value="end up">end up</option><option value="find it difficult">find it difficult</option><option value="cheer himself up">cheer himself up</option><option value="intolerant">intolerant</option></select>
+  </div>
+  <div class="item"><span class="num">5.</span>John eats spicy food ___. — 
+    <select data-answer="quite often"><option value="">—</option><option value="absolutely">absolutely</option><option value="tend to">tend to</option><option value="used to">used to</option><option value="quite often">quite often</option><option value="at least">at least</option><option value="end up">end up</option><option value="find it difficult">find it difficult</option><option value="cheer himself up">cheer himself up</option><option value="intolerant">intolerant</option></select>
+  </div>
+  <div class="item"><span class="num">6.</span>Sean ___ ordering pepperoni pizza in Italian restaurants. — 
+    <select data-answer="end up"><option value="">—</option><option value="absolutely">absolutely</option><option value="tend to">tend to</option><option value="used to">used to</option><option value="quite often">quite often</option><option value="at least">at least</option><option value="end up">end up</option><option value="find it difficult">find it difficult</option><option value="cheer himself up">cheer himself up</option><option value="intolerant">intolerant</option></select>
+  </div>
+  <div class="item"><span class="num">7.</span>Emma ___ loves tea and missed it on holiday. — 
+    <select data-answer="absolutely"><option value="">—</option><option value="absolutely">absolutely</option><option value="tend to">tend to</option><option value="used to">used to</option><option value="quite often">quite often</option><option value="at least">at least</option><option value="end up">end up</option><option value="find it difficult">find it difficult</option><option value="cheer himself up">cheer himself up</option><option value="intolerant">intolerant</option></select>
+  </div>
+  <div class="item"><span class="num">8.</span>James thinks he might be ___ to caffeine, because it gave him headaches. — 
+    <select data-answer="intolerant"><option value="">—</option><option value="absolutely">absolutely</option><option value="tend to">tend to</option><option value="used to">used to</option><option value="quite often">quite often</option><option value="at least">at least</option><option value="end up">end up</option><option value="find it difficult">find it difficult</option><option value="cheer himself up">cheer himself up</option><option value="intolerant">intolerant</option></select>
+  </div>
+
+  <div class="ex-controls">
+    <button class="btn-check" onclick="checkExercise('ex10')">Проверить</button>
+    <button class="btn-show" onclick="showAnswers('ex10')">Показать ответы</button>
+    <button class="btn-copy" onclick="copyLastAnswers()">📋 Скопировать все ответы</button>
+    <span class="score" id="ex10-score"></span>
+    <span class="copy-flash" id="copy-flash">Скопировано!</span>
+  </div>
+</section>
+
+</main>
+
+<footer>made for practice · food & feelings vocabulary set</footer>
+
+<script>
+function normalize(v){
+  return (v || "").trim().toLowerCase().replace(/\s+/g, ' ');
+}
+
+function checkExercise(exId){
+  const container = document.getElementById(exId);
+  const fields = container.querySelectorAll('[data-answer]');
+  let correctCount = 0;
+  fields.forEach(field => {
+    const answers = field.dataset.answer.toLowerCase().split('|').map(a => a.trim());
+    const val = normalize(field.value);
+    const item = field.closest('.item');
+    if(val !== '' && answers.includes(val)){
+      field.classList.add('correct'); field.classList.remove('incorrect');
+      if(item){ item.classList.add('correct'); item.classList.remove('incorrect'); }
+      correctCount++;
+    } else {
+      field.classList.add('incorrect'); field.classList.remove('correct');
+      if(item){ item.classList.add('incorrect'); item.classList.remove('correct'); }
+    }
+  });
+  document.getElementById(exId + '-score').textContent =
+    `Результат: ${correctCount} из ${fields.length}`;
+}
+
+function showAnswers(exId){
+  const container = document.getElementById(exId);
+  const fields = container.querySelectorAll('[data-answer]');
+  fields.forEach(field => {
+    const firstAnswer = field.dataset.answer.split('|')[0].trim();
+    field.value = firstAnswer;
+    field.classList.add('correct'); field.classList.remove('incorrect');
+    const item = field.closest('.item');
+    if(item){ item.classList.add('correct'); item.classList.remove('incorrect'); }
+  });
+  const scoreEl = document.getElementById(exId + '-score');
+  if(scoreEl) scoreEl.textContent = 'Показаны правильные ответы';
+}
+
+function toggleHint(id){
+  document.getElementById(id).classList.toggle('show');
+}
+
+function copyLastAnswers(){
+  const container = document.getElementById('ex10');
+  const fields = container.querySelectorAll('[data-answer]');
+  let lines = [];
+  fields.forEach((field, i) => {
+    const answer = field.dataset.answer.split('|')[0].trim();
+    lines.push(`${i + 1}. ${answer}`);
+  });
+  const text = lines.join('\n');
+  navigator.clipboard.writeText(text).then(() => {
+    const flash = document.getElementById('copy-flash');
+    flash.classList.add('show');
+    setTimeout(() => flash.classList.remove('show'), 1800);
+  }).catch(() => {
+    alert(text);
+  });
+}
+</script>
+
+</body>
+</html>
