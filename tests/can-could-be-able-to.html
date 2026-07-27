@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Can / Could / Be able to — тренажёр</title>
+<style>
+  :root{
+    --primary:#5b4fd6;
+    --primary-dark:#443bb0;
+    --accent:#00b8a9;
+    --bg:#f4f3fb;
+    --card:#ffffff;
+    --text:#26243a;
+    --muted:#6b6880;
+    --good:#1e9e6b;
+    --good-bg:#e5f7ee;
+    --bad:#d64545;
+    --bad-bg:#fdeaea;
+    --border:#e4e2f1;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background:linear-gradient(180deg,#f4f3fb 0%, #eeecfa 100%);
+    color:var(--text);
+    padding-bottom:60px;
+  }
+  .wrap{max-width:920px;margin:0 auto;padding:24px 16px;}
+  header.top{
+    background:linear-gradient(120deg,var(--primary) 0%,#7b6ff0 100%);
+    color:#fff;border-radius:18px;padding:28px 28px 24px;
+    box-shadow:0 10px 30px rgba(91,79,214,.25);
+    margin-bottom:20px;
+  }
+  header.top h1{margin:0 0 6px;font-size:26px;}
+  header.top p{margin:0;opacity:.9;font-size:15px;}
+
+  details.rule{
+    background:var(--card);border:1px solid var(--border);
+    border-radius:14px;padding:14px 18px;margin-bottom:20px;
+    box-shadow:0 2px 10px rgba(40,30,90,.04);
+  }
+  details.rule summary{cursor:pointer;font-weight:600;color:var(--primary-dark);font-size:15px;}
+  details.rule .rule-body{margin-top:12px;font-size:14.5px;line-height:1.55;color:var(--text);}
+  details.rule .rule-body code{background:#efeeff;padding:1px 6px;border-radius:6px;color:var(--primary-dark);}
+  details.rule .rule-body em.ex{color:var(--muted);display:block;margin:2px 0 8px 0;font-style:italic;}
+
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px;}
+  .tab-btn{
+    border:1px solid var(--border);background:var(--card);color:var(--text);
+    padding:9px 14px;border-radius:999px;font-size:13.5px;cursor:pointer;
+    transition:.15s;font-weight:600;
+  }
+  .tab-btn:hover{border-color:var(--primary);}
+  .tab-btn.active{background:var(--primary);color:#fff;border-color:var(--primary);}
+
+  .exercise{display:none;background:var(--card);border-radius:16px;padding:22px 22px 26px;
+    box-shadow:0 4px 20px rgba(40,30,90,.06);border:1px solid var(--border);}
+  .exercise.active{display:block;}
+
+  .ex-head{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;margin-bottom:6px;}
+  .ex-head h2{margin:0;font-size:19px;color:var(--primary-dark);}
+  .score-badge{background:#efeeff;color:var(--primary-dark);font-weight:700;font-size:13px;
+    padding:6px 12px;border-radius:999px;white-space:nowrap;}
+
+  .instructions{color:var(--muted);font-size:14px;margin:4px 0 18px;line-height:1.5;}
+
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px;}
+  button.btn{
+    border:none;border-radius:10px;padding:9px 16px;font-size:13.5px;font-weight:600;
+    cursor:pointer;transition:.15s;
+  }
+  .btn-primary{background:var(--primary);color:#fff;}
+  .btn-primary:hover{background:var(--primary-dark);}
+  .btn-outline{background:#fff;color:var(--primary-dark);border:1px solid var(--primary);}
+  .btn-outline:hover{background:#efeeff;}
+  .btn-ghost{background:#f1f0fa;color:var(--text);}
+  .btn-ghost:hover{background:#e6e4f7;}
+  .btn-copy{background:var(--accent);color:#fff;}
+  .btn-copy:hover{filter:brightness(0.95);}
+
+  .item{border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:14px;background:#fbfaff;}
+  .item .num{font-weight:700;color:var(--primary-dark);margin-right:6px;}
+  .task{font-size:15px;margin-bottom:10px;line-height:1.5;}
+  .task .ru{color:#39365a;}
+  .hint{color:var(--muted);font-size:12.5px;margin-bottom:8px;}
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+  input[type=text], select, textarea{
+    flex:1;min-width:220px;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;
+    font-size:14px;font-family:inherit;background:#fff;color:var(--text);
+  }
+  textarea{min-height:56px;resize:vertical;width:100%;}
+  input[type=text]:focus, select:focus, textarea:focus{outline:none;border-color:var(--primary);}
+  .item-actions{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;}
+  .small-btn{padding:7px 12px;font-size:12.5px;}
+
+  .feedback{margin-top:8px;font-size:13.5px;font-weight:600;padding:8px 10px;border-radius:8px;display:none;}
+  .feedback.correct{display:block;background:var(--good-bg);color:var(--good);}
+  .feedback.incorrect{display:block;background:var(--bad-bg);color:var(--bad);}
+
+  .answer-box{display:none;margin-top:10px;background:#f1f0fa;border-left:4px solid var(--primary);
+    border-radius:0 8px 8px 0;padding:10px 14px;font-size:13.8px;line-height:1.5;}
+  .answer-box.show{display:block;}
+  .answer-box b{color:var(--primary-dark);}
+  .answer-box .why{color:#39365a;margin-top:4px;display:block;}
+
+  .example-box{display:none;margin-top:10px;background:#e7fbf7;border-left:4px solid var(--accent);
+    border-radius:0 8px 8px 0;padding:10px 14px;font-size:13.8px;color:#0d5c53;}
+  .example-box.show{display:block;}
+
+  .drill-steps{display:flex;flex-direction:column;gap:8px;}
+  .drill-steps input{width:100%;}
+
+  footer{text-align:center;color:var(--muted);font-size:12.5px;margin-top:30px;}
+
+  @media (max-width:600px){
+    header.top{padding:20px 18px;}
+    .ex-head{flex-direction:column;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <h1>Can · Could · Be able to</h1>
+    <p>Интерактивный тренажёр: ability &amp; possibility — 8 упражнений, проверка ответов и объяснения.</p>
+  </header>
+
+  <details class="rule">
+    <summary>📘 Показать правило</summary>
+    <div class="rule-body">
+      <b>can / could</b> — модальные глаголы. У них есть только форма настоящего времени (<code>can</code>, может использоваться и для будущего) и форма прошедшего/условного времени (<code>could</code>).
+      <em class="ex">I can speak three languages fluently. · Jenny can't come tonight — she's ill. · Our daughter could play the violin when she was three. · They couldn't wait because they were in a hurry.</em>
+      Для всех остальных времён и форм (present perfect, инфинитив, герундий, future и т.д.) используется <b>be able to + infinitive</b>.
+      <em class="ex">Luke has been able to swim since he was three. · I'd like to be able to ski. · I love being able to stay in bed late on Sunday morning. · You'll be able to practise your English in London.</em>
+      Иногда <code>be able to</code> используется в present/past вместо can/could — обычно чтобы речь звучала более формально.
+      <em class="ex">Fortunately, I am able to accept your invitation. · My colleagues weren't able to come to yesterday's meeting.</em>
+    </div>
+  </details>
+
+  <div class="tabs" id="tabs"></div>
+  <div id="exercises"></div>
+
+  <footer>Тренажёр по теме «Ability and possibility: can, could, be able to»</footer>
+</div>
+
+<script>
+/* ============== NORMALIZATION & CHECK HELPERS ============== */
+function normalize(s){
+  return s.toLowerCase()
+    .replace(/[’']/g,"'")
+    .replace(/[.,!?;:"“”]/g,'')
+    .replace(/\s+/g,' ')
+    .trim();
+}
+function isCorrect(userText, acceptedList){
+  const u = normalize(userText);
+  if(!u) return false;
+  return acceptedList.some(a => normalize(a) === u);
+}
+
+/* ============== DATA ============== */
+const DATA = {
+
+ex1:{
+  title:"Упр. 1 — Преобразуйте в нужную форму be able to",
+  type:"check",
+  instructions:"Перепишите предложение, используя правильную форму be able to (см. подсказку в скобках) вместо can/could.",
+  items:[
+    {task:"I can accept your invitation. <span class='hint'>(Present Simple, более формально)</span>", answers:["I am able to accept your invitation.","I'm able to accept your invitation."], explanation:"Can возможен неформально, но be able to в present simple звучит более формально и вежливо."},
+    {task:"We could see the mountains from our hotel room. <span class='hint'>(Past Simple)</span>", answers:["We were able to see the mountains from our hotel room."], explanation:"Could и was/were able to оба верны для общей способности в прошлом; здесь тренируем трансформацию."},
+    {task:"I hope you can join us next week. <span class='hint'>(Future — will be able to)</span>", answers:["I hope you will be able to join us next week.","I hope you'll be able to join us next week."], explanation:"У can нет формы будущего времени, поэтому нужно will be able to."},
+    {task:"Since moving to London, she can speak English fluently. <span class='hint'>(Present Perfect)</span>", answers:["Since moving to London, she has been able to speak English fluently."], explanation:"У can нет формы Present Perfect; с since/for всегда используется has/have been able to."},
+    {task:"I really enjoy that I can work from home. <span class='hint'>(Gerund, после enjoy)</span>", answers:["I really enjoy being able to work from home.","I enjoy being able to work from home."], explanation:"После глаголов enjoy, love, like нужен герундий; у can нет формы герундия — только being able to."},
+    {task:"He wants that he can drive a car one day. <span class='hint'>(to-infinitive, после want)</span>", answers:["He wants to be able to drive a car one day.","He wants to be able to drive a car."], explanation:"После want, hope, would like используется инфинитив с to; у can нет инфинитива."},
+    {task:"My parents can't attend the ceremony. <span class='hint'>(Present Simple, отрицание, формально)</span>", answers:["My parents aren't able to attend the ceremony.","My parents are not able to attend the ceremony."], explanation:"Отрицательная форма be able to в настоящем времени звучит более формально, чем can't."},
+    {task:"They couldn't finish the project on time. <span class='hint'>(Past Simple, отрицание)</span>", answers:["They weren't able to finish the project on time.","They were not able to finish the project on time."], explanation:"Альтернативная отрицательная форма прошедшего времени с тем же значением, что и couldn't."},
+    {task:"He can't find his keys since this morning. <span class='hint'>(Present Perfect, отрицание)</span>", answers:["He hasn't been able to find his keys since this morning.","He has not been able to find his keys since this morning."], explanation:"У can't нет формы Present Perfect, поэтому нужно hasn't been able to."},
+    {task:"I don't think I can help you tomorrow. <span class='hint'>(Future, отрицание)</span>", answers:["I don't think I will be able to help you tomorrow.","I don't think I'll be able to help you tomorrow."], explanation:"Будущее отрицание способности требует won't/will not be able to, так как у can't нет формы будущего."}
+  ]
+},
+
+ex2:{
+  title:"Упр. 2 — Найдите и исправьте ошибку",
+  type:"check",
+  instructions:"В каждом предложении есть ошибка, связанная с can / could / be able to. Напишите исправленный вариант целиком.",
+  items:[
+    {task:"I can to swim very well.", answers:["I can swim very well."], explanation:"После модального глагола can не ставится to — только смысловой глагол в начальной форме."},
+    {task:"She could to play piano when she was five.", answers:["She could play piano when she was five.","She could play the piano when she was five."], explanation:"После could также нет to — модальные глаголы никогда не требуют частицы to перед смысловым глаголом."},
+    {task:"He will can help you tomorrow.", answers:["He will be able to help you tomorrow."], explanation:"Нельзя ставить подряд два модальных глагола (will + can). Для будущего используется will be able to."},
+    {task:"I have permission to can leave early.", answers:["I have permission to be able to leave early.","I have permission to leave early."], explanation:"После to не может идти модальный глагол can; нужен обычный инфинитив или to be able to."},
+    {task:"They are able speak three languages.", answers:["They are able to speak three languages."], explanation:"Конструкция be able to всегда требует частицы to перед инфинитивом: are able to speak."},
+    {task:"I didn't could finish my homework.", answers:["I wasn't able to finish my homework.","I couldn't finish my homework.","I was not able to finish my homework."], explanation:"Could уже стоит в прошедшем времени, поэтому didn't + could невозможно; нужно couldn't или wasn't able to."},
+    {task:"She has could solve the problem.", answers:["She has been able to solve the problem."], explanation:"У can/could нет причастия (participle), поэтому после have/has используется been able to."},
+    {task:"We enjoy can travel a lot.", answers:["We enjoy being able to travel a lot."], explanation:"После enjoy нужен герундий (being able to), а не модальный глагол can."},
+    {task:"I am can help you now.", answers:["I can help you now."], explanation:"Can — уже спрягаемый модальный глагол, его нельзя сочетать с am; лишний am убираем."},
+    {task:"He can plays the guitar.", answers:["He can play the guitar."], explanation:"После модальных глаголов смысловой глагол всегда стоит без окончания -s, даже с he/she/it."}
+  ]
+},
+
+ex3:{
+  title:"Упр. 3 — Вставьте нужную форму (can / could / be able to)",
+  type:"check",
+  instructions:"Заполните пропуск правильной формой глагола из скобок, используя can, could или be able to.",
+  items:[
+    {task:"I ______ (not / come) to the party next Friday because I'll be working.", answers:["won't be able to come","will not be able to come"], explanation:"Будущее отрицание — у can't нет формы будущего времени, нужна won't be able to."},
+    {task:"When she was a child, she ______ (swim) very fast.", answers:["could swim"], explanation:"Общая способность в прошлом обычно выражается через could."},
+    {task:"______ you ______ (help) me with this exercise, please?", answers:["could you help","can you help"], explanation:"Просьба строится по модели: модальный глагол + подлежащее + смысловой глагол без to."},
+    {task:"Unfortunately, we ______ (not / attend) yesterday's meeting.", answers:["weren't able to attend","couldn't attend","were not able to attend"], explanation:"Обе формы (couldn't / weren't able to) верны для отрицания способности в прошлом."},
+    {task:"I love ______ (sleep) late at weekends.", answers:["being able to sleep"], explanation:"После love нужен герундий — being able to sleep."},
+    {task:"She has never ______ (drive) a car.", answers:["been able to drive"], explanation:"Present Perfect требует been able to, так как у can/could нет формы причастия."},
+    {task:"Fortunately, I ______ (accept) your kind invitation.", answers:["am able to accept"], explanation:"В официальном стиле present simple часто использует am/is/are able to вместо can."},
+    {task:"He hopes ______ (finish) the project by Friday.", answers:["to be able to finish"], explanation:"После hope нужен инфинитив с to — to be able to finish."},
+    {task:"My brother ______ (ride) a bike since he was four.", answers:["has been able to ride"], explanation:"С since/for и Present Perfect всегда используется has/have been able to."},
+    {task:"In the future, robots ______ (do) many household tasks.", answers:["will be able to do"], explanation:"Будущее время способности всегда образуется через will be able to."}
+  ]
+},
+
+ex4:{
+  title:"Упр. 4 — Переведите на английский",
+  type:"check",
+  instructions:"Переведите предложения на английский, используя can, could или be able to.",
+  items:[
+    {task:"Я умею плавать.", answers:["I can swim."], explanation:"Способность в настоящем времени — can + инфинитив без to."},
+    {task:"Когда я был маленьким, я умел кататься на велосипеде.", answers:["When I was little, I could ride a bike.","When I was young, I could ride a bike."], explanation:"Общая способность в прошлом — could."},
+    {task:"К сожалению, я не смогу прийти завтра.", answers:["Unfortunately, I won't be able to come tomorrow.","Unfortunately, I will not be able to come tomorrow."], explanation:"Будущее отрицание — только won't be able to, у can't нет формы будущего."},
+    {task:"Она никогда не умела готовить.", answers:["She could never cook.","She was never able to cook."], explanation:"Общая неспособность в прошлом — could(n't) или was/were able to."},
+    {task:"Мне нравится иметь возможность работать из дома.", answers:["I like being able to work from home.","I love being able to work from home."], explanation:"После like/love — герундий being able to."},
+    {task:"Он надеется однажды суметь купить дом.", answers:["He hopes to be able to buy a house one day.","He hopes to be able to buy a house someday."], explanation:"После hope — инфинитив to be able to."},
+    {task:"Мы не смогли найти отель.", answers:["We couldn't find the hotel.","We weren't able to find the hotel.","We were not able to find the hotel."], explanation:"Конкретное однократное действие в прошлом — можно couldn't или weren't able to."},
+    {task:"С тех пор как она переехала в Лондон, она смогла улучшить свой английский.", answers:["Since she moved to London, she has been able to improve her English."], explanation:"Since + Present Perfect требует has been able to."},
+    {task:"Не могли бы вы мне помочь?", answers:["Could you help me, please?","Could you help me?"], explanation:"Вежливая просьба — Could you + инфинитив без to."},
+    {task:"К счастью, я смог принять ваше приглашение.", answers:["Fortunately, I was able to accept your invitation."], explanation:"Формальный стиль в прошедшем времени предпочитает was able to вместо could."}
+  ]
+},
+
+ex5:{
+  title:"Упр. 5 — Перефразируйте (can ⇄ be able to)",
+  type:"check",
+  instructions:"Перепишите предложение так, чтобы значение не изменилось, заменив can/could на be able to или наоборот.",
+  items:[
+    {task:"I can speak three languages fluently.", answers:["I am able to speak three languages fluently.","I'm able to speak three languages fluently."], explanation:"Can в present simple можно заменить на am/is/are able to без изменения смысла."},
+    {task:"Jenny can't come tonight because she's ill.", answers:["Jenny isn't able to come tonight because she's ill.","Jenny is not able to come tonight because she's ill."], explanation:"Отрицание can't ↔ isn't able to — значение то же самое, be able to немного более формально."},
+    {task:"Our daughter could play the violin when she was three.", answers:["Our daughter was able to play the violin when she was three."], explanation:"Could ↔ was able to для общей способности в прошлом."},
+    {task:"They couldn't wait because they were in a hurry.", answers:["They weren't able to wait because they were in a hurry.","They were not able to wait because they were in a hurry."], explanation:"Couldn't ↔ weren't able to — одинаковый смысл."},
+    {task:"My colleagues weren't able to come to yesterday's meeting.", answers:["My colleagues couldn't come to yesterday's meeting."], explanation:"В обратную сторону: weren't able to ↔ couldn't."},
+    {task:"Fortunately, I am able to accept your invitation.", answers:["Fortunately, I can accept your invitation."], explanation:"Am able to ↔ can — просто менее формальный вариант."},
+    {task:"She was able to solve the puzzle in five minutes.", answers:["She could solve the puzzle in five minutes."], explanation:"Внимание: для одного конкретного законченного действия в прошлом носители чаще говорят managed to, но для этого упражнения could / was able to считаются равнозначными."},
+    {task:"He isn't able to attend the ceremony.", answers:["He can't attend the ceremony.","He cannot attend the ceremony."], explanation:"Isn't able to ↔ can't — одинаковое значение, разный уровень формальности."},
+    {task:"We were able to find a good hotel.", answers:["We could find a good hotel."], explanation:"Как и выше: для завершённого единичного действия чаще используют managed to, но could допустимо в учебных целях."},
+    {task:"I'd love to be able to play the piano.", answers:["not possible","no direct equivalent","нельзя","impossible"], explanation:"Ловушка! Здесь НЕТ простого эквивалента с can/could: после would love to не может идти ещё один модальный глагол (нельзя сказать 'I'd love to can play'). Именно поэтому после других глаголов используется только be able to."}
+  ]
+},
+
+ex6:{
+  title:"Упр. 6 — Что обычно следует дальше?",
+  type:"pattern",
+  instructions:"Выберите, какая грамматическая форма обычно следует после данного слова/выражения, а затем впишите свой пример предложения.",
+  items:[
+    {word:"can", options:["инфинитив без to (bare infinitive)","to + инфинитив","герундий (-ing)","been able to + инфинитив"], correct:0, explanation:"После модального can всегда идёт смысловой глагол без частицы to: can swim, can help."},
+    {word:"could", options:["инфинитив без to (bare infinitive)","to + инфинитив","герундий (-ing)","be able to + инфинитив"], correct:0, explanation:"Could — тоже модальный глагол, после него глагол без to: could dance, could read."},
+    {word:"hope", options:["герундий (-ing)","to be able to + инфинитив","bare infinitive","been able to"], correct:1, explanation:"После hope используется инфинитив с to: hope to be able to help."},
+    {word:"enjoy", options:["being able to + инфинитив (герундий)","to be able to + инфинитив","bare infinitive","will be able to"], correct:0, explanation:"Enjoy требует герундия: enjoy being able to relax."},
+    {word:"want", options:["bare infinitive","to be able to + инфинитив","герундий (-ing)","been able to"], correct:1, explanation:"После want — инфинитив с to: want to be able to travel."},
+    {word:"would like", options:["bare infinitive","to be able to + инфинитив","герундий (-ing)","will be able to"], correct:1, explanation:"Would like всегда сопровождается инфинитивом с to: would like to be able to ski."},
+    {word:"will", options:["can + инфинитив","be able to + инфинитив","being able to","been able to"], correct:1, explanation:"Будущее время способности: will be able to help (нельзя 'will can')."},
+    {word:"have / has (Present Perfect)", options:["could + инфинитив","been able to + инфинитив","being able to","to be able to"], correct:1, explanation:"В Present Perfect используется been able to: has been able to swim."},
+    {word:"love", options:["being able to + инфинитив (герундий)","to be able to + инфинитив","bare infinitive","will be able to"], correct:0, explanation:"После love — герундий: love being able to sleep late."},
+    {word:"am / is / are", options:["can + инфинитив","able to + инфинитив","being able to","been able to"], correct:1, explanation:"С глаголом be используется able to + инфинитив: is able to speak (формальный вариант can)."}
+  ]
+},
+
+ex7:{
+  title:"Упр. 7 — Закончите предложения своими идеями",
+  type:"open",
+  instructions:"Закончите каждое предложение своей идеей. Ответы не проверяются автоматически — но вы можете посмотреть пример и скопировать все свои ответы одной кнопкой.",
+  items:[
+    {task:"I can ...", example:"I can play the guitar and the piano."},
+    {task:"When I was a child, I could ...", example:"When I was a child, I could run very fast."},
+    {task:"Unfortunately, I won't be able to ...", example:"Unfortunately, I won't be able to attend your wedding."},
+    {task:"I love being able to ...", example:"I love being able to work from anywhere."},
+    {task:"I've never been able to ...", example:"I've never been able to understand modern art."},
+    {task:"I hope to be able to ...", example:"I hope to be able to speak Chinese one day."},
+    {task:"Could you please ...?", example:"Could you please open the window?"},
+    {task:"Fortunately, I was able to ...", example:"Fortunately, I was able to catch the last train."},
+    {task:"My friend can't ...", example:"My friend can't eat dairy products."},
+    {task:"In the future, I will be able to ...", example:"In the future, I will be able to travel to space."}
+  ]
+},
+
+ex8:{
+  title:"Упр. 8 — Repeat & Change (дриллинг)",
+  type:"drill",
+  instructions:"По образцу постройте цепочку из 3 шагов: слово → слово + свои слова → полное предложение с can/could/be able to. Пример: suffer → suffer from stress → Many people suffer from stress. Ответы не проверяются, но их можно скопировать одной кнопкой.",
+  items:[
+    {word:"speak", example:["speak", "speak Spanish", "I can speak Spanish fluently."]},
+    {word:"drive", example:["drive", "drive a car", "She couldn't drive a car until last year."]},
+    {word:"swim", example:["swim", "swim across the lake", "He has never been able to swim across the lake."]},
+    {word:"cook", example:["cook", "cook Italian food", "I love being able to cook Italian food."]},
+    {word:"dance", example:["dance", "dance the tango", "My grandmother could dance the tango beautifully."]},
+    {word:"paint", example:["paint", "paint portraits", "I hope to be able to paint portraits one day."]},
+    {word:"fix", example:["fix", "fix a computer", "He wasn't able to fix the computer yesterday."]},
+    {word:"solve", example:["solve", "solve difficult problems", "She has always been able to solve difficult problems quickly."]},
+    {word:"understand", example:["understand", "understand quantum physics", "Unfortunately, I'm not able to understand quantum physics."]},
+    {word:"play", example:["play", "play chess well", "In the future, I will be able to play chess well."]}
+  ]
+}
+
+};
+
+/* ============== RENDER ============== */
+const tabsEl = document.getElementById('tabs');
+const exContainer = document.getElementById('exercises');
+const keys = Object.keys(DATA);
+
+keys.forEach((key, idx) => {
+  const ex = DATA[key];
+  const tabBtn = document.createElement('button');
+  tabBtn.className = 'tab-btn' + (idx===0 ? ' active':'');
+  tabBtn.textContent = 'Упр. ' + (idx+1);
+  tabBtn.onclick = () => showTab(key);
+  tabBtn.id = 'tabbtn-'+key;
+  tabsEl.appendChild(tabBtn);
+
+  const section = document.createElement('div');
+  section.className = 'exercise' + (idx===0 ? ' active':'');
+  section.id = 'section-'+key;
+
+  let html = `<div class="ex-head"><h2>${ex.title}</h2>`;
+  if(ex.type==='check' || ex.type==='pattern'){
+    html += `<span class="score-badge" id="score-${key}">0 / ${ex.items.length}</span>`;
+  }
+  html += `</div><div class="instructions">${ex.instructions}</div>`;
+
+  html += `<div class="toolbar">`;
+  if(ex.type==='check' || ex.type==='pattern'){
+    html += `<button class="btn btn-primary" onclick="checkAll('${key}')">✅ Проверить всё</button>
+             <button class="btn btn-outline" onclick="showAllAnswers('${key}')">👁 Показать все ответы</button>
+             <button class="btn btn-ghost" onclick="resetEx('${key}')">↺ Сбросить</button>`;
+  } else {
+    html += `<button class="btn btn-outline" onclick="toggleAllExamples('${key}')">💡 Показать/скрыть примеры</button>
+             <button class="btn btn-copy" onclick="copyAll('${key}')">📋 Скопировать все ответы</button>
+             <button class="btn btn-ghost" onclick="resetEx('${key}')">↺ Сбросить</button>`;
+  }
+  html += `</div>`;
+
+  ex.items.forEach((item, i)=>{
+    const n = i+1;
+    if(ex.type==='check'){
+      html += `
+      <div class="item" id="${key}-item-${n}">
+        <div class="task"><span class="num">${n}.</span> ${item.task}</div>
+        <div class="row">
+          <input type="text" id="${key}-input-${n}" placeholder="Введите ответ...">
+        </div>
+        <div class="item-actions">
+          <button class="btn btn-primary small-btn" onclick="checkOne('${key}',${n})">Проверить</button>
+          <button class="btn btn-outline small-btn" onclick="toggleAnswer('${key}',${n})">Показать ответ</button>
+        </div>
+        <div class="feedback" id="${key}-fb-${n}"></div>
+        <div class="answer-box" id="${key}-ans-${n}">
+          <b>Ответ:</b> ${item.answers[0]}
+          <span class="why"><b>Почему:</b> ${item.explanation}</span>
+        </div>
+      </div>`;
+    } else if(ex.type==='pattern'){
+      let opts = item.options.map((o,oi)=>`<option value="${oi}">${o}</option>`).join('');
+      html += `
+      <div class="item" id="${key}-item-${n}">
+        <div class="task"><span class="num">${n}.</span> После <b>${item.word}</b> обычно следует...</div>
+        <div class="row">
+          <select id="${key}-input-${n}">
+            <option value="">— выберите —</option>
+            ${opts}
+          </select>
+        </div>
+        <div class="item-actions">
+          <button class="btn btn-primary small-btn" onclick="checkOnePattern('${key}',${n})">Проверить</button>
+          <button class="btn btn-outline small-btn" onclick="toggleAnswer('${key}',${n})">Показать ответ</button>
+        </div>
+        <div class="feedback" id="${key}-fb-${n}"></div>
+        <div class="answer-box" id="${key}-ans-${n}">
+          <b>Правильно:</b> ${item.options[item.correct]}
+          <span class="why"><b>Почему:</b> ${item.explanation}</span>
+        </div>
+      </div>`;
+    } else if(ex.type==='open'){
+      html += `
+      <div class="item" id="${key}-item-${n}">
+        <div class="task"><span class="num">${n}.</span> ${item.task}</div>
+        <div class="row">
+          <textarea id="${key}-input-${n}" placeholder="Ваш вариант..."></textarea>
+        </div>
+        <div class="item-actions">
+          <button class="btn btn-outline small-btn" onclick="toggleExample('${key}',${n})">💡 Пример</button>
+        </div>
+        <div class="example-box" id="${key}-ex-${n}">${item.example}</div>
+      </div>`;
+    } else if(ex.type==='drill'){
+      html += `
+      <div class="item" id="${key}-item-${n}">
+        <div class="task"><span class="num">${n}.</span> Базовое слово: <b>${item.word}</b></div>
+        <div class="drill-steps">
+          <input type="text" id="${key}-s1-${n}" placeholder="Шаг 1: слово (${item.word})">
+          <input type="text" id="${key}-s2-${n}" placeholder="Шаг 2: слово + ваши слова">
+          <input type="text" id="${key}-s3-${n}" placeholder="Шаг 3: полное предложение с can/could/be able to">
+        </div>
+        <div class="item-actions">
+          <button class="btn btn-outline small-btn" onclick="toggleExample('${key}',${n})">💡 Пример</button>
+        </div>
+        <div class="example-box" id="${key}-ex-${n}">${item.example[0]} → ${item.example[1]} → ${item.example[2]}</div>
+      </div>`;
+    }
+  });
+
+  section.innerHTML = html;
+  exContainer.appendChild(section);
+});
+
+/* ============== TAB SWITCH ============== */
+function showTab(key){
+  keys.forEach(k=>{
+    document.getElementById('section-'+k).classList.toggle('active', k===key);
+    document.getElementById('tabbtn-'+k).classList.toggle('active', k===key);
+  });
+}
+
+/* ============== CHECK LOGIC (type=check) ============== */
+function checkOne(key, n){
+  const item = DATA[key].items[n-1];
+  const input = document.getElementById(`${key}-input-${n}`);
+  const fb = document.getElementById(`${key}-fb-${n}`);
+  const ok = isCorrect(input.value, item.answers);
+  fb.className = 'feedback ' + (ok ? 'correct' : 'incorrect');
+  fb.textContent = ok ? '✅ Верно!' : '❌ Не совсем. Нажмите «Показать ответ», чтобы увидеть объяснение.';
+  updateScore(key);
+}
+function checkAll(key){
+  DATA[key].items.forEach((item,i)=> {
+    const n=i+1;
+    if(DATA[key].type==='check') checkOne(key,n);
+    else if(DATA[key].type==='pattern') checkOnePattern(key,n);
+  });
+}
+function checkOnePattern(key, n){
+  const item = DATA[key].items[n-1];
+  const select = document.getElementById(`${key}-input-${n}`);
+  const fb = document.getElementById(`${key}-fb-${n}`);
+  const val = select.value;
+  const ok = val !== '' && parseInt(val) === item.correct;
+  fb.className = 'feedback ' + (ok ? 'correct' : 'incorrect');
+  fb.textContent = ok ? '✅ Верно!' : '❌ Не совсем. Нажмите «Показать ответ», чтобы увидеть объяснение.';
+  updateScore(key);
+}
+function updateScore(key){
+  const items = DATA[key].items;
+  let correct = 0;
+  items.forEach((item,i)=>{
+    const n=i+1;
+    if(DATA[key].type==='check'){
+      const input = document.getElementById(`${key}-input-${n}`);
+      if(isCorrect(input.value, item.answers)) correct++;
+    } else if(DATA[key].type==='pattern'){
+      const select = document.getElementById(`${key}-input-${n}`);
+      if(select.value !== '' && parseInt(select.value)===item.correct) correct++;
+    }
+  });
+  const badge = document.getElementById('score-'+key);
+  if(badge) badge.textContent = `${correct} / ${items.length}`;
+}
+function toggleAnswer(key, n){
+  const box = document.getElementById(`${key}-ans-${n}`);
+  box.classList.toggle('show');
+}
+function showAllAnswers(key){
+  DATA[key].items.forEach((item,i)=>{
+    document.getElementById(`${key}-ans-${i+1}`).classList.add('show');
+  });
+}
+function resetEx(key){
+  const ex = DATA[key];
+  ex.items.forEach((item,i)=>{
+    const n=i+1;
+    if(ex.type==='check'){
+      document.getElementById(`${key}-input-${n}`).value='';
+      const fb=document.getElementById(`${key}-fb-${n}`); fb.className='feedback'; fb.textContent='';
+      document.getElementById(`${key}-ans-${n}`).classList.remove('show');
+    } else if(ex.type==='pattern'){
+      document.getElementById(`${key}-input-${n}`).value='';
+      const fb=document.getElementById(`${key}-fb-${n}`); fb.className='feedback'; fb.textContent='';
+      document.getElementById(`${key}-ans-${n}`).classList.remove('show');
+    } else if(ex.type==='open'){
+      document.getElementById(`${key}-input-${n}`).value='';
+      document.getElementById(`${key}-ex-${n}`).classList.remove('show');
+    } else if(ex.type==='drill'){
+      document.getElementById(`${key}-s1-${n}`).value='';
+      document.getElementById(`${key}-s2-${n}`).value='';
+      document.getElementById(`${key}-s3-${n}`).value='';
+      document.getElementById(`${key}-ex-${n}`).classList.remove('show');
+    }
+  });
+  const badge = document.getElementById('score-'+key);
+  if(badge) badge.textContent = `0 / ${ex.items.length}`;
+}
+
+/* ============== OPEN / DRILL HELPERS ============== */
+function toggleExample(key, n){
+  document.getElementById(`${key}-ex-${n}`).classList.toggle('show');
+}
+function toggleAllExamples(key){
+  DATA[key].items.forEach((item,i)=>{
+    document.getElementById(`${key}-ex-${i+1}`).classList.toggle('show');
+  });
+}
+function copyAll(key){
+  const ex = DATA[key];
+  let lines = [ex.title, ''];
+  ex.items.forEach((item,i)=>{
+    const n=i+1;
+    if(ex.type==='open'){
+      const val = document.getElementById(`${key}-input-${n}`).value.trim();
+      lines.push(`${n}. ${val || '(пусто)'}`);
+    } else if(ex.type==='drill'){
+      const s1 = document.getElementById(`${key}-s1-${n}`).value.trim() || item.word;
+      const s2 = document.getElementById(`${key}-s2-${n}`).value.trim() || '...';
+      const s3 = document.getElementById(`${key}-s3-${n}`).value.trim() || '...';
+      lines.push(`${n}. ${s1} → ${s2} → ${s3}`);
+    }
+  });
+  const text = lines.join('\n');
+  navigator.clipboard.writeText(text).then(()=>{
+    alert('Ответы скопированы в буфер обмена! ✅');
+  }).catch(()=>{
+    const ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+    alert('Ответы скопированы в буфер обмена! ✅');
+  });
+}
+</script>
+</body>
+</html>
