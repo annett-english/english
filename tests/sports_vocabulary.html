@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sports Vocabulary — тренажёр</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0B1F3A;
+    --navy-2:#132A4D;
+    --crimson:#C81E3A;
+    --crimson-dark:#9E1730;
+    --chalk:#F7F5F0;
+    --paper:#FFFFFF;
+    --ink:#0B1F3A;
+    --ink-soft:#4A5568;
+    --gold:#FFC93C;
+    --line:#E3DFD4;
+    --good:#1E8E5A;
+    --bad:#C81E3A;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--chalk);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    line-height:1.5;
+  }
+  h1,h2,h3,.display{
+    font-family:'Oswald',sans-serif;
+    text-transform:uppercase;
+    letter-spacing:.02em;
+  }
+  .mono{font-family:'Roboto Mono',monospace;}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    background:
+      repeating-linear-gradient(180deg, transparent 0 38px, rgba(255,255,255,.05) 38px 40px),
+      linear-gradient(135deg, var(--navy) 0%, var(--navy-2) 100%);
+    color:#fff;
+    padding:56px 24px 40px;
+    position:relative;
+    overflow:hidden;
+    border-bottom:6px solid var(--crimson);
+  }
+  .hero::after{
+    content:"";
+    position:absolute; left:0; right:0; bottom:-4px; height:10px;
+    background:repeating-linear-gradient(90deg, var(--gold) 0 28px, transparent 28px 56px);
+    opacity:.9;
+  }
+  .hero-inner{max-width:1160px; margin:0 auto;}
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:'Roboto Mono',monospace; font-size:12px; letter-spacing:.15em;
+    color:var(--gold); text-transform:uppercase; margin-bottom:10px;
+  }
+  .hero h1{font-size:clamp(32px,5vw,52px); margin:0 0 8px; line-height:1;}
+  .hero p{max-width:640px; color:#C9D3E4; font-size:16px; margin:0 0 20px;}
+  .scoreboard{
+    display:inline-flex; gap:0; background:#08162B; border:2px solid #23385C;
+    border-radius:8px; overflow:hidden; font-family:'Roboto Mono',monospace;
+  }
+  .scoreboard div{padding:10px 18px; text-align:center; border-right:1px solid #23385C;}
+  .scoreboard div:last-child{border-right:none;}
+  .scoreboard .num{font-size:22px; font-weight:700; color:var(--gold);}
+  .scoreboard .lbl{font-size:10px; letter-spacing:.1em; color:#8FA3C4; text-transform:uppercase;}
+
+  /* ---------- LAYOUT ---------- */
+  .layout{
+    max-width:1160px; margin:0 auto; padding:32px 24px 80px;
+    display:grid; grid-template-columns:1fr 280px; gap:32px; align-items:start;
+  }
+  @media (max-width:880px){ .layout{grid-template-columns:1fr;} }
+
+  .main-col{min-width:0;}
+
+  /* ---------- WORD BANK ---------- */
+  .wordbank{
+    background:var(--paper); border:1px solid var(--line); border-radius:var(--radius);
+    padding:20px 20px 8px; margin-bottom:36px;
+  }
+  .wordbank h2{font-size:20px; margin:0 0 4px; color:var(--navy);}
+  .wordbank .sub{color:var(--ink-soft); font-size:13px; margin-bottom:16px;}
+  table.wb{width:100%; border-collapse:collapse; font-size:14px;}
+  table.wb th{
+    text-align:left; font-family:'Roboto Mono',monospace; font-size:11px; letter-spacing:.08em;
+    text-transform:uppercase; color:var(--ink-soft); padding:8px 6px; border-bottom:2px solid var(--navy);
+  }
+  table.wb td{padding:8px 6px; border-bottom:1px solid var(--line); vertical-align:middle;}
+  table.wb tr:hover td{background:#FBFAF6;}
+  .wb-word{font-weight:600;}
+  .wb-ipa{color:var(--crimson); font-family:'Roboto Mono',monospace; font-size:13px;}
+  .listen-btn{
+    border:1px solid var(--navy); background:#fff; color:var(--navy); cursor:pointer;
+    border-radius:50%; width:30px; height:30px; font-size:14px; line-height:1;
+    display:inline-flex; align-items:center; justify-content:center; transition:.15s;
+  }
+  .listen-btn:hover{background:var(--navy); color:#fff;}
+
+  /* ---------- SIDEBAR ---------- */
+  .sidebar{
+    position:sticky; top:20px;
+    background:var(--navy); color:#fff; border-radius:var(--radius);
+    padding:18px; border:2px solid var(--crimson);
+  }
+  .sidebar h3{font-size:15px; margin:0 0 4px; color:var(--gold);}
+  .sidebar .sub{font-size:12px; color:#B9C4DA; margin-bottom:12px;}
+  #problemList{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px;}
+  #problemList li{
+    display:flex; justify-content:space-between; align-items:center;
+    background:#132A4D; padding:7px 10px; border-radius:6px; font-size:13px;
+  }
+  #problemList .cnt{
+    font-family:'Roboto Mono',monospace; background:var(--crimson); color:#fff;
+    border-radius:10px; padding:1px 8px; font-size:11px;
+  }
+  #problemEmpty{font-size:13px; color:#8FA3C4; font-style:italic;}
+
+  /* ---------- EXERCISE CARD ---------- */
+  .exercise{
+    background:var(--paper); border:1px solid var(--line); border-radius:var(--radius);
+    margin-bottom:28px; overflow:hidden;
+    border-left:8px solid var(--crimson);
+    background-image:repeating-linear-gradient(180deg, transparent 0 15px, #fff 15px 15px);
+  }
+  .ex-head{
+    display:flex; align-items:center; gap:14px; padding:16px 20px 10px;
+  }
+  .lane-badge{
+    font-family:'Roboto Mono',monospace; font-weight:700; font-size:20px;
+    background:var(--navy); color:var(--gold); border-radius:6px;
+    min-width:44px; height:44px; display:flex; align-items:center; justify-content:center;
+  }
+  .ex-title-wrap{flex:1;}
+  .ex-title{font-size:19px; margin:0; color:var(--navy);}
+  .ex-instructions{font-size:13px; color:var(--ink-soft); margin:2px 0 0;}
+  .ex-score{
+    font-family:'Roboto Mono',monospace; font-size:13px; font-weight:700; color:var(--ink-soft);
+    white-space:nowrap;
+  }
+  .items{padding:4px 20px 6px; display:flex; flex-direction:column; gap:10px;}
+  .item{
+    display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+    padding:8px 10px; border-radius:8px; background:#FBFAF6; border:1px solid transparent;
+  }
+  .item .n{font-family:'Roboto Mono',monospace; color:var(--crimson); font-weight:700; min-width:22px;}
+  .item .prompt{flex:1; min-width:200px; font-size:14.5px;}
+  .item .prompt mark{background:#FFE9B0; padding:0 3px; border-radius:3px;}
+  .item .emoji{font-size:30px; margin-right:4px;}
+  .item input[type=text]{
+    flex:0 0 200px; padding:7px 10px; border:1.5px solid var(--line); border-radius:6px;
+    font-size:14px; font-family:'Inter',sans-serif;
+  }
+  .item select{
+    padding:7px 8px; border:1.5px solid var(--line); border-radius:6px; font-size:14px;
+  }
+  .item.correct{background:#E8F6EE; border-color:var(--good);}
+  .item.incorrect{background:#FCEAEA; border-color:var(--bad);}
+  .item .verdict{font-weight:700; font-size:13px;}
+  .item.correct .verdict{color:var(--good);}
+  .item.incorrect .verdict{color:var(--bad);}
+  .choices{display:flex; gap:14px; flex-wrap:wrap;}
+  .choices label{
+    display:flex; align-items:center; gap:5px; font-size:14px; background:#fff;
+    border:1.5px solid var(--line); border-radius:6px; padding:5px 10px; cursor:pointer;
+  }
+  .mini-play{
+    border:none; background:var(--navy); color:#fff; border-radius:50%;
+    width:32px; height:32px; cursor:pointer; font-size:14px;
+  }
+  .mini-play:hover{background:var(--crimson);}
+
+  .ex-actions{
+    display:flex; gap:10px; padding:14px 20px 20px; flex-wrap:wrap;
+  }
+  button.btn{
+    font-family:'Inter',sans-serif; font-weight:600; font-size:14px; cursor:pointer;
+    border-radius:7px; padding:10px 18px; border:none; transition:.15s;
+  }
+  .btn-primary{background:var(--crimson); color:#fff;}
+  .btn-primary:hover{background:var(--crimson-dark);}
+  .btn-secondary{background:#fff; color:var(--navy); border:1.5px solid var(--navy) !important;}
+  .btn-secondary:hover{background:var(--navy); color:#fff;}
+  .btn-copy{background:var(--gold); color:var(--navy);}
+  .btn-copy:hover{filter:brightness(.93);}
+
+  /* open sections */
+  .open-item{margin-bottom:14px;}
+  .open-item .lead{font-size:14.5px; margin-bottom:6px;}
+  .open-item textarea{
+    width:100%; min-height:52px; border:1.5px solid var(--line); border-radius:8px;
+    padding:9px 11px; font-family:'Inter',sans-serif; font-size:14px; resize:vertical;
+  }
+  .drill-example{
+    background:#FBFAF6; border:1px dashed var(--crimson); border-radius:8px;
+    padding:12px 16px; font-size:14px; margin-bottom:18px;
+  }
+  .drill-example .chain{font-family:'Roboto Mono',monospace; color:var(--navy);}
+  .drill-row{
+    display:grid; grid-template-columns:110px 1fr 1fr; gap:8px; align-items:center; margin-bottom:8px;
+  }
+  .drill-row .word{font-weight:700; color:var(--crimson);}
+  @media (max-width:700px){ .drill-row{grid-template-columns:1fr;} }
+
+  footer{
+    text-align:center; padding:30px; color:var(--ink-soft); font-size:13px;
+  }
+  .toast{
+    position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
+    background:var(--navy); color:#fff; padding:10px 20px; border-radius:8px;
+    font-size:14px; opacity:0; pointer-events:none; transition:.25s;
+  }
+  .toast.show{opacity:1;}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow">● Lesson Track — Sports People &amp; Places</div>
+    <h1>Sports Vocabulary</h1>
+    <p>Спортивная лексика: люди, места и снаряжение. Прослушай, прочитай, впиши руками — и проверь себя в 13 упражнениях.</p>
+    <div class="scoreboard">
+      <div><div class="num" id="scoreDone">0</div><div class="lbl">Проверено</div></div>
+      <div><div class="num" id="scoreCorrect">0</div><div class="lbl">Верно</div></div>
+      <div><div class="num" id="scoreTotal">0</div><div class="lbl">Всего вопросов</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="layout">
+  <div class="main-col">
+
+    <div class="wordbank">
+      <h2>Слова урока</h2>
+      <div class="sub">Прочитай перевод и транскрипцию, нажми 🔊, чтобы прослушать произношение.</div>
+      <table class="wb">
+        <thead><tr><th>Word</th><th>Транскрипция</th><th>Перевод</th><th></th></tr></thead>
+        <tbody id="wordBankBody"></tbody>
+      </table>
+    </div>
+
+    <div id="exercisesRoot"></div>
+
+    <!-- OPEN SECTION A -->
+    <div class="exercise">
+      <div class="ex-head">
+        <div class="lane-badge">12</div>
+        <div class="ex-title-wrap">
+          <h3 class="ex-title">Finish the sentences</h3>
+          <p class="ex-instructions">Закончи предложения своими идеями. Когда закончишь — скопируй все ответы одной кнопкой.</p>
+        </div>
+      </div>
+      <div class="items" id="finishSentences" style="flex-direction:column;"></div>
+      <div class="ex-actions">
+        <button class="btn btn-copy" onclick="copyOpenSection('finishSentences','Мои предложения')">📋 Скопировать все ответы</button>
+      </div>
+    </div>
+
+    <!-- OPEN SECTION B: DRILL -->
+    <div class="exercise">
+      <div class="ex-head">
+        <div class="lane-badge">13</div>
+        <div class="ex-title-wrap">
+          <h3 class="ex-title">Repeat &amp; Change — drilling</h3>
+          <p class="ex-instructions">По образцу: слово → словосочетание → предложение. Придумай свои варианты для каждого слова.</p>
+        </div>
+      </div>
+      <div style="padding:0 20px;">
+        <div class="drill-example">
+          <div class="chain">suffer</div>
+          <div class="chain">suffer → <b>suffer from stress</b></div>
+          <div class="chain">suffer from stress → <b>Many people suffer from stress.</b></div>
+        </div>
+      </div>
+      <div class="items" id="drillArea" style="flex-direction:column;"></div>
+      <div class="ex-actions">
+        <button class="btn btn-copy" onclick="copyDrill()">📋 Скопировать все ответы</button>
+      </div>
+    </div>
+
+  </div>
+
+  <aside class="sidebar">
+    <h3>⚠ Проблемные слова</h3>
+    <div class="sub">Сюда попадают слова, в которых была ошибка</div>
+    <div id="problemEmpty">Пока ошибок нет — так держать!</div>
+    <ul id="problemList"></ul>
+  </aside>
+</div>
+
+<footer>Sports Vocabulary Trainer — прописывай слова руками, проверяй себя, учись на ошибках.</footer>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ===================== DATA ===================== */
+const WORDS = [
+  {w:"captain", ipa:"/ˈkæptɪn/", ru:"капитан"},
+  {w:"coach", ipa:"/kəʊtʃ/", ru:"тренер"},
+  {w:"fans", ipa:"/fænz/", ru:"болельщики"},
+  {w:"players", ipa:"/ˈpleɪəz/", ru:"игроки"},
+  {w:"referee", ipa:"/ˌrefəˈriː/", ru:"судья (футбол)"},
+  {w:"umpire", ipa:"/ˈʌmpaɪə(r)/", ru:"судья (теннис, крикет)"},
+  {w:"spectators", ipa:"/spekˈteɪtəz/", ru:"зрители"},
+  {w:"the crowd", ipa:"/kraʊd/", ru:"толпа"},
+  {w:"sports hall", ipa:"/ˈspɔːts hɔːl/", ru:"спортивный зал"},
+  {w:"stadium", ipa:"/ˈsteɪdiəm/", ru:"стадион"},
+  {w:"team", ipa:"/tiːm/", ru:"команда"},
+  {w:"tracksuit", ipa:"/ˈtræksuːt/", ru:"спортивный костюм"},
+  {w:"track", ipa:"/træk/", ru:"беговая дорожка, трек"},
+  {w:"circuit", ipa:"/ˈsɜːkɪt/", ru:"круг, трасса"},
+  {w:"slope", ipa:"/sləʊp/", ru:"склон"},
+  {w:"pool", ipa:"/puːl/", ru:"бассейн"},
+  {w:"course", ipa:"/kɔːs/", ru:"трасса, маршрут"},
+  {w:"pitch", ipa:"/pɪtʃ/", ru:"поле (футбольное)"},
+  {w:"court", ipa:"/kɔːt/", ru:"корт"},
+];
+
+function norm(s){ return (s||"").trim().toLowerCase().replace(/\s+/g," ").replace(/^the\s+/,""); }
+function isCorrect(user, answer){
+  const accepted = Array.isArray(answer) ? answer : [answer];
+  const u = norm(user);
+  return accepted.some(a => norm(a) === u);
+}
+
+const EXERCISES = [
+{
+  id:"ex1", lane:"01", type:"text",
+  title:"Fill in the missing letters",
+  instr:"Впиши пропущенные буквы и запиши слово целиком.",
+  items:[
+    {prompt:"c_pt__n — капитан", answer:"captain", word:"captain"},
+    {prompt:"co_ch — тренер", answer:"coach", word:"coach"},
+    {prompt:"f_ns — болельщики", answer:"fans", word:"fans"},
+    {prompt:"pl_y_rs — игроки", answer:"players", word:"players"},
+    {prompt:"ref_r_e — судья (футбол)", answer:"referee", word:"referee"},
+    {prompt:"um_ire — судья (теннис)", answer:"umpire", word:"umpire"},
+    {prompt:"spect_t_rs — зрители", answer:"spectators", word:"spectators"},
+    {prompt:"cro_d — толпа", answer:"crowd", word:"the crowd"},
+    {prompt:"st_d_um — стадион", answer:"stadium", word:"stadium"},
+    {prompt:"tr_cks_it — спортивный костюм", answer:"tracksuit", word:"tracksuit"},
+  ]
+},
+{
+  id:"ex2", lane:"02", type:"text",
+  title:"Translate: Russian → English",
+  instr:"Переведи слово или словосочетание на английский.",
+  items:[
+    {prompt:"капитан", answer:"captain", word:"captain"},
+    {prompt:"тренер", answer:"coach", word:"coach"},
+    {prompt:"болельщики", answer:"fans", word:"fans"},
+    {prompt:"судья (в теннисе)", answer:"umpire", word:"umpire"},
+    {prompt:"зрители", answer:"spectators", word:"spectators"},
+    {prompt:"толпа", answer:"crowd", word:"the crowd"},
+    {prompt:"спортивный зал", answer:"sports hall", word:"sports hall"},
+    {prompt:"стадион", answer:"stadium", word:"stadium"},
+    {prompt:"беговая дорожка", answer:"track", word:"track"},
+    {prompt:"склон", answer:"slope", word:"slope"},
+  ]
+},
+{
+  id:"ex3", lane:"03", type:"dictation",
+  title:"Spell the word you hear",
+  instr:"Нажми 🔊, прослушай произношение и напиши слово по звуку.",
+  items:[
+    {answer:"pool", word:"pool"},
+    {answer:"course", word:"course"},
+    {answer:"pitch", word:"pitch"},
+    {answer:"court", word:"court"},
+    {answer:"circuit", word:"circuit"},
+    {answer:"slope", word:"slope"},
+    {answer:"track", word:"track"},
+    {answer:"team", word:"team"},
+    {answer:"referee", word:"referee"},
+    {answer:"umpire", word:"umpire"},
+  ]
+},
+{
+  id:"ex4", lane:"04", type:"text",
+  title:"Definition",
+  instr:"Прочитай определение и напиши подходящее слово.",
+  items:[
+    {prompt:"The player who leads the team.", answer:"captain", word:"captain"},
+    {prompt:"A person who trains a sports team.", answer:"coach", word:"coach"},
+    {prompt:"People who support a team or a player.", answer:["fans"], word:"fans"},
+    {prompt:"The official who controls a football match.", answer:"referee", word:"referee"},
+    {prompt:"The official who controls a tennis or cricket match.", answer:"umpire", word:"umpire"},
+    {prompt:"People watching a sports event.", answer:["spectators"], word:"spectators"},
+    {prompt:"A large group of people watching something.", answer:["crowd","the crowd"], word:"the crowd"},
+    {prompt:"A large building with seats for many people watching sport.", answer:"stadium", word:"stadium"},
+    {prompt:"Clothes worn for training — a jacket and trousers.", answer:"tracksuit", word:"tracksuit"},
+    {prompt:"A piece of land where football is played.", answer:"pitch", word:"pitch"},
+  ]
+},
+{
+  id:"ex5", lane:"05", type:"text",
+  title:"Word combinability (collocations)",
+  instr:"Впиши слово, которое сочетается с остальной частью фразы.",
+  items:[
+    {prompt:"The ___ blows the whistle.", answer:"referee", word:"referee"},
+    {prompt:"The line ___ checks if the ball is out.", answer:"umpire", word:"umpire"},
+    {prompt:"Swim fifty metres in the ___.", answer:"pool", word:"pool"},
+    {prompt:"Run three laps around the ___.", answer:"track", word:"track"},
+    {prompt:"Ski quickly down the ___.", answer:"slope", word:"slope"},
+    {prompt:"Play a match on a clay ___.", answer:"court", word:"court"},
+    {prompt:"The football match is on the ___.", answer:"pitch", word:"pitch"},
+    {prompt:"The marathon ___ goes through the city centre.", answer:"course", word:"course"},
+    {prompt:"The ___ cheered loudly after the goal.", answer:["crowd","the crowd"], word:"the crowd"},
+    {prompt:"She put on a warm ___ before the race.", answer:"tracksuit", word:"tracksuit"},
+  ]
+},
+{
+  id:"ex6", lane:"06", type:"picture",
+  title:"Guess by the picture",
+  instr:"Посмотри на картинку-эмодзи и напиши слово по-английски.",
+  items:[
+    {emoji:"📋🧑‍🏫", answer:"coach", word:"coach"},
+    {emoji:"📣👏", answer:"fans", word:"fans"},
+    {emoji:"🏟️", answer:"stadium", word:"stadium"},
+    {emoji:"🎽", answer:"tracksuit", word:"tracksuit"},
+    {emoji:"🏊", answer:"pool", word:"pool"},
+    {emoji:"⛷️", answer:"slope", word:"slope"},
+    {emoji:"🎾", answer:"court", word:"court"},
+    {emoji:"⚽🌱", answer:"pitch", word:"pitch"},
+    {emoji:"🏁🔁", answer:"circuit", word:"circuit"},
+    {emoji:"👥👏", answer:["crowd","the crowd"], word:"the crowd"},
+  ]
+},
+{
+  id:"ex7", lane:"07", type:"text",
+  title:"Context",
+  instr:"Впиши слово, которое подходит по смыслу предложения.",
+  items:[
+    {prompt:"The ___ scored two goals in the match.", answer:"players", word:"players"},
+    {prompt:"Our ___ always motivates us before the game.", answer:"coach", word:"coach"},
+    {prompt:"The ___ stopped the game because of a foul.", answer:"referee", word:"referee"},
+    {prompt:"Thousands of ___ filled the stadium.", answer:"spectators", word:"spectators"},
+    {prompt:"She trains every day at the sports ___.", answer:"hall", word:"sports hall"},
+    {prompt:"The runners completed one ___ before the finish.", answer:"circuit", word:"circuit"},
+    {prompt:"He changed into his ___ before training.", answer:"tracksuit", word:"tracksuit"},
+    {prompt:"We booked a ___ to play tennis on Saturday.", answer:"court", word:"court"},
+    {prompt:"The skiers raced down the steep ___.", answer:"slope", word:"slope"},
+    {prompt:"The marathon ___ passes through the old town.", answer:"course", word:"course"},
+  ]
+},
+{
+  id:"ex8", lane:"08", type:"match",
+  title:"Match the halves of the expressions",
+  instr:"Выбери в выпадающем списке подходящее продолжение выражения.",
+  rightPool:["stress","a goal","a record","a championship","a match","the course","the whistle","a sports club","a tracksuit","the team"],
+  items:[
+    {left:"suffer from", answer:"stress", word:"suffer"},
+    {left:"score", answer:"a goal", word:"score"},
+    {left:"break", answer:"a record", word:"break"},
+    {left:"win", answer:"a championship", word:"win"},
+    {left:"lose", answer:"a match", word:"lose"},
+    {left:"follow", answer:"the course", word:"course"},
+    {left:"blow", answer:"the whistle", word:"referee"},
+    {left:"join a", answer:"sports club", word:"sports hall"},
+    {left:"wear a", answer:"tracksuit", word:"tracksuit"},
+    {left:"cheer for", answer:"the team", word:"team"},
+  ]
+},
+{
+  id:"ex9", lane:"09", type:"text",
+  title:"Guess the word",
+  instr:"Прочитай подсказку и первую букву — напиши слово.",
+  items:[
+    {prompt:"Starts with \"c\" — a lap of a running track.", answer:"circuit", word:"circuit"},
+    {prompt:"Starts with \"p\" — a place for swimming.", answer:"pool", word:"pool"},
+    {prompt:"Starts with \"s\" — a steep place for skiing.", answer:"slope", word:"slope"},
+    {prompt:"Starts with \"c\" — where tennis is played.", answer:"court", word:"court"},
+    {prompt:"Starts with \"p\" — where football is played.", answer:"pitch", word:"pitch"},
+    {prompt:"Starts with \"t\" — a place to run around.", answer:"track", word:"track"},
+    {prompt:"Starts with \"c\" — the route of a marathon.", answer:"course", word:"course"},
+    {prompt:"Starts with \"s\" — a big building for sports events.", answer:"stadium", word:"stadium"},
+    {prompt:"Starts with \"t\" — clothes for training.", answer:"tracksuit", word:"tracksuit"},
+    {prompt:"Starts with \"c\" — the leader of a team.", answer:"captain", word:"captain"},
+  ]
+},
+{
+  id:"ex10", lane:"10", type:"choice",
+  title:"True or false?",
+  instr:"Выбери True или False.",
+  options:["True","False"],
+  items:[
+    {prompt:"A referee usually judges tennis matches.", answer:"False", word:"umpire"},
+    {prompt:"Spectators are people who watch a sports event.", answer:"True", word:"spectators"},
+    {prompt:"A tracksuit is worn for swimming.", answer:"False", word:"tracksuit"},
+    {prompt:"A stadium can hold thousands of spectators.", answer:"True", word:"stadium"},
+    {prompt:"Fans support their favourite team or player.", answer:"True", word:"fans"},
+    {prompt:"A court is only used for football.", answer:"False", word:"court"},
+    {prompt:"A pool is a place for skiing.", answer:"False", word:"pool"},
+    {prompt:"A pitch is a field where football is played.", answer:"True", word:"pitch"},
+    {prompt:"The crowd usually means just two or three people.", answer:"False", word:"the crowd"},
+    {prompt:"A coach trains a sports team.", answer:"True", word:"coach"},
+  ]
+},
+{
+  id:"ex11", lane:"11", type:"choice3",
+  title:"Which word fits?",
+  instr:"Выбери правильный вариант.",
+  items:[
+    {prompt:"The tennis match is judged by the ___.", options:["referee","umpire","coach"], answer:"umpire", word:"umpire"},
+    {prompt:"Football fans cheer to support their ___.", options:["team","court","slope"], answer:"team", word:"team"},
+    {prompt:"We swim in the ___.", options:["pitch","pool","track"], answer:"pool", word:"pool"},
+    {prompt:"Skiers go down the ___.", options:["slope","court","circuit"], answer:"slope", word:"slope"},
+    {prompt:"The marathon ___ is 42 km long.", options:["pitch","course","pool"], answer:"course", word:"course"},
+    {prompt:"She wore her ___ to the gym.", options:["umpire","tracksuit","crowd"], answer:"tracksuit", word:"tracksuit"},
+    {prompt:"The football match is played on the ___.", options:["court","pitch","slope"], answer:"pitch", word:"pitch"},
+    {prompt:"Thousands of ___ cheered in the stadium.", options:["spectators","coaches","captains"], answer:"spectators", word:"spectators"},
+    {prompt:"He trains at the sports ___ every evening.", options:["hall","course","track"], answer:"hall", word:"sports hall"},
+    {prompt:"Formula 1 drivers race around the ___.", options:["circuit","pool","court"], answer:"circuit", word:"circuit"},
+  ]
+},
+];
+
+const FINISH_STARTERS = [
+  "My favourite sports team is... because...",
+  "If I were a coach, I would...",
+  "The best stadium I've ever seen or heard of is...",
+  "I get nervous when the referee...",
+  "On weekends I like to go to the pool and...",
+  "My dream is to play on a professional...",
+  "When I see the crowd cheering, I feel...",
+  "If I could choose a tracksuit colour, it would be... because...",
+  "The hardest part of running on a track is...",
+  "In my opinion, a good captain should...",
+];
+
+const DRILL_WORDS = ["captain","coach","fans","referee","stadium","tracksuit","pool","slope","court","circuit"];
+
+/* ===================== STATE ===================== */
+const problemWords = new Map(); // word -> count
+let totalChecked = 0, totalCorrect = 0, totalQuestions = 0;
+
+/* ===================== RENDER: WORD BANK ===================== */
+const wbBody = document.getElementById("wordBankBody");
+WORDS.forEach((item, i)=>{
+  const tr = document.createElement("tr");
+  tr.innerHTML = `
+    <td class="wb-word">${item.w}</td>
+    <td class="wb-ipa">${item.ipa}</td>
+    <td>${item.ru}</td>
+    <td><button class="listen-btn" onclick="speak('${item.w.replace(/'/g,"")}')">🔊</button></td>`;
+  wbBody.appendChild(tr);
+});
+
+/* ===================== SPEECH ===================== */
+function speak(text){
+  if(!('speechSynthesis' in window)){ toast("Голосовой движок не поддерживается в этом браузере"); return; }
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = "en-GB"; u.rate = 0.9;
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(u);
+}
+
+/* ===================== TOAST ===================== */
+function toast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.classList.add("show");
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(()=>t.classList.remove("show"), 1800);
+}
+
+/* ===================== RENDER EXERCISES ===================== */
+const root = document.getElementById("exercisesRoot");
+
+function shuffle(arr){ return arr.map(v=>[Math.random(),v]).sort((a,b)=>a[0]-b[0]).map(v=>v[1]); }
+
+EXERCISES.forEach(ex=>{
+  totalQuestions += ex.items.length;
+  const section = document.createElement("div");
+  section.className = "exercise";
+  section.id = ex.id;
+
+  let itemsHtml = "";
+  ex.items.forEach((it, idx)=>{
+    if(ex.type==="text"){
+      itemsHtml += `<div class="item" data-idx="${idx}">
+        <span class="n">${idx+1}.</span>
+        <span class="prompt">${it.prompt}</span>
+        <input type="text" autocomplete="off" spellcheck="false">
+        <span class="verdict"></span>
+      </div>`;
+    } else if(ex.type==="dictation"){
+      itemsHtml += `<div class="item" data-idx="${idx}">
+        <span class="n">${idx+1}.</span>
+        <button class="mini-play" onclick="speak('${it.answer}')">🔊</button>
+        <span class="prompt">Напиши слово, которое услышал(а)</span>
+        <input type="text" autocomplete="off" spellcheck="false">
+        <span class="verdict"></span>
+      </div>`;
+    } else if(ex.type==="picture"){
+      itemsHtml += `<div class="item" data-idx="${idx}">
+        <span class="n">${idx+1}.</span>
+        <span class="emoji">${it.emoji}</span>
+        <input type="text" autocomplete="off" spellcheck="false" placeholder="напиши слово">
+        <span class="verdict"></span>
+      </div>`;
+    } else if(ex.type==="match"){
+      const opts = ["— выбери —", ...ex.rightPool];
+      itemsHtml += `<div class="item" data-idx="${idx}">
+        <span class="n">${idx+1}.</span>
+        <span class="prompt"><b>${it.left}</b> ___</span>
+        <select>${opts.map(o=>`<option>${o}</option>`).join("")}</select>
+        <span class="verdict"></span>
+      </div>`;
+    } else if(ex.type==="choice"){
+      const opts = ex.options.map(o=>`<label><input type="radio" name="${ex.id}_${idx}" value="${o}">${o}</label>`).join("");
+      itemsHtml += `<div class="item" data-idx="${idx}">
+        <span class="n">${idx+1}.</span>
+        <span class="prompt">${it.prompt}</span>
+        <span class="choices">${opts}</span>
+        <span class="verdict"></span>
+      </div>`;
+    } else if(ex.type==="choice3"){
+      const opts = it.options.map(o=>`<label><input type="radio" name="${ex.id}_${idx}" value="${o}">${o}</label>`).join("");
+      itemsHtml += `<div class="item" data-idx="${idx}">
+        <span class="n">${idx+1}.</span>
+        <span class="prompt">${it.prompt}</span>
+        <span class="choices">${opts}</span>
+        <span class="verdict"></span>
+      </div>`;
+    } else if(ex.type==="pictureSentence"){
+      itemsHtml += `<div class="item" data-idx="${idx}" style="align-items:flex-start;">
+        <span class="n">${idx+1}.</span>
+        <span class="emoji">${it.emoji}</span>
+        <input type="text" style="flex:1 1 300px;" autocomplete="off" placeholder="Напиши своё предложение...">
+        <span class="verdict"></span>
+      </div>`;
+    }
+  });
+
+  section.innerHTML = `
+    <div class="ex-head">
+      <div class="lane-badge">${ex.lane}</div>
+      <div class="ex-title-wrap">
+        <h3 class="ex-title">${ex.title}</h3>
+        <p class="ex-instructions">${ex.instr}</p>
+      </div>
+      <div class="ex-score" id="${ex.id}_score"></div>
+    </div>
+    <div class="items">${itemsHtml}</div>
+    <div class="ex-actions">
+      <button class="btn btn-primary" onclick="checkExercise('${ex.id}')">✔ Проверить</button>
+      <button class="btn btn-secondary" onclick="revealExercise('${ex.id}')">👁 Показать ответы</button>
+    </div>
+  `;
+  root.appendChild(section);
+});
+
+/* ===================== CHECK / REVEAL ===================== */
+function getUserAnswer(ex, idx, itemEl){
+  if(ex.type==="match"){
+    const sel = itemEl.querySelector("select");
+    return sel.value;
+  } else if(ex.type==="choice" || ex.type==="choice3"){
+    const checked = itemEl.querySelector("input[type=radio]:checked");
+    return checked ? checked.value : "";
+  } else if(ex.type==="pictureSentence"){
+    return itemEl.querySelector("input").value;
+  } else {
+    return itemEl.querySelector("input").value;
+  }
+}
+
+function checkExercise(exId){
+  const ex = EXERCISES.find(e=>e.id===exId);
+  const section = document.getElementById(exId);
+  let correctCount = 0;
+
+  ex.items.forEach((it, idx)=>{
+    const itemEl = section.querySelector(`.item[data-idx="${idx}"]`);
+    itemEl.classList.remove("correct","incorrect");
+    const verdict = itemEl.querySelector(".verdict");
+
+    if(ex.type==="pictureSentence"){
+      // open-ended: no strict check, just mark as "reviewed"
+      const val = getUserAnswer(ex, idx, itemEl);
+      if(val.trim().length > 3){
+        itemEl.classList.add("correct");
+        verdict.textContent = "✓ записано";
+        correctCount++;
+      } else {
+        itemEl.classList.add("incorrect");
+        verdict.textContent = "напиши предложение";
+      }
+      return;
+    }
+
+    const userVal = getUserAnswer(ex, idx, itemEl);
+    const ok = isCorrect(userVal, it.answer);
+    if(ok){
+      itemEl.classList.add("correct");
+      verdict.textContent = "✓";
+      correctCount++;
+    } else {
+      itemEl.classList.add("incorrect");
+      verdict.textContent = "✗";
+      addProblemWord(it.word);
+    }
+  });
+
+  document.getElementById(`${exId}_score`).textContent = `${correctCount}/${ex.items.length}`;
+  totalChecked += ex.items.length;
+  totalCorrect += correctCount;
+  updateScoreboard();
+  toast(`Упражнение проверено: ${correctCount} из ${ex.items.length}`);
+}
+
+function revealExercise(exId){
+  const ex = EXERCISES.find(e=>e.id===exId);
+  const section = document.getElementById(exId);
+  ex.items.forEach((it, idx)=>{
+    const itemEl = section.querySelector(`.item[data-idx="${idx}"]`);
+    itemEl.classList.remove("incorrect");
+    itemEl.classList.add("correct");
+    const verdict = itemEl.querySelector(".verdict");
+
+    if(ex.type==="match"){
+      itemEl.querySelector("select").value = it.answer;
+      verdict.textContent = "";
+    } else if(ex.type==="choice" || ex.type==="choice3"){
+      const radios = itemEl.querySelectorAll("input[type=radio]");
+      radios.forEach(r=>{ r.checked = (r.value===it.answer); });
+      verdict.textContent = "";
+    } else if(ex.type==="pictureSentence"){
+      itemEl.querySelector("input").value = it.sample;
+      verdict.textContent = "пример";
+    } else {
+      const answer = Array.isArray(it.answer) ? it.answer[0] : it.answer;
+      itemEl.querySelector("input").value = answer;
+      verdict.textContent = "";
+    }
+  });
+  toast("Показаны правильные ответы");
+}
+
+/* ===================== PROBLEM WORDS SIDEBAR ===================== */
+function addProblemWord(word){
+  problemWords.set(word, (problemWords.get(word)||0)+1);
+  renderProblemWords();
+}
+function renderProblemWords(){
+  const list = document.getElementById("problemList");
+  const empty = document.getElementById("problemEmpty");
+  if(problemWords.size===0){ empty.style.display="block"; list.innerHTML=""; return; }
+  empty.style.display="none";
+  const sorted = [...problemWords.entries()].sort((a,b)=>b[1]-a[1]);
+  list.innerHTML = sorted.map(([w,c])=>`<li><span>${w}</span><span class="cnt">${c}</span></li>`).join("");
+}
+
+/* ===================== SCOREBOARD ===================== */
+function updateScoreboard(){
+  document.getElementById("scoreDone").textContent = totalChecked;
+  document.getElementById("scoreCorrect").textContent = totalCorrect;
+  document.getElementById("scoreTotal").textContent = totalQuestions;
+}
+updateScoreboard();
+
+/* ===================== OPEN SECTION A: FINISH SENTENCES ===================== */
+const finishRoot = document.getElementById("finishSentences");
+FINISH_STARTERS.forEach((s, i)=>{
+  const div = document.createElement("div");
+  div.className = "open-item";
+  div.innerHTML = `<div class="lead"><b>${i+1}.</b> ${s}</div><textarea id="finish_${i}" placeholder="Напиши своё продолжение..."></textarea>`;
+  finishRoot.appendChild(div);
+});
+
+function copyOpenSection(containerId, label){
+  const container = document.getElementById(containerId);
+  const textareas = container.querySelectorAll("textarea");
+  let out = `${label}\n\n`;
+  textareas.forEach((ta, i)=>{
+    out += `${i+1}. ${ta.value || "(пусто)"}\n`;
+  });
+  navigator.clipboard.writeText(out).then(()=>toast("Ответы скопированы в буфер обмена")).catch(()=>toast("Не удалось скопировать"));
+}
+
+/* ===================== OPEN SECTION B: DRILL ===================== */
+const drillRoot = document.getElementById("drillArea");
+DRILL_WORDS.forEach((w, i)=>{
+  const div = document.createElement("div");
+  div.className = "open-item";
+  div.innerHTML = `
+    <div class="drill-row">
+      <div class="word">${w}</div>
+      <input type="text" id="drillPhrase_${i}" placeholder="словосочетание, напр. ${w} → ...">
+      <input type="text" id="drillSentence_${i}" placeholder="предложение с этим словосочетанием">
+    </div>`;
+  drillRoot.appendChild(div);
+});
+
+function copyDrill(){
+  let out = "Repeat & Change — мои ответы\n\n";
+  DRILL_WORDS.forEach((w,i)=>{
+    const phrase = document.getElementById(`drillPhrase_${i}`).value || "(пусто)";
+    const sentence = document.getElementById(`drillSentence_${i}`).value || "(пусто)";
+    out += `${w} → ${phrase} → ${sentence}\n`;
+  });
+  navigator.clipboard.writeText(out).then(()=>toast("Ответы скопированы в буфер обмена")).catch(()=>toast("Не удалось скопировать"));
+}
+</script>
+</body>
+</html>
