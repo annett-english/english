@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Family & Relatives — тетрадь для практики</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Patrick+Hand&family=PT+Serif:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#faf6ec;
+    --paper-line:#c9d8ea;
+    --margin-red:#d97a6f;
+    --ink:#28345a;
+    --ink-soft:#4a5680;
+    --accent-mustard:#c8952a;
+    --accent-sage:#6f8f5b;
+    --good:#4c7a3f;
+    --good-bg:#e7f1e0;
+    --bad:#b8433a;
+    --bad-bg:#fbe7e4;
+    --card:#fffdf7;
+    --shadow: 0 2px 0 rgba(40,52,90,0.06), 0 8px 20px rgba(40,52,90,0.06);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'PT Serif', serif;
+    color:var(--ink);
+    background:
+      repeating-linear-gradient(var(--paper),var(--paper) 31px, var(--paper-line) 32px)
+      ,var(--paper);
+    background-attachment:local;
+    padding-left:64px;
+    position:relative;
+  }
+  body::before{
+    content:"";
+    position:fixed;
+    top:0; bottom:0; left:44px;
+    width:2px;
+    background:var(--margin-red);
+    opacity:.55;
+    z-index:0;
+  }
+  .spiral{
+    position:fixed;
+    top:0; left:0; width:44px; height:100%;
+    z-index:1;
+    pointer-events:none;
+  }
+  .spiral span{
+    position:absolute;
+    left:14px;
+    width:16px;height:16px;
+    border-radius:50%;
+    background:var(--paper);
+    border:3px solid #b9c3da;
+    box-shadow: inset 0 0 0 3px var(--paper);
+  }
+  h1,h2,h3, .hand{
+    font-family:'Caveat', cursive;
+    font-weight:700;
+    color:var(--ink);
+  }
+  header.top{
+    padding:34px 36px 18px 40px;
+    position:relative;
+    z-index:2;
+  }
+  header.top h1{
+    font-size:52px;
+    margin:0 0 2px 0;
+    line-height:1;
+  }
+  header.top p.sub{
+    margin:2px 0 0 0;
+    font-size:17px;
+    color:var(--ink-soft);
+    font-style:italic;
+  }
+  .layout{
+    display:flex;
+    align-items:flex-start;
+    gap:24px;
+    padding:0 36px 60px 40px;
+    position:relative;
+    z-index:2;
+  }
+  main{flex:1; min-width:0;}
+  aside{
+    width:250px;
+    flex-shrink:0;
+    position:sticky;
+    top:20px;
+  }
+  .card{
+    background:var(--card);
+    border:1px solid #e4dcc8;
+    border-radius:10px;
+    box-shadow:var(--shadow);
+    padding:20px 22px;
+    margin-bottom:26px;
+  }
+  .sidebar-card{
+    background:repeating-linear-gradient(var(--card),var(--card) 27px,#f0e9d8 28px);
+    border:1px dashed var(--margin-red);
+    border-radius:8px;
+    padding:14px 16px;
+  }
+  .sidebar-card h3{
+    font-size:24px;
+    margin:0 0 4px 0;
+    color:var(--bad);
+  }
+  .sidebar-card p.hint{
+    font-size:13px;
+    color:var(--ink-soft);
+    margin:0 0 10px 0;
+    font-family:'PT Serif',serif;
+    font-style:italic;
+  }
+  #problemList{
+    list-style:none; margin:0; padding:0;
+    font-size:15px;
+  }
+  #problemList li{
+    display:flex; justify-content:space-between; gap:8px;
+    padding:5px 0;
+    border-bottom:1px solid #eadfc4;
+  }
+  #problemList li .w{font-weight:700; color:var(--ink);}
+  #problemList li .t{color:var(--ink-soft); font-size:13px;}
+  #problemList li .n{
+    background:var(--bad-bg); color:var(--bad);
+    border-radius:8px; padding:0 6px; font-size:12px; font-weight:700;
+    align-self:center;
+  }
+  #problemEmpty{color:var(--ink-soft); font-size:14px; font-style:italic;}
+
+  /* word reminder table */
+  .wordgrid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+    gap:10px;
+  }
+  .wordrow{
+    display:flex; align-items:center; gap:10px;
+    background:#fbf9f0;
+    border:1px solid #eee2c6;
+    border-radius:8px;
+    padding:8px 10px;
+  }
+  .wordrow .en{font-weight:700; color:var(--ink);}
+  .wordrow .tr{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px; color:var(--accent-sage);
+    display:block;
+  }
+  .wordrow .ru{font-size:13px; color:var(--ink-soft); display:block;}
+  .speak-btn{
+    margin-left:auto;
+    border:none; background:var(--ink);
+    color:#fff; width:30px;height:30px;border-radius:50%;
+    cursor:pointer; font-size:14px;
+    flex-shrink:0;
+    transition:transform .15s;
+  }
+  .speak-btn:hover{transform:scale(1.08); background:var(--accent-sage);}
+
+  /* exercise blocks */
+  .ex-title{
+    display:flex; align-items:baseline; gap:10px;
+    margin-bottom:2px;
+  }
+  .ex-title h2{font-size:32px; margin:0;}
+  .ex-title .instr{
+    font-size:15px; color:var(--ink-soft); font-style:italic;
+  }
+  .ex-desc{margin:2px 0 16px 0; font-size:14.5px; color:var(--ink-soft);}
+  .item{
+    display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+    padding:10px 0;
+    border-bottom:1px dotted #d9cfb2;
+  }
+  .item:last-of-type{border-bottom:none;}
+  .item .num{
+    font-family:'Caveat',cursive; font-size:24px; color:var(--accent-mustard);
+    width:26px; text-align:right; flex-shrink:0;
+  }
+  .item .prompt{flex:1; min-width:180px; font-size:16px;}
+  .item .prompt b{color:var(--ink);}
+  .item .emoji{font-size:34px; line-height:1;}
+  .item input[type=text]{
+    flex:1; min-width:160px;
+    font-family:'Patrick Hand', cursive;
+    font-size:19px;
+    padding:6px 4px;
+    border:none;
+    border-bottom:2px solid var(--ink-soft);
+    background:transparent;
+    color:var(--ink);
+    outline:none;
+  }
+  .item input[type=text]:focus{border-bottom-color:var(--accent-mustard);}
+  .item textarea{
+    flex:1; min-width:220px;
+    font-family:'Patrick Hand', cursive;
+    font-size:18px;
+    padding:6px;
+    border:none;
+    border-bottom:2px solid var(--ink-soft);
+    background:transparent;
+    color:var(--ink);
+    outline:none;
+    resize:vertical;
+  }
+  .fb{
+    font-size:13px; font-weight:700; padding:2px 8px; border-radius:6px;
+    display:none;
+  }
+  .fb.good{display:inline-block; color:var(--good); background:var(--good-bg);}
+  .fb.bad{display:inline-block; color:var(--bad); background:var(--bad-bg);}
+  .answer-reveal{
+    font-size:13px; color:var(--accent-sage); font-style:italic; display:none;
+  }
+  .btnrow{
+    display:flex; gap:10px; margin-top:16px; flex-wrap:wrap;
+  }
+  button.act{
+    font-family:'Patrick Hand', cursive;
+    font-size:17px;
+    padding:8px 18px;
+    border-radius:20px;
+    border:2px solid var(--ink);
+    background:var(--card);
+    color:var(--ink);
+    cursor:pointer;
+    transition:.15s;
+  }
+  button.act:hover{background:var(--ink); color:#fff;}
+  button.act.secondary{
+    border-color:var(--accent-sage); color:var(--accent-sage);
+  }
+  button.act.secondary:hover{background:var(--accent-sage); color:#fff;}
+  .score{
+    font-family:'JetBrains Mono', monospace;
+    font-size:13px; color:var(--ink-soft); margin-left:6px;
+  }
+
+  .fb.info{display:inline-block; color:var(--accent-sage); background:#eef3e7;}
+
+  footer{
+    text-align:center; padding:30px; color:var(--ink-soft); font-size:13px; font-style:italic;
+    position:relative; z-index:2;
+  }
+  @media (max-width:820px){
+    .layout{flex-direction:column;}
+    aside{position:static; width:100%;}
+    body{padding-left:34px;}
+    body::before{left:22px;}
+    .spiral{width:22px;}
+    .spiral span{left:5px; width:10px; height:10px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="spiral" id="spiral"></div>
+
+<header class="top">
+  <h1>Family &amp; Relatives</h1>
+  <p class="sub">тетрадь для практики лексики «Семья» — пиши от руки прямо на экране ✍️</p>
+</header>
+
+<div class="layout">
+  <main>
+
+    <!-- WORD REMINDER -->
+    <section class="card">
+      <h2 style="font-size:28px;margin:0 0 4px 0;">Слова для повторения</h2>
+      <p class="ex-desc">Нажми 🔊, чтобы прослушать произношение каждого слова.</p>
+      <div class="wordgrid" id="wordGrid"></div>
+    </section>
+
+    <!-- EX 1 -->
+    <section class="card" id="ex1">
+      <div class="ex-title"><h2>Упражнение 1</h2><span class="instr">Напиши слово на слух</span></div>
+      <p class="ex-desc">Нажми 🔊 и запиши услышанное слово по-английски.</p>
+      <div id="ex1-items"></div>
+      <div class="btnrow">
+        <button class="act" onclick="checkExercise('ex1')">Проверить</button>
+        <button class="act secondary" onclick="revealExercise('ex1')">Показать ответы</button>
+        <span class="score" id="ex1-score"></span>
+      </div>
+    </section>
+
+    <!-- EX 2 -->
+    <section class="card" id="ex2">
+      <div class="ex-title"><h2>Упражнение 2</h2><span class="instr">Слово по дефиниции</span></div>
+      <p class="ex-desc">Прочитай определение на английском и напиши нужное слово.</p>
+      <div id="ex2-items"></div>
+      <div class="btnrow">
+        <button class="act" onclick="checkExercise('ex2')">Проверить</button>
+        <button class="act secondary" onclick="revealExercise('ex2')">Показать ответы</button>
+        <span class="score" id="ex2-score"></span>
+      </div>
+    </section>
+
+    <!-- EX 3 -->
+    <section class="card" id="ex3">
+      <div class="ex-title"><h2>Упражнение 3</h2><span class="instr">Слово по картинке</span></div>
+      <p class="ex-desc">Посмотри на эмодзи-подсказку и напиши слово по-английски.</p>
+      <div id="ex3-items"></div>
+      <div class="btnrow">
+        <button class="act" onclick="checkExercise('ex3')">Проверить</button>
+        <button class="act secondary" onclick="revealExercise('ex3')">Показать ответы</button>
+        <span class="score" id="ex3-score"></span>
+      </div>
+    </section>
+
+    <!-- EX 4 -->
+    <section class="card" id="ex4">
+      <div class="ex-title"><h2>Упражнение 4</h2><span class="instr">Контекст</span></div>
+      <p class="ex-desc">Впиши пропущенное слово в предложение.</p>
+      <div id="ex4-items"></div>
+      <div class="btnrow">
+        <button class="act" onclick="checkExercise('ex4')">Проверить</button>
+        <button class="act secondary" onclick="revealExercise('ex4')">Показать ответы</button>
+        <span class="score" id="ex4-score"></span>
+      </div>
+    </section>
+
+    <!-- EX 5 -->
+    <section class="card" id="ex5">
+      <div class="ex-title"><h2>Упражнение 5</h2><span class="instr">Твои идеи</span></div>
+      <p class="ex-desc">Посмотри на картинку и напиши <b>своё</b> предложение с данным словом — правильного ответа тут нет, придумай сама/сам!</p>
+      <div id="ex5-items"></div>
+      <div class="btnrow">
+        <button class="act" onclick="markDone('ex5')">Отметить готово</button>
+        <button class="act secondary" onclick="copyAnswers('ex5')">📋 Скопировать все ответы</button>
+        <span class="score" id="ex5-score"></span>
+      </div>
+    </section>
+
+    <!-- EX 6 (bonus) -->
+    <section class="card" id="ex6">
+      <div class="ex-title"><h2>Упражнение 6 <span class="hand" style="font-size:22px;color:var(--accent-mustard)">★</span></h2><span class="instr">Множественное число: исключения</span></div>
+      <p class="ex-desc">Напиши форму множественного числа.</p>
+      <div id="ex6-items"></div>
+      <div class="btnrow">
+        <button class="act" onclick="checkExercise('ex6')">Проверить</button>
+        <button class="act secondary" onclick="revealExercise('ex6')">Показать ответы</button>
+        <span class="score" id="ex6-score"></span>
+      </div>
+    </section>
+
+  </main>
+
+  <aside>
+    <div class="sidebar-card">
+      <h3>⚠ Проблемные слова</h3>
+      <p class="hint">Сюда попадают слова, в которых ты ошиблась/ошибся</p>
+      <p id="problemEmpty">Пока ошибок нет — отлично!</p>
+      <ul id="problemList"></ul>
+    </div>
+  </aside>
+</div>
+
+<footer>сделано для практики письма — озвучка через голос браузера</footer>
+
+<script>
+/* ---------- spiral binding decoration ---------- */
+(function(){
+  const wrap = document.getElementById('spiral');
+  const n = Math.ceil(document.body.scrollHeight / 46);
+  for(let i=0;i<n;i++){
+    const s = document.createElement('span');
+    s.style.top = (20 + i*46) + 'px';
+    wrap.appendChild(s);
+  }
+  window.addEventListener('resize', ()=>{});
+})();
+
+/* ---------- word bank ---------- */
+const words = [
+  ["father","ˈfɑːðə(r)","отец"],
+  ["mother","ˈmʌðə(r)","мать"],
+  ["brother","ˈbrʌðə(r)","брат"],
+  ["sister","ˈsɪstə(r)","сестра"],
+  ["daughter","ˈdɔːtə(r)","дочь"],
+  ["son","sʌn","сын"],
+  ["grandfather","ˈɡrænfɑːðə(r)","дедушка"],
+  ["grandmother","ˈɡrænmʌðə(r)","бабушка"],
+  ["aunt","ɑːnt","тётя"],
+  ["uncle","ˈʌŋkl","дядя"],
+  ["nephew","ˈnefjuː","племянник"],
+  ["niece","niːs","племянница"],
+  ["cousin","ˈkʌzn","двоюродный брат/сестра"],
+  ["wife","waɪf","жена"],
+  ["children","ˈtʃɪldrən","дети"],
+  ["parents","ˈpeərənts","родители"],
+  ["grandparents","ˈɡrænpeərənts","бабушка и дедушка"],
+  ["parents-in-law","ˈpeərənts ɪn lɔː","родители супруга(и)"],
+  ["mother-in-law","ˈmʌðər ɪn lɔː","свекровь / тёща"],
+  ["couple","ˈkʌpl","пара"],
+  ["sister-in-law","ˈsɪstər ɪn lɔː","золовка / невестка"],
+  ["partner","ˈpɑːtnə(r)","партнёр"],
+  ["stepmother","ˈstepmʌðə(r)","мачеха"],
+  ["stepfather","ˈstepfɑːðə(r)","отчим"],
+];
+const ruOf = w => (words.find(x=>x[0]===w)||[,,w])[2];
+
+function speak(text){
+  if(!('speechSynthesis' in window)) return;
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-GB';
+  u.rate = 0.9;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+}
+
+const wordGrid = document.getElementById('wordGrid');
+words.forEach(([en,tr,ru])=>{
+  const div = document.createElement('div');
+  div.className = 'wordrow';
+  div.innerHTML = `<span>
+      <span class="en">${en}</span>
+      <span class="tr">/${tr}/</span>
+      <span class="ru">${ru}</span>
+    </span>
+    <button class="speak-btn" title="прослушать" onclick="speak('${en.replace(/'/g,"")}')">🔊</button>`;
+  wordGrid.appendChild(div);
+});
+
+/* ---------- problem words tracking ---------- */
+const problems = new Map(); // word -> count
+function markProblem(word){
+  if(!word) return;
+  problems.set(word, (problems.get(word)||0)+1);
+  renderProblems();
+}
+function renderProblems(){
+  const list = document.getElementById('problemList');
+  const empty = document.getElementById('problemEmpty');
+  list.innerHTML = '';
+  if(problems.size===0){ empty.style.display='block'; return; }
+  empty.style.display='none';
+  [...problems.entries()].sort((a,b)=>b[1]-a[1]).forEach(([w,c])=>{
+    const li = document.createElement('li');
+    li.innerHTML = `<span><span class="w">${w}</span><span class="t"> — ${ruOf(w)}</span></span><span class="n">${c}</span>`;
+    list.appendChild(li);
+  });
+}
+
+/* ---------- generic exercise builder ---------- */
+function normalize(s){
+  return s.trim().toLowerCase()
+    .replace(/[-\s]+/g,' ')
+    .replace(/[.,!?]/g,'');
+}
+function isCorrect(input, answers){
+  const n = normalize(input);
+  return answers.some(a => normalize(a) === n);
+}
+
+function buildFillItems(containerId, items){
+  const c = document.getElementById(containerId);
+  items.forEach((it, i)=>{
+    const row = document.createElement('div');
+    row.className = 'item';
+    row.dataset.answers = JSON.stringify(it.answers);
+    let promptHtml = '';
+    if(it.emoji){
+      promptHtml += `<span class="emoji">${it.emoji}</span>`;
+    }
+    if(it.audio){
+      promptHtml += `<button class="speak-btn" style="position:static" onclick="speak('${it.audio.replace(/'/g,"")}')">🔊</button>`;
+    }
+    promptHtml += `<span class="prompt">${it.prompt||''}</span>`;
+    row.innerHTML = `
+      <span class="num">${i+1}.</span>
+      ${promptHtml}
+      <input type="text" placeholder="ответ..." data-idx="${i}">
+      <span class="fb good">верно ✓</span>
+      <span class="fb bad">неверно ✕</span>
+      <span class="answer-reveal">${it.answers[0]}</span>
+    `;
+    c.appendChild(row);
+  });
+}
+
+function checkExercise(exId){
+  const items = document.querySelectorAll('#'+exId+'-items .item');
+  let correct = 0;
+  items.forEach(row=>{
+    const answers = JSON.parse(row.dataset.answers);
+    const input = row.querySelector('input, textarea');
+    const good = row.querySelector('.fb.good');
+    const bad = row.querySelector('.fb.bad');
+    good.style.display='none'; bad.style.display='none';
+    if(!input.value.trim()) return;
+    const ok = isCorrect(input.value, answers);
+    if(ok){ good.style.display='inline-block'; correct++; }
+    else { bad.style.display='inline-block'; markProblem(answers[0]); }
+  });
+  document.getElementById(exId+'-score').textContent = `${correct} / ${items.length} правильно`;
+}
+function revealExercise(exId){
+  document.querySelectorAll('#'+exId+'-items .item .answer-reveal').forEach(el=>{
+    el.style.display = el.style.display==='inline'?'none':'inline';
+  });
+}
+
+/* ---------- EX1 dictation ---------- */
+buildFillItems('ex1-items', [
+  {audio:"father", prompt:"", answers:["father"]},
+  {audio:"mother", prompt:"", answers:["mother"]},
+  {audio:"brother", prompt:"", answers:["brother"]},
+  {audio:"sister", prompt:"", answers:["sister"]},
+  {audio:"daughter", prompt:"", answers:["daughter"]},
+  {audio:"son", prompt:"", answers:["son"]},
+  {audio:"grandmother", prompt:"", answers:["grandmother"]},
+]);
+
+/* ---------- EX2 definitions ---------- */
+buildFillItems('ex2-items', [
+  {prompt:"Your father's or mother's father.", answers:["grandfather"]},
+  {prompt:"The sister of your mother or father.", answers:["aunt"]},
+  {prompt:"Your brother's or sister's son.", answers:["nephew"]},
+  {prompt:"Two people who are married or in a relationship.", answers:["couple"]},
+  {prompt:"The mother of your husband or wife.", answers:["mother-in-law","mother in law"]},
+  {prompt:"The son or daughter of your aunt or uncle.", answers:["cousin"]},
+  {prompt:"A person you live with and love, not necessarily your husband or wife.", answers:["partner"]},
+]);
+
+/* ---------- EX3 picture ---------- */
+buildFillItems('ex3-items', [
+  {emoji:"👴", prompt:"", answers:["grandfather"]},
+  {emoji:"👵", prompt:"", answers:["grandmother"]},
+  {emoji:"👦👧", prompt:"", answers:["children"]},
+  {emoji:"💑", prompt:"", answers:["couple"]},
+  {emoji:"👨‍👩‍👧‍👦", prompt:"", answers:["parents"]},
+  {emoji:"👰", prompt:"", answers:["wife"]},
+  {emoji:"👦", prompt:"", answers:["son"]},
+]);
+
+/* ---------- EX4 context ---------- */
+buildFillItems('ex4-items', [
+  {prompt:"My <b>___</b> is my father's brother.", answers:["uncle"]},
+  {prompt:"She is my mother's mother, my <b>___</b>.", answers:["grandmother"]},
+  {prompt:"My <b>___</b> live in London — I miss them.", answers:["parents"]},
+  {prompt:"He is not my real father, he is my <b>___</b>.", answers:["stepfather"]},
+  {prompt:"We are getting married next year — we are officially a <b>___</b> now.", answers:["couple"]},
+  {prompt:"My brother's daughter is my <b>___</b>.", answers:["niece"]},
+  {prompt:"Her husband's parents are her <b>___</b>.", answers:["parents-in-law","parents in law"]},
+]);
+
+/* ---------- EX5 free ideas: write your own sentence ---------- */
+const ex5data = [
+  {emoji:"👨‍👩‍👧", word:"family"},
+  {emoji:"👴📖👦", word:"grandfather"},
+  {emoji:"👰🤵", word:"wife / husband"},
+  {emoji:"👧👦", word:"sister / brother"},
+  {emoji:"👵🍪", word:"grandmother"},
+  {emoji:"💑", word:"couple"},
+];
+(function(){
+  const c = document.getElementById('ex5-items');
+  ex5data.forEach((it,i)=>{
+    const row = document.createElement('div');
+    row.className='item';
+    row.innerHTML = `
+      <span class="num">${i+1}.</span>
+      <span class="emoji">${it.emoji}</span>
+      <span class="prompt">Слово: <b>${it.word}</b></span>
+      <textarea rows="1" placeholder="напиши своё предложение..."></textarea>
+      <span class="fb info">записано ✓</span>
+    `;
+    c.appendChild(row);
+  });
+})();
+
+function markDone(exId){
+  const items = document.querySelectorAll('#'+exId+'-items .item');
+  let done = 0;
+  items.forEach(row=>{
+    const ta = row.querySelector('textarea, input');
+    const fb = row.querySelector('.fb.info') || row.querySelector('.fb.good');
+    if(ta.value.trim()){ fb.style.display='inline-block'; done++; }
+    else { fb.style.display='none'; }
+  });
+  document.getElementById(exId+'-score').textContent = `${done} / ${items.length} записано`;
+}
+
+function copyAnswers(exId){
+  const items = document.querySelectorAll('#'+exId+'-items .item');
+  const lines = [];
+  items.forEach((row,i)=>{
+    const ta = row.querySelector('textarea, input');
+    const word = row.querySelector('.prompt') ? row.querySelector('.prompt').textContent.replace(/^Слово:\s*/,'') : '';
+    const text = ta.value.trim();
+    lines.push(`${i+1}. [${word}] ${text || '—'}`);
+  });
+  const fullText = lines.join('\n');
+  const scoreEl = document.getElementById(exId+'-score');
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(fullText).then(()=>{
+      scoreEl.textContent = 'Скопировано ✓';
+    }).catch(()=>{
+      scoreEl.textContent = 'Не удалось скопировать';
+    });
+  } else {
+    scoreEl.textContent = 'Копирование не поддерживается';
+  }
+}
+
+/* ---------- EX6 plural forms (bonus) ---------- */
+buildFillItems('ex6-items', [
+  {prompt:"woman → ___", answers:["women"]},
+  {prompt:"man → ___", answers:["men"]},
+  {prompt:"child → ___", answers:["children"]},
+  {prompt:"person → ___", answers:["people"]},
+  {prompt:"brother-in-law → ___", answers:["brothers-in-law","brothers in law"]},
+  {prompt:"son-in-law → ___", answers:["sons-in-law","sons in law"]},
+  {prompt:"daughter-in-law → ___", answers:["daughters-in-law","daughters in law"]},
+]);
+</script>
+</body>
+</html>
