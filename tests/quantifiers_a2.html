@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How much / How many & Quantifiers — практика A2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Source+Sans+3:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F6F3EC;
+    --ink:#22303A;
+    --ink-soft:#5B6B73;
+    --teal:#2F6E68;
+    --teal-deep:#1E4A46;
+    --clay:#C97B4A;
+    --line:#D9D2C2;
+    --card:#FFFFFF;
+    --ok:#2F7D4F;
+    --ok-bg:#E7F4EA;
+    --bad:#B0473C;
+    --bad-bg:#FBEAE7;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Source Sans 3', sans-serif;
+    line-height:1.55;
+    padding-bottom:80px;
+  }
+  .wrap{max-width:880px;margin:0 auto;padding:0 20px;}
+
+  header.hero{
+    padding:56px 20px 40px;
+    border-bottom:1px solid var(--line);
+    background:
+      radial-gradient(circle at 85% 20%, rgba(201,123,74,0.10), transparent 45%),
+      var(--paper);
+  }
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12.5px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--teal-deep);
+    margin:0 0 14px;
+  }
+  h1{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:clamp(30px, 4.2vw, 46px);
+    margin:0 0 14px;
+    letter-spacing:-0.01em;
+  }
+  h1 em{font-style:italic;color:var(--teal);}
+  .hero p{max-width:60ch;color:var(--ink-soft);font-size:16.5px;margin:0;}
+
+  .cheatsheet{
+    margin-top:28px;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:4px 20px;
+  }
+  .cheatsheet summary{
+    cursor:pointer;
+    padding:14px 0;
+    font-weight:600;
+    color:var(--teal-deep);
+    list-style:none;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .cheatsheet summary::-webkit-details-marker{display:none;}
+  .cheatsheet summary::before{content:"＋";font-family:'IBM Plex Mono',monospace;color:var(--clay);font-size:16px;}
+  .cheatsheet[open] summary::before{content:"－";}
+  .rule-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:4px 0 20px;}
+  @media (max-width:640px){.rule-grid{grid-template-columns:1fr;}}
+  .rule-card{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:14px 16px;}
+  .rule-card h4{margin:0 0 6px;font-size:14.5px;color:var(--teal-deep);}
+  .rule-card p{margin:0 0 6px;font-size:14px;color:var(--ink);}
+  .rule-card .ex{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--ink-soft);}
+
+  nav.toc{
+    max-width:880px;margin:34px auto 0;padding:0 20px;
+    display:flex;flex-wrap:wrap;gap:8px;
+  }
+  nav.toc a{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    text-decoration:none;
+    color:var(--teal-deep);
+    background:var(--card);
+    border:1px solid var(--line);
+    padding:6px 11px;
+    border-radius:999px;
+  }
+  nav.toc a:hover{border-color:var(--teal);}
+
+  .section-title{
+    max-width:880px;margin:56px auto 4px;padding:0 20px;
+  }
+  .section-title .num{
+    font-family:'IBM Plex Mono',monospace;
+    color:var(--clay);
+    font-size:13px;
+    letter-spacing:.1em;
+  }
+  .section-title h2{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:26px;
+    margin:4px 0 0;
+  }
+  .section-title p{color:var(--ink-soft);font-size:14.5px;margin:6px 0 0;max-width:65ch;}
+
+  .exercise{
+    max-width:880px;margin:22px auto;padding:0 20px;
+  }
+  .ex-card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:22px 24px 20px;
+  }
+  .ex-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:6px;}
+  .ex-head h3{margin:0;font-size:18px;font-family:'Fraunces',serif;font-weight:600;}
+  .ex-tag{
+    font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--teal-deep);
+    background:#EAF2EF;border:1px solid #CFE3DC;padding:3px 9px;border-radius:999px;white-space:nowrap;
+  }
+  .ex-instructions{color:var(--ink-soft);font-size:14.5px;margin:2px 0 16px;}
+  .ex-instructions b{color:var(--ink);}
+
+  ol.items{list-style:none;margin:0;padding:0;}
+  ol.items li{
+    padding:12px 0;
+    border-top:1px dashed var(--line);
+  }
+  ol.items li:first-child{border-top:none;}
+  .item-row{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;font-size:15.5px;}
+  .item-num{font-family:'IBM Plex Mono',monospace;color:var(--clay);font-size:13px;min-width:22px;}
+  .gap-input, .word-input{
+    border:none;
+    border-bottom:2px solid var(--line);
+    background:transparent;
+    font-family:'Source Sans 3',sans-serif;
+    font-size:15.5px;
+    padding:2px 4px;
+    min-width:120px;
+    color:var(--ink);
+    outline:none;
+  }
+  .gap-input:focus, .word-input:focus{border-color:var(--teal);}
+  .gap-input.correct, .word-input.correct{border-color:var(--ok);background:var(--ok-bg);}
+  .gap-input.wrong, .word-input.wrong{border-color:var(--bad);background:var(--bad-bg);}
+  textarea.free-input{
+    width:100%;
+    margin-top:6px;
+    font-family:'Source Sans 3',sans-serif;
+    font-size:15px;
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:8px 10px;
+    resize:vertical;
+    min-height:38px;
+    background:#FCFBF8;
+  }
+  textarea.free-input:focus{outline:none;border-color:var(--teal);}
+  mark{background:#FBE4C6;padding:1px 3px;border-radius:3px;}
+  .note{
+    display:none;
+    margin-top:6px;
+    font-size:13.5px;
+    color:var(--teal-deep);
+    background:#EFF6F2;
+    border-left:3px solid var(--teal);
+    padding:7px 10px;
+    border-radius:0 6px 6px 0;
+  }
+  .note.show{display:block;}
+  .note b{color:var(--teal-deep);}
+  .icon{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:14px;}
+  .icon.ok{color:var(--ok);}
+  .icon.bad{color:var(--bad);}
+
+  .ex-controls{
+    margin-top:18px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+    padding-top:14px;border-top:1px solid var(--line);
+  }
+  button{
+    font-family:'Source Sans 3',sans-serif;
+    font-weight:600;
+    font-size:14px;
+    padding:9px 16px;
+    border-radius:7px;
+    border:1px solid var(--teal);
+    background:var(--teal);
+    color:#fff;
+    cursor:pointer;
+    transition:transform .06s ease, background .15s ease;
+  }
+  button:hover{background:var(--teal-deep);border-color:var(--teal-deep);}
+  button:active{transform:scale(0.97);}
+  button.secondary{
+    background:transparent;color:var(--teal-deep);border:1px solid var(--line);
+  }
+  button.secondary:hover{border-color:var(--teal);background:#F1F6F4;}
+  button.copy{background:var(--clay);border-color:var(--clay);}
+  button.copy:hover{background:#B5693B;border-color:#B5693B;}
+  .score{font-family:'IBM Plex Mono',monospace;font-size:13.5px;color:var(--ink-soft);margin-left:auto;}
+  .score b{color:var(--ink);}
+
+  .example-box{
+    background:#F1F6F4;border:1px dashed #BFD8CE;border-radius:8px;
+    padding:12px 14px;margin-bottom:16px;font-size:14px;color:var(--ink);
+  }
+  .example-box .chain{font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--teal-deep);}
+  .arrow{color:var(--clay);}
+
+  .drill-row{display:grid;grid-template-columns:110px 1fr 1fr;gap:10px;align-items:center;font-size:14.5px;}
+  @media (max-width:640px){.drill-row{grid-template-columns:1fr;}}
+  .drill-row .seed{font-family:'IBM Plex Mono',monospace;color:var(--teal-deep);font-weight:600;}
+
+  footer{
+    max-width:880px;margin:60px auto 0;padding:24px 20px;color:var(--ink-soft);font-size:13px;
+    border-top:1px solid var(--line);
+  }
+  .toast{
+    position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);
+    background:var(--teal-deep);color:#fff;padding:10px 18px;border-radius:8px;font-size:14px;
+    opacity:0;pointer-events:none;transition:all .25s ease;font-family:'Source Sans 3',sans-serif;
+    z-index:50;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow">A2 · Grammar Workbook</p>
+    <h1>How much, how many <em>&amp;</em> quantifiers</h1>
+    <p>13 интерактивных упражнений: сначала каждая структура отдельно, потом — микс из семи разных форматов, и в конце — два творческих упражнения с кнопкой «скопировать всё».</p>
+
+    <details class="cheatsheet">
+      <summary>Открыть краткое правило (шпаргалка)</summary>
+      <div class="rule-grid">
+        <div class="rule-card">
+          <h4>How much / How many</h4>
+          <p><b>How much</b> — с неисчисляемыми. <b>How many</b> — с исчисляемыми во мн. числе.</p>
+          <p class="ex">How much water? · How many apples?</p>
+        </div>
+        <div class="rule-card">
+          <h4>Quantifiers</h4>
+          <p><b>not much</b> (неисч.) / <b>not many</b> (исч.) / <b>not any</b> или <b>none</b> — нисколько.</p>
+          <p class="ex">We don't have much time. There aren't many people.</p>
+        </div>
+        <div class="rule-card">
+          <h4>A lot of vs much/many</h4>
+          <p>В утверждениях — обычно <b>a lot of</b>. В отрицаниях и вопросах — обычно <b>much/many</b> (a lot of тоже возможно).</p>
+          <p class="ex">I drink a lot of water. I don't drink much coffee.</p>
+        </div>
+        <div class="rule-card">
+          <h4>Quite a lot of</h4>
+          <p>«Довольно много» — работает и с исчисляемыми, и с неисчисляемыми.</p>
+          <p class="ex">quite a lot of people · quite a lot of money</p>
+        </div>
+        <div class="rule-card">
+          <h4>A little</h4>
+          <p>«Немного, но достаточно» — только с неисчисляемыми.</p>
+          <p class="ex">a little water · a little time</p>
+        </div>
+        <div class="rule-card">
+          <h4>A few</h4>
+          <p>«Немного, но достаточно» — только с исчисляемыми во мн. числе.</p>
+          <p class="ex">a few books · a few friends</p>
+        </div>
+      </div>
+    </details>
+  </div>
+</header>
+
+<nav class="toc" id="toc"></nav>
+
+<!-- ============ SECTION 1 ============ -->
+<div class="section-title">
+  <p class="num">Часть 1</p>
+  <h2>Каждая структура отдельно</h2>
+  <p>Fill in the gaps — четыре упражнения, по одному на каждую структуру. По 10 предложений.</p>
+</div>
+<div id="section-solo"></div>
+
+<!-- ============ SECTION 2 ============ -->
+<div class="section-title">
+  <p class="num">Часть 2</p>
+  <h2>Mix — семь форматов</h2>
+  <p>Все структуры перемешаны. Форматы: Find the mistake, Fill in the gaps, Translate, Replace the highlighted word, Rephrase, Circle the odd collocation, What usually comes after?</p>
+</div>
+<div id="section-mix"></div>
+
+<!-- ============ SECTION 3 ============ -->
+<div class="section-title">
+  <p class="num">Часть 3</p>
+  <h2>Творческие упражнения</h2>
+  <p>Свои идеи + драйвинг-упражнение Repeat &amp; Change. В обоих — кнопка «Скопировать всё».</p>
+</div>
+<div id="section-creative"></div>
+
+<footer>
+  Grammar workbook · How much / How many · Quantifiers · A2 level. Все ответы можно проверить или показать кнопками под каждым упражнением.
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ---------------------------------------------------------
+   Helpers
+--------------------------------------------------------- */
+function normalize(s){
+  return (s||"")
+    .toLowerCase()
+    .trim()
+    .replace(/['’]/g,"'")
+    .replace(/[.,!?;:]/g,"")
+    .replace(/\s+/g," ");
+}
+function isCorrect(userVal, accepted){
+  const u = normalize(userVal);
+  if(!u) return false;
+  return accepted.some(a => normalize(a) === u);
+}
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 1800);
+}
+function copyText(text, label){
+  navigator.clipboard.writeText(text).then(()=>{
+    showToast((label||"Текст") + " скопирован в буфер обмена ✓");
+  }).catch(()=>{
+    showToast("Не удалось скопировать — скопируйте вручную");
+  });
+}
+
+/* ---------------------------------------------------------
+   Generic GAP exercise renderer
+   items: [{q:"...___...", a:["ans1","ans2"], note:"..."}]
+   mode: 'check' (auto grade) 
+--------------------------------------------------------- */
+function renderGapExercise(mountId, cfg){
+  const {id, tag, title, instructions, items} = cfg;
+  const wrap = document.createElement('div');
+  wrap.className = 'exercise';
+  wrap.id = id;
+
+  let itemsHtml = items.map((it, i) => {
+    const parts = it.q.split('___');
+    const rowHtml = parts.length === 2
+      ? `${parts[0]}<input type="text" class="gap-input" data-idx="${i}" autocomplete="off" spellcheck="false">${parts[1]}`
+      : `${it.q} <input type="text" class="gap-input" data-idx="${i}" autocomplete="off" spellcheck="false">`;
+    return `
+      <li>
+        <div class="item-row">
+          <span class="item-num">${i+1}.</span>
+          <span class="q-text">${rowHtml}</span>
+          <span class="icon" data-icon="${i}"></span>
+        </div>
+        <div class="note" data-note="${i}"><b>Ответ:</b> ${it.a[0]} — ${it.note}</div>
+      </li>`;
+  }).join('');
+
+  wrap.innerHTML = `
+    <div class="ex-card">
+      <div class="ex-head"><h3>${title}</h3><span class="ex-tag">${tag}</span></div>
+      <p class="ex-instructions">${instructions}</p>
+      <ol class="items">${itemsHtml}</ol>
+      <div class="ex-controls">
+        <button data-action="check">Проверить</button>
+        <button class="secondary" data-action="reveal">Показать ответы</button>
+        <span class="score" data-score></span>
+      </div>
+    </div>`;
+
+  document.getElementById(mountId).appendChild(wrap);
+
+  const inputs = wrap.querySelectorAll('.gap-input');
+  const checkBtn = wrap.querySelector('[data-action="check"]');
+  const revealBtn = wrap.querySelector('[data-action="reveal"]');
+  const scoreEl = wrap.querySelector('[data-score]');
+
+  checkBtn.addEventListener('click', () => {
+    let correct = 0;
+    inputs.forEach((inp, i) => {
+      const icon = wrap.querySelector(`[data-icon="${i}"]`);
+      const note = wrap.querySelector(`[data-note="${i}"]`);
+      if(isCorrect(inp.value, items[i].a)){
+        inp.classList.remove('wrong'); inp.classList.add('correct');
+        icon.textContent = '✓'; icon.className='icon ok';
+        note.classList.remove('show');
+        correct++;
+      } else {
+        inp.classList.remove('correct'); inp.classList.add('wrong');
+        icon.textContent = '✕'; icon.className='icon bad';
+        note.classList.add('show');
+      }
+    });
+    scoreEl.innerHTML = `Результат: <b>${correct} / ${items.length}</b>`;
+  });
+
+  revealBtn.addEventListener('click', () => {
+    inputs.forEach((inp,i)=>{
+      wrap.querySelector(`[data-note="${i}"]`).classList.add('show');
+    });
+  });
+}
+
+/* ---------------------------------------------------------
+   REVEAL-only exercise (Translate, Rephrase, mistake-find with
+   full-sentence correction) - free-form answers, several
+   correct variants possible, no auto grading, just self-check
+   items: [{q:"...", a:"model answer", note:"..."}]
+--------------------------------------------------------- */
+function renderRevealExercise(mountId, cfg){
+  const {id, tag, title, instructions, items} = cfg;
+  const wrap = document.createElement('div');
+  wrap.className = 'exercise';
+  wrap.id = id;
+
+  let itemsHtml = items.map((it, i) => `
+    <li>
+      <div class="item-row" style="display:block;">
+        <div><span class="item-num">${i+1}.</span> ${it.q}</div>
+        <textarea class="free-input" data-idx="${i}" rows="1" placeholder="Ваш вариант..."></textarea>
+      </div>
+      <div class="note" data-note="${i}"><b>Модельный ответ:</b> ${it.a}<br><b>Почему:</b> ${it.note}</div>
+    </li>`).join('');
+
+  wrap.innerHTML = `
+    <div class="ex-card">
+      <div class="ex-head"><h3>${title}</h3><span class="ex-tag">${tag}</span></div>
+      <p class="ex-instructions">${instructions}</p>
+      <ol class="items">${itemsHtml}</ol>
+      <div class="ex-controls">
+        <button class="secondary" data-action="reveal">Показать ответы и объяснения</button>
+        <button class="secondary" data-action="hide">Скрыть ответы</button>
+      </div>
+    </div>`;
+
+  document.getElementById(mountId).appendChild(wrap);
+  wrap.querySelector('[data-action="reveal"]').addEventListener('click', ()=>{
+    wrap.querySelectorAll('.note').forEach(n=>n.classList.add('show'));
+  });
+  wrap.querySelector('[data-action="hide"]').addEventListener('click', ()=>{
+    wrap.querySelectorAll('.note').forEach(n=>n.classList.remove('show'));
+  });
+}
+
+/* ---------------------------------------------------------
+   OPEN exercise - student's own ideas, with "copy all" button
+   items: array of prompt strings (sentence starters / seed words)
+--------------------------------------------------------- */
+function renderOpenSentences(mountId, cfg){
+  const {id, tag, title, instructions, items, exampleHtml} = cfg;
+  const wrap = document.createElement('div');
+  wrap.className = 'exercise';
+  wrap.id = id;
+
+  let itemsHtml = items.map((q, i) => `
+    <li>
+      <div class="item-row">
+        <span class="item-num">${i+1}.</span>
+        <span class="q-text">${q}</span>
+      </div>
+      <textarea class="free-input" data-idx="${i}" rows="1" placeholder="Допишите своими словами..."></textarea>
+    </li>`).join('');
+
+  wrap.innerHTML = `
+    <div class="ex-card">
+      <div class="ex-head"><h3>${title}</h3><span class="ex-tag">${tag}</span></div>
+      <p class="ex-instructions">${instructions}</p>
+      ${exampleHtml ? `<div class="example-box">${exampleHtml}</div>` : ''}
+      <ol class="items">${itemsHtml}</ol>
+      <div class="ex-controls">
+        <button class="copy" data-action="copy">Скопировать все ответы</button>
+      </div>
+    </div>`;
+
+  document.getElementById(mountId).appendChild(wrap);
+
+  wrap.querySelector('[data-action="copy"]').addEventListener('click', ()=>{
+    const areas = wrap.querySelectorAll('.free-input');
+    let lines = [];
+    areas.forEach((ta,i)=>{
+      const val = ta.value.trim();
+      lines.push(`${i+1}. ${items[i].replace(/<[^>]+>/g,'')} ${val ? '→ ' + val : '(пусто)'}`);
+    });
+    copyText(lines.join('\n'), title);
+  });
+}
+
+/* ---------------------------------------------------------
+   OPEN drilling exercise - Repeat & Change chain (word -> collocation -> sentence)
+--------------------------------------------------------- */
+function renderDrill(mountId, cfg){
+  const {id, tag, title, instructions, seeds, exampleHtml} = cfg;
+  const wrap = document.createElement('div');
+  wrap.className = 'exercise';
+  wrap.id = id;
+
+  let rowsHtml = seeds.map((seed, i) => `
+    <li>
+      <div class="drill-row">
+        <span class="seed">${seed}</span>
+        <input type="text" class="word-input" data-role="collocation" data-idx="${i}" placeholder="+ collocation, e.g. a lot of ${seed}" autocomplete="off">
+        <input type="text" class="word-input" data-role="sentence" data-idx="${i}" placeholder="→ full sentence" autocomplete="off">
+      </div>
+    </li>`).join('');
+
+  wrap.innerHTML = `
+    <div class="ex-card">
+      <div class="ex-head"><h3>${title}</h3><span class="ex-tag">${tag}</span></div>
+      <p class="ex-instructions">${instructions}</p>
+      ${exampleHtml ? `<div class="example-box">${exampleHtml}</div>` : ''}
+      <ol class="items">${rowsHtml}</ol>
+      <div class="ex-controls">
+        <button class="copy" data-action="copy">Скопировать все ответы</button>
+      </div>
+    </div>`;
+
+  document.getElementById(mountId).appendChild(wrap);
+
+  wrap.querySelector('[data-action="copy"]').addEventListener('click', ()=>{
+    let lines = [];
+    seeds.forEach((seed,i)=>{
+      const colloc = wrap.querySelector(`[data-role="collocation"][data-idx="${i}"]`).value.trim();
+      const sentence = wrap.querySelector(`[data-role="sentence"][data-idx="${i}"]`).value.trim();
+      lines.push(`${i+1}. ${seed} → ${colloc || '...'} → ${sentence || '...'}`);
+    });
+    copyText(lines.join('\n'), title);
+  });
+}
+
+/* ===========================================================
+   DATA — Part 1: solo structure exercises
+=========================================================== */
+renderGapExercise('section-solo', {
+  id:'ex1', tag:'Fill in the gaps · 1/4',
+  title:'1. How much or How many?',
+  instructions:'Впишите <b>How much</b> или <b>How many</b>.',
+  items:[
+    {q:'___ sugar do you need for the cake?', a:['How much'], note:'sugar — неисчисляемое → how much'},
+    {q:'___ students are in your class?', a:['How many'], note:'students — исчисляемое, мн.ч. → how many'},
+    {q:'___ money did you spend?', a:['How much'], note:'money — неисчисляемое → how much'},
+    {q:'___ countries have you visited?', a:['How many'], note:'countries — исчисляемое, мн.ч. → how many'},
+    {q:'___ information do you have about it?', a:['How much'], note:'information — неисчисляемое → how much'},
+    {q:'___ eggs are in the fridge?', a:['How many'], note:'eggs — исчисляемое, мн.ч. → how many'},
+    {q:'___ homework do you have today?', a:['How much'], note:'homework — неисчисляемое → how much'},
+    {q:'___ languages does she speak?', a:['How many'], note:'languages — исчисляемое, мн.ч. → how many'},
+    {q:'___ water is in the bottle?', a:['How much'], note:'water — неисчисляемое → how much'},
+    {q:'___ cars are parked outside?', a:['How many'], note:'cars — исчисляемое, мн.ч. → how many'}
+  ]
+});
+
+renderGapExercise('section-solo', {
+  id:'ex2', tag:'Fill in the gaps · 2/4',
+  title:'2. Quantifiers: not much / not many / any / none',
+  instructions:'Впишите подходящее слово: <b>much, many, any</b> или <b>none</b>.',
+  items:[
+    {q:"I don't have ___ money left.", a:['much'], note:'money — неисчисляемое → not much'},
+    {q:"There aren't ___ shops near my house.", a:['many'], note:'shops — исчисляемое, мн.ч. → not many'},
+    {q:"We don't have ___ bread for breakfast.", a:['any'], note:'bread — неисчисляемое, в отрицании часто используем any'},
+    {q:'"How many messages did you get?" "___."', a:['None'], note:'ответ на вопрос "сколько" = "нисколько" → none'},
+    {q:"He doesn't have ___ experience in this job.", a:['much'], note:'experience — неисчисляемое → not much'},
+    {q:"There weren't ___ cars on the road.", a:['many'], note:'cars — исчисляемое, мн.ч. → not many'},
+    {q:"She doesn't eat ___ meat.", a:['much'], note:'meat — неисчисляемое → not much'},
+    {q:"We don't have ___ questions about the plan.", a:['many'], note:'questions — исчисляемое, мн.ч. → not many'},
+    {q:'"Is there any coffee left?" "No, there\'s ___."', a:['none'], note:'coffee закончился полностью → none'},
+    {q:"I don't have ___ free time this week.", a:['much'], note:'time — неисчисляемое → not much'}
+  ]
+});
+
+renderGapExercise('section-solo', {
+  id:'ex3', tag:'Fill in the gaps · 3/4',
+  title:'3. A lot of vs much / many (+ quite a lot of)',
+  instructions:'Впишите <b>a lot of, much, many</b> или <b>quite a lot of</b> в зависимости от типа предложения.',
+  items:[
+    {q:'I have ___ homework today.', a:['a lot of'], note:'утверждение → a lot of'},
+    {q:"I don't have ___ homework today.", a:['much'], note:'отрицание, homework неисчисляемое → much'},
+    {q:'Do you have ___ homework today?', a:['much'], note:'вопрос, homework неисчисляемое → much'},
+    {q:'There are ___ tourists here in summer.', a:['a lot of'], note:'утверждение → a lot of'},
+    {q:"There aren't ___ tourists here in winter.", a:['many'], note:'отрицание, tourists исчисляемое → many'},
+    {q:'We have ___ time before the train leaves — about 40 minutes.', a:['quite a lot of'], note:'«довольно много» времени → quite a lot of'},
+    {q:'Does she have ___ friends in the city?', a:['many'], note:'вопрос, friends исчисляемое → many'},
+    {q:'He earns ___ money.', a:['a lot of'], note:'утверждение → a lot of'},
+    {q:"I don't drink ___ tea.", a:['much'], note:'отрицание, tea неисчисляемое → much'},
+    {q:'Are there ___ books in the library?', a:['many'], note:'вопрос, books исчисляемое → many'}
+  ]
+});
+
+renderGapExercise('section-solo', {
+  id:'ex4', tag:'Fill in the gaps · 4/4',
+  title:'4. A little vs A few',
+  instructions:'Впишите <b>a little</b> (неисчисляемые) или <b>a few</b> (исчисляемые, мн.ч.).',
+  items:[
+    {q:'Can you give me ___ advice?', a:['a little'], note:'advice — неисчисляемое → a little'},
+    {q:'I need ___ minutes to get ready.', a:['a few'], note:'minutes — исчисляемое, мн.ч. → a few'},
+    {q:"There's ___ juice left in the jug.", a:['a little'], note:'juice — неисчисляемое → a little'},
+    {q:'She has ___ close friends.', a:['a few'], note:'friends — исчисляемое, мн.ч. → a few'},
+    {q:'Add ___ salt to the soup.', a:['a little'], note:'salt — неисчисляемое → a little'},
+    {q:'We have ___ days before the trip.', a:['a few'], note:'days — исчисляемое, мн.ч. → a few'},
+    {q:'He knows ___ words in Spanish.', a:['a few'], note:'words — исчисляемое, мн.ч. → a few'},
+    {q:"There's ___ hope that things will improve.", a:['a little'], note:'hope — неисчисляемое → a little'},
+    {q:"I'd like ___ more coffee, please.", a:['a little'], note:'coffee — неисчисляемое → a little'},
+    {q:'Could you buy ___ apples on your way home?', a:['a few'], note:'apples — исчисляемое, мн.ч. → a few'}
+  ]
+});
+
+/* ===========================================================
+   DATA — Part 2: mix, 7 formats
+=========================================================== */
+
+/* B1 Find the mistake — reveal mode (student writes correction of whole sentence) */
+renderRevealExercise('section-mix', {
+  id:'ex5', tag:'Find the mistake · 1/7',
+  title:'5. Find the mistake',
+  instructions:'В каждом предложении одна ошибка в квантификаторе. Напишите исправленное предложение целиком.',
+  items:[
+    {q:'How much apples do you want?', a:'How many apples do you want?', note:'apples — исчисляемое, мн.ч. → how many, не how much'},
+    {q:"She doesn't have much friends.", a:"She doesn't have many friends.", note:'friends — исчисляемое → many, не much'},
+    {q:'There isn\'t many water in the pool.', a:"There isn't much water in the pool.", note:'water — неисчисляемое → much, не many'},
+    {q:'We have a little books to read this weekend.', a:'We have a few books to read this weekend.', note:'books — исчисляемое, мн.ч. → a few, не a little'},
+    {q:'Do you need many help with this?', a:'Do you need much help with this?', note:'help — неисчисляемое → much, не many'},
+    {q:'I have a few money in my pocket.', a:'I have a little money in my pocket.', note:'money — неисчисляемое → a little, не a few'},
+    {q:'How many milk do we need?', a:'How much milk do we need?', note:'milk — неисчисляемое → how much, не how many'},
+    {q:"There aren't much people in the cafe today.", a:"There aren't many people in the cafe today.", note:'people — исчисляемое, мн.ч. → many, не much'},
+    {q:'He drinks a lot of coffees every morning.', a:'He drinks a lot of coffee every morning.', note:'coffee — неисчисляемое, без -s'},
+    {q:'She has none idea what to do.', a:'She has no idea what to do.', note:'"none" не ставится перед существительным — нужно "no idea"'}
+  ]
+});
+
+/* B2 Fill in the gaps (mixed correct form) — auto-check */
+renderGapExercise('section-mix', {
+  id:'ex6', tag:'Fill in the gaps · 2/7',
+  title:'6. Fill in the gaps using the correct form',
+  instructions:'Впишите правильный квантификатор: how much / how many / much / many / a lot of / a little / a few / any / none.',
+  items:[
+    {q:'___ sisters do you have?', a:['How many'], note:'sisters — исчисляемое, мн.ч. → how many'},
+    {q:"I don't eat ___ fast food.", a:['much'], note:'fast food — неисчисляемое, отрицание → much'},
+    {q:"There's ___ milk in the fridge — enough for tea.", a:['a little'], note:'немного, но достаточно молока → a little'},
+    {q:'We saw ___ interesting places on our trip.', a:['a lot of'], note:'утверждение, places исчисляемое → a lot of'},
+    {q:'___ times have you been to Paris?', a:['How many'], note:'times — исчисляемое, мн.ч. → how many'},
+    {q:"He doesn't need ___ help, thanks.", a:['much'], note:'help — неисчисляемое, отрицание → much'},
+    {q:'She bought ___ new clothes for the holiday.', a:['a lot of'], note:'утверждение → a lot of'},
+    {q:'There are ___ chairs, but not enough for everyone.', a:['a few'], note:'chairs — исчисляемое, но их мало → a few'},
+    {q:'Do you have ___ brothers or sisters?', a:['any'], note:'вопрос об исчисляемых, наличие вообще → any'},
+    {q:'"How much sugar is left?" "___ — just a spoonful."', a:['A little'], note:'sugar — неисчисляемое, немного, но есть → a little'}
+  ]
+});
+
+/* B3 Translate — reveal mode */
+renderRevealExercise('section-mix', {
+  id:'ex7', tag:'Translate · 3/7',
+  title:'7. Translate',
+  instructions:'Переведите предложения на английский, используя нужный квантификатор.',
+  items:[
+    {q:'Сколько у тебя денег?', a:'How much money do you have?', note:'money — неисчисляемое → how much'},
+    {q:'Сколько книг на полке?', a:'How many books are on the shelf?', note:'books — исчисляемое, мн.ч. → how many'},
+    {q:'У нас мало времени.', a:"We don't have much time.", note:'time — неисчисляемое, отрицание → much'},
+    {q:'У неё немного, но достаточно друзей здесь.', a:'She has a few friends here.', note:'friends — исчисляемое, мн.ч. → a few'},
+    {q:'В бутылке немного, но достаточно воды.', a:'There is a little water in the bottle.', note:'water — неисчисляемое → a little'},
+    {q:'Он пьёт много кофе.', a:'He drinks a lot of coffee.', note:'утверждение → a lot of'},
+    {q:'У них нет молока.', a:"They don't have any milk.", note:'milk — неисчисляемое, отрицание → any'},
+    {q:'«Сколько у тебя вопросов?» «Ни одного».', a:'"How many questions do you have?" "None."', note:'questions — исчисляемое, ответ «ноль» → none'},
+    {q:'У нас довольно много времени до автобуса.', a:'We have quite a lot of time before the bus.', note:'«довольно много» → quite a lot of'},
+    {q:'Она не ест много мяса.', a:"She doesn't eat much meat.", note:'meat — неисчисляемое, отрицание → much'}
+  ]
+});
+
+/* B4 Replace the highlighted word — auto-check (word input) */
+renderGapExercise('section-mix', {
+  id:'ex8', tag:'Replace the word · 4/7',
+  title:'8. Replace the highlighted word',
+  instructions:'Замените выделенное слово на правильный квантификатор так, чтобы предложение стало грамматически верным.',
+  items:[
+    {q:"I don't have <mark>MANY</mark> money. → ___", a:['much'], note:'money — неисчисляемое → much'},
+    {q:"There isn't <mark>MUCH</mark> eggs in the fridge. → ___", a:['many'], note:'eggs — исчисляемое, мн.ч. → many'},
+    {q:'We have <mark>A FEW</mark> time before the meeting. → ___', a:['a little'], note:'time — неисчисляемое → a little'},
+    {q:'She only has <mark>A LITTLE</mark> friends in this town. → ___', a:['a few'], note:'friends — исчисляемое, мн.ч. → a few'},
+    {q:'Do you need <mark>MUCH</mark> stamps for the letter? → ___', a:['many'], note:'stamps — исчисляемое, мн.ч. → many'},
+    {q:"He doesn't eat <mark>MANY</mark> bread. → ___", a:['much'], note:'bread — неисчисляемое → much'},
+    {q:"There's <mark>NONE</mark> sugar in the jar. → ___", a:['no'], note:'"none" не ставится перед существительным → no sugar'},
+    {q:'I bought <mark>MUCH</mark> flowers for her birthday. → ___', a:['a lot of','many'], note:'утверждение, flowers исчисляемое → a lot of / many'},
+    {q:'How <mark>MANY</mark> people came to the meeting? → ___', a:['many'], note:'people — исчисляемое, мн.ч. — здесь исходное слово уже верно, впишите "many" для подтверждения'},
+    {q:"We don't have <mark>MANY</mark> milk left. → ___", a:['much'], note:'milk — неисчисляемое → much'}
+  ]
+});
+
+/* B5 Rephrase — reveal mode */
+renderRevealExercise('section-mix', {
+  id:'ex9', tag:'Rephrase · 5/7',
+  title:'9. Rephrase',
+  instructions:'Перестройте предложение так, как указано в скобках, сохранив смысл.',
+  items:[
+    {q:'She has a lot of experience. (rephrase as a question with "much")', a:'Does she have much experience?', note:'вопрос об неисчисляемом → much'},
+    {q:"They don't have many problems. (rephrase as affirmative with \"a few\")", a:'They have a few problems.', note:'problems — исчисляемое, немного → a few'},
+    {q:'I have a little time today. (rephrase as negative with "much")', a:"I don't have much time today.", note:'time — неисчисляемое, отрицание → much'},
+    {q:'We have quite a lot of work to do. (rephrase with "a lot of")', a:'We have a lot of work to do.', note:'"quite a lot of" ≈ "a lot of" по смыслу «много»'},
+    {q:'There are a few mistakes in your essay. (rephrase as negative with "many")', a:"There aren't many mistakes in your essay.", note:'mistakes — исчисляемое, отрицание → many'},
+    {q:"He doesn't have much money. (rephrase as a question)", a:'Does he have much money?', note:'money — неисчисляемое, вопрос → much'},
+    {q:"I don't need many things for the trip. (rephrase as affirmative with \"a few\")", a:'I need a few things for the trip.', note:'things — исчисляемое, немного → a few'},
+    {q:'There isn\'t any milk in the glass. (rephrase with "none")', a:'There is none in the glass.', note:'"none" заменяет "no milk" — стоит без существительного'},
+    {q:'She has a lot of friends. (rephrase as negative with "many")', a:"She doesn't have many friends.", note:'friends — исчисляемое, отрицание → many'},
+    {q:'We have a little sugar left. (rephrase as a question with "much")', a:'Do we have much sugar left?', note:'sugar — неисчисляемое, вопрос → much'}
+  ]
+});
+
+/* B6 Circle the odd collocation — reveal mode (student names the odd one) */
+renderRevealExercise('section-mix', {
+  id:'ex10', tag:'Odd collocation · 6/7',
+  title:'10. Circle the odd collocation',
+  instructions:'В каждой строке — три словосочетания. Одно из них неверное (лишнее). Напишите, какое именно, и почему.',
+  items:[
+    {q:'much time / much money / much books', a:'much books', note:'books — исчисляемое, мн.ч., с ним нужно "many", а не "much"'},
+    {q:'many apples / many people / many water', a:'many water', note:'water — неисчисляемое, с ним "much", а не "many"'},
+    {q:'a little sugar / a little friends / a little milk', a:'a little friends', note:'friends — исчисляемое, мн.ч., нужно "a few"'},
+    {q:'a few minutes / a few advice / a few days', a:'a few advice', note:'advice — неисчисляемое, нужно "a little advice"'},
+    {q:'a lot of cars / a lot of information / a lot of childrens', a:'a lot of childrens', note:'"children" — уже форма мн.ч., окончание -s лишнее'},
+    {q:'how much rice / how much people / how much rain', a:'how much people', note:'people — исчисляемое, мн.ч., нужно "how many people"'},
+    {q:'how many books / how many bread / how many chairs', a:'how many bread', note:'bread — неисчисляемое, нужно "how much bread"'},
+    {q:'not any money / not any friends / not much friends', a:'not much friends', note:'friends — исчисляемое, нужно "not many friends"'},
+    {q:'none of them / none money / none of the money', a:'none money', note:'"none" перед существительным не используется, нужно "none of the money"'},
+    {q:'quite a lot of time / quite a lot of homeworks / quite a lot of patience', a:'quite a lot of homeworks', note:'homework — неисчисляемое, окончание -s не нужно'}
+  ]
+});
+
+/* B7 What usually comes after? — auto-check */
+renderGapExercise('section-mix', {
+  id:'ex11', tag:'Collocations · 7/7',
+  title:'11. What usually comes after?',
+  instructions:'Впишите слово, которое чаще всего идёт после квантификатора (выбирайте по исчисляемости).',
+  items:[
+    {q:'much + ___ (friends / time / books)', a:['time'], note:'time — неисчисляемое, сочетается с much'},
+    {q:'many + ___ (money / people / advice)', a:['people'], note:'people — исчисляемое, мн.ч., сочетается с many'},
+    {q:'a little + ___ (minutes / water / apples)', a:['water'], note:'water — неисчисляемое, сочетается с a little'},
+    {q:'a few + ___ (sugar / friends / milk)', a:['friends'], note:'friends — исчисляемое, мн.ч., сочетается с a few'},
+    {q:'a lot of + ___ (informations / information)', a:['information'], note:'information — неисчисляемое, без -s'},
+    {q:'how much + ___ (rice / eggs / tourists)', a:['rice'], note:'rice — неисчисляемое, сочетается с how much'},
+    {q:'how many + ___ (traffic / cars / luggage)', a:['cars'], note:'cars — исчисляемое, мн.ч., сочетается с how many'},
+    {q:'not any + ___ (bread / breads)', a:['bread'], note:'bread — неисчисляемое, без -s'},
+    {q:'none of + ___ (the students / student)', a:['the students'], note:'"none of" требует существительное с "the/my/them" во мн.ч.'},
+    {q:'quite a lot of + ___ (patience / patiences)', a:['patience'], note:'patience — неисчисляемое, без -s'}
+  ]
+});
+
+/* ===========================================================
+   DATA — Part 3: creative / open exercises
+=========================================================== */
+
+renderOpenSentences('section-creative', {
+  id:'ex12', tag:'Your own ideas · 12/13',
+  title:'12. Finish the sentences with your own ideas',
+  instructions:'Допишите каждое предложение своей идеей, соблюдая грамматику квантификатора в начале строки.',
+  exampleHtml:`<span class="chain">I don't have much <b>free time</b> during exams.</span>`,
+  items:[
+    "I don't have much ___.",
+    "There are a lot of ___ in my city.",
+    "I have a few ___.",
+    "I need a little ___ every day.",
+    "How much ___ do you usually spend in a week?",
+    "How many ___ do you have?",
+    "There isn't much ___ at home.",
+    "We don't have any ___ left.",
+    "I'd like a little more ___.",
+    "There are quite a lot of ___ in my bag."
+  ]
+});
+
+renderDrill('section-creative', {
+  id:'ex13', tag:'Drilling · Repeat & Change · 13/13',
+  title:'13. Repeat & Change',
+  instructions:'Возьмите слово, добавьте к нему квантификатор (свою идею), а затем превратите это в полноценное предложение — как в примере.',
+  exampleHtml:`
+    <div class="chain">suffer <span class="arrow">→</span> suffer from stress</div>
+    <div class="chain">suffer from stress <span class="arrow">→</span> Many people suffer from stress.</div>
+    <br>
+    <div class="chain">money <span class="arrow">→</span> a lot of money</div>
+    <div class="chain">a lot of money <span class="arrow">→</span> I don't have a lot of money.</div>`,
+  seeds:['money','time','friends','water','information','apples','sugar','people','advice','minutes']
+});
+
+/* ===========================================================
+   Build table of contents
+=========================================================== */
+(function(){
+  const toc = document.getElementById('toc');
+  const map = [
+    ['ex1','1. How much/many'],['ex2','2. Quantifiers'],['ex3','3. A lot of'],['ex4','4. A little/few'],
+    ['ex5','5. Mistake'],['ex6','6. Fill mix'],['ex7','7. Translate'],['ex8','8. Replace'],
+    ['ex9','9. Rephrase'],['ex10','10. Odd one'],['ex11','11. Comes after'],
+    ['ex12','12. Own ideas'],['ex13','13. Drilling']
+  ];
+  map.forEach(([id,label])=>{
+    const a = document.createElement('a');
+    a.href = '#'+id; a.textContent = label;
+    toc.appendChild(a);
+  });
+})();
+</script>
+</body>
+</html>
