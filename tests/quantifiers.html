@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Дозировка количества: few / little / many / much / enough / too</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F1ECDD;
+    --paper-2:#E8E1CC;
+    --ink:#20291F;
+    --bottle:#2D4A3E;
+    --bottle-2:#3E7C59;
+    --amber:#C98A3B;
+    --amber-2:#E3A75C;
+    --warn:#B4432D;
+    --line:#D8CFB5;
+    --card:#FBF8F0;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    line-height:1.5;
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size:28px 28px;
+    background-attachment:fixed;
+  }
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  h1,h2,h3{font-family:'Fraunces',serif; font-weight:600; margin:0;}
+
+  /* HERO */
+  header.hero{
+    max-width:980px;
+    margin:0 auto;
+    padding:56px 24px 28px;
+    text-align:center;
+  }
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    text-transform:uppercase;
+    letter-spacing:.18em;
+    font-size:12px;
+    color:var(--bottle-2);
+    margin-bottom:14px;
+  }
+  header.hero h1{
+    font-size:clamp(30px,5vw,48px);
+    line-height:1.1;
+    color:var(--ink);
+  }
+  header.hero h1 em{ color:var(--amber); font-style:normal; }
+  header.hero p.sub{
+    max-width:620px;
+    margin:16px auto 0;
+    color:#4b5346;
+    font-size:16px;
+  }
+
+  /* GAUGE — signature element */
+  .gauge-wrap{max-width:760px;margin:38px auto 0;padding:0 24px;}
+  .gauge{
+    display:grid;
+    grid-template-columns:1fr 1fr 1fr;
+    border:1.5px solid var(--ink);
+    border-radius:14px;
+    overflow:hidden;
+    background:var(--card);
+    box-shadow:0 3px 0 var(--ink);
+  }
+  .gauge>div{
+    padding:16px 12px;
+    text-align:center;
+    border-right:1.5px solid var(--ink);
+    position:relative;
+  }
+  .gauge>div:last-child{border-right:none;}
+  .gauge .zone-label{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    opacity:.65;
+    display:block;
+    margin-bottom:6px;
+  }
+  .gauge .zone-words{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:15px;
+  }
+  .gauge .too-little{background:linear-gradient(180deg,#EADFC4,var(--card));}
+  .gauge .just-right{background:linear-gradient(180deg,#DDEAE0,var(--card));}
+  .gauge .too-much{background:linear-gradient(180deg,#F1DAD2,var(--card));}
+  .gauge .too-little .zone-words{color:var(--amber);}
+  .gauge .just-right .zone-words{color:var(--bottle-2);}
+  .gauge .too-much .zone-words{color:var(--warn);}
+  .gauge-caption{
+    text-align:center;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    color:#6b7364;
+    margin-top:10px;
+  }
+
+  /* RULE CARD */
+  .rules{
+    max-width:980px;
+    margin:44px auto;
+    padding:0 24px;
+  }
+  .rules-card{
+    background:var(--card);
+    border:1.5px solid var(--ink);
+    border-radius:16px;
+    padding:26px 28px;
+    box-shadow:0 3px 0 var(--ink);
+  }
+  .rules-card h2{font-size:20px;margin-bottom:14px;}
+  table.rule-table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:14px;
+  }
+  table.rule-table th{
+    text-align:left;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    color:#6b7364;
+    padding:8px 10px;
+    border-bottom:1.5px solid var(--ink);
+  }
+  table.rule-table td{
+    padding:9px 10px;
+    border-bottom:1px solid var(--line);
+    vertical-align:top;
+  }
+  table.rule-table td.tag{font-family:'IBM Plex Mono',monospace;font-weight:600;color:var(--bottle);}
+  table.rule-table tr:last-child td{border-bottom:none;}
+
+  /* NAV */
+  nav.tabs{
+    position:sticky;
+    top:0;
+    z-index:20;
+    background:rgba(241,236,221,.94);
+    backdrop-filter:blur(6px);
+    border-bottom:1.5px solid var(--ink);
+    padding:10px 24px;
+  }
+  .tabs-inner{
+    max-width:980px;
+    margin:0 auto;
+    display:flex;
+    gap:8px;
+    overflow-x:auto;
+    scrollbar-width:none;
+  }
+  .tabs-inner::-webkit-scrollbar{display:none;}
+  .tab-btn{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    white-space:nowrap;
+    padding:8px 14px;
+    border:1.5px solid var(--ink);
+    border-radius:999px;
+    background:var(--card);
+    color:var(--ink);
+    text-decoration:none;
+    flex:0 0 auto;
+    transition:background .15s, color .15s, transform .1s;
+  }
+  .tab-btn:hover{background:var(--amber); color:#fff; transform:translateY(-1px);}
+
+  /* MAIN */
+  main{max-width:980px; margin:0 auto; padding:10px 24px 90px;}
+
+  section.exercise{
+    margin-top:56px;
+    scroll-margin-top:70px;
+  }
+  .ex-head{
+    display:flex;
+    align-items:baseline;
+    gap:14px;
+    flex-wrap:wrap;
+    border-bottom:2px solid var(--ink);
+    padding-bottom:12px;
+    margin-bottom:6px;
+  }
+  .ex-label{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    background:var(--bottle);
+    color:var(--paper);
+    padding:3px 10px;
+    border-radius:6px;
+    letter-spacing:.05em;
+  }
+  .ex-head h2{font-size:24px;}
+  .ex-desc{color:#565f4e; font-size:14px; margin:6px 0 18px;}
+
+  .toolbar{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    align-items:center;
+    margin-bottom:18px;
+  }
+  button.act{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:13px;
+    font-weight:600;
+    padding:9px 16px;
+    border-radius:8px;
+    border:1.5px solid var(--ink);
+    cursor:pointer;
+    background:var(--amber);
+    color:#fff;
+    box-shadow:0 2px 0 var(--ink);
+    transition:transform .08s;
+  }
+  button.act:active{transform:translateY(2px); box-shadow:0 0 0 var(--ink);}
+  button.act.secondary{background:var(--card); color:var(--ink);}
+  button.act.copy{background:var(--bottle-2); }
+  .score-pill{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:13px;
+    padding:8px 14px;
+    border-radius:999px;
+    border:1.5px solid var(--ink);
+    background:var(--card);
+    margin-left:auto;
+  }
+
+  .item{
+    background:var(--card);
+    border:1.5px solid var(--ink);
+    border-radius:12px;
+    padding:16px 18px;
+    margin-bottom:12px;
+    transition:border-color .15s, background .15s;
+  }
+  .item.correct{border-color:var(--bottle-2); background:#EFF6F0;}
+  .item.incorrect{border-color:var(--warn); background:#FBEDE8;}
+  .item.review{border-color:var(--amber); background:#FCF2E2;}
+
+  .item-head{display:flex; gap:10px; align-items:flex-start;}
+  .num{
+    font-family:'IBM Plex Mono',monospace;
+    font-weight:600;
+    font-size:13px;
+    background:var(--ink);
+    color:var(--paper);
+    min-width:24px;
+    height:24px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex:0 0 auto;
+  }
+  .prompt{margin:0; font-size:15.5px; flex:1;}
+  .prompt .miss{ border-bottom:2px dotted var(--amber); padding:0 2px;}
+  .scene{font-size:22px; margin:2px 0 4px;}
+
+  .ans-row{display:flex; gap:10px; margin-top:10px; align-items:center;}
+  .ans-input{
+    flex:1;
+    font-family:'Inter',sans-serif;
+    font-size:14.5px;
+    padding:9px 12px;
+    border-radius:8px;
+    border:1.5px solid var(--line);
+    background:#fff;
+  }
+  .ans-input:focus{outline:none; border-color:var(--amber);}
+  textarea.ans-input{resize:vertical; min-height:44px;}
+  .feedback-icon{font-size:16px; min-width:22px; text-align:center;}
+
+  .explain{
+    display:none;
+    margin-top:10px;
+    padding:10px 12px;
+    background:#fff;
+    border-left:3px solid var(--bottle-2);
+    border-radius:0 8px 8px 0;
+    font-size:13.5px;
+    color:#33402f;
+  }
+  .explain.show{display:block;}
+  .explain b{color:var(--bottle);}
+
+  .options{display:flex; flex-direction:column; gap:8px; margin-top:10px;}
+  .opt{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:8px 12px;
+    border:1.5px solid var(--line);
+    border-radius:8px;
+    cursor:pointer;
+    font-size:14.5px;
+  }
+  .opt:hover{border-color:var(--amber-2);}
+  .opt input{accent-color:var(--amber);}
+  .opt.correct-opt{border-color:var(--bottle-2); background:#EFF6F0;}
+  .opt.wrong-opt{border-color:var(--warn); background:#FBEDE8;}
+
+  .chain{display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin:10px 0;}
+  .chip{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:13px;
+    background:var(--ink);
+    color:var(--paper);
+    padding:5px 12px;
+    border-radius:999px;
+  }
+  .arrow{color:var(--amber); font-size:16px;}
+  .example-toggle{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    color:var(--bottle-2);
+    cursor:pointer;
+    background:none;
+    border:none;
+    text-decoration:underline;
+    padding:0;
+    margin-top:8px;
+  }
+
+  footer{
+    text-align:center;
+    padding:40px 24px 60px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    color:#7a8271;
+  }
+
+  @media(max-width:640px){
+    .gauge{grid-template-columns:1fr;}
+    .gauge>div{border-right:none; border-bottom:1.5px solid var(--ink);}
+    .gauge>div:last-child{border-bottom:none;}
+    header.hero{padding:36px 16px 20px;}
+    .score-pill{margin-left:0;}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="eyebrow">Грамматическая аптека · quantifiers</div>
+  <h1>Сколько это — <em>«много»</em>?</h1>
+  <p class="sub">Интерактивный тренажёр по теме <b>a few / a little / much / many / few / little / enough / too much / too many</b>. 8 упражнений по 10 заданий: проверка ответов, объяснения и готовые фразы для копирования.</p>
+
+  <div class="gauge-wrap">
+    <div class="gauge">
+      <div class="too-little">
+        <span class="zone-label">недостаточно</span>
+        <span class="zone-words">few · little</span>
+      </div>
+      <div class="just-right">
+        <span class="zone-label">нужная доза</span>
+        <span class="zone-words">a few · a little · enough</span>
+      </div>
+      <div class="too-much">
+        <span class="zone-label">перебор</span>
+        <span class="zone-words">too many · too much</span>
+      </div>
+    </div>
+    <div class="gauge-caption">весь урок — это шкала количества от нуля до передозировки</div>
+  </div>
+</header>
+
+<div class="rules">
+  <div class="rules-card">
+    <h2>Правило в одной таблице</h2>
+    <table class="rule-table">
+      <tr><th>Слово</th><th>С чем употребляется</th><th>Значение</th></tr>
+      <tr><td class="tag">many</td><td>исчисляемые сущ. во мн.ч. (books, people)</td><td>много (обычно в вопросах/отрицаниях)</td></tr>
+      <tr><td class="tag">much</td><td>неисчисляемые сущ. (water, time)</td><td>много (обычно в вопросах/отрицаниях)</td></tr>
+      <tr><td class="tag">few</td><td>исчисляемые сущ. во мн.ч.</td><td>мало (отрицательный оттенок — «почти нет»)</td></tr>
+      <tr><td class="tag">a few</td><td>исчисляемые сущ. во мн.ч.</td><td>несколько (положительный оттенок — «есть, хоть немного»)</td></tr>
+      <tr><td class="tag">little</td><td>неисчисляемые сущ.</td><td>мало (отрицательный оттенок)</td></tr>
+      <tr><td class="tag">a little</td><td>неисчисляемые сущ.</td><td>немного (положительный оттенок)</td></tr>
+      <tr><td class="tag">enough</td><td>перед сущ. (enough time) / после прил. и нареч. (good enough) / после глагола (sleep enough)</td><td>достаточно</td></tr>
+      <tr><td class="tag">too many</td><td>исчисляемые сущ. во мн.ч.</td><td>слишком много (избыток)</td></tr>
+      <tr><td class="tag">too much</td><td>неисчисляемые сущ. / после глагола (talk too much)</td><td>слишком много (избыток)</td></tr>
+    </table>
+  </div>
+</div>
+
+<nav class="tabs">
+  <div class="tabs-inner">
+    <a class="tab-btn" href="#ex1">1 · Ошибка</a>
+    <a class="tab-btn" href="#ex2">2 · Пропуски</a>
+    <a class="tab-btn" href="#ex3">3 · Перевод</a>
+    <a class="tab-btn" href="#ex4">4 · По картинке</a>
+    <a class="tab-btn" href="#ex5">5 · Rephrase</a>
+    <a class="tab-btn" href="#ex6">6 · Лишнее</a>
+    <a class="tab-btn" href="#ex7">7 · Свои идеи</a>
+    <a class="tab-btn" href="#ex8">8 · Drilling</a>
+  </div>
+</nav>
+
+<main>
+
+<!-- ===================== EXERCISE 1 ===================== -->
+<section class="exercise" id="ex1">
+  <div class="ex-head"><span class="ex-label">упр. 1</span><h2>Find the mistake</h2></div>
+  <p class="ex-desc">В каждом предложении одна ошибка на нашу тему. Перепиши предложение целиком в исправленном виде.</p>
+  <div class="toolbar">
+    <button class="act" onclick="checkExercise(1)">Проверить</button>
+    <button class="act secondary" onclick="revealExercise(1)">Показать ответы</button>
+    <span class="score-pill" id="score-1">0 / 10</span>
+  </div>
+  <div id="ex1-items"></div>
+</section>
+
+<!-- ===================== EXERCISE 2 ===================== -->
+<section class="exercise" id="ex2">
+  <div class="ex-head"><span class="ex-label">упр. 2</span><h2>Fill in the gaps</h2></div>
+  <p class="ex-desc">Впиши подходящее слово: few / a few / little / a little / many / much / enough / too much / too many.</p>
+  <div class="toolbar">
+    <button class="act" onclick="checkExercise(2)">Проверить</button>
+    <button class="act secondary" onclick="revealExercise(2)">Показать ответы</button>
+    <span class="score-pill" id="score-2">0 / 10</span>
+  </div>
+  <div id="ex2-items"></div>
+</section>
+
+<!-- ===================== EXERCISE 3 ===================== -->
+<section class="exercise" id="ex3">
+  <div class="ex-head"><span class="ex-label">упр. 3</span><h2>Translate</h2></div>
+  <p class="ex-desc">Переведи предложение на английский, используя нужный квантификатор. Проверка гибкая: ищем ключевую фразу, сравнивай с эталоном.</p>
+  <div class="toolbar">
+    <button class="act" onclick="checkExercise(3)">Проверить</button>
+    <button class="act secondary" onclick="revealExercise(3)">Показать ответы</button>
+    <span class="score-pill" id="score-3">0 / 10</span>
+  </div>
+  <div id="ex3-items"></div>
+</section>
+
+<!-- ===================== EXERCISE 4 ===================== -->
+<section class="exercise" id="ex4">
+  <div class="ex-head"><span class="ex-label">упр. 4</span><h2>Составь предложение по картинке</h2></div>
+  <p class="ex-desc">Вместо фото — сценка эмодзи и заданное слово. Опиши ситуацию одним предложением, обязательно используя указанное слово.</p>
+  <div class="toolbar">
+    <button class="act" onclick="checkExercise(4)">Проверить</button>
+    <button class="act secondary" onclick="revealExercise(4)">Показать ответы</button>
+    <span class="score-pill" id="score-4">0 / 10</span>
+  </div>
+  <div id="ex4-items"></div>
+</section>
+
+<!-- ===================== EXERCISE 5 ===================== -->
+<section class="exercise" id="ex5">
+  <div class="ex-head"><span class="ex-label">упр. 5</span><h2>Rephrase</h2></div>
+  <p class="ex-desc">Перефразируй предложение, используя указанное слово, сохранив смысл.</p>
+  <div class="toolbar">
+    <button class="act" onclick="checkExercise(5)">Проверить</button>
+    <button class="act secondary" onclick="revealExercise(5)">Показать ответы</button>
+    <span class="score-pill" id="score-5">0 / 10</span>
+  </div>
+  <div id="ex5-items"></div>
+</section>
+
+<!-- ===================== EXERCISE 6 ===================== -->
+<section class="exercise" id="ex6">
+  <div class="ex-head"><span class="ex-label">упр. 6</span><h2>Circle the odd collocation</h2></div>
+  <p class="ex-desc">В каждой группе из 4 сочетаний одно составлено неверно (не сочетается по исчисляемости). Отметь лишнее.</p>
+  <div class="toolbar">
+    <button class="act" onclick="checkExercise(6)">Проверить</button>
+    <button class="act secondary" onclick="revealExercise(6)">Показать ответы</button>
+    <span class="score-pill" id="score-6">0 / 10</span>
+  </div>
+  <div id="ex6-items"></div>
+</section>
+
+<!-- ===================== EXERCISE 7 ===================== -->
+<section class="exercise" id="ex7">
+  <div class="ex-head"><span class="ex-label">упр. 7</span><h2>Закончи предложения своими идеями</h2></div>
+  <p class="ex-desc">Здесь нет «правильного» варианта — придумай свой конец предложения, сохранив грамматику. Когда закончишь — скопируй все ответы одной кнопкой.</p>
+  <div class="toolbar">
+    <button class="act copy" onclick="copyBlock(7)">📋 Скопировать все ответы</button>
+    <span class="score-pill" id="copy-status-7">не скопировано</span>
+  </div>
+  <div id="ex7-items"></div>
+</section>
+
+<!-- ===================== EXERCISE 8 ===================== -->
+<section class="exercise" id="ex8">
+  <div class="ex-head"><span class="ex-label">упр. 8</span><h2>Drilling: Repeat &amp; Change</h2></div>
+  <p class="ex-desc">
+    Приём такой: берёшь слово → превращаешь его в словосочетание с нашим квантификатором → расширяешь до целого предложения со своей идеей.<br>
+    Пример: <span class="mono">suffer → suffer from stress → Many people suffer from stress.</span>
+  </p>
+  <div class="toolbar">
+    <button class="act copy" onclick="copyBlock(8)">📋 Скопировать все ответы</button>
+    <span class="score-pill" id="copy-status-8">не скопировано</span>
+  </div>
+  <div id="ex8-items"></div>
+</section>
+
+</main>
+
+<footer>сделано для практики a few / a little / much / many / few / little / enough / too much / too many</footer>
+
+<script>
+/* ============================================================
+   DATA
+   ============================================================ */
+
+// ---- EX1: Find the mistake ----
+const ex1data = [
+  {prompt:"There are too much tourists in the city centre in summer.", answers:["There are too many tourists in the city centre in summer."], explain:"<b>much → many</b>: tourists — исчисляемое существительное во мн.ч., поэтому нужен «too many», а не «too much»."},
+  {prompt:"I have very little friends, so I feel lonely.", answers:["I have very few friends, so I feel lonely."], explain:"<b>little → few</b>: friends — исчисляемое сущ., «мало» для исчисляемых передаётся словом few, а little используется только с неисчисляемыми."},
+  {prompt:"We haven't got many time before the train leaves.", answers:["We haven't got much time before the train leaves."], explain:"<b>many → much</b>: time — неисчисляемое существительное, значит нужно much."},
+  {prompt:"There isn't much enough sugar in the tea.", answers:["There isn't enough sugar in the tea."], explain:"Нельзя соединять much и enough вместе. Либо «not much sugar», либо «not enough sugar» — здесь по смыслу подходит enough (недостаточно сахара)."},
+  {prompt:"This exercise is too difficult much for beginners.", answers:["This exercise is too difficult for beginners."], explain:"После <b>too + прилагательное</b> much не добавляется: «too difficult», а не «too difficult much»."},
+  {prompt:"I've got a few money saved for the trip.", answers:["I've got a little money saved for the trip."], explain:"<b>a few → a little</b>: money — неисчисляемое существительное, поэтому «a little money»."},
+  {prompt:"There are little books on the shelf, so you can choose one.", answers:["There are a few books on the shelf, so you can choose one."], explain:"<b>little → a few</b>: books — исчисляемое, а по смыслу предложения оттенок положительный («есть из чего выбрать»), значит нужно a few, а не few/little."},
+  {prompt:"He doesn't have much qualifications for this job.", answers:["He doesn't have many qualifications for this job."], explain:"<b>much → many</b>: qualifications — исчисляемое существительное во мн.ч."},
+  {prompt:"Could you give me a few advice on that?", answers:["Could you give me a little advice on that?","Could you give me some advice on that?"], explain:"advice — неисчисляемое существительное (не имеет мн.ч.), поэтому нужно a little advice, а не a few advice."},
+  {prompt:"We ate too many cake at the party.", answers:["We ate too much cake at the party."], explain:"<b>too many → too much</b>: cake здесь употреблено как неисчисляемое вещество (торт как еда, не «штуки тортов»), поэтому too much."}
+];
+
+// ---- EX2: Fill in the gaps ----
+const ex2data = [
+  {prompt:"There is <span class='miss'>___</span> milk left in the fridge — just a couple of spoons.", answers:["little"], explain:"milk — неисчисляемое, оттенок отрицательный (почти нет), значит <b>little</b>."},
+  {prompt:"Don't worry, we have <span class='miss'>___</span> time before the meeting starts — about an hour.", answers:["enough"], explain:"Речь о том, что времени хватает на встречу — значение «достаточно» = <b>enough</b>."},
+  {prompt:"She speaks <span class='miss'>___</span> languages — English, French and Spanish.", answers:["many"], explain:"languages — исчисляемое во мн.ч., подчёркивается количество (три языка) — <b>many</b>."},
+  {prompt:"How <span class='miss'>___</span> sugar do you take in your coffee?", answers:["much"], explain:"sugar — неисчисляемое, вопрос о количестве — <b>much</b>."},
+  {prompt:"There are <span class='miss'>___</span> people at the party — the room is packed and it's hard to move.", answers:["too many"], explain:"people — исчисляемое во мн.ч., смысл «избыток, перебор» — <b>too many</b>."},
+  {prompt:"I'm sorry, there's <span class='miss'>___</span> salt in this soup — I can't eat it, it's way too salty.", answers:["too much"], explain:"salt — неисчисляемое, избыток — <b>too much</b>."},
+  {prompt:"We need <span class='miss'>___</span> eggs for this recipe — just two will do.", answers:["a few"], explain:"eggs — исчисляемое, оттенок положительный (небольшое, но достаточное число) — <b>a few</b>."},
+  {prompt:"He has <span class='miss'>___</span> money saved — only $5 — so he cannot buy the ticket.", answers:["little"], explain:"money — неисчисляемое, оттенок отрицательный (недостаточно) — <b>little</b>."},
+  {prompt:"I need exactly six apples for a pie — have you got <span class='miss'>___</span> apples at home?", answers:["enough"], explain:"Вопрос о том, хватит ли нужного числа яблок — <b>enough</b>."},
+  {prompt:"There were <span class='miss'>___</span> mistakes in your essay — only two small ones, well done!", answers:["a few"], explain:"mistakes — исчисляемое, оттенок положительный / нейтральный (совсем немного) — <b>a few</b>."}
+];
+
+// ---- EX3: Translate ----
+const ex3data = [
+  {prompt:"У меня мало друзей в этом городе.", model:"I have few friends in this city.", keywords:["few friends"], explain:"friends — исчисляемое, отрицательный оттенок «почти нет» → <b>few</b>."},
+  {prompt:"У меня есть немного времени, чтобы помочь тебе.", model:"I have a little time to help you.", keywords:["a little time"], explain:"time — неисчисляемое, положительный оттенок «есть немного» → <b>a little</b>."},
+  {prompt:"Сколько денег у тебя есть?", model:"How much money do you have?", keywords:["how much money"], explain:"money — неисчисляемое, вопрос о количестве → <b>much</b>."},
+  {prompt:"На вечеринке было слишком много людей.", model:"There were too many people at the party.", keywords:["too many people"], explain:"people — исчисляемое во мн.ч., избыток → <b>too many</b>."},
+  {prompt:"В чашке слишком много сахара.", model:"There is too much sugar in the cup.", keywords:["too much sugar"], explain:"sugar — неисчисляемое, избыток → <b>too much</b>."},
+  {prompt:"У нас достаточно еды на неделю.", model:"We have enough food for the week.", keywords:["enough food"], explain:"enough ставится перед существительным: <b>enough food</b>."},
+  {prompt:"Он выпил слишком много кофе сегодня.", model:"He drank too much coffee today.", keywords:["too much coffee"], explain:"coffee — неисчисляемое → <b>too much</b>."},
+  {prompt:"У неё мало идей для проекта.", model:"She has few ideas for the project.", keywords:["few ideas"], explain:"ideas — исчисляемое, отрицательный оттенок → <b>few</b>."},
+  {prompt:"Ты достаточно взрослый, чтобы принять это решение.", model:"You are old enough to make this decision.", keywords:["old enough"], explain:"С прилагательным enough ставится ПОСЛЕ: <b>old enough</b>, а не enough old."},
+  {prompt:"У меня есть несколько вопросов к тебе.", model:"I have a few questions for you.", keywords:["a few questions"], explain:"questions — исчисляемое, положительный оттенок «есть немного, но есть» → <b>a few</b>."}
+];
+
+// ---- EX4: Picture ----
+const ex4data = [
+  {scene:"🧳🧳🧳🧳🧳🚗", word:"too many", context:"Гора чемоданов не помещается в багажник машины.", model:"There are too many suitcases — they don't fit in the car.", keywords:["too many"], explain:"suitcases — исчисляемое, избыток → <b>too many</b>."},
+  {scene:"🥛", word:"a little", context:"На самом дне стакана — немного молока.", model:"There is a little milk in the glass.", keywords:["a little"], explain:"milk — неисчисляемое, положительный оттенок → <b>a little</b>."},
+  {scene:"🚌👥👥👥👥👥👥👥👥", word:"too many", context:"Переполненный автобус, люди стоят вплотную.", model:"There are too many people on the bus.", keywords:["too many"], explain:"people — исчисляемое во мн.ч., избыток → <b>too many</b>."},
+  {scene:"🍬🫙", word:"very few", context:"Одна одинокая конфета в большой пустой банке.", model:"There are very few sweets in the jar.", keywords:["few"], explain:"sweets — исчисляемое, отрицательный оттенок «почти нет» → <b>few / very few</b>."},
+  {scene:"💰💰🎫", word:"enough", context:"Небольшая стопка монет — но её хватает на билет.", model:"He has enough money for a ticket.", keywords:["enough"], explain:"Хватает ровно на билет — значение «достаточно» → <b>enough</b>."},
+  {scene:"☕☕☕☕☕☕😵", word:"too much", context:"Шесть чашек кофе на столе у уставшего студента.", model:"He has drunk too much coffee.", keywords:["too much"], explain:"coffee — неисчисляемое, избыток → <b>too much</b>."},
+  {scene:"📚📖", word:"a few", context:"Пара книг на большой пустой полке.", model:"There are a few books on the shelf.", keywords:["a few"], explain:"books — исчисляемое, положительный оттенок → <b>a few</b>."},
+  {scene:"🧂🍲😖", word:"too much", context:"Пересоленный суп — повар морщится от вкуса.", model:"There is too much salt in the soup.", keywords:["too much"], explain:"salt — неисчисляемое, избыток → <b>too much</b>."},
+  {scene:"🙋🙋🙋", word:"a few", context:"Три поднятые руки в классе — у нескольких учеников есть вопросы.", model:"A few students have questions.", keywords:["a few"], explain:"students — исчисляемое, положительный оттенок → <b>a few</b>."},
+  {scene:"⏳", word:"little", context:"Песочные часы почти опустели.", model:"There is little time left.", keywords:["little"], explain:"time — неисчисляемое, отрицательный оттенок «почти не осталось» → <b>little</b>."}
+];
+
+// ---- EX5: Rephrase ----
+const ex5data = [
+  {prompt:"He has almost no money.", useWord:"little", model:"He has little money.", keywords:["little"], explain:"«Почти нет денег» = отрицательный оттенок для неисчисляемого → <b>little</b>."},
+  {prompt:"I need some more minutes, not a lot, just a couple.", useWord:"a few", model:"I need a few more minutes.", keywords:["a few"], explain:"minutes — исчисляемое, небольшое количество с положительным оттенком → <b>a few</b>."},
+  {prompt:"There isn't sufficient light in this room to read.", useWord:"enough", model:"There isn't enough light in this room to read.", keywords:["enough"], explain:"sufficient = «достаточный» → <b>enough</b>."},
+  {prompt:"The room was so full of people that no one could move.", useWord:"too many", model:"There were too many people in the room.", keywords:["too many"], explain:"Избыток людей (исчисляемое) → <b>too many</b>."},
+  {prompt:"She almost has no free time.", useWord:"little", model:"She has little free time.", keywords:["little"], explain:"time — неисчисляемое, отрицательный оттенок → <b>little</b>."},
+  {prompt:"He added way more salt than necessary.", useWord:"too much", model:"He added too much salt.", keywords:["too much"], explain:"salt — неисчисляемое, избыток → <b>too much</b>."},
+  {prompt:"We have exactly the amount of food we need — no more, no less.", useWord:"enough", model:"We have enough food.", keywords:["enough"], explain:"«Ровно столько, сколько нужно» → <b>enough</b>."},
+  {prompt:"Only two or three students came to the lecture.", useWord:"a few", model:"A few students came to the lecture.", keywords:["a few"], explain:"students — исчисляемое, небольшое число → <b>a few</b>."},
+  {prompt:"This coffee has an excessive number of sugar cubes in it.", useWord:"too many", model:"There are too many sugar cubes in this coffee.", keywords:["too many"], explain:"sugar cubes (кусочки — исчисляемое!) → <b>too many</b>, хотя sugar само по себе неисчисляемое."},
+  {prompt:"He rarely spends money because he doesn't have much.", useWord:"little", model:"He has little money to spend.", keywords:["little"], explain:"money — неисчисляемое, отрицательный оттенок → <b>little</b>."}
+];
+
+// ---- EX6: Odd collocation ----
+const ex6data = [
+  {opts:["many books","many friends","many advice","many problems"], odd:2, explain:"<b>advice</b> — неисчисляемое существительное (не бывает «advices»), поэтому «many advice» неверно; нужно much advice / a little advice."},
+  {opts:["much water","much information","much cars","much time"], odd:2, explain:"<b>cars</b> — исчисляемое во мн.ч., с ним нужно many, а не much."},
+  {opts:["a few ideas","a few cars","a few furniture","a few students"], odd:2, explain:"<b>furniture</b> — неисчисляемое (нет мн.ч.), с ним нужно a little, а не a few."},
+  {opts:["a little sugar","a little money","a little people","a little patience"], odd:2, explain:"<b>people</b> — исчисляемое во мн.ч., с ним нужно a few, а не a little."},
+  {opts:["too many mistakes","too many luggage","too many exercises","too many chairs"], odd:1, explain:"<b>luggage</b> — неисчисляемое (нет мн.ч.), нужно too much luggage."},
+  {opts:["too much noise","too much homework","too much minutes","too much rain"], odd:2, explain:"<b>minutes</b> — исчисляемое во мн.ч., нужно too many minutes."},
+  {opts:["enough time","enough chairs","enough money","enough furnitures"], odd:3, explain:"<b>furnitures</b> — furniture неисчисляемое и не имеет формы множественного числа; правильно enough furniture."},
+  {opts:["few opportunities","few knowledge","few countries","few options"], odd:1, explain:"<b>knowledge</b> — неисчисляемое, с ним нужно little, а не few."},
+  {opts:["little information","little advice","little suggestions","little water"], odd:2, explain:"<b>suggestions</b> — исчисляемое во мн.ч., нужно few suggestions."},
+  {opts:["many equipment","many tools","many machines","many devices"], odd:0, explain:"<b>equipment</b> — неисчисляемое (нет мн.ч.), нужно much equipment / a lot of equipment."}
+];
+
+// ---- EX7: Own ideas ----
+const ex7data = [
+  "I don't have much",
+  "There are too many",
+  "She has a little",
+  "We need a few",
+  "He doesn't have enough",
+  "There is too much",
+  "Very few people",
+  "I have little",
+  "Is there enough",
+  "He talks too much about"
+];
+
+// ---- EX8: Drilling ----
+const ex8data = [
+  {word:"money", example:"money → little money → He has little money."},
+  {word:"friends", example:"friends → a few friends → I have a few friends in this city."},
+  {word:"time", example:"time → not enough time → We don't have enough time."},
+  {word:"sugar", example:"sugar → too much sugar → There is too much sugar in this tea."},
+  {word:"books", example:"books → many books → She has read many books this year."},
+  {word:"water", example:"water → a little water → There is a little water in the bottle."},
+  {word:"people", example:"people → too many people → There were too many people at the concert."},
+  {word:"advice", example:"advice → a little advice → Can you give me a little advice?"},
+  {word:"mistakes", example:"mistakes → a few mistakes → I made a few mistakes in the test."},
+  {word:"patience", example:"patience → enough patience → I don't have enough patience for this."}
+];
+
+/* ============================================================
+   HELPERS
+   ============================================================ */
+function norm(s){
+  return (s||"").toLowerCase().trim()
+    .replace(/[.!?,;:]+$/,'')
+    .replace(/\s+/g,' ')
+    .replace(/’/g,"'");
+}
+function containsAny(text, keywords){
+  const t = norm(text);
+  return keywords.some(k => t.includes(norm(k)));
+}
+function exactAny(text, answers){
+  const t = norm(text);
+  return answers.some(a => norm(a) === t);
+}
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+function renderInputItem(containerId, idx, promptHtml, sceneHtml, isTextarea){
+  const wrap = document.createElement('div');
+  wrap.className = 'item';
+  wrap.id = containerId + '-item-' + idx;
+  wrap.innerHTML = `
+    <div class="item-head">
+      <span class="num">${idx+1}</span>
+      <div style="flex:1">
+        ${sceneHtml ? `<div class="scene">${sceneHtml}</div>` : ''}
+        <p class="prompt">${promptHtml}</p>
+      </div>
+    </div>
+    <div class="ans-row">
+      ${isTextarea
+        ? `<textarea class="ans-input" placeholder="Твой ответ..." data-idx="${idx}"></textarea>`
+        : `<input class="ans-input" type="text" placeholder="Твой ответ..." data-idx="${idx}">`}
+      <span class="feedback-icon"></span>
+    </div>
+    <div class="explain"></div>
+  `;
+  document.getElementById(containerId).appendChild(wrap);
+}
+
+// EX1
+ex1data.forEach((d,i)=>renderInputItem('ex1-items', i, d.prompt));
+// EX2
+ex2data.forEach((d,i)=>renderInputItem('ex2-items', i, d.prompt));
+// EX3
+ex3data.forEach((d,i)=>renderInputItem('ex3-items', i, d.prompt));
+// EX4
+ex4data.forEach((d,i)=>renderInputItem('ex4-items', i, `<i>${d.context}</i> — используй слово «<b>${d.word}</b>».`, d.scene));
+// EX5
+ex5data.forEach((d,i)=>renderInputItem('ex5-items', i, `${d.prompt} <span class="mono" style="color:var(--bottle-2)">(используй: ${d.useWord})</span>`));
+
+// EX6 — radio groups
+ex6data.forEach((d,i)=>{
+  const wrap = document.createElement('div');
+  wrap.className = 'item';
+  wrap.id = 'ex6-item-' + i;
+  let optsHtml = d.opts.map((o,oi)=>`
+    <label class="opt" data-oi="${oi}">
+      <input type="radio" name="ex6-${i}" value="${oi}">
+      <span>${String.fromCharCode(97+oi)}) ${o}</span>
+    </label>`).join('');
+  wrap.innerHTML = `
+    <div class="item-head">
+      <span class="num">${i+1}</span>
+      <p class="prompt">Найди сочетание, которое нельзя так сказать:</p>
+    </div>
+    <div class="options">${optsHtml}</div>
+    <div class="explain"></div>
+  `;
+  document.getElementById('ex6-items').appendChild(wrap);
+});
+
+// EX7 — own ideas
+ex7data.forEach((starter,i)=>{
+  const wrap = document.createElement('div');
+  wrap.className = 'item';
+  wrap.innerHTML = `
+    <div class="item-head">
+      <span class="num">${i+1}</span>
+      <p class="prompt"><b class="mono">${starter}</b> ___ ?</p>
+    </div>
+    <div class="ans-row">
+      <input class="ans-input" type="text" id="ex7-input-${i}" placeholder="закончи предложение...">
+    </div>
+  `;
+  document.getElementById('ex7-items').appendChild(wrap);
+});
+
+// EX8 — drilling
+ex8data.forEach((d,i)=>{
+  const wrap = document.createElement('div');
+  wrap.className = 'item';
+  wrap.innerHTML = `
+    <div class="item-head">
+      <span class="num">${i+1}</span>
+      <div style="flex:1">
+        <div class="chain">
+          <span class="chip">${d.word}</span><span class="arrow">→</span>
+          <input class="ans-input" style="max-width:220px" type="text" id="ex8-colloc-${i}" placeholder="словосочетание">
+          <span class="arrow">→</span>
+        </div>
+        <input class="ans-input" type="text" id="ex8-sentence-${i}" placeholder="твоё предложение целиком">
+        <button class="example-toggle" onclick="toggleExample(${i})">показать пример</button>
+        <div class="explain" id="ex8-example-${i}">${d.example}</div>
+      </div>
+    </div>
+  `;
+  document.getElementById('ex8-items').appendChild(wrap);
+});
+function toggleExample(i){
+  document.getElementById('ex8-example-'+i).classList.toggle('show');
+}
+
+/* ============================================================
+   CHECK / REVEAL LOGIC
+   ============================================================ */
+const DATASETS = {1:ex1data, 2:ex2data, 3:ex3data, 4:ex4data, 5:ex5data, 6:ex6data};
+
+function checkExercise(n){
+  const data = DATASETS[n];
+  let score = 0;
+  data.forEach((d,i)=>{
+    const item = document.getElementById(`ex${n}-items`).children[i] || document.getElementById(`ex${n}-item-${i}`);
+    const el = document.getElementById('ex'+n+'-items').querySelectorAll('.item')[i];
+    let correct = false, reviewOnly = false;
+
+    if(n===6){
+      const checked = el.querySelector('input[type=radio]:checked');
+      correct = checked && parseInt(checked.value)===d.odd;
+      el.querySelectorAll('.opt').forEach(o=>o.classList.remove('correct-opt','wrong-opt'));
+      if(checked){
+        el.querySelector(`.opt[data-oi="${d.odd}"]`).classList.add('correct-opt');
+        if(!correct) el.querySelector(`.opt[data-oi="${checked.value}"]`).classList.add('wrong-opt');
+      }
+    } else {
+      const input = el.querySelector('.ans-input');
+      const val = input.value;
+      if(n===1 || n===2){
+        correct = exactAny(val, d.answers);
+      } else if(n===3 || n===4 || n===5){
+        if(val.trim()==='' ){ correct=false; }
+        else if(containsAny(val, d.keywords)){ correct = true; }
+        else { reviewOnly = true; }
+      }
+    }
+
+    el.classList.remove('correct','incorrect','review');
+    const icon = el.querySelector('.feedback-icon');
+    if(correct){ el.classList.add('correct'); if(icon) icon.textContent='✓'; score++; }
+    else if(reviewOnly){ el.classList.add('review'); if(icon) icon.textContent='~'; }
+    else { el.classList.add('incorrect'); if(icon) icon.textContent='✗'; }
+
+    const ex = el.querySelector('.explain');
+    let text = d.explain;
+    if(d.model) text = `Пример ответа: <b>${d.model}</b><br>${d.explain}`;
+    ex.innerHTML = text;
+    ex.classList.add('show');
+  });
+  document.getElementById('score-'+n).textContent = score + ' / 10';
+}
+
+function revealExercise(n){
+  const data = DATASETS[n];
+  data.forEach((d,i)=>{
+    const el = document.getElementById('ex'+n+'-items').querySelectorAll('.item')[i];
+    const ex = el.querySelector('.explain');
+    let text = d.explain;
+    if(d.model) text = `Пример ответа: <b>${d.model}</b><br>${d.explain}`;
+    if(n===1 || n===2) text = `Правильный ответ: <b>${d.answers[0]}</b><br>${d.explain}`;
+    ex.innerHTML = text;
+    ex.classList.add('show');
+    if(n===6){
+      el.querySelectorAll('.opt').forEach(o=>o.classList.remove('correct-opt','wrong-opt'));
+      el.querySelector(`.opt[data-oi="${d.odd}"]`).classList.add('correct-opt');
+    }
+  });
+}
+
+/* ============================================================
+   COPY ALL ANSWERS
+   ============================================================ */
+function copyBlock(n){
+  let lines = [];
+  if(n===7){
+    ex7data.forEach((starter,i)=>{
+      const v = document.getElementById('ex7-input-'+i).value.trim();
+      lines.push(`${i+1}. ${starter} ${v}`);
+    });
+  } else if(n===8){
+    ex8data.forEach((d,i)=>{
+      const c = document.getElementById('ex8-colloc-'+i).value.trim();
+      const s = document.getElementById('ex8-sentence-'+i).value.trim();
+      lines.push(`${i+1}. ${d.word} → ${c} → ${s}`);
+    });
+  }
+  const text = lines.join('\n');
+  const status = document.getElementById('copy-status-'+n);
+  navigator.clipboard.writeText(text).then(()=>{
+    status.textContent = 'скопировано ✓';
+    setTimeout(()=>status.textContent='не скопировано', 3000);
+  }).catch(()=>{
+    status.textContent = 'не удалось скопировать';
+  });
+}
+</script>
+</body>
+</html>
