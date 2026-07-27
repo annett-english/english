@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>a / an / the / — · тренажёр артиклей</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Golos+Text:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#E9EDF4; --surface:#fff; --ink:#0F1428; --muted:#5C6580; --line:#D2D9E6;
+  --c-a:#D8730E; --c-the:#0E7C86; --c-zero:#6B4EFF;
+  --ok:#12724A; --no:#BE2038;
+  --r:14px;
+  --mono:"JetBrains Mono",ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:"Golos Text",system-ui,sans-serif; font-size:16px; line-height:1.55;
+  -webkit-text-size-adjust:100%;
+}
+.wrap{max-width:780px;margin:0 auto;padding:0 18px 90px}
+
+/* ── header ─────────────────────────────── */
+header{position:sticky;top:0;z-index:20;background:rgba(233,237,244,.93);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.hbar{max-width:780px;margin:0 auto;padding:10px 18px}
+.hrow{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.brand{font-family:"Unbounded",sans-serif;font-weight:800;font-size:15px;letter-spacing:-.02em}
+.brand i{font-style:normal;color:var(--c-a)}.brand b{color:var(--c-the)}.brand s{text-decoration:none;color:var(--c-zero)}
+.score{font-family:var(--mono);font-size:13px;font-weight:700;white-space:nowrap}
+.score span{color:var(--muted);font-weight:400}
+/* ruler = 70 ticks, one per item */
+.ruler{display:flex;gap:2px;margin-top:9px}
+.rgroup{display:flex;gap:1.5px;flex:1}
+.rgroup+.rgroup{margin-left:5px}
+.tick{flex:1;height:8px;border-radius:2px;background:#fff;border:1px solid var(--line);transition:background .18s,border-color .18s}
+.tick.ok{background:var(--ok);border-color:var(--ok)}
+.tick.no{background:var(--no);border-color:var(--no)}
+.tick.shown{background:#B9C1D2;border-color:#B9C1D2}
+
+/* ── hero ───────────────────────────────── */
+.hero{padding:44px 0 26px}
+h1{font-family:"Unbounded",sans-serif;font-weight:800;font-size:clamp(28px,7vw,46px);line-height:1.04;letter-spacing:-.035em;margin:0 0 14px}
+h1 em{font-style:normal;display:block}
+h1 .k1{color:var(--c-a)}h1 .k2{color:var(--c-the)}h1 .k3{color:var(--c-zero)}
+.lede{color:var(--muted);max-width:52ch;margin:0}
+
+/* ── rule card ──────────────────────────── */
+.rules{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin:22px 0 34px}
+.rules>summary{cursor:pointer;padding:14px 18px;font-weight:600;font-size:14px;display:flex;justify-content:space-between;align-items:center;list-style:none}
+.rules>summary::-webkit-details-marker{display:none}
+.rules>summary::after{content:"развернуть";font-family:var(--mono);font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.rules[open]>summary::after{content:"свернуть"}
+.rbody{border-top:1px solid var(--line);padding:4px 0}
+.rblock{display:grid;grid-template-columns:88px 1fr;gap:14px;padding:14px 18px;border-left:4px solid transparent}
+.rblock+.rblock{border-top:1px solid var(--line)}
+.rblock h3{font-family:var(--mono);font-size:15px;font-weight:700;margin:0}
+.rblock ol{margin:0;padding-left:18px;font-size:14.5px}
+.rblock li{margin-bottom:3px}
+.rblock code{font-family:var(--mono);font-size:13.5px;background:#F1F4F9;padding:1px 5px;border-radius:5px}
+.rb-a{border-left-color:var(--c-a)} .rb-a h3{color:var(--c-a)}
+.rb-the{border-left-color:var(--c-the)} .rb-the h3{color:var(--c-the)}
+.rb-z{border-left-color:var(--c-zero)} .rb-z h3{color:var(--c-zero)}
+
+/* ── exercise ───────────────────────────── */
+section.ex{margin-bottom:40px}
+.exhead{display:flex;gap:14px;align-items:flex-start;margin-bottom:16px}
+.exnum{font-family:"Unbounded",sans-serif;font-weight:800;font-size:13px;background:var(--ink);color:#fff;border-radius:8px;padding:5px 9px;line-height:1;flex:none;margin-top:3px}
+.exhead h2{font-size:20px;margin:0;letter-spacing:-.01em;font-weight:700}
+.exhead p{margin:2px 0 0;color:var(--muted);font-size:14px}
+.items{display:flex;flex-direction:column;gap:10px}
+
+.item{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;display:grid;grid-template-columns:26px 1fr;gap:10px}
+.item.ok{border-color:#9ED3B8;box-shadow:inset 3px 0 0 var(--ok)}
+.item.no{border-color:#F0B4BE;box-shadow:inset 3px 0 0 var(--no)}
+.item.shown{box-shadow:inset 3px 0 0 #B9C1D2}
+.n{font-family:var(--mono);font-size:12px;color:var(--muted);padding-top:3px}
+.q{font-family:var(--mono);font-size:15px;line-height:1.5}
+.q .blank{color:var(--c-zero);font-weight:700}
+.ru{font-size:15.5px}
+.pic{font-size:30px;line-height:1.2;margin-bottom:2px}
+
+.opts{display:flex;flex-direction:column;gap:6px;margin-top:9px}
+.opts.row{flex-direction:row;flex-wrap:wrap}
+.opt{border:1px solid var(--line);background:#fff;border-radius:9px;padding:8px 11px;text-align:left;font:inherit;font-size:14.5px;cursor:pointer;color:var(--ink);transition:.14s}
+.opt.mono{font-family:var(--mono);font-size:14px}
+.opt:hover{border-color:#9AA5BD}
+.opt[aria-pressed="true"]{border-color:var(--ink);background:#F2F5FA;box-shadow:inset 0 0 0 1px var(--ink)}
+.opt.right{border-color:var(--ok);background:#EAF6F0;box-shadow:inset 0 0 0 1px var(--ok)}
+.opt.wrong{border-color:var(--no);background:#FCEEF0;box-shadow:inset 0 0 0 1px var(--no)}
+.opt:disabled{cursor:default}
+
+.tok{display:inline-flex;flex-wrap:wrap;gap:5px;font-family:var(--mono);font-size:14.5px;margin-top:2px}
+.tok button{font:inherit;border:1px dashed var(--line);background:#fff;border-radius:7px;padding:3px 7px;cursor:pointer;color:var(--ink)}
+.tok button:hover{border-color:#9AA5BD;border-style:solid}
+.tok button[aria-pressed="true"]{border-style:solid;border-color:var(--ink);background:#F2F5FA}
+.tok button.right{border-style:solid;border-color:var(--ok);background:#EAF6F0}
+.tok button.wrong{border-style:solid;border-color:var(--no);background:#FCEEF0}
+
+select,input[type=text]{font:inherit;font-family:var(--mono);font-size:14.5px;border:1px solid var(--line);border-radius:9px;padding:7px 9px;background:#fff;color:var(--ink);max-width:100%}
+input[type=text]{width:100%;margin-top:8px}
+select{margin:0 2px}
+select.right,input.right{border-color:var(--ok);background:#EAF6F0}
+select.wrong,input.wrong{border-color:var(--no);background:#FCEEF0}
+
+.slot{min-height:34px;border:1px solid var(--line);border-radius:9px;background:#F7F9FC;padding:6px 8px;margin-top:8px;font-family:var(--mono);font-size:14.5px;display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.slot:empty::before{content:"нажимайте слова ниже";color:#9AA5BD;font-family:"Golos Text",sans-serif;font-size:13px}
+.slot button{font:inherit;border:1px solid var(--ink);background:#fff;border-radius:7px;padding:3px 7px;cursor:pointer;color:var(--ink)}
+
+.fb{margin-top:11px;border-left:3px solid var(--line);padding:2px 0 2px 11px;font-size:14.5px;display:none}
+.fb.on{display:block;animation:in .22s ease-out}
+@keyframes in{from{opacity:0;transform:translateY(-3px)}to{opacity:1}}
+.fb .verdict{font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.05em;font-family:var(--mono)}
+.fb.g{border-left-color:var(--ok)} .fb.g .verdict{color:var(--ok)}
+.fb.b{border-left-color:var(--no)} .fb.b .verdict{color:var(--no)}
+.fb.s{border-left-color:#B9C1D2} .fb.s .verdict{color:var(--muted)}
+.fb .key{font-family:var(--mono);font-weight:600}
+.tag{display:inline-block;font-family:var(--mono);font-size:11px;font-weight:700;padding:2px 7px;border-radius:20px;margin-top:6px;letter-spacing:.02em}
+.tag.a{background:#FBEEE1;color:#8F4A05}
+.tag.the{background:#E1F1F2;color:#0A5C63}
+.tag.zero{background:#EAE6FF;color:#4A31C4}
+
+.acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.btn{font:inherit;font-weight:600;font-size:14px;border-radius:10px;padding:9px 15px;cursor:pointer;border:1px solid var(--ink);background:var(--ink);color:#fff}
+.btn.ghost{background:transparent;color:var(--ink)}
+.btn:hover{opacity:.88}
+.btn:focus-visible,.opt:focus-visible,summary:focus-visible,.tok button:focus-visible{outline:2px solid var(--c-zero);outline-offset:2px}
+.exscore{font-family:var(--mono);font-size:13px;color:var(--muted);align-self:center}
+
+footer{border-top:1px solid var(--line);padding-top:18px;color:var(--muted);font-size:14px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center}
+@media(max-width:520px){
+  .rblock{grid-template-columns:1fr;gap:6px}
+  .item{grid-template-columns:22px 1fr;padding:13px}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hbar">
+    <div class="hrow">
+      <div class="brand"><i>a/an</i> · <b>the</b> · <s>—</s></div>
+      <div class="score" id="score">0<span>/70</span></div>
+    </div>
+    <div class="ruler" id="ruler"></div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="hero">
+    <h1><em class="k1">a / an</em><em class="k2">the</em><em class="k3">zero article</em></h1>
+    <p class="lede">Семь упражнений по десять пунктов. В каждом ответе — почему именно так, со ссылкой на пункт правила.</p>
+  </div>
+
+  <details class="rules">
+    <summary>Правило под рукой</summary>
+    <div class="rbody">
+      <div class="rblock rb-a">
+        <h3>a / an</h3>
+        <ol>
+          <li>исчисляемое существительное в ед. ч.: <code>a house</code></li>
+          <li>прилагательное + сущ. в ед. ч.: <code>a nice house</code></li>
+          <li>первое упоминание: <code>I saw a dog...</code></li>
+          <li><code>what a</code> + исчисл. сущ.: <code>What a day!</code> (но <code>What nice weather!</code>)</li>
+          <li>частотность: <code>once a week</code>, <code>twice a month</code>, <code>three times a year</code>; <code>a bit</code></li>
+          <li>профессия / роль: <code>I am a student</code>, <code>I work as a teacher</code></li>
+          <li><code>an</code> — перед гласным <b>звуком</b>: <code>an hour</code>, но <code>a university</code></li>
+        </ol>
+      </div>
+      <div class="rblock rb-the">
+        <h3>the</h3>
+        <ol>
+          <li>второе упоминание: <code>...The dog was big.</code></li>
+          <li>конкретный, понятный из ситуации: <code>Open the door</code></li>
+          <li>единственное в своём роде: <code>the sun</code>, <code>the moon</code>, <code>the Internet</code></li>
+          <li>привычные места: <code>go to the shop</code>, <code>the gym</code>, <code>the cinema</code>; <code>go to the dentist</code></li>
+          <li>превосходная степень: <code>the biggest</code>, <code>the most beautiful</code></li>
+        </ol>
+      </div>
+      <div class="rblock rb-z">
+        <h3>zero</h3>
+        <ol>
+          <li>обобщение: мн. ч. исчисл. или неисчисл. — <code>Women talk more than men</code>, <code>Money can't buy...</code></li>
+          <li><code>home / work / school / university / church</code> + <code>at, to, from</code></li>
+          <li>еда, дни, месяцы: <code>have breakfast</code>, <code>on Monday</code>, <code>in June</code></li>
+          <li><code>next / last</code> + время: <code>last week</code>, <code>next Monday</code></li>
+        </ol>
+      </div>
+    </div>
+  </details>
+
+  <div id="app"></div>
+
+  <footer>
+    <span>Счёт считается по первой проверке. «Показать ответ» балл не даёт.</span>
+    <button class="btn ghost" id="reset">Начать заново</button>
+  </footer>
+</div>
+
+<script>
+/* ═══ данные ═══ */
+const EX = [
+{
+  t:"Почему так?", s:"Выберите объяснение, которое работает в этом предложении.", type:"choice",
+  items:[
+    {q:"I bought <b>a</b> car yesterday.", o:["Второе упоминание машины","Первое упоминание, исчисляемое сущ. в ед. ч.","Единственное в своём роде","Обобщение: машины вообще"], a:1,
+     e:"Машина в разговоре появляется впервые и она одна — <span class='key'>a car</span>. Второе упоминание было бы <span class='key'>the car</span>.", tag:"a/an · 3"},
+    {q:"What <b>a</b> surprise!", o:["Частотность","Профессия","what a/an + исчисляемое существительное","Превосходная степень"], a:2,
+     e:"Конструкция <span class='key'>What a + сущ.</span> Сравните с неисчисляемым: <span class='key'>What nice weather!</span> — там артикля нет.", tag:"a/an · 4"},
+    {q:"Close <b>the</b> window, please.", o:["Понятно, о каком именно окне речь","Окно упоминается впервые","Окно единственное в мире","Обобщение про окна"], a:0,
+     e:"Оба знают, какое окно имеется в виду — предмет определённый, поэтому <span class='key'>the</span>.", tag:"the · 2"},
+    {q:"I go to the gym three times <b>a</b> week.", o:["Профессия","Первое упоминание недели","Устойчивая частотность: three times a week","Прилагательное + существительное"], a:2,
+     e:"В значении «сколько раз за период» — всегда <span class='key'>a</span>: <span class='key'>once a day, twice a month, three times a week</span>.", tag:"a/an · 5"},
+    {q:"<b>The</b> sun is very bright today.", o:["Второе упоминание","Единственное в своём роде","Профессия","Обобщение"], a:1,
+     e:"Солнце у нас одно, как <span class='key'>the moon</span>, <span class='key'>the Internet</span>, <span class='key'>the sky</span>.", tag:"the · 3"},
+    {q:"Cats sleep a lot. <i>(артикля нет)</i>", o:["Обобщение: мн. ч. исчисляемого","Конкретные кошки во дворе","Единственное в своём роде","Первое упоминание"], a:0,
+     e:"Речь о кошках как о виде. Обобщение даём через мн. ч. без артикля. <span class='key'>The cats sleep a lot</span> — уже про конкретных кошек.", tag:"zero · 1"},
+    {q:"She is <b>an</b> engineer.", o:["Профессия; an — потому что дальше гласный звук","Второе упоминание","Единственная инженерша в мире","Превосходная степень"], a:0,
+     e:"Профессия в ед. ч. требует артикля: <span class='key'>She is an engineer</span>, <span class='key'>He works as a driver</span>. Форма <span class='key'>an</span> — из-за звука [e] в начале.", tag:"a/an · 6"},
+    {q:"I saw a dog. <b>The</b> dog was huge.", o:["Собака единственная в мире","Обобщение про собак","Второе упоминание того же предмета","Устойчивое выражение"], a:2,
+     e:"Схема истории: сначала <span class='key'>a</span> — вводим, потом <span class='key'>the</span> — уже знакомое.", tag:"the · 1"},
+    {q:"I have breakfast at 8. <i>(артикля нет)</i>", o:["Завтрак единственный в мире","Названия приёмов пищи идут без артикля","Обобщение через мн. ч.","Первое упоминание"], a:1,
+     e:"<span class='key'>have breakfast / lunch / dinner</span> — без артикля, как и <span class='key'>on Monday</span>, <span class='key'>in June</span>.", tag:"zero · 3"},
+    {q:"This is <b>the</b> most interesting book I've read.", o:["Первое упоминание книги","Превосходная степень требует the","Книга — единственная в своём роде","Профессия"], a:1,
+     e:"Superlative всегда с <span class='key'>the</span>: <span class='key'>the biggest</span>, <span class='key'>the best</span>, <span class='key'>the most interesting</span>.", tag:"the · 5"}
+  ]
+},
+{
+  t:"Find the mistake", s:"Нажмите на фрагмент с ошибкой.", type:"mistake",
+  items:[
+    {p:["I am student","at a big","university."], a:0, fix:"I am <b>a student</b> at a big university.", e:"Профессия или роль в ед. ч. — только с артиклем.", tag:"a/an · 6"},
+    {p:["She goes to","the school","by bus every day."], a:1, fix:"She goes to <b>school</b> by bus every day.", e:"<span class='key'>school, home, work, university</span> с предлогами идут без артикля, когда речь о занятии, а не о здании.", tag:"zero · 2"},
+    {p:["Look outside!","What","a nice weather!"], a:2, fix:"What <b>nice weather!</b>", e:"<span class='key'>weather</span> неисчисляемое, поэтому <span class='key'>a</span> невозможно. Ср.: <span class='key'>What a nice day!</span>", tag:"a/an · 4"},
+    {p:["I met a friend yesterday.","We talked a lot.","A friend was very happy."], a:2, fix:"<b>The friend</b> was very happy.", e:"Второе упоминание того же человека — <span class='key'>the</span>.", tag:"the · 1"},
+    {p:["Moon","is smaller than","the Earth."], a:0, fix:"<b>The moon</b> is smaller than the Earth.", e:"Единственное в своём роде — с <span class='key'>the</span>.", tag:"the · 3"},
+    {p:["Twice a week","I go to","gym."], a:2, fix:"Twice a week I go to <b>the gym</b>.", e:"Привычные места (<span class='key'>the gym, the shop, the cinema</span>) — с <span class='key'>the</span>. Без артикля только home/work/school/university/church.", tag:"the · 4"},
+    {p:["We had","a dinner","at 7 o'clock."], a:1, fix:"We had <b>dinner</b> at 7 o'clock.", e:"Приёмы пищи — без артикля.", tag:"zero · 3"},
+    {p:["In Berlin","he works as","engineer."], a:2, fix:"In Berlin he works as <b>an engineer</b>.", e:"После <span class='key'>work as</span> профессия тоже нужна с артиклем; <span class='key'>an</span> — из-за гласного звука.", tag:"a/an · 6"},
+    {p:["The last week","I saw her","in the park."], a:0, fix:"<b>Last week</b> I saw her in the park.", e:"<span class='key'>last / next</span> + время — без артикля.", tag:"zero · 4"},
+    {p:["It's","a most beautiful place","in the city."], a:1, fix:"It's <b>the most beautiful place</b> in the city.", e:"Превосходная степень — с <span class='key'>the</span>.", tag:"the · 5"}
+  ]
+},
+{
+  t:"Fill in the gaps", s:"Выберите нужную форму. Прочерк — значит артикль не нужен.", type:"gap",
+  items:[
+    {p:["She is "," honest woman."], a:"an", e:"Пишется через h, но читается с гласного звука — значит <span class='key'>an honest</span>.", tag:"a/an · 7"},
+    {p:["I'll be back in "," hour."], a:"an", e:"<span class='key'>hour</span> начинается со звука [a] — <span class='key'>an hour</span>.", tag:"a/an · 7"},
+    {p:["Look at "," moon tonight!"], a:"the", e:"Луна одна — <span class='key'>the moon</span>.", tag:"the · 3"},
+    {p:["We go to "," church on Sundays."], a:"—", e:"<span class='key'>go to church</span> — про действие, не про здание, поэтому без артикля.", tag:"zero · 2"},
+    {p:["","  money can't buy happiness."], a:"—", e:"Обобщение + неисчисляемое существительное — артикль не нужен.", tag:"zero · 1"},
+    {p:["He is "," university student."], a:"a", e:"Ловушка: <span class='key'>university</span> читается со звука [j], как «ю», — поэтому <span class='key'>a</span>, не <span class='key'>an</span>.", tag:"a/an · 7"},
+    {p:["I visit my parents twice "," month."], a:"a", e:"Частотность: <span class='key'>twice a month</span>.", tag:"a/an · 5"},
+    {p:["Can you open "," door, please?"], a:"the", e:"Понятно, какая дверь — предмет определённый.", tag:"the · 2"},
+    {p:["I had "," lunch with Ann."], a:"—", e:"Приёмы пищи без артикля: <span class='key'>have lunch</span>.", tag:"zero · 3"},
+    {p:["It was "," best day of my life."], a:"the", e:"<span class='key'>best</span> — превосходная степень.", tag:"the · 5"}
+  ]
+},
+{
+  t:"Составьте предложение по картинке", s:"Нажимайте слова в нужном порядке. Повторное нажатие в строке убирает слово.", type:"build",
+  items:[
+    {pic:"🌞", a:["The","sun","is","shining."], e:"Солнце одно в своём роде — <span class='key'>the sun</span>.", tag:"the · 3"},
+    {pic:"🏠", a:["It","is","a","big","house."], e:"Прилагательное + исчисляемое в ед. ч. — <span class='key'>a big house</span>.", tag:"a/an · 2"},
+    {pic:"🐶🐕🦮", a:["Dogs","like","long","walks."], e:"Обобщение через мн. ч. — без артикля.", tag:"zero · 1"},
+    {pic:"🎂", a:["What","a","lovely","cake!"], e:"<span class='key'>What a + прил. + исчисл. сущ.</span>", tag:"a/an · 4"},
+    {pic:"🏫", a:["The","children","go","to","school."], e:"Дети конкретные → <span class='key'>the children</span>, а <span class='key'>go to school</span> — устойчиво без артикля.", tag:"zero · 2"},
+    {pic:"🌙", a:["The","moon","is","bright","tonight."], e:"Луна одна — <span class='key'>the moon</span>.", tag:"the · 3"},
+    {pic:"👨‍🍳", a:["He","works","as","a","cook."], e:"Профессия после <span class='key'>work as</span> — с артиклем.", tag:"a/an · 6"},
+    {pic:"🍳🏠", a:["I","have","breakfast","at","home."], e:"Двойной ноль: <span class='key'>breakfast</span> — еда, <span class='key'>at home</span> — из списка home/work/school.", tag:"zero · 2,3"},
+    {pic:"🏊📅", a:["I","go","swimming","twice","a","week."], e:"Частотность — <span class='key'>twice a week</span>.", tag:"a/an · 5"},
+    {pic:"🏔️", a:["It","is","the","highest","mountain","here."], e:"Превосходная степень — <span class='key'>the highest</span>.", tag:"the · 5"}
+  ]
+},
+{
+  t:"Circle the odd collocation", s:"Три варианта соответствуют правилу, один — нет. Найдите лишний.", type:"odd",
+  items:[
+    {o:["once a week","two times the day","twice a month","three times a year"], a:1, e:"Частотность строится только с <span class='key'>a</span>, и говорят <span class='key'>twice</span>, а не <span class='key'>two times</span>: <span class='key'>twice a day</span>.", tag:"a/an · 5"},
+    {o:["an hour","an honest man","an university","an umbrella"], a:2, e:"<span class='key'>university</span> начинается со звука [j] — <span class='key'>a university</span>. Смотрим на звук, а не на букву.", tag:"a/an · 7"},
+    {o:["the sun","the breakfast","the moon","the Internet"], a:1, e:"Приёмы пищи идут без артикля: <span class='key'>breakfast</span>.", tag:"zero · 3"},
+    {o:["at home","at the work","at school","at university"], a:1, e:"<span class='key'>at work</span> — без артикля, как и остальные из этой группы.", tag:"zero · 2"},
+    {o:["What a day!","What a surprise!","What a weather!","What a nice car!"], a:2, e:"<span class='key'>weather</span> неисчисляемое → <span class='key'>What weather!</span> или <span class='key'>What terrible weather!</span>", tag:"a/an · 4"},
+    {o:["the next week","last week","next Monday","last June"], a:0, e:"С <span class='key'>next / last</span> артикль не нужен: <span class='key'>next week</span>.", tag:"zero · 4"},
+    {o:["I am a teacher","They are a doctors","She is an artist","He works as a driver"], a:1, e:"<span class='key'>a</span> не сочетается с мн. ч.: <span class='key'>They are doctors</span>.", tag:"a/an · 1"},
+    {o:["the biggest","a fastest","the best","the most beautiful"], a:1, e:"Превосходная степень требует <span class='key'>the</span>: <span class='key'>the fastest</span>.", tag:"the · 5"},
+    {o:["a house","a nice house","a houses","a big old house"], a:2, e:"<span class='key'>a</span> — только с ед. ч.: <span class='key'>houses</span> без артикля или <span class='key'>the houses</span>.", tag:"a/an · 1"},
+    {o:["on Monday","in June","on the Friday","at 5 o'clock"], a:2, e:"Дни недели идут без артикля: <span class='key'>on Friday</span>.", tag:"zero · 3"}
+  ]
+},
+{
+  t:"What usually comes after?", s:"Какое продолжение соответствует правилу?", type:"after",
+  items:[
+    {q:"once ___", o:["a week","the week","weeks"], a:0, e:"<span class='key'>once a week</span> — устойчивая модель частотности.", tag:"a/an · 5"},
+    {q:"What ___", o:["day!","a day!","the day!"], a:1, e:"<span class='key'>What a day!</span> — с исчисляемым нужен артикль.", tag:"a/an · 4"},
+    {q:"the most ___", o:["a beautiful girl","beautiful girl in the class","beautiful the girl"], a:1, e:"<span class='key'>the</span> уже стоит перед превосходной степенью, второй артикль не нужен.", tag:"the · 5"},
+    {q:"I am ___ (о работе)", o:["nurse","the nurse","a nurse"], a:2, e:"Профессия в ед. ч. — с <span class='key'>a/an</span>.", tag:"a/an · 6"},
+    {q:"I usually stay at ___", o:["home","the home","a home"], a:0, e:"<span class='key'>at home</span> — фиксированное сочетание без артикля.", tag:"zero · 2"},
+    {q:"Please close ___", o:["a door","door","the door"], a:2, e:"Дверь конкретная и понятная из ситуации.", tag:"the · 2"},
+    {q:"I saw him last ___", o:["Friday","the Friday","a Friday"], a:0, e:"<span class='key'>last Friday</span> — без артикля.", tag:"zero · 4"},
+    {q:"We have ___ at 7 a.m.", o:["a breakfast","breakfast","the breakfast"], a:1, e:"Еда без артикля: <span class='key'>have breakfast</span>.", tag:"zero · 3"},
+    {q:"I waited for an ___", o:["week","hour","day"], a:1, e:"<span class='key'>an</span> возможно только перед гласным звуком: <span class='key'>an hour</span>, но <span class='key'>a week</span>, <span class='key'>a day</span>.", tag:"a/an · 7"},
+    {q:"I found it on the ___", o:["school","home","Internet"], a:2, e:"<span class='key'>the Internet</span> — единственное в своём роде. School и home с <span class='key'>the</span> в этих значениях не идут.", tag:"the · 3"}
+  ]
+},
+{
+  t:"Translate", s:"Напишите перевод на английском. Проверка учитывает разные допустимые варианты.", type:"translate",
+  items:[
+    {ru:"Это дом.", a:["This is a house","It is a house","That is a house"], e:"Первое упоминание, исчисляемое в ед. ч. — <span class='key'>a house</span>.", tag:"a/an · 1"},
+    {ru:"Какой красивый день!", a:["What a beautiful day","What a lovely day","What a nice day"], e:"<span class='key'>What a + прил. + сущ.</span>", tag:"a/an · 4"},
+    {ru:"Я хожу в спортзал два раза в неделю.", a:["I go to the gym twice a week","I go to the gym two times a week"], e:"Место привычного назначения — <span class='key'>the gym</span>; частотность — <span class='key'>twice a week</span>.", tag:"the · 4 + a/an · 5"},
+    {ru:"Солнце сегодня яркое.", a:["The sun is bright today","Today the sun is bright"], e:"<span class='key'>the sun</span> — единственное в своём роде.", tag:"the · 3"},
+    {ru:"Я студент.", a:["I am a student","I'm a student"], e:"Роль или профессия — с артиклем.", tag:"a/an · 6"},
+    {ru:"Я видел собаку. Собака была большая.", a:["I saw a dog The dog was big","I saw a dog The dog was large","I saw a dog and the dog was big"], e:"Первое упоминание <span class='key'>a dog</span> → второе <span class='key'>the dog</span>.", tag:"a/an · 3 + the · 1"},
+    {ru:"Женщины говорят больше, чем мужчины.", a:["Women talk more than men","Women speak more than men"], e:"Обобщение через мн. ч. без артикля с обеих сторон.", tag:"zero · 1"},
+    {ru:"Я завтракаю в 8.", a:["I have breakfast at 8","I have breakfast at eight","I have breakfast at 8 o'clock"], e:"<span class='key'>have breakfast</span> — без артикля.", tag:"zero · 3"},
+    {ru:"На прошлой неделе я ходил в магазин.", a:["I went to the shop last week","Last week I went to the shop","I went to the store last week"], e:"<span class='key'>the shop</span> — привычное место, <span class='key'>last week</span> — без артикля.", tag:"the · 4 + zero · 4"},
+    {ru:"Это самый большой город в стране.", a:["It is the biggest city in the country","This is the biggest city in the country","It's the biggest city in the country"], e:"Превосходная степень — <span class='key'>the biggest</span>.", tag:"the · 5"}
+  ]
+}
+];
+
+/* ═══ утилиты ═══ */
+const GAPS=["—","a","an","the"];
+const state={}; // "ex-i" -> {sel, done, shown, ok}
+const esc=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;");
+function tagClass(t){return t.startsWith("a/an")?"a":t.startsWith("the")?"the":t.startsWith("zero")?"zero":"the"}
+function norm(s){
+  return s.toLowerCase().replace(/[’´`]/g,"'")
+    .replace(/\bi'm\b/g,"i am").replace(/\bit's\b/g,"it is").replace(/\bthat's\b/g,"that is")
+    .replace(/\bdon't\b/g,"do not").replace(/\bcan't\b/g,"cannot")
+    .replace(/[.,!?;:"()]/g," ").replace(/\s+/g," ").trim();
+}
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function key(e,i){return e+"-"+i}
+
+/* ═══ ruler ═══ */
+const ruler=document.getElementById("ruler");
+EX.forEach((ex,ei)=>{
+  const g=document.createElement("div");g.className="rgroup";
+  ex.items.forEach((_,ii)=>{const t=document.createElement("div");t.className="tick";t.id="t"+key(ei,ii);g.appendChild(t)});
+  ruler.appendChild(g);
+});
+function updateScore(){
+  let n=0;Object.values(state).forEach(s=>{if(s.ok&&!s.shown)n++});
+  document.getElementById("score").innerHTML=n+"<span>/70</span>";
+}
+function mark(ei,ii,cls){document.getElementById("t"+key(ei,ii)).className="tick "+cls}
+
+/* ═══ рендер ═══ */
+const app=document.getElementById("app");
+EX.forEach((ex,ei)=>{
+  const sec=document.createElement("section");sec.className="ex";
+  sec.innerHTML=`<div class="exhead"><div class="exnum">${ei+1}</div><div><h2>${ex.t}</h2><p>${ex.s}</p></div></div>`;
+  const list=document.createElement("div");list.className="items";
+  ex.items.forEach((it,ii)=>list.appendChild(renderItem(ex,ei,it,ii)));
+  sec.appendChild(list);
+  const acts=document.createElement("div");acts.className="acts";
+  const b1=document.createElement("button");b1.className="btn";b1.textContent="Проверить упражнение";
+  b1.onclick=()=>{ex.items.forEach((_,ii)=>check(ei,ii,false));showExScore(ei)};
+  const b2=document.createElement("button");b2.className="btn ghost";b2.textContent="Показать ответы";
+  b2.onclick=()=>{ex.items.forEach((_,ii)=>check(ei,ii,true));showExScore(ei)};
+  const sc=document.createElement("div");sc.className="exscore";sc.id="es"+ei;
+  acts.append(b1,b2,sc);sec.appendChild(acts);
+  app.appendChild(sec);
+});
+function showExScore(ei){
+  let ok=0,total=EX[ei].items.length;
+  EX[ei].items.forEach((_,ii)=>{const s=state[key(ei,ii)];if(s&&s.ok&&!s.shown)ok++});
+  document.getElementById("es"+ei).textContent=ok+" / "+total;
+}
+
+function renderItem(ex,ei,it,ii){
+  const k=key(ei,ii);
+  state[k]={sel:null,done:false,shown:false,ok:false,slot:[]};
+  const box=document.createElement("div");box.className="item";box.id="i"+k;
+  const n=document.createElement("div");n.className="n";n.textContent=(ii+1)+".";
+  const body=document.createElement("div");
+  box.append(n,body);
+
+  if(ex.type==="choice"||ex.type==="after"){
+    const q=document.createElement("div");q.className="q";
+    q.innerHTML=ex.type==="after"?it.q.replace("___","<span class='blank'>___</span>"):it.q;
+    body.appendChild(q);
+    body.appendChild(optionList(it.o,k,ex.type==="after"));
+  }
+  else if(ex.type==="odd"){
+    body.appendChild(optionList(it.o,k,true,"row"));
+  }
+  else if(ex.type==="mistake"){
+    const t=document.createElement("div");t.className="tok";
+    it.p.forEach((chunk,ci)=>{
+      const b=document.createElement("button");b.type="button";b.textContent=chunk;b.setAttribute("aria-pressed","false");
+      b.onclick=()=>{if(state[k].done)return;
+        t.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed","false"));
+        b.setAttribute("aria-pressed","true");state[k].sel=ci};
+      t.appendChild(b);
+    });
+    body.appendChild(t);
+  }
+  else if(ex.type==="gap"){
+    const q=document.createElement("div");q.className="q";
+    const sel=document.createElement("select");
+    sel.innerHTML='<option value="">?</option>'+GAPS.map(g=>`<option value="${g}">${g}</option>`).join("");
+    sel.onchange=()=>{if(!state[k].done)state[k].sel=sel.value};
+    sel.id="s"+k;
+    q.append(document.createTextNode(it.p[0]),sel,document.createTextNode(it.p[1]));
+    body.appendChild(q);
+  }
+  else if(ex.type==="build"){
+    const p=document.createElement("div");p.className="pic";p.textContent=it.pic;
+    const slot=document.createElement("div");slot.className="slot";slot.id="sl"+k;
+    const bank=document.createElement("div");bank.className="tok";
+    const order=shuffle(it.a.map((w,i)=>i));
+    order.forEach(wi=>{
+      const b=document.createElement("button");b.type="button";b.textContent=it.a[wi];b.dataset.wi=wi;
+      b.onclick=()=>{if(state[k].done)return;
+        b.setAttribute("aria-pressed","true");b.disabled=true;
+        state[k].slot.push(wi);
+        const s=document.createElement("button");s.type="button";s.textContent=it.a[wi];
+        s.onclick=()=>{if(state[k].done)return;
+          const pos=state[k].slot.lastIndexOf(wi);state[k].slot.splice(pos,1);
+          s.remove();b.disabled=false;b.setAttribute("aria-pressed","false")};
+        slot.appendChild(s)};
+      bank.appendChild(b);
+    });
+    body.append(p,slot,bank);
+  }
+  else if(ex.type==="translate"){
+    const q=document.createElement("div");q.className="ru";q.textContent=it.ru;
+    const inp=document.createElement("input");inp.type="text";inp.placeholder="ваш перевод";inp.id="in"+k;
+    inp.oninput=()=>{if(!state[k].done)state[k].sel=inp.value};
+    inp.onkeydown=e=>{if(e.key==="Enter")check(ei,ii,false)};
+    body.append(q,inp);
+  }
+
+  const fb=document.createElement("div");fb.className="fb";fb.id="f"+k;
+  body.appendChild(fb);
+  return box;
+}
+
+function optionList(opts,k,mono,row){
+  const wrap=document.createElement("div");wrap.className="opts"+(row?" row":"");
+  opts.forEach((o,oi)=>{
+    const b=document.createElement("button");b.type="button";b.className="opt"+(mono?" mono":"");
+    b.innerHTML=o;b.setAttribute("aria-pressed","false");
+    b.onclick=()=>{if(state[k].done)return;
+      wrap.querySelectorAll(".opt").forEach(x=>x.setAttribute("aria-pressed","false"));
+      b.setAttribute("aria-pressed","true");state[k].sel=oi};
+    wrap.appendChild(b);
+  });
+  return wrap;
+}
+
+/* ═══ проверка ═══ */
+function check(ei,ii,reveal){
+  const ex=EX[ei],it=ex.items[ii],k=key(ei,ii),s=state[k];
+  if(s.done&&!reveal)return;
+  if(s.done&&reveal&&s.revealedOnce)return;
+  const box=document.getElementById("i"+k),fb=document.getElementById("f"+k);
+  let ok=false,answered=true,right="";
+
+  if(ex.type==="choice"||ex.type==="after"||ex.type==="odd"){
+    const opts=box.querySelectorAll(".opt");
+    answered=s.sel!==null;ok=s.sel===it.a;
+    if(reveal||answered){
+      opts.forEach((o,oi)=>{o.disabled=true;
+        if(oi===it.a)o.classList.add("right");
+        else if(oi===s.sel)o.classList.add("wrong")});
+    }
+    right=it.o[it.a];
+  }
+  else if(ex.type==="mistake"){
+    const btns=box.querySelectorAll(".tok button");
+    answered=s.sel!==null;ok=s.sel===it.a;
+    if(reveal||answered){
+      btns.forEach((b,bi)=>{if(bi===it.a)b.classList.add("right");else if(bi===s.sel)b.classList.add("wrong")});
+    }
+    right=it.fix;
+  }
+  else if(ex.type==="gap"){
+    const sel=document.getElementById("s"+k);
+    answered=!!s.sel;ok=s.sel===it.a;
+    if(reveal||answered){sel.disabled=true;sel.classList.add(ok?"right":"wrong");if(reveal&&!ok)sel.value=it.a}
+    right=it.p[0]+"<b>"+(it.a==="—"?" — ":it.a)+"</b>"+it.p[1];
+  }
+  else if(ex.type==="build"){
+    const built=s.slot.map(i=>it.a[i]);
+    answered=built.length>0;
+    ok=built.join(" ")===it.a.join(" ");
+    const slot=document.getElementById("sl"+k);
+    if(reveal||answered){
+      slot.querySelectorAll("button").forEach(b=>b.disabled=true);
+      box.querySelectorAll(".tok button").forEach(b=>b.disabled=true);
+    }
+    right=it.a.join(" ");
+  }
+  else if(ex.type==="translate"){
+    const inp=document.getElementById("in"+k),val=(s.sel||"").trim();
+    answered=val.length>0;
+    ok=it.a.some(v=>norm(v)===norm(val));
+    if(reveal||answered){inp.disabled=true;inp.classList.add(ok?"right":"wrong")}
+    right=it.a[0]+(it.a.length>1?" <span style='color:var(--muted)'>(или: "+it.a.slice(1).join(" / ")+")</span>":"");
+  }
+
+  if(!answered&&!reveal){
+    fb.className="fb on s";
+    fb.innerHTML="<div class='verdict'>нет ответа</div><div>Выберите или введите вариант, потом проверяйте.</div>";
+    return;
+  }
+  s.done=true;s.ok=ok;
+  if(reveal&&!answered){s.shown=true;s.revealedOnce=true}
+  if(reveal&&answered&&!ok)s.shown=true;
+
+  box.classList.add(s.shown&&!ok?"shown":(ok?"ok":"no"));
+  fb.className="fb on "+(ok?"g":(s.shown&&!answered?"s":"b"));
+  fb.innerHTML=
+    "<div class='verdict'>"+(ok?"верно":(answered?"ошибка":"ответ"))+"</div>"+
+    (ok?"":"<div class='q' style='margin:3px 0 5px'>"+right+"</div>")+
+    "<div>"+it.e+"</div>"+
+    "<span class='tag "+tagClass(it.tag)+"'>"+it.tag+"</span>";
+  mark(ei,ii,ok&&!s.shown?"ok":(ok?"shown":(answered?"no":"shown")));
+  updateScore();
+}
+
+document.getElementById("reset").onclick=()=>location.reload();
+updateScore();
+</script>
+</body>
+</html>
