@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Money &amp; Debt — тренажёр лексики</title>
+<style>
+  :root{
+    --paper:#e7eee6;
+    --card:#fbfcf9;
+    --ink:#16261d;
+    --ink-soft:#5a6d60;
+    --rule:#bdd0bf;
+    --green:#1c7a4f;
+    --stamp:#b3312b;
+    --amber:#9a6a12;
+    --mono: ui-monospace, "SFMono-Regular", "Cascadia Mono", Menlo, Consolas, monospace;
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:
+      repeating-linear-gradient(to bottom, transparent 0 31px, rgba(29,90,58,.07) 31px 32px),
+      var(--paper);
+    color:var(--ink);
+    font-family:var(--serif);
+    font-size:17px;
+    line-height:1.6;
+    -webkit-text-size-adjust:100%;
+  }
+  .wrap{max-width:1140px;margin:0 auto;padding:28px 18px 80px}
+
+  /* ---------- statement header ---------- */
+  header.statement{
+    border:1.5px solid var(--ink);
+    background:var(--card);
+    padding:18px 20px 14px;
+  }
+  .eyebrow{
+    font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--ink-soft);margin:0 0 6px;
+  }
+  h1{font-size:clamp(28px,5vw,42px);line-height:1.05;margin:0 0 6px;font-weight:600;letter-spacing:-.01em}
+  h1 em{font-style:italic;color:var(--green)}
+  .lede{margin:0;color:var(--ink-soft);max-width:62ch}
+  .balance{
+    margin-top:16px;padding-top:12px;border-top:1px dashed var(--rule);
+    display:flex;flex-wrap:wrap;gap:10px 26px;align-items:baseline;font-family:var(--mono);font-size:12.5px;
+  }
+  .balance span b{font-size:17px;font-weight:700}
+  .balance .ok b{color:var(--green)}
+  .balance .bad b{color:var(--stamp)}
+
+  /* ---------- layout ---------- */
+  .grid{display:grid;grid-template-columns:minmax(0,1fr) 268px;gap:26px;margin-top:26px;align-items:start}
+  @media (max-width:920px){ .grid{grid-template-columns:1fr} .side{order:-1} }
+
+  /* ---------- receipt panel ---------- */
+  .side{position:sticky;top:18px}
+  .receipt{
+    background:var(--card);
+    border:1.5px solid var(--ink);
+    border-bottom:none;
+    padding:14px 16px 18px;
+    box-shadow:3px 3px 0 rgba(22,38,29,.12);
+  }
+  .receipt h2{
+    font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+    margin:0 0 2px;color:var(--stamp);
+  }
+  .receipt .sub{font-family:var(--mono);font-size:10.5px;color:var(--ink-soft);margin:0 0 12px;letter-spacing:.04em}
+  .zig{
+    height:12px;
+    background:var(--card);
+    border-left:1.5px solid var(--ink);border-right:1.5px solid var(--ink);
+    -webkit-mask:conic-gradient(from -45deg at bottom, #0000 25%, #000 0) 50%/12px 100%;
+            mask:conic-gradient(from -45deg at bottom, #0000 25%, #000 0) 50%/12px 100%;
+    box-shadow:3px 3px 0 rgba(22,38,29,.12);
+  }
+  #problemList{list-style:none;margin:0;padding:0}
+  #problemList li{
+    display:flex;justify-content:space-between;gap:8px;align-items:baseline;
+    padding:6px 0;border-bottom:1px dotted var(--rule);font-size:14.5px;
+  }
+  #problemList li:last-child{border-bottom:none}
+  #problemList .tally{font-family:var(--mono);font-size:11px;color:var(--stamp);white-space:nowrap}
+  .empty-note{font-size:14px;color:var(--ink-soft);margin:0}
+  .side-actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+
+  /* ---------- buttons ---------- */
+  button{
+    font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;
+    background:var(--card);color:var(--ink);border:1.4px solid var(--ink);
+    padding:8px 12px;cursor:pointer;
+  }
+  button:hover{background:var(--ink);color:var(--card)}
+  button.primary{background:var(--green);border-color:var(--green);color:#fff}
+  button.primary:hover{background:var(--ink);border-color:var(--ink)}
+  button.ghost{border-style:dashed}
+  button:focus-visible, input:focus-visible, textarea:focus-visible{outline:2.5px solid var(--amber);outline-offset:2px}
+  .speak{
+    border:none;background:none;padding:2px 4px;font-size:15px;text-transform:none;letter-spacing:0;cursor:pointer;
+    color:var(--green);line-height:1;
+  }
+  .speak:hover{background:none;color:var(--stamp)}
+
+  /* ---------- word list ---------- */
+  section.block{background:var(--card);border:1.5px solid var(--ink);padding:18px 20px 22px;margin-bottom:22px}
+  .block-head{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline;border-bottom:1.5px solid var(--ink);padding-bottom:8px;margin-bottom:14px}
+  .tag{font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--card);background:var(--ink);padding:3px 7px}
+  .block-head h2{font-size:22px;margin:0;font-weight:600}
+  .task{font-size:15px;color:var(--ink-soft);margin:0 0 14px}
+  .task b{color:var(--ink)}
+
+  table.words{width:100%;border-collapse:collapse;font-size:15.5px}
+  table.words th{
+    text-align:left;font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--ink-soft);font-weight:400;padding:0 8px 6px 0;border-bottom:1px solid var(--rule);
+  }
+  table.words td{padding:7px 8px 7px 0;border-bottom:1px dotted var(--rule);vertical-align:top}
+  table.words tr:last-child td{border-bottom:none}
+  .en{font-weight:600}
+  .ipa{font-family:var(--mono);font-size:12.5px;color:var(--green);white-space:nowrap}
+  .ex{display:block;font-size:13.5px;color:var(--ink-soft);font-style:italic}
+  @media (max-width:640px){
+    table.words thead{display:none}
+    table.words td{display:block;border:none;padding:1px 0}
+    table.words tr{display:block;padding:9px 0;border-bottom:1px dotted var(--rule)}
+  }
+
+  /* ---------- exercise items ---------- */
+  ol.items{list-style:none;counter-reset:it;margin:0;padding:0}
+  ol.items>li{
+    counter-increment:it;display:grid;grid-template-columns:34px 1fr;gap:0 10px;
+    padding:9px 0;border-bottom:1px dotted var(--rule);align-items:baseline;
+  }
+  ol.items>li:last-child{border-bottom:none}
+  ol.items>li::before{
+    content:counter(it,decimal-leading-zero);
+    font-family:var(--mono);font-size:11.5px;color:var(--ink-soft);padding-top:4px;
+  }
+  .q{margin:0}
+  .hint{color:var(--ink-soft);font-size:14px;font-style:italic}
+  input.ans, textarea.ans{
+    font-family:var(--mono);font-size:15px;color:var(--ink);
+    background:transparent;border:none;border-bottom:1.6px solid var(--rule);
+    padding:2px 4px;min-width:80px;
+  }
+  input.ans{width:min(100%,var(--w,190px))}
+  textarea.ans{width:100%;resize:vertical;line-height:1.7;border-bottom-width:1.6px}
+  .verdict{font-family:var(--mono);font-size:12px;margin-left:8px;white-space:nowrap}
+  li.ok input.ans{border-bottom-color:var(--green);color:var(--green)}
+  li.ok .verdict{color:var(--green)}
+  li.bad input.ans{border-bottom-color:var(--stamp);color:var(--stamp)}
+  li.bad .verdict{color:var(--stamp)}
+  li.blank input.ans{border-bottom-color:var(--amber)}
+  li.blank .verdict{color:var(--amber)}
+  li.shown input.ans{border-bottom-color:var(--amber);color:var(--amber)}
+  li.shown .verdict{color:var(--amber)}
+  .key{font-family:var(--mono);font-size:13px;color:var(--green);display:block;margin-top:3px}
+  .actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:16px;padding-top:12px;border-top:1.5px solid var(--ink)}
+  .score{font-family:var(--mono);font-size:12px;color:var(--ink-soft);margin-left:auto}
+  .two-in{display:flex;flex-wrap:wrap;gap:10px 18px;margin-top:5px}
+  .two-in label{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);display:block}
+  .toast{
+    position:fixed;left:50%;bottom:22px;transform:translateX(-50%);
+    background:var(--ink);color:var(--card);font-family:var(--mono);font-size:12px;letter-spacing:.06em;
+    padding:10px 16px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:50;
+  }
+  .toast.on{opacity:1}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="statement">
+    <p class="eyebrow">Vocabulary statement · Money, debt &amp; payment</p>
+    <h1>Деньги: <em>заработать, занять, потратить</em></h1>
+    <p class="lede">17 слов и выражений — от <i>be worth</i> до <i>pay in cash</i>. Семь упражнений с проверкой по 10 пунктов и блок со своими идеями. Все ответы пишутся руками.</p>
+    <div class="balance">
+      <span class="ok">Правильно: <b id="statOk">0</b> / 70</span>
+      <span class="bad">Ошибок: <b id="statBad">0</b></span>
+      <span>Проблемных слов: <b id="statWords">0</b></span>
+      <button id="speakAll" style="margin-left:auto">🔊 Прослушать все слова</button>
+    </div>
+  </header>
+
+  <div class="grid">
+    <main>
+
+      <!-- ===== WORD LIST ===== -->
+      <section class="block">
+        <div class="block-head">
+          <span class="tag">RECALL</span>
+          <h2>Напоминание слов</h2>
+        </div>
+        <p class="task">Прочитайте таблицу, нажмите <b>🔊</b> на каждом слове и повторите вслух за озвучкой. Потом закройте таблицу рукой и переходите к упражнениям.</p>
+        <table class="words">
+          <thead><tr><th>Слово</th><th>Транскрипция</th><th>Перевод</th><th></th></tr></thead>
+          <tbody id="wordBody"></tbody>
+        </table>
+      </section>
+
+      <div id="exercises"></div>
+
+    </main>
+
+    <!-- ===== PROBLEM WORDS ===== -->
+    <aside class="side">
+      <div class="receipt">
+        <h2>Проблемные слова</h2>
+        <p class="sub">Сюда попадает всё, где была ошибка</p>
+        <ul id="problemList"></ul>
+        <p class="empty-note" id="problemEmpty">Пока чисто. Проверьте первое упражнение.</p>
+        <div class="side-actions">
+          <button id="speakProblems" class="ghost">🔊 Прослушать</button>
+          <button id="clearProblems" class="ghost">Очистить</button>
+        </div>
+      </div>
+      <div class="zig"></div>
+    </aside>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============ WORDS ============ */
+const WORDS = [
+  ["be worth","/biː ˈwɜːθ/","стоить / иметь ценность","The house is worth a lot of money."],
+  ["borrow money from sb","/ˈbɒrəʊ/","занимать деньги у кого-то","I borrowed money from my friend."],
+  ["can't afford to buy","/əˈfɔːd/","не мочь себе позволить купить","I can't afford to buy a new car."],
+  ["charge sb $12 for sth","/tʃɑːdʒ/","взять с кого-то $12 за что-то","They charged me $12 for delivery."],
+  ["cost","/kɒst/","стоить","The ticket costs $20."],
+  ["earn","/ɜːn/","зарабатывать","She earns a good salary."],
+  ["inherit","/ɪnˈherɪt/","унаследовать","He inherited a house."],
+  ["inheritance","/ɪnˈherɪtəns/","наследство","She received an inheritance."],
+  ["invest in","/ɪnˈvest/","инвестировать в","I invest in shares."],
+  ["lend money to sb","/lend/","одолжить деньги кому-то","I lent money to my brother."],
+  ["owe sb sth","/əʊ/","быть должным кому-то что-то","I owe him $50."],
+  ["raise","/reɪz/","повышать","The company raised prices."],
+  ["save","/seɪv/","копить / экономить","I save money every month."],
+  ["waste money on","/weɪst/","тратить впустую на","Don't waste money on useless things."],
+  ["get into debt / be in debt","/det/","влезть в долги / быть в долгах","They got into debt. They are in debt."],
+  ["pay by card","/kɑːd/","платить картой","I usually pay by card."],
+  ["pay in cash","/kæʃ/","платить наличными","I paid in cash."]
+];
+
+/* ============ EXERCISES ============ */
+const EX = [
+{ tag:"UNSCRAMBLE", title:"Вставьте пропущенные буквы",
+  task:"Напишите слово целиком, без пропусков.", w:170,
+  items:[
+   ["b _ rr _ w", "занимать у кого-то", ["borrow"], "borrow money from sb"],
+   ["a ff _ rd", "мочь себе позволить", ["afford"], "can't afford to buy"],
+   ["ch _ rg _", "взять с кого-то плату", ["charge"], "charge sb $12 for sth"],
+   ["_ arn", "зарабатывать", ["earn"], "earn"],
+   ["inh _ r _ t", "унаследовать", ["inherit"], "inherit"],
+   ["inh _ r _ t _ nce", "наследство", ["inheritance"], "inheritance"],
+   ["inv _ st", "инвестировать", ["invest"], "invest in"],
+   ["_ we", "быть должным", ["owe"], "owe sb sth"],
+   ["w _ st _", "тратить впустую", ["waste"], "waste money on"],
+   ["d _ bt", "долг", ["debt"], "get into debt / be in debt"]
+  ]},
+
+{ tag:"RU → EN", title:"Переведите на английский",
+  task:"Пишите предложение целиком. Знак $ и слово dollars — оба варианта принимаются.", w:"100%", wide:true,
+  items:[
+   ["Этот дом стоит много денег.", "", ["The house is worth a lot of money","This house is worth a lot of money","The house is worth much money"], "be worth"],
+   ["Я занял деньги у друга.", "", ["I borrowed money from my friend","I borrowed money from a friend"], "borrow money from sb"],
+   ["Я не могу позволить себе купить новую машину.", "", ["I can't afford to buy a new car","I cannot afford to buy a new car"], "can't afford to buy"],
+   ["Они взяли с меня 12 долларов за доставку.", "", ["They charged me $12 for delivery","They charged me $12 for the delivery"], "charge sb $12 for sth"],
+   ["Билет стоит 20 долларов.", "", ["The ticket costs $20","This ticket costs $20"], "cost"],
+   ["Она хорошо зарабатывает.", "", ["She earns a good salary","She earns good money","She earns well"], "earn"],
+   ["Он унаследовал дом.", "", ["He inherited a house","He inherited the house"], "inherit"],
+   ["Я инвестирую в акции.", "", ["I invest in shares","I invest in stocks"], "invest in"],
+   ["Я одолжил деньги брату.", "", ["I lent money to my brother","I lent my brother money"], "lend money to sb"],
+   ["Не трать деньги впустую на бесполезные вещи.", "", ["Don't waste money on useless things","Do not waste money on useless things","Don't waste your money on useless things"], "waste money on"]
+  ]},
+
+{ tag:"DEFINITIONS", title:"Дефиниции",
+  task:"Прочитайте определение и напишите слово (глагол — в форме инфинитива без to).", w:190,
+  items:[
+   ["to take money from somebody and agree to give it back later", "", ["borrow"], "borrow money from sb"],
+   ["to give somebody money for a short time", "", ["lend"], "lend money to sb"],
+   ["to have to give money back to somebody", "", ["owe"], "owe sb sth"],
+   ["to get money for the work you do", "", ["earn"], "earn"],
+   ["to keep money for the future instead of spending it", "", ["save"], "save"],
+   ["to ask somebody to pay a particular amount of money", "", ["charge"], "charge sb $12 for sth"],
+   ["to get money or property from somebody who has died", "", ["inherit"], "inherit"],
+   ["the money or property you get from somebody who has died", "", ["inheritance","an inheritance"], "inheritance"],
+   ["to put money into shares or a business to get more money later", "", ["invest","invest in"], "invest in"],
+   ["to spend money on something useless", "", ["waste","waste money"], "waste money on"]
+  ]},
+
+{ tag:"COLLOCATIONS", title:"Сочетаемость: какое слово подходит",
+  task:"Впишите один глагол в каждый пропуск.", w:150,
+  items:[
+   ["______ money from your parents", "занять", ["borrow"], "borrow money from sb"],
+   ["______ money to a friend", "одолжить", ["lend"], "lend money to sb"],
+   ["______ a good salary", "получать за работу", ["earn"], "earn"],
+   ["______ money every month", "откладывать", ["save"], "save"],
+   ["______ prices by 10%", "повысить", ["raise"], "raise"],
+   ["______ into debt", "влезть в долги", ["get","fall"], "get into debt / be in debt"],
+   ["______ in cash", "расплатиться", ["pay"], "pay in cash"],
+   ["______ money on junk food", "тратить впустую", ["waste"], "waste money on"],
+   ["______ sb $12 for delivery", "взять с кого-то", ["charge"], "charge sb $12 for sth"],
+   ["can't ______ to buy a house", "позволить себе", ["afford"], "can't afford to buy"]
+  ]},
+
+{ tag:"CONTEXT", title:"Контекст: история Тома",
+  task:"Поставьте слово в нужную форму (время и лицо важны).", w:190,
+  items:[
+   ["Last year Tom ______ £20,000 from his aunt.", "унаследовать", ["inherited"], "inherit"],
+   ["He ______ half of it in shares.", "инвестировать, past", ["invested"], "invest in"],
+   ["Then he ______ £3,000 on useless gadgets.", "тратить впустую, past", ["wasted"], "waste money on"],
+   ["His new laptop ______ £1,200.", "стоить, past", ["cost"], "cost"],
+   ["The shop ______ him £50 for delivery.", "взять с него, past", ["charged"], "charge sb $12 for sth"],
+   ["Now Tom ______ the bank £2,000.", "быть должным, present", ["owes"], "owe sb sth"],
+   ["He can't ______ to go on holiday this summer.", "позволить себе", ["afford"], "can't afford to buy"],
+   ["He ______ money from his brother every month.", "занимать, present", ["borrows"], "borrow money from sb"],
+   ["He says his old guitar ______ a lot of money.", "стоить / иметь ценность, present", ["is worth"], "be worth"],
+   ["Next year he wants to ______ £100 a month.", "копить", ["save"], "save"]
+  ]},
+
+{ tag:"PREPOSITIONS", title:"Соедините с предлогами",
+  task:"Впишите только предлог: from, to, in, on, for, by, into.", w:110,
+  items:[
+   ["borrow money ______ your parents", "", ["from"], "borrow money from sb"],
+   ["lend money ______ a friend", "", ["to"], "lend money to sb"],
+   ["invest ______ property", "", ["in"], "invest in"],
+   ["waste money ______ junk food", "", ["on"], "waste money on"],
+   ["They charged me $50 ______ a haircut.", "", ["for"], "charge sb $12 for sth"],
+   ["I usually pay ______ card.", "", ["by"], "pay by card"],
+   ["Yesterday I paid ______ cash.", "", ["in"], "pay in cash"],
+   ["Be careful — you can get ______ debt very fast.", "", ["into"], "get into debt / be in debt"],
+   ["They lost their jobs and now they are ______ debt.", "", ["in"], "get into debt / be in debt"],
+   ["I'm saving ______ a new laptop.", "", ["for"], "save"]
+  ]},
+
+{ tag:"FIND 2 MISTAKES", title:"Найдите две ошибки",
+  task:"В каждом предложении две ошибки. Впишите два <b>исправленных</b> слова (или сочетания) — порядок не важен.", pairs:true, w:170,
+  items:[
+   ["I borrowed money to my friend, and now he owe me $50.", "", [["from"],["owes"]], "borrow money from sb"],
+   ["She can't afford buy a new car — it costs to much.", "", [["to buy","afford to buy"],["too much","too"]], "can't afford to buy"],
+   ["They charged to me $12 of delivery.", "", [["me","charged me"],["for"]], "charge sb $12 for sth"],
+   ["He inherit a big house and got an expensive inheritant.", "", [["inherited"],["inheritance"]], "inheritance"],
+   ["I usually pay with card, but yesterday I paid by cash.", "", [["by card","by"],["in cash","in"]], "pay by card"],
+   ["My brother owns me money because I lend him $100 last week.", "", [["owes","owes me"],["lent"]], "owe sb sth"],
+   ["This old painting worths a lot of moneys.", "", [["is worth","worth"],["money"]], "be worth"],
+   ["Don't waste your money in useless things — you should safe it.", "", [["on"],["save"]], "waste money on"],
+   ["He got in debt last year, and now he is on debt.", "", [["into","into debt"],["in","in debt"]], "get into debt / be in debt"],
+   ["She earn a good salary and she invests on shares.", "", [["earns"],["in"]], "invest in"]
+  ]}
+];
+
+const OWN = [
+  "I can't afford to",
+  "Last month I wasted money on",
+  "I would never borrow money from",
+  "In my opinion, it's worth",
+  "At the moment I'm saving for",
+  "If I inherited a lot of money, I would invest in",
+  "Once a shop charged me too much for",
+  "I usually pay by card when",
+  "People get into debt because",
+  "I still owe"
+];
+
+/* ============ HELPERS ============ */
+const $ = s => document.querySelector(s);
+const esc = s => s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+function norm(s){
+  return (s||"").toLowerCase()
+    .replace(/[’‘`]/g,"'")
+    .replace(/[£$€]/g,"")
+    .replace(/\b(dollars?|pounds?|usd|gbp)\b/g,"")
+    .replace(/[.,!?;:"«»]/g,"")
+    .replace(/\s+/g," ").trim();
+}
+const match = (val, list) => list.some(a => norm(a) === norm(val));
+
+let problems = new Map();       // word -> mistakes count
+let okSet = new Set(), badSet = new Set();
+
+function toast(msg){
+  const t = $("#toast"); t.textContent = msg; t.classList.add("on");
+  clearTimeout(t._t); t._t = setTimeout(()=>t.classList.remove("on"), 1900);
+}
+
+/* ---- speech ---- */
+let voice = null;
+function pickVoice(){
+  const v = speechSynthesis.getVoices();
+  voice = v.find(x=>/en-GB/i.test(x.lang)) || v.find(x=>/^en/i.test(x.lang)) || null;
+}
+if ("speechSynthesis" in window){ pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
+function speak(text){
+  if(!("speechSynthesis" in window)){ toast("Озвучка не поддерживается браузером"); return; }
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = "en-GB"; u.rate = .9; if(voice) u.voice = voice;
+  speechSynthesis.speak(u);
+}
+function speakList(arr){
+  if(!("speechSynthesis" in window)){ toast("Озвучка не поддерживается браузером"); return; }
+  speechSynthesis.cancel();
+  arr.forEach(t=>{
+    const u = new SpeechSynthesisUtterance(t);
+    u.lang="en-GB"; u.rate=.9; if(voice) u.voice=voice; speechSynthesis.speak(u);
+  });
+}
+
+/* ============ RENDER: words ============ */
+$("#wordBody").innerHTML = WORDS.map(([en,ipa,ru,ex],i)=>`
+  <tr>
+    <td class="en">${esc(en)}<span class="ex">${esc(ex)}</span></td>
+    <td class="ipa">${esc(ipa)}</td>
+    <td>${esc(ru)}</td>
+    <td><button class="speak" data-say="${esc(en.replace(/ \/ .*/,"").replace(/sb|sth/g,""))}. ${esc(ex)}" aria-label="Прослушать ${esc(en)}">🔊</button></td>
+  </tr>`).join("");
+
+$("#speakAll").onclick = () => speakList(WORDS.map(w=>w[0].replace(/ \/ .*/,"").replace(/sb|sth/g,"")));
+
+/* ============ RENDER: exercises ============ */
+const box = $("#exercises");
+EX.forEach((ex, ei)=>{
+  const sec = document.createElement("section");
+  sec.className = "block"; sec.dataset.ex = ei;
+  const items = ex.items.map(([q,hint,ans,word], i)=>{
+    const inputs = ex.pairs
+      ? `<div class="two-in">
+           <div><label>исправление 1</label><input class="ans" data-i="0" style="--w:${ex.w}px" autocomplete="off" spellcheck="false"></div>
+           <div><label>исправление 2</label><input class="ans" data-i="1" style="--w:${ex.w}px" autocomplete="off" spellcheck="false"></div>
+         </div>`
+      : (ex.wide
+          ? `<div style="margin-top:4px"><input class="ans" style="--w:100%" autocomplete="off" spellcheck="false"></div>`
+          : ` <input class="ans" style="--w:${ex.w}px" autocomplete="off" spellcheck="false">`);
+    return `<li data-i="${i}">
+       <div>
+         <p class="q">${ex.wide?esc(q):q}${hint?` <span class="hint">(${esc(hint)})</span>`:""}${ex.pairs||ex.wide?"":inputs}<span class="verdict"></span></p>
+         ${ex.pairs||ex.wide?inputs:""}
+         <span class="key" hidden></span>
+       </div>
+     </li>`;
+  }).join("");
+  sec.innerHTML = `
+    <div class="block-head">
+      <span class="tag">УПР. ${String(ei+1).padStart(2,"0")} · ${ex.tag}</span>
+      <h2>${ex.title}</h2>
+    </div>
+    <p class="task">${ex.task}</p>
+    <ol class="items">${items}</ol>
+    <div class="actions">
+      <button class="primary check">Проверить</button>
+      <button class="show">Показать ответы</button>
+      <button class="reset ghost">Очистить</button>
+      <span class="score"></span>
+    </div>`;
+  box.appendChild(sec);
+});
+
+/* ---- own ideas block ---- */
+const own = document.createElement("section");
+own.className = "block";
+own.innerHTML = `
+  <div class="block-head">
+    <span class="tag">УПР. 08 · YOUR IDEAS</span>
+    <h2>Закончите предложения своими идеями</h2>
+  </div>
+  <p class="task">Здесь нет правильных ответов. Напишите про себя — минимум 5–6 слов в каждом пункте, затем скопируйте всё одной кнопкой и отправьте преподавателю.</p>
+  <ol class="items">${OWN.map((p,i)=>`
+    <li><div><p class="q"><b>${esc(p)}</b> …</p>
+    <textarea class="ans own" rows="1" data-prompt="${esc(p)}" autocomplete="off"></textarea></div></li>`).join("")}
+  </ol>
+  <div class="actions">
+    <button class="primary" id="copyOwn">Скопировать все ответы</button>
+    <button class="ghost" id="clearOwn">Очистить</button>
+    <span class="score" id="ownCount">0 / 10 заполнено</span>
+  </div>`;
+box.appendChild(own);
+
+/* ============ CHECKING ============ */
+function addProblem(word){
+  problems.set(word, (problems.get(word)||0)+1);
+  renderProblems();
+}
+function renderProblems(){
+  const list = $("#problemList"), empty = $("#problemEmpty");
+  const arr = [...problems.entries()].sort((a,b)=>b[1]-a[1]);
+  list.innerHTML = arr.map(([w,n])=>`
+    <li><span>${esc(w)}</span><span class="tally">${n}×</span></li>`).join("");
+  empty.hidden = arr.length > 0;
+  $("#statWords").textContent = arr.length;
+}
+function updateStats(){
+  $("#statOk").textContent = okSet.size;
+  $("#statBad").textContent = badSet.size;
+}
+
+function checkItem(ex, li, itemIdx, reveal){
+  const [q,hint,ans,word] = ex.items[itemIdx];
+  const inputs = [...li.querySelectorAll("input.ans")];
+  const verdict = li.querySelector(".verdict");
+  const key = li.querySelector(".key");
+  const id = ex.tag+"#"+itemIdx;
+  li.classList.remove("ok","bad","blank","shown");
+  key.hidden = true;
+
+  if(reveal){
+    if(ex.pairs){ inputs[0].value = ans[0][0]; inputs[1].value = ans[1][0]; }
+    else inputs[0].value = ans[0];
+    li.classList.add("shown");
+    verdict.textContent = "ответ";
+    if(ans.length>1 && !ex.pairs){
+      key.hidden = false; key.textContent = "также верно: " + ans.slice(1).join(" / ");
+    }
+    return null;
+  }
+
+  const empty = inputs.every(i=>!i.value.trim());
+  if(empty){ li.classList.add("blank"); verdict.textContent = "— пусто"; return null; }
+
+  let correct;
+  if(ex.pairs){
+    const [a,b] = inputs.map(i=>i.value);
+    correct = (match(a,ans[0]) && match(b,ans[1])) || (match(a,ans[1]) && match(b,ans[0]));
+  } else {
+    correct = match(inputs[0].value, ans);
+  }
+
+  if(correct){
+    li.classList.add("ok"); verdict.textContent = "✓ верно";
+    okSet.add(id); badSet.delete(id);
+  } else {
+    li.classList.add("bad"); verdict.textContent = "✗ ещё раз";
+    badSet.add(id); okSet.delete(id);
+    addProblem(word);
+  }
+  return correct;
+}
+
+document.addEventListener("click", e=>{
+  const say = e.target.closest(".speak");
+  if(say){ speak(say.dataset.say); return; }
+
+  const sec = e.target.closest("section.block[data-ex]");
+  if(!sec) return;
+  const ex = EX[+sec.dataset.ex];
+  const lis = [...sec.querySelectorAll("ol.items>li")];
+
+  if(e.target.classList.contains("check")){
+    let right=0, done=0;
+    lis.forEach((li,i)=>{ const r = checkItem(ex,li,i,false); if(r!==null){done++; if(r) right++;} });
+    sec.querySelector(".score").textContent = done ? `${right} / ${done} верно` : "ничего не заполнено";
+    updateStats();
+  }
+  if(e.target.classList.contains("show")){
+    lis.forEach((li,i)=>checkItem(ex,li,i,true));
+    sec.querySelector(".score").textContent = "ответы открыты — закройте и напишите сами";
+  }
+  if(e.target.classList.contains("reset")){
+    lis.forEach((li,i)=>{
+      li.classList.remove("ok","bad","blank","shown");
+      li.querySelector(".verdict").textContent = "";
+      li.querySelector(".key").hidden = true;
+      li.querySelectorAll("input.ans").forEach(inp=>inp.value="");
+      okSet.delete(ex.tag+"#"+i); badSet.delete(ex.tag+"#"+i);
+    });
+    sec.querySelector(".score").textContent = "";
+    updateStats();
+  }
+});
+
+/* Enter = check the current exercise */
+document.addEventListener("keydown", e=>{
+  if(e.key!=="Enter") return;
+  const inp = e.target.closest("input.ans"); if(!inp) return;
+  e.preventDefault();
+  inp.closest("section.block").querySelector(".check").click();
+});
+
+/* ============ OWN IDEAS ============ */
+function ownCount(){
+  const n = [...own.querySelectorAll("textarea.own")].filter(t=>t.value.trim()).length;
+  $("#ownCount").textContent = `${n} / 10 заполнено`;
+}
+own.addEventListener("input", e=>{
+  if(e.target.matches("textarea.own")){
+    e.target.style.height = "auto";
+    e.target.style.height = e.target.scrollHeight + "px";
+    ownCount();
+  }
+});
+$("#copyOwn").onclick = async ()=>{
+  const lines = [...own.querySelectorAll("textarea.own")].map((t,i)=>{
+    const v = t.value.trim();
+    return `${i+1}. ${t.dataset.prompt} ${v || "…"}`;
+  });
+  const problemLine = problems.size
+    ? "\n\nПроблемные слова: " + [...problems.keys()].join(", ")
+    : "";
+  const text = "Money vocabulary — my own sentences\n\n" + lines.join("\n") + problemLine;
+  try{
+    await navigator.clipboard.writeText(text);
+    toast("Скопировано — вставьте в чат или документ");
+  }catch{
+    const ta = document.createElement("textarea");
+    ta.value = text; ta.style.position="fixed"; ta.style.opacity="0";
+    document.body.appendChild(ta); ta.select();
+    const ok = document.execCommand("copy"); ta.remove();
+    toast(ok ? "Скопировано" : "Браузер не дал скопировать — выделите текст вручную");
+  }
+};
+$("#clearOwn").onclick = ()=>{
+  own.querySelectorAll("textarea.own").forEach(t=>{t.value=""; t.style.height="auto";});
+  ownCount();
+};
+
+/* ============ PROBLEM PANEL ACTIONS ============ */
+$("#clearProblems").onclick = ()=>{ problems.clear(); renderProblems(); };
+$("#speakProblems").onclick = ()=>{
+  if(!problems.size){ toast("Список пуст"); return; }
+  speakList([...problems.keys()].map(w=>w.replace(/ \/ .*/,"").replace(/sb|sth/g,"")));
+};
+
+renderProblems(); updateStats(); ownCount();
+</script>
+</body>
+</html>
