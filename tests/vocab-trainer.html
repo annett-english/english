@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Словарный тренажёр</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --board: #16211c;
+    --board-2: #1c2b23;
+    --chalk: #eef1ea;
+    --chalk-dim: #b9c4bb;
+    --chalk-gold: #e8d5a0;
+    --chalk-blue: #8fb8de;
+    --chalk-pink: #e8a0b8;
+    --chalk-green: #9fd6a6;
+    --rule: rgba(238,241,234,0.16);
+    --correct: #9fd6a6;
+    --wrong: #e79a9a;
+    --radius: 10px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background: var(--board);
+    background-image:
+      radial-gradient(ellipse at 15% 0%, rgba(255,255,255,0.05), transparent 55%),
+      radial-gradient(ellipse at 85% 100%, rgba(255,255,255,0.04), transparent 55%);
+    color: var(--chalk);
+    font-family: 'Inter', sans-serif;
+    line-height: 1.5;
+    padding: 0 0 80px 0;
+  }
+  ::selection{ background: var(--chalk-gold); color:#16211c; }
+
+  a{color:var(--chalk-blue);}
+
+  .wrap{
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 40px 24px 0;
+    display:grid;
+    grid-template-columns: 1fr 280px;
+    gap: 32px;
+    align-items:start;
+  }
+  @media (max-width: 880px){
+    .wrap{ grid-template-columns: 1fr; }
+  }
+
+  header.hero{
+    grid-column: 1 / -1;
+    text-align:center;
+    padding: 8px 0 28px;
+    border-bottom: 1px dashed var(--rule);
+    margin-bottom: 8px;
+  }
+  header.hero h1{
+    font-family:'Caveat', cursive;
+    font-weight:700;
+    font-size: clamp(2.4rem, 5vw, 3.6rem);
+    margin: 0 0 6px;
+    color: var(--chalk);
+    letter-spacing: 0.5px;
+  }
+  header.hero p{
+    font-family:'Fraunces', serif;
+    color: var(--chalk-dim);
+    font-size: 1.05rem;
+    margin:0;
+    font-style: italic;
+  }
+
+  .main-col{min-width:0;}
+
+  section.card{
+    background: var(--board-2);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    padding: 24px clamp(16px,3vw,28px);
+    margin-bottom: 28px;
+  }
+
+  .intro-title, .lesson-title{
+    display:flex;
+    align-items:baseline;
+    gap: 10px;
+    margin: 0 0 4px;
+  }
+  .lesson-num{
+    font-family:'Caveat', cursive;
+    font-size: 1.6rem;
+    color: var(--chalk-gold);
+    font-weight:700;
+  }
+  .lesson-title h2{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size: 1.35rem;
+    margin:0;
+  }
+  .lesson-sub{
+    color: var(--chalk-dim);
+    font-size: 0.92rem;
+    margin: 0 0 18px;
+  }
+
+  /* Intro word list */
+  .word-grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px,1fr));
+    gap: 12px;
+    margin-top: 16px;
+  }
+  .word-item{
+    border: 1px dashed var(--rule);
+    border-radius: 8px;
+    padding: 12px 14px;
+    background: rgba(255,255,255,0.02);
+  }
+  .word-item .en{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size: 1.05rem;
+    color: var(--chalk-gold);
+  }
+  .word-item .ipa{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 0.82rem;
+    color: var(--chalk-blue);
+    margin-left: 6px;
+  }
+  .word-item .ru{
+    color: var(--chalk-dim);
+    font-size: 0.92rem;
+    margin-top: 2px;
+  }
+  .word-item .ex{
+    font-size: 0.85rem;
+    color: var(--chalk-dim);
+    margin-top: 6px;
+    font-style: italic;
+  }
+  /* Exercise items */
+  .item{
+    padding: 14px 0;
+    border-top: 1px dashed var(--rule);
+  }
+  .item:first-of-type{ border-top:none; }
+  .item-num{
+    font-family:'IBM Plex Mono', monospace;
+    color: var(--chalk-dim);
+    font-size: 0.8rem;
+    margin-right: 8px;
+  }
+  .item-prompt{
+    font-size: 0.98rem;
+    margin-bottom: 8px;
+  }
+  .item-prompt .mask, .item-prompt .fill{
+    font-family:'IBM Plex Mono', monospace;
+    color: var(--chalk-gold);
+    letter-spacing: 1px;
+  }
+  .item-row{
+    display:flex;
+    gap: 10px;
+    align-items:center;
+    flex-wrap: wrap;
+  }
+  input.answer{
+    flex: 1 1 220px;
+    background: rgba(0,0,0,0.25);
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    color: var(--chalk);
+    padding: 9px 12px;
+    font-size: 0.95rem;
+    font-family: 'Inter', sans-serif;
+  }
+  input.answer:focus{
+    outline: none;
+    border-color: var(--chalk-gold);
+  }
+  input.answer.correct{ border-color: var(--correct); box-shadow: 0 0 0 1px var(--correct) inset; }
+  input.answer.wrong{ border-color: var(--wrong); box-shadow: 0 0 0 1px var(--wrong) inset; }
+
+  .mini-btn{
+    background: transparent;
+    border: 1px solid var(--rule);
+    color: var(--chalk-dim);
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    font-family:'IBM Plex Mono', monospace;
+  }
+  .mini-btn:hover{ color: var(--chalk); border-color: var(--chalk-blue); }
+
+  .reveal{
+    display:none;
+    margin-top: 6px;
+    font-size: 0.85rem;
+    color: var(--chalk-green);
+    font-family:'IBM Plex Mono', monospace;
+  }
+  .reveal.show{ display:block; }
+
+  .lesson-actions{
+    display:flex;
+    gap: 10px;
+    margin-top: 18px;
+    flex-wrap: wrap;
+    align-items:center;
+  }
+  .btn{
+    border-radius: 8px;
+    padding: 10px 18px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    font-family:'Inter', sans-serif;
+    font-weight: 600;
+    border: 1px solid transparent;
+  }
+  .btn-primary{
+    background: var(--chalk-gold);
+    color: #16211c;
+  }
+  .btn-primary:hover{ filter: brightness(1.08); }
+  .btn-ghost{
+    background: transparent;
+    border: 1px dashed var(--rule);
+    color: var(--chalk-dim);
+  }
+  .btn-ghost:hover{ color: var(--chalk); border-color: var(--chalk-blue); }
+
+  .score{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--chalk-dim);
+  }
+  .score b{ color: var(--chalk-green); }
+
+  /* Sidebar */
+  .sidebar{
+    position: sticky;
+    top: 24px;
+  }
+  .sidebar .card{
+    background: var(--board-2);
+    border: 1px dashed var(--chalk-pink);
+    border-radius: var(--radius);
+    padding: 18px 18px 20px;
+  }
+  .sidebar h3{
+    font-family:'Caveat', cursive;
+    color: var(--chalk-pink);
+    font-size: 1.5rem;
+    margin: 0 0 4px;
+  }
+  .sidebar p.hint{
+    color: var(--chalk-dim);
+    font-size: 0.82rem;
+    margin: 0 0 14px;
+  }
+  .problem-list{
+    list-style:none;
+    padding:0;
+    margin:0;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    max-height: 60vh;
+    overflow-y:auto;
+  }
+  .problem-list li{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background: rgba(232,160,184,0.08);
+    border: 1px solid rgba(232,160,184,0.25);
+    border-radius: 6px;
+    padding: 7px 10px;
+    font-size: 0.88rem;
+  }
+  .problem-list .pw-count{
+    font-family:'IBM Plex Mono', monospace;
+    color: var(--chalk-pink);
+    font-size: 0.78rem;
+  }
+  .problem-empty{
+    color: var(--chalk-dim);
+    font-size: 0.85rem;
+    font-style: italic;
+  }
+  .clear-btn{
+    margin-top: 14px;
+    width: 100%;
+  }
+
+  footer{
+    text-align:center;
+    color: var(--chalk-dim);
+    font-size: 0.8rem;
+    margin-top: 20px;
+    font-family:'IBM Plex Mono', monospace;
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="hero">
+    <h1>Словарный тренажёр</h1>
+    <p>euros · aliens · UFO · consciousness · philosophy · poverty · free will</p>
+  </header>
+
+  <div class="main-col">
+
+    <!-- INTRO -->
+    <section class="card" id="intro">
+      <div class="lesson-title"><span class="lesson-num">0.</span><h2>Слова урока</h2></div>
+      <p class="lesson-sub">Повторите слова и переходите к упражнениям ниже.</p>
+      <div class="word-grid" id="wordGrid"></div>
+    </section>
+
+    <div id="exercises"></div>
+
+  </div>
+
+  <aside class="sidebar">
+    <div class="card">
+      <h3>Проблемные слова</h3>
+      <p class="hint">Сюда попадают слова, в которых вы ошиблись хотя бы раз.</p>
+      <ul class="problem-list" id="problemList"></ul>
+      <p class="problem-empty" id="problemEmpty">Пока ошибок нет — отлично!</p>
+      <button class="btn btn-ghost clear-btn" onclick="clearProblems()">Очистить список</button>
+    </div>
+  </aside>
+</div>
+
+<footer>6 упражнений · 48 заданий</footer>
+
+<script>
+/* ---------- DATA ---------- */
+const words = [
+  {id:'euros', en:'euros', ipa:'/ˈjʊərəʊz/', ru:'евро', ex:'The ticket costs 20 euros.'},
+  {id:'lend', en:'lend – lent – lent', ipa:'/lɛnd/', ru:'одалживать / давать взаймы', ex:'Can you lend me some money?'},
+  {id:'universe', en:'universe', ipa:'/ˈjuːnɪvɜːs/', ru:'Вселенная', ex:'The universe is enormous.'},
+  {id:'ufo', en:'UFO', ipa:'/ˌjuː.efˈəʊ/', ru:'НЛО', ex:'Some people believe they have seen a UFO.'},
+  {id:'howmuchcost', en:'How much does it cost?', ipa:'/haʊ mʌtʃ dʌz ɪt kɒst/', ru:'сколько это стоит?', ex:'How much does it cost?'},
+  {id:'howmuchisit', en:'How much is it? / How much are they?', ipa:'/haʊ mʌtʃ ɪz ɪt/', ru:'сколько это стоит? / сколько они стоят?', ex:'How much is it?'},
+  {id:'aliens', en:'aliens', ipa:'/ˈeɪliənz/', ru:'инопланетяне', ex:'Do you believe in aliens?'},
+  {id:'freewill', en:'free will', ipa:'/friː wɪl/', ru:'свобода воли', ex:'Do people really have free will?'},
+  {id:'philosophy', en:'philosophy', ipa:'/fɪˈlɒsəfi/', ru:'философия', ex:'She studies philosophy at university.'},
+  {id:'philosophic', en:'philosophic', ipa:'/ˌfɪləˈsɒfɪk/', ru:'философский', ex:'He has a philosophic attitude to life.'},
+  {id:'consciousness', en:'consciousness', ipa:'/ˈkɒnʃəsnəs/', ru:'сознание', ex:'Scientists still study consciousness.'},
+  {id:'conscious', en:'be conscious', ipa:'/ˈkɒnʃəs/', ru:'быть в сознании', ex:'He was conscious after the accident.'},
+  {id:'loseconsciousness', en:'lose consciousness', ipa:'/luːz ˈkɒnʃəsnəs/', ru:'потерять сознание', ex:'She lost consciousness for a few minutes.'},
+  {id:'poverty', en:'poverty', ipa:'/ˈpɒvəti/', ru:'бедность', ex:'Many families live in poverty.'},
+  {id:'livingbeing', en:'a living being', ipa:'/ə ˈlɪvɪŋ ˈbiːɪŋ/', ru:'живое существо', ex:'Humans are living beings.'}
+];
+
+/* ---------- EXERCISE DEFINITIONS ---------- */
+// each item: { prompt(html), answers:[accepted normalized strings], wordId }
+const exercises = [
+  {
+    key: 'ex1', num: 1, title: 'Вставь пропущенные буквы',
+    sub: 'Впишите слово целиком, ориентируясь на пропуски.',
+    items: [
+      {prompt:'eur_s', answers:['euros'], wordId:'euros'},
+      {prompt:'un_v_rse', answers:['universe'], wordId:'universe'},
+      {prompt:'al_ens', answers:['aliens'], wordId:'aliens'},
+      {prompt:'phil_s_phy', answers:['philosophy'], wordId:'philosophy'},
+      {prompt:'c_nsci_usness', answers:['consciousness'], wordId:'consciousness'},
+      {prompt:'p_v_rty', answers:['poverty'], wordId:'poverty'},
+      {prompt:'phil_s_ph_c', answers:['philosophic'], wordId:'philosophic'},
+      {prompt:'fr_e w_ll', answers:['free will'], wordId:'freewill'}
+    ]
+  },
+  {
+    key: 'ex2', num: 2, title: 'Перевод с русского на английский',
+    sub: 'Переведите предложение целиком.',
+    items: [
+      {prompt:'Билет стоит 20 евро.', answers:['the ticket costs 20 euros','the ticket costs twenty euros'], wordId:'euros'},
+      {prompt:'Можешь одолжить мне немного денег?', answers:['can you lend me some money'], wordId:'lend'},
+      {prompt:'Вселенная огромна.', answers:['the universe is enormous','the universe is huge'], wordId:'universe'},
+      {prompt:'Некоторые люди верят, что видели НЛО.', answers:['some people believe they have seen a ufo','some people believe they saw a ufo'], wordId:'ufo'},
+      {prompt:'Ты веришь в инопланетян?', answers:['do you believe in aliens'], wordId:'aliens'},
+      {prompt:'Действительно ли у людей есть свобода воли?', answers:['do people really have free will'], wordId:'freewill'},
+      {prompt:'Она изучает философию в университете.', answers:['she studies philosophy at university'], wordId:'philosophy'},
+      {prompt:'Многие семьи живут в бедности.', answers:['many families live in poverty'], wordId:'poverty'}
+    ]
+  },
+  {
+    key: 'ex4', num: 3, title: 'Дефиниция',
+    sub: 'По определению угадайте слово.',
+    items: [
+      {prompt:'The state of being aware of and able to think, feel and perceive things around you.', answers:['consciousness'], wordId:'consciousness'},
+      {prompt:'The idea that people are free to make their own choices, not controlled by fate.', answers:['free will'], wordId:'freewill'},
+      {prompt:'All of space and everything that exists within it.', answers:['universe','the universe'], wordId:'universe'},
+      {prompt:'An unusual object seen in the sky that some believe is a spacecraft from another planet.', answers:['ufo','a ufo'], wordId:'ufo'},
+      {prompt:'The academic study of the nature of knowledge, reality and existence.', answers:['philosophy'], wordId:'philosophy'},
+      {prompt:'The state of being extremely poor.', answers:['poverty'], wordId:'poverty'},
+      {prompt:'To give something, usually money, to someone with the understanding that it will be given back.', answers:['lend'], wordId:'lend'},
+      {prompt:'Creatures believed to come from another planet.', answers:['aliens'], wordId:'aliens'}
+    ]
+  },
+  {
+    key: 'ex5', num: 4, title: 'Сочетаемость фраз',
+    sub: 'Допишите слово, которое обычно сочетается в устойчивой фразе.',
+    items: [
+      {prompt:'lose ___', answers:['consciousness'], wordId:'loseconsciousness'},
+      {prompt:'be ___', answers:['conscious'], wordId:'conscious'},
+      {prompt:'live in ___', answers:['poverty'], wordId:'poverty'},
+      {prompt:'believe in ___', answers:['aliens'], wordId:'aliens'},
+      {prompt:'study ___', answers:['philosophy'], wordId:'philosophy'},
+      {prompt:'have ___', answers:['free will'], wordId:'freewill'},
+      {prompt:'see a ___', answers:['ufo'], wordId:'ufo'},
+      {prompt:'___ me some money', answers:['lend'], wordId:'lend'}
+    ]
+  },
+  {
+    key: 'ex6', num: 5, title: 'Контекст',
+    sub: 'Заполните пропуск в предложении подходящим словом.',
+    items: [
+      {prompt:'The ticket costs 20 ___.', answers:['euros'], wordId:'euros'},
+      {prompt:'Can you ___ me some money?', answers:['lend'], wordId:'lend'},
+      {prompt:'The ___ is enormous.', answers:['universe'], wordId:'universe'},
+      {prompt:'Some people believe they have seen a ___.', answers:['ufo'], wordId:'ufo'},
+      {prompt:'Do you believe in ___?', answers:['aliens'], wordId:'aliens'},
+      {prompt:'She studies ___ at university.', answers:['philosophy'], wordId:'philosophy'},
+      {prompt:'He was ___ after the accident.', answers:['conscious'], wordId:'conscious'},
+      {prompt:'Many families live in ___.', answers:['poverty'], wordId:'poverty'}
+    ]
+  },
+  {
+    key: 'ex7', num: 6, title: 'What usually comes after?',
+    sub: 'Какое слово обычно продолжает данную фразу?',
+    items: [
+      {prompt:'lose…', answers:['consciousness'], wordId:'loseconsciousness'},
+      {prompt:'be…', answers:['conscious'], wordId:'conscious'},
+      {prompt:'living…', answers:['being','beings'], wordId:'livingbeing'},
+      {prompt:'free…', answers:['will'], wordId:'freewill'},
+      {prompt:'How much does it…', answers:['cost'], wordId:'howmuchcost'},
+      {prompt:'believe in…', answers:['aliens','ufos','ufo'], wordId:'aliens'},
+      {prompt:'study…', answers:['philosophy'], wordId:'philosophy'},
+      {prompt:'live in…', answers:['poverty'], wordId:'poverty'}
+    ]
+  }
+];
+
+/* ---------- RENDER INTRO ---------- */
+const wordGrid = document.getElementById('wordGrid');
+words.forEach(w=>{
+  const div = document.createElement('div');
+  div.className = 'word-item';
+  div.innerHTML = `
+    <div><span class="en">${w.en}</span><span class="ipa">${w.ipa}</span></div>
+    <div class="ru">${w.ru}</div>
+    <div class="ex">${w.ex}</div>
+  `;
+  wordGrid.appendChild(div);
+});
+
+/* ---------- RENDER EXERCISES ---------- */
+const exWrap = document.getElementById('exercises');
+
+function normalize(s){
+  return s.toLowerCase()
+    .replace(/[.,!?;:"']/g,'')
+    .replace(/\s+/g,' ')
+    .trim();
+}
+
+exercises.forEach(ex=>{
+  const section = document.createElement('section');
+  section.className = 'card';
+  section.id = ex.key;
+
+  let itemsHtml = '';
+  ex.items.forEach((it, idx)=>{
+    const inputId = `${ex.key}-${idx}`;
+    const promptHtml = `<span class="mask fill">${it.prompt}</span>`;
+    itemsHtml += `
+      <div class="item">
+        <div class="item-prompt"><span class="item-num">${idx+1}.</span>${promptHtml}</div>
+        <div class="item-row">
+          <input class="answer" type="text" id="${inputId}" placeholder="Ваш ответ..." autocomplete="off">
+        </div>
+        <div class="reveal" id="${inputId}-reveal">Ответ: ${it.answers[0]}</div>
+      </div>
+    `;
+  });
+
+  section.innerHTML = `
+    <div class="lesson-title"><span class="lesson-num">${ex.num}.</span><h2>${ex.title}</h2></div>
+    <p class="lesson-sub">${ex.sub}</p>
+    ${itemsHtml}
+    <div class="lesson-actions">
+      <button class="btn btn-primary" onclick="checkExercise('${ex.key}')">Проверить</button>
+      <button class="btn btn-ghost" onclick="showAnswers('${ex.key}')">Показать ответы</button>
+      <button class="btn btn-ghost" onclick="resetExercise('${ex.key}')">Сбросить</button>
+      <span class="score" id="${ex.key}-score"></span>
+    </div>
+  `;
+  exWrap.appendChild(section);
+});
+
+/* ---------- CHECK / REVEAL / RESET ---------- */
+const exercisesByKey = Object.fromEntries(exercises.map(e=>[e.key,e]));
+const problemWords = {}; // wordId -> count
+
+function checkExercise(key){
+  const ex = exercisesByKey[key];
+  let correctCount = 0;
+  ex.items.forEach((it, idx)=>{
+    const input = document.getElementById(`${key}-${idx}`);
+    const userVal = normalize(input.value || '');
+    const accepted = it.answers.map(normalize);
+    const isCorrect = accepted.includes(userVal) && userVal.length > 0;
+    input.classList.remove('correct','wrong');
+    if(isCorrect){
+      input.classList.add('correct');
+      correctCount++;
+    } else {
+      input.classList.add('wrong');
+      registerProblem(it.wordId);
+    }
+  });
+  document.getElementById(`${key}-score`).innerHTML = `Результат: <b>${correctCount} / ${ex.items.length}</b>`;
+}
+
+function showAnswers(key){
+  const ex = exercisesByKey[key];
+  ex.items.forEach((it, idx)=>{
+    const reveal = document.getElementById(`${key}-${idx}-reveal`);
+    reveal.classList.toggle('show');
+  });
+}
+
+function resetExercise(key){
+  const ex = exercisesByKey[key];
+  ex.items.forEach((it, idx)=>{
+    const input = document.getElementById(`${key}-${idx}`);
+    input.value = '';
+    input.classList.remove('correct','wrong');
+    document.getElementById(`${key}-${idx}-reveal`).classList.remove('show');
+  });
+  document.getElementById(`${key}-score`).innerHTML = '';
+}
+
+/* ---------- PROBLEM WORDS SIDEBAR ---------- */
+function registerProblem(wordId){
+  problemWords[wordId] = (problemWords[wordId] || 0) + 1;
+  renderProblems();
+}
+
+function renderProblems(){
+  const list = document.getElementById('problemList');
+  const empty = document.getElementById('problemEmpty');
+  const ids = Object.keys(problemWords);
+  if(ids.length === 0){
+    list.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  const sorted = ids.sort((a,b)=>problemWords[b]-problemWords[a]);
+  list.innerHTML = sorted.map(id=>{
+    const w = words.find(w=>w.id===id);
+    const label = w ? w.en : id;
+    return `<li><span>${label}</span><span class="pw-count">×${problemWords[id]}</span></li>`;
+  }).join('');
+}
+
+function clearProblems(){
+  Object.keys(problemWords).forEach(k=>delete problemWords[k]);
+  renderProblems();
+}
+
+renderProblems();
+</script>
+</body>
+</html>
