@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Survive the Drive — Interactive Exercises</title>
+<style>
+  :root{
+    --asphalt:#232527;
+    --asphalt-2:#2c2f31;
+    --line-yellow:#f4c430;
+    --line-yellow-dim:#c9a227;
+    --paper:#f3f0e6;
+    --paper-dim:#e5e0d0;
+    --ok:#3c8f5c;
+    --bad:#c0463c;
+    --ink:#1c1c1c;
+    --muted:#8b8f92;
+    font-family:'Segoe UI', Arial, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:
+      repeating-linear-gradient(180deg, transparent 0 40px, rgba(244,196,48,0.0) 40px 40px),
+      var(--asphalt);
+    color:var(--paper);
+    padding-bottom:60px;
+  }
+  header{
+    position:relative;
+    padding:48px 24px 36px;
+    text-align:center;
+    background:linear-gradient(180deg, var(--asphalt-2), var(--asphalt));
+    border-bottom:6px dashed var(--line-yellow-dim);
+    overflow:hidden;
+  }
+  header::before{
+    content:"";
+    position:absolute;
+    top:0; left:50%;
+    width:14px;
+    height:100%;
+    background:repeating-linear-gradient(180deg, var(--line-yellow) 0 26px, transparent 26px 52px);
+    transform:translateX(-50%);
+    opacity:0.85;
+  }
+  h1{
+    font-size:2.4rem;
+    letter-spacing:1px;
+    margin:0 0 6px;
+    color:var(--line-yellow);
+    text-transform:uppercase;
+    position:relative;
+  }
+  header p.sub{
+    color:var(--paper-dim);
+    margin:0;
+    font-size:1rem;
+    position:relative;
+  }
+  main{
+    max-width:820px;
+    margin:0 auto;
+    padding:32px 20px 0;
+  }
+  .exercise{
+    background:var(--paper);
+    color:var(--ink);
+    border-radius:10px;
+    padding:26px 26px 24px;
+    margin-bottom:34px;
+    box-shadow:0 10px 24px rgba(0,0,0,0.35);
+    border-left:8px solid var(--line-yellow);
+    position:relative;
+  }
+  .exercise h2{
+    margin:0 0 4px;
+    font-size:1.3rem;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .badge{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    background:var(--asphalt);
+    color:var(--line-yellow);
+    font-weight:700;
+    font-size:0.85rem;
+    width:30px;height:30px;
+    border-radius:50%;
+    flex-shrink:0;
+  }
+  .exercise .instructions{
+    color:#555;
+    font-size:0.92rem;
+    margin:0 0 18px;
+    line-height:1.4;
+  }
+  .item{
+    margin-bottom:14px;
+    padding:12px 14px;
+    background:var(--paper-dim);
+    border-radius:8px;
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:8px;
+  }
+  .item .num{
+    font-weight:700;
+    color:var(--muted);
+    min-width:22px;
+  }
+  .item .text{
+    flex:1;
+    min-width:200px;
+    line-height:1.5;
+  }
+  input[type="text"]{
+    padding:7px 10px;
+    border:2px solid #c9c4b3;
+    border-radius:6px;
+    font-size:0.95rem;
+    min-width:140px;
+    background:#fff;
+  }
+  input[type="text"]:focus{
+    outline:none;
+    border-color:var(--line-yellow-dim);
+  }
+  select{
+    padding:7px 8px;
+    border:2px solid #c9c4b3;
+    border-radius:6px;
+    font-size:0.95rem;
+    background:#fff;
+  }
+  .item.correct{
+    border:2px solid var(--ok);
+    background:#e6f2ea;
+  }
+  .item.incorrect{
+    border:2px solid var(--bad);
+    background:#f7e8e7;
+  }
+  .feedback-icon{
+    font-weight:700;
+    font-size:1.1rem;
+    min-width:22px;
+    text-align:center;
+  }
+  .feedback-icon.ok{color:var(--ok);}
+  .feedback-icon.bad{color:var(--bad);}
+  .answer-reveal{
+    display:none;
+    font-style:italic;
+    color:#666;
+    font-size:0.88rem;
+    width:100%;
+    margin-top:2px;
+  }
+  .answer-reveal.show{display:block;}
+  .controls{
+    display:flex;
+    gap:10px;
+    margin-top:18px;
+    flex-wrap:wrap;
+    align-items:center;
+  }
+  button{
+    cursor:pointer;
+    border:none;
+    border-radius:6px;
+    padding:10px 18px;
+    font-size:0.92rem;
+    font-weight:600;
+    transition:transform 0.08s ease, box-shadow 0.15s ease;
+  }
+  button:active{transform:scale(0.97);}
+  .btn-check{
+    background:var(--asphalt);
+    color:var(--line-yellow);
+  }
+  .btn-check:hover{background:#141516;}
+  .btn-reveal{
+    background:transparent;
+    color:var(--asphalt);
+    border:2px solid var(--asphalt);
+  }
+  .btn-reveal:hover{background:var(--asphalt);color:var(--line-yellow);}
+  .btn-reset{
+    background:transparent;
+    color:#888;
+    border:2px solid #ccc;
+  }
+  .btn-reset:hover{border-color:#999;color:#555;}
+  .score{
+    margin-left:auto;
+    font-weight:700;
+    font-size:0.95rem;
+    color:var(--asphalt);
+    background:var(--line-yellow);
+    padding:6px 14px;
+    border-radius:20px;
+    display:none;
+  }
+  .score.show{display:inline-block;}
+  .script-toggle{
+    text-align:center;
+    margin:0 0 30px;
+  }
+  .script-toggle button{
+    background:var(--line-yellow);
+    color:var(--asphalt);
+    padding:12px 26px;
+    font-size:1rem;
+    border-radius:24px;
+  }
+  .script-toggle button:hover{background:#e0b41f;}
+  #scriptBox{
+    display:none;
+    max-width:820px;
+    margin:0 auto 30px;
+    background:var(--paper);
+    color:var(--ink);
+    padding:24px 26px;
+    border-radius:10px;
+    line-height:1.6;
+    font-size:0.95rem;
+    box-shadow:0 10px 24px rgba(0,0,0,0.35);
+  }
+  #scriptBox.show{display:block;}
+  #scriptBox p{margin:0 0 10px;}
+  #scriptBox b{color:var(--asphalt);}
+  footer{
+    text-align:center;
+    color:var(--muted);
+    font-size:0.82rem;
+    padding:20px;
+  }
+  @media (max-width:520px){
+    h1{font-size:1.7rem;}
+    .exercise{padding:20px 16px;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🚗 Survive the Drive</h1>
+  <p class="sub">Listening &amp; vocabulary practice based on the radio interview with Tom, the transport correspondent</p>
+</header>
+
+<div class="script-toggle" style="margin-top:24px;">
+  <button onclick="document.getElementById('scriptBox').classList.toggle('show')">📄 Show / hide transcript (for teacher / self-check)</button>
+</div>
+
+<div id="scriptBox">
+  <p><b>H</b> = TV host, <b>T</b> = Tom</p>
+  <p><b>H</b> Hello and welcome. On today's programme, we're talking about how to drive safely. A new book called Survive the Drive has just been published, and we asked Tom, our transport and travel correspondent, to take a look. Welcome, Tom.</p>
+  <p><b>T</b> Thank you.</p>
+  <p><b>H</b> So, tell us — what's the most dangerous thing you can do while you're driving? Obviously, we're not talking about drinking alcohol, taking drugs, or using a handheld phone to make calls or text, which everyone knows you must never do.</p>
+  <p><b>T</b> Well, this is really surprising: top of the list is driving when you're feeling emotional. The researchers found that you're nearly ten times more likely to have an accident if you're feeling very sad or angry or stressed. If you're emotional, then you can't concentrate on the road, and you'll probably make bad decisions if you find yourself in a dangerous situation. In fact, if you're feeling very emotional, it'd be better not to drive at all!</p>
+  <p><b>H</b> Wow, OK. I'll try to remember that next time I have a bad day at work! What's the second most dangerous thing?</p>
+  <p><b>T</b> This one's less surprising — it's reaching for something in your car. It might be your phone, or a map, or some sweets. If you're reaching down, or trying to get something from the back seat, then you aren't looking at the road, and you're nine times more likely to have an accident.</p>
+  <p><b>H</b> And number three?</p>
+  <p><b>T</b> Number three is looking at something interesting or something that's happening by the road. A really common example of this is when people slow down to look at an accident — they don't realize that by looking at the accident and not at the road, the chance of having an accident themselves goes up over seven times. In fact, this is a really common cause of accidents on motorways.</p>
+  <p><b>H</b> So the message is: don't be distracted.</p>
+  <p><b>T</b> Yes, exactly. If you're driving fast, you can travel over one hundred metres in less than three seconds. And a lot can happen in three seconds.</p>
+  <p><b>H</b> So that's the top three — what about other things to avoid?</p>
+  <p><b>T</b> Well, at number four is adjusting your satnav, which can be very distracting, and makes you nearly five times more likely to have an accident. At number five is driving when you're tired. Sixty per cent of drivers say they've driven when tired in the last year, so it's a big problem — and you can lose control of your car completely. And at number six is adjusting your radio or music system. This makes you twice as likely to have an accident. Again, it's the distraction from the road that's the problem, and only having one hand on the wheel.</p>
+  <p><b>H</b> And the last two?</p>
+  <p><b>T</b> The seventh is eating or drinking, because again, you normally take one hand off the wheel, and the eighth is talking to a passenger, which can be distracting because the driver often turns to look at the passenger.</p>
+  <p><b>H</b> So how would you summarize the research? What did you find most interesting?</p>
+  <p><b>T</b> I think for me, the most interesting thing is that some of these things don't seem very dangerous, and good drivers often do them — but the research shows that they are. So next time you get in your car to drive somewhere, think about what you're doing, and always, always keep your eyes on the road!</p>
+</div>
+
+<main>
+
+  <!-- EXERCISE 1: Fill in the gaps -->
+  <section class="exercise" id="ex1">
+    <h2><span class="badge">1</span> Fill in the gaps</h2>
+    <p class="instructions">Listen to the audio and complete the sentences with the missing words. Type one word (or number) in each box.</p>
+
+    <div class="item" data-answer="safely">
+      <span class="num">1.</span>
+      <span class="text">Today's programme is about how to drive <input type="text" class="gap-input"></span>
+    </div>
+    <div class="item" data-answer="emotional">
+      <span class="num">2.</span>
+      <span class="text">The most dangerous thing is driving when you're feeling <input type="text" class="gap-input"></span>
+    </div>
+    <div class="item" data-answer="nine">
+      <span class="num">3.</span>
+      <span class="text">Reaching for something in your car makes you <input type="text" class="gap-input"> times more likely to have an accident.</span>
+    </div>
+    <div class="item" data-answer="seven">
+      <span class="num">4.</span>
+      <span class="text">Looking at an accident by the road increases your chance of crashing by over <input type="text" class="gap-input"> times.</span>
+    </div>
+    <div class="item" data-answer="satnav">
+      <span class="num">5.</span>
+      <span class="text">Adjusting your <input type="text" class="gap-input"> makes you nearly five times more likely to have an accident.</span>
+    </div>
+    <div class="item" data-answer="sixty">
+      <span class="num">6.</span>
+      <span class="text"><input type="text" class="gap-input"> per cent of drivers say they've driven when tired in the last year.</span>
+    </div>
+
+    <div class="controls">
+      <button class="btn-check" onclick="checkExercise('ex1')">✅ Check answers</button>
+      <button class="btn-reveal" onclick="revealExercise('ex1')">👀 Show answers</button>
+      <button class="btn-reset" onclick="resetExercise('ex1')">↺ Reset</button>
+      <span class="score" id="score-ex1"></span>
+    </div>
+  </section>
+
+  <!-- EXERCISE 2: Vocabulary hunt -->
+  <section class="exercise" id="ex2">
+    <h2><span class="badge">2</span> Vocabulary hunt</h2>
+    <p class="instructions">Find the word in the script that matches each definition. Write the exact word from the text.</p>
+
+    <div class="item" data-answer="distracted">
+      <span class="num">1.</span>
+      <span class="text">not paying full attention because your mind is on something else (adjective) → <input type="text" class="gap-input"></span>
+    </div>
+    <div class="item" data-answer="adjusting">
+      <span class="num">2.</span>
+      <span class="text">changing something slightly to make it work better (verb, -ing form) → <input type="text" class="gap-input"></span>
+    </div>
+    <div class="item" data-answer="passenger">
+      <span class="num">3.</span>
+      <span class="text">a person travelling in a car who is not driving it → <input type="text" class="gap-input"></span>
+    </div>
+    <div class="item" data-answer="satnav">
+      <span class="num">4.</span>
+      <span class="text">a device that shows you directions while you drive → <input type="text" class="gap-input"></span>
+    </div>
+    <div class="item" data-answer="published">
+      <span class="num">5.</span>
+      <span class="text">brought out (a book) for people to buy or read (verb, past participle) → <input type="text" class="gap-input"></span>
+    </div>
+    <div class="item" data-answer="correspondent">
+      <span class="num">6.</span>
+      <span class="text">a journalist who reports on a particular subject → <input type="text" class="gap-input"></span>
+    </div>
+
+    <div class="controls">
+      <button class="btn-check" onclick="checkExercise('ex2')">✅ Check answers</button>
+      <button class="btn-reveal" onclick="revealExercise('ex2')">👀 Show answers</button>
+      <button class="btn-reset" onclick="resetExercise('ex2')">↺ Reset</button>
+      <span class="score" id="score-ex2"></span>
+    </div>
+  </section>
+
+  <!-- EXERCISE 3: True or False -->
+  <section class="exercise" id="ex3">
+    <h2><span class="badge">3</span> True or False</h2>
+    <p class="instructions">Read each statement and choose whether it is True or False, according to the interview.</p>
+
+    <div class="item" data-answer="false">
+      <span class="num">1.</span>
+      <span class="text">Drinking alcohol is the most dangerous thing you can do while driving.</span>
+      <select class="gap-input"><option value="">--</option><option value="true">True</option><option value="false">False</option></select>
+    </div>
+    <div class="item" data-answer="true">
+      <span class="num">2.</span>
+      <span class="text">You're nearly ten times more likely to have an accident if you're feeling emotional.</span>
+      <select class="gap-input"><option value="">--</option><option value="true">True</option><option value="false">False</option></select>
+    </div>
+    <div class="item" data-answer="false">
+      <span class="num">3.</span>
+      <span class="text">Reaching for something in the car is the single most dangerous distraction on the list.</span>
+      <select class="gap-input"><option value="">--</option><option value="true">True</option><option value="false">False</option></select>
+    </div>
+    <div class="item" data-answer="true">
+      <span class="num">4.</span>
+      <span class="text">Looking at an accident by the road can increase your own accident risk by more than seven times.</span>
+      <select class="gap-input"><option value="">--</option><option value="true">True</option><option value="false">False</option></select>
+    </div>
+    <div class="item" data-answer="false">
+      <span class="num">5.</span>
+      <span class="text">Adjusting the radio makes drivers nearly five times more likely to crash.</span>
+      <select class="gap-input"><option value="">--</option><option value="true">True</option><option value="false">False</option></select>
+    </div>
+    <div class="item" data-answer="false">
+      <span class="num">6.</span>
+      <span class="text">Talking to a passenger is not mentioned as a distraction at all.</span>
+      <select class="gap-input"><option value="">--</option><option value="true">True</option><option value="false">False</option></select>
+    </div>
+
+    <div class="controls">
+      <button class="btn-check" onclick="checkExercise('ex3')">✅ Check answers</button>
+      <button class="btn-reveal" onclick="revealExercise('ex3')">👀 Show answers</button>
+      <button class="btn-reset" onclick="resetExercise('ex3')">↺ Reset</button>
+      <span class="score" id="score-ex3"></span>
+    </div>
+  </section>
+
+  <!-- EXERCISE 4: Put in order -->
+  <section class="exercise" id="ex4">
+    <h2><span class="badge">4</span> Put the dangers in order</h2>
+    <p class="instructions">According to Tom, choose the correct position (1 = most dangerous) for each distraction.</p>
+
+    <div class="item" data-answer="1">
+      <span class="num">•</span>
+      <span class="text">Driving when you're feeling emotional</span>
+      <select class="gap-input"><option value="">--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option></select>
+    </div>
+    <div class="item" data-answer="2">
+      <span class="num">•</span>
+      <span class="text">Reaching for something in the car</span>
+      <select class="gap-input"><option value="">--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option></select>
+    </div>
+    <div class="item" data-answer="3">
+      <span class="num">•</span>
+      <span class="text">Looking at something interesting by the road</span>
+      <select class="gap-input"><option value="">--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option></select>
+    </div>
+    <div class="item" data-answer="4">
+      <span class="num">•</span>
+      <span class="text">Adjusting the satnav</span>
+      <select class="gap-input"><option value="">--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option></select>
+    </div>
+    <div class="item" data-answer="5">
+      <span class="num">•</span>
+      <span class="text">Driving when you're tired</span>
+      <select class="gap-input"><option value="">--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option></select>
+    </div>
+    <div class="item" data-answer="6">
+      <span class="num">•</span>
+      <span class="text">Adjusting the radio or music system</span>
+      <select class="gap-input"><option value="">--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option></select>
+    </div>
+
+    <div class="controls">
+      <button class="btn-check" onclick="checkExercise('ex4')">✅ Check answers</button>
+      <button class="btn-reveal" onclick="revealExercise('ex4')">👀 Show answers</button>
+      <button class="btn-reset" onclick="resetExercise('ex4')">↺ Reset</button>
+      <span class="score" id="score-ex4"></span>
+    </div>
+  </section>
+
+</main>
+
+<footer>Based on the listening "Survive the Drive" · Created for classroom / self-study use</footer>
+
+<script>
+function normalize(str){
+  return str.trim().toLowerCase().replace(/[.,!?]/g,'');
+}
+
+function checkExercise(exId){
+  const section = document.getElementById(exId);
+  const items = section.querySelectorAll('.item');
+  let correctCount = 0;
+
+  items.forEach(item => {
+    const correctAnswer = normalize(item.dataset.answer);
+    const input = item.querySelector('.gap-input');
+    const userAnswer = normalize(input.value);
+
+    // remove previous feedback icon if present
+    const oldIcon = item.querySelector('.feedback-icon');
+    if(oldIcon) oldIcon.remove();
+
+    item.classList.remove('correct','incorrect');
+
+    const icon = document.createElement('span');
+    icon.classList.add('feedback-icon');
+
+    if(userAnswer !== "" && userAnswer === correctAnswer){
+      item.classList.add('correct');
+      icon.classList.add('ok');
+      icon.textContent = '✓';
+      correctCount++;
+    } else {
+      item.classList.add('incorrect');
+      icon.classList.add('bad');
+      icon.textContent = '✗';
+    }
+    item.appendChild(icon);
+  });
+
+  const scoreEl = document.getElementById('score-' + exId);
+  scoreEl.textContent = correctCount + ' / ' + items.length;
+  scoreEl.classList.add('show');
+}
+
+function revealExercise(exId){
+  const section = document.getElementById(exId);
+  const items = section.querySelectorAll('.item');
+
+  items.forEach(item => {
+    const input = item.querySelector('.gap-input');
+    input.value = item.dataset.answer;
+  });
+
+  checkExercise(exId);
+}
+
+function resetExercise(exId){
+  const section = document.getElementById(exId);
+  const items = section.querySelectorAll('.item');
+
+  items.forEach(item => {
+    const input = item.querySelector('.gap-input');
+    input.value = "";
+    item.classList.remove('correct','incorrect');
+    const oldIcon = item.querySelector('.feedback-icon');
+    if(oldIcon) oldIcon.remove();
+  });
+
+  const scoreEl = document.getElementById('score-' + exId);
+  scoreEl.classList.remove('show');
+  scoreEl.textContent = '';
+}
+</script>
+
+</body>
+</html>
