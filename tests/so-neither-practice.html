@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>So do I / Neither do I — тренажёр</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@500;600;700&family=Source+Sans+3:wght@400;500;600;700&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f6f1e6;
+    --paper-2:#efe8d8;
+    --ink:#232a3b;
+    --ink-soft:#5a6076;
+    --rule-line:#d8cdb2;
+    --red:#b23a2f;
+    --red-soft:#d9d2c2;
+    --green:#2f6b4f;
+    --green-bg:#e7efe4;
+    --red-bg:#f7e6e2;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:
+      repeating-linear-gradient(180deg, transparent, transparent 37px, var(--rule-line) 38px),
+      var(--paper);
+    color:var(--ink);
+    font-family:'Source Sans 3', sans-serif;
+    padding:0 0 80px;
+  }
+  .margin-line{
+    position:fixed;
+    top:0; bottom:0; left:64px;
+    width:2px;
+    background:rgba(178,58,47,0.25);
+    z-index:0;
+  }
+  header{
+    position:relative;
+    max-width:880px;
+    margin:0 auto;
+    padding:56px 32px 28px 88px;
+  }
+  h1{
+    font-family:'Lora', serif;
+    font-size:2.3rem;
+    margin:0 0 6px;
+    line-height:1.15;
+  }
+  .subtitle{
+    color:var(--ink-soft);
+    font-size:1.05rem;
+    margin-bottom:28px;
+  }
+  .rule-card{
+    background:var(--paper-2);
+    border:1px solid var(--rule-line);
+    border-left:5px solid var(--red);
+    border-radius:4px;
+    padding:20px 24px;
+    margin-bottom:8px;
+  }
+  .rule-card h2{
+    font-family:'Lora', serif;
+    font-size:1.15rem;
+    margin:0 0 12px;
+  }
+  .rule-card p{margin:6px 0; line-height:1.55;}
+  .rule-card code{
+    background:#fff;
+    border:1px solid var(--rule-line);
+    padding:1px 7px;
+    border-radius:3px;
+    font-family:'Source Sans 3', sans-serif;
+    font-weight:600;
+    color:var(--red);
+  }
+  main{
+    max-width:880px;
+    margin:0 auto;
+    padding:0 32px 0 88px;
+    position:relative;
+  }
+  .exercise{
+    margin-top:52px;
+  }
+  .exercise-head{
+    display:flex;
+    align-items:baseline;
+    gap:14px;
+    margin-bottom:6px;
+  }
+  .ex-num{
+    font-family:'Lora', serif;
+    font-weight:700;
+    font-size:1.6rem;
+    color:var(--red);
+    min-width:34px;
+  }
+  .ex-title{
+    font-family:'Lora', serif;
+    font-size:1.35rem;
+    margin:0;
+  }
+  .ex-instructions{
+    color:var(--ink-soft);
+    font-size:0.97rem;
+    margin:0 0 18px;
+    padding-left:48px;
+  }
+  .item{
+    background:#fff;
+    border:1px solid var(--rule-line);
+    border-radius:6px;
+    padding:16px 20px;
+    margin-bottom:14px;
+    box-shadow:0 1px 0 rgba(0,0,0,0.02);
+  }
+  .item-num{
+    display:inline-block;
+    font-weight:600;
+    color:var(--ink-soft);
+    margin-right:6px;
+    font-size:0.9rem;
+  }
+  .stimulus{
+    font-size:1.02rem;
+    margin-bottom:10px;
+    line-height:1.5;
+  }
+  .stimulus .A{color:var(--ink-soft);}
+  .stimulus .B{font-weight:600;}
+  .answer-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    align-items:center;
+    margin-bottom:4px;
+  }
+  input[type=text]{
+    flex:1 1 220px;
+    padding:8px 10px;
+    font-size:0.98rem;
+    border:1px solid #c9c0a8;
+    border-radius:4px;
+    font-family:'Source Sans 3', sans-serif;
+    background:#fffdf8;
+  }
+  input[type=text]:focus{outline:2px solid var(--red); outline-offset:1px;}
+  .mc-options{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    margin-bottom:6px;
+  }
+  .mc-option{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:8px 10px;
+    border:1px solid #c9c0a8;
+    border-radius:4px;
+    cursor:pointer;
+    background:#fffdf8;
+    font-size:0.98rem;
+    transition:background .15s;
+  }
+  .mc-option:hover{background:#fbf6ea;}
+  .mc-option.selected{border-color:var(--red); background:#fdf1ee;}
+  .mc-option input{margin:0;}
+  .btn{
+    border:none;
+    border-radius:4px;
+    padding:8px 16px;
+    font-size:0.92rem;
+    font-weight:600;
+    cursor:pointer;
+    font-family:'Source Sans 3', sans-serif;
+  }
+  .btn-check{background:var(--ink); color:#fff;}
+  .btn-check:hover{background:#3a4360;}
+  .btn-show{background:transparent; color:var(--red-soft-text, var(--red)); border:1px solid var(--red); color:var(--red);}
+  .btn-show:hover{background:var(--red); color:#fff;}
+  .feedback{
+    margin-top:10px;
+    font-size:0.95rem;
+    display:none;
+  }
+  .feedback.show{display:block;}
+  .feedback.correct{color:var(--green);}
+  .feedback.incorrect{color:var(--red);}
+  .verdict{font-weight:700; margin-right:6px;}
+  .explanation{
+    font-family:'Caveat', cursive;
+    color:var(--red);
+    font-size:1.28rem;
+    line-height:1.3;
+    margin-top:6px;
+    padding-left:2px;
+    transform:rotate(-0.4deg);
+  }
+  .correct-answer-line{
+    font-size:0.9rem;
+    color:var(--ink-soft);
+    margin-top:4px;
+  }
+  .correct-answer-line b{color:var(--ink);}
+  .score-bar{
+    max-width:880px;
+    margin:0 auto;
+    padding:0 32px 0 88px;
+  }
+  .score-pill{
+    display:inline-block;
+    margin-top:8px;
+    background:var(--ink);
+    color:#fff;
+    padding:6px 14px;
+    border-radius:20px;
+    font-size:0.88rem;
+    font-weight:600;
+  }
+  @media (max-width:640px){
+    .margin-line{left:20px;}
+    header, main, .score-bar{padding-left:36px; padding-right:20px;}
+    .ex-instructions{padding-left:0;}
+  }
+</style>
+</head>
+<body>
+<div class="margin-line"></div>
+<header>
+  <h1>So do I / Neither do I</h1>
+  <div class="subtitle">Тренажёр по согласию с утверждениями — 5 упражнений, 40 заданий</div>
+  <div class="rule-card">
+    <h2>Правило</h2>
+    <p><b>Положительное согласие</b> («я тоже»): <code>So + вспом. глагол + подлежащее</code> — <code>So do I</code>, <code>So am I</code>, <code>So can I</code>. Порядок слов обратный (инверсия). Второй вариант: <code>подлежащее + вспом. глагол + too</code> — <code>I do too</code>.</p>
+    <p><b>Отрицательное согласие</b> («я тоже нет»): <code>Neither/Nor + вспом. глагол + подлежащее</code> — <code>Neither do I</code>, <code>Neither am I</code>. Второй вариант: <code>подлежащее + not + вспом. глагол + either</code> — <code>I don't either</code>, <code>I'm not either</code>.</p>
+    <p>Вспомогательный глагол выбирается <b>по тому, что было в исходной фразе</b>, и согласуется с новым подлежащим: <code>be</code> → am/is/are/was/were; <code>do</code> → do/does/did; <code>have</code> → have/has/had; модальные — без изменений (can, will, must, would…).</p>
+  </div>
+</header>
+<main id="app"></main>
+<div class="score-bar" id="scoreBar"></div>
+
+<script>
+const exercises = [
+{
+  title: "Find the mistake",
+  instructions: "В реплике B есть ошибка. Впишите исправленный вариант.",
+  type: "find",
+  items: [
+    {a:"I like pizza.", b:"So do I too.", accepted:["so do i","i like pizza too"], expl:"«So do I» уже само по себе значит «я тоже» — добавлять too не нужно, это лишнее удвоение смысла."},
+    {a:"I can't swim.", b:"Neither I can.", accepted:["neither can i"], expl:"После Neither — инверсия: вспом. глагол ставится перед подлежащим. Neither can I, а не Neither I can."},
+    {a:"She has seen that film.", b:"So has I.", accepted:["so have i"], expl:"Вспом. глагол согласуется с новым подлежащим I, а не копирует has из фразы A. С I нужно have."},
+    {a:"I went to Paris last year.", b:"So do I.", accepted:["so did i"], expl:"В A — Past Simple (went), поэтому нужен did, а не do: время должно совпадать."},
+    {a:"I am not happy with this.", b:"I not either.", accepted:["i'm not either","i am not either","neither am i"], expl:"В отрицательном согласии вспом. глагол обязателен: I'm not either, его нельзя пропускать."},
+    {a:"They don't smoke.", b:"Neither smoke we.", accepted:["neither do we"], expl:"После Neither используется вспом. глагол do/does/did, а не смысловой глагол smoke."},
+    {a:"He will come tomorrow.", b:"So I will.", accepted:["so will i"], expl:"Конструкция с so требует инверсии: So will I, а не So I will."},
+    {a:"I don't have any money.", b:"Neither do I too.", accepted:["neither do i","i don't have any money either","i dont have any money either"], expl:"Neither уже выражает отрицательное согласие; too относится к утвердительным фразам — вместе они противоречат друг другу."}
+  ]
+},
+{
+  title: "Fill in the gaps using the correct form",
+  instructions: "Впишите пропущенное слово (So / Neither / нужный вспомогательный глагол).",
+  type: "blank",
+  items: [
+    {a:"I love chocolate.", bTemplate:"___ do I.", accepted:["so"], expl:"So + вспом. do (love — смысловой глагол в Present Simple) + I."},
+    {a:"I can't drive.", bTemplate:"___ can I.", accepted:["neither"], expl:"Neither ставится перед вспом. can, так как в A использован модальный глагол can't."},
+    {a:"She is studying English.", bTemplate:"So ___ I.", accepted:["am"], expl:"Present Continuous (is studying) → вспом. am для подлежащего I."},
+    {a:"We haven't finished yet.", bTemplate:"Neither ___ I.", accepted:["have"], expl:"Present Perfect (haven't finished) → вспом. have для I."},
+    {a:"He plays tennis every week.", bTemplate:"So ___ I.", accepted:["do"], expl:"Present Simple (plays) → вспом. do для I."},
+    {a:"I didn't see the movie.", bTemplate:"Neither ___ I.", accepted:["did"], expl:"Past Simple negative (didn't see) → вспом. did."},
+    {a:"They will be there.", bTemplate:"So ___ I.", accepted:["will"], expl:"Future Simple (will be) → модальный will не меняется."},
+    {a:"I don't like spicy food.", bTemplate:"I don't ___.", accepted:["either"], expl:"Без Neither: подлежащее + вспом. + not + either — второй способ выразить отрицательное согласие."}
+  ]
+},
+{
+  title: "Agree (2 versions)",
+  instructions: "Согласитесь с утверждением двумя способами: 1) So/Neither + вспом. + I  2) I + вспом. + too/either.",
+  type: "agree2",
+  items: [
+    {stimulus:"I love pizza.", v1:["so do i"], v2:["i love pizza too","i do too"], explV1:"So do I — love → do.", explV2:"I love pizza too / I do too — вспом. do + too."},
+    {stimulus:"I can't sing.", v1:["neither can i"], v2:["i can't sing either","i cant sing either","i can't either","i cant either"], explV1:"Neither can I — модальный can не меняется.", explV2:"I can't sing either — not + either для отрицания."},
+    {stimulus:"I have never been to Japan.", v1:["neither have i"], v2:["i have never been to japan either","i haven't either","i havent either"], explV1:"Neither have I — never делает фразу отрицательной, значит согласие тоже отрицательное.", explV2:"…either в конце отрицательного предложения."},
+    {stimulus:"I'm not coming tonight.", v1:["neither am i"], v2:["i'm not coming tonight either","i am not coming tonight either"], explV1:"Neither am I — вспом. am (Continuous/be).", explV2:"not … either — стандартная формула отрицательного согласия."},
+    {stimulus:"I enjoy hiking.", v1:["so do i"], v2:["i enjoy hiking too","i do too"], explV1:"So do I — enjoy требует do.", explV2:"…too в конце утвердительного предложения."},
+    {stimulus:"I don't drink coffee.", v1:["neither do i"], v2:["i don't drink coffee either","i dont drink coffee either","i don't either","i dont either"], explV1:"Neither do I — do для Present Simple negative.", explV2:"not … either."},
+    {stimulus:"I was at the party.", v1:["so was i"], v2:["i was at the party too","i was too"], explV1:"So was I — was, т.к. подлежащее I + глагол be в прошедшем.", explV2:"…too после was."},
+    {stimulus:"I would like some help.", v1:["so would i"], v2:["i would like some help too","i would too"], explV1:"So would I — модальный would без изменений.", explV2:"…too после would."}
+  ]
+},
+{
+  title: "Rephrase",
+  instructions: "Перепишите фразу, используя другую конструкцию (so/neither ↔ too/either).",
+  type: "blank_full",
+  items: [
+    {given:"I love reading too.", accepted:["so do i"], expl:"too → so + do + I (Present Simple)."},
+    {given:"I haven't tried sushi either.", accepted:["neither have i"], expl:"either в отрицательном предложении → neither + have + I."},
+    {given:"So does my brother.", accepted:["my brother does too","my brother does, too"], expl:"so + does + подлежащее → подлежащее + does + too."},
+    {given:"Neither will they.", accepted:["they won't either","they will not either","they wont either"], expl:"neither + will → подлежащее + won't + either."},
+    {given:"I was late too.", accepted:["so was i"], expl:"too → so + was + I."},
+    {given:"I don't smoke either.", accepted:["neither do i"], expl:"either (отрицание) → neither + do + I."},
+    {given:"So can my sister.", accepted:["my sister can too","my sister can, too"], expl:"so + can + подлежащее → подлежащее + can + too."},
+    {given:"Neither did we.", accepted:["we didn't either","we did not either","we didnt either"], expl:"neither + did → подлежащее + didn't + either."}
+  ]
+},
+{
+  title: "What usually comes after?",
+  instructions: "Выберите естественное продолжение-согласие к данному утверждению.",
+  type: "mc_stimulus",
+  items: [
+    {stimulus:"I've never been skiing.", options:["So have I","Neither have I","So am I"], correct:1, expl:"never — отрицательный маркер, значит согласие тоже отрицательное: Neither have I."},
+    {stimulus:"I love spicy food.", options:["So do I","Neither do I","So am I"], correct:0, expl:"Утвердительная фраза с love (do) → So do I."},
+    {stimulus:"I'm not very good at maths.", options:["So am I","Neither am I","So do I"], correct:1, expl:"Отрицание (not) + be → Neither am I."},
+    {stimulus:"I can speak French.", options:["So can I","Neither can I","So do I"], correct:0, expl:"Утвердительная фраза с модальным can → So can I."},
+    {stimulus:"I didn't enjoy the film.", options:["So did I","Neither did I","Neither do I"], correct:1, expl:"Past Simple negative → Neither did I (время должно совпадать)."},
+    {stimulus:"I'll be there at 8.", options:["So will I","Neither will I","So am I"], correct:0, expl:"Утвердительное будущее (will) → So will I."},
+    {stimulus:"I haven't finished my homework.", options:["So have I","Neither have I","So did I"], correct:1, expl:"Present Perfect negative (haven't) → Neither have I."},
+    {stimulus:"I was really tired yesterday.", options:["So was I","Neither was I","So am I"], correct:0, expl:"Утвердительное прошедшее (was) → So was I."}
+  ]
+}
+];
+
+function norm(s){
+  return s.toLowerCase()
+    .replace(/[.,!?;:'’]/g,"")
+    .replace(/\s+/g," ")
+    .trim();
+}
+function matches(userVal, accepted){
+  const u = norm(userVal);
+  if(!u) return false;
+  return accepted.some(a => norm(a) === u);
+}
+
+let totalItems = 0, checkedCorrect = new Set();
+
+function itemKey(exIdx, itIdx){ return exIdx+"-"+itIdx; }
+
+function renderApp(){
+  const app = document.getElementById("app");
+  exercises.forEach((ex, exIdx) => {
+    totalItems += ex.items.length;
+    const section = document.createElement("section");
+    section.className = "exercise";
+    section.innerHTML = `
+      <div class="exercise-head">
+        <span class="ex-num">${exIdx+1}</span>
+        <h2 class="ex-title">${ex.title}</h2>
+      </div>
+      <p class="ex-instructions">${ex.instructions}</p>
+    `;
+    const list = document.createElement("div");
+    ex.items.forEach((item, itIdx) => {
+      list.appendChild(renderItem(ex, item, exIdx, itIdx));
+    });
+    section.appendChild(list);
+    app.appendChild(section);
+  });
+  updateScore();
+}
+
+function renderItem(ex, item, exIdx, itIdx){
+  const wrap = document.createElement("div");
+  wrap.className = "item";
+  const key = itemKey(exIdx, itIdx);
+
+  let stimulusHtml = "";
+  if(ex.type === "find"){
+    stimulusHtml = `<div class="stimulus"><span class="A">A: ${item.a}</span><br><span class="B">B: ${item.b}</span></div>`;
+  } else if(ex.type === "blank"){
+    stimulusHtml = `<div class="stimulus"><span class="A">A: ${item.a}</span><br><span class="B">B: ${item.bTemplate}</span></div>`;
+  } else if(ex.type === "agree2"){
+    stimulusHtml = `<div class="stimulus"><span class="A">${item.stimulus}</span></div>`;
+  } else if(ex.type === "blank_full"){
+    stimulusHtml = `<div class="stimulus"><span class="A">${item.given}</span></div>`;
+  } else if(ex.type === "mc"){
+    stimulusHtml = `<div class="stimulus">Найдите лишний (неправильный) вариант:</div>`;
+  } else if(ex.type === "mc_stimulus"){
+    stimulusHtml = `<div class="stimulus"><span class="A">${item.stimulus}</span></div>`;
+  }
+
+  let controlsHtml = "";
+  if(ex.type === "find" || ex.type === "blank" || ex.type === "blank_full"){
+    controlsHtml = `
+      <div class="answer-row">
+        <input type="text" id="in-${key}" placeholder="Ваш ответ" autocomplete="off">
+        <button class="btn btn-check" data-action="check" data-key="${key}">Проверить</button>
+        <button class="btn btn-show" data-action="show" data-key="${key}">Показать ответ</button>
+      </div>
+    `;
+  } else if(ex.type === "agree2"){
+    controlsHtml = `
+      <div class="answer-row">
+        <input type="text" id="in-${key}-1" placeholder="Вариант 1: So/Neither + ..." autocomplete="off">
+      </div>
+      <div class="answer-row">
+        <input type="text" id="in-${key}-2" placeholder="Вариант 2: ... too/either" autocomplete="off">
+        <button class="btn btn-check" data-action="check2" data-key="${key}">Проверить</button>
+        <button class="btn btn-show" data-action="show2" data-key="${key}">Показать ответы</button>
+      </div>
+    `;
+  } else if(ex.type === "mc" || ex.type === "mc_stimulus"){
+    const opts = item.options.map((opt, oIdx) => `
+      <label class="mc-option" data-key="${key}" data-idx="${oIdx}">
+        <input type="radio" name="mc-${key}" value="${oIdx}">
+        <span>${opt}</span>
+      </label>
+    `).join("");
+    controlsHtml = `
+      <div class="mc-options">${opts}</div>
+      <div class="answer-row">
+        <button class="btn btn-check" data-action="checkmc" data-key="${key}">Проверить</button>
+        <button class="btn btn-show" data-action="showmc" data-key="${key}">Показать ответ</button>
+      </div>
+    `;
+  }
+
+  wrap.innerHTML = `
+    <span class="item-num">${itIdx+1}.</span>
+    ${stimulusHtml}
+    ${controlsHtml}
+    <div class="feedback" id="fb-${key}"></div>
+  `;
+
+  wrap.addEventListener("click", (e) => {
+    const btn = e.target.closest("button[data-action]");
+    const opt = e.target.closest(".mc-option");
+    if(opt){
+      const group = wrap.querySelectorAll(".mc-option");
+      group.forEach(g => g.classList.remove("selected"));
+      opt.classList.add("selected");
+      opt.querySelector("input").checked = true;
+      return;
+    }
+    if(!btn) return;
+    const action = btn.dataset.action;
+    if(action === "check") doCheckText(ex, item, exIdx, itIdx, key);
+    if(action === "show") doShowText(ex, item, key);
+    if(action === "check2") doCheckAgree2(item, exIdx, itIdx, key);
+    if(action === "show2") doShowAgree2(item, key);
+    if(action === "checkmc") doCheckMc(item, exIdx, itIdx, key, wrap);
+    if(action === "showmc") doShowMc(item, key, wrap);
+  });
+
+  return wrap;
+}
+
+function markSolved(exIdx, itIdx, correct){
+  const k = itemKey(exIdx, itIdx);
+  if(correct) checkedCorrect.add(k); else checkedCorrect.delete(k);
+  updateScore();
+}
+
+function updateScore(){
+  const bar = document.getElementById("scoreBar");
+  bar.innerHTML = `<span class="score-pill">Верно отмечено: ${checkedCorrect.size} / ${totalItems}</span>`;
+}
+
+function doCheckText(ex, item, exIdx, itIdx, key){
+  const input = document.getElementById(`in-${key}`);
+  const accepted = ex.type === "blank_full" ? item.accepted : item.accepted;
+  const ok = matches(input.value, accepted);
+  const fb = document.getElementById(`fb-${key}`);
+  fb.className = "feedback show " + (ok ? "correct" : "incorrect");
+  fb.innerHTML = `<span class="verdict">${ok ? "✓ Верно." : "✗ Не совсем."}</span>` +
+    (ok ? `<div class="explanation">${item.expl}</div>` : `<div class="correct-answer-line">Правильный вариант: <b>${item.accepted[0]}</b></div><div class="explanation">${item.expl}</div>`);
+  markSolved(exIdx, itIdx, ok);
+}
+
+function doShowText(ex, item, key){
+  const fb = document.getElementById(`fb-${key}`);
+  fb.className = "feedback show";
+  fb.innerHTML = `<div class="correct-answer-line">Ответ: <b>${item.accepted[0]}</b></div><div class="explanation">${item.expl}</div>`;
+}
+
+function doCheckAgree2(item, exIdx, itIdx, key){
+  const in1 = document.getElementById(`in-${key}-1`);
+  const in2 = document.getElementById(`in-${key}-2`);
+  const ok1 = matches(in1.value, item.v1);
+  const ok2 = matches(in2.value, item.v2);
+  const ok = ok1 && ok2;
+  const fb = document.getElementById(`fb-${key}`);
+  fb.className = "feedback show " + (ok ? "correct" : "incorrect");
+  fb.innerHTML = `
+    <span class="verdict">Вариант 1: ${ok1 ? "✓" : "✗ (" + item.v1[0] + ")"}</span><br>
+    <span class="verdict">Вариант 2: ${ok2 ? "✓" : "✗ (" + item.v2[0] + ")"}</span>
+    <div class="explanation">${item.explV1} ${item.explV2}</div>
+  `;
+  markSolved(exIdx, itIdx, ok);
+}
+
+function doShowAgree2(item, key){
+  const fb = document.getElementById(`fb-${key}`);
+  fb.className = "feedback show";
+  fb.innerHTML = `
+    <div class="correct-answer-line">Вариант 1: <b>${item.v1[0]}</b></div>
+    <div class="correct-answer-line">Вариант 2: <b>${item.v2[0]}</b></div>
+    <div class="explanation">${item.explV1} ${item.explV2}</div>
+  `;
+}
+
+function doCheckMc(item, exIdx, itIdx, key, wrap){
+  const selected = wrap.querySelector(`input[name="mc-${key}"]:checked`);
+  const fb = document.getElementById(`fb-${key}`);
+  if(!selected){
+    fb.className = "feedback show incorrect";
+    fb.innerHTML = `<span class="verdict">Сначала выберите вариант.</span>`;
+    return;
+  }
+  const idx = parseInt(selected.value, 10);
+  const ok = idx === item.correct;
+  fb.className = "feedback show " + (ok ? "correct" : "incorrect");
+  fb.innerHTML = `<span class="verdict">${ok ? "✓ Верно." : "✗ Не совсем. Правильный вариант: " + item.options[item.correct]}</span><div class="explanation">${item.expl}</div>`;
+  markSolved(exIdx, itIdx, ok);
+}
+
+function doShowMc(item, key, wrap){
+  const fb = document.getElementById(`fb-${key}`);
+  fb.className = "feedback show";
+  fb.innerHTML = `<div class="correct-answer-line">Ответ: <b>${item.options[item.correct]}</b></div><div class="explanation">${item.expl}</div>`;
+  wrap.querySelectorAll(".mc-option").forEach((opt) => {
+    if(parseInt(opt.dataset.idx,10) === item.correct){
+      opt.style.borderColor = "var(--green)";
+      opt.style.background = "#eef6f0";
+    }
+  });
+}
+
+renderApp();
+</script>
+</body>
+</html>
