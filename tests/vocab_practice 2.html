@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Home &amp; Property — практика лексики</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F6F2E9;
+    --card:#FFFFFF;
+    --ink:#23262B;
+    --ink-soft:#63676F;
+    --teal:#2F5D62;
+    --teal-dark:#1E3F43;
+    --mustard:#D9A441;
+    --rust:#B3452C;
+    --green:#3F7D58;
+    --line:#E4DDCC;
+    --paper2:#FBF9F4;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    line-height:1.5;
+  }
+  h1,h2,h3{ font-family:'Fraunces',serif; font-weight:700; margin:0; }
+  .mono{ font-family:'IBM Plex Mono',monospace; }
+
+  /* ---- HERO ---- */
+  .hero{
+    background:linear-gradient(180deg,var(--teal-dark) 0%, var(--teal) 100%);
+    color:#F6F2E9;
+    padding:48px 24px 40px;
+    position:relative;
+    overflow:hidden;
+  }
+  .hero::after{
+    content:"";
+    position:absolute; right:-60px; top:-60px; width:260px; height:260px;
+    border:2px solid rgba(246,242,233,0.15); border-radius:50%;
+  }
+  .hero-inner{ max-width:1180px; margin:0 auto; position:relative; }
+  .eyebrow{
+    display:inline-block; font-family:'IBM Plex Mono',monospace; font-size:12px;
+    letter-spacing:.14em; text-transform:uppercase; color:var(--mustard);
+    border:1px solid rgba(217,164,65,.5); padding:4px 10px; border-radius:20px; margin-bottom:14px;
+  }
+  .hero h1{ font-size:clamp(28px,4vw,42px); max-width:760px; }
+  .hero p.sub{ max-width:640px; color:#DCE7E6; margin-top:10px; font-size:15px; }
+
+  /* ---- vocab reminder ---- */
+  .vocab-wrap{ margin-top:28px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.15); border-radius:14px; padding:18px; }
+  .vocab-wrap h2{ font-size:16px; color:var(--mustard); font-family:'IBM Plex Mono',monospace; text-transform:uppercase; letter-spacing:.08em; margin-bottom:12px; font-weight:500;}
+  .vocab-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(270px,1fr)); gap:10px; }
+  .vocab-card{
+    background:rgba(255,255,255,.9); color:var(--ink); border-radius:10px; padding:12px 14px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .vocab-play{
+    flex:0 0 auto; width:34px; height:34px; border-radius:50%; border:none; cursor:pointer;
+    background:var(--mustard); color:#2b2109; font-size:15px; display:flex; align-items:center; justify-content:center;
+    transition:transform .15s;
+  }
+  .vocab-play:hover{ transform:scale(1.08); }
+  .vocab-text .w{ font-weight:700; font-size:14.5px; }
+  .vocab-text .ipa{ font-family:'IBM Plex Mono',monospace; color:var(--teal); font-size:12px; }
+  .vocab-text .ru{ color:var(--ink-soft); font-size:12.5px; margin-top:1px; }
+
+  /* ---- LAYOUT ---- */
+  .layout{
+    max-width:1180px; margin:0 auto; padding:32px 24px 90px;
+    display:grid; grid-template-columns:1fr 270px; gap:28px;
+    align-items:start;
+  }
+  @media (max-width:880px){ .layout{ grid-template-columns:1fr; } .sidebar{ position:static !important; order:-1; } }
+
+  .sidebar{ position:sticky; top:20px; }
+  .note{
+    background:#FFF9DE; border:1px solid #E9D98A; border-radius:4px; padding:16px;
+    box-shadow:3px 4px 0 rgba(0,0,0,.05); transform:rotate(-0.6deg);
+  }
+  .note h3{ font-size:15px; color:#6B5410; display:flex; align-items:center; gap:6px; }
+  .note p.hint{ font-size:12px; color:#8a7327; margin:6px 0 10px; }
+  .pw-row{ display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px dashed #E4D48C; font-size:13.5px; }
+  .pw-row:last-child{ border-bottom:none; }
+  .pw-count{ background:var(--rust); color:#fff; font-family:'IBM Plex Mono',monospace; font-size:11px; padding:2px 7px; border-radius:20px; }
+  .pw-empty{ font-size:12.5px; color:#8a7327; font-style:italic; }
+  .sidebar-actions{ margin-top:14px; }
+  .btn-mini{ width:100%; padding:8px; font-size:12px; border-radius:8px; border:1px solid #E9D98A; background:#fff; cursor:pointer; color:#6B5410; font-family:'Inter'; }
+
+  .toc{ margin-top:18px; background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px 16px; }
+  .toc h4{ font-size:12px; text-transform:uppercase; letter-spacing:.08em; color:var(--ink-soft); margin-bottom:8px; font-family:'IBM Plex Mono',monospace; font-weight:500;}
+  .toc a{ display:block; font-size:12.5px; color:var(--teal); text-decoration:none; padding:3px 0; }
+  .toc a:hover{ text-decoration:underline; }
+
+  /* ---- exercise cards ---- */
+  .ex-card{
+    background:var(--card); border:1px solid var(--line); border-radius:16px;
+    padding:24px 26px; margin-bottom:22px; scroll-margin-top:16px;
+  }
+  .ex-head{ display:flex; gap:14px; align-items:flex-start; margin-bottom:14px; }
+  .ex-num{
+    font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--teal); background:#EAF1EF;
+    border-radius:8px; padding:4px 9px; flex:0 0 auto; margin-top:3px;
+  }
+  .ex-head h3{ font-size:19px; }
+  .ex-instr{ font-size:13px; color:var(--ink-soft); margin-top:3px; }
+  .ex-bank{ background:var(--paper2); border:1px solid var(--line); border-radius:10px; padding:10px 14px; font-size:13px; margin:10px 0 16px; color:var(--ink-soft); }
+  .ex-bank b{ color:var(--ink); }
+
+  .item{ display:flex; flex-wrap:wrap; align-items:center; gap:8px; padding:9px 0; border-bottom:1px solid var(--line); }
+  .item:last-child{ border-bottom:none; }
+  .item-n{ font-family:'IBM Plex Mono',monospace; color:var(--ink-soft); font-size:13px; min-width:20px; }
+  .item-prompt{ font-size:14.5px; flex:1 1 260px; }
+  .answer-input{
+    font-family:'Inter'; font-size:14px; padding:7px 10px; border:1.5px solid var(--line); border-radius:8px;
+    min-width:150px; flex:0 0 auto; background:var(--paper2);
+  }
+  .answer-input.wide{ flex:1 1 100%; min-width:220px; }
+  .answer-input.short{ width:44px; text-align:center; min-width:44px; }
+  .answer-input:focus{ outline:none; border-color:var(--teal); background:#fff; }
+  .answer-input.correct{ border-color:var(--green); background:#EAF6EE; }
+  .answer-input.incorrect{ border-color:var(--rust); background:#FBEAE5; }
+  .match-right{ font-size:13px; color:var(--ink-soft); }
+  .drill-word{ font-weight:700; min-width:150px; }
+  .arrow{ color:var(--mustard); font-weight:700; }
+  .radio-group{ display:flex; flex-wrap:wrap; gap:12px; margin:4px 0 4px 28px; }
+  .radio-opt{ font-size:13.5px; display:flex; align-items:center; gap:5px; background:var(--paper2); border:1px solid var(--line); border-radius:20px; padding:5px 12px; cursor:pointer; }
+  .radio-opt input{ accent-color:var(--teal); }
+  .speak-btn{
+    border:none; background:var(--teal); color:#fff; width:30px; height:30px; border-radius:50%;
+    cursor:pointer; font-size:13px; flex:0 0 auto;
+  }
+  .reveal{ display:none; font-size:12.5px; color:var(--green); font-family:'IBM Plex Mono',monospace; width:100%; margin:2px 0 0 28px; }
+  .reveal.show{ display:block; }
+
+  .ex-controls{ display:flex; gap:10px; margin-top:16px; flex-wrap:wrap; }
+  .btn{
+    font-family:'Inter'; font-weight:600; font-size:13px; padding:9px 16px; border-radius:9px; border:none; cursor:pointer;
+    transition:opacity .15s;
+  }
+  .btn:hover{ opacity:.85; }
+  .btn-primary{ background:var(--teal); color:#fff; }
+  .btn-ghost{ background:transparent; color:var(--teal); border:1.5px solid var(--teal); }
+  .btn-copy{ background:var(--mustard); color:#2b2109; }
+  .ex-result{ margin-top:10px; font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--teal); font-weight:500; }
+  .copy-msg{ font-size:12px; color:var(--green); margin-left:6px; }
+
+  .example-row{ background:var(--paper2); border:1px dashed var(--line); border-radius:8px; padding:8px 12px; font-size:13px; margin-bottom:10px; color:var(--ink-soft); }
+
+  footer{ text-align:center; padding:30px; font-size:12px; color:var(--ink-soft); }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <span class="eyebrow">Vocabulary Workout · Home &amp; Property</span>
+    <h1>Дом, недвижимость и порядок в доме — 9 слов, 14 упражнений</h1>
+    <p class="sub">Сначала прослушай и повтори каждое слово, затем пройди упражнения ниже. Проверяй ответы, смотри правильные варианты и следи за колонкой «Проблемные слова» — она сама отметит то, что стоит повторить ещё раз.</p>
+
+    <div class="vocab-wrap">
+      <h2>🔊 Прослушай и повтори</h2>
+      <div class="vocab-grid" id="vocabGrid"></div>
+    </div>
+  </div>
+</div>
+
+<div class="layout">
+  <div class="main" id="mainCol"></div>
+
+  <div class="sidebar">
+    <div class="note">
+      <h3>📌 Проблемные слова</h3>
+      <p class="hint">Появляются, если в упражнении с проверкой была ошибка</p>
+      <div id="pwList"><div class="pw-empty">Пока пусто — начни выполнять задания!</div></div>
+      <div class="sidebar-actions"><button class="btn-mini" onclick="resetProblemWords()">Очистить список</button></div>
+    </div>
+    <div class="toc">
+      <h4>Упражнения</h4>
+      <div id="tocList"></div>
+    </div>
+  </div>
+</div>
+
+<footer>Сделано для практики письма и лексики · 9 слов · 14 упражнений · 140 заданий</footer>
+
+<script>
+/* ============ VOCAB ============ */
+const vocab = [
+  {word:"bookcase", ipa:"/ˈbʊkˌkeɪs/", ru:"книжный шкаф, стеллаж для книг"},
+  {word:"plain", ipa:"/pleɪn/", ru:"простой, без излишеств; невзрачный"},
+  {word:"overlook", ipa:"/ˌoʊvərˈlʊk/", ru:"иметь вид (на что-л.), выходить окнами (на)"},
+  {word:"tidy", ipa:"/ˈtaɪdi/", ru:"1) опрятный, аккуратный  2) убирать(ся), наводить порядок"},
+  {word:"turn the house into", ipa:"/tɜːrn ðə haʊs ˈɪntə/", ru:"превратить дом во что-либо"},
+  {word:"hanging", ipa:"/ˈhæŋɪŋ/", ru:"висящий, подвесной"},
+  {word:"hang", ipa:"/hæŋ/", ru:"вешать; висеть"},
+  {word:"property", ipa:"/ˈprɒpərti/", ru:"недвижимость, собственность"},
+  {word:"remain", ipa:"/rɪˈmeɪn/", ru:"оставаться"}
+];
+
+function speak(text){
+  if(!('speechSynthesis' in window)){ alert("Ваш браузер не поддерживает озвучку."); return; }
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = "en-GB"; u.rate = 0.88;
+  window.speechSynthesis.speak(u);
+}
+
+function buildVocabGrid(){
+  const grid = document.getElementById('vocabGrid');
+  vocab.forEach(v=>{
+    const card = document.createElement('div'); card.className='vocab-card';
+    card.innerHTML = `<button class="vocab-play" onclick="speak('${v.word.replace(/'/g,"\\'")}')">▶</button>
+      <div class="vocab-text"><div class="w">${v.word}</div><div class="ipa">${v.ipa}</div><div class="ru">${v.ru}</div></div>`;
+    grid.appendChild(card);
+  });
+}
+
+/* ============ PROBLEM WORDS ============ */
+let problemWords = {};
+function trackMistake(word){
+  problemWords[word] = (problemWords[word]||0)+1;
+  renderProblemWords();
+}
+function resetProblemWords(){ problemWords = {}; renderProblemWords(); }
+function renderProblemWords(){
+  const box = document.getElementById('pwList');
+  const entries = Object.entries(problemWords).sort((a,b)=>b[1]-a[1]);
+  if(entries.length===0){ box.innerHTML = '<div class="pw-empty">Пока пусто — начни выполнять задания!</div>'; return; }
+  box.innerHTML = entries.map(([w,c])=>`<div class="pw-row"><span>${w}</span><span class="pw-count">${c}</span></div>`).join('');
+}
+
+/* ============ HELPERS ============ */
+function norm(s){ return (s||'').toLowerCase().trim().replace(/\s+/g,' ').replace(/[.,!?"']/g,''); }
+function matchAny(val, answers){
+  if(!val) return false;
+  return answers.some(a=>{
+    const na = norm(a);
+    return na===val || na.includes(val) || val.includes(na);
+  });
+}
+
+/* ============ EXERCISE DATA ============ */
+const exercises = [
+{ id:1, type:'gap', title:'Вставь пропущенные буквы', instr:'Restore the missing letters in each word or phrase.',
+  items:[
+    {prompt:'bo_kc__e', answer:['bookcase'], word:'bookcase'},
+    {prompt:'pl__n', answer:['plain'], word:'plain'},
+    {prompt:'_verl__k', answer:['overlook'], word:'overlook'},
+    {prompt:'ti_y', answer:['tidy'], word:'tidy'},
+    {prompt:'t_rn the h__se _nto', answer:['turn the house into'], word:'turn the house into'},
+    {prompt:'h_ngi_g', answer:['hanging'], word:'hanging'},
+    {prompt:'h_ng', answer:['hang'], word:'hang'},
+    {prompt:'pr_p_r_y', answer:['property'], word:'property'},
+    {prompt:'rem_i_', answer:['remain'], word:'remain'},
+    {prompt:'_id_ up', answer:['tidy up','tidy'], word:'tidy'}
+  ]},
+{ id:2, type:'gap', title:'Перевод: с русского на английский', instr:'Translate each Russian phrase into English.',
+  items:[
+    {prompt:'книжный шкаф', answer:['bookcase','a bookcase'], word:'bookcase'},
+    {prompt:'простое (без узора) платье', answer:['plain dress','a plain dress'], word:'plain'},
+    {prompt:'окна выходят на сад', answer:['the windows overlook the garden','overlook the garden'], word:'overlook'},
+    {prompt:'опрятная комната', answer:['tidy room','a tidy room'], word:'tidy'},
+    {prompt:'превратить дом в отель', answer:['turn the house into a hotel'], word:'turn the house into'},
+    {prompt:'подвесной сад / висящие растения', answer:['hanging garden','hanging plants'], word:'hanging'},
+    {prompt:'повесить картину', answer:['hang a picture'], word:'hang'},
+    {prompt:'элитная недвижимость', answer:['prime property','property'], word:'property'},
+    {prompt:'оставаться спокойным', answer:['remain calm'], word:'remain'},
+    {prompt:'прибраться в комнате', answer:['tidy up the room','tidy the room'], word:'tidy'}
+  ]},
+{ id:3, type:'gap', title:'Запиши слово по звуку (Listen &amp; write)', instr:'Нажми ▶, прослушай фразу и запиши то, что услышал(а).',
+  items:[
+    {audio:'I bought a new bookcase.', answer:['i bought a new bookcase','bookcase'], word:'bookcase'},
+    {audio:'She wore a plain dress.', answer:['she wore a plain dress','plain'], word:'plain'},
+    {audio:'Our balcony overlooks the park.', answer:['our balcony overlooks the park','overlooks'], word:'overlook'},
+    {audio:'His room is always tidy.', answer:['his room is always tidy','tidy'], word:'tidy'},
+    {audio:'They turned the house into a cafe.', answer:['they turned the house into a cafe','turned the house into a cafe'], word:'turn the house into'},
+    {audio:'There is a hanging garden on the roof.', answer:['there is a hanging garden on the roof','hanging garden'], word:'hanging'},
+    {audio:'Please hang your coat here.', answer:['please hang your coat here','hang'], word:'hang'},
+    {audio:'Property prices are rising fast.', answer:['property prices are rising fast','property'], word:'property'},
+    {audio:'The mystery remains unsolved.', answer:['the mystery remains unsolved','remains'], word:'remain'},
+    {audio:'Let us tidy up the kitchen.', answer:['let us tidy up the kitchen','tidy up'], word:'tidy'}
+  ]},
+{ id:4, type:'gap', title:'Дефиниции', instr:'Read the definition and write the correct word.',
+  items:[
+    {prompt:'a piece of furniture with shelves for keeping books', answer:['bookcase'], word:'bookcase'},
+    {prompt:'simple in style, without much decoration or pattern', answer:['plain'], word:'plain'},
+    {prompt:'if a building or window overlooks something, it has a view over it', answer:['overlook','overlooks'], word:'overlook'},
+    {prompt:'neat and well organised, with everything in its place', answer:['tidy'], word:'tidy'},
+    {prompt:'to change a building completely so that it becomes something else', answer:['turn ... into','turn the house into'], word:'turn the house into'},
+    {prompt:'hung up so that the object is not touching the ground', answer:['hanging'], word:'hanging'},
+    {prompt:'to fix something to a wall or hook so the top is attached and the rest hangs free', answer:['hang'], word:'hang'},
+    {prompt:'a building or land that belongs to someone', answer:['property'], word:'property'},
+    {prompt:'to continue to exist, or to stay the same', answer:['remain'], word:'remain'},
+    {prompt:'to make a place neat by putting things where they belong', answer:['tidy up','tidy'], word:'tidy'}
+  ]},
+{ id:5, type:'gap', title:'Сочетаемость слов (collocations)', instr:'Fill in the missing word so the collocation is correct.',
+  items:[
+    {prompt:'a floor-to-ceiling ____ .', answer:['bookcase'], word:'bookcase'},
+    {prompt:'a ____ white wall, with no pattern at all.', answer:['plain'], word:'plain'},
+    {prompt:'The balcony ____s the sea.', answer:['overlook'], word:'overlook'},
+    {prompt:'Keep the flat ____ before the guests arrive.', answer:['tidy'], word:'tidy'},
+    {prompt:'They want to turn the house ____ a museum.', answer:['into'], word:'turn the house into'},
+    {prompt:'a ____ garden with plants in baskets.', answer:['hanging'], word:'hanging'},
+    {prompt:'____ a picture on the wall.', answer:['hang'], word:'hang'},
+    {prompt:'rental ____ in the city centre.', answer:['property'], word:'property'},
+    {prompt:'____ calm under pressure.', answer:['remain'], word:'remain'},
+    {prompt:'____ up your desk before you leave.', answer:['tidy'], word:'tidy'}
+  ]},
+{ id:6, type:'gap', title:'По картинке', instr:'Guess the word from the picture / description.',
+  items:[
+    {prompt:'📚🗄️ — a piece of furniture full of books', answer:['bookcase'], word:'bookcase'},
+    {prompt:'👗⬜ — a dress with one colour, no pattern at all', answer:['plain'], word:'plain'},
+    {prompt:'🪟🌊 — a window with a view over the sea', answer:['overlook','overlooks'], word:'overlook'},
+    {prompt:'🧹✨🛏️ — a perfectly neat, organised room', answer:['tidy'], word:'tidy'},
+    {prompt:'🏚️➡️🏨 — an old house becoming a hotel', answer:['turn the house into a hotel'], word:'turn the house into'},
+    {prompt:'🪴🧺 — plants hanging from the ceiling in baskets', answer:['hanging'], word:'hanging'},
+    {prompt:'🖼️🔨 — someone putting a picture up on the wall', answer:['hang'], word:'hang'},
+    {prompt:'🏘️💷 — houses and flats for sale, real estate signs', answer:['property'], word:'property'},
+    {prompt:'🏛️⏳ — ancient ruins that survived for centuries', answer:['remain','remains'], word:'remain'},
+    {prompt:'🧽🧺🏠 — someone cleaning and putting everything away', answer:['tidy up','tidy'], word:'tidy'}
+  ]},
+{ id:7, type:'gap', title:'Контекст', instr:'Complete each sentence with the correct form of the target word.',
+  items:[
+    {prompt:'We need a bigger ____ — our books do not fit any more.', answer:['bookcase'], word:'bookcase'},
+    {prompt:'She wore a ____ black dress to the interview, nothing fancy.', answer:['plain'], word:'plain'},
+    {prompt:'Our hotel room ____ the mountains.', answer:['overlooks'], word:'overlook'},
+    {prompt:'His desk is always so ____ — everything has its place.', answer:['tidy'], word:'tidy'},
+    {prompt:'They decided to turn the old house ____ a small hotel.', answer:['into'], word:'turn the house into'},
+    {prompt:'There is a ____ garden of herbs on the balcony.', answer:['hanging'], word:'hanging'},
+    {prompt:'Can you ____ this picture a bit higher, please?', answer:['hang'], word:'hang'},
+    {prompt:'House prices and ____ prices in general have gone up this year.', answer:['property'], word:'property'},
+    {prompt:'Only a few old walls ____ of the original castle.', answer:['remain'], word:'remain'},
+    {prompt:'Please ____ your room before your grandparents arrive.', answer:['tidy up','tidy'], word:'tidy'}
+  ]},
+{ id:8, type:'match', title:'Соедини половинки выражений', instr:'Type the letter (a–j) that correctly completes each phrase. Смотри банк вариантов ниже.',
+  bank:'a) into a family home &nbsp; b) bookcase &nbsp; c) tidy &nbsp; d) the park &nbsp; e) on the wall &nbsp; f) under pressure &nbsp; g) property &nbsp; h) white t-shirt &nbsp; i) baskets of flowers &nbsp; j) up your desk before dinner',
+  items:[
+    {left:'turn the house', rightLetter:'a', rightText:'into a family home', word:'turn the house into'},
+    {left:'a floor-to-ceiling', rightLetter:'b', rightText:'bookcase', word:'bookcase'},
+    {left:'keep your room', rightLetter:'c', rightText:'tidy', word:'tidy'},
+    {left:'the flat overlooks', rightLetter:'d', rightText:'the park', word:'overlook'},
+    {left:'hang a picture', rightLetter:'e', rightText:'on the wall', word:'hang'},
+    {left:'remain calm', rightLetter:'f', rightText:'under pressure', word:'remain'},
+    {left:'rental', rightLetter:'g', rightText:'property', word:'property'},
+    {left:'a plain', rightLetter:'h', rightText:'white t-shirt', word:'plain'},
+    {left:'hanging', rightLetter:'i', rightText:'baskets of flowers', word:'hanging'},
+    {left:'tidy', rightLetter:'j', rightText:'up your desk before dinner', word:'tidy'}
+  ]},
+{ id:9, type:'twoMistakes', title:'Find two mistakes', instr:'Each sentence has exactly two mistakes. Type the two corrected words, separated by a comma.',
+  items:[
+    {prompt:'We bought a new bokcase for the living room, it look great.', answers:['bookcase','looks'], word:'bookcase'},
+    {prompt:'She likes a plane style — simple clothes without any pattern\'s.', answers:['plain','patterns'], word:'plain'},
+    {prompt:'Our new flat overlook a small park, and the view are amazing.', answers:['overlooks','is'], word:'overlook'},
+    {prompt:'He always keep his desk very tidi, even after a long day.', answers:['keeps','tidy'], word:'tidy'},
+    {prompt:'She plan to turn the house in a boutique hotel.', answers:['plans','into'], word:'turn the house into'},
+    {prompt:'There\'s a hangng garden on the roof, full of flower\'s.', answers:['hanging','flowers'], word:'hanging'},
+    {prompt:'Could you hung this picture a little higher, it look crooked?', answers:['hang','looks'], word:'hang'},
+    {prompt:'Propertys prices in this area has doubled in five years.', answers:['property','have'], word:'property'},
+    {prompt:'Only a few old wall\'s remains from the original castle.', answers:['walls','remain'], word:'remain'},
+    {prompt:'Please tidi up your room, it look like a mess today.', answers:['tidy','looks'], word:'tidy'}
+  ]},
+{ id:10, type:'openKeyword', title:'Составь предложение по картинке', instr:'Look at the picture / description and write your own full sentence using the target word. Проверка нестрогая — сверься с примером после нажатия «Показать ответы».',
+  items:[
+    {prompt:'📚📖📚 — a piece of furniture full of books · use: bookcase', keywords:['bookcase'], sample:'We bought a tall bookcase for all our books.', word:'bookcase'},
+    {prompt:'👗⬜ — a plain, one-colour dress · use: plain', keywords:['plain'], sample:'She was wearing a plain blue dress.', word:'plain'},
+    {prompt:'🪟🏔️ — a window with a view of the mountains · use: overlook', keywords:['overlook'], sample:'Our hotel room overlooks the mountains.', word:'overlook'},
+    {prompt:'🧹✨🛏️ — a perfectly neat bedroom · use: tidy', keywords:['tidy'], sample:'Her bedroom is always neat and tidy.', word:'tidy'},
+    {prompt:'🏚️➡️🏨 — an old house becoming a hotel · use: turn ... into', keywords:['turn','into'], sample:'They turned the old house into a small hotel.', word:'turn the house into'},
+    {prompt:'🪴🧺 — plants hanging from the ceiling · use: hanging', keywords:['hanging'], sample:'There is a beautiful hanging garden on the terrace.', word:'hanging'},
+    {prompt:'🖼️🔨 — someone putting up a picture · use: hang', keywords:['hang'], sample:'He hung a new picture above the sofa.', word:'hang'},
+    {prompt:'🏘️💷 — houses and flats for sale · use: property', keywords:['property'], sample:'Property prices in the city keep rising.', word:'property'},
+    {prompt:'🏛️🕰️ — ancient ruins that survived for centuries · use: remain', keywords:['remain'], sample:'Only a few walls of the old temple remain.', word:'remain'},
+    {prompt:'🧽🧹🏠 — cleaning the whole house before guests arrive · use: tidy up', keywords:['tidy'], sample:'We need to tidy up the whole house before the guests arrive.', word:'tidy'}
+  ]},
+{ id:11, type:'radio', title:'Circle the odd collocation', instr:'Choose the option that does NOT collocate with the word (the odd one out).',
+  items:[
+    {prompt:'bookcase', options:['a wooden bookcase','a built-in bookcase','an empty bookcase','a barefoot bookcase'], correct:3, word:'bookcase'},
+    {prompt:'plain', options:['plain flour','plain yoghurt','plain English','plain traffic'], correct:3, word:'plain'},
+    {prompt:'overlook', options:['overlook the garden','overlook the sea','overlook the park','overlook the Tuesday'], correct:3, word:'overlook'},
+    {prompt:'tidy', options:['a tidy room','a tidy desk','a tidy garden','tidy weather'], correct:3, word:'tidy'},
+    {prompt:'turn ... into', options:['turn the house into a hotel','turn the house into a museum','turn the house into an office','turn the house into a Monday'], correct:3, word:'turn the house into'},
+    {prompt:'hanging', options:['hanging basket','hanging garden','hanging plant','hanging homework'], correct:3, word:'hanging'},
+    {prompt:'hang', options:['hang a picture','hang a coat','hang the curtains','hang a soup'], correct:3, word:'hang'},
+    {prompt:'property', options:['private property','rental property','commercial property','Tuesday property'], correct:3, word:'property'},
+    {prompt:'remain', options:['remain calm','remain silent','remain unknown','remain purple loudly'], correct:3, word:'remain'},
+    {prompt:'tidy (verb)', options:['tidy your room','tidy your desk','tidy the house','tidy your opinion'], correct:3, word:'tidy'}
+  ]},
+{ id:12, type:'openKeyword', title:'Rephrase', instr:'Rewrite each sentence using the target word, keeping the same meaning.',
+  items:[
+    {prompt:'The books do not fit on the shelf any more. (use: bookcase)', keywords:['bookcase'], sample:'We need a bigger bookcase.', word:'bookcase'},
+    {prompt:'Her dress had no pattern or decoration. (use: plain)', keywords:['plain'], sample:'Her dress was plain.', word:'plain'},
+    {prompt:'You can see the mountains from our room. (use: overlook)', keywords:['overlook'], sample:'Our room overlooks the mountains.', word:'overlook'},
+    {prompt:'He always keeps his things neat. (use: tidy)', keywords:['tidy'], sample:'He is always tidy.', word:'tidy'},
+    {prompt:'They changed the old house completely — now it is a hotel. (use: turn ... into)', keywords:['turn','into'], sample:'They turned the old house into a hotel.', word:'turn the house into'},
+    {prompt:'There are plants hanging from the ceiling. (use: hanging)', keywords:['hanging'], sample:'There is a hanging garden.', word:'hanging'},
+    {prompt:'Put the picture up on that wall. (use: hang)', keywords:['hang'], sample:'Hang the picture on that wall.', word:'hang'},
+    {prompt:'The real estate market is growing fast. (use: property)', keywords:['property'], sample:'The property market is growing fast.', word:'property'},
+    {prompt:'The old ruins are still there today. (use: remain)', keywords:['remain'], sample:'The old ruins remain today.', word:'remain'},
+    {prompt:'Clean up your room, please. (use: tidy)', keywords:['tidy'], sample:'Tidy up your room, please.', word:'tidy'}
+  ]},
+{ id:13, type:'openFree', title:'Закончи предложение своей идеей', instr:'No правильного/неправильного ответа — просто твои идеи. Когда закончишь, скопируй все ответы одной кнопкой.',
+  items:[
+    {prompt:'I think I need a new bookcase because…'},
+    {prompt:'I prefer plain clothes because…'},
+    {prompt:'My dream house would overlook…'},
+    {prompt:'I feel more relaxed when my room is tidy because…'},
+    {prompt:'If I could turn my house into anything, I would turn it into…'},
+    {prompt:'I would love to have a hanging garden with…'},
+    {prompt:'In my room, I usually hang…'},
+    {prompt:'If I owned property in another country, I would choose…'},
+    {prompt:'No matter what happens, I always try to remain…'},
+    {prompt:'Every weekend I try to tidy…'}
+  ]},
+{ id:14, type:'drill', title:'Drilling: Repeat &amp; Change', instr:'По примеру: слово → своё словосочетание → своё предложение. Придумай свои варианты для каждого слова, затем скопируй всё одной кнопкой.',
+  example:'suffer → suffer from stress → Many people suffer from stress.',
+  items:[
+    {word:'bookcase'},{word:'plain'},{word:'overlook'},{word:'tidy'},{word:'turn the house into'},
+    {word:'hanging'},{word:'hang'},{word:'property'},{word:'remain'},{word:'tidy'}
+  ]}
+];
+
+/* ============ RENDER ============ */
+function renderItem(ex, it, idx){
+  const row = document.createElement('div'); row.className='item';
+  const n = idx+1;
+  if(ex.type==='gap'){
+    const promptHtml = it.audio
+      ? `<button class="speak-btn" onclick="speak('${it.audio.replace(/'/g,"\\'")}')">▶</button>`
+      : `<span class="item-prompt">${it.prompt}</span>`;
+    row.innerHTML = `<span class="item-n">${n}.</span>${promptHtml}
+      <input type="text" class="answer-input${it.audio?' wide':''}" data-ex="${ex.id}" data-idx="${idx}" placeholder="type here..." autocomplete="off">
+      <div class="reveal" id="rv-${ex.id}-${idx}"></div>`;
+  } else if(ex.type==='openKeyword'){
+    row.innerHTML = `<span class="item-n">${n}.</span><span class="item-prompt">${it.prompt}</span>
+      <input type="text" class="answer-input wide" data-ex="${ex.id}" data-idx="${idx}" placeholder="write your sentence..." autocomplete="off">
+      <div class="reveal" id="rv-${ex.id}-${idx}"></div>`;
+  } else if(ex.type==='openFree'){
+    row.innerHTML = `<span class="item-n">${n}.</span><span class="item-prompt">${it.prompt}</span>
+      <input type="text" class="answer-input wide" data-ex="${ex.id}" data-idx="${idx}" placeholder="your idea..." autocomplete="off">`;
+  } else if(ex.type==='radio'){
+    const opts = it.options.map((o,oi)=>`<label class="radio-opt"><input type="radio" name="r-${ex.id}-${idx}" value="${oi}"> ${o}</label>`).join('');
+    row.innerHTML = `<div style="width:100%"><span class="item-n">${n}.</span> <b>${it.prompt}</b>
+      <div class="radio-group">${opts}</div>
+      <div class="reveal" id="rv-${ex.id}-${idx}"></div></div>`;
+  } else if(ex.type==='match'){
+    row.innerHTML = `<span class="item-n">${n}.</span><span class="item-prompt">${it.left}</span>
+      <input type="text" class="answer-input short" maxlength="1" data-ex="${ex.id}" data-idx="${idx}" placeholder="?" autocomplete="off">
+      <div class="reveal" id="rv-${ex.id}-${idx}"></div>`;
+  } else if(ex.type==='twoMistakes'){
+    row.innerHTML = `<span class="item-n">${n}.</span><span class="item-prompt">${it.prompt}</span>
+      <input type="text" class="answer-input wide" data-ex="${ex.id}" data-idx="${idx}" placeholder="mistake 1, mistake 2" autocomplete="off">
+      <div class="reveal" id="rv-${ex.id}-${idx}"></div>`;
+  } else if(ex.type==='drill'){
+    row.innerHTML = `<span class="item-n">${n}.</span><span class="drill-word">${it.word}</span>
+      <span class="arrow">→</span>
+      <input type="text" class="answer-input" data-ex="${ex.id}" data-idx="${idx}" data-part="collocation" placeholder="your collocation">
+      <span class="arrow">→</span>
+      <input type="text" class="answer-input wide" data-ex="${ex.id}" data-idx="${idx}" data-part="sentence" placeholder="your sentence">`;
+  }
+  return row;
+}
+
+function renderExercise(ex){
+  const card = document.createElement('section'); card.className='ex-card'; card.id='ex'+ex.id;
+  card.innerHTML = `<div class="ex-head"><span class="ex-num">${String(ex.id).padStart(2,'0')}</span>
+    <div><h3>${ex.title}</h3><p class="ex-instr">${ex.instr}</p></div></div>`;
+  if(ex.bank) card.innerHTML += `<div class="ex-bank"><b>Bank:</b> ${ex.bank}</div>`;
+  if(ex.example) card.innerHTML += `<div class="example-row"><b>Пример:</b> ${ex.example}</div>`;
+
+  const list = document.createElement('div'); list.className='ex-list';
+  ex.items.forEach((it,idx)=> list.appendChild(renderItem(ex,it,idx)) );
+  card.appendChild(list);
+
+  const controls = document.createElement('div'); controls.className='ex-controls';
+  if(ex.type==='openFree' || ex.type==='drill'){
+    controls.innerHTML = `<button class="btn btn-copy" onclick="copyExercise(${ex.id})">📋 Скопировать все ответы</button><span class="copy-msg" id="cm-${ex.id}"></span>`;
+    if(ex.type==='drill'){
+      controls.innerHTML = `<button class="btn btn-primary" onclick="showDrillSample(${ex.id})">Показать пример полностью</button>` + controls.innerHTML;
+    }
+  } else {
+    controls.innerHTML = `<button class="btn btn-primary" onclick="checkExercise(${ex.id})">✓ Проверить</button>
+      <button class="btn btn-ghost" onclick="showAllAnswers(${ex.id})">👁 Показать ответы</button>`;
+  }
+  card.appendChild(controls);
+
+  const result = document.createElement('div'); result.className='ex-result'; result.id='res'+ex.id;
+  card.appendChild(result);
+  return card;
+}
+
+function buildAll(){
+  buildVocabGrid();
+  const main = document.getElementById('mainCol');
+  const toc = document.getElementById('tocList');
+  exercises.forEach(ex=>{
+    main.appendChild(renderExercise(ex));
+    const a = document.createElement('a'); a.href = '#ex'+ex.id; a.textContent = `${String(ex.id).padStart(2,'0')}. ${ex.title}`;
+    toc.appendChild(a);
+  });
+  renderProblemWords();
+}
+
+/* ============ CHECK / REVEAL ============ */
+function showReveal(exId, idx, text){
+  const r = document.getElementById(`rv-${exId}-${idx}`);
+  if(r){ r.textContent = '✓ ' + text; r.classList.add('show'); }
+}
+
+function checkExercise(id){
+  const ex = exercises.find(e=>e.id===id);
+  let correctCount = 0;
+  ex.items.forEach((it,idx)=>{
+    if(ex.type==='radio'){
+      const checked = document.querySelector(`input[name="r-${id}-${idx}"]:checked`);
+      const ok = !!checked && parseInt(checked.value)===it.correct;
+      if(ok) correctCount++; else trackMistake(it.word);
+      showReveal(id, idx, it.options[it.correct]);
+    } else if(ex.type==='match'){
+      const input = document.querySelector(`input[data-ex="${id}"][data-idx="${idx}"]`);
+      const val = norm(input.value);
+      const ok = val === it.rightLetter;
+      input.classList.remove('correct','incorrect'); input.classList.add(ok?'correct':'incorrect');
+      if(ok) correctCount++; else trackMistake(it.word);
+      showReveal(id, idx, it.rightLetter + ' — ' + it.rightText);
+    } else if(ex.type==='twoMistakes'){
+      const input = document.querySelector(`input[data-ex="${id}"][data-idx="${idx}"]`);
+      const val = norm(input.value);
+      const ok = it.answers.every(a=>val.includes(norm(a)));
+      input.classList.remove('correct','incorrect'); input.classList.add(ok?'correct':'incorrect');
+      if(ok) correctCount++; else trackMistake(it.word);
+      showReveal(id, idx, it.answers.join(', '));
+    } else if(ex.type==='openKeyword'){
+      const input = document.querySelector(`input[data-ex="${id}"][data-idx="${idx}"]`);
+      const val = norm(input.value);
+      const ok = it.keywords.some(k=>val.includes(norm(k)));
+      input.classList.remove('correct','incorrect'); input.classList.add(ok?'correct':'incorrect');
+      if(ok) correctCount++; else trackMistake(it.word);
+      showReveal(id, idx, it.sample);
+    } else {
+      const input = document.querySelector(`input[data-ex="${id}"][data-idx="${idx}"]`);
+      const val = norm(input.value);
+      const ok = matchAny(val, it.answer);
+      input.classList.remove('correct','incorrect'); input.classList.add(ok?'correct':'incorrect');
+      if(ok) correctCount++; else trackMistake(it.word);
+      showReveal(id, idx, it.answer[0]);
+    }
+  });
+  document.getElementById('res'+id).textContent = `Результат: ${correctCount} / ${ex.items.length}`;
+}
+
+function showAllAnswers(id){
+  const ex = exercises.find(e=>e.id===id);
+  ex.items.forEach((it,idx)=>{
+    let ans = '';
+    if(ex.type==='radio') ans = it.options[it.correct];
+    else if(ex.type==='match') ans = it.rightLetter + ' — ' + it.rightText;
+    else if(ex.type==='twoMistakes') ans = it.answers.join(', ');
+    else if(ex.type==='openKeyword') ans = it.sample;
+    else ans = it.answer[0];
+    showReveal(id, idx, ans);
+  });
+}
+
+function showDrillSample(id){
+  document.getElementById('cm-'+id).textContent = 'Пример вверху ↑: suffer → suffer from stress → Many people suffer from stress.';
+}
+
+/* ============ COPY ALL ============ */
+function copyExercise(id){
+  const ex = exercises.find(e=>e.id===id);
+  let lines = [];
+  if(ex.type==='openFree'){
+    ex.items.forEach((it,idx)=>{
+      const input = document.querySelector(`input[data-ex="${id}"][data-idx="${idx}"]`);
+      lines.push(`${idx+1}. ${it.prompt} ${input.value || '…'}`);
+    });
+  } else if(ex.type==='drill'){
+    ex.items.forEach((it,idx)=>{
+      const colloc = document.querySelector(`input[data-ex="${id}"][data-idx="${idx}"][data-part="collocation"]`).value || '…';
+      const sent = document.querySelector(`input[data-ex="${id}"][data-idx="${idx}"][data-part="sentence"]`).value || '…';
+      lines.push(`${idx+1}. ${it.word} → ${colloc} → ${sent}`);
+    });
+  }
+  const text = lines.join('\n');
+  navigator.clipboard.writeText(text).then(()=>{
+    document.getElementById('cm-'+id).textContent = '✓ Скопировано!';
+    setTimeout(()=>{ document.getElementById('cm-'+id).textContent=''; }, 2500);
+  }).catch(()=>{
+    document.getElementById('cm-'+id).textContent = 'Не удалось скопировать — выделите текст вручную.';
+  });
+}
+
+buildAll();
+</script>
+</body>
+</html>
