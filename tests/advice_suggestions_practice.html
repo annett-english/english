@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Giving advice & Making suggestions — практика</title>
+<style>
+  :root{
+    --bg:#f4f6fb;
+    --card:#ffffff;
+    --primary:#4f46e5;
+    --primary-dark:#3730a3;
+    --accent:#0ea5e9;
+    --green:#16a34a;
+    --green-bg:#dcfce7;
+    --red:#dc2626;
+    --red-bg:#fee2e2;
+    --text:#1e293b;
+    --muted:#64748b;
+    --border:#e2e8f0;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Segoe UI', Arial, sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    line-height:1.5;
+  }
+  .container{max-width:900px;margin:0 auto;padding:24px 16px 60px;}
+  header.top{
+    background:linear-gradient(135deg,var(--primary),var(--accent));
+    color:#fff;
+    border-radius:16px;
+    padding:28px 24px;
+    margin-bottom:20px;
+    box-shadow:0 8px 24px rgba(79,70,229,.25);
+  }
+  header.top h1{margin:0 0 6px;font-size:1.6rem;}
+  header.top p{margin:0;opacity:.9;font-size:.95rem;}
+
+  .rule-box{
+    background:var(--card);
+    border-radius:14px;
+    padding:20px 22px;
+    margin-bottom:22px;
+    border:1px solid var(--border);
+    box-shadow:0 2px 8px rgba(0,0,0,.04);
+  }
+  .rule-box h2{margin-top:0;font-size:1.1rem;color:var(--primary-dark);}
+  .rule-box h3{font-size:.98rem;color:var(--primary);margin-bottom:6px;}
+  .rule-box p{margin:4px 0 10px;font-size:.93rem;}
+  .rule-box ol{margin:0 0 12px 20px;font-size:.93rem;padding:0;}
+  code.struct{
+    background:#eef2ff;
+    color:var(--primary-dark);
+    padding:2px 6px;
+    border-radius:6px;
+    font-weight:600;
+  }
+
+  nav.tabs{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-bottom:20px;
+    position:sticky;
+    top:0;
+    background:var(--bg);
+    padding:10px 0;
+    z-index:10;
+  }
+  nav.tabs button{
+    border:1px solid var(--border);
+    background:var(--card);
+    color:var(--text);
+    padding:9px 14px;
+    border-radius:999px;
+    cursor:pointer;
+    font-size:.85rem;
+    font-weight:600;
+    transition:.15s;
+  }
+  nav.tabs button:hover{border-color:var(--primary);}
+  nav.tabs button.active{
+    background:var(--primary);
+    color:#fff;
+    border-color:var(--primary);
+  }
+
+  .exercise{display:none;}
+  .exercise.active{display:block;animation:fade .25s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+
+  .ex-card{
+    background:var(--card);
+    border-radius:16px;
+    padding:22px 22px 8px;
+    border:1px solid var(--border);
+    box-shadow:0 2px 10px rgba(0,0,0,.04);
+    margin-bottom:20px;
+  }
+  .ex-card h2{margin-top:0;font-size:1.25rem;color:var(--primary-dark);}
+  .ex-instructions{color:var(--muted);font-size:.92rem;margin-bottom:16px;}
+
+  .item{
+    border-top:1px solid var(--border);
+    padding:16px 0;
+  }
+  .item:first-of-type{border-top:none;}
+  .item-prompt{font-size:.98rem;margin-bottom:8px;}
+  .item-prompt mark{
+    background:#fef08a;
+    padding:1px 5px;
+    border-radius:4px;
+    font-weight:600;
+  }
+  .item-emoji{font-size:1.6rem;margin-right:6px;vertical-align:middle;}
+
+  input[type=text], textarea{
+    width:100%;
+    padding:9px 12px;
+    border-radius:10px;
+    border:1.5px solid var(--border);
+    font-size:.95rem;
+    font-family:inherit;
+    color:var(--text);
+    background:#fbfcff;
+    transition:.15s;
+  }
+  input[type=text]:focus, textarea:focus{
+    outline:none;
+    border-color:var(--primary);
+    background:#fff;
+  }
+  textarea{resize:vertical;min-height:44px;}
+
+  .mcq-options{display:flex;flex-wrap:wrap;gap:10px;}
+  .mcq-options label{
+    border:1.5px solid var(--border);
+    padding:7px 12px;
+    border-radius:10px;
+    cursor:pointer;
+    font-size:.9rem;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    background:#fbfcff;
+  }
+  .mcq-options label:hover{border-color:var(--primary);}
+  .mcq-options input{margin:0;}
+
+  .result-box{
+    margin-top:8px;
+    font-size:.87rem;
+    padding:10px 12px;
+    border-radius:10px;
+    display:none;
+  }
+  .result-box.correct{background:var(--green-bg);color:#166534;display:block;}
+  .result-box.incorrect{background:var(--red-bg);color:#991b1b;display:block;}
+  .result-box.revealed{background:#eef2ff;color:var(--primary-dark);display:block;}
+  .result-box b{display:block;margin-bottom:2px;}
+
+  input.correct, textarea.correct{border-color:var(--green);background:var(--green-bg);}
+  input.incorrect, textarea.incorrect{border-color:var(--red);background:var(--red-bg);}
+
+  .toolbar{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    padding:14px 0 18px;
+    position:sticky;
+    bottom:0;
+    background:linear-gradient(to top,var(--card) 70%,rgba(255,255,255,0));
+  }
+  .toolbar button{
+    border:none;
+    padding:10px 18px;
+    border-radius:10px;
+    font-size:.9rem;
+    font-weight:600;
+    cursor:pointer;
+    transition:.15s;
+  }
+  .btn-check{background:var(--primary);color:#fff;}
+  .btn-check:hover{background:var(--primary-dark);}
+  .btn-show{background:#e0e7ff;color:var(--primary-dark);}
+  .btn-show:hover{background:#c7d2fe;}
+  .btn-copy{background:#0ea5e9;color:#fff;}
+  .btn-copy:hover{background:#0284c7;}
+  .btn-reset{background:#f1f5f9;color:var(--muted);}
+  .btn-reset:hover{background:#e2e8f0;}
+
+  .score-tag{
+    font-size:.85rem;
+    font-weight:600;
+    color:var(--primary-dark);
+    align-self:center;
+    margin-left:auto;
+  }
+
+  .copy-toast{
+    position:fixed;
+    bottom:20px;
+    left:50%;
+    transform:translateX(-50%);
+    background:#1e293b;
+    color:#fff;
+    padding:10px 18px;
+    border-radius:10px;
+    font-size:.88rem;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .25s;
+    z-index:100;
+  }
+  .copy-toast.show{opacity:1;}
+
+  @media(max-width:600px){
+    header.top h1{font-size:1.3rem;}
+    .ex-card{padding:16px 16px 6px;}
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header class="top">
+    <h1>Giving advice &amp; Making suggestions</h1>
+    <p>7 упражнений по 10 заданий · проверка ответов · показ ответов с объяснением · копирование одной кнопкой</p>
+  </header>
+
+  <div class="rule-box">
+    <h2>📘 Правило</h2>
+    <h3>Making suggestions</h3>
+    <p>Мы используем <code class="struct">Why not</code> или <code class="struct">Why don't you</code> + инфинитив без to, чтобы сделать предложение:</p>
+    <ol>
+      <li>Why not try connecting with people in other industries?</li>
+      <li>Why don't you give more information about your latest project?</li>
+    </ol>
+    <p>Мы используем <code class="struct">What about</code> и <code class="struct">How about</code> + форма -ing:</p>
+    <ol>
+      <li>What about changing your profile picture?</li>
+      <li>How about giving more details about the website you designed?</li>
+    </ol>
+    <h3>Giving advice</h3>
+    <p>Мы используем <code class="struct">should</code>, <code class="struct">shouldn't</code>, <code class="struct">ought to</code> и <code class="struct">could</code> + инфинитив, чтобы дать совет:</p>
+    <ol>
+      <li>You should give detailed information about your experience.</li>
+      <li>You shouldn't use words like 'passionate' on your profile.</li>
+      <li>You could include information about your interest in hiking.</li>
+      <li>You ought to think outside the box.</li>
+    </ol>
+  </div>
+
+  <nav class="tabs" id="tabs"></nav>
+  <div id="exercises"></div>
+</div>
+
+<div class="copy-toast" id="toast">Скопировано!</div>
+
+<script>
+/* ============ DATA ============ */
+const exercises = [
+{
+  id:'ex1', tag:'1. Find the mistake', title:'Упр. 1 — Find the mistake',
+  instructions:'В каждом предложении есть ошибка. Найдите её и напишите правильное слово или словосочетание.',
+  type:'text',
+  items:[
+    {prompt:"1. Why not to try adding a professional photo?", answer:"try", explanation:"После Why not глагол используется без частицы to: Why not try..."},
+    {prompt:"2. Why don't you adding more skills to your profile?", answer:"add", explanation:"После Why don't you нужен инфинитив без to, а не форма -ing."},
+    {prompt:"3. What about change your job title?", answer:"changing", explanation:"После What about используется форма -ing: What about changing..."},
+    {prompt:"4. How about to write a short bio?", answer:"writing", explanation:"После How about нужна форма -ing, а не to + инфинитив."},
+    {prompt:"5. You should to mention your achievements.", answer:"mention", explanation:"После should глагол идёт без частицы to."},
+    {prompt:"6. You shouldn't using informal language.", answer:"use", explanation:"После shouldn't глагол используется без to и без окончания -ing."},
+    {prompt:"7. You could to ask for recommendations.", answer:"ask", explanation:"После could глагол идёт без частицы to."},
+    {prompt:"8. You ought asking for feedback.", answer:"ought to ask", explanation:"Ought требует частицу to перед глаголом: ought to ask."},
+    {prompt:"9. Why not connecting with old colleagues?", answer:"connect", explanation:"После Why not нужен инфинитив без to, а не форма -ing."},
+    {prompt:"10. What about to join a professional group?", answer:"joining", explanation:"После What about нужна форма -ing, а не to + инфинитив."}
+  ]
+},
+{
+  id:'ex2', tag:'2. Fill in the gaps', title:'Упр. 2 — Fill in the gaps using the correct form',
+  instructions:'Вставьте глагол в скобках в правильной форме.',
+  type:'text',
+  items:[
+    {prompt:"1. Why not ___ (update) your headline?", answer:"update", explanation:"Why not + инфинитив без to → update."},
+    {prompt:"2. Why don't you ___ (share) an article every week?", answer:"share", explanation:"Why don't you + инфинитив без to → share."},
+    {prompt:"3. What about ___ (add) a video to your profile?", answer:"adding", explanation:"What about + -ing → adding."},
+    {prompt:"4. How about ___ (list) your certificates?", answer:"listing", explanation:"How about + -ing → listing."},
+    {prompt:"5. You should ___ (proofread) your summary.", answer:"proofread", explanation:"should + инфинитив без to → proofread."},
+    {prompt:"6. You shouldn't ___ (copy) someone else's text.", answer:"copy", explanation:"shouldn't + инфинитив без to → copy."},
+    {prompt:"7. You could ___ (mention) a recent project.", answer:"mention", explanation:"could + инфинитив без to → mention."},
+    {prompt:"8. You ought to ___ (respond) to messages quickly.", answer:"respond", explanation:"ought to уже содержит to, поэтому дальше идёт голый инфинитив → respond."},
+    {prompt:"9. Why not ___ (follow) industry leaders?", answer:"follow", explanation:"Why not + инфинитив без to → follow."},
+    {prompt:"10. What about ___ (join) a webinar this month?", answer:"joining", explanation:"What about + -ing → joining."}
+  ]
+},
+{
+  id:'ex3', tag:'3. По картинке', title:'Упр. 3 — Составить предложение по картинке',
+  instructions:'Опишите ситуацию, составив предложение с указанной конструкцией.',
+  type:'text',
+  items:[
+    {prompt:"1. 📸 На профиле нет фото. Используйте <b>Why not</b>.", keywords:["why not"], model:"Why not add a profile photo?", explanation:"Why not + инфинитив без to выражает предложение."},
+    {prompt:"2. 📝 Био слишком короткое. Используйте <b>Why don't you</b>.", keywords:["why don't you","why dont you"], model:"Why don't you write a longer bio?", explanation:"Why don't you + инфинитив без to."},
+    {prompt:"3. 🎓 Не указаны сертификаты. Используйте <b>What about</b>.", keywords:["what about"], model:"What about adding your certificates?", explanation:"What about + форма -ing."},
+    {prompt:"4. 🌐 Нет ссылки на портфолио. Используйте <b>How about</b>.", keywords:["how about"], model:"How about sharing a link to your portfolio?", explanation:"How about + форма -ing."},
+    {prompt:"5. 💬 Не комментирует посты коллег. Используйте <b>should</b>.", keywords:["should"], model:"You should comment on other people's posts.", explanation:"should + инфинитив без to для совета."},
+    {prompt:"6. 🙅 Использует сленг в профиле. Используйте <b>shouldn't</b>.", keywords:["shouldn't","shouldnt"], model:"You shouldn't use slang in your profile.", explanation:"shouldn't + инфинитив без to для негативного совета."},
+    {prompt:"7. 🤝 Мало профессиональных контактов. Используйте <b>could</b>.", keywords:["could"], model:"You could connect with more colleagues.", explanation:"could + инфинитив без to — мягкий совет-возможность."},
+    {prompt:"8. ⏰ Медленно отвечает на сообщения. Используйте <b>ought to</b>.", keywords:["ought to"], model:"You ought to reply faster to messages.", explanation:"ought to + инфинитив, всегда с частицей to."},
+    {prompt:"9. 📅 Нет активности на этой неделе. Используйте <b>Why not</b>.", keywords:["why not"], model:"Why not post an update this week?", explanation:"Why not + инфинитив без to."},
+    {prompt:"10. 🎥 Нет видео-презентации. Используйте <b>What about</b>.", keywords:["what about"], model:"What about recording a short video introduction?", explanation:"What about + форма -ing."}
+  ]
+},
+{
+  id:'ex4', tag:'4. Replace the word', title:'Упр. 4 — Replace the highlighted word',
+  instructions:'Замените выделенное слово/словосочетание на указанное, изменив предложение по необходимости.',
+  type:'text',
+  items:[
+    {prompt:"1. You <mark>SHOULD</mark> update your CV. (замените на <b>ought to</b>)", keywords:["ought to"], model:"You ought to update your CV.", explanation:"ought to выражает совет так же, как should, но после ought to всегда нужна частица to."},
+    {prompt:"2. Why <mark>DON'T YOU</mark> ask your manager for feedback? (замените на <b>not</b> — то есть Why not)", keywords:["why not"], model:"Why not ask your manager for feedback?", explanation:"Why not — синонимичная конструкция для Why don't you."},
+    {prompt:"3. <mark>WHAT ABOUT</mark> changing your username? (замените на <b>How about</b>)", keywords:["how about"], model:"How about changing your username?", explanation:"What about и How about взаимозаменяемы, обе требуют -ing."},
+    {prompt:"4. You <mark>SHOULDN'T</mark> ignore recruiters' messages. (замените на <b>It's not a good idea to</b>)", keywords:["it's not a good idea to","its not a good idea to","not a good idea to"], model:"It's not a good idea to ignore recruiters' messages.", explanation:"It's not a good idea to + инфинитив — альтернатива shouldn't."},
+    {prompt:"5. You <mark>COULD</mark> add more details. (замените на <b>might want to</b>)", keywords:["might want to"], model:"You might want to add more details.", explanation:"Might want to + инфинитив — мягкий вариант совета, похожий на could."},
+    {prompt:"6. <mark>HOW ABOUT</mark> joining a new group? (замените на <b>What about</b>)", keywords:["what about"], model:"What about joining a new group?", explanation:"Синонимичные конструкции, обе требуют -ing."},
+    {prompt:"7. <mark>WHY NOT</mark> try a new template? (замените на <b>Why don't you</b>)", keywords:["why don't you","why dont you"], model:"Why don't you try a new template?", explanation:"После Why don't you используется инфинитив без to, как и после Why not."},
+    {prompt:"8. You <mark>OUGHT TO</mark> check your spelling. (замените на <b>should</b>)", keywords:["should"], model:"You should check your spelling.", explanation:"should тоже выражает совет, но не требует to перед глаголом."},
+    {prompt:"9. You <mark>SHOULD</mark> avoid long paragraphs. (замените на <b>had better</b>)", keywords:["had better","d better"], model:"You'd better avoid long paragraphs.", explanation:"Had better (сокращённо 'd better) даёт более настойчивый совет, чем should."},
+    {prompt:"10. Why <mark>DON'T YOU</mark> update your skills list? (замените на <b>not</b> — то есть Why not)", keywords:["why not"], model:"Why not update your skills list?", explanation:"Ещё один пример замены Why don't you на Why not."}
+  ]
+},
+{
+  id:'ex5', tag:'5. Rephrase', title:'Упр. 5 — Rephrase',
+  instructions:'Перефразируйте предложение, используя указанную конструкцию.',
+  type:'text',
+  items:[
+    {prompt:"1. It's a good idea to add a photo. (используйте: Why not)", keywords:["why not"], model:"Why not add a photo?", explanation:"Why not + инфинитив без to."},
+    {prompt:"2. I suggest you write a summary. (используйте: Why don't you)", keywords:["why don't you","why dont you"], model:"Why don't you write a summary?", explanation:"Why don't you + инфинитив без to."},
+    {prompt:"3. My advice is to change your headline. (используйте: What about)", keywords:["what about"], model:"What about changing your headline?", explanation:"What about + форма -ing."},
+    {prompt:"4. I recommend joining a group. (используйте: How about)", keywords:["how about"], model:"How about joining a group?", explanation:"How about + форма -ing."},
+    {prompt:"5. It's important to update your CV. (используйте: should)", keywords:["should"], model:"You should update your CV.", explanation:"should + инфинитив без to."},
+    {prompt:"6. It's not good to use slang. (используйте: shouldn't)", keywords:["shouldn't","shouldnt"], model:"You shouldn't use slang.", explanation:"shouldn't + инфинитив без to."},
+    {prompt:"7. It's possible to ask for advice. (используйте: could)", keywords:["could"], model:"You could ask for advice.", explanation:"could + инфинитив без to."},
+    {prompt:"8. It's necessary to reply quickly. (используйте: ought to)", keywords:["ought to"], model:"You ought to reply quickly.", explanation:"ought to + инфинитив, с частицей to."},
+    {prompt:"9. I suggest adding your projects. (используйте: Why not)", keywords:["why not"], model:"Why not add your projects?", explanation:"Why not + инфинитив без to."},
+    {prompt:"10. I recommend following experts. (используйте: What about)", keywords:["what about"], model:"What about following experts?", explanation:"What about + форма -ing."}
+  ]
+},
+{
+  id:'ex6', tag:'6. Odd collocation', title:'Упр. 6 — Circle the odd collocation',
+  instructions:'Выберите вариант, который НЕ подходит по грамматике к данной конструкции.',
+  type:'mcq',
+  items:[
+    {prompt:"1. Why not ___ ?", options:["try","connect","to ask","add"], correct:2, explanation:"После Why not глагол используется без to, поэтому «to ask» не подходит."},
+    {prompt:"2. What about ___ ?", options:["trying","asking","update","connecting"], correct:2, explanation:"После What about нужна -ing форма, а «update» — просто инфинитив без окончания -ing."},
+    {prompt:"3. You should ___ .", options:["try","to ask","update","connect"], correct:1, explanation:"После should глагол используется без частицы to."},
+    {prompt:"4. How about ___ ?", options:["joining","writing","share","adding"], correct:2, explanation:"После How about нужна -ing форма, а «share» — это инфинитив."},
+    {prompt:"5. You shouldn't ___ .", options:["copy","ignore","to use","forget"], correct:2, explanation:"После shouldn't глагол используется без to."},
+    {prompt:"6. Why don't you ___ ?", options:["ask","sharing","try","update"], correct:1, explanation:"После Why don't you нужен инфинитив без to, а не -ing форма."},
+    {prompt:"7. You could ___ .", options:["mention","to include","add","try"], correct:1, explanation:"После could глагол идёт без частицы to."},
+    {prompt:"8. You ought to ___ .", options:["check","to think","ask","reply"], correct:1, explanation:"После ought to уже есть to — второй to перед глаголом лишний («to think»)."},
+    {prompt:"9. How about ___ ?", options:["recording","posting","to write","sharing"], correct:2, explanation:"Нужна форма -ing, а «to write» — это инфинитив с to."},
+    {prompt:"10. What about ___ ?", options:["adding","changing","to join","writing"], correct:2, explanation:"После What about используется -ing форма, а не инфинитив с to."}
+  ]
+},
+{
+  id:'ex7', tag:'7. Your own ideas', title:'Упр. 7 — Finish the sentences with your own ideas',
+  instructions:'Закончите предложения своими идеями. Здесь нет «правильного» ответа — просто напишите и скопируйте всё одной кнопкой.',
+  type:'open',
+  items:[
+    {prompt:"1. Why not ___ your profile?"},
+    {prompt:"2. Why don't you ___ this weekend?"},
+    {prompt:"3. What about ___ a new skill?"},
+    {prompt:"4. How about ___ with your colleagues?"},
+    {prompt:"5. You should ___ before an interview."},
+    {prompt:"6. You shouldn't ___ on social media."},
+    {prompt:"7. You could ___ to improve your CV."},
+    {prompt:"8. You ought to ___ every morning."},
+    {prompt:"9. If I were you, I'd ___."},
+    {prompt:"10. My advice is to ___."}
+  ]
+}
+];
+
+/* ============ HELPERS ============ */
+function normalize(str){
+  return (str||"").toLowerCase().replace(/[^\w\s']/g,'').replace(/\s+/g,' ').trim();
+}
+function stripHtml(str){
+  return (str||"").replace(/<[^>]+>/g,'');
+}
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg||'Скопировано!';
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),1400);
+}
+function copyText(text){
+  navigator.clipboard.writeText(text).then(()=>showToast('Скопировано в буфер обмена!'))
+  .catch(()=>{
+    const ta=document.createElement('textarea');
+    ta.value=text; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+    showToast('Скопировано в буфер обмена!');
+  });
+}
+
+/* ============ RENDER ============ */
+const tabsEl=document.getElementById('tabs');
+const exercisesEl=document.getElementById('exercises');
+
+exercises.forEach((ex,exIndex)=>{
+  const tabBtn=document.createElement('button');
+  tabBtn.textContent=ex.tag;
+  tabBtn.dataset.target=ex.id;
+  tabBtn.addEventListener('click',()=>switchTab(ex.id));
+  tabsEl.appendChild(tabBtn);
+
+  const wrap=document.createElement('div');
+  wrap.className='exercise';
+  wrap.id=ex.id;
+
+  let itemsHtml='';
+  ex.items.forEach((it,i)=>{
+    if(ex.type==='mcq'){
+      let optsHtml='';
+      it.options.forEach((opt,oi)=>{
+        optsHtml+=`<label><input type="radio" name="${ex.id}-${i}" value="${oi}">${opt}</label>`;
+      });
+      itemsHtml+=`
+        <div class="item" data-idx="${i}">
+          <div class="item-prompt">${it.prompt}</div>
+          <div class="mcq-options">${optsHtml}</div>
+          <div class="result-box" id="${ex.id}-result-${i}"></div>
+        </div>`;
+    } else if(ex.type==='open'){
+      itemsHtml+=`
+        <div class="item" data-idx="${i}">
+          <div class="item-prompt">${it.prompt}</div>
+          <textarea id="${ex.id}-input-${i}" placeholder="Напишите свой вариант..."></textarea>
+        </div>`;
+    } else {
+      itemsHtml+=`
+        <div class="item" data-idx="${i}">
+          <div class="item-prompt">${it.prompt}</div>
+          <input type="text" id="${ex.id}-input-${i}" placeholder="Ваш ответ...">
+          <div class="result-box" id="${ex.id}-result-${i}"></div>
+        </div>`;
+    }
+  });
+
+  const toolbarHtml = ex.type==='open'
+    ? `<div class="toolbar">
+         <button class="btn-copy" data-action="copy">📋 Скопировать все ответы</button>
+         <button class="btn-reset" data-action="reset">↺ Очистить</button>
+       </div>`
+    : `<div class="toolbar">
+         <button class="btn-check" data-action="check">✔️ Проверить ответы</button>
+         <button class="btn-show" data-action="show">👁️ Показать ответы</button>
+         <button class="btn-copy" data-action="copy">📋 Скопировать ответы</button>
+         <button class="btn-reset" data-action="reset">↺ Очистить</button>
+         <span class="score-tag" id="${ex.id}-score"></span>
+       </div>`;
+
+  wrap.innerHTML = `
+    <div class="ex-card">
+      <h2>${ex.title}</h2>
+      <div class="ex-instructions">${ex.instructions}</div>
+      ${itemsHtml}
+      ${toolbarHtml}
+    </div>`;
+
+  exercisesEl.appendChild(wrap);
+
+  wrap.querySelectorAll('.toolbar button').forEach(btn=>{
+    btn.addEventListener('click',()=>handleAction(ex, btn.dataset.action));
+  });
+});
+
+function switchTab(id){
+  document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.toggle('active', b.dataset.target===id));
+  document.querySelectorAll('.exercise').forEach(e=>e.classList.toggle('active', e.id===id));
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+switchTab(exercises[0].id);
+
+function handleAction(ex, action){
+  if(action==='check') checkExercise(ex);
+  else if(action==='show') showExercise(ex);
+  else if(action==='copy') copyExercise(ex);
+  else if(action==='reset') resetExercise(ex);
+}
+
+function checkExercise(ex){
+  let correctCount=0;
+  ex.items.forEach((it,i)=>{
+    const resultBox=document.getElementById(`${ex.id}-result-${i}`);
+    if(ex.type==='mcq'){
+      const checked=document.querySelector(`input[name="${ex.id}-${i}"]:checked`);
+      const label=checked ? checked.closest('label') : null;
+      ex.items[i].options.forEach((opt,oi)=>{
+        // reset styles handled by not toggling classes on labels, just result box below
+      });
+      if(!checked){
+        resultBox.className='result-box incorrect';
+        resultBox.innerHTML=`<b>Вы не выбрали вариант.</b>${it.explanation}`;
+        return;
+      }
+      const val=parseInt(checked.value,10);
+      const isCorrect = val===it.correct;
+      if(isCorrect) correctCount++;
+      resultBox.className='result-box '+(isCorrect?'correct':'incorrect');
+      resultBox.innerHTML=`<b>${isCorrect?'Верно! 🎉':'Неверно.'} Лишнее: "${it.options[it.correct]}"</b>${it.explanation}`;
+    } else {
+      const input=document.getElementById(`${ex.id}-input-${i}`);
+      const userVal=normalize(input.value);
+      let isCorrect=false;
+      if(it.keywords){
+        isCorrect = it.keywords.some(k=>userVal.includes(normalize(k)));
+      } else if(it.answer){
+        isCorrect = userVal===normalize(it.answer) || userVal.includes(normalize(it.answer));
+      }
+      if(isCorrect) correctCount++;
+      input.classList.remove('correct','incorrect');
+      input.classList.add(isCorrect?'correct':'incorrect');
+      resultBox.className='result-box '+(isCorrect?'correct':'incorrect');
+      const modelAnswer = it.model || it.answer;
+      resultBox.innerHTML=`<b>${isCorrect?'Верно! 🎉':'Неверно. Пример правильного ответа: "'+modelAnswer+'"'}</b>${it.explanation}`;
+    }
+  });
+  const scoreTag=document.getElementById(`${ex.id}-score`);
+  if(scoreTag) scoreTag.textContent=`Результат: ${correctCount}/${ex.items.length}`;
+}
+
+function showExercise(ex){
+  ex.items.forEach((it,i)=>{
+    const resultBox=document.getElementById(`${ex.id}-result-${i}`);
+    const modelAnswer = it.model || it.answer;
+    if(ex.type==='mcq'){
+      const radios=document.querySelectorAll(`input[name="${ex.id}-${i}"]`);
+      radios.forEach((r,ri)=>{ r.checked = (ri===it.correct); });
+      resultBox.className='result-box revealed';
+      resultBox.innerHTML=`<b>Лишнее: "${it.options[it.correct]}"</b>${it.explanation}`;
+    } else {
+      const input=document.getElementById(`${ex.id}-input-${i}`);
+      input.value=modelAnswer;
+      input.classList.remove('correct','incorrect');
+      resultBox.className='result-box revealed';
+      resultBox.innerHTML=`<b>Ответ: ${modelAnswer}</b>${it.explanation}`;
+    }
+  });
+}
+
+function copyExercise(ex){
+  let text=`${ex.title}\n\n`;
+  ex.items.forEach((it,i)=>{
+    if(ex.type==='open'){
+      const input=document.getElementById(`${ex.id}-input-${i}`);
+      text+=`${stripHtml(it.prompt)}\n→ ${input.value || '(нет ответа)'}\n\n`;
+    } else if(ex.type==='mcq'){
+      text+=`${stripHtml(it.prompt)}\n→ Лишнее: ${it.options[it.correct]} — ${it.explanation}\n\n`;
+    } else {
+      const modelAnswer = it.model || it.answer;
+      text+=`${stripHtml(it.prompt)}\n→ ${modelAnswer} — ${it.explanation}\n\n`;
+    }
+  });
+  copyText(text.trim());
+}
+
+function resetExercise(ex){
+  ex.items.forEach((it,i)=>{
+    if(ex.type==='mcq'){
+      document.querySelectorAll(`input[name="${ex.id}-${i}"]`).forEach(r=>r.checked=false);
+      const rb=document.getElementById(`${ex.id}-result-${i}`);
+      if(rb){rb.className='result-box';rb.innerHTML='';}
+    } else {
+      const input=document.getElementById(`${ex.id}-input-${i}`);
+      input.value='';
+      input.classList.remove('correct','incorrect');
+      const rb=document.getElementById(`${ex.id}-result-${i}`);
+      if(rb){rb.className='result-box';rb.innerHTML='';}
+    }
+  });
+  const scoreTag=document.getElementById(`${ex.id}-score`);
+  if(scoreTag) scoreTag.textContent='';
+}
+</script>
+</body>
+</html>
