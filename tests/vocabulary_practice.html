@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vocabulary Practice: Feelings & Descriptions</title>
+<style>
+  :root{
+    --bg:#f4f6fb; --card:#ffffff; --accent:#4f5df0; --accent-dark:#3a45c9;
+    --good:#1e9e5a; --bad:#e0473e; --text:#1f2434; --muted:#6b7280;
+    --border:#e3e6f0;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:'Segoe UI',Roboto,Arial,sans-serif; background:var(--bg); color:var(--text);
+    display:flex; flex-direction:column; align-items:center; padding:24px 12px 80px;
+  }
+  h1{font-size:1.6rem; margin-bottom:4px; text-align:center;}
+  .subtitle{color:var(--muted); margin-bottom:24px; text-align:center; max-width:700px;}
+  .layout{display:flex; gap:20px; width:100%; max-width:1200px; align-items:flex-start;}
+  .main{flex:1; min-width:0;}
+  .sidebar{
+    width:250px; position:sticky; top:16px; background:var(--card); border:1px solid var(--border);
+    border-radius:14px; padding:16px; box-shadow:0 2px 10px rgba(20,20,50,.05);
+  }
+  .sidebar h3{margin-top:0; font-size:1rem;}
+  .sidebar table{width:100%; border-collapse:collapse; font-size:.85rem;}
+  .sidebar td, .sidebar th{padding:5px 4px; border-bottom:1px solid var(--border); text-align:left;}
+  .sidebar .empty{color:var(--muted); font-size:.85rem;}
+  .reset-btn{margin-top:10px; font-size:.75rem; background:none; border:1px solid var(--border); border-radius:8px; padding:4px 8px; cursor:pointer; color:var(--muted);}
+  .card{
+    background:var(--card); border:1px solid var(--border); border-radius:16px; padding:22px 24px;
+    margin-bottom:22px; box-shadow:0 2px 10px rgba(20,20,50,.05);
+  }
+  .card h2{margin-top:0; font-size:1.15rem; display:flex; align-items:center; gap:8px;}
+  .card .instr{color:var(--muted); font-size:.9rem; margin-bottom:14px;}
+  table.wordlist{width:100%; border-collapse:collapse; font-size:.92rem;}
+  table.wordlist th{text-align:left; padding:8px 6px; border-bottom:2px solid var(--border); color:var(--muted); font-weight:600;}
+  table.wordlist td{padding:8px 6px; border-bottom:1px solid var(--border); vertical-align:middle;}
+  .ipa{color:var(--accent-dark); font-style:italic;}
+  .speak-btn{
+    border:none; background:var(--accent); color:#fff; border-radius:8px; padding:5px 9px;
+    cursor:pointer; font-size:.85rem;
+  }
+  .speak-btn:hover{background:var(--accent-dark);}
+  .item{display:flex; flex-wrap:wrap; align-items:center; gap:8px; padding:9px 0; border-bottom:1px dashed var(--border);}
+  .item:last-child{border-bottom:none;}
+  .item .num{width:22px; color:var(--muted); font-weight:600;}
+  .item .prompt{flex:1; min-width:220px;}
+  .item input[type=text]{
+    padding:7px 10px; border:1.5px solid var(--border); border-radius:8px; font-size:.95rem; width:190px;
+  }
+  .item select{padding:6px 8px; border:1.5px solid var(--border); border-radius:8px; font-size:.9rem;}
+  .item .feedback{min-width:24px; font-size:1.1rem;}
+  .correct{color:var(--good); font-weight:600;}
+  .incorrect{color:var(--bad); font-weight:600;}
+  .answer-reveal{color:var(--accent-dark); font-size:.85rem; margin-left:6px;}
+  .btn-row{display:flex; gap:10px; margin-top:14px; flex-wrap:wrap; align-items:center;}
+  .btn{
+    border:none; border-radius:9px; padding:9px 16px; cursor:pointer; font-size:.9rem; font-weight:600;
+  }
+  .btn-check{background:var(--accent); color:#fff;}
+  .btn-check:hover{background:var(--accent-dark);}
+  .btn-show{background:#eef0fb; color:var(--accent-dark);}
+  .btn-show:hover{background:#dfe2f7;}
+  .score{font-weight:600; color:var(--accent-dark);}
+  .mask{font-family:'Courier New',monospace; font-weight:700; letter-spacing:1px; color:var(--accent-dark);}
+  @media(max-width:850px){
+    .layout{flex-direction:column;}
+    .sidebar{width:100%; position:static;}
+  }
+</style>
+</head>
+<body>
+
+<h1>🧠 Vocabulary Practice — Feelings &amp; Descriptions</h1>
+<p class="subtitle">Прописывай слова руками, проверяй ответы или сразу смотри правильные. Внизу справа появится табличка «Проблемные слова» — туда попадут слова, в которых ты ошибся.</p>
+
+<div class="layout">
+  <div class="main">
+
+    <div class="card">
+      <h2>🔤 Повторим слова</h2>
+      <p class="instr">Прочитай перевод, посмотри транскрипцию и нажми 🔊, чтобы прослушать произношение.</p>
+      <table class="wordlist" id="wordlistTable">
+        <thead><tr><th>Word</th><th>Транскрипция</th><th>Перевод</th><th>🔊</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2>1️⃣ Вставь пропущенные буквы</h2>
+      <p class="instr">Впиши слово целиком, ориентируясь на пропущенные буквы.</p>
+      <div id="ex1"></div>
+      <div class="btn-row">
+        <button class="btn btn-check" onclick="checkExercise(1)">Проверить</button>
+        <button class="btn btn-show" onclick="showAnswers(1)">Показать ответы</button>
+        <span class="score" id="score1"></span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>2️⃣ Перевод: с русского на английский</h2>
+      <p class="instr">Напиши английское слово, соответствующее переводу.</p>
+      <div id="ex2"></div>
+      <div class="btn-row">
+        <button class="btn btn-check" onclick="checkExercise(2)">Проверить</button>
+        <button class="btn btn-show" onclick="showAnswers(2)">Показать ответы</button>
+        <span class="score" id="score2"></span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>3️⃣ Дефиниции</h2>
+      <p class="instr">По определению на английском напиши нужное слово.</p>
+      <div id="ex4"></div>
+      <div class="btn-row">
+        <button class="btn btn-check" onclick="checkExercise(4)">Проверить</button>
+        <button class="btn btn-show" onclick="showAnswers(4)">Показать ответы</button>
+        <span class="score" id="score4"></span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>4️⃣ Сочетаемость (collocations)</h2>
+      <p class="instr">Вставь слово, которое естественно сочетается с фразой.</p>
+      <div id="ex5"></div>
+      <div class="btn-row">
+        <button class="btn btn-check" onclick="checkExercise(5)">Проверить</button>
+        <button class="btn btn-show" onclick="showAnswers(5)">Показать ответы</button>
+        <span class="score" id="score5"></span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>5️⃣ Контекст: какое слово подходит?</h2>
+      <p class="instr">Прочитай предложение и впиши подходящее по смыслу слово.</p>
+      <div id="ex6"></div>
+      <div class="btn-row">
+        <button class="btn btn-check" onclick="checkExercise(6)">Проверить</button>
+        <button class="btn btn-show" onclick="showAnswers(6)">Показать ответы</button>
+        <span class="score" id="score6"></span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>6️⃣ Соедини половинки выражений</h2>
+      <p class="instr">Выбери из списка вторую половину выражения для каждого слова.</p>
+      <div id="ex7"></div>
+      <div class="btn-row">
+        <button class="btn btn-check" onclick="checkExercise(7)">Проверить</button>
+        <button class="btn btn-show" onclick="showAnswers(7)">Показать ответы</button>
+        <span class="score" id="score7"></span>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="sidebar">
+    <h3>⚠️ Проблемные слова</h3>
+    <div id="problemBox"><p class="empty">Пока ошибок нет 🙂</p></div>
+    <button class="reset-btn" onclick="resetMistakes()">Сбросить список</button>
+  </div>
+</div>
+
+<script>
+/* ---------- WORD LIST ---------- */
+const wordList = [
+  {en:"freezing", ipa:"/ˈfriːzɪŋ/", ru:"ледяной, замёрзший"},
+  {en:"amazed", ipa:"/əˈmeɪzd/", ru:"поражённый, изумлённый"},
+  {en:"fascinating", ipa:"/ˈfæsɪneɪtɪŋ/", ru:"увлекательный, захватывающий"},
+  {en:"enormous", ipa:"/ɪˈnɔːrməs/", ru:"огромный (huge / enormous)"},
+  {en:"furious", ipa:"/ˈfjʊəriəs/", ru:"взбешённый, разъярённый"},
+  {en:"hilarious", ipa:"/hɪˈleəriəs/", ru:"уморительный, очень смешной"},
+  {en:"starving", ipa:"/ˈstɑːrvɪŋ/", ru:"умирающий от голода"},
+  {en:"boiling", ipa:"/ˈbɔɪlɪŋ/", ru:"кипящий, очень жаркий"},
+  {en:"filthy", ipa:"/ˈfɪlθi/", ru:"грязный"},
+  {en:"positive", ipa:"/ˈpɒzətɪv/", ru:"уверенный, позитивный"},
+  {en:"delighted", ipa:"/dɪˈlaɪtɪd/", ru:"очень довольный, восхищённый"},
+  {en:"terrified", ipa:"/ˈterɪfaɪd/", ru:"в ужасе, напуганный"},
+  {en:"tiny", ipa:"/ˈtaɪni/", ru:"крошечный"},
+  {en:"exhausted", ipa:"/ɪɡˈzɔːstɪd/", ru:"измождённый, без сил"}
+];
+
+function speak(word){
+  const u = new SpeechSynthesisUtterance(word);
+  u.lang = "en-US"; u.rate = 0.85;
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(u);
+}
+
+const wlBody = document.querySelector("#wordlistTable tbody");
+wordList.forEach(w=>{
+  const tr = document.createElement("tr");
+  tr.innerHTML = `<td><strong>${w.en}</strong></td><td class="ipa">${w.ipa}</td><td>${w.ru}</td>
+  <td><button class="speak-btn" onclick="speak('${w.en}')">🔊</button></td>`;
+  wlBody.appendChild(tr);
+});
+
+/* ---------- MISTAKE TRACKER ---------- */
+let mistakes = {};
+function logMistake(word){
+  mistakes[word] = (mistakes[word]||0) + 1;
+  renderMistakes();
+}
+function renderMistakes(){
+  const box = document.getElementById("problemBox");
+  const entries = Object.entries(mistakes).sort((a,b)=>b[1]-a[1]);
+  if(entries.length===0){ box.innerHTML = '<p class="empty">Пока ошибок нет 🙂</p>'; return; }
+  let html = '<table><tr><th>Слово</th><th>Ошибок</th></tr>';
+  entries.forEach(([w,c])=>{ html += `<tr><td>${w}</td><td>${c}</td></tr>`; });
+  html += '</table>';
+  box.innerHTML = html;
+}
+function resetMistakes(){ mistakes = {}; renderMistakes(); }
+
+/* ---------- HELPER: normalize ---------- */
+function norm(s){ return s.trim().toLowerCase().replace(/\s+/g," "); }
+
+/* ---------- EXERCISE DATA ---------- */
+const ex1Items = [
+  {prompt:"fr__z_ng", answers:["freezing"], track:"freezing"},
+  {prompt:"am_z_d", answers:["amazed"], track:"amazed"},
+  {prompt:"f_sc_n_t_ng", answers:["fascinating"], track:"fascinating"},
+  {prompt:"en_rm_us", answers:["enormous"], track:"enormous"},
+  {prompt:"f_r_ous", answers:["furious"], track:"furious"},
+  {prompt:"h_l_r_ous", answers:["hilarious"], track:"hilarious"},
+  {prompt:"st_rv_ng", answers:["starving"], track:"starving"},
+  {prompt:"f_lth_", answers:["filthy"], track:"filthy"},
+  {prompt:"del_ght_d", answers:["delighted"], track:"delighted"},
+  {prompt:"terr_f_ed", answers:["terrified"], track:"terrified"}
+];
+
+const ex2Items = [
+  {prompt:"кипящий, очень жаркий", answers:["boiling"], track:"boiling"},
+  {prompt:"уверенный, позитивный", answers:["positive"], track:"positive"},
+  {prompt:"крошечный", answers:["tiny"], track:"tiny"},
+  {prompt:"измождённый, без сил", answers:["exhausted"], track:"exhausted"},
+  {prompt:"грязный", answers:["filthy"], track:"filthy"},
+  {prompt:"в ужасе, напуганный", answers:["terrified"], track:"terrified"},
+  {prompt:"огромный", answers:["huge","enormous"], track:"enormous"},
+  {prompt:"взбешённый, разъярённый", answers:["furious"], track:"furious"},
+  {prompt:"умирающий от голода", answers:["starving"], track:"starving"},
+  {prompt:"увлекательный, захватывающий", answers:["fascinating"], track:"fascinating"}
+];
+
+const ex4Items = [
+  {prompt:"very cold", answers:["freezing"], track:"freezing"},
+  {prompt:"extremely surprised", answers:["amazed"], track:"amazed"},
+  {prompt:"very interesting, holding your attention", answers:["fascinating"], track:"fascinating"},
+  {prompt:"very big", answers:["huge","enormous"], track:"enormous"},
+  {prompt:"extremely angry", answers:["furious"], track:"furious"},
+  {prompt:"extremely funny", answers:["hilarious"], track:"hilarious"},
+  {prompt:"extremely hungry", answers:["starving"], track:"starving"},
+  {prompt:"very hot (about liquid or weather)", answers:["boiling"], track:"boiling"},
+  {prompt:"very dirty", answers:["filthy"], track:"filthy"},
+  {prompt:"extremely tired", answers:["exhausted"], track:"exhausted"}
+];
+
+const ex5Items = [
+  {prompt:"a ___ joke", answers:["hilarious"], track:"hilarious"},
+  {prompt:"It's ___ outside, wear a coat!", answers:["freezing"], track:"freezing"},
+  {prompt:"absolutely ___ by the news", answers:["amazed"], track:"amazed"},
+  {prompt:"a ___ documentary about space", answers:["fascinating"], track:"fascinating"},
+  {prompt:"a ___ mistake", answers:["huge","enormous"], track:"enormous"},
+  {prompt:"___ that someone stole his bike", answers:["furious"], track:"furious"},
+  {prompt:"I'm ___, let's eat now", answers:["starving"], track:"starving"},
+  {prompt:"Careful, the soup is ___!", answers:["boiling"], track:"boiling"},
+  {prompt:"His hands were ___ after the trip", answers:["filthy"], track:"filthy"},
+  {prompt:"She was ___ about her exam result", answers:["positive"], track:"positive"}
+];
+
+const ex6Items = [
+  {prompt:"My little sister is only two, she's so ___.", answers:["tiny"], track:"tiny"},
+  {prompt:"He was ___ to see his best friend after five years.", answers:["delighted"], track:"delighted"},
+  {prompt:"She screamed because she was ___ of the dark.", answers:["terrified"], track:"terrified"},
+  {prompt:"After the marathon, I was completely ___.", answers:["exhausted"], track:"exhausted"},
+  {prompt:"This box is ___, it fits in my pocket.", answers:["tiny"], track:"tiny"},
+  {prompt:"The soup was ___, I burned my tongue.", answers:["boiling"], track:"boiling"},
+  {prompt:"The kitchen was ___, nobody had cleaned it for weeks.", answers:["filthy"], track:"filthy"},
+  {prompt:"We were ___ when we won the competition.", answers:["delighted"], track:"delighted"},
+  {prompt:"I felt ___ walking through the empty house at night.", answers:["terrified"], track:"terrified"},
+  {prompt:"After the night shift, the nurse looked ___.", answers:["exhausted"], track:"exhausted"}
+];
+
+const ex7Items = [
+  {word:"freezing", ending:"cold weather"},
+  {word:"boiling", ending:"hot soup"},
+  {word:"starving", ending:"I need food right now"},
+  {word:"exhausted", ending:"to the point of collapse"},
+  {word:"filthy", ending:"rich (idiom)"},
+  {word:"terrified", ending:"to death"},
+  {word:"delighted", ending:"to meet you"},
+  {word:"positive", ending:"thinking"},
+  {word:"hilarious", ending:"joke"},
+  {word:"fascinating", ending:"story"}
+];
+
+/* ---------- RENDER TEXT-INPUT EXERCISES ---------- */
+const store = { 1:ex1Items, 2:ex2Items, 4:ex4Items, 5:ex5Items, 6:ex6Items };
+
+function renderTextExercise(exNum, items){
+  const container = document.getElementById("ex"+exNum);
+  let html = "";
+  items.forEach((it, i)=>{
+    const promptHtml = exNum===1
+      ? `<span class="mask">${it.prompt}</span>`
+      : `<span>${it.prompt}</span>`;
+    html += `<div class="item" data-idx="${i}">
+      <span class="num">${i+1}.</span>
+      <span class="prompt">${promptHtml}</span>
+      <input type="text" id="ex${exNum}_input_${i}" autocomplete="off">
+      <span class="feedback" id="ex${exNum}_fb_${i}"></span>
+    </div>`;
+  });
+  container.innerHTML = html;
+}
+
+Object.keys(store).forEach(n=>renderTextExercise(n, store[n]));
+
+/* ---------- RENDER MATCH-HALVES EXERCISE (7) ---------- */
+function renderEx7(){
+  const container = document.getElementById("ex7");
+  const shuffledEndings = ex7Items.map(x=>x.ending).sort(()=>Math.random()-0.5);
+  let html = "";
+  ex7Items.forEach((it,i)=>{
+    let options = `<option value="">--выбери--</option>`;
+    shuffledEndings.forEach(end=>{
+      options += `<option value="${end}">${end}</option>`;
+    });
+    html += `<div class="item" data-idx="${i}">
+      <span class="num">${i+1}.</span>
+      <span class="prompt"><strong>${it.word}</strong> + …</span>
+      <select id="ex7_input_${i}">${options}</select>
+      <span class="feedback" id="ex7_fb_${i}"></span>
+    </div>`;
+  });
+  container.innerHTML = html;
+}
+renderEx7();
+
+/* ---------- CHECK / SHOW LOGIC ---------- */
+function checkExercise(exNum){
+  let items, correctCount = 0;
+  if(exNum===7){
+    items = ex7Items;
+    items.forEach((it,i)=>{
+      const sel = document.getElementById(`ex7_input_${i}`);
+      const fb = document.getElementById(`ex7_fb_${i}`);
+      const val = sel.value;
+      if(val === it.ending){
+        fb.textContent = "✅"; fb.className="feedback correct"; correctCount++;
+      } else {
+        fb.textContent = "❌"; fb.className="feedback incorrect";
+        logMistake(it.word);
+      }
+    });
+  } else {
+    items = store[exNum];
+    items.forEach((it,i)=>{
+      const input = document.getElementById(`ex${exNum}_input_${i}`);
+      const fb = document.getElementById(`ex${exNum}_fb_${i}`);
+      const val = norm(input.value);
+      const ok = it.answers.some(a=>norm(a)===val) && val!=="";
+      if(ok){
+        fb.textContent = "✅"; fb.className="feedback correct"; correctCount++;
+      } else {
+        fb.textContent = "❌"; fb.className="feedback incorrect";
+        logMistake(it.track);
+      }
+    });
+  }
+  document.getElementById("score"+exNum).textContent = `${correctCount} / ${items.length} правильно`;
+}
+
+function showAnswers(exNum){
+  if(exNum===7){
+    ex7Items.forEach((it,i)=>{
+      const sel = document.getElementById(`ex7_input_${i}`);
+      sel.value = it.ending;
+      const fb = document.getElementById(`ex7_fb_${i}`);
+      fb.textContent = ""; fb.className="feedback";
+    });
+    document.getElementById("score7").textContent = "Ответы показаны";
+    return;
+  }
+  const items = store[exNum];
+  items.forEach((it,i)=>{
+    const input = document.getElementById(`ex${exNum}_input_${i}`);
+    input.value = it.answers[0];
+    const fb = document.getElementById(`ex${exNum}_fb_${i}`);
+    fb.innerHTML = `<span class="answer-reveal">answer</span>`;
+  });
+  document.getElementById("score"+exNum).textContent = "Ответы показаны";
+}
+</script>
+</body>
+</html>
