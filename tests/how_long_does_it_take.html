@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How long does it take…? — тренажёр</title>
+<style>
+:root{
+  --ink:#0f1b33;
+  --board:#16244a;
+  --board-line:#2a3c68;
+  --amber:#ffb703;
+  --amber-dim:#c98f10;
+  --paper:#faf7f0;
+  --card:#ffffff;
+  --slate:#5c6b8a;
+  --success:#2f9e6e;
+  --success-bg:#e6f6ee;
+  --error:#d9483a;
+  --error-bg:#fdece9;
+  --mono:'IBM Plex Mono', 'Courier New', monospace;
+  --sans:'Inter', -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  background:var(--paper);
+  font-family:var(--sans);
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ---------- HEADER / DEPARTURE BOARD ---------- */
+.board{
+  background:linear-gradient(180deg,var(--ink),#0b1428);
+  color:var(--amber);
+  padding:34px 20px 26px;
+  position:relative;
+  overflow:hidden;
+  border-bottom:4px solid var(--amber);
+}
+.board::before{
+  content:"";
+  position:absolute; inset:0;
+  background:repeating-linear-gradient(0deg, rgba(255,183,3,0.035) 0px, rgba(255,183,3,0.035) 1px, transparent 1px, transparent 4px);
+  pointer-events:none;
+}
+.board-inner{max-width:980px;margin:0 auto;position:relative;}
+.board-eyebrow{
+  font-family:var(--mono);
+  font-size:12px;
+  letter-spacing:.22em;
+  text-transform:uppercase;
+  color:#8fa3d1;
+  margin:0 0 10px;
+}
+.flipword{
+  font-family:var(--mono);
+  font-weight:700;
+  font-size:clamp(28px,5vw,52px);
+  letter-spacing:.02em;
+  line-height:1.05;
+  margin:0;
+  display:flex;
+  flex-wrap:wrap;
+  gap:0 14px;
+}
+.flipword span{
+  display:inline-block;
+  animation:flipin .5s ease backwards;
+}
+@keyframes flipin{
+  0%{opacity:0; transform:rotateX(70deg) translateY(-6px); filter:blur(2px);}
+  100%{opacity:1; transform:rotateX(0) translateY(0); filter:blur(0);}
+}
+.board-sub{
+  font-family:var(--sans);
+  color:#c8d3ef;
+  font-size:15px;
+  max-width:640px;
+  margin:14px 0 0;
+  line-height:1.55;
+}
+.board-rule{
+  margin-top:22px;
+  background:rgba(255,183,3,.08);
+  border:1px solid var(--board-line);
+  border-left:4px solid var(--amber);
+  border-radius:6px;
+  padding:16px 18px;
+  font-size:14.5px;
+  color:#e7ecf9;
+  line-height:1.7;
+}
+.board-rule b{color:var(--amber);}
+.board-rule code{
+  font-family:var(--mono);
+  background:rgba(255,255,255,.06);
+  padding:1px 6px;
+  border-radius:4px;
+  color:#ffe9b0;
+}
+
+/* ---------- LAYOUT ---------- */
+.wrap{max-width:980px;margin:0 auto;padding:26px 20px 80px;}
+
+.platforms{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-bottom:28px;
+  position:sticky;
+  top:0;
+  background:var(--paper);
+  padding:14px 0;
+  z-index:10;
+}
+.platform-btn{
+  font-family:var(--mono);
+  font-size:12.5px;
+  font-weight:600;
+  border:1.5px solid var(--board-line);
+  background:var(--card);
+  color:var(--ink);
+  padding:8px 12px;
+  border-radius:999px;
+  cursor:pointer;
+  transition:.15s;
+  white-space:nowrap;
+}
+.platform-btn:hover{border-color:var(--amber-dim);}
+.platform-btn.active{
+  background:var(--ink);
+  color:var(--amber);
+  border-color:var(--ink);
+}
+
+.exercise{display:none;}
+.exercise.active{display:block; animation:fadein .3s ease;}
+@keyframes fadein{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);}}
+
+.ex-head{
+  display:flex;
+  align-items:baseline;
+  gap:14px;
+  margin-bottom:6px;
+  flex-wrap:wrap;
+}
+.ex-num{
+  font-family:var(--mono);
+  font-size:13px;
+  background:var(--ink);
+  color:var(--amber);
+  padding:3px 10px;
+  border-radius:4px;
+  font-weight:700;
+}
+.ex-title{font-size:21px; font-weight:700; margin:0;}
+.ex-desc{color:var(--slate); font-size:14.5px; margin:4px 0 20px; line-height:1.6;}
+
+.item{
+  background:var(--card);
+  border:1px solid #e7e2d4;
+  border-radius:10px;
+  padding:16px 18px;
+  margin-bottom:12px;
+  box-shadow:0 1px 2px rgba(20,20,20,.03);
+}
+.item-num{
+  font-family:var(--mono);
+  color:var(--amber-dim);
+  font-weight:700;
+  font-size:13px;
+  margin-right:6px;
+}
+.item-prompt{font-size:15.5px; line-height:1.6; margin-bottom:10px;}
+.item-prompt .hint{color:var(--slate); font-size:13px; font-style:italic;}
+.item-prompt mark{
+  background:#ffe6b3;
+  color:var(--ink);
+  padding:0 4px;
+  border-radius:3px;
+  font-weight:600;
+}
+.item-prompt .keys{
+  font-family:var(--mono);
+  font-size:13px;
+  color:var(--slate);
+  background:#f2efe6;
+  padding:6px 10px;
+  border-radius:6px;
+  display:inline-block;
+  margin-top:6px;
+}
+
+input[type=text], textarea{
+  width:100%;
+  font-family:var(--sans);
+  font-size:15px;
+  padding:9px 12px;
+  border:1.5px solid #d8d2c0;
+  border-radius:7px;
+  background:#fffdf8;
+  color:var(--ink);
+  transition:.15s;
+}
+input[type=text]:focus, textarea:focus{
+  outline:none;
+  border-color:var(--amber-dim);
+  background:#fff;
+}
+textarea{resize:vertical; min-height:54px; font-family:var(--sans);}
+
+.mcq-options{display:flex; flex-direction:column; gap:7px; margin-top:6px;}
+.mcq-opt{
+  display:flex; align-items:center; gap:9px;
+  padding:8px 12px;
+  border:1.5px solid #e2ddce;
+  border-radius:7px;
+  cursor:pointer;
+  font-size:14.5px;
+  transition:.15s;
+}
+.mcq-opt:hover{border-color:var(--amber-dim); background:#fff9ee;}
+.mcq-opt input{accent-color:var(--amber-dim);}
+.mcq-opt.picked{border-color:var(--ink); background:#fdf6e3;}
+
+.feedback{
+  margin-top:10px;
+  padding:10px 12px;
+  border-radius:7px;
+  font-size:14px;
+  line-height:1.6;
+  display:none;
+}
+.feedback.show{display:block;}
+.feedback.ok{background:var(--success-bg); color:#1d6b4d; border:1px solid #b7e3cc;}
+.feedback.bad{background:var(--error-bg); color:#a3372c; border:1px solid #f3c3bc;}
+.feedback b{display:block; margin-bottom:2px;}
+.feedback .expl{color:var(--ink); opacity:.85; margin-top:4px;}
+
+.answer-reveal{
+  margin-top:10px;
+  padding:10px 12px;
+  border-radius:7px;
+  background:#eef1fb;
+  border:1px solid #cfd8f2;
+  font-size:14px;
+  line-height:1.6;
+  display:none;
+}
+.answer-reveal.show{display:block;}
+.answer-reveal .ans{font-weight:700; color:#26356e; font-family:var(--mono);}
+.answer-reveal .expl{color:var(--ink); opacity:.8; margin-top:4px;}
+
+.controls{
+  display:flex;
+  gap:10px;
+  margin:22px 0 8px;
+  flex-wrap:wrap;
+  align-items:center;
+}
+.btn{
+  font-family:var(--sans);
+  font-weight:600;
+  font-size:14px;
+  padding:11px 20px;
+  border-radius:8px;
+  border:none;
+  cursor:pointer;
+  transition:.15s;
+}
+.btn-primary{background:var(--ink); color:var(--amber);}
+.btn-primary:hover{background:#0b1428;}
+.btn-ghost{background:transparent; color:var(--ink); border:1.5px solid var(--board-line);}
+.btn-ghost:hover{background:#efeadb;}
+.btn-copy{background:var(--amber); color:var(--ink);}
+.btn-copy:hover{background:#ffc633;}
+.score-pill{
+  font-family:var(--mono);
+  font-size:13px;
+  background:#efeadb;
+  padding:8px 14px;
+  border-radius:999px;
+  font-weight:700;
+  margin-left:auto;
+}
+.copied-note{
+  font-size:13px;
+  color:var(--success);
+  font-weight:600;
+  display:none;
+}
+.copied-note.show{display:inline;}
+
+.example-box{
+  background:#fff9ee;
+  border:1.5px dashed var(--amber-dim);
+  border-radius:9px;
+  padding:14px 16px;
+  margin-bottom:20px;
+  font-size:14px;
+  line-height:1.9;
+  font-family:var(--mono);
+}
+.example-box .lbl{
+  font-family:var(--sans);
+  font-weight:700;
+  color:var(--amber-dim);
+  text-transform:uppercase;
+  font-size:11px;
+  letter-spacing:.08em;
+  display:block;
+  margin-bottom:6px;
+}
+.chain-step{display:flex; align-items:center; gap:10px; margin-bottom:8px; flex-wrap:wrap;}
+.chain-step .given{
+  font-family:var(--mono);
+  font-weight:700;
+  background:var(--ink);
+  color:var(--amber);
+  padding:6px 12px;
+  border-radius:6px;
+  font-size:14px;
+}
+.chain-step .arrow{color:var(--slate); font-size:16px;}
+.chain-step input{flex:1; min-width:200px;}
+
+footer{
+  text-align:center;
+  color:var(--slate);
+  font-size:12.5px;
+  padding:30px 20px;
+  font-family:var(--mono);
+}
+
+@media (max-width:600px){
+  .flipword{font-size:26px;}
+  .platforms{overflow-x:auto; flex-wrap:nowrap; -webkit-overflow-scrolling:touch;}
+}
+</style>
+</head>
+<body>
+
+<div class="board">
+  <div class="board-inner">
+    <p class="board-eyebrow">Grammar drill · Departure Board №7</p>
+    <h1 class="flipword">
+      <span style="animation-delay:.02s">HOW</span>
+      <span style="animation-delay:.08s">LONG</span>
+      <span style="animation-delay:.14s">DOES</span>
+      <span style="animation-delay:.20s">IT</span>
+      <span style="animation-delay:.26s">TAKE…?</span>
+    </h1>
+    <p class="board-sub">8 упражнений · по 10 заданий в каждом · проверка ответов, показ правильных вариантов и объяснение к каждому пункту.</p>
+    <div class="board-rule">
+      <b>Правило.</b><br>
+      <code>How long does it take from … to … ?</code> — сколько времени занимает дорога откуда-то куда-то.<br>
+      <code>How long does it take to do sth?</code> — сколько времени занимает что-то сделать (общий факт, Present Simple).<br>
+      <code>It takes (smb) … to do sth</code> — обычно, регулярно занимает столько-то времени.<br>
+      <code>It took (smb) … to do sth</code> + маркеры прошедшего времени (<i>yesterday, last week, in 2019…</i>) — заняло столько-то времени в конкретном прошедшем случае, всегда Past Simple.
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="platforms" id="platforms"></div>
+  <div id="exercises"></div>
+</div>
+
+<footer>flip-board grammar trainer · нажимайте «Проверить», чтобы увидеть результат и объяснение</footer>
+
+<script>
+/* ======================= DATA ======================= */
+
+const EX1 = { // multiple choice
+  key:"ex1", title:"Упр. 1 — Выбери правильный вариант", type:"mcq",
+  desc:"Отметь букву правильного ответа для каждого предложения.",
+  items:[
+    {p:"How long ___ it take to get to school?", opts:["does","did","do"], correct:0,
+     expl:"Вопрос о привычном, регулярном маршруте → Present Simple, вспомогательный глагол «does» согласуется с «it»."},
+    {p:"It ___ us three hours to drive there last weekend.", opts:["takes","took","take"], correct:1,
+     expl:"«Last weekend» — маркер прошедшего времени → Past Simple «took»."},
+    {p:"How long does it ___ to learn a new language?", opts:["take","takes","took"], correct:0,
+     expl:"После вспомогательного «does» смысловой глагол стоит в базовой форме без -s."},
+    {p:"It usually ___ me 20 minutes to get ready.", opts:["take","takes","took"], correct:1,
+     expl:"«Usually» + безличное «it» (3-е лицо ед. числа) → «takes» в Present Simple."},
+    {p:"How long did it ___ you to finish the project?", opts:["take","takes","took"], correct:0,
+     expl:"После «did» смысловой глагол всегда в базовой форме — «take», не «took»."},
+    {p:"It took her two days ___ the whole book.", opts:["read","to read","reading"], correct:1,
+     expl:"Конструкция «It took + время + to + инфинитив»: после отрезка времени нужен «to + verb»."},
+    {p:"How long does it take ___ Warsaw ___ Berlin by car?", opts:["from … to","since … until","for … to"], correct:0,
+     expl:"Для указания пункта отправления и назначения используется пара «from … to»."},
+    {p:"It usually ___ two hours to get from the city centre to the airport.", opts:["take","takes","took"], correct:1,
+     expl:"«Usually» указывает на общий факт → Present Simple «takes»."},
+    {p:"How long did it take you ___ that email?", opts:["write","to write","wrote"], correct:1,
+     expl:"«It took you … to write» — после отрезка времени снова нужен «to + verb»."},
+    {p:"Yesterday it ___ me an hour to do the dishes.", opts:["take","takes","took"], correct:2,
+     expl:"«Yesterday» — чёткий маркер прошедшего времени → «took»."}
+  ]
+};
+
+const EX2 = { // find the mistake, free text with required fragments
+  key:"ex2", title:"Упр. 2 — Найди и исправь ошибку", type:"free",
+  desc:"В каждом предложении есть одна ошибка. Впиши исправленный вариант целиком.",
+  items:[
+    {p:"How long it does take to get to work?", req:["does it take"],
+     model:"How long does it take to get to work?",
+     expl:"Порядок слов в вопросе: вспомогательный глагол «does» ставится перед подлежащим «it» — «does it take», а не «it does take»."},
+    {p:"It take me an hour to cook dinner.", req:["it takes"],
+     model:"It takes me an hour to cook dinner.",
+     expl:"Безличное «it» — это 3-е лицо единственного числа, в Present Simple глагол получает -s: «it takes»."},
+    {p:"How long does it took to fly to New York?", req:["does it take"],
+     model:"How long does it take to fly to New York?",
+     expl:"После «does» смысловой глагол стоит в базовой форме — «take», а не «took»."},
+    {p:"It taked us three hours to paint the room.", req:["it took"],
+     model:"It took us three hours to paint the room.",
+     expl:"«Take» — неправильный глагол, форма прошедшего времени «took», а не «taked»."},
+    {p:"How long do it take to finish the exam?", req:["does it take"],
+     model:"How long does it take to finish the exam?",
+     expl:"С подлежащим «it» используется вспомогательный «does», а не «do»."},
+    {p:"It takes she twenty minutes to walk to school.", req:["takes her"],
+     model:"It takes her twenty minutes to walk to school.",
+     expl:"После глагола нужно объектное местоимение «her», а не подлежащное «she»."},
+    {p:"How long did it take you finish the report?", req:["to finish"],
+     model:"How long did it take you to finish the report?",
+     expl:"Конструкция «it took smb … to do sth» требует частицы «to» перед глаголом."},
+    {p:"It took two hour to drive there.", req:["two hours"],
+     model:"It took two hours to drive there.",
+     expl:"Если число больше одного, существительное «hour» ставится во множественном числе — «hours»."},
+    {p:"How long does it takes to boil an egg?", req:["does it take"],
+     model:"How long does it take to boil an egg?",
+     expl:"После «does» смысловой глагол без -s: «take», а не «takes»."},
+    {p:"Yesterday it take me all day to clean the house.", req:["it took"],
+     model:"Yesterday it took me all day to clean the house.",
+     expl:"«Yesterday» требует Past Simple — «took», а не «take»."}
+  ]
+};
+
+const EX3 = { // fill the gap, single word
+  key:"ex3", title:"Упр. 3 — Впиши нужную форму глагола take", type:"free",
+  desc:"Заполни пропуск правильной формой глагола take (take / takes / took).",
+  items:[
+    {p:"How long does it ___ (take) to get to school?", req:["take"],
+     model:"take", expl:"После «does» — базовая форма без -s."},
+    {p:"It usually ___ (take) him 15 minutes to have breakfast.", req:["takes"],
+     model:"takes", expl:"«Usually» + he/she/it → Present Simple, -s."},
+    {p:"Yesterday it ___ (take) us two hours to finish the test.", req:["took"],
+     model:"took", expl:"«Yesterday» → Past Simple, «took»."},
+    {p:"How long did it ___ (take) you to write the essay?", req:["take"],
+     model:"take", expl:"После «did» — базовая форма."},
+    {p:"It ___ (take) me a whole week to read that book last month.", req:["took"],
+     model:"took", expl:"«Last month» → Past Simple."},
+    {p:"How long does it ___ (take) to bake a cake?", req:["take"],
+     model:"take", expl:"После «does» — базовая форма."},
+    {p:"It normally ___ (take) 30 minutes to walk to the station.", req:["takes"],
+     model:"takes", expl:"«Normally» → Present Simple, -s."},
+    {p:"Last night it ___ (take) her ages to fall asleep.", req:["took"],
+     model:"took", expl:"«Last night» → Past Simple."},
+    {p:"How long does it ___ (take) to get from Moscow to St Petersburg by train?", req:["take"],
+     model:"take", expl:"После «does» — базовая форма."},
+    {p:"It ___ (take) three years to build this bridge.", req:["took"],
+     model:"took", expl:"Завершённое действие в прошлом (мост уже построен) → «took»."}
+  ]
+};
+
+const EX4 = { // translate ru->en
+  key:"ex4", title:"Упр. 4 — Переведи на английский", type:"free",
+  desc:"Переведи предложение, используя изученную конструкцию. Проверка приблизительная — сверяет ключевые слова, полный вариант смотри в объяснении.",
+  items:[
+    {p:"Сколько времени занимает дорога от дома до школы?", req:["how long","does it take"],
+     model:"How long does it take to get from home to school?",
+     expl:"Общий вопрос о привычном маршруте → Present Simple «does … take»."},
+    {p:"Мне потребовалось два часа, чтобы сделать домашнее задание вчера.", req:["it took me","yesterday"],
+     model:"It took me two hours to do my homework yesterday.",
+     expl:"«Вчера» — маркер прошедшего конкретного случая → «It took me…»."},
+    {p:"Сколько времени нужно, чтобы выучить новый язык?", req:["how long","does it take"],
+     model:"How long does it take to learn a new language?",
+     expl:"Общий факт → Present Simple."},
+    {p:"Обычно мне требуется 20 минут, чтобы добраться до работы.", req:["takes me"],
+     model:"It usually takes me 20 minutes to get to work.",
+     expl:"«Обычно» + безличное «it» → «takes» с -s."},
+    {p:"Сколько времени у тебя ушло на написание этого письма?", req:["did it take","to write"],
+     model:"How long did it take you to write this letter?",
+     expl:"Конкретный завершённый случай в прошлом → «did it take»."},
+    {p:"Прошлым летом нам потребовалось три дня, чтобы добраться туда.", req:["it took us"],
+     model:"Last summer it took us three days to get there.",
+     expl:"«Прошлым летом» — маркер прошедшего времени → «took»."},
+    {p:"Сколько времени занимает перелёт из Лондона в Нью-Йорк?", req:["how long","does it take"],
+     model:"How long does it take to fly from London to New York?",
+     expl:"Пункты отправления/назначения передаются парой «from … to»."},
+    {p:"Ей потребовался час, чтобы приготовить ужин вчера вечером.", req:["it took her"],
+     model:"It took her an hour to cook dinner last night.",
+     expl:"«Вчера вечером» → Past Simple «took»."},
+    {p:"Сколько времени занимает дорога от станции до аэропорта на автобусе?", req:["how long","does it take"],
+     model:"How long does it take to get from the station to the airport by bus?",
+     expl:"Общий факт/расписание → Present Simple."},
+    {p:"Нам потребовалось много времени, чтобы построить этот дом.", req:["it took us"],
+     model:"It took us a long time to build this house.",
+     expl:"Завершённое действие в прошлом → «took»."}
+  ]
+};
+
+const EX5 = { // build sentence from scenario keywords (picture substitute)
+  key:"ex5", title:"Упр. 5 — Составь предложение по ситуации", type:"free",
+  desc:"Вместо картинки — короткое описание ситуации и ключевые слова. Составь полное предложение по правилу.",
+  items:[
+    {p:"Ситуация: обычный будний день Анны.", keys:"Anna / cook dinner / every day / 40 minutes", req:["takes anna"],
+     model:"It takes Anna 40 minutes to cook dinner every day.",
+     expl:"«Every day» — регулярное действие → Present Simple «takes»."},
+    {p:"Ситуация: вчерашняя поездка на машине.", keys:"we / drive / from Warsaw to Krakow / yesterday / 4 hours", req:["it took us"],
+     model:"It took us four hours to drive from Warsaw to Krakow yesterday.",
+     expl:"«Yesterday» → Past Simple «took»."},
+    {p:"Ситуация: вопрос об уроках.", keys:"How long / you / finish / homework / usually", req:["how long","does"],
+     model:"How long does it usually take you to finish your homework?",
+     expl:"Вопрос о привычном действии → Present Simple «does»."},
+    {p:"Ситуация: путь Тома в школу.", keys:"Tom / walk / to school / 15 minutes", req:["takes tom"],
+     model:"It takes Tom 15 minutes to walk to school.",
+     expl:"Общий факт о маршруте → «takes»."},
+    {p:"Ситуация: вопрос о перелёте.", keys:"How long / fly / from Moscow to Paris", req:["how long","does it take"],
+     model:"How long does it take to fly from Moscow to Paris?",
+     expl:"Общий вопрос о продолжительности перелёта → Present Simple."},
+    {p:"Ситуация: прошлогоднее событие.", keys:"she / learn / to swim / last year / two months", req:["it took her"],
+     model:"It took her two months to learn to swim last year.",
+     expl:"«Last year» — маркер прошедшего времени → «took»."},
+    {p:"Ситуация: вопрос о районе.", keys:"How long / get / from your house to the nearest shop", req:["how long","does it take"],
+     model:"How long does it take to get from your house to the nearest shop?",
+     expl:"Общий факт о расстоянии → Present Simple."},
+    {p:"Ситуация: строительство моста.", keys:"they / build / the bridge / three years", req:["it took them"],
+     model:"It took them three years to build the bridge.",
+     expl:"Завершённое действие в прошлом → «took»."},
+    {p:"Ситуация: утренние сборы.", keys:"How long / you / get ready / in the morning", req:["how long","does it take"],
+     model:"How long does it take you to get ready in the morning?",
+     expl:"Привычное действие → Present Simple."},
+    {p:"Ситуация: чтение книги в прошлом месяце.", keys:"I / read / this book / last month / a week", req:["it took me"],
+     model:"It took me a week to read this book last month.",
+     expl:"«Last month» → Past Simple «took»."}
+  ]
+};
+
+const EX6 = { // replace highlighted word (transform tense)
+  key:"ex6", title:"Упр. 6 — Замени выделенное слово", type:"free",
+  desc:"Перепиши предложение так, как указано в скобках, меняя выделенное слово и всё, что нужно по смыслу.",
+  items:[
+    {p:'It <mark>takes</mark> me an hour to get to work. <span class="hint">(перепиши в прошедшем, «yesterday»)</span>', req:["it took me"],
+     model:"It took me an hour to get to work yesterday.",
+     expl:"«Takes» → «took», добавляем маркер «yesterday»."},
+    {p:'It <mark>took</mark> us two hours to finish the project. <span class="hint">(перепиши в настоящем, «usually»)</span>', req:["takes us"],
+     model:"It usually takes us two hours to finish the project.",
+     expl:"«Took» → «takes», добавляем «usually»."},
+    {p:'How long <mark>does</mark> it take to bake a cake? <span class="hint">(перепиши в прошедшем)</span>', req:["did it take"],
+     model:"How long did it take to bake a cake?",
+     expl:"«Does» → «did»."},
+    {p:'How long <mark>did</mark> it take you to read the book? <span class="hint">(перепиши в настоящем)</span>', req:["does it take"],
+     model:"How long does it take you to read the book?",
+     expl:"«Did» → «does»."},
+    {p:'It <mark>takes</mark> her 20 minutes to walk to school. <span class="hint">(перепиши в прошедшем, «yesterday»)</span>', req:["it took her"],
+     model:"It took her 20 minutes to walk to school yesterday.",
+     expl:"«Takes» → «took» + «yesterday»."},
+    {p:'It <mark>took</mark> them a week to paint the house. <span class="hint">(перепиши в настоящем, «usually»)</span>', req:["takes them"],
+     model:"It usually takes them a week to paint the house.",
+     expl:"«Took» → «takes» + «usually»."},
+    {p:'How long <mark>does</mark> it take to learn Spanish? <span class="hint">(перепиши в прошедшем)</span>', req:["did it take"],
+     model:"How long did it take to learn Spanish?",
+     expl:"«Does» → «did»."},
+    {p:'It <mark>took</mark> me three hours to clean my room. <span class="hint">(перепиши в настоящем, «normally»)</span>', req:["takes me"],
+     model:"It normally takes me three hours to clean my room.",
+     expl:"«Took» → «takes» + «normally»."},
+    {p:'How long <mark>did</mark> it take to build this bridge? <span class="hint">(перепиши в настоящем)</span>', req:["does it take"],
+     model:"How long does it take to build this bridge?",
+     expl:"«Did» → «does»."},
+    {p:'It <mark>takes</mark> him 10 minutes to get ready. <span class="hint">(перепиши в прошедшем, «this morning»)</span>', req:["it took him"],
+     model:"It took him 10 minutes to get ready this morning.",
+     expl:"«Takes» → «took» + «this morning»."}
+  ]
+};
+
+const EX7 = { // open-ended completion, copy-all
+  key:"ex7", title:"Упр. 7 — Закончи предложения своими идеями", type:"open",
+  desc:"Никакой «правильности» здесь нет — пиши свои варианты. В конце нажми кнопку, чтобы скопировать все ответы одним куском (например, чтобы отправить учителю).",
+  items:[
+    "It usually takes me … to …",
+    "Yesterday it took … to …",
+    "How long does it take you to …?",
+    "Last year it took … a long time to …",
+    "It takes about … to get from … to …",
+    "How long did it take you to …?",
+    "It only takes … minutes to …",
+    "It took … years to …",
+    "How long does it take to get from … to … by …?",
+    "It never takes me long to …"
+  ]
+};
+
+const EX8 = { // drilling repeat & change chain
+  key:"ex8", title:"Упр. 8 — Дриллинг: Repeat & Change", type:"chain",
+  desc:"Как в примере: от одного слова — к словосочетанию, от словосочетания — к полному предложению со своей идеей. В конце скопируй все цепочки одной кнопкой.",
+  example:{
+    word:"take",
+    step1:"take → it takes (time) to do sth",
+    step2:"it takes (time) to do sth → It takes me fifteen minutes to get ready in the morning."
+  },
+  items:["cook","get","build","learn","drive","clean","write","paint","walk","finish"]
+};
+
+const ALL = [EX1,EX2,EX3,EX4,EX5,EX6,EX7,EX8];
+
+/* ======================= NORMALIZE / CHECK ======================= */
+function norm(s){
+  return (s||"").toLowerCase()
+    .replace(/[.,!?;:"'’“”]/g,"")
+    .replace(/\s+/g," ")
+    .trim();
+}
+function checkFree(userVal, reqArr){
+  const n = norm(userVal);
+  if(!n) return false;
+  return reqArr.every(r => n.includes(norm(r)));
+}
+
+/* ======================= RENDERERS ======================= */
+const exercisesEl = document.getElementById("exercises");
+const platformsEl = document.getElementById("platforms");
+
+function platformNumber(i){ return String(i+1).padStart(2,"0"); }
+
+ALL.forEach((ex,idx)=>{
+  // nav button
+  const btn = document.createElement("button");
+  btn.className = "platform-btn" + (idx===0 ? " active":"");
+  btn.textContent = "Платформа "+platformNumber(idx)+" · Упр "+(idx+1);
+  btn.onclick = ()=> showExercise(idx);
+  btn.id = "nav-"+ex.key;
+  platformsEl.appendChild(btn);
+
+  // section
+  const sec = document.createElement("section");
+  sec.className = "exercise" + (idx===0 ? " active":"");
+  sec.id = "sec-"+ex.key;
+
+  let html = `
+    <div class="ex-head">
+      <span class="ex-num">№${idx+1}</span>
+      <h2 class="ex-title">${ex.title}</h2>
+    </div>
+    <p class="ex-desc">${ex.desc}</p>
+  `;
+
+  if(ex.type==="mcq"){
+    ex.items.forEach((it,i)=>{
+      html += `<div class="item" data-idx="${i}">
+        <div class="item-prompt"><span class="item-num">${i+1}.</span>${it.p}</div>
+        <div class="mcq-options">
+          ${it.opts.map((o,oi)=>`
+            <label class="mcq-opt">
+              <input type="radio" name="${ex.key}-${i}" value="${oi}">
+              ${o}
+            </label>`).join("")}
+        </div>
+        <div class="feedback"></div>
+        <div class="answer-reveal"></div>
+      </div>`;
+    });
+  } else if(ex.type==="free"){
+    ex.items.forEach((it,i)=>{
+      html += `<div class="item" data-idx="${i}">
+        <div class="item-prompt"><span class="item-num">${i+1}.</span>${it.p}
+          ${it.keys? `<div class="keys">${it.keys}</div>`:""}
+        </div>
+        <input type="text" placeholder="Твой ответ…" data-input>
+        <div class="feedback"></div>
+        <div class="answer-reveal"></div>
+      </div>`;
+    });
+  } else if(ex.type==="open"){
+    ex.items.forEach((starter,i)=>{
+      html += `<div class="item" data-idx="${i}">
+        <div class="item-prompt"><span class="item-num">${i+1}.</span>${starter}</div>
+        <textarea placeholder="Продолжи предложение…" data-open></textarea>
+      </div>`;
+    });
+    html += `<div class="controls">
+      <button class="btn btn-copy" data-copy-open>Скопировать все ответы</button>
+      <span class="copied-note">Скопировано ✓</span>
+    </div>`;
+  } else if(ex.type==="chain"){
+    html += `<div class="example-box">
+      <span class="lbl">Пример</span>
+      ${ex.example.word}<br>
+      ${ex.example.step1}<br>
+      ${ex.example.step2}
+    </div>`;
+    ex.items.forEach((word,i)=>{
+      html += `<div class="item" data-idx="${i}">
+        <div class="chain-step">
+          <span class="given">${i+1}. ${word}</span>
+        </div>
+        <div class="chain-step">
+          <span class="arrow">→</span>
+          <input type="text" placeholder="${word} → it takes/took (time) to ${word} …" data-chain1>
+        </div>
+        <div class="chain-step">
+          <span class="arrow">→</span>
+          <input type="text" placeholder="полное предложение со своей идеей" data-chain2>
+        </div>
+      </div>`;
+    });
+    html += `<div class="controls">
+      <button class="btn btn-copy" data-copy-chain>Скопировать все цепочки</button>
+      <span class="copied-note">Скопировано ✓</span>
+    </div>`;
+  }
+
+  if(ex.type==="mcq" || ex.type==="free"){
+    html += `<div class="controls">
+      <button class="btn btn-primary" data-check>Проверить</button>
+      <button class="btn btn-ghost" data-reveal>Показать ответы</button>
+      <span class="score-pill" data-score style="display:none"></span>
+    </div>`;
+  }
+
+  sec.innerHTML = html;
+  exercisesEl.appendChild(sec);
+
+  /* ---- wiring ---- */
+  if(ex.type==="mcq"){
+    sec.querySelectorAll(".mcq-opt").forEach(lbl=>{
+      lbl.addEventListener("click", ()=>{
+        const item = lbl.closest(".item");
+        item.querySelectorAll(".mcq-opt").forEach(l=>l.classList.remove("picked"));
+        lbl.classList.add("picked");
+      });
+    });
+    sec.querySelector("[data-check]").onclick = ()=>{
+      let correctCount = 0;
+      ex.items.forEach((it,i)=>{
+        const item = sec.querySelector(`.item[data-idx="${i}"]`);
+        const picked = item.querySelector("input[type=radio]:checked");
+        const fb = item.querySelector(".feedback");
+        fb.classList.remove("ok","bad"); fb.classList.add("show");
+        if(!picked){
+          fb.classList.add("bad");
+          fb.innerHTML = "<b>Не выбран вариант</b>";
+          return;
+        }
+        const val = parseInt(picked.value,10);
+        if(val === it.correct){
+          correctCount++;
+          fb.classList.add("ok");
+          fb.innerHTML = `<b>Верно ✓</b><span class="expl">${it.expl}</span>`;
+        } else {
+          fb.classList.add("bad");
+          fb.innerHTML = `<b>Неверно · правильный ответ: ${it.opts[it.correct]}</b><span class="expl">${it.expl}</span>`;
+        }
+      });
+      const score = sec.querySelector("[data-score]");
+      score.style.display = "inline-block";
+      score.textContent = correctCount+" / "+ex.items.length;
+    };
+    sec.querySelector("[data-reveal]").onclick = ()=>{
+      ex.items.forEach((it,i)=>{
+        const item = sec.querySelector(`.item[data-idx="${i}"]`);
+        const ar = item.querySelector(".answer-reveal");
+        ar.classList.add("show");
+        ar.innerHTML = `<span class="ans">${it.opts[it.correct]}</span><div class="expl">${it.expl}</div>`;
+      });
+    };
+  }
+
+  if(ex.type==="free"){
+    sec.querySelector("[data-check]").onclick = ()=>{
+      let correctCount = 0;
+      ex.items.forEach((it,i)=>{
+        const item = sec.querySelector(`.item[data-idx="${i}"]`);
+        const val = item.querySelector("[data-input]").value;
+        const fb = item.querySelector(".feedback");
+        fb.classList.remove("ok","bad"); fb.classList.add("show");
+        const ok = checkFree(val, it.req);
+        if(ok){
+          correctCount++;
+          fb.classList.add("ok");
+          fb.innerHTML = `<b>Похоже на правильный ответ ✓</b><span class="expl">${it.expl}</span>`;
+        } else {
+          fb.classList.add("bad");
+          fb.innerHTML = `<b>Не совсем · пример правильного ответа: «${it.model}»</b><span class="expl">${it.expl}</span>`;
+        }
+      });
+      const score = sec.querySelector("[data-score]");
+      score.style.display = "inline-block";
+      score.textContent = correctCount+" / "+ex.items.length;
+    };
+    sec.querySelector("[data-reveal]").onclick = ()=>{
+      ex.items.forEach((it,i)=>{
+        const item = sec.querySelector(`.item[data-idx="${i}"]`);
+        const ar = item.querySelector(".answer-reveal");
+        ar.classList.add("show");
+        ar.innerHTML = `<span class="ans">${it.model}</span><div class="expl">${it.expl}</div>`;
+      });
+    };
+  }
+
+  if(ex.type==="open"){
+    const copyBtn = sec.querySelector("[data-copy-open]");
+    const note = sec.querySelector(".copied-note");
+    copyBtn.onclick = ()=>{
+      const lines = ex.items.map((starter,i)=>{
+        const item = sec.querySelector(`.item[data-idx="${i}"]`);
+        const val = item.querySelector("[data-open]").value.trim();
+        return (i+1)+". "+starter+"\n   → "+(val || "(пусто)");
+      });
+      const text = lines.join("\n\n");
+      navigator.clipboard.writeText(text).then(()=>{
+        note.classList.add("show");
+        setTimeout(()=>note.classList.remove("show"),2200);
+      });
+    };
+  }
+
+  if(ex.type==="chain"){
+    const copyBtn = sec.querySelector("[data-copy-chain]");
+    const note = sec.querySelector(".copied-note");
+    copyBtn.onclick = ()=>{
+      const lines = ex.items.map((word,i)=>{
+        const item = sec.querySelector(`.item[data-idx="${i}"]`);
+        const s1 = item.querySelector("[data-chain1]").value.trim();
+        const s2 = item.querySelector("[data-chain2]").value.trim();
+        return (i+1)+". "+word+"\n   "+word+" → "+(s1||"…")+"\n   "+(s1||"…")+" → "+(s2||"…");
+      });
+      const text = lines.join("\n\n");
+      navigator.clipboard.writeText(text).then(()=>{
+        note.classList.add("show");
+        setTimeout(()=>note.classList.remove("show"),2200);
+      });
+    };
+  }
+});
+
+function showExercise(idx){
+  ALL.forEach((ex,i)=>{
+    document.getElementById("sec-"+ex.key).classList.toggle("active", i===idx);
+    document.getElementById("nav-"+ex.key).classList.toggle("active", i===idx);
+  });
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+</script>
+</body>
+</html>
