@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Real Estate Vocabulary Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0f2438;
+    --bg2:#0c1e30;
+    --panel:#15304a;
+    --panel2:#1c3a57;
+    --card:#132a41;
+    --line:#2f5675;
+    --grid: rgba(127,184,217,0.07);
+    --ink:#e9f1f7;
+    --muted:#93aec2;
+    --accent:#e8b04b;
+    --accent-ink:#3a2705;
+    --cyan:#7fb8d9;
+    --good:#5fbf7a;
+    --good-bg:rgba(95,191,122,0.13);
+    --bad:#e2685c;
+    --bad-bg:rgba(226,104,92,0.13);
+    --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:
+      linear-gradient(var(--grid) 1px, transparent 1px) 0 0/40px 40px,
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px) 0 0/40px 40px,
+      var(--bg);
+    color:var(--ink);
+    font-family:'Inter', sans-serif;
+    line-height:1.5;
+    padding-bottom:80px;
+  }
+  a{color:var(--cyan);}
+  h1,h2,h3{font-family:'Playfair Display', serif; margin:0 0 6px;}
+  .wrap{max-width:1180px; margin:0 auto; padding:28px 20px;}
+
+  header.top{
+    text-align:center;
+    padding:34px 20px 22px;
+    border-bottom:1px solid var(--line);
+    background:linear-gradient(180deg, rgba(127,184,217,0.06), transparent);
+  }
+  header.top .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    letter-spacing:.24em;
+    text-transform:uppercase;
+    font-size:11px;
+    color:var(--accent);
+    margin-bottom:10px;
+  }
+  header.top h1{font-size:clamp(28px,4vw,42px); color:var(--ink);}
+  header.top p{color:var(--muted); max-width:640px; margin:8px auto 0; font-size:14.5px;}
+
+  /* ===== layout: vocab + sidebar ===== */
+  .layout{
+    display:grid;
+    grid-template-columns: 1fr 280px;
+    gap:22px;
+    align-items:start;
+    margin-top:26px;
+  }
+  @media (max-width: 900px){
+    .layout{grid-template-columns:1fr;}
+  }
+
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:18px 20px 22px;
+  }
+  .panel h2{font-size:19px; color:var(--ink); display:flex; align-items:center; gap:8px;}
+  .panel h2 .num{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    color:var(--accent);
+    border:1px solid var(--accent);
+    border-radius:20px;
+    padding:2px 9px;
+  }
+  .panel .instr{color:var(--muted); font-size:13.5px; margin:2px 0 16px;}
+
+  /* vocab reminder cards */
+  .vocab-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(230px,1fr));
+    gap:12px;
+  }
+  .vocab-card{
+    background:var(--card);
+    border:1px dashed var(--line);
+    border-radius:8px;
+    padding:12px 14px 13px;
+    position:relative;
+  }
+  .vocab-card::before{
+    content:"";
+    position:absolute; top:8px; right:10px;
+    width:7px; height:7px; border-radius:50%;
+    background:var(--accent);
+    box-shadow:0 0 0 3px rgba(232,176,74,0.18);
+  }
+  .vocab-card .en{font-family:'Playfair Display', serif; font-weight:700; font-size:16px; color:var(--ink); padding-right:14px;}
+  .vocab-card .ipa{font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--cyan); margin:3px 0 5px;}
+  .vocab-card .ru{font-size:13px; color:var(--muted);}
+  .listen-btn{
+    margin-top:9px;
+    display:inline-flex; align-items:center; gap:6px;
+    background:transparent;
+    border:1px solid var(--line);
+    color:var(--accent);
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11.5px;
+    padding:5px 10px;
+    border-radius:20px;
+    cursor:pointer;
+    transition:.15s;
+  }
+  .listen-btn:hover{background:var(--accent); color:var(--accent-ink); border-color:var(--accent);}
+
+  /* sidebar */
+  aside.sidebar{
+    position:sticky; top:16px;
+  }
+  @media (max-width:900px){ aside.sidebar{position:static;} }
+  .problem-table{width:100%; border-collapse:collapse; font-size:13px; margin-top:6px;}
+  .problem-table th{
+    text-align:left; font-family:'IBM Plex Mono', monospace; font-weight:500;
+    color:var(--muted); font-size:11px; text-transform:uppercase; letter-spacing:.05em;
+    padding-bottom:6px; border-bottom:1px solid var(--line);
+  }
+  .problem-table td{padding:7px 4px; border-bottom:1px solid rgba(47,86,117,0.5);}
+  .problem-table .cnt{
+    font-family:'IBM Plex Mono', monospace;
+    color:var(--bad); font-weight:600; text-align:right;
+  }
+  .empty-note{color:var(--muted); font-size:13px; font-style:italic; margin-top:8px;}
+  .reset-link{
+    display:inline-block; margin-top:14px; font-family:'IBM Plex Mono', monospace;
+    font-size:11.5px; color:var(--muted); text-decoration:underline; cursor:pointer; background:none; border:none; padding:0;
+  }
+  .reset-link:hover{color:var(--bad);}
+
+  /* nav tabs */
+  nav.tabs{
+    position:sticky; top:0; z-index:20;
+    background:rgba(15,36,56,0.94);
+    backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--line);
+    overflow-x:auto;
+    white-space:nowrap;
+    padding:10px 20px;
+    margin-top:26px;
+  }
+  nav.tabs a{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    color:var(--muted);
+    text-decoration:none;
+    margin-right:18px;
+    padding-bottom:4px;
+    border-bottom:2px solid transparent;
+  }
+  nav.tabs a:hover{color:var(--accent); border-color:var(--accent);}
+
+  section.ex{margin-top:22px;}
+
+  .row{
+    display:grid;
+    grid-template-columns: 1fr auto;
+    gap:10px 14px;
+    align-items:center;
+    padding:11px 0;
+    border-bottom:1px solid rgba(47,86,117,0.5);
+  }
+  .row:last-of-type{border-bottom:none;}
+  .row .prompt{font-size:14.5px; color:var(--ink);}
+  .row .prompt b{color:var(--accent);}
+  .row .prompt .ru-hint{color:var(--muted); font-size:12.5px; display:block; margin-top:2px;}
+  .field-group{display:flex; gap:8px; align-items:center; flex-wrap:wrap; justify-content:flex-end;}
+  input[type=text]{
+    font-family:'IBM Plex Mono', monospace;
+    background:var(--bg2);
+    border:1px solid var(--line);
+    color:var(--ink);
+    border-radius:6px;
+    padding:8px 10px;
+    font-size:13.5px;
+    min-width:190px;
+  }
+  input[type=text]:focus{outline:none; border-color:var(--accent);}
+  input.correct{border-color:var(--good); background:var(--good-bg);}
+  input.incorrect{border-color:var(--bad); background:var(--bad-bg);}
+
+  textarea{
+    font-family:'Inter', sans-serif;
+    background:var(--bg2);
+    border:1px solid var(--line);
+    color:var(--ink);
+    border-radius:6px;
+    padding:9px 11px;
+    font-size:13.5px;
+    width:100%;
+    min-height:52px;
+    resize:vertical;
+  }
+  textarea:focus{outline:none; border-color:var(--accent);}
+
+  button.mini{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    background:var(--card);
+    border:1px solid var(--line);
+    color:var(--cyan);
+    padding:8px 11px;
+    border-radius:6px;
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  button.mini:hover{border-color:var(--cyan);}
+  button.speak-mini{color:var(--accent); border-color:var(--line);}
+  .feedback-icon{width:20px; text-align:center; font-size:15px;}
+  .feedback-icon.ok{color:var(--good);}
+  .feedback-icon.no{color:var(--bad);}
+  .answer-reveal{
+    font-size:12.5px; color:var(--accent); margin-top:2px; font-family:'IBM Plex Mono', monospace;
+  }
+
+  .tf-buttons{display:flex; gap:6px;}
+  .tf-btn{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    padding:7px 12px;
+    border-radius:6px;
+    border:1px solid var(--line);
+    background:var(--card);
+    color:var(--ink);
+    cursor:pointer;
+  }
+  .tf-btn.selected-ok{background:var(--good-bg); border-color:var(--good); color:var(--good);}
+  .tf-btn.selected-no{background:var(--bad-bg); border-color:var(--bad); color:var(--bad);}
+
+  .section-actions{
+    display:flex; gap:10px; flex-wrap:wrap; margin-top:14px;
+  }
+  .section-actions button{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12.5px;
+    padding:9px 15px;
+    border-radius:20px;
+    border:1px solid var(--accent);
+    background:transparent;
+    color:var(--accent);
+    cursor:pointer;
+  }
+  .section-actions button:hover{background:var(--accent); color:var(--accent-ink);}
+  .section-actions button.ghost{border-color:var(--line); color:var(--muted);}
+  .section-actions button.ghost:hover{border-color:var(--cyan); color:var(--cyan); background:transparent;}
+  .copy-note{font-size:12px; color:var(--good); font-family:'IBM Plex Mono', monospace; align-self:center;}
+
+  .chain-row{
+    padding:13px 0; border-bottom:1px solid rgba(47,86,117,0.5);
+  }
+  .chain-row:last-child{border-bottom:none;}
+  .chain-example{
+    font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--muted);
+    background:var(--bg2); border:1px dashed var(--line); border-radius:6px;
+    padding:8px 10px; margin-bottom:8px;
+  }
+  .chain-example .arrow{color:var(--accent); margin:0 4px;}
+  .chain-inputs{display:flex; flex-direction:column; gap:6px;}
+  .chain-inputs input[type=text]{width:100%; min-width:unset;}
+
+  .open-example-btn{margin-left:auto;}
+  .example-box{
+    font-size:12.5px; color:var(--cyan); font-family:'IBM Plex Mono', monospace;
+    margin-top:6px; display:none;
+  }
+  .open-row{padding:13px 0; border-bottom:1px solid rgba(47,86,117,0.5);}
+  .open-row:last-child{border-bottom:none;}
+  .open-row .prompt{margin-bottom:7px;}
+
+  footer{
+    text-align:center; color:var(--muted); font-size:12px; margin-top:40px; font-family:'IBM Plex Mono', monospace;
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="eyebrow">Property &amp; Real Estate English</div>
+  <h1>Real Estate Vocabulary Lab</h1>
+  <p>8 ключевых слов и выражений — прописываем руками, проверяем себя, отслеживаем ошибки. Нажимайте 🔊, чтобы услышать произношение.</p>
+</header>
+
+<div class="wrap">
+  <div class="layout">
+    <div class="panel" id="vocab-panel">
+      <h2><span class="num">START</span> Повторяем слова</h2>
+      <p class="instr">Прочитайте, послушайте произношение и переходите к упражнениям ниже.</p>
+      <div class="vocab-grid" id="vocabGrid"></div>
+    </div>
+
+    <aside class="sidebar panel">
+      <h2 style="font-size:16px;">⚠ Проблемные слова</h2>
+      <p class="instr" style="margin-bottom:6px;">Здесь появятся слова, в которых вы ошиблись.</p>
+      <table class="problem-table" id="problemTable" style="display:none;">
+        <thead><tr><th>Слово</th><th class="cnt">Ошибок</th></tr></thead>
+        <tbody id="problemTbody"></tbody>
+      </table>
+      <div class="empty-note" id="emptyNote">Пока всё чисто ✨</div>
+      <button class="reset-link" onclick="resetProgress()">Сбросить весь прогресс</button>
+    </aside>
+  </div>
+</div>
+
+<nav class="tabs" id="tabsNav"></nav>
+
+<div class="wrap" id="exercisesRoot"></div>
+
+<footer>Real Estate Vocabulary Lab · 8 слов · 12 форматов практики</footer>
+
+<script>
+/* ============ DATA ============ */
+const words = [
+  {id:0, en:"real estate", ru:"недвижимость", ipa:"/ˈriːəl ɪˈsteɪt/"},
+  {id:1, en:"be in disrepair", ru:"быть в запущенном / аварийном состоянии", ipa:"/biː ɪn ˌdɪsrɪˈpeə/"},
+  {id:2, en:"be in the midst of a renovation", ru:"быть в процессе ремонта", ipa:"/biː ɪn ðə mɪdst əv ə ˌrenəˈveɪʃn/"},
+  {id:3, en:"be worth", ru:"стоить (о ценности)", ipa:"/biː wɜːθ/"},
+  {id:4, en:"priceless", ru:"бесценный", ipa:"/ˈpraɪsləs/"},
+  {id:5, en:"repossess", ru:"конфисковать имущество (за долги)", ipa:"/ˌriːpəˈzes/"},
+  {id:6, en:"cut the price", ru:"снизить цену", ipa:"/kʌt ðə praɪs/"},
+  {id:7, en:"worthless / not worth a dime", ru:"ничего не стоящий (дом)", ipa:"/ˈwɜːθləs/ · /nɒt wɜːθ ə daɪm/"},
+];
+
+const mistakes = {}; // wordId -> count
+words.forEach(w=>mistakes[w.id]=0);
+
+/* ============ HELPERS ============ */
+function norm(s){
+  return (s||"").toLowerCase().trim()
+    .replace(/[.,!?;:"'’]/g,"")
+    .replace(/\s+/g," ");
+}
+function matches(val, accept){
+  const u = norm(val);
+  if(!u) return false;
+  return accept.some(a=>norm(a)===u);
+}
+function speak(text){
+  if(!('speechSynthesis' in window)){ alert('Синтез речи не поддерживается в этом браузере.'); return; }
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-US';
+  u.rate = 0.92;
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(u);
+}
+function addMistake(wordId){
+  mistakes[wordId] = (mistakes[wordId]||0) + 1;
+  renderProblemWords();
+}
+function renderProblemWords(){
+  const tbody = document.getElementById('problemTbody');
+  const table = document.getElementById('problemTable');
+  const empty = document.getElementById('emptyNote');
+  const entries = words
+    .map(w=>({w, c:mistakes[w.id]||0}))
+    .filter(e=>e.c>0)
+    .sort((a,b)=>b.c-a.c);
+  if(entries.length===0){
+    table.style.display='none'; empty.style.display='block';
+    return;
+  }
+  table.style.display='table'; empty.style.display='none';
+  tbody.innerHTML = entries.map(e=>`<tr><td>${e.w.en}</td><td class="cnt">${e.c}</td></tr>`).join('');
+}
+function resetProgress(){
+  if(!confirm('Сбросить весь прогресс и очистить поля?')) return;
+  words.forEach(w=>mistakes[w.id]=0);
+  renderProblemWords();
+  document.querySelectorAll('input[type=text]').forEach(i=>{i.value=''; i.className='';});
+  document.querySelectorAll('textarea').forEach(t=>t.value='');
+  document.querySelectorAll('.feedback-icon').forEach(f=>f.textContent='');
+  document.querySelectorAll('.answer-reveal').forEach(a=>a.remove());
+  document.querySelectorAll('.tf-btn').forEach(b=>b.classList.remove('selected-ok','selected-no'));
+}
+
+/* ============ VOCAB REMINDER ============ */
+const vocabGrid = document.getElementById('vocabGrid');
+vocabGrid.innerHTML = words.map(w=>`
+  <div class="vocab-card">
+    <div class="en">${w.en}</div>
+    <div class="ipa">${w.ipa}</div>
+    <div class="ru">${w.ru}</div>
+    <button class="listen-btn" onclick="speak('${w.en.replace(/'/g,"\\'")}')">🔊 Listen</button>
+  </div>
+`).join('');
+renderProblemWords();
+
+/* ============ EXERCISE DEFINITIONS ============ */
+
+// 1. Fill in the missing letters
+const ex1 = {
+  id:'ex1', num:1, title:'Вставьте пропущенные буквы', type:'fill',
+  instr:'Впишите слово / фразу полностью.',
+  items:[
+    {prompt:'r_al est_te', accept:['real estate'], wordId:0},
+    {prompt:'be _n d_srep_ir', accept:['be in disrepair','in disrepair'], wordId:1},
+    {prompt:'be _n the m_dst _f a ren_vat_on', accept:['be in the midst of a renovation','in the midst of a renovation'], wordId:2},
+    {prompt:'be w_rth', accept:['be worth','worth'], wordId:3},
+    {prompt:'pr_cel_ss', accept:['priceless'], wordId:4},
+    {prompt:'rep_ssess', accept:['repossess'], wordId:5},
+    {prompt:'c_t the pr_ce', accept:['cut the price'], wordId:6},
+    {prompt:'w_rthl_ss', accept:['worthless','not worth a dime'], wordId:7},
+  ]
+};
+
+// 2. Translate RU -> EN
+const ex2 = {
+  id:'ex2', num:2, title:'Переведите с русского на английский', type:'fill',
+  instr:'Напишите слово / фразу по-английски.',
+  items:[
+    {prompt:'недвижимость', accept:['real estate'], wordId:0},
+    {prompt:'быть в запущенном / аварийном состоянии (о доме)', accept:['be in disrepair','in disrepair'], wordId:1},
+    {prompt:'быть в процессе ремонта', accept:['be in the midst of a renovation','in the midst of a renovation'], wordId:2},
+    {prompt:'стоить (о ценности, о цене)', accept:['be worth','worth'], wordId:3},
+    {prompt:'бесценный', accept:['priceless'], wordId:4},
+    {prompt:'конфисковать имущество (о банке)', accept:['repossess'], wordId:5},
+    {prompt:'снизить цену', accept:['cut the price'], wordId:6},
+    {prompt:'ничего не стоящий дом', accept:['worthless house','worthless','not worth a dime'], wordId:7},
+  ]
+};
+
+// 3. Listen and write (dictation)
+const ex3 = {
+  id:'ex3', num:3, title:'Прослушайте и запишите слово', type:'listen',
+  instr:'Нажмите 🔊, чтобы услышать произношение, и напишите то, что услышали.',
+  items: words.map(w=>({prompt:w.en, accept:[w.en, ...(w.id===7?['worthless','not worth a dime']:[])], wordId:w.id, speakText:w.id===7?'worthless, not worth a dime':w.en}))
+};
+
+// 4. Definitions
+const ex4 = {
+  id:'ex4', num:4, title:'Дефиниция → слово', type:'fill',
+  instr:'По определению напишите нужное слово / фразу.',
+  items:[
+    {prompt:'Property such as land, houses and buildings that people buy, sell or rent.', accept:['real estate'], wordId:0},
+    {prompt:'In a bad condition because it has not been repaired or looked after.', accept:['in disrepair','be in disrepair'], wordId:1},
+    {prompt:'Currently being renovated or repaired.', accept:['in the midst of a renovation','be in the midst of a renovation'], wordId:2},
+    {prompt:'Having a particular value, especially in money.', accept:['worth','be worth'], wordId:3},
+    {prompt:'So valuable that its true worth cannot be measured in money.', accept:['priceless'], wordId:4},
+    {prompt:'To take property back from someone because they failed to make payments.', accept:['repossess'], wordId:5},
+    {prompt:'To make something cost less than before.', accept:['cut the price','reduce the price'], wordId:6},
+    {prompt:'Having no monetary value at all.', accept:['worthless','not worth a dime'], wordId:7},
+  ]
+};
+
+// 5. Collocations
+const ex5 = {
+  id:'ex5', num:5, title:'Сочетаемость: закончите фразу', type:'fill',
+  instr:'Допишите пропущенное слово / фразу так, чтобы получилось естественное сочетание.',
+  items:[
+    {prompt:'a ___ agent (specialist who sells houses)', accept:['real estate'], wordId:0},
+    {prompt:'the old house ___ after years without repairs', accept:['is in disrepair','was in disrepair','in disrepair'], wordId:1},
+    {prompt:'right now their kitchen ___', accept:['is in the midst of a renovation','in the midst of a renovation'], wordId:2},
+    {prompt:'this ring ___ a small fortune', accept:['is worth'], wordId:3},
+    {prompt:'a ___ painting no one can put a price on', accept:['priceless'], wordId:4},
+    {prompt:'the bank ___ the house after months of missed payments', accept:['repossessed'], wordId:5},
+    {prompt:'the seller had to ___ by half', accept:['cut the price'], wordId:6},
+    {prompt:'a completely ___ house after the flood', accept:['worthless'], wordId:7},
+  ]
+};
+
+// 6. Context (full sentence, fill in blank)
+const ex6 = {
+  id:'ex6', num:6, title:'Контекст: заполните пропуск', type:'fill',
+  instr:'Впишите нужное слово / фразу в правильной форме.',
+  items:[
+    {prompt:'My sister works in ___ and helps people buy houses.', accept:['real estate'], wordId:0},
+    {prompt:'After years without repairs, the old house ___.', accept:['is in disrepair','was in disrepair'], wordId:1},
+    {prompt:"We can't visit them now — their kitchen ___.", accept:['is in the midst of a renovation'], wordId:2},
+    {prompt:'Experts say this painting ___ over a million dollars.', accept:['is worth'], wordId:3},
+    {prompt:"This necklace is absolutely ___ — money can't buy it.", accept:['priceless'], wordId:4},
+    {prompt:'The bank decided to ___ the house because the owners stopped paying.', accept:['repossess'], wordId:5},
+    {prompt:'The seller had to ___ because no one wanted to buy.', accept:['cut the price'], wordId:6},
+    {prompt:'After the fire, the house was completely ___.', accept:['worthless','not worth a dime'], wordId:7},
+  ]
+};
+
+// 7. Find two mistakes (two input fields per sentence)
+const ex7 = {
+  id:'ex7', num:7, title:'Find two mistakes', type:'twofill',
+  instr:'В каждом предложении есть 2 ошибки. Впишите исправленный вариант каждого ошибочного слова.',
+  items:[
+    {sentence:'My brother work in reel estate and sell houses every week.', accept1:['works'], accept2:['real'], wordId:0},
+    {sentence:'The house are in disrepear after the storm.', accept1:['is'], accept2:['disrepair'], wordId:1},
+    {sentence:'They is in the midst of renovation since March.', accept1:['are'], accept2:['a renovation'], wordId:2},
+    {sentence:'This painting worth a million dollar.', accept1:['is worth'], accept2:['dollars'], wordId:3},
+    {sentence:'Her ring are pricless.', accept1:['is'], accept2:['priceless'], wordId:4},
+    {sentence:'The bank repossess they house last year.', accept1:['repossessed'], accept2:['their'], wordId:5},
+    {sentence:'They had to cutted the price of they house.', accept1:['cut'], accept2:['their'], wordId:6},
+    {sentence:'This house is not worth a dimes because is worthless.', accept1:['dime'], accept2:['it is'], wordId:7},
+  ]
+};
+
+// 8. Guess the word
+const ex8 = {
+  id:'ex8', num:8, title:'Guess the word', type:'fill',
+  instr:'По подсказке угадайте слово / фразу.',
+  items:[
+    {prompt:'Property like houses, land and apartments that people buy, sell or rent (2 words).', accept:['real estate'], wordId:0},
+    {prompt:'Describes a building that badly needs repair.', accept:['in disrepair','be in disrepair'], wordId:1},
+    {prompt:'Describes a house that is currently being renovated.', accept:['in the midst of a renovation','be in the midst of a renovation'], wordId:2},
+    {prompt:'Used to say how much something costs in value.', accept:['worth','be worth'], wordId:3},
+    {prompt:"So valuable you can't put a price on it.", accept:['priceless'], wordId:4},
+    {prompt:"What a bank does when it takes a house back from an owner who didn't pay.", accept:['repossess'], wordId:5},
+    {prompt:'To make something cost less.', accept:['cut the price'], wordId:6},
+    {prompt:'Describes something that has zero value.', accept:['worthless','not worth a dime'], wordId:7},
+  ]
+};
+
+// 9. Rank true / false
+const ex9 = {
+  id:'ex9', num:9, title:'True or false?', type:'truefalse',
+  instr:'Отметьте, верно утверждение или нет.',
+  items:[
+    {statement:'"Real estate" means the same as "furniture".', correct:false, wordId:0},
+    {statement:'If a house "is in disrepair", it looks perfect and new.', correct:false, wordId:1},
+    {statement:'"Be in the midst of a renovation" means the renovation is currently happening.', correct:true, wordId:2},
+    {statement:'If something "is worth $500", it has no monetary value.', correct:false, wordId:3},
+    {statement:'"Priceless" means something is very cheap.', correct:false, wordId:4},
+    {statement:'When a bank "repossesses" a house, it takes it back from the owner.', correct:true, wordId:5},
+    {statement:'To "cut the price" means to increase the cost.', correct:false, wordId:6},
+    {statement:'A "worthless house" has great market value.', correct:false, wordId:7},
+  ]
+};
+
+// 10. Replace the highlighted word
+const ex10 = {
+  id:'ex10', num:10, title:'Replace the highlighted word', type:'fill',
+  instr:'Замените выделенную часть предложения нужным словом / фразой из списка (впишите только замену).',
+  items:[
+    {prompt:'He works in the <b>property business</b>.', accept:['real estate'], wordId:0},
+    {prompt:'The old barn looks <b>neglected and falling apart</b>.', accept:['in disrepair'], wordId:1},
+    {prompt:'They are currently <b>repairing and updating</b> their kitchen.', accept:['in the midst of a renovation'], wordId:2},
+    {prompt:'This car <b>costs about</b> $20,000.', accept:['is worth'], wordId:3},
+    {prompt:'This ring <b>has no price you could put on it</b>.', accept:['is priceless','priceless'], wordId:4},
+    {prompt:'The bank <b>took the house back</b> because the family stopped paying.', accept:['repossessed'], wordId:5},
+    {prompt:'The shop <b>reduced the cost</b> of all items by 30%.', accept:['cut the price'], wordId:6},
+    {prompt:'After the flood, the house <b>had absolutely no value</b>.', accept:['was worthless','worthless','was not worth a dime'], wordId:7},
+  ]
+};
+
+// 11. Finish the sentence with your own idea
+const ex11 = {
+  id:'ex11', num:11, title:'Закончите предложение своей идеей', type:'open',
+  instr:'Допишите каждое предложение своими словами. В конце можно скопировать все ответы одной кнопкой.',
+  items:[
+    {prompt:'Real estate in my city is...', example:'Real estate in my city is getting more expensive every year.', wordId:0},
+    {prompt:'The building I saw yesterday was in disrepair because...', example:'The building I saw yesterday was in disrepair because nobody had lived there for ten years.', wordId:1},
+    {prompt:'Right now, my friend\'s apartment is in the midst of a renovation, so...', example:"Right now, my friend's apartment is in the midst of a renovation, so we can't visit her.", wordId:2},
+    {prompt:'I think a good used car is worth...', example:'I think a good used car is worth around $8,000.', wordId:3},
+    {prompt:'To me, the most priceless thing I own is...', example:'To me, the most priceless thing I own is a letter from my grandmother.', wordId:4},
+    {prompt:'A bank might repossess a house if...', example:"A bank might repossess a house if the owner stops paying the mortgage.", wordId:5},
+    {prompt:'A shop usually cuts the price when...', example:'A shop usually cuts the price when a new model comes out.', wordId:6},
+    {prompt:'A house can become worthless if...', example:'A house can become worthless if it burns down and is never rebuilt.', wordId:7},
+  ]
+};
+
+// 12. Drilling: Repeat & Change
+const ex12 = {
+  id:'ex12', num:12, title:'Drilling: Repeat & Change', type:'chain',
+  instr:'По образцу постройте свою цепочку: слово → словосочетание → предложение со своей идеей.',
+  example:['suffer','suffer from stress','Many people suffer from stress.'],
+  items: words.map(w=>({word:w.en, wordId:w.id}))
+};
+
+const allFillExercises = [ex1,ex2,ex3,ex4,ex5,ex6,ex8,ex10];
+const exercises = [ex1,ex2,ex3,ex4,ex5,ex6,ex7,ex8,ex9,ex10,ex11,ex12];
+
+/* ============ NAV ============ */
+document.getElementById('tabsNav').innerHTML = exercises.map(e=>`<a href="#${e.id}">${e.num}. ${e.title}</a>`).join('');
+
+/* ============ RENDER: fill / listen type ============ */
+function renderFillSection(ex){
+  const isListen = ex.type === 'listen';
+  const rows = ex.items.map((it,i)=>{
+    const rowId = `${ex.id}_${i}`;
+    const speakBtn = isListen ? `<button class="mini speak-mini" onclick="speak('${(it.speakText||it.prompt).replace(/'/g,"\\'")}')">🔊</button>` : '';
+    const promptHtml = isListen ? `Item ${i+1} — click 🔊` : it.prompt;
+    return `
+    <div class="row" id="row_${rowId}">
+      <div class="prompt">${promptHtml}
+        <div id="ans_${rowId}"></div>
+      </div>
+      <div class="field-group">
+        ${speakBtn}
+        <input type="text" id="in_${rowId}" placeholder="введите ответ" onkeydown="if(event.key==='Enter')checkFill('${ex.id}',${i})">
+        <span class="feedback-icon" id="fb_${rowId}"></span>
+      </div>
+    </div>`;
+  }).join('');
+
+  return `
+  <section class="ex panel" id="${ex.id}">
+    <h2><span class="num">${ex.num}</span> ${ex.title}</h2>
+    <p class="instr">${ex.instr}</p>
+    ${rows}
+    <div class="section-actions">
+      <button onclick="checkAllFill('${ex.id}')">Проверить всё</button>
+      <button class="ghost" onclick="showAllAnswers('${ex.id}')">Показать ответы</button>
+    </div>
+  </section>`;
+}
+
+function checkFill(exId, i){
+  const ex = exercises.find(e=>e.id===exId);
+  const it = ex.items[i];
+  const rowId = `${exId}_${i}`;
+  const input = document.getElementById(`in_${rowId}`);
+  const fb = document.getElementById(`fb_${rowId}`);
+  const ok = matches(input.value, it.accept);
+  input.classList.remove('correct','incorrect');
+  input.classList.add(ok?'correct':'incorrect');
+  fb.textContent = ok ? '✔' : '✘';
+  fb.className = 'feedback-icon ' + (ok?'ok':'no');
+  if(!ok) addMistake(it.wordId);
+}
+function checkAllFill(exId){
+  const ex = exercises.find(e=>e.id===exId);
+  ex.items.forEach((_,i)=>checkFill(exId,i));
+}
+function showAllAnswers(exId){
+  const ex = exercises.find(e=>e.id===exId);
+  ex.items.forEach((it,i)=>{
+    const rowId = `${exId}_${i}`;
+    const box = document.getElementById(`ans_${rowId}`);
+    box.innerHTML = `<div class="answer-reveal">Ответ: ${it.accept[0]}</div>`;
+  });
+}
+
+/* ============ RENDER: two-fill (find two mistakes) ============ */
+function renderEx7(ex){
+  const rows = ex.items.map((it,i)=>{
+    const rowId = `${ex.id}_${i}`;
+    return `
+    <div class="row" id="row_${rowId}" style="grid-template-columns:1fr;">
+      <div class="prompt">${i+1}. "${it.sentence}"
+        <div id="ans_${rowId}"></div>
+      </div>
+      <div class="field-group" style="justify-content:flex-start; margin-top:6px;">
+        <input type="text" id="in_${rowId}_a" placeholder="исправление 1">
+        <input type="text" id="in_${rowId}_b" placeholder="исправление 2">
+        <button class="mini" onclick="checkEx7(${i})">Проверить</button>
+        <span class="feedback-icon" id="fb_${rowId}"></span>
+      </div>
+    </div>`;
+  }).join('');
+  return `
+  <section class="ex panel" id="${ex.id}">
+    <h2><span class="num">${ex.num}</span> ${ex.title}</h2>
+    <p class="instr">${ex.instr}</p>
+    ${rows}
+    <div class="section-actions">
+      <button onclick="ex7.items.forEach((_,i)=>checkEx7(i))">Проверить всё</button>
+      <button class="ghost" onclick="showEx7Answers()">Показать ответы</button>
+    </div>
+  </section>`;
+}
+function checkEx7(i){
+  const it = ex7.items[i];
+  const rowId = `ex7_${i}`;
+  const a = document.getElementById(`in_${rowId}_a`);
+  const b = document.getElementById(`in_${rowId}_b`);
+  const fb = document.getElementById(`fb_${rowId}`);
+  const okA1 = matches(a.value, it.accept1) && matches(b.value, it.accept2);
+  const okA2 = matches(a.value, it.accept2) && matches(b.value, it.accept1);
+  const ok = okA1 || okA2;
+  a.classList.remove('correct','incorrect'); b.classList.remove('correct','incorrect');
+  a.classList.add(ok?'correct':'incorrect'); b.classList.add(ok?'correct':'incorrect');
+  fb.textContent = ok?'✔':'✘'; fb.className='feedback-icon ' + (ok?'ok':'no');
+  if(!ok) addMistake(it.wordId);
+}
+function showEx7Answers(){
+  ex7.items.forEach((it,i)=>{
+    const box = document.getElementById(`ans_ex7_${i}`);
+    box.innerHTML = `<div class="answer-reveal">Ответы: ${it.accept1[0]} · ${it.accept2[0]}</div>`;
+  });
+}
+
+/* ============ RENDER: true/false ============ */
+function renderEx9(ex){
+  const rows = ex.items.map((it,i)=>{
+    const rowId = `${ex.id}_${i}`;
+    return `
+    <div class="row" id="row_${rowId}">
+      <div class="prompt">${i+1}. ${it.statement}</div>
+      <div class="tf-buttons">
+        <button class="tf-btn" id="${rowId}_true" onclick="answerTF(${i},true)">True</button>
+        <button class="tf-btn" id="${rowId}_false" onclick="answerTF(${i},false)">False</button>
+      </div>
+    </div>`;
+  }).join('');
+  return `
+  <section class="ex panel" id="${ex.id}">
+    <h2><span class="num">${ex.num}</span> ${ex.title}</h2>
+    <p class="instr">${ex.instr}</p>
+    ${rows}
+    <div class="section-actions">
+      <button class="ghost" onclick="showEx9Answers()">Показать ответы</button>
+    </div>
+  </section>`;
+}
+function answerTF(i, val){
+  const it = ex9.items[i];
+  const rowId = `ex9_${i}`;
+  const tBtn = document.getElementById(`${rowId}_true`);
+  const fBtn = document.getElementById(`${rowId}_false`);
+  tBtn.classList.remove('selected-ok','selected-no');
+  fBtn.classList.remove('selected-ok','selected-no');
+  const ok = (val === it.correct);
+  const btn = val ? tBtn : fBtn;
+  btn.classList.add(ok?'selected-ok':'selected-no');
+  if(!ok) addMistake(it.wordId);
+}
+function showEx9Answers(){
+  ex9.items.forEach((it,i)=>{
+    const rowId = `ex9_${i}`;
+    const tBtn = document.getElementById(`${rowId}_true`);
+    const fBtn = document.getElementById(`${rowId}_false`);
+    tBtn.classList.remove('selected-ok','selected-no');
+    fBtn.classList.remove('selected-ok','selected-no');
+    (it.correct?tBtn:fBtn).classList.add('selected-ok');
+  });
+}
+
+/* ============ RENDER: open (finish sentence) ============ */
+function renderEx11(ex){
+  const rows = ex.items.map((it,i)=>{
+    const rowId = `${ex.id}_${i}`;
+    return `
+    <div class="open-row" id="row_${rowId}">
+      <div class="prompt">${i+1}. ${it.prompt}</div>
+      <textarea id="in_${rowId}" placeholder="ваш вариант..."></textarea>
+      <div style="display:flex; justify-content:flex-end; margin-top:4px;">
+        <button class="mini open-example-btn" onclick="toggleExample('${rowId}')">Показать пример</button>
+      </div>
+      <div class="example-box" id="ex_${rowId}">Пример: ${it.example}</div>
+    </div>`;
+  }).join('');
+  return `
+  <section class="ex panel" id="${ex.id}">
+    <h2><span class="num">${ex.num}</span> ${ex.title}</h2>
+    <p class="instr">${ex.instr}</p>
+    ${rows}
+    <div class="section-actions">
+      <button onclick="copyAllOpen('${ex.id}')">📋 Скопировать все ответы</button>
+      <span class="copy-note" id="copyNote_${ex.id}"></span>
+    </div>
+  </section>`;
+}
+function toggleExample(rowId){
+  const box = document.getElementById(`ex_${rowId}`);
+  box.style.display = box.style.display === 'block' ? 'none' : 'block';
+}
+function copyAllOpen(exId){
+  const ex = exercises.find(e=>e.id===exId);
+  const lines = ex.items.map((it,i)=>{
+    const val = document.getElementById(`in_${exId}_${i}`).value.trim();
+    return `${i+1}. ${it.prompt} ${val}`;
+  });
+  const text = lines.join('\n');
+  navigator.clipboard.writeText(text).then(()=>{
+    const note = document.getElementById(`copyNote_${exId}`);
+    note.textContent = 'Скопировано!';
+    setTimeout(()=>note.textContent='', 2000);
+  });
+}
+
+/* ============ RENDER: chain (repeat & change drilling) ============ */
+function renderEx12(ex){
+  const exampleHtml = `<div class="chain-example">${ex.example[0]} <span class="arrow">→</span> ${ex.example[1]} <span class="arrow">→</span> ${ex.example[2]}</div>`;
+  const rows = ex.items.map((it,i)=>{
+    const rowId = `${ex.id}_${i}`;
+    return `
+    <div class="chain-row" id="row_${rowId}">
+      <div class="prompt" style="margin-bottom:6px;">${i+1}. <b>${it.word}</b></div>
+      <div class="chain-inputs">
+        <input type="text" id="in_${rowId}_1" placeholder="слово / фраза: ${it.word}">
+        <input type="text" id="in_${rowId}_2" placeholder="словосочетание с этим словом">
+        <input type="text" id="in_${rowId}_3" placeholder="полное предложение со своей идеей">
+      </div>
+    </div>`;
+  }).join('');
+  return `
+  <section class="ex panel" id="${ex.id}">
+    <h2><span class="num">${ex.num}</span> ${ex.title}</h2>
+    <p class="instr">${ex.instr}</p>
+    ${exampleHtml}
+    ${rows}
+    <div class="section-actions">
+      <button onclick="copyAllChain('${ex.id}')">📋 Скопировать все ответы</button>
+      <span class="copy-note" id="copyNote_${ex.id}"></span>
+    </div>
+  </section>`;
+}
+function copyAllChain(exId){
+  const ex = exercises.find(e=>e.id===exId);
+  const lines = ex.items.map((it,i)=>{
+    const rowId = `${exId}_${i}`;
+    const v1 = document.getElementById(`in_${rowId}_1`).value.trim();
+    const v2 = document.getElementById(`in_${rowId}_2`).value.trim();
+    const v3 = document.getElementById(`in_${rowId}_3`).value.trim();
+    return `${i+1}. ${v1} → ${v2} → ${v3}`;
+  });
+  const text = lines.join('\n');
+  navigator.clipboard.writeText(text).then(()=>{
+    const note = document.getElementById(`copyNote_${exId}`);
+    note.textContent = 'Скопировано!';
+    setTimeout(()=>note.textContent='', 2000);
+  });
+}
+
+/* ============ MOUNT ALL SECTIONS ============ */
+const root = document.getElementById('exercisesRoot');
+let html = '';
+exercises.forEach(ex=>{
+  if(ex.type==='fill' || ex.type==='listen') html += renderFillSection(ex);
+  else if(ex.type==='twofill') html += renderEx7(ex);
+  else if(ex.type==='truefalse') html += renderEx9(ex);
+  else if(ex.type==='open') html += renderEx11(ex);
+  else if(ex.type==='chain') html += renderEx12(ex);
+});
+root.innerHTML = html;
+</script>
+</body>
+</html>
