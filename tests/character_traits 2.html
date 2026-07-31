@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Character Traits — тренажёр по чертам характера</title>
+<style>
+  :root{
+    --bg: #161B29;
+    --panel: #1F2740;
+    --panel-2: #242D4A;
+    --ink: #EDEFF5;
+    --ink-dim: #A9B1CC;
+    --line: #333F63;
+    --teal: #4FD1C5;
+    --coral: #F0876A;
+    --mustard: #F2B84B;
+    --good: #6FCF6F;
+    --bad: #F06868;
+    --radius: 12px;
+    --serif: Georgia, 'Iowan Old Style', 'Palatino Linotype', 'Times New Roman', serif;
+    --sans: 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
+    --mono: 'JetBrains Mono', 'Consolas', 'SFMono-Regular', monospace;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(1200px 500px at 10% -10%, rgba(79,209,197,.09), transparent 60%),
+      radial-gradient(1000px 500px at 100% 0%, rgba(240,135,106,.08), transparent 55%),
+      var(--bg);
+    color:var(--ink);
+    font-family:var(--sans);
+    line-height:1.55;
+    padding-bottom:80px;
+  }
+  a{color:var(--teal);}
+
+  .spectrum-bar{
+    height:6px;
+    width:100%;
+    background:linear-gradient(90deg, var(--teal), var(--mustard) 50%, var(--coral));
+  }
+
+  header.hero{
+    max-width:1100px;
+    margin:0 auto;
+    padding:36px 24px 18px;
+    text-align:center;
+  }
+  header.hero h1{
+    font-family:var(--serif);
+    font-size:clamp(28px,4vw,44px);
+    margin:0 0 6px;
+    letter-spacing:.3px;
+  }
+  header.hero .eyebrow{
+    font-family:var(--mono);
+    font-size:12px;
+    letter-spacing:3px;
+    text-transform:uppercase;
+    color:var(--teal);
+  }
+  header.hero p.sub{
+    color:var(--ink-dim);
+    max-width:640px;
+    margin:10px auto 0;
+    font-size:15px;
+  }
+
+  .wrap{
+    max-width:1100px;
+    margin:0 auto;
+    padding:0 24px;
+    display:grid;
+    grid-template-columns: 1fr 260px;
+    gap:28px;
+    align-items:start;
+  }
+  @media (max-width: 880px){
+    .wrap{grid-template-columns:1fr;}
+    aside.sidebar{position:static !important; order:-1;}
+  }
+
+  main{min-width:0;}
+
+  /* sidebar */
+  aside.sidebar{
+    position:sticky;
+    top:16px;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:16px;
+  }
+  aside.sidebar h3{
+    margin:0 0 4px;
+    font-family:var(--serif);
+    font-size:17px;
+    color:var(--coral);
+  }
+  aside.sidebar p.hint{
+    font-size:12px;
+    color:var(--ink-dim);
+    margin:0 0 10px;
+  }
+  #problemList{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+  }
+  .chip{
+    background:rgba(240,104,104,.15);
+    border:1px solid rgba(240,104,104,.4);
+    color:#ffb4b4;
+    padding:4px 9px;
+    border-radius:999px;
+    font-size:12.5px;
+    font-family:var(--mono);
+  }
+  #problemEmpty{color:var(--ink-dim); font-size:13px;}
+
+  /* top action bar */
+  .topbar{
+    max-width:1100px;
+    margin:0 auto 20px;
+    padding:0 24px;
+    display:flex;
+    justify-content:center;
+  }
+  .btn{
+    border:1px solid var(--line);
+    background:var(--panel-2);
+    color:var(--ink);
+    padding:10px 18px;
+    border-radius:999px;
+    font-size:14px;
+    cursor:pointer;
+    transition:.15s ease;
+    font-family:var(--sans);
+  }
+  .btn:hover{border-color:var(--teal); color:var(--teal);}
+  .btn.primary{
+    background:linear-gradient(90deg, var(--teal), #3fb8ac);
+    color:#0c1420;
+    font-weight:600;
+    border:none;
+  }
+  .btn.primary:hover{filter:brightness(1.08); color:#0c1420;}
+  .btn.ghost{background:transparent;}
+  .btn.small{padding:6px 12px; font-size:12.5px;}
+
+  #toast{
+    position:fixed; left:50%; bottom:26px; transform:translateX(-50%) translateY(20px);
+    background:var(--good); color:#0c1420; font-weight:600;
+    padding:10px 18px; border-radius:10px; font-size:14px;
+    opacity:0; transition:.25s ease; pointer-events:none;
+  }
+  #toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+
+  /* intro vocab */
+  section.intro{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:20px 20px 14px;
+    margin-bottom:26px;
+  }
+  section.intro h2{
+    font-family:var(--serif);
+    margin:0 0 4px;
+    font-size:22px;
+  }
+  section.intro .lead{color:var(--ink-dim); font-size:14px; margin:0 0 14px;}
+  table.vocab{
+    width:100%;
+    border-collapse:collapse;
+    font-size:14.5px;
+  }
+  table.vocab th{
+    text-align:left;
+    font-family:var(--mono);
+    font-size:11.5px;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    color:var(--ink-dim);
+    border-bottom:1px solid var(--line);
+    padding:8px 8px;
+  }
+  table.vocab td{
+    padding:9px 8px;
+    border-bottom:1px solid rgba(255,255,255,.05);
+    vertical-align:middle;
+  }
+  table.vocab td.word{font-weight:600;}
+  table.vocab td.ipa{font-family:var(--mono); color:var(--mustard); font-size:13px;}
+  .listen-btn{
+    border:1px solid var(--teal);
+    background:transparent;
+    color:var(--teal);
+    width:30px; height:30px;
+    border-radius:50%;
+    cursor:pointer;
+    font-size:14px;
+  }
+  .listen-btn:hover{background:var(--teal); color:#0c1420;}
+  .listen-all{margin:12px 0 4px;}
+
+  /* exercises */
+  section.exercise{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:20px;
+    margin-bottom:22px;
+  }
+  section.exercise .exhead{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-bottom:6px;
+  }
+  section.exercise h2{
+    font-family:var(--serif);
+    font-size:19px;
+    margin:0;
+  }
+  section.exercise .num-badge{
+    font-family:var(--mono);
+    color:var(--teal);
+    font-size:13px;
+    margin-right:8px;
+  }
+  section.exercise p.instr{
+    color:var(--ink-dim);
+    font-size:13.5px;
+    margin:2px 0 14px;
+  }
+  .score-badge{
+    font-family:var(--mono);
+    font-size:13px;
+    padding:3px 10px;
+    border-radius:999px;
+    background:var(--panel-2);
+    border:1px solid var(--line);
+  }
+  .score-badge.ok{border-color:var(--good); color:var(--good);}
+  .score-badge.bad{border-color:var(--bad); color:var(--bad);}
+
+  .item{
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    padding:9px 0;
+    border-bottom:1px dashed rgba(255,255,255,.08);
+    flex-wrap:wrap;
+  }
+  .item:last-child{border-bottom:none;}
+  .item .idx{
+    font-family:var(--mono);
+    color:var(--ink-dim);
+    min-width:20px;
+    padding-top:8px;
+  }
+  .item .clue{
+    flex:1 1 260px;
+    padding-top:7px;
+    font-size:14.5px;
+  }
+  .item .clue mark{
+    background:rgba(242,184,75,.28);
+    color:var(--mustard);
+    padding:0 3px;
+    border-radius:3px;
+  }
+  .item .clue .mono-clue{font-family:var(--mono); letter-spacing:1px; color:var(--mustard); font-size:16px;}
+  input.ans, textarea.ans{
+    background:var(--bg);
+    border:1px solid var(--line);
+    color:var(--ink);
+    padding:8px 10px;
+    border-radius:8px;
+    font-family:var(--mono);
+    font-size:14px;
+    min-width:180px;
+  }
+  textarea.ans{width:100%; min-height:46px; resize:vertical; font-family:var(--sans);}
+  input.ans.small{min-width:120px; max-width:150px;}
+  input.ans:focus, textarea.ans:focus{outline:2px solid var(--teal); border-color:var(--teal);}
+  input.ans.correct{border-color:var(--good); box-shadow:0 0 0 1px var(--good) inset;}
+  input.ans.wrong{border-color:var(--bad); box-shadow:0 0 0 1px var(--bad) inset;}
+  .reveal{
+    font-family:var(--mono);
+    font-size:13px;
+    color:var(--good);
+    padding-top:8px;
+    display:none;
+  }
+  .reveal.show{display:block;}
+  .tf-buttons{display:flex; gap:8px;}
+  .tf-btn{
+    border:1px solid var(--line);
+    background:var(--bg);
+    color:var(--ink-dim);
+    padding:6px 14px;
+    border-radius:8px;
+    cursor:pointer;
+    font-family:var(--mono);
+    font-size:13px;
+  }
+  .tf-btn.selected{border-color:var(--teal); color:var(--teal);}
+  .tf-btn.correct{border-color:var(--good); color:var(--good);}
+  .tf-btn.wrong{border-color:var(--bad); color:var(--bad);}
+  .mistakes-row{display:flex; flex-direction:column; gap:8px; flex:1 1 100%;}
+  .mistakes-row .sentence{font-size:14.5px;}
+  .mistakes-inputs{display:flex; gap:8px; flex-wrap:wrap;}
+  .exfoot{
+    display:flex;
+    gap:10px;
+    margin-top:14px;
+    flex-wrap:wrap;
+    align-items:center;
+  }
+  .exfoot .exp{color:var(--ink-dim); font-size:12.5px;}
+
+  footer.pagefoot{
+    text-align:center;
+    color:var(--ink-dim);
+    font-size:12.5px;
+    padding:30px 24px 10px;
+  }
+</style>
+</head>
+<body>
+
+<div class="spectrum-bar"></div>
+
+<header class="hero">
+  <div class="eyebrow">Personality &amp; Character</div>
+  <h1>Character Traits Workout</h1>
+  <p class="sub">Черты характера: слушаем, повторяем, прописываем руками и проверяем себя. 13 упражнений, по 10 заданий в каждом.</p>
+</header>
+
+<div class="topbar">
+  <button class="btn primary" id="copyAllBtn">📋 Скопировать все мои ответы</button>
+</div>
+
+<div class="wrap">
+  <main>
+
+    <section class="intro">
+      <h2>Слова урока</h2>
+      <p class="lead">Прослушайте произношение (кнопка 🔊), посмотрите транскрипцию и перевод, прежде чем приступать к упражнениям.</p>
+      <button class="btn small listen-all" id="listenAllBtn">🔊 Прослушать все слова подряд</button>
+      <table class="vocab">
+        <thead>
+          <tr><th style="width:34px"></th><th>Word</th><th>Transcription</th><th>Перевод</th></tr>
+        </thead>
+        <tbody id="vocabBody"></tbody>
+      </table>
+    </section>
+
+    <div id="exercisesRoot"></div>
+
+  </main>
+
+  <aside class="sidebar">
+    <h3>⚠️ Проблемные слова</h3>
+    <p class="hint">Сюда автоматически попадают слова, в которых вы ошиблись при проверке.</p>
+    <div id="problemEmpty">Пока ошибок нет — отлично!</div>
+    <div id="problemList"></div>
+  </aside>
+</div>
+
+<footer class="pagefoot">Character Traits Workout · практика написания и употребления составных прилагательных характера</footer>
+<div id="toast"></div>
+
+<script>
+/* ============ DATA ============ */
+const WORDS = [
+  {en:"open-minded",   ru:"непредвзятый, широких взглядов",         ipa:"/ˌəʊpənˈmaɪndɪd/"},
+  {en:"self-centred",  ru:"эгоцентричный",                          ipa:"/ˌselfˈsentəd/"},
+  {en:"absent-minded", ru:"рассеянный",                             ipa:"/ˌæbsəntˈmaɪndɪd/"},
+  {en:"strong-willed", ru:"волевой, с сильной волей",               ipa:"/ˌstrɒŋˈwɪld/"},
+  {en:"bad-tempered",  ru:"вспыльчивый, со скверным характером",    ipa:"/ˌbædˈtempəd/"},
+  {en:"laid-back",     ru:"невозмутимый, расслабленный",            ipa:"/ˌleɪdˈbæk/"},
+  {en:"easy-going",    ru:"покладистый, лёгкий в общении",          ipa:"/ˌiːziˈɡəʊɪŋ/"},
+  {en:"two-faced",     ru:"двуличный",                              ipa:"/ˌtuːˈfeɪst/"},
+  {en:"good-tempered", ru:"добродушный",                            ipa:"/ˌɡʊdˈtempəd/"},
+  {en:"big-headed",    ru:"самовлюблённый, зазнавшийся",            ipa:"/ˌbɪɡˈhedɪd/"},
+  {en:"tight-fisted",  ru:"скупой, прижимистый",                    ipa:"/ˌtaɪtˈfɪstɪd/"},
+  {en:"well-balanced", ru:"уравновешенный",                         ipa:"/ˌwelˈbælənst/"},
+  {en:"well-behaved",  ru:"благовоспитанный, послушный",            ipa:"/ˌwelbɪˈheɪvd/"},
+  {en:"narrow-minded", ru:"узколобый, ограниченный",                ipa:"/ˌnærəʊˈmaɪndɪd/"},
+];
+
+const EX1_FILL = [
+  {clue:"op_n-m_nd_d",        answer:"open-minded"},
+  {clue:"s_lf-c_ntr_d",       answer:"self-centred"},
+  {clue:"abs_nt-m_nd_d",      answer:"absent-minded"},
+  {clue:"str_ng-w_ll_d",      answer:"strong-willed"},
+  {clue:"b_d-t_mp_r_d",       answer:"bad-tempered"},
+  {clue:"l_id-b_ck",          answer:"laid-back"},
+  {clue:"e_sy-g_ing",         answer:"easy-going"},
+  {clue:"t_o-f_ced",          answer:"two-faced"},
+  {clue:"g_od-t_mp_r_d",      answer:"good-tempered"},
+  {clue:"b_g-h_ad_d",         answer:"big-headed"},
+];
+
+const EX2_TRANSLATE = [
+  {clue:"скупой, прижимистый", answer:"tight-fisted"},
+  {clue:"уравновешенный", answer:"well-balanced"},
+  {clue:"благовоспитанный, послушный", answer:"well-behaved"},
+  {clue:"ограниченный, узколобый", answer:"narrow-minded"},
+  {clue:"вспыльчивый", answer:"bad-tempered"},
+  {clue:"невозмутимый, расслабленный", answer:"laid-back"},
+  {clue:"покладистый", answer:"easy-going"},
+  {clue:"двуличный", answer:"two-faced"},
+  {clue:"добродушный", answer:"good-tempered"},
+  {clue:"самовлюблённый, зазнавшийся", answer:"big-headed"},
+];
+
+const EX3_LISTEN = ["open-minded","absent-minded","strong-willed","self-centred","laid-back","two-faced","well-balanced","tight-fisted","narrow-minded","good-tempered"];
+
+const EX4_DEFINITION = [
+  {clue:"Willing to consider new ideas and other people's opinions.", answer:"open-minded"},
+  {clue:"Thinking mostly about yourself and your own interests.", answer:"self-centred"},
+  {clue:"Often forgetting things or not noticing what's going on around you.", answer:"absent-minded"},
+  {clue:"Having a firm determination to do what you want, however hard it is.", answer:"strong-willed"},
+  {clue:"Getting angry very easily, over small things.", answer:"bad-tempered"},
+  {clue:"Calm and relaxed, not worried or stressed about things.", answer:"laid-back"},
+  {clue:"Friendly, relaxed and easy to get on with.", answer:"easy-going"},
+  {clue:"Pretending to be friendly while actually being deceitful.", answer:"two-faced"},
+  {clue:"Having a calm, pleasant character; not easily annoyed.", answer:"good-tempered"},
+  {clue:"Thinking you are more important, clever or talented than you really are.", answer:"big-headed"},
+];
+
+const EX5_PICTURE = [
+  {clue:"🧠💡🤝 — с радостью выслушивает чужое мнение и пробует новое", answer:"open-minded"},
+  {clue:"🤳💬 «я, я, я» — разговор всегда только о себе", answer:"self-centred"},
+  {clue:"🔑❓🚪 — снова забыл ключи дома", answer:"absent-minded"},
+  {clue:"💪🎯 — не сдаётся, идёт к цели несмотря ни на что", answer:"strong-willed"},
+  {clue:"😡💥 — кричит из-за мелочи", answer:"bad-tempered"},
+  {clue:"🏖️😌 — ничего не выводит из себя", answer:"laid-back"},
+  {clue:"🙂🤝 — легко находит общий язык с новыми людьми", answer:"easy-going"},
+  {clue:"🎭 — улыбается в лицо, а потом говорит гадости за спиной", answer:"two-faced"},
+  {clue:"😊👍 — никогда не злится, даже когда всё идёт не так", answer:"good-tempered"},
+  {clue:"👑🙄 — считает себя лучше всех", answer:"big-headed"},
+];
+
+const EX6_CONTEXT = [
+  {clue:"He never buys anyone a coffee, he's so ______.", answer:"tight-fisted"},
+  {clue:"She never overreacts, she has a very ______ personality.", answer:"well-balanced"},
+  {clue:"The children were so ______ that the teacher didn't have to say a word.", answer:"well-behaved"},
+  {clue:"He refuses to even listen to other opinions — he's really ______.", answer:"narrow-minded"},
+  {clue:"My grandmother is very ______; she loves hearing about different cultures.", answer:"open-minded"},
+  {clue:"I'm so ______ these days — I left my phone at the café again!", answer:"absent-minded"},
+  {clue:"Despite everyone's doubts, she was ______ enough to finish the marathon.", answer:"strong-willed"},
+  {clue:"Don't trust him, he's ______ — nice to your face, but he talks behind your back.", answer:"two-faced"},
+  {clue:"He's so ______ he thinks nobody can do the job better than him.", answer:"big-headed"},
+  {clue:"Nothing stresses him out — he's the most ______ person I know.", answer:"laid-back"},
+];
+
+const EX7_MISTAKES = [
+  {sentence:"My cousin is quite selfsentred and often abcent-minded when it comes to remembering birthdays.",
+   fix:["self-centred","absent-minded"]},
+  {sentence:"She's very opened-minded but sometimes to strong-willd for her own good.",
+   fix:["open-minded","strong-willed"]},
+  {sentence:"He's bad-temperd today, but usually he's quite layed-back.",
+   fix:["bad-tempered","laid-back"]},
+  {sentence:"They say she's to-faced, though I always found her rather easygoing.",
+   fix:["two-faced","easy-going"]},
+  {sentence:"Our teacher is good-tempard, unlike our old big-heded boss.",
+   fix:["good-tempered","big-headed"]},
+  {sentence:"He's famous for being tightfisted, and also a bit narow-minded.",
+   fix:["tight-fisted","narrow-minded"]},
+  {sentence:"She's the most well-balansed and well-behavd person in our class.",
+   fix:["well-balanced","well-behaved"]},
+  {sentence:"My dad is open-mineded, though my mum can be quite self-centerd.",
+   fix:["open-minded","self-centred"]},
+  {sentence:"The manager is absant-minded and occasionally strongwilled.",
+   fix:["absent-minded","strong-willed"]},
+  {sentence:"He seems layd back and good tempered most of the time.",
+   fix:["laid-back","good-tempered"]},
+];
+
+const EX8_GUESS = [
+  {clue:"I forget where I put my keys almost every day. What am I?", answer:"absent-minded"},
+  {clue:"I think the world revolves around me. What am I?", answer:"self-centred"},
+  {clue:"I smile at you, but talk behind your back. What am I?", answer:"two-faced"},
+  {clue:"Nothing can upset me — I just relax and enjoy life. What am I?", answer:"laid-back"},
+  {clue:"I refuse to accept any new ideas or opinions. What am I?", answer:"narrow-minded"},
+  {clue:"I never lose my temper, no matter what happens. What am I?", answer:"good-tempered"},
+  {clue:"I hate spending money, even on my closest friends. What am I?", answer:"tight-fisted"},
+  {clue:"I believe I'm smarter and better than everyone else. What am I?", answer:"big-headed"},
+  {clue:"I keep my promises and never give up, no matter the obstacles. What am I?", answer:"strong-willed"},
+  {clue:"I stay calm and never overreact under stress. What am I?", answer:"well-balanced"},
+];
+
+const EX9_RANK = [
+  {clue:"От самого спокойного к самому вспыльчивому:", words:["bad-tempered","well-balanced","good-tempered"], sample:"good-tempered → well-balanced → bad-tempered"},
+  {clue:"От самого открытого новому к самому закрытому:", words:["narrow-minded","open-minded"], sample:"open-minded → narrow-minded"},
+  {clue:"От того, с кем легче всего дружить, к самому сложному:", words:["two-faced","self-centred","easy-going"], sample:"easy-going → self-centred → two-faced"},
+  {clue:"От самого щедрого к самому прижимистому:", words:["easy-going","tight-fisted"], sample:"easy-going → tight-fisted"},
+  {clue:"От самого надёжного в работе к самому забывчивому:", words:["well-behaved","absent-minded"], sample:"well-behaved → absent-minded"},
+  {clue:"От самого скромного к самому самовлюблённому:", words:["good-tempered","big-headed"], sample:"good-tempered → big-headed"},
+  {clue:"От самого решительного к самому расслабленному:", words:["strong-willed","laid-back"], sample:"strong-willed → laid-back"},
+  {clue:"От качества, которое чаще всего хвалят, к тому, что чаще всего критикуют:", words:["open-minded","big-headed","two-faced"], sample:"open-minded → big-headed → two-faced"},
+  {clue:"От самого спокойного характера к самому «взрывному»:", words:["laid-back","well-balanced","bad-tempered"], sample:"laid-back → well-balanced → bad-tempered"},
+  {clue:"От качества, которое хотели бы видеть в друге больше всего, к тому, что меньше всего:", words:["good-tempered","absent-minded","tight-fisted"], sample:"good-tempered → absent-minded → tight-fisted"},
+];
+
+const EX10_TF = [
+  {clue:"An open-minded person refuses to listen to other people's opinions.", answer:false},
+  {clue:"A self-centred person always thinks about themselves first.", answer:true},
+  {clue:"An absent-minded person always remembers small details perfectly.", answer:false},
+  {clue:"A strong-willed person doesn't give up easily.", answer:true},
+  {clue:"A bad-tempered person gets angry very easily.", answer:true},
+  {clue:"A laid-back person worries about everything all the time.", answer:false},
+  {clue:"An easy-going person is difficult to get along with.", answer:false},
+  {clue:"A two-faced person behaves differently in front of you than behind your back.", answer:true},
+  {clue:"A tight-fisted person loves spending and sharing money.", answer:false},
+  {clue:"A big-headed person thinks very highly of themselves.", answer:true},
+];
+
+const EX11_PICSENT = [
+  {clue:"🧳✈️🗣️🌍 Человек с радостью пробует новую еду и слушает истории из других культур в путешествии.", sample:"She is very open-minded — she loves trying new food and listening to people from other cultures."},
+  {clue:"🎉🤳 Человек всегда переводит разговор на себя.", sample:"He is so self-centred, he always turns the conversation back to himself."},
+  {clue:"🔑📱🚪 Забыл ключи и телефон дома.", sample:"I'm so absent-minded, I forgot my keys and my phone at home again."},
+  {clue:"🏋️🎯 Не бросает тренировки, несмотря на трудности.", sample:"She's very strong-willed, she never gives up on her training no matter how hard it gets."},
+  {clue:"😡📞 Кричит на всех из-за мелочи по телефону.", sample:"He got so bad-tempered on the phone over a tiny mistake."},
+  {clue:"🏖️😌 Ничего не беспокоит на пляже.", sample:"He's really laid-back, nothing ever stresses him out."},
+  {clue:"🙂👫 Легко заводит друзей в новом коллективе.", sample:"She's very easy-going, she made friends with everyone on her first day."},
+  {clue:"🎭🤝 Улыбается в лицо, а потом ругает за спиной.", sample:"He's two-faced — polite to your face, but he talks badly about you behind your back."},
+  {clue:"😊👍 Никогда не злится, даже когда всё идёт не так.", sample:"She's so good-tempered, she never gets angry even when everything goes wrong."},
+  {clue:"👑🙄 Хвастается своими достижениями перед всеми.", sample:"He's really big-headed, he's always boasting about his achievements."},
+];
+
+const EX12_REPLACE = [
+  {clue:"My boss is really <mark>stingy</mark> — he never buys anyone a coffee.", answer:"tight-fisted"},
+  {clue:"She's incredibly <mark>arrogant</mark> and thinks she's better than everyone.", answer:"big-headed"},
+  {clue:"He's so <mark>forgetful</mark>, he left his umbrella on the bus again.", answer:"absent-minded"},
+  {clue:"My friend is very <mark>calm and relaxed</mark>, nothing bothers her.", answer:"laid-back"},
+  {clue:"He's <mark>determined</mark> and never gives up on his goals.", answer:"strong-willed"},
+  {clue:"She's <mark>dishonest and two-timing</mark> — nice to your face, not behind your back.", answer:"two-faced"},
+  {clue:"My grandad gets <mark>angry very easily</mark> over small things.", answer:"bad-tempered"},
+  {clue:"She's very <mark>tolerant of new ideas</mark> and loves hearing different opinions.", answer:"open-minded"},
+  {clue:"He <mark>refuses to accept</mark> other people's opinions.", answer:"narrow-minded"},
+  {clue:"The kids were very <mark>obedient</mark> during the museum trip.", answer:"well-behaved"},
+];
+
+const EX13_FINISH = [
+  "I get on well with people who are ... because ...",
+  "I find it difficult to be friends with someone who is ... because ...",
+  "My best friend is ... , for example, ...",
+  "If I could change one character trait about myself, I would stop being so ... because ...",
+  "A good leader should be ... , but should never be ...",
+  "I think being ... is a good quality in a partner because ...",
+  "One person in my family is quite ... , which sometimes causes ...",
+  "I would describe myself as ... in most situations because ...",
+  "It's hard to work with someone who is ... because ...",
+  "I admire people who are ... because ...",
+];
+
+/* ============ HELPERS ============ */
+function norm(s){ return (s||"").toLowerCase().trim().replace(/\s+/g,' ').replace(/[^a-zа-я\- ]/gi,''); }
+function speak(text){
+  if(!('speechSynthesis' in window)){ alert('Ваш браузер не поддерживает озвучивание.'); return; }
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-GB'; u.rate = 0.85;
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(u);
+}
+const problemWords = new Set();
+function addProblem(w){ if(!w) return; problemWords.add(w); renderProblems(); }
+function renderProblems(){
+  const list = document.getElementById('problemList');
+  const empty = document.getElementById('problemEmpty');
+  list.innerHTML = '';
+  if(problemWords.size === 0){ empty.style.display='block'; return; }
+  empty.style.display = 'none';
+  [...problemWords].forEach(w=>{
+    const c = document.createElement('span');
+    c.className='chip'; c.textContent = w;
+    list.appendChild(c);
+  });
+}
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(window.__toastT);
+  window.__toastT = setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+/* ============ VOCAB INTRO ============ */
+const vocabBody = document.getElementById('vocabBody');
+WORDS.forEach((w,i)=>{
+  const tr = document.createElement('tr');
+  tr.innerHTML = `<td><button class="listen-btn" onclick="speak('${w.en}')">🔊</button></td>
+    <td class="word">${w.en}</td>
+    <td class="ipa">${w.ipa}</td>
+    <td>${w.ru}</td>`;
+  vocabBody.appendChild(tr);
+});
+document.getElementById('listenAllBtn').addEventListener('click', ()=>{
+  let i=0;
+  function next(){
+    if(i>=WORDS.length) return;
+    const u = new SpeechSynthesisUtterance(WORDS[i].en);
+    u.lang='en-GB'; u.rate=0.85;
+    u.onend = ()=>{ i++; setTimeout(next, 350); };
+    window.speechSynthesis.speak(u);
+  }
+  window.speechSynthesis.cancel();
+  next();
+});
+
+/* ============ EXERCISE RENDERING ============ */
+const root = document.getElementById('exercisesRoot');
+let scoreBadges = {};
+
+function makeSection(n, title, instr){
+  const sec = document.createElement('section');
+  sec.className = 'exercise';
+  sec.id = 'ex'+n;
+  sec.innerHTML = `
+    <div class="exhead">
+      <h2><span class="num-badge">${String(n).padStart(2,'0')}</span>${title}</h2>
+      <span class="score-badge" id="score-${n}"></span>
+    </div>
+    <p class="instr">${instr}</p>
+    <div class="items" id="items-${n}"></div>
+    <div class="exfoot" id="foot-${n}"></div>
+  `;
+  root.appendChild(sec);
+  return sec;
+}
+
+function addFooter(n, {onCheck, onReveal}){
+  const foot = document.getElementById('foot-'+n);
+  if(onCheck){
+    const b = document.createElement('button');
+    b.className='btn small'; b.textContent='✅ Проверить';
+    b.onclick = onCheck;
+    foot.appendChild(b);
+  }
+  if(onReveal){
+    const b2 = document.createElement('button');
+    b2.className='btn small ghost'; b2.textContent='👀 Показать ответы';
+    b2.onclick = onReveal;
+    foot.appendChild(b2);
+  }
+}
+
+function setScore(n, correct, total){
+  const el = document.getElementById('score-'+n);
+  el.textContent = correct+' / '+total;
+  el.className = 'score-badge ' + (correct===total ? 'ok' : (correct===0?'bad':''));
+}
+
+/* --- generic single-answer exercise (fill / translate / definition / picture / context / guess / replace) --- */
+function renderSimple(n, title, instr, data, opts={}){
+  makeSection(n, title, instr);
+  const box = document.getElementById('items-'+n);
+  data.forEach((d,i)=>{
+    const row = document.createElement('div'); row.className='item';
+    const clueHtml = opts.mono ? `<span class="mono-clue">${d.clue}</span>` : d.clue;
+    row.innerHTML = `
+      <span class="idx">${i+1}.</span>
+      <span class="clue">${clueHtml}</span>
+      <input type="text" class="ans" id="i${n}-${i}" placeholder="${opts.placeholder||'напишите слово'}" autocomplete="off">
+      <span class="reveal" id="r${n}-${i}"></span>
+    `;
+    box.appendChild(row);
+  });
+  addFooter(n, {
+    onCheck: ()=>{
+      let ok=0;
+      data.forEach((d,i)=>{
+        const inp = document.getElementById(`i${n}-${i}`);
+        const correct = opts.contains
+          ? norm(inp.value).includes(norm(d.answer))
+          : norm(inp.value) === norm(d.answer);
+        inp.classList.remove('correct','wrong');
+        if(correct){ inp.classList.add('correct'); ok++; }
+        else { inp.classList.add('wrong'); addProblem(d.answer); }
+      });
+      setScore(n, ok, data.length);
+    },
+    onReveal: ()=>{
+      data.forEach((d,i)=>{
+        const r = document.getElementById(`r${n}-${i}`);
+        r.textContent = '→ ' + d.answer;
+        r.classList.add('show');
+      });
+    }
+  });
+}
+
+/* --- listen & write --- */
+function renderListen(n, title, instr, words){
+  makeSection(n, title, instr);
+  const box = document.getElementById('items-'+n);
+  words.forEach((w,i)=>{
+    const row = document.createElement('div'); row.className='item';
+    row.innerHTML = `
+      <span class="idx">${i+1}.</span>
+      <span class="clue"><button class="listen-btn" onclick="speak('${w}')">🔊</button></span>
+      <input type="text" class="ans" id="i${n}-${i}" placeholder="напишите услышанное слово" autocomplete="off">
+      <span class="reveal" id="r${n}-${i}"></span>
+    `;
+    box.appendChild(row);
+  });
+  addFooter(n, {
+    onCheck: ()=>{
+      let ok=0;
+      words.forEach((w,i)=>{
+        const inp = document.getElementById(`i${n}-${i}`);
+        inp.classList.remove('correct','wrong');
+        if(norm(inp.value) === norm(w)){ inp.classList.add('correct'); ok++; }
+        else { inp.classList.add('wrong'); addProblem(w); }
+      });
+      setScore(n, ok, words.length);
+    },
+    onReveal: ()=>{
+      words.forEach((w,i)=>{
+        const r = document.getElementById(`r${n}-${i}`);
+        r.textContent = '→ ' + w;
+        r.classList.add('show');
+      });
+    }
+  });
+}
+
+/* --- find two mistakes --- */
+function renderMistakes(n, title, instr, data){
+  makeSection(n, title, instr);
+  const box = document.getElementById('items-'+n);
+  data.forEach((d,i)=>{
+    const row = document.createElement('div'); row.className='item';
+    row.innerHTML = `
+      <span class="idx">${i+1}.</span>
+      <div class="mistakes-row">
+        <div class="sentence">${d.sentence}</div>
+        <div class="mistakes-inputs">
+          <input type="text" class="ans small" id="i${n}-${i}-0" placeholder="ошибка 1 →">
+          <input type="text" class="ans small" id="i${n}-${i}-1" placeholder="ошибка 2 →">
+        </div>
+        <span class="reveal" id="r${n}-${i}"></span>
+      </div>
+    `;
+    box.appendChild(row);
+  });
+  addFooter(n, {
+    onCheck: ()=>{
+      let ok=0, total=data.length*2;
+      data.forEach((d,i)=>{
+        [0,1].forEach(j=>{
+          const inp = document.getElementById(`i${n}-${i}-${j}`);
+          inp.classList.remove('correct','wrong');
+          const isRight = d.fix.some(f=>norm(inp.value)===norm(f));
+          if(isRight){ inp.classList.add('correct'); ok++; }
+          else { inp.classList.add('wrong'); addProblem(d.fix[j]); }
+        });
+      });
+      setScore(n, ok, total);
+    },
+    onReveal: ()=>{
+      data.forEach((d,i)=>{
+        const r = document.getElementById(`r${n}-${i}`);
+        r.textContent = '→ ' + d.fix.join(', ');
+        r.classList.add('show');
+      });
+    }
+  });
+}
+
+/* --- rank them (subjective, sample only) --- */
+function renderRank(n, title, instr, data){
+  makeSection(n, title, instr);
+  const box = document.getElementById('items-'+n);
+  data.forEach((d,i)=>{
+    const row = document.createElement('div'); row.className='item';
+    row.innerHTML = `
+      <span class="idx">${i+1}.</span>
+      <div class="mistakes-row">
+        <div class="sentence">${d.clue} <em style="color:var(--ink-dim)">(${d.words.join(', ')})</em></div>
+        <input type="text" class="ans" id="i${n}-${i}" style="min-width:280px" placeholder="впишите слова через → в нужном порядке">
+        <span class="reveal" id="r${n}-${i}"></span>
+      </div>
+    `;
+    box.appendChild(row);
+  });
+  addFooter(n, {
+    onReveal: ()=>{
+      data.forEach((d,i)=>{
+        const r = document.getElementById(`r${n}-${i}`);
+        r.textContent = 'Пример возможного ответа: ' + d.sample + ' (в этом задании возможны разные мнения)';
+        r.classList.add('show');
+      });
+    }
+  });
+}
+
+/* --- true / false --- */
+function renderTF(n, title, instr, data){
+  makeSection(n, title, instr);
+  const box = document.getElementById('items-'+n);
+  data.forEach((d,i)=>{
+    const row = document.createElement('div'); row.className='item';
+    row.innerHTML = `
+      <span class="idx">${i+1}.</span>
+      <span class="clue">${d.clue}</span>
+      <div class="tf-buttons" id="tf${n}-${i}">
+        <button class="tf-btn" data-v="true">True</button>
+        <button class="tf-btn" data-v="false">False</button>
+      </div>
+      <span class="reveal" id="r${n}-${i}"></span>
+    `;
+    box.appendChild(row);
+    row.querySelectorAll('.tf-btn').forEach(btn=>{
+      btn.onclick = ()=>{
+        row.querySelectorAll('.tf-btn').forEach(b=>b.classList.remove('selected'));
+        btn.classList.add('selected');
+        row.dataset.selected = btn.dataset.v;
+      };
+    });
+  });
+  addFooter(n, {
+    onCheck: ()=>{
+      let ok=0;
+      data.forEach((d,i)=>{
+        const row = document.getElementById(`tf${n}-${i}`).parentElement;
+        const sel = row.dataset.selected;
+        row.querySelectorAll('.tf-btn').forEach(b=>b.classList.remove('correct','wrong'));
+        const rightBtn = [...row.querySelectorAll('.tf-btn')].find(b=>b.dataset.v===String(d.answer));
+        if(sel === String(d.answer)){ rightBtn.classList.add('correct'); ok++; }
+        else if(sel){ const wrongBtn=[...row.querySelectorAll('.tf-btn')].find(b=>b.dataset.v===sel); wrongBtn.classList.add('wrong'); rightBtn.classList.add('correct'); }
+      });
+      setScore(n, ok, data.length);
+    },
+    onReveal: ()=>{
+      data.forEach((d,i)=>{
+        const r = document.getElementById(`r${n}-${i}`);
+        r.textContent = '→ ' + (d.answer ? 'True' : 'False');
+        r.classList.add('show');
+      });
+    }
+  });
+}
+
+/* --- open-ended (picture-sentence / finish sentence) --- */
+function renderOpen(n, title, instr, items, samples){
+  makeSection(n, title, instr);
+  const box = document.getElementById('items-'+n);
+  items.forEach((clue,i)=>{
+    const row = document.createElement('div'); row.className='item';
+    row.innerHTML = `
+      <span class="idx">${i+1}.</span>
+      <div class="mistakes-row">
+        <div class="sentence">${clue}</div>
+        <textarea class="ans" id="i${n}-${i}" placeholder="ваш ответ..."></textarea>
+        <span class="reveal" id="r${n}-${i}"></span>
+      </div>
+    `;
+    box.appendChild(row);
+  });
+  addFooter(n, {
+    onReveal: ()=>{
+      items.forEach((_,i)=>{
+        const r = document.getElementById(`r${n}-${i}`);
+        r.textContent = samples ? ('Пример: ' + samples[i]) : '';
+        r.classList.add('show');
+      });
+    }
+  });
+}
+
+/* ============ BUILD ALL EXERCISES ============ */
+renderSimple(1, "Вставь пропущенные буквы", "Впишите слово целиком, ориентируясь на пропущенные буквы.", EX1_FILL, {mono:true});
+renderSimple(2, "Переведи с русского на английский", "Напишите английское слово по русскому переводу.", EX2_TRANSLATE);
+renderListen(3, "Прослушай и напиши слово", "Нажмите 🔊 и напишите услышанное слово по звукам.", EX3_LISTEN);
+renderSimple(4, "Дай слово по определению", "Прочитайте определение (definition) и напишите нужное слово.", EX4_DEFINITION);
+renderSimple(5, "Слово по картинке", "Опишите, какое слово подходит к ситуации/картинке.", EX5_PICTURE);
+renderSimple(6, "Впиши слово по контексту", "Заполните пропуск подходящим по смыслу словом.", EX6_CONTEXT);
+renderMistakes(7, "Find two mistakes — найди две ошибки", "В каждом предложении спрятаны 2 слова с ошибкой в написании. Найдите их и впишите правильный вариант.", EX7_MISTAKES);
+renderSimple(8, "Guess the word — угадай слово", "Прочитайте загадку от первого лица и назовите слово.", EX8_GUESS);
+renderRank(9, "Rank them — расставь по порядку", "Расставьте слова в порядке, указанном в задании (через стрелку →). Задание творческое — сверьтесь с примером ответа.", EX9_RANK);
+renderTF(10, "True or False", "Отметьте, верно ли утверждение (True) или нет (False).", EX10_TF);
+renderOpen(11, "Составь предложение по картинке", "Опишите ситуацию своим предложением, используя нужное слово из темы.", EX11_PICSENT.map(d=>d.clue), EX11_PICSENT.map(d=>d.sample));
+renderSimple(12, "Replace the highlighted word", "Замените выделенное слово/фразу одним словом из темы (близким по смыслу).", EX12_REPLACE, {contains:true, placeholder:"замените выделенное слово"});
+renderOpen(13, "Закончи предложение своими идеями", "Допишите предложение своими словами, используя слова из темы.", EX13_FINISH, null);
+
+/* ============ COPY ALL ANSWERS ============ */
+document.getElementById('copyAllBtn').addEventListener('click', ()=>{
+  let out = "Character Traits — мои ответы\n" + "=".repeat(32) + "\n\n";
+  document.querySelectorAll('section.exercise').forEach(sec=>{
+    const title = sec.querySelector('h2').textContent.trim();
+    out += title + "\n";
+    const inputs = sec.querySelectorAll('input.ans, textarea.ans, .tf-buttons');
+    let idx = 1;
+    sec.querySelectorAll('.item').forEach(item=>{
+      const inp = item.querySelectorAll('input.ans, textarea.ans');
+      const tf = item.querySelector('.tf-buttons');
+      if(tf){
+        const sel = tf.parentElement.dataset.selected || '(не отмечено)';
+        out += `  ${idx}. ${sel}\n`;
+      } else if(inp.length === 2){
+        out += `  ${idx}. ${inp[0].value || '—'} | ${inp[1].value || '—'}\n`;
+      } else if(inp.length === 1){
+        out += `  ${idx}. ${inp[0].value || '—'}\n`;
+      }
+      idx++;
+    });
+    out += "\n";
+  });
+  navigator.clipboard.writeText(out).then(()=>{
+    toast('✅ Ответы скопированы в буфер обмена!');
+  }).catch(()=>{
+    toast('⚠️ Не удалось скопировать. Попробуйте вручную.');
+  });
+});
+</script>
+</body>
+</html>
