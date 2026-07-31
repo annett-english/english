@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Восхождение: лексика и грамматика</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#EEF3F7;
+    --paper:#FFFFFF;
+    --ink:#1E2A38;
+    --muted:#5B6B7B;
+    --peak:#2F4A63;
+    --peak-dark:#1D2E3F;
+    --accent:#E08E45;
+    --accent-dark:#B5701F;
+    --success:#2F8F5C;
+    --success-bg:#E3F3EA;
+    --error:#C1543C;
+    --error-bg:#FBEAE6;
+    --line:#DCE4EC;
+    --shadow: 0 1px 2px rgba(30,42,56,0.06), 0 8px 24px rgba(30,42,56,0.06);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter', sans-serif;
+    line-height:1.5;
+    padding-bottom:80px;
+  }
+  ::selection{background:#E08E4533;}
+
+  h1,h2,h3{ font-family:'Fraunces', serif; font-weight:600; margin:0; color:var(--peak-dark);}
+  .mono{ font-family:'JetBrains Mono', monospace; }
+
+  /* ============ HEADER ============ */
+  header.hero{
+    position:relative;
+    background:linear-gradient(180deg, var(--peak) 0%, var(--peak-dark) 100%);
+    color:#fff;
+    padding:44px 24px 90px;
+    overflow:hidden;
+  }
+  header.hero .hero-inner{
+    max-width:1180px;
+    margin:0 auto;
+    position:relative;
+    z-index:2;
+  }
+  header.hero .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    font-size:12px;
+    color:#F3C892;
+    margin-bottom:10px;
+  }
+  header.hero h1{
+    color:#fff;
+    font-size:clamp(28px,4vw,42px);
+    max-width:720px;
+    margin-bottom:10px;
+  }
+  header.hero p.sub{
+    color:#CBD9E4;
+    max-width:600px;
+    font-size:15px;
+  }
+  .mountains-svg{
+    position:absolute; left:0; right:0; bottom:0; width:100%; height:150px;
+    z-index:1; opacity:.9;
+  }
+
+  /* progress rail (the "climb") */
+  .rail-wrap{
+    max-width:1180px;
+    margin:-46px auto 0;
+    padding:0 24px;
+    position:relative;
+    z-index:3;
+  }
+  .rail{
+    background:var(--paper);
+    border-radius:16px;
+    box-shadow:var(--shadow);
+    padding:18px 22px 14px;
+    overflow-x:auto;
+  }
+  .rail-track{
+    display:flex;
+    align-items:flex-end;
+    gap:6px;
+    min-width:920px;
+  }
+  .rail-node{
+    flex:1;
+    text-align:center;
+    position:relative;
+    padding-top:22px;
+  }
+  .rail-node::before{
+    content:'';
+    position:absolute; top:8px; left:-50%; width:100%; height:2px;
+    background:var(--line);
+    z-index:0;
+  }
+  .rail-node:first-child::before{ display:none; }
+  .rail-dot{
+    width:15px;height:15px;border-radius:50%;
+    background:#fff;border:2px solid var(--line);
+    margin:0 auto 6px;position:relative;z-index:1;
+    transition:all .25s ease;
+  }
+  .rail-node.done .rail-dot{ background:var(--accent); border-color:var(--accent-dark); }
+  .rail-node.perfect .rail-dot{ background:var(--success); border-color:#1f6b41; }
+  .rail-alt{ font-family:'JetBrains Mono', monospace; font-size:10px; color:var(--muted); }
+  .rail-label{ font-size:11px; color:var(--ink); font-weight:600; margin-top:2px; max-width:100px; margin-inline:auto; }
+
+  /* ============ LAYOUT ============ */
+  .layout{
+    max-width:1180px;
+    margin:36px auto 0;
+    padding:0 24px;
+    display:grid;
+    grid-template-columns:1fr 270px;
+    gap:28px;
+    align-items:start;
+  }
+  main{ display:flex; flex-direction:column; gap:28px; }
+
+  .sidebar{
+    position:sticky; top:20px;
+    background:var(--paper);
+    border-radius:16px;
+    box-shadow:var(--shadow);
+    padding:18px;
+    border:1px solid var(--line);
+  }
+  .sidebar h3{ font-size:16px; display:flex; align-items:center; gap:8px;}
+  .sidebar h3 .flag{ font-size:18px; }
+  .sidebar p.hint{ color:var(--muted); font-size:12.5px; margin:6px 0 14px; }
+  table.problems{ width:100%; border-collapse:collapse; font-size:13px; }
+  table.problems th{ text-align:left; font-size:11px; color:var(--muted); font-weight:600; text-transform:uppercase; letter-spacing:.04em; padding-bottom:6px; border-bottom:1px solid var(--line);}
+  table.problems td{ padding:7px 0; border-bottom:1px solid #EEF2F6; vertical-align:top; }
+  table.problems tr:last-child td{ border-bottom:none; }
+  .count-pill{
+    display:inline-flex; align-items:center; justify-content:center;
+    min-width:20px; height:20px; padding:0 6px;
+    background:var(--error-bg); color:var(--error);
+    border-radius:20px; font-weight:700; font-size:11.5px;
+  }
+  .empty-note{ color:var(--muted); font-size:12.5px; font-style:italic; padding:8px 0;}
+  .reset-btn{
+    margin-top:14px; width:100%; padding:8px 10px; font-size:12.5px;
+    background:none; border:1px solid var(--line); border-radius:8px; color:var(--muted);
+    cursor:pointer; font-family:inherit;
+  }
+  .reset-btn:hover{ border-color:var(--error); color:var(--error); }
+
+  /* ============ CARD / SECTION ============ */
+  .card{
+    background:var(--paper);
+    border-radius:16px;
+    box-shadow:var(--shadow);
+    border:1px solid var(--line);
+    overflow:hidden;
+  }
+  .card-head{
+    padding:20px 24px 14px;
+    border-bottom:1px solid var(--line);
+    display:flex; justify-content:space-between; align-items:flex-start; gap:16px; flex-wrap:wrap;
+  }
+  .card-head .tag{
+    font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--accent-dark);
+    background:#FBF0E2; padding:3px 8px; border-radius:20px; display:inline-block; margin-bottom:8px;
+  }
+  .card-head h2{ font-size:20px; }
+  .card-head p{ color:var(--muted); font-size:13.5px; margin-top:4px; max-width:560px;}
+  .card-body{ padding:20px 24px 24px; }
+
+  /* vocab reminder table */
+  .vocab-table{ width:100%; border-collapse:collapse; }
+  .vocab-table th{ text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); padding:8px 10px; border-bottom:1px solid var(--line);}
+  .vocab-table td{ padding:12px 10px; border-bottom:1px solid #EFF3F6; font-size:14.5px; vertical-align:middle;}
+  .vocab-table tr:last-child td{ border-bottom:none; }
+  .vocab-en{ font-weight:600; }
+  .ipa{ color:var(--accent-dark); font-size:13px; }
+  .listen-btn{
+    border:none; background:var(--peak); color:#fff; width:34px; height:34px; border-radius:50%;
+    cursor:pointer; display:inline-flex; align-items:center; justify-content:center; font-size:14px;
+    transition:transform .12s ease, background .12s ease;
+  }
+  .listen-btn:hover{ background:var(--accent-dark); transform:scale(1.06); }
+  .listen-all{
+    margin-top:14px; border:1px solid var(--peak); color:var(--peak); background:none;
+    padding:9px 16px; border-radius:8px; font-family:inherit; font-weight:600; font-size:13px; cursor:pointer;
+  }
+  .listen-all:hover{ background:var(--peak); color:#fff; }
+
+  /* exercise items */
+  .item{
+    display:flex; gap:12px; align-items:flex-start; padding:12px 0; border-bottom:1px dashed var(--line);
+  }
+  .item:last-child{ border-bottom:none; }
+  .item-num{
+    font-family:'JetBrains Mono',monospace; font-weight:600; color:var(--accent-dark);
+    background:#FBF0E2; width:26px; height:26px; border-radius:8px; display:flex; align-items:center; justify-content:center;
+    flex-shrink:0; font-size:13px; margin-top:2px;
+  }
+  .item-body{ flex:1; min-width:0; }
+  .item-prompt{ font-size:14.5px; margin-bottom:8px; }
+  .item-prompt .gap{ font-family:'JetBrains Mono',monospace; letter-spacing:.03em; color:var(--peak); }
+  .item-prompt em{ color:var(--accent-dark); font-style:normal; font-weight:600; }
+  input[type=text], textarea, select{
+    width:100%; font-family:inherit; font-size:14.5px; padding:9px 11px;
+    border:1.5px solid var(--line); border-radius:9px; background:#FBFCFD; color:var(--ink);
+    transition:border-color .15s ease, background .15s ease;
+  }
+  textarea{ min-height:56px; resize:vertical; }
+  input[type=text]:focus, textarea:focus, select:focus{ outline:none; border-color:var(--peak); background:#fff; }
+  input.correct, select.correct{ border-color:var(--success); background:var(--success-bg); }
+  input.incorrect, select.incorrect{ border-color:var(--error); background:var(--error-bg); }
+  input.shown, select.shown, textarea.shown{ border-color:var(--accent); background:#FFF7EC; }
+  .feedback-icon{ font-size:13px; margin-left:6px; font-weight:600; }
+  .feedback-icon.ok{ color:var(--success); }
+  .feedback-icon.bad{ color:var(--error); }
+  .answer-note{ font-size:12.5px; color:var(--accent-dark); margin-top:5px; display:none; }
+  .answer-note.visible{ display:block; }
+  .match-row{ display:flex; align-items:center; gap:10px; }
+  .match-left{ font-weight:600; min-width:190px; font-size:14.5px; }
+  .match-arrow{ color:var(--muted); }
+
+  /* buttons row */
+  .actions{ display:flex; gap:10px; margin-top:18px; flex-wrap:wrap; }
+  .btn{
+    border:none; font-family:inherit; font-weight:600; font-size:13.5px; padding:10px 18px;
+    border-radius:9px; cursor:pointer; transition:transform .1s ease, opacity .15s ease; display:inline-flex; align-items:center; gap:6px;
+  }
+  .btn:active{ transform:scale(.97); }
+  .btn-primary{ background:var(--peak); color:#fff; }
+  .btn-primary:hover{ background:var(--peak-dark); }
+  .btn-ghost{ background:none; color:var(--peak); border:1.5px solid var(--peak); }
+  .btn-ghost:hover{ background:var(--peak); color:#fff; }
+  .btn-accent{ background:none; color:var(--accent-dark); border:1.5px solid var(--accent); }
+  .btn-accent:hover{ background:var(--accent); color:#fff; }
+  .score-badge{ font-size:13px; color:var(--muted); margin-left:auto; align-self:center; }
+  .copy-toast{
+    position:fixed; bottom:26px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:var(--peak-dark); color:#fff; padding:10px 18px; border-radius:9px; font-size:13.5px;
+    opacity:0; pointer-events:none; transition:all .25s ease; z-index:50; box-shadow:var(--shadow);
+  }
+  .copy-toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+  .divider{
+    display:flex; align-items:center; gap:14px; margin:8px 0 -6px;
+    color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:12px; text-transform:uppercase; letter-spacing:.08em;
+  }
+  .divider::before, .divider::after{ content:''; height:1px; background:var(--line); flex:1; }
+
+  footer.credits{ text-align:center; color:var(--muted); font-size:12px; margin-top:40px; }
+
+  @media (max-width:880px){
+    .layout{ grid-template-columns:1fr; }
+    .sidebar{ position:static; order:-1; }
+    .match-left{ min-width:130px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow">Тренировка · лексика восхождения</div>
+    <h1>Покорение вершины</h1>
+    <p class="sub">5 слов о восхождении на гору + повторение Past Simple / Present Simple / Present Continuous. Проходите привалы снизу вверх — до самой вершины.</p>
+  </div>
+  <svg class="mountains-svg" viewBox="0 0 1200 150" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M0,150 L0,90 L150,40 L260,80 L360,10 L480,70 L620,25 L760,85 L900,30 L1050,75 L1200,45 L1200,150 Z" fill="#24384B"/>
+    <path d="M0,150 L0,110 L120,75 L240,105 L340,55 L470,100 L600,60 L740,110 L880,65 L1010,105 L1200,80 L1200,150 Z" fill="#1D2E3F"/>
+  </svg>
+</header>
+
+<div class="rail-wrap">
+  <div class="rail">
+    <div class="rail-track" id="railTrack"></div>
+  </div>
+</div>
+
+<div class="layout">
+  <main id="main"></main>
+
+  <aside class="sidebar">
+    <h3><span class="flag">🚩</span> Проблемные слова</h3>
+    <p class="hint">Сюда попадают слова и темы, где вы ошиблись. Проверяйте упражнения — список обновится.</p>
+    <table class="problems" id="problemsTable">
+      <thead><tr><th>Слово / тема</th><th style="text-align:right">Ошибки</th></tr></thead>
+      <tbody id="problemsBody"></tbody>
+    </table>
+    <div class="empty-note" id="problemsEmpty">Пока всё чисто — ни одной ошибки!</div>
+    <button class="reset-btn" id="resetBtn">Сбросить весь прогресс</button>
+  </aside>
+</div>
+
+<footer class="credits">Нажмите «Проверить», чтобы увидеть результат, или «Показать ответы», чтобы свериться. У каждого упражнения — своя кнопка копирования ответов.</footer>
+
+<div class="copy-toast" id="toast">Скопировано в буфер обмена</div>
+
+<script>
+/* ================= DATA ================= */
+const VOCAB = [
+  { en:"take out of the pocket", ru:"вынуть из кармана", ipa:"/teɪk aʊt ɒv ðə ˈpɒkɪt/" },
+  { en:"at the top of the mountain", ru:"на вершине горы", ipa:"/æt ðə tɒp ɒv ðə ˈmaʊntɪn/" },
+  { en:"go missing", ru:"пропасть, исчезнуть", ipa:"/ɡəʊ ˈmɪsɪŋ/" },
+  { en:"get to the top", ru:"добраться до вершины", ipa:"/ɡet tə ðə tɒp/" },
+  { en:"climb the mountain", ru:"взбираться на гору", ipa:"/klaɪm ðə ˈmaʊntɪn/" }
+];
+
+// Every exercise item has: prompt (html), answer (string used for checking / copying),
+// key (label used for the "problem words" tracker), and for 'open' items an extra `phrase`
+// that must appear in the free-text answer to count as correct.
+const EXERCISES = [
+  {
+    id:"ex1", alt:"800 м", label:"Буквы", type:"text",
+    tag:"Упражнение 1", title:"Вставьте пропущенные буквы",
+    desc:"Впишите слово или выражение целиком — пропуски отмечены подчёркиванием.",
+    items:[
+      { prompt:'<span class="gap">t_ke _ut _f the p_cket</span>', answer:VOCAB[0].en, key:VOCAB[0].en },
+      { prompt:'<span class="gap">_t the t_p _f the m__nta_n</span>', answer:VOCAB[1].en, key:VOCAB[1].en },
+      { prompt:'<span class="gap">g_ m_ss_ng</span>', answer:VOCAB[2].en, key:VOCAB[2].en },
+      { prompt:'<span class="gap">g_t t_ the t_p</span>', answer:VOCAB[3].en, key:VOCAB[3].en },
+      { prompt:'<span class="gap">cl_mb the m__nta_n</span>', answer:VOCAB[4].en, key:VOCAB[4].en }
+    ]
+  },
+  {
+    id:"ex2", alt:"1400 м", label:"Перевод", type:"text",
+    tag:"Упражнение 2", title:"Переведите с русского на английский",
+    desc:"Напишите выражение целиком по-английски.",
+    items:[
+      { prompt:'«вынуть из кармана»', answer:VOCAB[0].en, key:VOCAB[0].en },
+      { prompt:'«на вершине горы»', answer:VOCAB[1].en, key:VOCAB[1].en },
+      { prompt:'«пропасть, исчезнуть»', answer:VOCAB[2].en, key:VOCAB[2].en },
+      { prompt:'«добраться до вершины»', answer:VOCAB[3].en, key:VOCAB[3].en },
+      { prompt:'«взбираться на гору»', answer:VOCAB[4].en, key:VOCAB[4].en }
+    ]
+  },
+  {
+    id:"ex3", alt:"2000 м", label:"Дефиниция", type:"text",
+    tag:"Упражнение 3", title:"Угадайте слово по определению",
+    desc:"Прочитайте определение на английском и напишите нужное выражение.",
+    items:[
+      { prompt:'to remove something from inside your clothing, where it was kept', answer:VOCAB[0].en, key:VOCAB[0].en },
+      { prompt:'the highest point of a mountain, where the wind is usually strongest', answer:VOCAB[1].en, key:VOCAB[1].en },
+      { prompt:'to disappear suddenly, so that nobody knows where you are', answer:VOCAB[2].en, key:VOCAB[2].en },
+      { prompt:'to finally reach the highest point after a long, hard journey', answer:VOCAB[3].en, key:VOCAB[3].en },
+      { prompt:'to go up a mountain on foot, often using your hands too', answer:VOCAB[4].en, key:VOCAB[4].en }
+    ]
+  },
+  {
+    id:"ex4", alt:"2600 м", label:"Сочетаемость", type:"text",
+    tag:"Упражнение 4", title:"Сочетаемость фраз",
+    desc:"Впишите одно недостающее слово, чтобы получилось верное выражение.",
+    items:[
+      { prompt:'take <span class="gap">___</span> of the pocket', answer:"out", key:VOCAB[0].en },
+      { prompt:'at the top <span class="gap">___</span> the mountain', answer:"of", key:VOCAB[1].en },
+      { prompt:'go <span class="gap">___</span>', answer:"missing", key:VOCAB[2].en },
+      { prompt:'get <span class="gap">___</span> the top', answer:"to", key:VOCAB[3].en },
+      { prompt:'climb <span class="gap">___</span> mountain', answer:"the", key:VOCAB[4].en }
+    ]
+  },
+  {
+    id:"ex5", alt:"3200 м", label:"Контекст", type:"text",
+    tag:"Упражнение 5", title:"Впишите фразу в контекст",
+    desc:"Дополните предложение подходящим выражением из списка слов.",
+    items:[
+      { prompt:'He put his hand in his coat to <span class="gap">___</span> his keys.', answer:VOCAB[0].en, key:VOCAB[0].en },
+      { prompt:'The flag was fixed <span class="gap">___</span>, where the wind almost blew it away.', answer:VOCAB[1].en, key:VOCAB[1].en },
+      { prompt:'After the snowstorm, the climber seemed to <span class="gap">___</span> for almost two days.', answer:VOCAB[2].en, key:VOCAB[2].en },
+      { prompt:'It took the team six exhausting hours to finally <span class="gap">___</span> of the cliff.', answer:VOCAB[3].en, key:VOCAB[3].en },
+      { prompt:'Every summer, brave hikers <span class="gap">___</span> without any special equipment.', answer:VOCAB[4].en, key:VOCAB[4].en }
+    ]
+  },
+  {
+    id:"ex6", alt:"3800 м", label:"Половинки", type:"match",
+    tag:"Упражнение 6", title:"Соедините половинки выражений",
+    desc:"Выберите вторую половину, чтобы получилось верное выражение.",
+    options:["of the pocket","of the mountain","missing","the top","the mountain"],
+    items:[
+      { left:"take out", answer:"of the pocket", key:VOCAB[0].en },
+      { left:"at the top", answer:"of the mountain", key:VOCAB[1].en },
+      { left:"go", answer:"missing", key:VOCAB[2].en },
+      { left:"get to", answer:"the top", key:VOCAB[3].en },
+      { left:"climb", answer:"the mountain", key:VOCAB[4].en }
+    ]
+  },
+  {
+    id:"ex7", alt:"4400 м", label:"Свои идеи", type:"open",
+    tag:"Упражнение 7", title:"Закончите предложения своими идеями",
+    desc:"Используйте указанное выражение и допишите предложение так, как считаете нужным.",
+    items:[
+      { prompt:'Используйте <em>«take out of the pocket»</em>: «Before the interview, I nervously …»', phrase:"take out of the pocket", answer:"...took my phone out of the pocket to check the time.", key:VOCAB[0].en },
+      { prompt:'Используйте <em>«at the top of the mountain»</em>: «When we finally arrived, we saw a small hut …»', phrase:"at the top of the mountain", answer:"...at the top of the mountain.", key:VOCAB[1].en },
+      { prompt:'Используйте <em>«go missing»</em>: «During the expedition, one of the climbers suddenly …»', phrase:"go missing", answer:"...seemed to go missing for several hours.", key:VOCAB[2].en },
+      { prompt:'Используйте <em>«get to the top»</em>: «After years of training, she finally managed to …»', phrase:"get to the top", answer:"...get to the top of Everest.", key:VOCAB[3].en },
+      { prompt:'Используйте <em>«climb the mountain»</em>: «Every weekend, my grandfather still likes to …»', phrase:"climb the mountain", answer:"...climb the mountain near his village.", key:VOCAB[4].en }
+    ]
+  },
+  {
+    id:"ex8", alt:"4700 м", label:"Mix времён", type:"text",
+    tag:"Упражнение 8 · грамматика", title:"Mix: Past Simple / Present Simple / Present Continuous",
+    desc:"Впишите глагол в верной форме.",
+    items:[
+      { prompt:'Look! It <span class="gap">___ (rain)</span> outside right now.', answer:"is raining", key:"Present Continuous" },
+      { prompt:'I usually <span class="gap">___ (get up)</span> at 7 o\'clock.', answer:"get up", key:"Present Simple" },
+      { prompt:'Yesterday we <span class="gap">___ (go)</span> to the cinema.', answer:"went", key:"Past Simple" },
+      { prompt:'She <span class="gap">___ (not / like)</span> coffee.', answer:"doesn't like", key:"Present Simple" },
+      { prompt:'Right now, they <span class="gap">___ (play)</span> football in the yard.', answer:"are playing", key:"Present Continuous" }
+    ]
+  },
+  {
+    id:"ex9", alt:"5000 м", label:"Указатели времени", type:"text",
+    tag:"Упражнение 9 · грамматика", title:"Указатели времени",
+    desc:"Обратите внимание на слово-подсказку (always, right now, last year…) и впишите верную форму.",
+    items:[
+      { prompt:'He always <span class="gap">___ (brush)</span> his teeth before bed.', answer:"brushes", key:"Present Simple" },
+      { prompt:'Look, she <span class="gap">___ (climb)</span> the mountain right now!', answer:"is climbing", key:"Present Continuous" },
+      { prompt:'Last year, they <span class="gap">___ (climb)</span> Mount Elbrus.', answer:"climbed", key:"Past Simple" },
+      { prompt:'At the moment, I <span class="gap">___ (write)</span> a letter.', answer:"am writing", key:"Present Continuous" },
+      { prompt:'We <span class="gap">___ (visit)</span> our grandparents every summer.', answer:"visit", key:"Present Simple" }
+    ]
+  },
+  {
+    id:"ex10", alt:"5300 м", label:"Ошибки", type:"text",
+    tag:"Упражнение 10 · грамматика", title:"Найдите и исправьте ошибку",
+    desc:"Перепишите предложение целиком в исправленном виде.",
+    items:[
+      { prompt:'She don\'t like tea.', answer:"She doesn't like tea.", key:"Present Simple" },
+      { prompt:'Yesterday I go to school.', answer:"Yesterday I went to school.", key:"Past Simple" },
+      { prompt:'Look! He is climb the mountain.', answer:"Look! He is climbing the mountain.", key:"Present Continuous" },
+      { prompt:'They was at home last night.', answer:"They were at home last night.", key:"Past Simple" },
+      { prompt:'I am liking this song.', answer:"I like this song.", key:"Present Simple" }
+    ]
+  },
+  {
+    id:"ex11", alt:"5600 м", label:"is/am/are…", type:"text",
+    tag:"Упражнение 11 · грамматика", title:"Вставьте is / am / are / do / does / did / was / were",
+    desc:"Впишите одно подходящее слово.",
+    items:[
+      { prompt:'<span class="gap">___</span> you like pizza?', answer:"Do", key:"Auxiliary verbs" },
+      { prompt:'She <span class="gap">___</span> at home yesterday.', answer:"was", key:"Auxiliary verbs" },
+      { prompt:'<span class="gap">___</span> they play football every day?', answer:"Do", key:"Auxiliary verbs" },
+      { prompt:'He <span class="gap">___</span> climbing the mountain right now.', answer:"is", key:"Auxiliary verbs" },
+      { prompt:'<span class="gap">___</span> she go to the party last week?', answer:"Did", key:"Auxiliary verbs" }
+    ]
+  },
+  {
+    id:"ex12", alt:"5895 м · Вершина", label:"Окончание -ed", type:"choice3",
+    tag:"Упражнение 12 · произношение", title:"Как звучит окончание -ed?",
+    desc:"Прослушайте слово и выберите, как произносится его окончание: /t/, /d/ или /ɪd/.",
+    options:["/t/","/d/","/ɪd/"],
+    items:[
+      { word:"wanted", answer:"/ɪd/", key:"-ed pronunciation" },
+      { word:"liked", answer:"/t/", key:"-ed pronunciation" },
+      { word:"played", answer:"/d/", key:"-ed pronunciation" },
+      { word:"watched", answer:"/t/", key:"-ed pronunciation" },
+      { word:"needed", answer:"/ɪd/", key:"-ed pronunciation" }
+    ]
+  }
+];
+
+/* ================= STATE ================= */
+const problemWords = {}; // key -> count
+const exResult = {}; // exId -> 'perfect' | 'done'
+
+/* ================= HELPERS ================= */
+function normalize(s){
+  return (s||"")
+    .toLowerCase()
+    .replace(/[.,!?;:"'’]/g,"")
+    .replace(/\s+/g," ")
+    .trim();
+}
+function speak(text){
+  try{
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = "en-US";
+    u.rate = 0.92;
+    window.speechSynthesis.speak(u);
+  }catch(e){ console.warn("Speech synthesis not available", e); }
+}
+function showToast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"), 1800);
+}
+function copyText(text, label){
+  const done = ()=> showToast((label||"Ответы") + " скопированы");
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(done).catch(()=>fallbackCopy(text, done));
+  } else {
+    fallbackCopy(text, done);
+  }
+}
+function fallbackCopy(text, done){
+  const ta = document.createElement("textarea");
+  ta.value = text; document.body.appendChild(ta); ta.select();
+  try{ document.execCommand("copy"); done(); }catch(e){ alert("Не удалось скопировать автоматически. Текст:\n\n"+text); }
+  document.body.removeChild(ta);
+}
+function addProblem(key){
+  problemWords[key] = (problemWords[key]||0) + 1;
+  renderProblems();
+}
+function renderProblems(){
+  const body = document.getElementById("problemsBody");
+  const empty = document.getElementById("problemsEmpty");
+  const entries = Object.entries(problemWords).sort((a,b)=>b[1]-a[1]);
+  body.innerHTML = entries.map(([k,c])=>`<tr><td>${k}</td><td style="text-align:right"><span class="count-pill">${c}</span></td></tr>`).join("");
+  empty.style.display = entries.length ? "none" : "block";
+}
+
+/* ================= RENDER: PROGRESS RAIL ================= */
+function renderRail(){
+  const track = document.getElementById("railTrack");
+  track.innerHTML = EXERCISES.map((ex,i)=>`
+    <div class="rail-node" id="rail-${ex.id}">
+      <div class="rail-dot"></div>
+      <div class="rail-alt">${ex.alt}</div>
+      <div class="rail-label">${ex.label}</div>
+    </div>
+  `).join("");
+}
+function updateRail(exId, state){
+  const node = document.getElementById("rail-"+exId);
+  node.classList.remove("done","perfect");
+  node.classList.add(state === "perfect" ? "perfect" : "done");
+}
+
+/* ================= RENDER: VOCAB REMINDER ================= */
+function renderVocabCard(){
+  const rows = VOCAB.map((w,i)=>`
+    <tr>
+      <td class="vocab-en">${w.en}</td>
+      <td>${w.ru}</td>
+      <td class="ipa mono">${w.ipa}</td>
+      <td><button class="listen-btn" title="Прослушать" onclick="speak('${w.en.replace(/'/g,"\\'")}')">▶</button></td>
+    </tr>
+  `).join("");
+  return `
+  <section class="card">
+    <div class="card-head">
+      <div>
+        <span class="tag">Базовый лагерь</span>
+        <h2>Слова перед подъёмом</h2>
+        <p>Прослушайте и повторите произношение, прежде чем идти дальше.</p>
+      </div>
+    </div>
+    <div class="card-body">
+      <table class="vocab-table">
+        <thead><tr><th>Слово / фраза</th><th>Перевод</th><th>Транскрипция</th><th></th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+      <button class="listen-all" id="listenAllBtn">▶ Прослушать все слова подряд</button>
+    </div>
+  </section>`;
+}
+function listenAll(){
+  let i = 0;
+  function next(){
+    if(i >= VOCAB.length) return;
+    const u = new SpeechSynthesisUtterance(VOCAB[i].en);
+    u.lang = "en-US"; u.rate = 0.9;
+    u.onend = ()=>{ i++; setTimeout(next, 350); };
+    window.speechSynthesis.speak(u);
+  }
+  window.speechSynthesis.cancel();
+  next();
+}
+
+/* ================= RENDER: EXERCISE CARDS ================= */
+function renderExercise(ex){
+  let itemsHtml = "";
+  ex.items.forEach((it, i)=>{
+    const inputId = `${ex.id}-${i}`;
+    let control = "";
+    if(ex.type === "text"){
+      control = `<input type="text" id="${inputId}" autocomplete="off" placeholder="Ваш ответ...">`;
+    } else if(ex.type === "match"){
+      const opts = ex.options.map(o=>`<option value="${o}">${o}</option>`).join("");
+      control = `
+        <div class="match-row">
+          <div class="match-left">${it.left}</div>
+          <span class="match-arrow">→</span>
+          <select id="${inputId}"><option value="">— выберите —</option>${opts}</select>
+        </div>`;
+    } else if(ex.type === "choice3"){
+      const opts = ex.options.map(o=>`<option value="${o}">${o}</option>`).join("");
+      control = `
+        <div class="match-row">
+          <div class="match-left mono">${it.word}</div>
+          <button class="listen-btn" title="Прослушать" onclick="speak('${it.word}')">▶</button>
+          <select id="${inputId}"><option value="">— звук —</option>${opts}</select>
+        </div>`;
+    } else if(ex.type === "open"){
+      control = `<textarea id="${inputId}" placeholder="Допишите предложение..."></textarea>`;
+    }
+    const promptHtml = ex.type === "choice3" ? "" : `<div class="item-prompt">${it.prompt}</div>`;
+    itemsHtml += `
+      <div class="item">
+        <div class="item-num">${i+1}</div>
+        <div class="item-body">
+          ${promptHtml}
+          ${control}
+          <span id="${inputId}-fb"></span>
+          <div class="answer-note" id="${inputId}-note"></div>
+        </div>
+      </div>`;
+  });
+
+  return `
+  <section class="card" id="${ex.id}">
+    <div class="card-head">
+      <div>
+        <span class="tag">${ex.tag}</span>
+        <h2>${ex.title}</h2>
+        <p>${ex.desc}</p>
+      </div>
+    </div>
+    <div class="card-body">
+      ${itemsHtml}
+      <div class="actions">
+        <button class="btn btn-primary" onclick="checkExercise('${ex.id}')">Проверить</button>
+        <button class="btn btn-ghost" onclick="showAnswers('${ex.id}')">Показать ответы</button>
+        <button class="btn btn-accent" onclick="copyAnswers('${ex.id}')">Скопировать ответы</button>
+        <span class="score-badge" id="${ex.id}-score"></span>
+      </div>
+    </div>
+  </section>`;
+}
+
+/* ================= CHECK / SHOW / COPY ================= */
+function checkExercise(exId){
+  const ex = EXERCISES.find(e=>e.id===exId);
+  let correctCount = 0;
+  ex.items.forEach((it,i)=>{
+    const inputId = `${ex.id}-${i}`;
+    const el = document.getElementById(inputId);
+    const fb = document.getElementById(inputId+"-fb");
+    el.classList.remove("shown");
+    let isCorrect = false;
+    if(ex.type === "open"){
+      const val = (el.value||"").toLowerCase();
+      isCorrect = val.includes(it.phrase.toLowerCase()) && val.trim().length > it.phrase.length;
+    } else if(ex.type === "match" || ex.type === "choice3"){
+      isCorrect = el.value !== "" && el.value === it.answer;
+    } else {
+      isCorrect = normalize(el.value) === normalize(it.answer);
+    }
+    el.classList.remove("correct","incorrect");
+    if(isCorrect){
+      el.classList.add("correct");
+      fb.innerHTML = '<span class="feedback-icon ok">✓</span>';
+      correctCount++;
+    } else {
+      el.classList.add("incorrect");
+      fb.innerHTML = '<span class="feedback-icon bad">✕</span>';
+      addProblem(it.key);
+    }
+  });
+  const scoreBadge = document.getElementById(exId+"-score");
+  scoreBadge.textContent = `Результат: ${correctCount} / ${ex.items.length}`;
+  updateRail(exId, correctCount === ex.items.length ? "perfect" : "done");
+}
+
+function showAnswers(exId){
+  const ex = EXERCISES.find(e=>e.id===exId);
+  ex.items.forEach((it,i)=>{
+    const inputId = `${ex.id}-${i}`;
+    const el = document.getElementById(inputId);
+    const fb = document.getElementById(inputId+"-fb");
+    const note = document.getElementById(inputId+"-note");
+    el.classList.remove("correct","incorrect");
+    el.classList.add("shown");
+    fb.innerHTML = "";
+    if(ex.type === "open"){
+      note.textContent = "Пример ответа: " + it.answer;
+    } else {
+      el.value = it.answer;
+      note.textContent = "";
+    }
+    note.classList.add("visible");
+  });
+  updateRail(exId, "done");
+}
+
+function copyAnswers(exId){
+  const ex = EXERCISES.find(e=>e.id===exId);
+  const lines = ex.items.map((it,i)=>{
+    if(ex.type === "match"){
+      return `${i+1}. ${it.left} → ${it.answer}`;
+    }
+    if(ex.type === "choice3"){
+      return `${i+1}. ${it.word} — ${it.answer}`;
+    }
+    if(ex.type === "open"){
+      return `${i+1}. ${it.answer}`;
+    }
+    return `${i+1}. ${it.answer}`;
+  });
+  copyText(`${ex.title}\n` + lines.join("\n"), "Ответы упражнения");
+}
+
+/* ================= INIT ================= */
+function buildPage(){
+  renderRail();
+  const main = document.getElementById("main");
+  let html = renderVocabCard();
+  const vocabExercises = EXERCISES.filter(e=>["ex1","ex2","ex3","ex4","ex5","ex6","ex7"].includes(e.id));
+  const grammarExercises = EXERCISES.filter(e=>!["ex1","ex2","ex3","ex4","ex5","ex6","ex7"].includes(e.id));
+  vocabExercises.forEach(ex=> html += renderExercise(ex));
+  html += `<div class="divider">Грамматика: Past Simple · Present Simple · Present Continuous</div>`;
+  grammarExercises.forEach(ex=> html += renderExercise(ex));
+  main.innerHTML = html;
+  document.getElementById("listenAllBtn").addEventListener("click", listenAll);
+}
+
+document.getElementById("resetBtn").addEventListener("click", ()=>{
+  if(!confirm("Сбросить весь прогресс и очистить список проблемных слов?")) return;
+  Object.keys(problemWords).forEach(k=>delete problemWords[k]);
+  renderProblems();
+  buildPage();
+  showToast("Прогресс сброшен");
+});
+
+buildPage();
+</script>
+</body>
+</html>
