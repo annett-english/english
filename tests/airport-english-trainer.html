@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Airport English — тренажёр лексики</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0E1620;
+  --panel:#16232F;
+  --panel-2:#1D2E3D;
+  --paper:#E8EBEE;
+  --card:#FFFFFF;
+  --line:#C9D1D8;
+  --sign:#005EB8;
+  --amber:#FFB300;
+  --yellow:#FFCC00;
+  --ok:#127C58;
+  --ok-bg:#E4F4EC;
+  --bad:#C0392B;
+  --bad-bg:#FBE9E7;
+  --muted:#5C6B78;
+  --display:"Barlow Condensed", "Arial Narrow", sans-serif;
+  --body:"IBM Plex Sans", -apple-system, Segoe UI, Roboto, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, Consolas, monospace;
+  --radius:2px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:var(--body); font-size:15px; line-height:1.55;
+  background-image:linear-gradient(180deg,#DFE4E8 0,#E8EBEE 240px);
+}
+/* ---------- header / board ---------- */
+header.board{
+  background:var(--ink); color:#fff; padding:22px 20px 18px;
+  border-bottom:5px solid var(--yellow);
+}
+.board-inner{max-width:1180px;margin:0 auto;display:flex;flex-wrap:wrap;gap:18px;align-items:flex-end;justify-content:space-between}
+.sign-row{display:flex;align-items:center;gap:14px}
+.arrow{font-family:var(--display);font-size:40px;line-height:1;color:var(--yellow)}
+h1{
+  font-family:var(--display); font-weight:700; text-transform:uppercase;
+  letter-spacing:.06em; font-size:clamp(28px,5vw,46px); margin:0;
+}
+h1 small{display:block;font-size:13px;letter-spacing:.22em;color:var(--yellow);font-weight:500;margin-top:4px}
+.gcontrols{display:flex;gap:8px;flex-wrap:wrap}
+/* ---------- buttons ---------- */
+button{font-family:var(--body);cursor:pointer;border-radius:var(--radius);transition:.15s}
+.btn{
+  border:1px solid rgba(255,255,255,.35); background:transparent; color:#fff;
+  padding:9px 14px; font-size:13px; font-weight:600; letter-spacing:.03em;
+}
+.btn:hover{background:rgba(255,255,255,.12)}
+.btn.solid{background:var(--yellow);border-color:var(--yellow);color:var(--ink)}
+.btn.solid:hover{background:#ffd633}
+.btn-s{
+  border:1px solid var(--line); background:#fff; color:var(--ink);
+  padding:7px 12px; font-size:13px; font-weight:600;
+}
+.btn-s:hover{border-color:var(--sign);color:var(--sign)}
+.btn-s.primary{background:var(--sign);border-color:var(--sign);color:#fff}
+.btn-s.primary:hover{background:#004e99;color:#fff}
+.btn-s.ghost{background:transparent}
+.spk{
+  border:1px solid transparent;background:transparent;color:var(--sign);
+  font-size:15px;padding:2px 6px;line-height:1;
+}
+.spk:hover{background:#D9E6F5}
+:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+/* ---------- layout ---------- */
+.wrap{max-width:1180px;margin:0 auto;padding:22px 20px 80px;display:grid;grid-template-columns:1fr 268px;gap:26px;align-items:start}
+aside{position:sticky;top:16px;display:flex;flex-direction:column;gap:14px}
+@media (max-width:920px){
+  .wrap{grid-template-columns:1fr}
+  aside{position:static;order:-1}
+}
+/* ---------- panels ---------- */
+.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius)}
+.panel-h{
+  font-family:var(--display);text-transform:uppercase;letter-spacing:.1em;
+  font-size:15px;font-weight:600;padding:9px 12px;background:var(--panel);color:#fff;
+  display:flex;justify-content:space-between;align-items:center;gap:8px
+}
+.panel-b{padding:12px}
+.score{font-family:var(--mono);font-size:26px;font-weight:500}
+.score span{font-size:14px;color:var(--muted)}
+.bar{height:6px;background:#DDE2E7;margin-top:8px}
+.bar i{display:block;height:100%;background:var(--ok);width:0;transition:width .3s}
+/* problem words */
+table.pw{width:100%;border-collapse:collapse;font-size:13px}
+table.pw td{padding:5px 4px;border-bottom:1px dotted var(--line);vertical-align:middle}
+table.pw td.n{font-family:var(--mono);color:var(--bad);text-align:right;width:26px;font-weight:500}
+table.pw td.w{font-weight:600}
+.empty{font-size:13px;color:var(--muted);font-style:italic}
+.hint-box{font-size:12.5px;color:var(--muted);line-height:1.5}
+/* ---------- word board ---------- */
+.wordboard{background:var(--ink);color:#fff;border:1px solid var(--ink);margin-bottom:22px}
+.wb-h{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid #2A3A48;flex-wrap:wrap}
+.wb-h h2{font-family:var(--display);text-transform:uppercase;letter-spacing:.12em;font-size:16px;margin:0;font-weight:600}
+.wb-h .eyebrow{font-family:var(--mono);font-size:11px;color:var(--amber);letter-spacing:.1em}
+.rows{display:grid;grid-template-columns:1fr 1fr}
+@media (max-width:700px){.rows{grid-template-columns:1fr}}
+.row{
+  display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;
+  padding:7px 14px;border-top:1px solid #22323F;animation:flap .35s ease both;
+}
+@keyframes flap{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+.row .en{font-family:var(--display);font-size:19px;letter-spacing:.03em;text-transform:uppercase;font-weight:600}
+.row .ipa{font-family:var(--mono);font-size:11.5px;color:var(--amber)}
+.row .ru{font-size:12.5px;color:#AFBCC7}
+.row .spk{color:var(--yellow)}
+.row .spk:hover{background:rgba(255,255,255,.12)}
+.phrases{padding:12px 14px;border-top:2px solid var(--yellow);display:flex;flex-wrap:wrap;gap:7px}
+.chip{
+  font-family:var(--mono);font-size:12px;border:1px solid #334656;color:#DCE4EA;
+  padding:4px 8px;background:#111E29;display:inline-flex;gap:6px;align-items:center
+}
+.chip button{border:0;background:transparent;color:var(--yellow);cursor:pointer;font-size:12px;padding:0}
+/* ---------- exercise ---------- */
+.ex{margin-bottom:20px;border:1px solid var(--line);background:var(--card)}
+.ex-h{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border-bottom:1px solid var(--line);background:#F4F6F8}
+.gate{
+  font-family:var(--mono);font-size:11px;background:var(--panel);color:var(--yellow);
+  padding:4px 7px;letter-spacing:.08em;white-space:nowrap;margin-top:2px
+}
+.ex-h h3{font-family:var(--display);text-transform:uppercase;letter-spacing:.06em;font-size:20px;margin:0;font-weight:600}
+.ex-h p{margin:2px 0 0;font-size:13px;color:var(--muted)}
+.ex-b{padding:6px 14px 14px}
+.bank{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 4px;padding:9px;background:#F4F6F8;border:1px dashed var(--line)}
+.bank b{font-family:var(--mono);font-size:11px;color:var(--muted);align-self:center;margin-right:4px;letter-spacing:.08em}
+.bank span{font-family:var(--mono);font-size:12.5px;background:#fff;border:1px solid var(--line);padding:3px 7px}
+ol.items{list-style:none;margin:8px 0 0;padding:0;counter-reset:it}
+ol.items>li{
+  counter-increment:it;display:grid;grid-template-columns:24px 1fr minmax(190px,42%) 22px;
+  gap:10px;align-items:center;padding:7px 0;border-bottom:1px dotted var(--line)
+}
+ol.items>li:before{content:counter(it);font-family:var(--mono);font-size:12px;color:var(--muted);text-align:right}
+ol.items>li.stack{grid-template-columns:24px 1fr 22px}
+ol.items>li.stack .q{grid-column:2/3;grid-row:1}
+ol.items>li.stack .field{grid-column:2/4}
+ol.items>li.stack .mark{grid-column:3/4;grid-row:1;align-self:start}
+@media (max-width:640px){
+  ol.items>li{grid-template-columns:22px 1fr 22px}
+  ol.items>li .field{grid-column:2/3}
+}
+.q{font-size:14.5px}
+.q em{font-style:normal;font-family:var(--mono);background:#F0F3F5;padding:1px 5px;border:1px solid var(--line);font-size:13px}
+.q .sc{font-family:var(--mono);letter-spacing:.02em;font-size:13.5px}
+.q .ru-q{color:var(--sign);font-weight:600}
+input.ans,textarea.ans{
+  width:100%;font-family:var(--body);font-size:14.5px;padding:7px 9px;
+  border:1px solid var(--line);border-radius:var(--radius);background:#FCFDFD;color:var(--ink)
+}
+input.ans:focus,textarea.ans:focus{border-color:var(--sign);background:#fff}
+textarea.ans{min-height:44px;resize:vertical;line-height:1.45}
+.ok input.ans,.ok textarea.ans{border-color:var(--ok);background:var(--ok-bg)}
+.bad input.ans{border-color:var(--bad);background:var(--bad-bg)}
+.shown input.ans{border-color:var(--amber);background:#FFF7E3;font-weight:600}
+.mark{font-family:var(--mono);font-size:15px;text-align:center}
+.ok .mark{color:var(--ok)}.bad .mark{color:var(--bad)}.shown .mark{color:#B07800}
+.sol{font-size:12.5px;color:var(--ok);font-family:var(--mono);margin-top:3px;display:none}
+.shown .sol,.bad.revealed .sol{display:block}
+.ex-f{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:0 14px 14px}
+.res{font-family:var(--mono);font-size:13px;color:var(--muted);margin-left:auto}
+.drill{display:grid;gap:6px}
+.drill .stepline{display:grid;grid-template-columns:110px 1fr;gap:8px;align-items:center}
+.drill .stepline b{font-family:var(--display);text-transform:uppercase;font-size:17px;letter-spacing:.04em}
+.drill .stepline i{font-family:var(--mono);font-size:11px;color:var(--muted);font-style:normal}
+.model{background:#F4F6F8;border-left:3px solid var(--amber);padding:9px 12px;margin:8px 0 12px;font-family:var(--mono);font-size:12.5px;line-height:1.7}
+.toast{
+  position:fixed;left:50%;bottom:26px;transform:translate(-50%,20px);opacity:0;
+  background:var(--ink);color:#fff;padding:11px 18px;font-size:14px;pointer-events:none;
+  transition:.25s;z-index:50;border-left:4px solid var(--yellow)
+}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+footer{max-width:1180px;margin:0 auto;padding:0 20px 40px;font-size:12.5px;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<header class="board">
+  <div class="board-inner">
+    <div class="sign-row">
+      <div class="arrow">→</div>
+      <h1>Airport English<small>vocabulary · 13 exercises</small></h1>
+    </div>
+    <div class="gcontrols">
+      <button class="btn solid" id="checkAll">Проверить всё</button>
+      <button class="btn" id="showAll">Показать все ответы</button>
+      <button class="btn" id="resetAll">Начать заново</button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <main>
+    <!-- WORD BOARD -->
+    <section class="wordboard">
+      <div class="wb-h">
+        <div>
+          <div class="eyebrow">STEP 0 · WARM-UP</div>
+          <h2>Слова и транскрипция</h2>
+        </div>
+        <button class="btn solid" id="playAll">▶ Прослушать все слова</button>
+      </div>
+      <div class="rows" id="wordRows"></div>
+      <div class="phrases" id="phraseChips"></div>
+    </section>
+
+    <div id="exercises"></div>
+  </main>
+
+  <aside>
+    <div class="panel">
+      <div class="panel-h">Счёт</div>
+      <div class="panel-b">
+        <div class="score"><b id="scoreNum">0</b><span> / <span id="scoreTotal">0</span> верно</span></div>
+        <div class="bar"><i id="barFill"></i></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-h">Проблемные слова <button class="btn-s ghost" id="clearPw" style="padding:2px 7px;font-size:11px">очистить</button></div>
+      <div class="panel-b" id="pwBox"><div class="empty">Пока пусто. Слово попадёт сюда, если ответ будет неверным.</div></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-h">Как работать</div>
+      <div class="panel-b hint-box">
+        Пишите ответы руками — без подсказок и списков.<br><br>
+        Регистр, точки и запятые не важны. <b>check-in</b> и <b>check in</b> — одинаково верно.<br><br>
+        В упр. 11 проверяется, использовали ли вы заданное слово. В упр. 12–13 ответы свои — их можно скопировать одной кнопкой.
+      </div>
+    </div>
+  </aside>
+</div>
+
+<footer>Airport English · 12 слов, 10 фраз, 13 упражнений. Озвучка — встроенный синтезатор речи браузера (лучше всего работает в Chrome / Safari).</footer>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============ DATA ============ */
+const WORDS=[
+ {en:"arrivals",ipa:"/əˈraɪvəlz/",ru:"прилёт, зона прилёта"},
+ {en:"departures",ipa:"/dɪˈpɑːtʃəz/",ru:"вылет, зона вылета"},
+ {en:"customs",ipa:"/ˈkʌstəmz/",ru:"таможня"},
+ {en:"passport control",ipa:"/ˈpɑːspɔːt kənˈtrəʊl/",ru:"паспортный контроль"},
+ {en:"bag drop",ipa:"/ˈbæɡ drɒp/",ru:"стойка сдачи багажа"},
+ {en:"security check",ipa:"/sɪˈkjʊərəti tʃek/",ru:"досмотр, контроль безопасности"},
+ {en:"baggage reclaim",ipa:"/ˈbæɡɪdʒ rɪˈkleɪm/",ru:"выдача багажа"},
+ {en:"gates",ipa:"/ɡeɪts/",ru:"выходы на посадку"},
+ {en:"terminal",ipa:"/ˈtɜːmɪnl/",ru:"терминал"},
+ {en:"check-in",ipa:"/ˈtʃek ɪn/",ru:"регистрация (на рейс)"},
+ {en:"lifts",ipa:"/lɪfts/",ru:"лифты"},
+ {en:"trolley",ipa:"/ˈtrɒli/",ru:"тележка (для багажа)"}
+];
+const PHRASES=["collect your baggage","board the plane","go through customs","get a boarding pass","show your passport","drop off your bag","go through security check","check in for your flight","go through passport control","take a trolley"];
+
+const EX=[
+{n:1,title:"Вставьте пропущенные буквы",instr:"Напишите слово полностью.",items:[
+ {q:"a _ r i _ a l s",a:["arrivals"],w:"arrivals"},
+ {q:"d e p _ r t _ r e s",a:["departures"],w:"departures"},
+ {q:"c u s _ o _ s",a:["customs"],w:"customs"},
+ {q:"t r _ l l _ y",a:["trolley"],w:"trolley"},
+ {q:"t e _ m i n _ l",a:["terminal"],w:"terminal"},
+ {q:"b _ g g _ g e   r e c l _ i m",a:["baggage reclaim"],w:"baggage reclaim"},
+ {q:"s e c _ r i t y   c h _ c k",a:["security check"],w:"security check"},
+ {q:"p _ s s p _ r t   c o n t r o l",a:["passport control"],w:"passport control"},
+ {q:"c h _ c k - _ n",a:["check-in","check in"],w:"check-in"},
+ {q:"l _ f t s",a:["lifts"],w:"lifts"}
+],mono:true},
+
+{n:2,title:"Переведите на английский",instr:"Одно слово или словосочетание.",items:[
+ {q:"прилёт",a:["arrivals","arrival"],w:"arrivals"},
+ {q:"вылет",a:["departures","departure"],w:"departures"},
+ {q:"таможня",a:["customs"],w:"customs"},
+ {q:"тележка для багажа",a:["trolley","a trolley","baggage trolley"],w:"trolley"},
+ {q:"лифты",a:["lifts","the lifts"],w:"lifts"},
+ {q:"терминал",a:["terminal","a terminal","the terminal"],w:"terminal"},
+ {q:"выдача багажа",a:["baggage reclaim"],w:"baggage reclaim"},
+ {q:"паспортный контроль",a:["passport control"],w:"passport control"},
+ {q:"регистрация на рейс",a:["check-in","check in"],w:"check-in"},
+ {q:"контроль безопасности, досмотр",a:["security check","the security check"],w:"security check"}
+],ruq:true},
+
+{n:3,title:"Definition → word",instr:"Прочитайте определение и напишите слово.",items:[
+ {q:"The place where you wait for your suitcase after the flight.",a:["baggage reclaim","the baggage reclaim"],w:"baggage reclaim"},
+ {q:"The place where officers check what you are bringing into the country.",a:["customs"],w:"customs"},
+ {q:"The part of the airport where planes land and passengers come in.",a:["arrivals"],w:"arrivals"},
+ {q:"The part of the airport where planes take off from.",a:["departures"],w:"departures"},
+ {q:"A big building at an airport where passengers arrive and leave.",a:["terminal","a terminal"],w:"terminal"},
+ {q:"The desk where you show your ticket and get a boarding pass.",a:["check-in","check in","check-in desk"],w:"check-in"},
+ {q:"The point where your bag and your body are scanned.",a:["security check","the security check"],w:"security check"},
+ {q:"The doors where passengers get on the plane.",a:["gates","gate","the gates"],w:"gates"},
+ {q:"A metal cart you push your heavy bags on.",a:["trolley","a trolley"],w:"trolley"},
+ {q:"The desk where you only leave your suitcase if you checked in online.",a:["bag drop","the bag drop"],w:"bag drop"}
+]},
+
+{n:4,title:"Сочетаемость: поставьте глагол",instr:"Впишите один глагол в правильной форме.",bank:["board","check","collect","drop","get","go","show","take"],items:[
+ {q:"____ in for your flight",a:["check"],w:"check in for your flight"},
+ {q:"____ through customs",a:["go"],w:"go through customs"},
+ {q:"____ your baggage",a:["collect"],w:"collect your baggage"},
+ {q:"____ the plane",a:["board"],w:"board the plane"},
+ {q:"____ off your bag",a:["drop"],w:"drop off your bag"},
+ {q:"____ a boarding pass",a:["get"],w:"get a boarding pass"},
+ {q:"____ your passport",a:["show"],w:"show your passport"},
+ {q:"____ a trolley",a:["take"],w:"take a trolley"},
+ {q:"____ through passport control",a:["go"],w:"go through passport control"},
+ {q:"____ through the security check",a:["go"],w:"go through security check"}
+],mono:true},
+
+{n:5,title:"Соедините половинки выражений",instr:"Напишите вторую половину. Все окончания перемешаны в рамке.",bank:["your passport","the plane","a trolley","customs","your bag","your baggage","for your flight","a boarding pass","security check","passport control"],items:[
+ {q:"collect …",a:["your baggage"],w:"collect your baggage"},
+ {q:"board …",a:["the plane"],w:"board the plane"},
+ {q:"go through … (зелёный/красный коридор)",a:["customs"],w:"go through customs"},
+ {q:"get …",a:["a boarding pass"],w:"get a boarding pass"},
+ {q:"show …",a:["your passport"],w:"show your passport"},
+ {q:"drop off …",a:["your bag"],w:"drop off your bag"},
+ {q:"go through … (сканер, снимите ремень)",a:["security check","the security check"],w:"go through security check"},
+ {q:"check in …",a:["for your flight"],w:"check in for your flight"},
+ {q:"take …",a:["a trolley"],w:"take a trolley"},
+ {q:"go through … (офицер смотрит документы)",a:["passport control"],w:"go through passport control"}
+]},
+
+{n:6,title:"What usually comes after?",instr:"Впишите слово, которое обычно идёт следующим.",items:[
+ {q:"security ____",a:["check"],w:"security check"},
+ {q:"passport ____",a:["control"],w:"passport control"},
+ {q:"baggage ____",a:["reclaim"],w:"baggage reclaim"},
+ {q:"boarding ____",a:["pass","card"],w:"get a boarding pass"},
+ {q:"hand ____",a:["luggage","baggage"],w:"baggage reclaim"},
+ {q:"bag ____",a:["drop"],w:"bag drop"},
+ {q:"duty-____",a:["free"],w:"terminal"},
+ {q:"carry-____",a:["on"],w:"bag drop"},
+ {q:"window ____",a:["seat"],w:"board the plane"},
+ {q:"departure ____",a:["lounge","gate","board","hall"],w:"departures"}
+],mono:true},
+
+{n:7,title:"Guess the word",instr:"Первая буква дана. Напишите слово целиком.",items:[
+ {q:"You push your heavy bags on it. — t _ _ _ _ _ _",a:["trolley"],w:"trolley"},
+ {q:"Numbers on the screen: 12, 24, 36 — you go there to board. — g _ _ _ _",a:["gates","gate"],w:"gates"},
+ {q:"You take them instead of the stairs. — l _ _ _ _",a:["lifts","lift"],w:"lifts"},
+ {q:"Green channel, red channel, \u201cnothing to declare\u201d. — c _ _ _ _ _ _",a:["customs"],w:"customs"},
+ {q:"Heathrow has five of them. — t _ _ _ _ _ _ _",a:["terminals","terminal"],w:"terminal"},
+ {q:"Where families wait with flowers and signs. — a _ _ _ _ _ _ _",a:["arrivals"],w:"arrivals"},
+ {q:"The board with all the flights leaving today. — d _ _ _ _ _ _ _ _ _",a:["departures"],w:"departures"},
+ {q:"Online or at the desk, 2 hours before the flight. — c _ _ _ _ - _ _",a:["check-in","check in"],w:"check-in"},
+ {q:"The belt that goes round and round with suitcases. — b _ _ _ _ _ _   r _ _ _ _ _ _",a:["baggage reclaim"],w:"baggage reclaim"},
+ {q:"Take off your belt, laptop out of the bag. — s _ _ _ _ _ _ _   c _ _ _ _",a:["security check"],w:"security check"}
+]},
+
+{n:8,title:"Put in the correct order",instr:"Соберите предложение. Знаки препинания не важны.",items:[
+ {q:"reclaim / at / baggage / the / meet / me",a:["meet me at the baggage reclaim"],w:"baggage reclaim"},
+ {q:"through / went / customs / we / quickly",a:["we went through customs quickly"],w:"go through customs"},
+ {q:"you / did / in / check / online",a:["did you check in online"],w:"check in for your flight"},
+ {q:"bag / drop / where / the / is",a:["where is the bag drop"],w:"bag drop"},
+ {q:"boarding / your / show / pass / please",a:["show your boarding pass please","please show your boarding pass"],w:"get a boarding pass"},
+ {q:"plane / we / the / boarded / at / 12 / gate",a:["we boarded the plane at gate 12"],w:"board the plane"},
+ {q:"take / let's / trolley / a",a:["lets take a trolley"],w:"take a trolley"},
+ {q:"terminal / arrives / flight / 2 / at / his",a:["his flight arrives at terminal 2"],w:"terminal"},
+ {q:"lifts / are / the / on / left / the",a:["the lifts are on the left"],w:"lifts"},
+ {q:"control / long / passport / the / queue / at / was",a:["the queue at passport control was long"],w:"passport control"}
+],stack:true,mono:true},
+
+{n:9,title:"True or False",instr:"Напишите T (true) или F (false).",items:[
+ {q:"You collect your bags at the check-in desk.",a:["f","false","неверно"],sol:"F — at baggage reclaim",w:"baggage reclaim"},
+ {q:"Departures is for passengers who are leaving by plane.",a:["t","true","верно"],sol:"T",w:"departures"},
+ {q:"At passport control an officer checks your documents.",a:["t","true","верно"],sol:"T",w:"passport control"},
+ {q:"A trolley helps you move heavy bags.",a:["t","true","верно"],sol:"T",w:"trolley"},
+ {q:"Customs is the place where you buy your ticket.",a:["f","false","неверно"],sol:"F — you buy tickets online or at a ticket desk",w:"customs"},
+ {q:"You get a boarding pass when you check in.",a:["t","true","верно"],sol:"T",w:"get a boarding pass"},
+ {q:"Baggage reclaim is where you leave your bag before the flight.",a:["f","false","неверно"],sol:"F — that is the bag drop",w:"bag drop"},
+ {q:"Gates are the places where passengers get on the plane.",a:["t","true","верно"],sol:"T",w:"gates"},
+ {q:"You go through the security check just after you land.",a:["f","false","неверно"],sol:"F — before the flight, in departures",w:"security check"},
+ {q:"A terminal is a building at an airport.",a:["t","true","верно"],sol:"T",w:"terminal"}
+],narrow:true},
+
+{n:10,title:"Which word fits?",instr:"Выберите одно из двух и впишите его.",items:[
+ {q:"My sister is waiting for me in ____. (arrivals / departures)",a:["arrivals"],w:"arrivals"},
+ {q:"Put your laptop in the tray at the ____. (security check / bag drop)",a:["security check"],w:"security check"},
+ {q:"We waited 30 minutes at ____ for our suitcases. (baggage reclaim / check-in)",a:["baggage reclaim"],w:"baggage reclaim"},
+ {q:"If you checked in online, just go to the ____. (bag drop / gates)",a:["bag drop"],w:"bag drop"},
+ {q:"Our plane leaves from ____ 24. (gate / customs)",a:["gate"],w:"gates"},
+ {q:"Take the ____ to the third floor. (lifts / trolley)",a:["lifts","lift"],w:"lifts"},
+ {q:"He had nothing to declare at ____. (customs / departures)",a:["customs"],w:"customs"},
+ {q:"The flight to Rome leaves from ____ 3 — the whole building. (Terminal / Trolley)",a:["terminal"],w:"terminal"},
+ {q:"You need your passport at ____. (passport control / baggage reclaim)",a:["passport control"],w:"passport control"},
+ {q:"Push your bags on a ____. (trolley / lift)",a:["trolley"],w:"trolley"}
+]},
+
+{n:11,title:"Rephrase",instr:"Перепишите предложение, используя слово в скобках. Проверяется, есть ли это слово в вашем ответе.",items:[
+ {q:"We left our suitcase at the desk. (drop off)",need:["drop"],sol:"We dropped off our bag at the bag drop.",w:"drop off your bag"},
+ {q:"They looked at my documents. (passport control)",need:["passport control"],sol:"I went through passport control.",w:"passport control"},
+ {q:"We got on the plane at seven. (board)",need:["board"],sol:"We boarded the plane at seven.",w:"board the plane"},
+ {q:"I took my suitcase from the belt. (collect)",need:["collect"],sol:"I collected my baggage at baggage reclaim.",w:"collect your baggage"},
+ {q:"I registered for my flight on my phone. (check in)",need:["check"],sol:"I checked in for my flight online.",w:"check in for your flight"},
+ {q:"They scanned my bag and my coat. (security check)",need:["security check"],sol:"I went through the security check.",w:"security check"},
+ {q:"Officers asked what I was bringing into the country. (customs)",need:["customs"],sol:"I went through customs.",w:"go through customs"},
+ {q:"I couldn't carry all my bags. (trolley)",need:["trolley"],sol:"I took a trolley.",w:"take a trolley"},
+ {q:"Mum met me right after I landed. (arrivals)",need:["arrivals"],sol:"Mum met me in arrivals.",w:"arrivals"},
+ {q:"The screen showed all the flights leaving today. (departures)",need:["departures"],sol:"The departures board showed all today's flights.",w:"departures"}
+],stack:true},
+
+{n:12,title:"Finish the sentences — your own ideas",instr:"Свободные ответы. Проверки нет — есть кнопка «Скопировать всё».",free:true,items:[
+ {q:"The last time I was at an airport, I …"},
+ {q:"I usually check in …"},
+ {q:"At the security check I always …"},
+ {q:"When I collect my baggage, I …"},
+ {q:"I hate waiting at passport control because …"},
+ {q:"If my flight is delayed, I …"},
+ {q:"I never take a trolley when …"},
+ {q:"The best terminal I have ever been to was …"},
+ {q:"Before I board the plane, I …"},
+ {q:"When I come into arrivals, the first thing I do is …"}
+]},
+
+{n:13,title:"Repeat & Change — drilling",instr:"По образцу: слово → словосочетание → своё предложение. Свои идеи, потом «Скопировать всё».",drill:true,model:["suffer","suffer → suffer from stress","suffer from stress → Many people suffer from stress."],items:[
+ {w:"check in"},{w:"drop off"},{w:"go through"},{w:"board"},{w:"collect"},
+ {w:"customs"},{w:"trolley"},{w:"terminal"},{w:"gate"},{w:"arrivals"}
+]}
+];
+
+/* ============ HELPERS ============ */
+const $=s=>document.querySelector(s), esc=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+function norm(s){return (s||"").toLowerCase().replace(/[\u2019\u2018\u02bc]/g,"'").replace(/[.,!?;:()"\u00ab\u00bb]/g,"").replace(/[-\u2013\u2014_]/g," ").replace(/\s+/g," ").trim();}
+let toastT;
+function toast(msg){const t=$("#toast");t.textContent=msg;t.classList.add("on");clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove("on"),2200);}
+function speak(txt){
+  if(!("speechSynthesis" in window)){toast("Браузер не поддерживает озвучку");return;}
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(txt);u.lang="en-GB";u.rate=.88;
+  const v=speechSynthesis.getVoices().find(x=>/en-GB/i.test(x.lang))||speechSynthesis.getVoices().find(x=>/^en/i.test(x.lang));
+  if(v)u.voice=v;speechSynthesis.speak(u);
+}
+function speakSeq(list){
+  if(!("speechSynthesis" in window)){toast("Браузер не поддерживает озвучку");return;}
+  speechSynthesis.cancel();
+  list.forEach((w,i)=>{const u=new SpeechSynthesisUtterance(w);u.lang="en-GB";u.rate=.85;setTimeout(()=>speechSynthesis.speak(u),0);});
+}
+
+/* ============ WARM-UP BOARD ============ */
+$("#wordRows").innerHTML=WORDS.map((w,i)=>`
+ <div class="row" style="animation-delay:${i*40}ms">
+   <div>
+     <div class="en">${w.en}</div>
+     <div class="ipa">${w.ipa}</div>
+     <div class="ru">${w.ru}</div>
+   </div>
+   <button class="spk" data-say="${w.en}" title="Прослушать" aria-label="Прослушать ${w.en}">▶</button>
+ </div>`).join("");
+$("#phraseChips").innerHTML=`<span class="chip" style="border-color:var(--yellow);color:var(--yellow)">10 ФРАЗ →</span>`+
+ PHRASES.map(p=>`<span class="chip">${p}<button data-say="${p}" title="Прослушать" aria-label="Прослушать ${p}">▶</button></span>`).join("");
+$("#playAll").onclick=()=>speakSeq(WORDS.map(w=>w.en));
+document.addEventListener("click",e=>{const b=e.target.closest("[data-say]");if(b)speak(b.dataset.say);});
+
+/* ============ RENDER EXERCISES ============ */
+const problem={}; let totalCheckable=0;
+const host=$("#exercises");
+EX.forEach(ex=>{
+  const sec=document.createElement("section");
+  sec.className="ex";sec.id="ex"+ex.n;
+  let body="";
+  if(ex.bank)body+=`<div class="bank"><b>BANK</b>${ex.bank.map(b=>`<span>${esc(b)}</span>`).join("")}</div>`;
+  if(ex.model)body+=`<div class="model">${ex.model.map(m=>esc(m)).join("<br>")}</div>`;
+
+  if(ex.drill){
+    body+=`<ol class="items">`+ex.items.map((it,i)=>`
+      <li class="stack" data-i="${i}">
+        <div class="field drill">
+          <div class="stepline"><b>${esc(it.w)}</b><i>слово</i></div>
+          <div class="stepline"><i style="text-align:right">→ фраза</i><input class="ans d1" placeholder="${esc(it.w)} → …"></div>
+          <div class="stepline"><i style="text-align:right">→ предложение</i><input class="ans d2" placeholder="… → своё предложение"></div>
+        </div><div></div>
+      </li>`).join("")+`</ol>`;
+  } else if(ex.free){
+    body+=`<ol class="items">`+ex.items.map((it,i)=>`
+      <li class="stack" data-i="${i}">
+        <div class="field">
+          <div class="q">${esc(it.q)}</div>
+          <textarea class="ans" placeholder="ваш вариант…"></textarea>
+        </div><div></div>
+      </li>`).join("")+`</ol>`;
+  } else {
+    body+=`<ol class="items">`+ex.items.map((it,i)=>{
+      totalCheckable++;
+      const qcls=ex.mono?"sc":(ex.ruq?"ru-q":"");
+      const solTxt=it.sol||it.a[0];
+      return `<li class="${ex.stack?"stack":""}" data-i="${i}">
+        <div class="q ${qcls}">${esc(it.q)}</div>
+        <div class="field">
+          <input class="ans" ${ex.narrow?'style="max-width:120px" placeholder="T / F"':'placeholder="ваш ответ"'} autocomplete="off" spellcheck="false">
+          <div class="sol">✓ ${esc(solTxt)}</div>
+        </div>
+        <div class="mark"></div>
+      </li>`;}).join("")+`</ol>`;
+  }
+
+  const foot=(ex.free||ex.drill)
+    ? `<button class="btn-s primary" data-act="copy">Скопировать всё</button>
+       <button class="btn-s" data-act="clear">Очистить</button>
+       <span class="res"></span>`
+    : `<button class="btn-s primary" data-act="check">Проверить</button>
+       <button class="btn-s" data-act="show">Показать ответы</button>
+       <button class="btn-s" data-act="clear">Очистить</button>
+       <span class="res"></span>`;
+
+  sec.innerHTML=`
+    <div class="ex-h">
+      <div class="gate">EX ${String(ex.n).padStart(2,"0")}</div>
+      <div><h3>${esc(ex.title)}</h3><p>${esc(ex.instr)}</p></div>
+    </div>
+    <div class="ex-b">${body}</div>
+    <div class="ex-f">${foot}</div>`;
+  host.appendChild(sec);
+  sec._ex=ex;
+});
+$("#scoreTotal").textContent=totalCheckable;
+
+/* ============ CHECKING ============ */
+function isRight(ex,it,val){
+  if(it.need){const n=norm(val);if(n.split(" ").length<3)return false;return it.need.every(k=>n.includes(norm(k)));}
+  return it.a.some(a=>norm(a)===norm(val));
+}
+function addProblem(w){if(!w)return;problem[w]=(problem[w]||0)+1;renderProblem();}
+function renderProblem(){
+  const keys=Object.keys(problem).sort((a,b)=>problem[b]-problem[a]);
+  $("#pwBox").innerHTML=keys.length
+    ? `<table class="pw">`+keys.map(k=>`<tr><td class="n">${problem[k]}</td><td class="w">${esc(k)}</td><td style="width:24px"><button class="spk" data-say="${esc(k)}" aria-label="Прослушать ${esc(k)}">▶</button></td></tr>`).join("")+`</table>`
+    : `<div class="empty">Пока пусто. Слово попадёт сюда, если ответ будет неверным.</div>`;
+}
+function checkEx(sec,silent){
+  const ex=sec._ex;if(ex.free||ex.drill)return;
+  let ok=0;
+  sec.querySelectorAll("ol.items>li").forEach(li=>{
+    const it=ex.items[+li.dataset.i], inp=li.querySelector("input.ans"), val=inp.value.trim();
+    li.classList.remove("ok","bad","shown");
+    const mark=li.querySelector(".mark");
+    if(!val){mark.textContent="";return;}
+    if(isRight(ex,it,val)){li.classList.add("ok");mark.textContent="✓";ok++;}
+    else{li.classList.add("bad");mark.textContent="✕";addProblem(it.w);}
+  });
+  sec.querySelector(".res").textContent=`${ok} / ${ex.items.length}`;
+  updateScore();
+  if(!silent)toast(ok===ex.items.length?"Всё верно 🎉":`Верно: ${ok} из ${ex.items.length}`);
+}
+function showEx(sec){
+  const ex=sec._ex;if(ex.free||ex.drill)return;
+  sec.querySelectorAll("ol.items>li").forEach(li=>{
+    const it=ex.items[+li.dataset.i],inp=li.querySelector("input.ans");
+    if(!li.classList.contains("ok")){
+      li.classList.remove("bad");li.classList.add("shown");
+      inp.value=it.need?(it.sol||""):it.a[0];
+      li.querySelector(".mark").textContent="→";
+    }
+  });
+  updateScore();
+}
+function clearEx(sec){
+  sec.querySelectorAll(".ans").forEach(i=>i.value="");
+  sec.querySelectorAll("ol.items>li").forEach(li=>{li.classList.remove("ok","bad","shown");const m=li.querySelector(".mark");if(m)m.textContent="";});
+  sec.querySelector(".res").textContent="";updateScore();
+}
+function updateScore(){
+  const n=document.querySelectorAll("ol.items>li.ok").length;
+  $("#scoreNum").textContent=n;
+  $("#barFill").style.width=(totalCheckable?100*n/totalCheckable:0)+"%";
+}
+function copyEx(sec){
+  const ex=sec._ex;let out=`Ex ${ex.n} — ${ex.title}\n\n`;
+  sec.querySelectorAll("ol.items>li").forEach((li,i)=>{
+    if(ex.drill){
+      const a=li.querySelector(".d1").value.trim(),b=li.querySelector(".d2").value.trim();
+      out+=`${i+1}. ${ex.items[i].w}\n   → ${a||"—"}\n   → ${b||"—"}\n`;
+    }else{
+      out+=`${i+1}. ${ex.items[i].q} ${li.querySelector("textarea").value.trim()}\n`;
+    }
+  });
+  const done=()=>{toast("Скопировано в буфер обмена");sec.querySelector(".res").textContent="скопировано ✓";};
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(out).then(done,()=>fallbackCopy(out,done));}
+  else fallbackCopy(out,done);
+}
+function fallbackCopy(text,cb){
+  const ta=document.createElement("textarea");ta.value=text;ta.style.position="fixed";ta.style.opacity="0";
+  document.body.appendChild(ta);ta.select();
+  try{document.execCommand("copy");cb();}catch(e){toast("Не удалось скопировать — выделите текст вручную");}
+  ta.remove();
+}
+
+/* ============ EVENTS ============ */
+host.addEventListener("click",e=>{
+  const b=e.target.closest("[data-act]");if(!b)return;
+  const sec=b.closest(".ex");
+  ({check:checkEx,show:showEx,clear:clearEx,copy:copyEx})[b.dataset.act](sec);
+});
+host.addEventListener("keydown",e=>{
+  if(e.key==="Enter"&&e.target.matches("input.ans")){e.preventDefault();
+    const sec=e.target.closest(".ex");
+    if(sec._ex.drill){const all=[...sec.querySelectorAll("input.ans")],i=all.indexOf(e.target);if(all[i+1])all[i+1].focus();}
+    else{const all=[...sec.querySelectorAll("input.ans")],i=all.indexOf(e.target);if(all[i+1])all[i+1].focus();else checkEx(sec);}
+  }
+});
+$("#checkAll").onclick=()=>{document.querySelectorAll(".ex").forEach(s=>checkEx(s,true));toast("Проверено. Ошибки — в таблице справа.");};
+$("#showAll").onclick=()=>{document.querySelectorAll(".ex").forEach(showEx);toast("Ответы открыты");};
+$("#resetAll").onclick=()=>{document.querySelectorAll(".ex").forEach(clearEx);for(const k in problem)delete problem[k];renderProblem();toast("Всё сброшено");};
+$("#clearPw").onclick=()=>{for(const k in problem)delete problem[k];renderProblem();};
+if("speechSynthesis" in window)speechSynthesis.getVoices();
+renderProblem();updateScore();
+</script>
+</body>
+</html>
