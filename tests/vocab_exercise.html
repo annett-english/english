@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Health & Beauty — тренажёр слов</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#EEF3EC;
+    --paper:#FFFFFF;
+    --ink:#20301F;
+    --ink-soft:#576853;
+    --line:#CBDAC5;
+    --teal:#2F7A5C;
+    --teal-dark:#1F5B43;
+    --teal-pale:#E1F0E6;
+    --coral:#D9584A;
+    --coral-pale:#FBE6E2;
+    --gold:#C9922E;
+    --gold-pale:#FBF0DC;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'IBM Plex Sans', sans-serif;
+    line-height:1.5;
+    padding-bottom:80px;
+  }
+  .mono{font-family:'IBM Plex Mono', monospace;}
+  .display{font-family:'Space Grotesk', sans-serif;}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    max-width:1180px;
+    margin:0 auto;
+    padding:48px 24px 12px;
+  }
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12.5px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--teal-dark);
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .eyebrow::before{
+    content:"";
+    width:8px;height:8px;border-radius:50%;
+    background:var(--coral);
+    display:inline-block;
+    animation:pulse-dot 1.8s ease-in-out infinite;
+  }
+  @keyframes pulse-dot{0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.4);opacity:.55;}}
+  h1.title{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700;
+    font-size:clamp(32px,5vw,52px);
+    letter-spacing:-0.01em;
+    margin:10px 0 8px;
+  }
+  .subtitle{
+    color:var(--ink-soft);
+    font-size:16px;
+    max-width:640px;
+    margin:0 0 22px;
+  }
+  .pulse-divider{width:100%;height:34px;display:block;margin:6px 0 30px;}
+  .pulse-divider path{
+    fill:none;
+    stroke:var(--teal);
+    stroke-width:2;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+    stroke-dasharray:1000;
+    stroke-dashoffset:1000;
+    animation:draw 2.4s ease-out forwards;
+  }
+  @keyframes draw{to{stroke-dashoffset:0;}}
+  @media (prefers-reduced-motion: reduce){
+    .pulse-divider path{animation:none; stroke-dashoffset:0;}
+    .eyebrow::before{animation:none;}
+  }
+
+  /* ---------- INTRO / VOCAB CARDS ---------- */
+  .intro{
+    max-width:1180px;
+    margin:0 auto;
+    padding:0 24px 20px;
+  }
+  .intro-head{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-bottom:14px;
+  }
+  .intro-head h2{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:20px;
+    margin:0;
+  }
+  .intro-hint{
+    font-size:13.5px;
+    color:var(--ink-soft);
+  }
+  .vocab-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(230px,1fr));
+    gap:10px;
+  }
+  .vocab-card{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:13px 14px;
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+    position:relative;
+  }
+  .vocab-top{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+  }
+  .vocab-word{
+    font-weight:600;
+    font-size:15px;
+  }
+  .play-btn{
+    flex:none;
+    width:28px;height:28px;
+    border-radius:50%;
+    border:1px solid var(--line);
+    background:var(--teal-pale);
+    color:var(--teal-dark);
+    cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    font-size:13px;
+    transition:transform .15s ease, background .15s ease;
+  }
+  .play-btn:hover{background:var(--teal);color:#fff;transform:scale(1.07);}
+  .vocab-ipa{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12.5px;
+    color:var(--teal-dark);
+  }
+  .vocab-ru{
+    font-size:13.5px;
+    color:var(--ink-soft);
+  }
+
+  /* ---------- LAYOUT ---------- */
+  .layout{
+    max-width:1180px;
+    margin:0 auto;
+    padding:10px 24px 0;
+    display:grid;
+    grid-template-columns:1fr 260px;
+    gap:26px;
+    align-items:start;
+  }
+  main.exercises{min-width:0;}
+  aside.sidebar{position:sticky; top:20px;}
+
+  .problem-card{
+    background:#fff;
+    border:1px solid var(--coral);
+    border-radius:var(--radius);
+    padding:16px 16px 14px;
+    transform:rotate(0.6deg);
+    box-shadow:0 6px 0 -3px rgba(217,88,74,.18);
+  }
+  .problem-card h3{
+    margin:0 0 4px;
+    font-family:'Space Grotesk',sans-serif;
+    font-size:15px;
+    color:var(--coral);
+    display:flex;align-items:center;gap:6px;
+  }
+  .problem-card .sub{
+    font-size:12px;color:var(--ink-soft);margin-bottom:10px;
+  }
+  #problemList{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;}
+  #problemList li{
+    font-size:13.5px;
+    background:var(--coral-pale);
+    border-radius:8px;
+    padding:6px 9px;
+    display:flex;
+    justify-content:space-between;
+    gap:8px;
+  }
+  #problemList li.empty{
+    background:var(--teal-pale);
+    color:var(--teal-dark);
+    justify-content:flex-start;
+  }
+  #problemList li .cnt{
+    font-family:'IBM Plex Mono',monospace;
+    color:var(--coral);
+    font-weight:600;
+  }
+
+  /* ---------- EXERCISE SECTIONS ---------- */
+  .exercise{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:22px 24px 24px;
+    margin-bottom:22px;
+  }
+  .ex-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:14px;
+    flex-wrap:wrap;
+    margin-bottom:6px;
+  }
+  .ex-number{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    color:var(--teal-dark);
+    letter-spacing:.08em;
+  }
+  .ex-title{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:19px;
+    margin:2px 0 4px;
+  }
+  .ex-desc{
+    font-size:13.5px;
+    color:var(--ink-soft);
+    margin:0 0 16px;
+    max-width:640px;
+  }
+  .ex-score{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12.5px;
+    background:var(--teal-pale);
+    color:var(--teal-dark);
+    padding:5px 10px;
+    border-radius:20px;
+    white-space:nowrap;
+    height:fit-content;
+  }
+
+  .item{
+    display:flex;
+    gap:12px;
+    padding:12px 0;
+    border-top:1px dashed var(--line);
+  }
+  .item:first-of-type{border-top:none;}
+  .item-num{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    color:var(--ink-soft);
+    padding-top:9px;
+    flex:none;
+    width:20px;
+  }
+  .item-body{flex:1; min-width:0;}
+  .item-prompt{
+    margin:0 0 8px;
+    font-size:14.5px;
+  }
+  .item-prompt .masked{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:16px;
+    letter-spacing:.03em;
+    background:var(--gold-pale);
+    padding:2px 8px;
+    border-radius:6px;
+  }
+  .item-prompt .ru-hint{
+    display:block;
+    font-size:12.5px;
+    color:var(--ink-soft);
+    margin-top:3px;
+  }
+  .answer-input, .answer-input-wide, select.answer-select{
+    width:100%;
+    max-width:360px;
+    font-family:'IBM Plex Sans',sans-serif;
+    font-size:14.5px;
+    padding:9px 12px;
+    border-radius:9px;
+    border:1.5px solid var(--line);
+    background:#FBFCFA;
+    color:var(--ink);
+    outline:none;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .answer-input:focus, select.answer-select:focus{border-color:var(--teal);}
+  .answer-input.correct, select.answer-select.correct{border-color:var(--teal); background:var(--teal-pale);}
+  .answer-input.incorrect, select.answer-select.incorrect{border-color:var(--coral); background:var(--coral-pale);}
+  textarea.answer-open{
+    width:100%;
+    max-width:640px;
+    min-height:64px;
+    font-family:'IBM Plex Sans',sans-serif;
+    font-size:14.5px;
+    padding:10px 12px;
+    border-radius:9px;
+    border:1.5px solid var(--line);
+    background:#FBFCFA;
+    resize:vertical;
+  }
+  textarea.answer-open:focus{outline:none;border-color:var(--teal);}
+  .item-feedback{
+    font-size:12.5px;
+    margin-top:6px;
+    min-height:16px;
+    color:var(--ink-soft);
+  }
+  .item-feedback.ok{color:var(--teal-dark); font-weight:500;}
+  .item-feedback.bad{color:var(--coral); font-weight:500;}
+
+  .match-row{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+  .match-left{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:14px;
+    background:var(--teal-pale);
+    color:var(--teal-dark);
+    padding:6px 10px;
+    border-radius:8px;
+    min-width:110px;
+    text-align:center;
+  }
+  .match-arrow{color:var(--ink-soft);}
+
+  .ex-footer{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-top:16px;
+    align-items:center;
+  }
+  button.btn{
+    font-family:'IBM Plex Sans',sans-serif;
+    font-weight:600;
+    font-size:13.5px;
+    padding:9px 16px;
+    border-radius:9px;
+    border:1.5px solid var(--teal);
+    background:var(--teal);
+    color:#fff;
+    cursor:pointer;
+    transition:opacity .15s ease, transform .1s ease;
+  }
+  button.btn:hover{opacity:.88;}
+  button.btn:active{transform:scale(.98);}
+  button.btn.ghost{
+    background:transparent;
+    color:var(--teal-dark);
+  }
+  button.btn.gold{
+    border-color:var(--gold);
+    background:var(--gold);
+  }
+  .toast{
+    position:fixed;
+    bottom:22px;
+    left:50%;
+    transform:translateX(-50%) translateY(20px);
+    background:var(--ink);
+    color:#fff;
+    padding:10px 18px;
+    border-radius:30px;
+    font-size:13.5px;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .2s ease, transform .2s ease;
+    z-index:50;
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+
+  @media (max-width:880px){
+    .layout{grid-template-columns:1fr;}
+    aside.sidebar{position:static;}
+    .problem-card{transform:none;}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="eyebrow">health &amp; beauty vocabulary</div>
+  <h1 class="title">Care, Cure, Tone &amp; Glow</h1>
+  <p class="subtitle">Повторите слова по темам «здоровье, спорт и уход за собой», прослушайте произношение, а затем пропишите ответы в 8 упражнениях. Ошибки автоматически попадают в список «Проблемные слова» справа.</p>
+  <svg class="pulse-divider" viewBox="0 0 1180 34" preserveAspectRatio="none">
+    <path d="M0,17 L260,17 L285,4 L305,30 L325,17 L345,17 L365,10 L385,24 L405,17 L1180,17"></path>
+  </svg>
+</header>
+
+<section class="intro" id="introSection">
+  <div class="intro-head">
+    <h2>Слова для повторения</h2>
+    <span class="intro-hint">нажмите 🔊, чтобы прослушать произношение</span>
+  </div>
+  <div class="vocab-grid" id="vocabGrid"></div>
+</section>
+
+<div class="layout">
+  <main class="exercises" id="exercisesContainer"></main>
+  <aside class="sidebar">
+    <div class="problem-card">
+      <h3>⚠ Проблемные слова</h3>
+      <div class="sub">слова, в которых была ошибка</div>
+      <ul id="problemList"><li class="empty">Пока нет ошибок — отлично!</li></ul>
+    </div>
+  </aside>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ===================== DATA ===================== */
+
+const VOCAB = [
+  ["take care","/teɪk keə/","заботиться (о здоровье)"],
+  ["supplement","/ˈsʌplɪmənt/","добавка, БАД"],
+  ["treat","/triːt/","лечить, обращаться с кем-то"],
+  ["treatment","/ˈtriːtmənt/","лечение"],
+  ["dumbbells","/ˈdʌmbelz/","гантели"],
+  ["lose weight","/luːz weɪt/","похудеть"],
+  ["tone the muscles","/təʊn ðə ˈmʌsəlz/","подтянуть мышцы"],
+  ["improve your flexibility","/ɪmˈpruːv jɔː ˌfleksəˈbɪləti/","улучшить гибкость"],
+  ["do squats","/duː skwɒts/","делать приседания"],
+  ["do spinning","/duː ˈspɪnɪŋ/","заниматься спиннингом"],
+  ["do stretches","/duː ˈstretʃɪz/","делать растяжку"],
+  ["do aerobics","/duː eəˈrəʊbɪks/","заниматься аэробикой"],
+  ["an exercise bike","/ən ˈeksəsaɪz baɪk/","велотренажёр"],
+  ["a cross-trainer","/ə ˈkrɒs ˌtreɪnə/","эллиптический тренажёр"],
+  ["a running machine","/ə ˈrʌnɪŋ məˈʃiːn/","беговая дорожка"],
+  ["do Pilates / yoga","/duː pɪˈlɑːtiːz ˈjəʊgə/","пилатес / йога"],
+  ["a yoga mat","/ə ˈjəʊgə mæt/","коврик для йоги"],
+  ["lift weights","/lɪft weɪts/","поднимать тяжести"],
+  ["do sit-ups","/duː ˈsɪtʌps/","качать пресс"],
+  ["a rowing machine","/ə ˈrəʊɪŋ məˈʃiːn/","гребной тренажёр"],
+  ["do press-ups","/duː ˈpresʌps/","отжиматься"],
+  ["facial","/ˈfeɪʃəl/","уход за лицом"],
+  ["manicure","/ˈmænɪkjʊə/","маникюр"],
+  ["pedicure","/ˈpedɪkjʊə/","педикюр"],
+  ["massage","/məˈsɑːʒ/","массаж"],
+  ["waxing","/ˈwæksɪŋ/","восковая эпиляция"],
+  ["fake tan","/feɪk tæn/","искусственный загар"],
+];
+
+const EX1 = [ // missing letters
+  {masked:"s_ppl_m_nt", answer:"supplement", ru:"добавка, БАД"},
+  {masked:"tr__tm_nt", answer:"treatment", ru:"лечение"},
+  {masked:"d_mbb_lls", answer:"dumbbells", ru:"гантели"},
+  {masked:"fl_x_b_l_ty", answer:"flexibility", ru:"гибкость"},
+  {masked:"str_tch_s", answer:"stretches", ru:"растяжка"},
+  {masked:"a_r_b_cs", answer:"aerobics", ru:"аэробика"},
+  {masked:"m_ss_g_", answer:"massage", ru:"массаж"},
+  {masked:"p_d_c_r_", answer:"pedicure", ru:"педикюр"},
+];
+
+const EX2 = [ // ru -> en
+  {ru:"заботиться о своём здоровье", accepted:["take care of your health","take care"], word:"take care"},
+  {ru:"похудеть", accepted:["lose weight"], word:"lose weight"},
+  {ru:"подтянуть мышцы", accepted:["tone the muscles","tone your muscles"], word:"tone the muscles"},
+  {ru:"делать приседания", accepted:["do squats"], word:"do squats"},
+  {ru:"пользоваться беговой дорожкой", accepted:["use a running machine","use a treadmill","a running machine","treadmill"], word:"a running machine (treadmill)"},
+  {ru:"поднимать тяжести", accepted:["lift weights","do weights"], word:"lift weights"},
+  {ru:"делать маникюр", accepted:["have a manicure","get a manicure","do a manicure","have manicure"], word:"have / get / do a manicure"},
+  {ru:"искусственный загар", accepted:["fake tan"], word:"fake tan"},
+];
+
+const EX3 = [ // definitions
+  {def:"Тренажёр, на котором дома или в зале имитируют езду на велосипеде.", accepted:["exercise bike","an exercise bike"], word:"an exercise bike"},
+  {def:"Тренажёр, имитирующий греблю на лодке.", accepted:["rowing machine","a rowing machine"], word:"a rowing machine"},
+  {def:"Небольшие снаряды, которые держат по одному в каждой руке во время тренировки.", accepted:["dumbbells"], word:"dumbbells"},
+  {def:"Косметическая процедура по уходу за кожей лица.", accepted:["facial","a facial"], word:"facial"},
+  {def:"Процедура удаления волос с помощью горячего воска.", accepted:["waxing"], word:"waxing"},
+  {def:"Коврик, на котором выполняют упражнения йоги или растяжку.", accepted:["yoga mat","a yoga mat"], word:"a yoga mat"},
+  {def:"Расслабляющая процедура, во время которой разминают мышцы тела.", accepted:["massage","a massage"], word:"massage"},
+  {def:"Курс медицинской помощи для лечения болезни.", accepted:["treatment"], word:"treatment"},
+];
+
+const EX4 = [ // collocations
+  {prompt:"___ care of your health", accepted:["take"], word:"take care"},
+  {prompt:"___ weight before summer", accepted:["lose"], word:"lose weight"},
+  {prompt:"___ the muscles at the gym", accepted:["tone"], word:"tone the muscles"},
+  {prompt:"___ squats every morning", accepted:["do"], word:"do squats"},
+  {prompt:"___ weights three times a week", accepted:["lift","do"], word:"(do / lift) weights"},
+  {prompt:"___ a facial at the spa", accepted:["have","get","do"], word:"have / get / do a facial"},
+  {prompt:"___ your flexibility with stretching", accepted:["improve"], word:"improve your flexibility"},
+  {prompt:"___ a massage after a hard week", accepted:["have","get","do"], word:"have / get / do a massage"},
+];
+
+const EX5 = [ // context
+  {sentence:"She lifts ___ at the gym.", accepted:["dumbbells"], word:"dumbbells"},
+  {sentence:"I do ___ every morning.", accepted:["squats"], word:"do squats"},
+  {sentence:"He uses a ___ for cardio.", accepted:["cross-trainer","cross trainer"], word:"a cross-trainer"},
+  {sentence:"They use a ___ at the gym.", accepted:["rowing machine"], word:"a rowing machine"},
+  {sentence:"I'm going to have a ___.", accepted:["manicure"], word:"manicure"},
+  {sentence:"She applied ___ before the party.", accepted:["fake tan"], word:"fake tan"},
+  {sentence:"He had a back ___.", accepted:["massage"], word:"massage"},
+  {sentence:"She goes for ___ regularly.", accepted:["waxing"], word:"waxing"},
+];
+
+const EX6 = [ // match halves
+  {left:"take", right:"care of your health"},
+  {left:"do", right:"press-ups"},
+  {left:"lose", right:"weight"},
+  {left:"improve", right:"your flexibility"},
+  {left:"use", right:"a yoga mat"},
+  {left:"have / get", right:"a pedicure"},
+  {left:"apply", right:"fake tan"},
+  {left:"tone", right:"the muscles"},
+];
+
+const EX7 = [ // find two mistakes
+  {sentence:"She always makes care of her health and lifts a facial once a month.", wrong:["makes","lifts"], correct:["takes","has / gets"]},
+  {sentence:"He does weights every morning to improve his muscles and takes squats after that.", wrong:["improve","takes"], correct:["tone","does"]},
+  {sentence:"They use a manicure at the beauty salon and apply a massage to relax.", wrong:["use","apply"], correct:["have / get","have / get"]},
+  {sentence:"She wants to shrink her muscles and grow her weight before the competition.", wrong:["shrink","grow"], correct:["tone","lose"]},
+  {sentence:"He runs an exercise bike and drives a cross-trainer at the gym.", wrong:["runs","drives"], correct:["uses","uses"]},
+  {sentence:"She washed a manicure and painted a fake tan before the holiday.", wrong:["washed","painted"], correct:["had / got","applied"]},
+  {sentence:"I throw stretches every morning and climb on a rowing machine after work.", wrong:["throw","climb"], correct:["do","use"]},
+  {sentence:"We hold aerobics and get press-ups at the sports club twice a week.", wrong:["hold","get"], correct:["do","do"]},
+];
+
+const EX8 = [ // open sentences
+  "I always take care of my health by",
+  "If I wanted to lose weight, I would",
+  "My ideal morning workout includes doing squats and",
+  "In my opinion, a rowing machine is better / worse than a running machine because",
+  "The last time I had a massage or a facial, I",
+  "To tone my muscles and improve my flexibility, I",
+  "I would / wouldn't try a fake tan because",
+  "For me, the best way to relax after a hard week is",
+];
+
+/* ===================== HELPERS ===================== */
+
+function normalize(s){
+  return s.toLowerCase().trim()
+    .replace(/[.,!?;:'"()]/g,'')
+    .replace(/\s+/g,' ');
+}
+function matchesAny(value, accepted){
+  const v = normalize(value);
+  if(!v) return false;
+  return accepted.some(a => normalize(a) === v);
+}
+function speak(text){
+  if(!('speechSynthesis' in window)) return;
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-GB';
+  u.rate = 0.92;
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(u);
+}
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(showToast._h);
+  showToast._h = setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+/* wrongMap: key "exId-idx" -> display word, used for the sidebar */
+const wrongMap = new Map();
+function renderProblemList(){
+  const ul = document.getElementById('problemList');
+  if(wrongMap.size === 0){
+    ul.innerHTML = '<li class="empty">Пока нет ошибок — отлично!</li>';
+    return;
+  }
+  const counts = {};
+  for(const w of wrongMap.values()) counts[w] = (counts[w]||0) + 1;
+  const rows = Object.entries(counts).sort((a,b)=> b[1]-a[1] || a[0].localeCompare(b[0]));
+  ul.innerHTML = rows.map(([word,c]) => `<li><span>${word}</span><span class="cnt">×${c}</span></li>`).join('');
+}
+function setWrong(exId, idx, word){ wrongMap.set(exId+'-'+idx, word); renderProblemList(); }
+function clearWrong(exId, idx){ wrongMap.delete(exId+'-'+idx); renderProblemList(); }
+
+/* ===================== RENDER: VOCAB INTRO ===================== */
+
+const vocabGrid = document.getElementById('vocabGrid');
+VOCAB.forEach(([word, ipa, ru]) => {
+  const card = document.createElement('div');
+  card.className = 'vocab-card';
+  card.innerHTML = `
+    <div class="vocab-top">
+      <span class="vocab-word">${word}</span>
+      <button class="play-btn" type="button" title="Прослушать">🔊</button>
+    </div>
+    <span class="vocab-ipa mono">${ipa}</span>
+    <span class="vocab-ru">${ru}</span>
+  `;
+  card.querySelector('.play-btn').addEventListener('click', ()=>speak(word));
+  vocabGrid.appendChild(card);
+});
+
+/* ===================== RENDER: EXERCISES ===================== */
+
+const container = document.getElementById('exercisesContainer');
+
+function exerciseShell(exId, number, title, desc){
+  const section = document.createElement('section');
+  section.className = 'exercise';
+  section.id = exId;
+  section.innerHTML = `
+    <div class="ex-head">
+      <div>
+        <div class="ex-number">Упражнение ${number} / 8</div>
+        <h3 class="ex-title">${title}</h3>
+        <p class="ex-desc">${desc}</p>
+      </div>
+      <div class="ex-score mono" id="${exId}-score"></div>
+    </div>
+    <div class="ex-items" id="${exId}-items"></div>
+    <div class="ex-footer" id="${exId}-footer"></div>
+  `;
+  container.appendChild(section);
+  return section;
+}
+
+/* ---- generic text-input exercise (used for EX1-EX5) ---- */
+function renderTextExercise(exId, number, title, desc, items, promptFn){
+  exerciseShell(exId, number, title, desc);
+  const itemsEl = document.getElementById(exId+'-items');
+  items.forEach((it, idx) => {
+    const row = document.createElement('div');
+    row.className = 'item';
+    row.innerHTML = `
+      <div class="item-num mono">${String(idx+1).padStart(2,'0')}</div>
+      <div class="item-body">
+        <p class="item-prompt">${promptFn(it)}</p>
+        <input type="text" class="answer-input" autocomplete="off" spellcheck="false" placeholder="Введите ответ…">
+        <div class="item-feedback"></div>
+      </div>
+    `;
+    itemsEl.appendChild(row);
+  });
+
+  const footer = document.getElementById(exId+'-footer');
+  footer.innerHTML = `
+    <button class="btn" type="button" data-act="check">Проверить</button>
+    <button class="btn ghost" type="button" data-act="reveal">Показать ответы</button>
+  `;
+  footer.querySelector('[data-act="check"]').addEventListener('click', ()=>{
+    let correctCount = 0;
+    itemsEl.querySelectorAll('.item').forEach((row, idx) => {
+      const input = row.querySelector('.answer-input');
+      const fb = row.querySelector('.item-feedback');
+      const accepted = items[idx].accepted || [items[idx].answer];
+      const ok = matchesAny(input.value, accepted);
+      input.classList.remove('correct','incorrect');
+      if(ok){
+        input.classList.add('correct');
+        fb.textContent = '✓ верно';
+        fb.className = 'item-feedback ok';
+        clearWrong(exId, idx);
+        correctCount++;
+      } else {
+        input.classList.add('incorrect');
+        fb.textContent = '✗ попробуйте ещё раз';
+        fb.className = 'item-feedback bad';
+        setWrong(exId, idx, items[idx].word || items[idx].answer || accepted[0]);
+      }
+    });
+    document.getElementById(exId+'-score').textContent = `${correctCount} / ${items.length}`;
+  });
+  footer.querySelector('[data-act="reveal"]').addEventListener('click', ()=>{
+    itemsEl.querySelectorAll('.item').forEach((row, idx) => {
+      const fb = row.querySelector('.item-feedback');
+      const accepted = items[idx].accepted || [items[idx].answer];
+      fb.textContent = 'Ответ: ' + accepted[0];
+      fb.className = 'item-feedback';
+    });
+  });
+}
+
+renderTextExercise('ex1', 1, 'Вставьте пропущенные буквы', 'Пропишите слово целиком — часть букв скрыта.', EX1,
+  (it) => `<span class="masked mono">${it.masked}</span><span class="ru-hint">${it.ru}</span>`);
+
+renderTextExercise('ex2', 2, 'Переведите с русского на английский', 'Напишите английский эквивалент фразы.', EX2,
+  (it) => `«${it.ru}»`);
+
+renderTextExercise('ex3', 3, 'Угадайте слово по определению', 'Прочитайте определение и напишите нужное слово или фразу по-английски.', EX3,
+  (it) => it.def);
+
+renderTextExercise('ex4', 4, 'Сочетаемость слов', 'Вставьте глагол, который правильно сочетается с выделенным словом.', EX4,
+  (it) => it.prompt);
+
+renderTextExercise('ex5', 5, 'Контекст', 'Заполните пропуск в предложении подходящим словом.', EX5,
+  (it) => it.sentence);
+
+/* ---- EX6: match halves (select) ---- */
+(function(){
+  const exId = 'ex6';
+  exerciseShell(exId, 6, 'Соедините половинки выражений', 'Выберите вторую половину, которая правильно завершает выражение.');
+  const itemsEl = document.getElementById(exId+'-items');
+  const rights = EX6.map(p => p.right);
+  const shuffled = [...rights].sort(()=>Math.random()-0.5);
+
+  EX6.forEach((pair, idx) => {
+    const row = document.createElement('div');
+    row.className = 'item';
+    row.innerHTML = `
+      <div class="item-num mono">${String(idx+1).padStart(2,'0')}</div>
+      <div class="item-body">
+        <div class="match-row">
+          <span class="match-left mono">${pair.left}</span>
+          <span class="match-arrow">→</span>
+          <select class="answer-select">
+            <option value="">— выберите —</option>
+            ${shuffled.map(r => `<option value="${r}">${r}</option>`).join('')}
+          </select>
+        </div>
+        <div class="item-feedback"></div>
+      </div>
+    `;
+    itemsEl.appendChild(row);
+  });
+
+  const footer = document.getElementById(exId+'-footer');
+  footer.innerHTML = `
+    <button class="btn" type="button" data-act="check">Проверить</button>
+    <button class="btn ghost" type="button" data-act="reveal">Показать ответы</button>
+  `;
+  footer.querySelector('[data-act="check"]').addEventListener('click', ()=>{
+    let correctCount = 0;
+    itemsEl.querySelectorAll('.item').forEach((row, idx) => {
+      const sel = row.querySelector('.answer-select');
+      const fb = row.querySelector('.item-feedback');
+      const ok = sel.value === EX6[idx].right;
+      sel.classList.remove('correct','incorrect');
+      if(ok){
+        sel.classList.add('correct');
+        fb.textContent = '✓ верно';
+        fb.className = 'item-feedback ok';
+        clearWrong(exId, idx);
+        correctCount++;
+      } else {
+        sel.classList.add('incorrect');
+        fb.textContent = '✗ неверная пара';
+        fb.className = 'item-feedback bad';
+        setWrong(exId, idx, EX6[idx].left + ' ' + EX6[idx].right);
+      }
+    });
+    document.getElementById(exId+'-score').textContent = `${correctCount} / ${EX6.length}`;
+  });
+  footer.querySelector('[data-act="reveal"]').addEventListener('click', ()=>{
+    itemsEl.querySelectorAll('.item').forEach((row, idx) => {
+      row.querySelector('.answer-select').value = EX6[idx].right;
+      const fb = row.querySelector('.item-feedback');
+      fb.textContent = 'Ответ: ' + EX6[idx].left + ' — ' + EX6[idx].right;
+      fb.className = 'item-feedback';
+    });
+  });
+})();
+
+/* ---- EX7: find two mistakes ---- */
+(function(){
+  const exId = 'ex7';
+  exerciseShell(exId, 7, 'Find two mistakes', 'В каждом предложении есть два неверных слова. Впишите их через запятую (в любом порядке).');
+  const itemsEl = document.getElementById(exId+'-items');
+
+  EX7.forEach((it, idx) => {
+    const row = document.createElement('div');
+    row.className = 'item';
+    row.innerHTML = `
+      <div class="item-num mono">${String(idx+1).padStart(2,'0')}</div>
+      <div class="item-body">
+        <p class="item-prompt">${it.sentence}</p>
+        <input type="text" class="answer-input" autocomplete="off" spellcheck="false" placeholder="слово 1, слово 2">
+        <div class="item-feedback"></div>
+      </div>
+    `;
+    itemsEl.appendChild(row);
+  });
+
+  const footer = document.getElementById(exId+'-footer');
+  footer.innerHTML = `
+    <button class="btn" type="button" data-act="check">Проверить</button>
+    <button class="btn ghost" type="button" data-act="reveal">Показать ответы</button>
+  `;
+  footer.querySelector('[data-act="check"]').addEventListener('click', ()=>{
+    let correctCount = 0;
+    itemsEl.querySelectorAll('.item').forEach((row, idx) => {
+      const input = row.querySelector('.answer-input');
+      const fb = row.querySelector('.item-feedback');
+      const tokens = normalize(input.value).split(/[,]+| и /).map(t=>t.trim()).filter(Boolean);
+      const wrongWords = EX7[idx].wrong.map(w => normalize(w));
+      const found = wrongWords.filter(w => tokens.some(t => t===w));
+      input.classList.remove('correct','incorrect');
+      if(found.length === 2){
+        input.classList.add('correct');
+        fb.textContent = '✓ оба слова найдены верно';
+        fb.className = 'item-feedback ok';
+        clearWrong(exId, idx);
+        correctCount++;
+      } else {
+        input.classList.add('incorrect');
+        fb.textContent = `✗ найдено ${found.length} из 2`;
+        fb.className = 'item-feedback bad';
+        setWrong(exId, idx, EX7[idx].wrong.join(' / '));
+      }
+    });
+    document.getElementById(exId+'-score').textContent = `${correctCount} / ${EX7.length}`;
+  });
+  footer.querySelector('[data-act="reveal"]').addEventListener('click', ()=>{
+    itemsEl.querySelectorAll('.item').forEach((row, idx) => {
+      const fb = row.querySelector('.item-feedback');
+      const it = EX7[idx];
+      fb.textContent = `Ошибки: ${it.wrong[0]} → ${it.correct[0]}; ${it.wrong[1]} → ${it.correct[1]}`;
+      fb.className = 'item-feedback';
+    });
+  });
+})();
+
+/* ---- EX8: open-ended, copy all ---- */
+(function(){
+  const exId = 'ex8';
+  exerciseShell(exId, 8, 'Закончите предложения своими идеями', 'Открытое задание — единственно верного ответа нет. Допишите мысль и скопируйте все ответы одной кнопкой.');
+  document.getElementById(exId+'-score').remove();
+  const itemsEl = document.getElementById(exId+'-items');
+
+  EX8.forEach((starter, idx) => {
+    const row = document.createElement('div');
+    row.className = 'item';
+    row.innerHTML = `
+      <div class="item-num mono">${String(idx+1).padStart(2,'0')}</div>
+      <div class="item-body">
+        <p class="item-prompt">${starter} …</p>
+        <textarea class="answer-open" placeholder="Допишите предложение…"></textarea>
+      </div>
+    `;
+    itemsEl.appendChild(row);
+  });
+
+  const footer = document.getElementById(exId+'-footer');
+  footer.innerHTML = `<button class="btn gold" type="button" data-act="copy">Скопировать все ответы</button>`;
+  footer.querySelector('[data-act="copy"]').addEventListener('click', async ()=>{
+    const lines = [];
+    itemsEl.querySelectorAll('.item').forEach((row, idx) => {
+      const ta = row.querySelector('.answer-open');
+      const text = ta.value.trim();
+      lines.push(`${idx+1}. ${EX8[idx]} ${text ? '… ' + text : '…'}`);
+    });
+    const full = lines.join('\n');
+    try{
+      await navigator.clipboard.writeText(full);
+      showToast('Ответы скопированы в буфер обмена ✓');
+    }catch(e){
+      showToast('Не удалось скопировать — выделите текст вручную');
+    }
+  });
+})();
+
+renderProblemList();
+</script>
+</body>
+</html>
