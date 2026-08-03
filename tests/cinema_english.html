@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cinema English — лексика о кино</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #15100b;
+    --panel: #1e1710;
+    --panel-2: #241b12;
+    --gold: #d4a537;
+    --gold-soft: #e8c877;
+    --burgundy: #8c2f39;
+    --burgundy-soft: #b34754;
+    --cream: #f2e8d5;
+    --muted: #a8987a;
+    --line: #3a2f20;
+    --ok: #5cb887;
+    --bad: #e0665f;
+    --info: #6ea8d8;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background: radial-gradient(1200px 600px at 15% -10%, #241b12 0%, var(--bg) 55%), var(--bg);
+    color: var(--cream);
+    font-family: 'Manrope', sans-serif;
+    line-height:1.5;
+    padding-bottom: 80px;
+  }
+  ::selection{ background: var(--gold); color:#1a1208; }
+
+  /* film strip border */
+  .filmstrip{
+    height: 22px;
+    background: repeating-linear-gradient(90deg, #0c0906 0 18px, #241b12 18px 36px);
+    position: relative;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+  .filmstrip::before, .filmstrip::after{
+    content:"";
+    position:absolute; top:50%; left:0; right:0;
+    height:9px; transform:translateY(-50%);
+    background-image: radial-gradient(circle, var(--bg) 3.2px, transparent 3.3px);
+    background-size: 36px 9px;
+    background-repeat: repeat-x;
+  }
+  .filmstrip::before{ top: 4px; }
+  .filmstrip::after{ top: 18px; }
+
+  header.hero{
+    padding: 38px 24px 28px;
+    text-align:center;
+    position:relative;
+  }
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    letter-spacing:.28em;
+    text-transform:uppercase;
+    font-size:11px;
+    color: var(--gold);
+    margin-bottom: 10px;
+  }
+  h1.title{
+    font-family:'Bebas Neue', sans-serif;
+    font-size: clamp(40px, 7vw, 76px);
+    letter-spacing: .04em;
+    margin: 0;
+    color: var(--cream);
+    text-shadow: 0 0 40px rgba(212,165,55,.15);
+  }
+  h1.title span{ color: var(--gold); }
+  .subtitle{
+    color: var(--muted);
+    max-width: 640px;
+    margin: 10px auto 0;
+    font-size: 15px;
+  }
+
+  /* tabs styled like ticket stubs */
+  .tabs{
+    display:flex;
+    justify-content:center;
+    gap: 14px;
+    margin: 26px auto 0;
+    flex-wrap: wrap;
+    padding: 0 16px;
+  }
+  .tab{
+    font-family:'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: .05em;
+    background: var(--panel);
+    border: 1.5px dashed var(--line);
+    color: var(--muted);
+    padding: 12px 26px;
+    border-radius: 4px;
+    cursor:pointer;
+    position:relative;
+    transition: all .15s ease;
+  }
+  .tab::before, .tab::after{
+    content:"";
+    position:absolute; width:14px; height:14px; border-radius:50%;
+    background: var(--bg); top:50%; transform:translateY(-50%);
+  }
+  .tab::before{ left:-7px; }
+  .tab::after{ right:-7px; }
+  .tab.active{
+    color:#1a1208;
+    background: linear-gradient(180deg, var(--gold-soft), var(--gold));
+    border-color: var(--gold);
+  }
+  .tab:hover:not(.active){ color: var(--cream); border-color: var(--gold); }
+
+  .layout{
+    max-width: 1180px;
+    margin: 34px auto 0;
+    padding: 0 20px;
+    display:grid;
+    grid-template-columns: 1fr 270px;
+    gap: 26px;
+    align-items:start;
+  }
+  .unit{ display:none; }
+  .unit.active{ display:block; }
+
+  .card{
+    background: linear-gradient(180deg, var(--panel), var(--panel-2));
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 22px 22px 24px;
+    margin-bottom: 22px;
+  }
+  .card h2{
+    font-family:'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: .03em;
+    margin: 0 0 4px;
+    color: var(--gold-soft);
+    display:flex; align-items:center; gap:10px;
+  }
+  .card .hint{ color: var(--muted); font-size: 13.5px; margin-bottom: 16px; }
+  .num-badge{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    color:#1a1208;
+    background: var(--gold);
+    padding: 2px 8px;
+    border-radius: 3px;
+  }
+
+  /* vocab table */
+  .vocab-toolbar{
+    display:flex; justify-content:flex-end; margin-bottom: 10px;
+  }
+  .btn{
+    font-family:'Manrope', sans-serif;
+    font-weight: 700;
+    font-size: 13.5px;
+    border: none;
+    border-radius: 6px;
+    padding: 9px 16px;
+    cursor: pointer;
+    transition: transform .1s ease, filter .15s ease;
+  }
+  .btn:active{ transform: scale(.96); }
+  .btn-gold{ background: linear-gradient(180deg,var(--gold-soft),var(--gold)); color:#1a1208; }
+  .btn-outline{ background: transparent; border:1.5px solid var(--line); color: var(--cream); }
+  .btn-outline:hover{ border-color: var(--gold); color: var(--gold-soft); }
+  .btn-sm{ padding:6px 11px; font-size:12px; }
+  .btn:disabled{ opacity:.5; cursor:default; }
+
+  table.vocab{ width:100%; border-collapse: collapse; font-size: 14.5px; }
+  table.vocab th{
+    text-align:left; font-family:'JetBrains Mono', monospace; font-size:11px;
+    text-transform:uppercase; letter-spacing:.08em; color: var(--muted);
+    padding: 8px 10px; border-bottom: 1px solid var(--line);
+  }
+  table.vocab td{ padding: 10px; border-bottom: 1px solid var(--line); vertical-align:middle; }
+  table.vocab tr:last-child td{ border-bottom:none; }
+  .en-word{ font-weight:700; color: var(--cream); }
+  .ipa{ font-family:'JetBrains Mono', monospace; color: var(--info); font-size:13px; }
+  .ru-word{ color: var(--muted); }
+  .play-btn{
+    width:30px; height:30px; border-radius:50%;
+    border:1px solid var(--line); background: var(--panel-2);
+    color: var(--gold-soft); cursor:pointer; font-size:13px;
+    display:inline-flex; align-items:center; justify-content:center;
+  }
+  .play-btn:hover{ border-color: var(--gold); background:#2c2213; }
+
+  /* exercise items */
+  .ex-item{
+    display:grid;
+    grid-template-columns: 26px 1fr 200px 26px;
+    gap: 12px;
+    align-items:center;
+    padding: 10px 0;
+    border-bottom: 1px dashed var(--line);
+  }
+  .ex-item:last-child{ border-bottom:none; }
+  .ex-idx{ font-family:'JetBrains Mono', monospace; color: var(--muted); font-size:13px; }
+  .ex-prompt{ font-size: 14.5px; }
+  .ex-prompt .ru-hint{ color: var(--gold-soft); font-weight:600; }
+  .ex-prompt .def-text{ color: var(--cream); }
+  .gap-word{ font-family:'JetBrains Mono', monospace; letter-spacing:.05em; font-size:16px; color:var(--cream); }
+  input.ans{
+    width:100%;
+    background: #0f0b07;
+    border: 1.5px solid var(--line);
+    color: var(--cream);
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-size: 14px;
+    font-family:'Manrope',sans-serif;
+  }
+  input.ans:focus{ outline:none; border-color: var(--gold); }
+  input.ans.correct{ border-color: var(--ok); background: #10251a; }
+  input.ans.wrong{ border-color: var(--bad); background: #2a1412; }
+  input.ans.revealed{ border-color: var(--info); background: #12202b; color: var(--gold-soft); }
+  .fb-icon{ text-align:center; font-size:16px; }
+  select.ans{
+    width:100%; background:#0f0b07; border:1.5px solid var(--line); color:var(--cream);
+    border-radius:6px; padding:8px 10px; font-size:14px; font-family:'Manrope',sans-serif;
+  }
+  select.ans:focus{ outline:none; border-color:var(--gold); }
+
+  .tf-row{ display:flex; gap:8px; }
+  .tf-btn{
+    flex:1; padding:7px 0; border-radius:6px; border:1.5px solid var(--line);
+    background:#0f0b07; color:var(--muted); font-weight:700; font-size:13px; cursor:pointer;
+  }
+  .tf-btn.picked{ border-color: var(--gold); color: var(--gold-soft); background:#241b12; }
+  .tf-btn.correct{ border-color: var(--ok) !important; color:var(--ok) !important; }
+  .tf-btn.wrong{ border-color: var(--bad) !important; color:var(--bad) !important; }
+
+  .ex-actions{
+    display:flex; gap:10px; align-items:center; margin-top: 16px;
+  }
+  .score-tag{
+    font-family:'JetBrains Mono', monospace; font-size: 13px; color: var(--muted);
+    margin-left:auto;
+  }
+  .score-tag b{ color: var(--gold-soft); }
+
+  /* sidebar */
+  aside.sidebar{
+    position: sticky; top: 18px;
+    background: linear-gradient(180deg, var(--panel), var(--panel-2));
+    border:1px solid var(--line);
+    border-radius: 10px;
+    padding: 18px 16px;
+  }
+  aside.sidebar h3{
+    font-family:'Bebas Neue', sans-serif;
+    font-size:20px; letter-spacing:.03em;
+    margin: 0 0 4px;
+    color: var(--burgundy-soft);
+    display:flex; align-items:center; gap:8px;
+  }
+  aside.sidebar p.hint{ color: var(--muted); font-size:12.5px; margin: 0 0 12px; }
+  .problem-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px; }
+  .problem-list li{
+    display:flex; justify-content:space-between; align-items:center;
+    background:#241014; border:1px solid #46232a; border-radius:6px;
+    padding: 7px 10px; font-size:13.5px;
+  }
+  .problem-list .pw-en{ font-weight:700; color: var(--cream); }
+  .problem-list .pw-ru{ color: var(--muted); font-size:12px; }
+  .problem-list .pw-count{
+    font-family:'JetBrains Mono', monospace; background: var(--burgundy);
+    color:#fff; font-size:11px; padding:2px 7px; border-radius:10px;
+  }
+  .empty-note{ color: var(--muted); font-size:13px; font-style:italic; }
+  .clear-btn{ margin-top:12px; width:100%; }
+
+  @media (max-width: 880px){
+    .layout{ grid-template-columns: 1fr; }
+    aside.sidebar{ position:static; }
+    .ex-item{ grid-template-columns: 20px 1fr; row-gap:8px; }
+    .ex-item .ex-prompt{ grid-column: 1/-1; }
+    .ex-item input.ans, .ex-item select.ans{ grid-column: 1/-1; }
+    .fb-icon{ display:none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="filmstrip"></div>
+<header class="hero">
+  <div class="eyebrow">English · Vocabulary Workshop</div>
+  <h1 class="title">CINEMA <span>ENGLISH</span></h1>
+  <p class="subtitle">Два модуля лексики о кино: жанры фильмов и киноиндустрия. Слушайте произношение, пишите слова от руки (клавиатурой), проверяйте себя.</p>
+  <div class="tabs">
+    <button class="tab active" data-unit="u1">🎞 Unit 1 · Жанры фильмов</button>
+    <button class="tab" data-unit="u2">🎬 Unit 2 · Киноиндустрия</button>
+  </div>
+</header>
+<div class="filmstrip"></div>
+
+<div class="layout">
+  <main>
+
+    <!-- ============ UNIT 1 ============ -->
+    <section class="unit active" id="u1">
+
+      <div class="card">
+        <h2>📖 Повторение слов</h2>
+        <p class="hint">Прочитайте перевод и транскрипцию, затем прослушайте произношение каждого слова — нажмите на 🔊 или включите проигрывание всего списка.</p>
+        <div class="vocab-toolbar">
+          <button class="btn btn-gold" id="playAllU1">🔊 Прослушать все слова</button>
+        </div>
+        <table class="vocab" id="vocabTableU1"></table>
+      </div>
+
+      <div class="card">
+        <h2><span class="num-badge">1</span> Вставь пропущенные буквы</h2>
+        <p class="hint">Впишите слово целиком — часть букв уже подставлена в подсказке.</p>
+        <div id="ex1-1"></div>
+        <div class="ex-actions">
+          <button class="btn btn-gold" onclick="checkExercise('ex1-1')">Проверить</button>
+          <button class="btn btn-outline" onclick="showAnswers('ex1-1')">Показать ответы</button>
+          <span class="score-tag" id="score-ex1-1"></span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2><span class="num-badge">2</span> Перевод с русского на английский</h2>
+        <p class="hint">Напишите жанр по-английски (с артиклем или без — оба варианта засчитаются).</p>
+        <div id="ex1-2"></div>
+        <div class="ex-actions">
+          <button class="btn btn-gold" onclick="checkExercise('ex1-2')">Проверить</button>
+          <button class="btn btn-outline" onclick="showAnswers('ex1-2')">Показать ответы</button>
+          <span class="score-tag" id="score-ex1-2"></span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2><span class="num-badge">3</span> Напиши слово на слух</h2>
+        <p class="hint">Нажмите 🔊, прослушайте произношение и запишите слово по звуку.</p>
+        <div id="ex1-3"></div>
+        <div class="ex-actions">
+          <button class="btn btn-gold" onclick="checkExercise('ex1-3')">Проверить</button>
+          <button class="btn btn-outline" onclick="showAnswers('ex1-3')">Показать ответы</button>
+          <span class="score-tag" id="score-ex1-3"></span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2><span class="num-badge">4</span> Угадай жанр по определению</h2>
+        <p class="hint">Прочитайте определение на английском и назовите жанр.</p>
+        <div id="ex1-4"></div>
+        <div class="ex-actions">
+          <button class="btn btn-gold" onclick="checkExercise('ex1-4')">Проверить</button>
+          <button class="btn btn-outline" onclick="showAnswers('ex1-4')">Показать ответы</button>
+          <span class="score-tag" id="score-ex1-4"></span>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ============ UNIT 2 ============ -->
+    <section class="unit" id="u2">
+
+      <div class="card">
+        <h2>📖 Повторение слов</h2>
+        <p class="hint">Прочитайте перевод и транскрипцию, затем прослушайте произношение — а также запомните 5 устойчивых выражений о кино в пассивном залоге.</p>
+        <div class="vocab-toolbar">
+          <button class="btn btn-gold" id="playAllU2">🔊 Прослушать все слова</button>
+        </div>
+        <table class="vocab" id="vocabTableU2"></table>
+
+        <p class="hint" style="margin-top:18px;">Выражения:</p>
+        <table class="vocab" id="exprTable"></table>
+      </div>
+
+      <div class="card">
+        <h2><span class="num-badge">1</span> Вставь пропущенные буквы</h2>
+        <p class="hint">Впишите слово целиком.</p>
+        <div id="ex2-1"></div>
+        <div class="ex-actions">
+          <button class="btn btn-gold" onclick="checkExercise('ex2-1')">Проверить</button>
+          <button class="btn btn-outline" onclick="showAnswers('ex2-1')">Показать ответы</button>
+          <span class="score-tag" id="score-ex2-1"></span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2><span class="num-badge">2</span> Перевод с русского на английский</h2>
+        <div id="ex2-2"></div>
+        <div class="ex-actions">
+          <button class="btn btn-gold" onclick="checkExercise('ex2-2')">Проверить</button>
+          <button class="btn btn-outline" onclick="showAnswers('ex2-2')">Показать ответы</button>
+          <span class="score-tag" id="score-ex2-2"></span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2><span class="num-badge">3</span> Напиши слово на слух</h2>
+        <p class="hint">Нажмите 🔊 и запишите услышанное слово.</p>
+        <div id="ex2-3"></div>
+        <div class="ex-actions">
+          <button class="btn btn-gold" onclick="checkExercise('ex2-3')">Проверить</button>
+          <button class="btn btn-outline" onclick="showAnswers('ex2-3')">Показать ответы</button>
+          <span class="score-tag" id="score-ex2-3"></span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2><span class="num-badge">4</span> Выбери правильное выражение</h2>
+        <p class="hint">Заполните пропуск в предложении, выбрав нужную форму выражения.</p>
+        <div id="ex2-4"></div>
+        <div class="ex-actions">
+          <button class="btn btn-gold" onclick="checkExercise('ex2-4')">Проверить</button>
+          <button class="btn btn-outline" onclick="showAnswers('ex2-4')">Показать ответы</button>
+          <span class="score-tag" id="score-ex2-4"></span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2><span class="num-badge">5</span> Перефразируй в страдательном залоге (Passive)</h2>
+        <p class="hint">Перепишите предложение в пассивном залоге, используя нужное выражение.</p>
+        <div id="ex2-5"></div>
+        <div class="ex-actions">
+          <button class="btn btn-gold" onclick="checkExercise('ex2-5')">Проверить</button>
+          <button class="btn btn-outline" onclick="showAnswers('ex2-5')">Показать ответы</button>
+          <span class="score-tag" id="score-ex2-5"></span>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <aside class="sidebar">
+    <h3>⚠️ Проблемные слова</h3>
+    <p class="hint">Здесь появляются слова, в которых вы ошиблись.</p>
+    <ul class="problem-list" id="problemList"></ul>
+    <p class="empty-note" id="emptyNote">Пока ошибок нет — отлично!</p>
+    <button class="btn btn-outline clear-btn" onclick="clearProblems()">Очистить список</button>
+  </aside>
+</div>
+
+<script>
+/* ============ DATA ============ */
+const unit1Words = [
+  {en:"action film", ru:"боевик", ipa:"ˈækʃn fɪlm", art:"an"},
+  {en:"musical", ru:"мюзикл", ipa:"ˈmjuːzɪkl", art:"a"},
+  {en:"comedy", ru:"комедия", ipa:"ˈkɒmədi", art:"a"},
+  {en:"animation", ru:"анимационный фильм / мультфильм", ipa:"ˌænɪˈmeɪʃn", art:"an"},
+  {en:"historical film", ru:"исторический фильм", ipa:"hɪˈstɒrɪkl fɪlm", art:"a"},
+  {en:"science fiction film", ru:"фантастика", ipa:"ˈsaɪəns ˈfɪkʃn fɪlm", art:"a"},
+  {en:"rom-com", ru:"романтическая комедия (romantic comedy)", ipa:"ˈrɒm kɒm", art:"a"},
+  {en:"thriller", ru:"триллер", ipa:"ˈθrɪlə", art:"a"},
+  {en:"war film", ru:"фильм о войне", ipa:"wɔː fɪlm", art:"a"},
+  {en:"western", ru:"вестерн", ipa:"ˈwestən", art:"a"},
+  {en:"horror film", ru:"фильм ужасов", ipa:"ˈhɒrə fɪlm", art:"a"},
+  {en:"drama", ru:"драма", ipa:"ˈdrɑːmə", art:"a"},
+];
+
+const unit2Words = [
+  {en:"subtitles", ru:"субтитры", ipa:"ˈsʌbtaɪtlz"},
+  {en:"soundtrack", ru:"саундтрек", ipa:"ˈsaʊndtræk"},
+  {en:"star", ru:"звезда (актёр/актриса)", ipa:"stɑː"},
+  {en:"special effects", ru:"спецэффекты", ipa:"ˌspeʃl ɪˈfekts"},
+  {en:"set", ru:"съёмочная площадка", ipa:"set"},
+  {en:"critic", ru:"критик", ipa:"ˈkrɪtɪk"},
+  {en:"scene", ru:"сцена", ipa:"siːn"},
+  {en:"audience", ru:"зрители, аудитория", ipa:"ˈɔːdiəns"},
+  {en:"trailer", ru:"трейлер", ipa:"ˈtreɪlə"},
+  {en:"extra", ru:"актёр массовки", ipa:"ˈekstrə"},
+  {en:"sequel", ru:"сиквел, продолжение", ipa:"ˈsiːkwəl"},
+  {en:"plot", ru:"сюжет", ipa:"plɒt"},
+  {en:"review", ru:"рецензия, обзор", ipa:"rɪˈvjuː"},
+  {en:"script", ru:"сценарий", ipa:"skrɪpt"},
+  {en:"cast", ru:"актёрский состав", ipa:"kɑːst"},
+];
+
+const expressions = [
+  {en:"be set in", ru:"действие происходит в..."},
+  {en:"play the part of", ru:"играть роль..."},
+  {en:"be based on", ru:"быть основанным на..."},
+  {en:"be dubbed into", ru:"быть дублированным на..."},
+  {en:"be shot on", ru:"быть снятым на (натуре/месте)"},
+];
+
+/* ============ SPEECH ============ */
+function speak(text){
+  if(!('speechSynthesis' in window)){
+    alert('Синтез речи не поддерживается в этом браузере.');
+    return;
+  }
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-US';
+  u.rate = 0.85;
+  window.speechSynthesis.speak(u);
+}
+function speakAll(words){
+  if(!('speechSynthesis' in window)) return alert('Синтез речи не поддерживается в этом браузере.');
+  window.speechSynthesis.cancel();
+  words.forEach((w, i) => {
+    const u = new SpeechSynthesisUtterance(w.en);
+    u.lang = 'en-US';
+    u.rate = 0.85;
+    window.speechSynthesis.speak(u);
+  });
+}
+
+/* ============ VOCAB TABLES ============ */
+function renderVocabTable(id, words, withArticle){
+  const table = document.getElementById(id);
+  table.innerHTML = `
+    <tr><th>Слово</th><th>Транскрипция</th><th>Перевод</th><th></th></tr>
+    ${words.map(w => `
+      <tr>
+        <td class="en-word">${withArticle && w.art ? w.art+' ' : ''}${w.en}</td>
+        <td class="ipa">/${w.ipa}/</td>
+        <td class="ru-word">${w.ru}</td>
+        <td><button class="play-btn" onclick="speak('${w.en.replace(/'/g,"\\'")}')">🔊</button></td>
+      </tr>`).join('')}
+  `;
+}
+renderVocabTable('vocabTableU1', unit1Words, true);
+renderVocabTable('vocabTableU2', unit2Words, false);
+
+const exprTable = document.getElementById('exprTable');
+exprTable.innerHTML = `
+  <tr><th>Выражение</th><th>Перевод</th><th></th></tr>
+  ${expressions.map(e => `
+    <tr>
+      <td class="en-word">${e.en}</td>
+      <td class="ru-word">${e.ru}</td>
+      <td><button class="play-btn" onclick="speak('${e.en.replace(/'/g,"\\'")}')">🔊</button></td>
+    </tr>`).join('')}
+`;
+
+document.getElementById('playAllU1').onclick = () => speakAll(unit1Words);
+document.getElementById('playAllU2').onclick = () => speakAll(unit2Words);
+
+/* ============ TABS ============ */
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.onclick = () => {
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.unit').forEach(u=>u.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById(tab.dataset.unit).classList.add('active');
+  };
+});
+
+/* ============ PROBLEM WORDS ============ */
+const problemWords = {}; // en -> {ru, count}
+function addProblem(en, ru){
+  if(!problemWords[en]) problemWords[en] = {ru: ru||'', count: 0};
+  problemWords[en].count++;
+  renderProblems();
+}
+function renderProblems(){
+  const list = document.getElementById('problemList');
+  const empty = document.getElementById('emptyNote');
+  const entries = Object.entries(problemWords).sort((a,b)=>b[1].count-a[1].count);
+  if(entries.length===0){
+    list.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  list.innerHTML = entries.map(([en,data]) => `
+    <li>
+      <span>
+        <div class="pw-en">${en}</div>
+        <div class="pw-ru">${data.ru}</div>
+      </span>
+      <span class="pw-count">×${data.count}</span>
+    </li>`).join('');
+}
+function clearProblems(){
+  Object.keys(problemWords).forEach(k => delete problemWords[k]);
+  renderProblems();
+}
+
+/* ============ ANSWER NORMALIZATION ============ */
+function normalize(s){
+  return s.trim().toLowerCase()
+    .replace(/^(a|an|the)\s+/,'')
+    .replace(/[.,!?;:]/g,'')
+    .replace(/\s+/g,' ');
+}
+function isCorrect(userVal, correctVal){
+  return normalize(userVal) === normalize(correctVal);
+}
+
+/* ============ EXERCISE REGISTRY ============ */
+const exercises = {}; // id -> {items, type, containerId}
+
+function blankWord(word, keepEvery){
+  // keep first and last letter, blank ~half the middle letters
+  return word.split(' ').map(part => {
+    if(part.length <= 3) return part;
+    const chars = part.split('');
+    for(let i=1;i<chars.length-1;i++){
+      if(i % 2 === 0) chars[i] = '_';
+    }
+    return chars.join('');
+  }).join(' ');
+}
+
+/* ---- TYPE-ANSWER exercise renderer (gapfill / translate / dictation / definition) ---- */
+function renderTypeExercise(exId, items, mode, ruLookup){
+  exercises[exId] = {items, mode};
+  const container = document.getElementById(exId);
+  container.innerHTML = items.map((it, i) => {
+    let promptHtml = '';
+    if(mode === 'gap'){
+      promptHtml = `Слово: <span class="gap-word">${blankWord(it.en)}</span> <span class="ru-hint">(${it.ru})</span>`;
+    } else if(mode === 'translate'){
+      promptHtml = `Переведите: <span class="ru-hint">${it.ru}</span>`;
+    } else if(mode === 'dictation'){
+      promptHtml = `<button class="play-btn" onclick="speak('${it.en.replace(/'/g,"\\'")}')">🔊</button> &nbsp;Прослушайте и запишите слово`;
+    } else if(mode === 'definition'){
+      promptHtml = `<span class="def-text">${it.def}</span>`;
+    }
+    return `
+      <div class="ex-item">
+        <span class="ex-idx">${i+1}.</span>
+        <span class="ex-prompt">${promptHtml}</span>
+        <input class="ans" type="text" id="${exId}-${i}" placeholder="введите ответ" autocomplete="off">
+        <span class="fb-icon" id="${exId}-${i}-fb"></span>
+      </div>`;
+  }).join('');
+}
+
+function checkExercise(exId){
+  const data = exercises[exId];
+  if(!data) return;
+  let correctCount = 0;
+  data.items.forEach((it, i) => {
+    const input = document.getElementById(`${exId}-${i}`);
+    const fb = document.getElementById(`${exId}-${i}-fb`);
+    input.classList.remove('correct','wrong','revealed');
+    const ok = isCorrect(input.value, it.en);
+    if(ok){
+      input.classList.add('correct');
+      if(fb) fb.textContent = '✅';
+      correctCount++;
+    } else {
+      input.classList.add('wrong');
+      if(fb) fb.textContent = '❌';
+      addProblem(it.en, it.ru || '');
+    }
+  });
+  const scoreTag = document.getElementById('score-' + exId);
+  if(scoreTag) scoreTag.innerHTML = `Правильно: <b>${correctCount} / ${data.items.length}</b>`;
+}
+
+function showAnswers(exId){
+  const data = exercises[exId];
+  if(!data) return;
+  data.items.forEach((it, i) => {
+    const input = document.getElementById(`${exId}-${i}`);
+    const fb = document.getElementById(`${exId}-${i}-fb`);
+    if(!input) return;
+    input.classList.remove('correct','wrong');
+    input.classList.add('revealed');
+    input.value = it.en;
+    if(fb) fb.textContent = 'ℹ️';
+  });
+  const scoreTag = document.getElementById('score-' + exId);
+  if(scoreTag) scoreTag.textContent = 'Ответы показаны';
+}
+
+/* ============ UNIT 1 EXERCISES ============ */
+renderTypeExercise('ex1-1', [
+  {en:"comedy", ru:"комедия"},
+  {en:"musical", ru:"мюзикл"},
+  {en:"animation", ru:"анимация"},
+  {en:"thriller", ru:"триллер"},
+  {en:"western", ru:"вестерн"},
+  {en:"drama", ru:"драма"},
+  {en:"horror film", ru:"фильм ужасов"},
+  {en:"war film", ru:"фильм о войне"},
+], 'gap');
+
+renderTypeExercise('ex1-2', [
+  {en:"action film", ru:"боевик"},
+  {en:"science fiction film", ru:"фантастика"},
+  {en:"rom-com", ru:"романтическая комедия"},
+  {en:"historical film", ru:"исторический фильм"},
+  {en:"western", ru:"вестерн"},
+  {en:"horror film", ru:"фильм ужасов"},
+  {en:"war film", ru:"фильм о войне"},
+  {en:"animation", ru:"мультфильм"},
+], 'translate');
+
+renderTypeExercise('ex1-3', [
+  {en:"musical", ru:"мюзикл"},
+  {en:"comedy", ru:"комедия"},
+  {en:"thriller", ru:"триллер"},
+  {en:"drama", ru:"драма"},
+  {en:"rom-com", ru:"романтическая комедия"},
+  {en:"animation", ru:"анимация"},
+  {en:"action film", ru:"боевик"},
+  {en:"science fiction film", ru:"фантастика"},
+], 'dictation');
+
+renderTypeExercise('ex1-4', [
+  {en:"thriller", ru:"триллер", def:"A film full of danger and suspense, often involving crime — it keeps you on the edge of your seat."},
+  {en:"musical", ru:"мюзикл", def:"A film in which the story is told partly through singing and dancing."},
+  {en:"comedy", ru:"комедия", def:"A light-hearted film made to make the audience laugh."},
+  {en:"animation", ru:"мультфильм", def:"A film made with drawings or computer graphics instead of real actors."},
+  {en:"historical film", ru:"исторический фильм", def:"A film based on real people or events from the past."},
+  {en:"science fiction film", ru:"фантастика", def:"A film about robots, aliens, space travel, or future technology."},
+  {en:"rom-com", ru:"романтическая комедия", def:"A funny film about people falling in love."},
+  {en:"western", ru:"вестерн", def:"A film that shows cowboys and life in the American West in the 19th century."},
+], 'definition');
+
+/* ============ UNIT 2 EXERCISES ============ */
+renderTypeExercise('ex2-1', [
+  {en:"subtitles", ru:"субтитры"},
+  {en:"soundtrack", ru:"саундтрек"},
+  {en:"audience", ru:"зрители"},
+  {en:"trailer", ru:"трейлер"},
+  {en:"sequel", ru:"сиквел"},
+  {en:"script", ru:"сценарий"},
+  {en:"critic", ru:"критик"},
+  {en:"cast", ru:"актёрский состав"},
+], 'gap');
+
+renderTypeExercise('ex2-2', [
+  {en:"star", ru:"звезда (актёр)"},
+  {en:"special effects", ru:"спецэффекты"},
+  {en:"set", ru:"съёмочная площадка"},
+  {en:"scene", ru:"сцена"},
+  {en:"extra", ru:"актёр массовки"},
+  {en:"plot", ru:"сюжет"},
+  {en:"review", ru:"рецензия"},
+  {en:"subtitles", ru:"субтитры"},
+], 'translate');
+
+renderTypeExercise('ex2-3', [
+  {en:"soundtrack", ru:"саундтрек"},
+  {en:"audience", ru:"зрители"},
+  {en:"trailer", ru:"трейлер"},
+  {en:"sequel", ru:"сиквел"},
+  {en:"script", ru:"сценарий"},
+  {en:"critic", ru:"критик"},
+  {en:"cast", ru:"актёрский состав"},
+  {en:"plot", ru:"сюжет"},
+], 'dictation');
+
+/* ---- Exercise 2-4: expression multiple choice ---- */
+const ex24items = [
+  {sentence:"Titanic ___ true events.", answer:"be based on"},
+  {sentence:"The movie ___ Paris in the 1920s.", answer:"be set in"},
+  {sentence:"The film ___ five different languages.", answer:"be dubbed into"},
+  {sentence:"Most scenes ___ location in Morocco.", answer:"be shot on"},
+  {sentence:"Leonardo DiCaprio ___ Jack in the film.", answer:"play the part of"},
+  {sentence:"The new series ___ a bestselling novel.", answer:"be based on"},
+  {sentence:"This animation ___ over 30 languages worldwide.", answer:"be dubbed into"},
+  {sentence:"The battle scenes ___ location in New Zealand.", answer:"be shot on"},
+];
+function renderExpressionExercise(){
+  exercises['ex2-4'] = {items: ex24items.map(it=>({en: it.answer, ru:''})), mode:'select'};
+  const container = document.getElementById('ex2-4');
+  container.innerHTML = ex24items.map((it,i) => `
+    <div class="ex-item">
+      <span class="ex-idx">${i+1}.</span>
+      <span class="ex-prompt">${it.sentence}</span>
+      <select class="ans" id="ex2-4-${i}">
+        <option value="">— выберите —</option>
+        ${expressions.map(e => `<option value="${e.en}">${e.en}</option>`).join('')}
+      </select>
+      <span class="fb-icon" id="ex2-4-${i}-fb"></span>
+    </div>`).join('');
+}
+renderExpressionExercise();
+
+/* ---- Exercise 2-5: passive rephrase ---- */
+const ex25items = [
+  {active:"They set the story in Victorian London.", answers:["the story is set in victorian london"]},
+  {active:"They based the film on a true story.", answers:["the film is based on a true story"]},
+  {active:"They dubbed the cartoon into French.", answers:["the cartoon is dubbed into french"]},
+  {active:"They shot the movie on location in Iceland.", answers:["the movie was shot on location in iceland"]},
+  {active:"They set the series in a small town.", answers:["the series is set in a small town"]},
+  {active:"They based the script on a comic book.", answers:["the script is based on a comic book"]},
+  {active:"They dubbed the show into Japanese.", answers:["the show is dubbed into japanese"]},
+  {active:"They shot the final scene on a real beach.", answers:["the final scene was shot on a real beach"]},
+];
+function renderRephraseExercise(){
+  const container = document.getElementById('ex2-5');
+  container.innerHTML = ex25items.map((it,i) => `
+    <div class="ex-item">
+      <span class="ex-idx">${i+1}.</span>
+      <span class="ex-prompt">${it.active}</span>
+      <input class="ans" type="text" id="ex2-5-${i}" placeholder="Passive: ..." autocomplete="off">
+      <span class="fb-icon" id="ex2-5-${i}-fb"></span>
+    </div>`).join('');
+}
+renderRephraseExercise();
+
+function checkEx24(){
+  let correct = 0;
+  ex24items.forEach((it,i) => {
+    const sel = document.getElementById(`ex2-4-${i}`);
+    const fb = document.getElementById(`ex2-4-${i}-fb`);
+    sel.classList.remove('correct','wrong');
+    if(sel.value === it.answer){
+      sel.classList.add('correct'); fb.textContent = '✅'; correct++;
+    } else {
+      sel.classList.add('wrong'); fb.textContent = '❌';
+      addProblem(it.answer, expressions.find(e=>e.en===it.answer).ru);
+    }
+  });
+  document.getElementById('score-ex2-4').innerHTML = `Правильно: <b>${correct} / ${ex24items.length}</b>`;
+}
+function showEx24(){
+  ex24items.forEach((it,i) => {
+    const sel = document.getElementById(`ex2-4-${i}`);
+    sel.value = it.answer;
+    sel.classList.remove('correct','wrong');
+    sel.classList.add('revealed');
+  });
+  document.getElementById('score-ex2-4').textContent = 'Ответы показаны';
+}
+
+function checkEx25(){
+  let correct = 0;
+  ex25items.forEach((it,i) => {
+    const input = document.getElementById(`ex2-5-${i}`);
+    const fb = document.getElementById(`ex2-5-${i}-fb`);
+    input.classList.remove('correct','wrong','revealed');
+    const norm = input.value.trim().toLowerCase().replace(/[.,!?;:]/g,'').replace(/\s+/g,' ');
+    const ok = it.answers.includes(norm);
+    if(ok){
+      input.classList.add('correct'); fb.textContent = '✅'; correct++;
+    } else {
+      input.classList.add('wrong'); fb.textContent = '❌';
+      addProblem(it.answers[0], 'passive rephrase');
+    }
+  });
+  document.getElementById('score-ex2-5').innerHTML = `Правильно: <b>${correct} / ${ex25items.length}</b>`;
+}
+function showEx25(){
+  ex25items.forEach((it,i) => {
+    const input = document.getElementById(`ex2-5-${i}`);
+    input.classList.remove('correct','wrong');
+    input.classList.add('revealed');
+    input.value = it.answers[0].charAt(0).toUpperCase() + it.answers[0].slice(1);
+  });
+  document.getElementById('score-ex2-5').textContent = 'Ответы показаны';
+}
+
+/* override generic check/show for ex2-4 and ex2-5 via wrapper */
+const _origCheck = checkExercise;
+checkExercise = function(exId){
+  if(exId === 'ex2-4') return checkEx24();
+  if(exId === 'ex2-5') return checkEx25();
+  return _origCheck(exId);
+};
+const _origShow = showAnswers;
+showAnswers = function(exId){
+  if(exId === 'ex2-4') return showEx24();
+  if(exId === 'ex2-5') return showEx25();
+  return _origShow(exId);
+};
+
+renderProblems();
+</script>
+</body>
+</html>
