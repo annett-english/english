@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Airport English — тренажёр лексики</title>
+<style>
+  :root{
+    --navy:#101c34;
+    --navy-2:#16264a;
+    --amber:#e8a33d;
+    --amber-dim:#8a6321;
+    --cream:#f4f1ea;
+    --paper:#fffdf8;
+    --teal:#2f7a6b;
+    --coral:#c9524a;
+    --ink:#1b2230;
+    --line:#d8d2c2;
+    --mono: 'Courier New', ui-monospace, SFMono-Regular, Menlo, monospace;
+    --sans: 'Segoe UI', Roboto, -apple-system, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--cream);
+    color:var(--ink);
+    font-family:var(--sans);
+    line-height:1.5;
+    padding-bottom:80px;
+  }
+  /* ---- Split-flap header ---- */
+  .board{
+    background:var(--navy);
+    background-image:linear-gradient(180deg,var(--navy-2),var(--navy));
+    color:var(--amber);
+    padding:28px 20px 22px;
+    border-bottom:6px solid var(--amber-dim);
+  }
+  .board-inner{max-width:1100px;margin:0 auto;}
+  .board-eyebrow{
+    font-family:var(--mono);
+    letter-spacing:.25em;
+    font-size:12px;
+    color:#c7ae7a;
+    text-transform:uppercase;
+    margin-bottom:8px;
+  }
+  .board h1{
+    font-family:var(--mono);
+    font-size:clamp(24px,4vw,40px);
+    margin:0 0 6px;
+    letter-spacing:.03em;
+    text-shadow:0 0 12px rgba(232,163,61,.35);
+  }
+  .board p.sub{
+    color:#cbd3e6;
+    font-family:var(--sans);
+    font-size:14px;
+    max-width:640px;
+    margin:0;
+  }
+  .status-row{
+    display:flex;
+    gap:18px;
+    flex-wrap:wrap;
+    margin-top:16px;
+    font-family:var(--mono);
+    font-size:12px;
+    color:#9fb0c9;
+  }
+  .status-row span b{color:var(--amber);}
+
+  /* ---- Layout ---- */
+  .layout{
+    max-width:1100px;
+    margin:0 auto;
+    padding:24px 20px 0;
+    display:grid;
+    grid-template-columns:1fr 260px;
+    gap:24px;
+    align-items:start;
+  }
+  @media (max-width:820px){
+    .layout{grid-template-columns:1fr;}
+    .sidebar{order:-1;position:static !important;}
+  }
+  .main{min-width:0;}
+
+  /* ---- Sidebar ---- */
+  .sidebar{
+    position:sticky;
+    top:20px;
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-left:4px solid var(--coral);
+    border-radius:4px;
+    padding:16px 16px 18px;
+  }
+  .sidebar h3{
+    margin:0 0 10px;
+    font-size:13px;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:var(--coral);
+    font-family:var(--mono);
+  }
+  #problemList{
+    list-style:none;
+    margin:0;padding:0;
+    font-size:14px;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+  }
+  #problemList li{
+    background:#fbeceb;
+    border:1px solid #f0cfcc;
+    border-radius:3px;
+    padding:6px 8px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:6px;
+  }
+  #problemList li .cnt{
+    font-family:var(--mono);
+    font-size:11px;
+    color:var(--coral);
+    background:#fff;
+    border-radius:10px;
+    padding:1px 7px;
+  }
+  .empty-note{color:#8a8477;font-size:13px;font-style:italic;}
+  .sidebar .clear-btn{
+    margin-top:12px;
+    width:100%;
+    background:transparent;
+    border:1px solid var(--line);
+    color:#7a7461;
+    font-size:12px;
+    padding:6px;
+    border-radius:3px;
+    cursor:pointer;
+  }
+  .sidebar .clear-btn:hover{border-color:var(--coral);color:var(--coral);}
+
+  /* ---- Vocabulary reminder ---- */
+  .vocab-card{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:18px 20px 20px;
+    margin-bottom:28px;
+  }
+  .vocab-card h2{
+    font-family:var(--mono);
+    font-size:16px;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    margin:0 0 4px;
+    color:var(--navy);
+  }
+  .vocab-card .hint{
+    font-size:13px;
+    color:#7a7461;
+    margin:0 0 14px;
+  }
+  table.vocab-table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:14px;
+  }
+  table.vocab-table th{
+    text-align:left;
+    font-family:var(--mono);
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    color:#8a8471;
+    border-bottom:2px solid var(--line);
+    padding:6px 8px;
+  }
+  table.vocab-table td{
+    border-bottom:1px solid var(--line);
+    padding:9px 8px;
+    vertical-align:middle;
+  }
+  table.vocab-table tr:last-child td{border-bottom:none;}
+  .transcr{
+    font-family:var(--mono);
+    color:var(--teal);
+    font-size:13px;
+  }
+  .listen-btn{
+    background:var(--navy);
+    color:var(--amber);
+    border:none;
+    border-radius:50%;
+    width:30px;height:30px;
+    cursor:pointer;
+    font-size:14px;
+    line-height:1;
+  }
+  .listen-btn:hover{background:var(--amber-dim);}
+
+  /* ---- Exercise blocks ---- */
+  .ex{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:4px;
+    margin-bottom:26px;
+    overflow:hidden;
+  }
+  .ex-head{
+    background:var(--navy);
+    color:#fff;
+    padding:12px 18px;
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .ex-head .tag{
+    font-family:var(--mono);
+    font-size:11px;
+    color:var(--amber);
+    letter-spacing:.08em;
+    text-transform:uppercase;
+  }
+  .ex-head h3{
+    margin:2px 0 0;
+    font-size:17px;
+    font-weight:600;
+  }
+  .ex-head .desc{
+    font-size:12.5px;
+    color:#b9c3d6;
+    margin-top:2px;
+  }
+  .ex-body{padding:16px 18px 6px;}
+  .item{
+    border-bottom:1px dashed var(--line);
+    padding:12px 0;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+  }
+  .item:last-child{border-bottom:none;}
+  .item .prompt{font-size:14.5px;}
+  .item .prompt b{color:var(--navy);}
+  .item .row{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    align-items:center;
+  }
+  .item input[type=text], .item textarea, .item select{
+    font-family:var(--sans);
+    font-size:14px;
+    padding:7px 9px;
+    border:1px solid #c7c0ab;
+    border-radius:3px;
+    background:#fff;
+    flex:1;
+    min-width:180px;
+  }
+  .item textarea{width:100%;min-height:44px;resize:vertical;}
+  .item .feedback{
+    font-size:13px;
+    font-family:var(--mono);
+    min-height:16px;
+  }
+  .feedback.ok{color:var(--teal);}
+  .feedback.bad{color:var(--coral);}
+  .feedback.answer{color:#8a8471;font-style:italic;}
+  .match-pair{display:flex;align-items:center;gap:10px;}
+  .match-pair .left{
+    min-width:170px;
+    font-weight:600;
+    color:var(--navy);
+    font-size:14px;
+  }
+  .ex-actions{
+    display:flex;
+    gap:10px;
+    padding:14px 18px 18px;
+    flex-wrap:wrap;
+  }
+  button.act{
+    font-family:var(--sans);
+    font-weight:600;
+    font-size:13px;
+    padding:9px 16px;
+    border-radius:3px;
+    border:none;
+    cursor:pointer;
+  }
+  button.check{background:var(--teal);color:#fff;}
+  button.check:hover{background:#25604f;}
+  button.reveal{background:transparent;border:1px solid var(--amber-dim);color:var(--amber-dim);}
+  button.reveal:hover{background:#f6ecd8;}
+  .score-pill{
+    font-family:var(--mono);
+    font-size:12px;
+    background:var(--cream);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:5px 12px;
+    align-self:center;
+    color:#584f36;
+  }
+  footer{
+    text-align:center;
+    font-size:12px;
+    color:#9a927c;
+    padding:20px;
+    font-family:var(--mono);
+  }
+</style>
+</head>
+<body>
+
+<div class="board">
+  <div class="board-inner">
+    <div class="board-eyebrow">Departures · Vocabulary Practice</div>
+    <h1>AIRPORT ENGLISH ✈</h1>
+    <p class="sub">Слова и выражения по теме «В аэропорту». Повторите блок ниже, прослушайте произношение, затем пропишите слова руками в 9 упражнениях (по 7 заданий в каждом).</p>
+    <div class="status-row">
+      <span>GATE <b>7</b></span>
+      <span>WORDS <b>7</b></span>
+      <span>EXERCISES <b>9</b></span>
+      <span>STATUS <b>BOARDING</b></span>
+    </div>
+  </div>
+</div>
+
+<div class="layout">
+  <div class="main">
+
+    <!-- VOCAB REMINDER -->
+    <div class="vocab-card">
+      <h2>Напоминание слов</h2>
+      <p class="hint">Нажмите 🔊, чтобы прослушать произношение (озвучка браузера).</p>
+      <table class="vocab-table">
+        <thead>
+          <tr><th></th><th>Phrase</th><th>Транскрипция</th><th>Перевод</th></tr>
+        </thead>
+        <tbody id="vocabBody"></tbody>
+      </table>
+    </div>
+
+    <div id="exercises"></div>
+
+  </div>
+
+  <aside class="sidebar">
+    <h3>⚠ Проблемные слова</h3>
+    <ul id="problemList"></ul>
+    <p class="empty-note" id="emptyNote">Пока всё отлично — ошибок нет.</p>
+    <button class="clear-btn" onclick="clearProblems()">Очистить список</button>
+  </aside>
+</div>
+
+<footer>Airport English Trainer · answers checked locally in your browser</footer>
+
+<script>
+/* ============ DATA ============ */
+const VOCAB = [
+  {id:"pickup",   en:"pick up your luggage",            tr:"/pɪk ʌp jɔːr ˈlʌɡɪdʒ/",         ru:"забрать (получить) свой багаж"},
+  {id:"security", en:"go through security check",       tr:"/ɡəʊ θruː sɪˈkjʊərəti tʃek/",    ru:"пройти проверку безопасности"},
+  {id:"lounge",   en:"wait in the departure lounge",    tr:"/weɪt ɪn ðə dɪˈpɑːtʃər laʊndʒ/", ru:"ждать в зале ожидания вылета"},
+  {id:"dropoff",  en:"drop off your baggage / bag",     tr:"/drɒp ɒf jɔːr ˈbæɡɪdʒ/",         ru:"сдать багаж (на стойке регистрации)"},
+  {id:"customs",  en:"go through customs",              tr:"/ɡəʊ θruː ˈkʌstəmz/",            ru:"пройти таможню"},
+  {id:"checkin",  en:"check in online / at the airport",tr:"/tʃek ɪn ˈɒnˌlaɪn/",             ru:"зарегистрироваться онлайн / в аэропорту"},
+  {id:"baggage",  en:"baggage / luggage",                tr:"/ˈbæɡɪdʒ/ /ˈlʌɡɪdʒ/",            ru:"багаж"},
+];
+
+const NAME = { // for problem-word display
+  pickup:"pick up your luggage", security:"go through security check",
+  lounge:"wait in the departure lounge", dropoff:"drop off your baggage",
+  customs:"go through customs", checkin:"check in online / at the airport",
+  baggage:"baggage / luggage"
+};
+
+/* problem word tracker: id -> mistake count */
+let problems = {};
+
+function markProblem(id){
+  problems[id] = (problems[id]||0)+1;
+  renderProblems();
+}
+function clearProblems(){
+  problems = {};
+  renderProblems();
+}
+function renderProblems(){
+  const ul = document.getElementById('problemList');
+  const note = document.getElementById('emptyNote');
+  const ids = Object.keys(problems);
+  ul.innerHTML = "";
+  if(ids.length===0){ note.style.display='block'; return; }
+  note.style.display='none';
+  ids.sort((a,b)=>problems[b]-problems[a]).forEach(id=>{
+    const li = document.createElement('li');
+    li.innerHTML = `<span>${NAME[id]||id}</span><span class="cnt">${problems[id]}</span>`;
+    ul.appendChild(li);
+  });
+}
+
+/* ============ VOCAB TABLE + TTS ============ */
+function speak(text){
+  if(!('speechSynthesis' in window)) return;
+  const u = new SpeechSynthesisUtterance(text.replace(/\/.*?\//g,'').replace('/',' or '));
+  u.lang = 'en-GB';
+  u.rate = 0.92;
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(u);
+}
+
+function buildVocabTable(){
+  const body = document.getElementById('vocabBody');
+  VOCAB.forEach(v=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><button class="listen-btn" onclick="speak('${v.en.replace(/'/g,"\\'")}')">🔊</button></td>
+      <td><b>${v.en}</b></td>
+      <td class="transcr">${v.tr}</td>
+      <td>${v.ru}</td>`;
+    body.appendChild(tr);
+  });
+}
+
+/* ============ ANSWER NORMALIZATION ============ */
+function norm(s){
+  return (s||"").toLowerCase().trim().replace(/\s+/g," ").replace(/[.,!?;:]/g,"");
+}
+function isCorrect(input, accepted){
+  const n = norm(input);
+  return accepted.some(a=>norm(a)===n);
+}
+function looseContains(input, keywords){
+  const n = norm(input);
+  return keywords.some(k=>n.includes(norm(k)));
+}
+
+/* ============ EXERCISE ENGINE ============ */
+const exContainer = document.getElementById('exercises');
+
+function makeExercise({tag, title, desc, items, renderItem, checkAll, revealAll}){
+  const wrap = document.createElement('div');
+  wrap.className = 'ex';
+  const exId = 'ex_'+Math.random().toString(36).slice(2,8);
+  wrap.innerHTML = `
+    <div class="ex-head">
+      <div>
+        <div class="tag">${tag}</div>
+        <h3>${title}</h3>
+        <div class="desc">${desc}</div>
+      </div>
+    </div>
+    <div class="ex-body" id="${exId}_body"></div>
+    <div class="ex-actions">
+      <button class="act check" id="${exId}_check">✓ Проверить</button>
+      <button class="act reveal" id="${exId}_reveal">👁 Показать ответы</button>
+      <span class="score-pill" id="${exId}_score">0 / ${items.length}</span>
+    </div>
+  `;
+  exContainer.appendChild(wrap);
+  const body = wrap.querySelector(`#${exId}_body`);
+  items.forEach((it,i)=> body.appendChild(renderItem(it,i,exId)));
+  wrap.querySelector(`#${exId}_check`).onclick = ()=> checkAll(items, exId);
+  wrap.querySelector(`#${exId}_reveal`).onclick = ()=> revealAll(items, exId);
+}
+
+function setFeedback(exId,i,cls,text){
+  const f = document.getElementById(`${exId}_fb_${i}`);
+  if(f){ f.className='feedback '+cls; f.textContent=text; }
+}
+function setScore(exId, correct, total){
+  document.getElementById(`${exId}_score`).textContent = `${correct} / ${total}`;
+}
+
+/* ---------- 1. Вставить пропущенные буквы ---------- */
+const gapItems = [
+  {id:"pickup",  masked:"p_ck u_ y__r l_gg_ge",           answer:["pick up your luggage"]},
+  {id:"security",masked:"g_ thr__gh sec_r_ty ch_ck",      answer:["go through security check"]},
+  {id:"lounge",  masked:"w__t _n the dep_rt_re l__nge",   answer:["wait in the departure lounge"]},
+  {id:"dropoff", masked:"dr_p _ff y__r b_gg_ge",          answer:["drop off your baggage","drop off your bag"]},
+  {id:"customs", masked:"g_ thr__gh c_st_ms",             answer:["go through customs"]},
+  {id:"checkin", masked:"ch_ck _n _nl_ne",                answer:["check in online"]},
+  {id:"baggage", masked:"b_gg_ge / l_gg_ge",              answer:["baggage / luggage","baggage/luggage"]},
+];
+makeExercise({
+  tag:"Exercise 1", title:"Вставьте пропущенные буквы",
+  desc:"Впишите слово / фразу полностью, ориентируясь на пропуски.",
+  items:gapItems,
+  renderItem:(it,i,exId)=>{
+    const d=document.createElement('div'); d.className='item';
+    d.innerHTML=`
+      <div class="prompt"><b>${i+1}.</b> ${it.masked}</div>
+      <div class="row"><input type="text" id="${exId}_in_${i}" placeholder="напишите полностью..."></div>
+      <div class="feedback" id="${exId}_fb_${i}"></div>`;
+    return d;
+  },
+  checkAll:(items,exId)=>{
+    let c=0;
+    items.forEach((it,i)=>{
+      const v=document.getElementById(`${exId}_in_${i}`).value;
+      if(isCorrect(v,it.answer)){c++;setFeedback(exId,i,'ok','✓ верно');}
+      else{setFeedback(exId,i,'bad','✗ неверно');markProblem(it.id);}
+    });
+    setScore(exId,c,items.length);
+  },
+  revealAll:(items,exId)=>items.forEach((it,i)=>{
+    document.getElementById(`${exId}_in_${i}`).value=it.answer[0];
+    setFeedback(exId,i,'answer','ответ: '+it.answer[0]);
+  })
+});
+
+/* ---------- 2. Перевод с русского на английский ---------- */
+const ruEnItems = [
+  {id:"pickup",  ru:"Забрать свой багаж (с ленты выдачи)", answer:["pick up your luggage","pick up my luggage"]},
+  {id:"security",ru:"Пройти проверку безопасности",        answer:["go through security check","go through security"]},
+  {id:"lounge",  ru:"Ждать в зале ожидания вылета",        answer:["wait in the departure lounge"]},
+  {id:"dropoff", ru:"Сдать багаж на стойке регистрации",   answer:["drop off your baggage","drop off your bag"]},
+  {id:"customs", ru:"Пройти таможню",                       answer:["go through customs"]},
+  {id:"checkin", ru:"Зарегистрироваться онлайн",            answer:["check in online"]},
+  {id:"baggage", ru:"Багаж (общее слово)",                  answer:["baggage","luggage"]},
+];
+makeExercise({
+  tag:"Exercise 2", title:"Перевод: с русского на английский",
+  desc:"Напишите фразу по-английски.",
+  items:ruEnItems,
+  renderItem:(it,i,exId)=>{
+    const d=document.createElement('div'); d.className='item';
+    d.innerHTML=`
+      <div class="prompt"><b>${i+1}.</b> ${it.ru}</div>
+      <div class="row"><input type="text" id="${exId}_in_${i}" placeholder="in English..."></div>
+      <div class="feedback" id="${exId}_fb_${i}"></div>`;
+    return d;
+  },
+  checkAll:(items,exId)=>{
+    let c=0;
+    items.forEach((it,i)=>{
+      const v=document.getElementById(`${exId}_in_${i}`).value;
+      if(isCorrect(v,it.answer)){c++;setFeedback(exId,i,'ok','✓ верно');}
+      else{setFeedback(exId,i,'bad','✗ неверно');markProblem(it.id);}
+    });
+    setScore(exId,c,items.length);
+  },
+  revealAll:(items,exId)=>items.forEach((it,i)=>{
+    document.getElementById(`${exId}_in_${i}`).value=it.answer[0];
+    setFeedback(exId,i,'answer','ответ: '+it.answer[0]);
+  })
+});
+
+/* ---------- 3. Дефиниция ---------- */
+const defItems = [
+  {id:"pickup",  def:"To collect your bags after they arrive on the baggage claim belt.", answer:["pick up your luggage","pick up luggage"]},
+  {id:"security",def:"To have your body and bags scanned before you're allowed to the gates.", answer:["go through security check","go through security"]},
+  {id:"lounge",  def:"To sit and wait in the area near your gate before boarding starts.", answer:["wait in the departure lounge"]},
+  {id:"dropoff", def:"To leave your suitcase at the check-in desk before your flight.", answer:["drop off your baggage","drop off your bag"]},
+  {id:"customs", def:"To have your belongings checked by officials when entering a country.", answer:["go through customs"]},
+  {id:"checkin", def:"To confirm your flight and get a boarding pass before arriving at the airport.", answer:["check in online"]},
+  {id:"baggage", def:"The suitcases and bags a passenger travels with.", answer:["baggage","luggage"]},
+];
+makeExercise({
+  tag:"Exercise 3", title:"Дефиниция",
+  desc:"По определению напишите нужное слово / фразу.",
+  items:defItems,
+  renderItem:(it,i,exId)=>{
+    const d=document.createElement('div'); d.className='item';
+    d.innerHTML=`
+      <div class="prompt"><b>${i+1}.</b> ${it.def}</div>
+      <div class="row"><input type="text" id="${exId}_in_${i}" placeholder="word / phrase..."></div>
+      <div class="feedback" id="${exId}_fb_${i}"></div>`;
+    return d;
+  },
+  checkAll:(items,exId)=>{
+    let c=0;
+    items.forEach((it,i)=>{
+      const v=document.getElementById(`${exId}_in_${i}`).value;
+      if(isCorrect(v,it.answer)){c++;setFeedback(exId,i,'ok','✓ верно');}
+      else{setFeedback(exId,i,'bad','✗ неверно');markProblem(it.id);}
+    });
+    setScore(exId,c,items.length);
+  },
+  revealAll:(items,exId)=>items.forEach((it,i)=>{
+    document.getElementById(`${exId}_in_${i}`).value=it.answer[0];
+    setFeedback(exId,i,'answer','ответ: '+it.answer[0]);
+  })
+});
+
+/* ---------- 4. Сочетаемость фраз (collocations) ---------- */
+const collItems = [
+  {id:"pickup",  stem:"____ your luggage from the carousel", options:["Pick up","Make up","Take off","Give up"], answer:"Pick up"},
+  {id:"security",stem:"____ through the security check",      options:["Go","Do","Make","Take"], answer:"Go"},
+  {id:"lounge",  stem:"____ in the departure lounge for an hour", options:["Wait","Stay","Stand","Sit up"], answer:"Wait"},
+  {id:"dropoff", stem:"____ off your bag at the check-in desk", options:["Drop","Fall","Put","Leave up"], answer:"Drop"},
+  {id:"customs", stem:"____ through customs with your passport", options:["Go","Pass","Walk","Cross"], answer:"Go"},
+  {id:"checkin", stem:"____ in online the night before the flight", options:["Check","Sign","Log","Enter"], answer:"Check"},
+  {id:"baggage", stem:"Excess ____ costs extra money", options:["baggage","baggages","bag's","bagage"], answer:"baggage"},
+];
+makeExercise({
+  tag:"Exercise 4", title:"Сочетаемость фраз",
+  desc:"Выберите слово, которое верно сочетается по смыслу.",
+  items:collItems,
+  renderItem:(it,i,exId)=>{
+    const d=document.createElement('div'); d.className='item';
+    const opts = it.options.map(o=>`<option value="${o}">${o}</option>`).join('');
+    d.innerHTML=`
+      <div class="prompt"><b>${i+1}.</b> ${it.stem}</div>
+      <div class="row"><select id="${exId}_in_${i}"><option value="">— выбрать —</option>${opts}</select></div>
+      <div class="feedback" id="${exId}_fb_${i}"></div>`;
+    return d;
+  },
+  checkAll:(items,exId)=>{
+    let c=0;
+    items.forEach((it,i)=>{
+      const v=document.getElementById(`${exId}_in_${i}`).value;
+      if(v===it.answer){c++;setFeedback(exId,i,'ok','✓ верно');}
+      else{setFeedback(exId,i,'bad','✗ неверно');markProblem(it.id);}
+    });
+    setScore(exId,c,items.length);
+  },
+  revealAll:(items,exId)=>items.forEach((it,i)=>{
+    document.getElementById(`${exId}_in_${i}`).value=it.answer;
+    setFeedback(exId,i,'answer','ответ: '+it.answer);
+  })
+});
+
+/* ---------- 5. Контекст ---------- */
+const ctxItems = [
+  {id:"checkin", sent:"Please remember to ______ the night before your flight to save time.", answer:["check in online"]},
+  {id:"pickup",  sent:"After landing, go to the carousel to ______.", answer:["pick up your luggage","pick up your bag"]},
+  {id:"security",sent:"You need to ______ before you can reach the gates.", answer:["go through security check","go through security"]},
+  {id:"lounge",  sent:"We had two hours to ______ before our gate opened.", answer:["wait in the departure lounge"]},
+  {id:"dropoff", sent:"At the check-in desk, you ______ and get a baggage tag.", answer:["drop off your baggage","drop off your bag"]},
+  {id:"customs", sent:"Arriving passengers must ______ before leaving the airport.", answer:["go through customs"]},
+  {id:"baggage", sent:"Each passenger is allowed 20kg of ______.", answer:["baggage","luggage"]},
+];
+makeExercise({
+  tag:"Exercise 5", title:"Контекст",
+  desc:"Заполните пропуск в предложении подходящей фразой.",
+  items:ctxItems,
+  renderItem:(it,i,exId)=>{
+    const d=document.createElement('div'); d.className='item';
+    d.innerHTML=`
+      <div class="prompt"><b>${i+1}.</b> ${it.sent}</div>
+      <div class="row"><input type="text" id="${exId}_in_${i}" placeholder="впишите фразу..."></div>
+      <div class="feedback" id="${exId}_fb_${i}"></div>`;
+    return d;
+  },
+  checkAll:(items,exId)=>{
+    let c=0;
+    items.forEach((it,i)=>{
+      const v=document.getElementById(`${exId}_in_${i}`).value;
+      if(isCorrect(v,it.answer)){c++;setFeedback(exId,i,'ok','✓ верно');}
+      else{setFeedback(exId,i,'bad','✗ неверно');markProblem(it.id);}
+    });
+    setScore(exId,c,items.length);
+  },
+  revealAll:(items,exId)=>items.forEach((it,i)=>{
+    document.getElementById(`${exId}_in_${i}`).value=it.answer[0];
+    setFeedback(exId,i,'answer','ответ: '+it.answer[0]);
+  })
+});
+
+/* ---------- 6. Соединить половинки ---------- */
+const halves = [
+  {id:"pickup",  left:"pick up",       right:"your luggage"},
+  {id:"security",left:"go through",    right:"security check"},
+  {id:"lounge",  left:"wait in the",   right:"departure lounge"},
+  {id:"dropoff", left:"drop off",      right:"your bag"},
+  {id:"customs", left:"go through",    right:"customs"},
+  {id:"checkin", left:"check in",      right:"online"},
+  {id:"baggage", left:"baggage /",     right:"luggage"},
+];
+const rightOptions = halves.map(h=>h.right);
+makeExercise({
+  tag:"Exercise 6", title:"Соедините половинки выражений",
+  desc:"Выберите правую часть, которая соединяется с левой.",
+  items:halves,
+  renderItem:(it,i,exId)=>{
+    const d=document.createElement('div'); d.className='item';
+    const opts = rightOptions.map(o=>`<option value="${o}">${o}</option>`).join('');
+    d.innerHTML=`
+      <div class="match-pair">
+        <div class="left">${i+1}. ${it.left} ___</div>
+        <select id="${exId}_in_${i}"><option value="">— выбрать —</option>${opts}</select>
+      </div>
+      <div class="feedback" id="${exId}_fb_${i}"></div>`;
+    return d;
+  },
+  checkAll:(items,exId)=>{
+    let c=0;
+    items.forEach((it,i)=>{
+      const v=document.getElementById(`${exId}_in_${i}`).value;
+      if(v===it.right){c++;setFeedback(exId,i,'ok','✓ верно');}
+      else{setFeedback(exId,i,'bad','✗ неверно');markProblem(it.id);}
+    });
+    setScore(exId,c,items.length);
+  },
+  revealAll:(items,exId)=>items.forEach((it,i)=>{
+    document.getElementById(`${exId}_in_${i}`).value=it.right;
+    setFeedback(exId,i,'answer','ответ: '+it.right);
+  })
+});
+
+/* ---------- 7. Guess the word ---------- */
+const guessItems = [
+  {id:"pickup",  clue:"🧳 + ✋ (после посадки, у ленты выдачи багажа)", answer:["pick up your luggage","pick up luggage"]},
+  {id:"security",clue:"🛂🔍 (сканер, металлоискатель, ручная кладь на ленте)", answer:["go through security check","go through security"]},
+  {id:"lounge",  clue:"🪑⏳🚪 (сидите у выхода на посадку и ждёте)", answer:["wait in the departure lounge"]},
+  {id:"dropoff", clue:"🧳➡️🏷️ (оставляете чемодан на стойке, получаете бирку)", answer:["drop off your baggage","drop off your bag"]},
+  {id:"customs", clue:"🛂📋 (проверка вещей при въезде в страну)", answer:["go through customs"]},
+  {id:"checkin", clue:"💻✅ (делаете это дома вечером перед вылетом)", answer:["check in online"]},
+  {id:"baggage", clue:"🧳 (общее слово для чемоданов и сумок)", answer:["baggage","luggage"]},
+];
+makeExercise({
+  tag:"Exercise 7", title:"Guess the word",
+  desc:"Угадайте фразу по подсказке / эмодзи.",
+  items:guessItems,
+  renderItem:(it,i,exId)=>{
+    const d=document.createElement('div'); d.className='item';
+    d.innerHTML=`
+      <div class="prompt"><b>${i+1}.</b> ${it.clue}</div>
+      <div class="row"><input type="text" id="${exId}_in_${i}" placeholder="ваш ответ..."></div>
+      <div class="feedback" id="${exId}_fb_${i}"></div>`;
+    return d;
+  },
+  checkAll:(items,exId)=>{
+    let c=0;
+    items.forEach((it,i)=>{
+      const v=document.getElementById(`${exId}_in_${i}`).value;
+      if(isCorrect(v,it.answer)){c++;setFeedback(exId,i,'ok','✓ верно');}
+      else{setFeedback(exId,i,'bad','✗ неверно');markProblem(it.id);}
+    });
+    setScore(exId,c,items.length);
+  },
+  revealAll:(items,exId)=>items.forEach((it,i)=>{
+    document.getElementById(`${exId}_in_${i}`).value=it.answer[0];
+    setFeedback(exId,i,'answer','ответ: '+it.answer[0]);
+  })
+});
+
+/* ---------- 8. Поставить в очередности ---------- */
+const orderSentences = [
+  {id:"checkin", sent:"First, I checked in online the night before my flight.", pos:1},
+  {id:"dropoff", sent:"At the airport, I dropped off my bag at the counter.", pos:2},
+  {id:"security",sent:"Then I went through the security check with my boarding pass.", pos:3},
+  {id:"lounge",  sent:"I had to wait in the departure lounge for almost an hour.", pos:4},
+  {id:"customs", sent:"After landing, I went through customs with my passport.", pos:5},
+  {id:"pickup",  sent:"Finally, I picked up my luggage from the carousel.", pos:6},
+  {id:"baggage", sent:"I put my baggage into a taxi and went home.", pos:7},
+];
+// shuffle a copy for display
+const shuffled = [...orderSentences].sort(()=>Math.random()-0.5);
+makeExercise({
+  tag:"Exercise 8", title:"Поставьте в правильном порядке",
+  desc:"Пронумеруйте предложения от 1 до 7 так, чтобы получился связный рассказ о поездке.",
+  items:shuffled,
+  renderItem:(it,i,exId)=>{
+    const d=document.createElement('div'); d.className='item';
+    d.innerHTML=`
+      <div class="prompt">${it.sent}</div>
+      <div class="row"><input type="text" id="${exId}_in_${i}" style="max-width:70px" placeholder="№"></div>
+      <div class="feedback" id="${exId}_fb_${i}"></div>`;
+    return d;
+  },
+  checkAll:(items,exId)=>{
+    let c=0;
+    items.forEach((it,i)=>{
+      const v=document.getElementById(`${exId}_in_${i}`).value.trim();
+      if(v===String(it.pos)){c++;setFeedback(exId,i,'ok','✓ верно');}
+      else{setFeedback(exId,i,'bad','✗ неверно');markProblem(it.id);}
+    });
+    setScore(exId,c,items.length);
+  },
+  revealAll:(items,exId)=>items.forEach((it,i)=>{
+    document.getElementById(`${exId}_in_${i}`).value=it.pos;
+    setFeedback(exId,i,'answer','позиция: '+it.pos);
+  })
+});
+
+/* ---------- 9. Rephrase ---------- */
+const rephraseItems = [
+  {id:"pickup",  orig:"Please collect your bags from the belt.", key:["pick up your luggage","pick up your bag"], model:"Please pick up your luggage from the belt."},
+  {id:"security",orig:"You must pass through the safety scanners.", key:["go through security check","go through security"], model:"You must go through the security check."},
+  {id:"lounge",  orig:"We had to sit and wait near gate 12 before flying.", key:["wait in the departure lounge"], model:"We had to wait in the departure lounge before flying."},
+  {id:"dropoff", orig:"Leave your suitcase at the check-in desk.", key:["drop off your baggage","drop off your bag"], model:"Drop off your baggage at the check-in desk."},
+  {id:"customs", orig:"Arriving travellers must have their bags inspected by officials.", key:["go through customs"], model:"Arriving travellers must go through customs."},
+  {id:"checkin", orig:"Confirm your flight details on the website before arriving.", key:["check in online"], model:"Check in online before arriving."},
+  {id:"baggage", orig:"Airlines usually allow 23kg of bags per passenger.", key:["baggage","luggage"], model:"Airlines usually allow 23kg of baggage per passenger."},
+];
+makeExercise({
+  tag:"Exercise 9", title:"Rephrase",
+  desc:"Перефразируйте предложение, используя целевое слово / фразу из темы.",
+  items:rephraseItems,
+  renderItem:(it,i,exId)=>{
+    const d=document.createElement('div'); d.className='item';
+    d.innerHTML=`
+      <div class="prompt"><b>${i+1}.</b> ${it.orig}</div>
+      <div class="row"><textarea id="${exId}_in_${i}" placeholder="ваш вариант..."></textarea></div>
+      <div class="feedback" id="${exId}_fb_${i}"></div>`;
+    return d;
+  },
+  checkAll:(items,exId)=>{
+    let c=0;
+    items.forEach((it,i)=>{
+      const v=document.getElementById(`${exId}_in_${i}`).value;
+      if(looseContains(v,it.key)){c++;setFeedback(exId,i,'ok','✓ целевая фраза найдена');}
+      else{setFeedback(exId,i,'bad','✗ фраза не найдена — сравните с образцом');markProblem(it.id);}
+    });
+    setScore(exId,c,items.length);
+  },
+  revealAll:(items,exId)=>items.forEach((it,i)=>{
+    document.getElementById(`${exId}_in_${i}`).value=it.model;
+    setFeedback(exId,i,'answer','образец: '+it.model);
+  })
+});
+
+/* ============ INIT ============ */
+buildVocabTable();
+renderProblems();
+</script>
+</body>
+</html>
