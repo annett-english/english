@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Articles Workbook — тренажёр по артиклям</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap');
+
+:root{
+  --board: #16342a;
+  --board-2: #1d4235;
+  --chalk: #eef3ea;
+  --chalk-dim: #b9c7bd;
+  --paper: #fbf8ef;
+  --paper-line: #d8dcc9;
+  --red: #c0392b;
+  --red-soft: #e8746633;
+  --green: #2f7d4f;
+  --green-soft: #2f7d4f22;
+  --amber: #d9a441;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  background: var(--board);
+  background-image:
+    radial-gradient(circle at 15% 8%, rgba(255,255,255,0.03), transparent 40%),
+    repeating-linear-gradient(0deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px, transparent 1px, transparent 34px);
+  font-family:'Inter', sans-serif;
+  color: var(--chalk);
+  min-height:100vh;
+  padding: 28px 16px 60px;
+}
+.wrap{max-width: 880px; margin: 0 auto;}
+
+header{ text-align:center; margin-bottom: 22px; }
+header .eyebrow{
+  font-family:'JetBrains Mono', monospace;
+  font-size: 12px; letter-spacing: .18em; text-transform:uppercase;
+  color: var(--amber); margin-bottom: 6px;
+}
+header h1{
+  font-family:'Caveat', cursive;
+  font-size: 52px;
+  margin: 0 0 6px;
+  color: var(--chalk);
+  transform: rotate(-0.6deg);
+}
+header p{ color: var(--chalk-dim); font-size: 14.5px; max-width:560px; margin: 0 auto;}
+
+.chalk-underline{
+  display:inline-block; position:relative;
+}
+.chalk-underline::after{
+  content:''; position:absolute; left:2%; right:2%; bottom:-4px; height:6px;
+  background: var(--red); opacity:.55; border-radius: 3px;
+  transform: rotate(-0.5deg);
+}
+
+/* Rules cheat-sheet */
+details.cheat{
+  background: var(--paper); color:#2b2b22; border-radius: 10px; padding: 14px 18px;
+  margin-bottom: 22px; box-shadow: 0 8px 20px rgba(0,0,0,.25);
+  border: 1px solid #00000010;
+}
+details.cheat summary{
+  cursor:pointer; font-weight:700; font-size:15px; color:#3a3a2e;
+  font-family:'JetBrains Mono', monospace; letter-spacing:.02em;
+}
+.cheat-grid{ display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-top:14px;}
+@media(max-width:720px){ .cheat-grid{grid-template-columns: 1fr;} }
+.cheat-col h4{
+  margin:0 0 6px; font-size:13px; text-transform:uppercase; letter-spacing:.08em;
+}
+.cheat-col.a h4{color:#8a5a1c;}
+.cheat-col.t h4{color:#1c5a8a;}
+.cheat-col.z h4{color:#5a1c8a;}
+.cheat-col ul{ margin:0; padding-left:16px; font-size:12.5px; line-height:1.5; }
+.cheat-col li{ margin-bottom:5px;}
+.cheat-col code{ background:#00000010; padding:1px 4px; border-radius:4px; font-size:11.5px;}
+
+/* tabs */
+.tabs{
+  display:flex; flex-wrap:wrap; gap:8px; margin-bottom: 20px; justify-content:center;
+}
+.tab-btn{
+  background: var(--board-2); color: var(--chalk-dim); border:1px solid #ffffff22;
+  padding: 9px 15px; border-radius: 999px; font-size: 13.5px; cursor:pointer;
+  font-family:'Inter'; font-weight:600; transition: all .15s;
+}
+.tab-btn:hover{ color: var(--chalk); border-color:#ffffff55; }
+.tab-btn.active{
+  background: var(--amber); color:#241a04; border-color: var(--amber);
+}
+
+.panel{ display:none; }
+.panel.active{ display:block; animation: fade .25s ease; }
+@keyframes fade{ from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:none;} }
+
+.panel-head{
+  display:flex; align-items:baseline; justify-content:space-between; flex-wrap:wrap; gap:10px;
+  margin-bottom: 14px;
+}
+.panel-head h2{
+  font-family:'Caveat', cursive; font-size:32px; margin:0; color: var(--chalk);
+}
+.panel-head .instr{ color: var(--chalk-dim); font-size:13px; max-width:420px; }
+
+.controls{ display:flex; gap:10px; margin: 16px 0 6px; flex-wrap:wrap; align-items:center;}
+button.action{
+  border:none; border-radius: 8px; padding: 10px 18px; font-weight:700; font-size:13.5px;
+  cursor:pointer; font-family:'Inter'; transition: transform .1s;
+}
+button.action:active{ transform: scale(0.97); }
+.btn-check{ background: var(--green); color:#eafff0; }
+.btn-show{ background: transparent; color: var(--amber); border:1.5px solid var(--amber) !important; }
+.btn-reset{ background: transparent; color: var(--chalk-dim); border:1.5px solid #ffffff33 !important; }
+.score{
+  font-family:'JetBrains Mono', monospace; font-size:13px; color: var(--amber);
+  margin-left:auto;
+}
+
+/* item cards - notebook paper */
+.item{
+  background: var(--paper); color:#2b2b22; border-radius: 10px;
+  padding: 14px 16px 12px; margin-bottom: 12px;
+  box-shadow: 0 6px 16px rgba(0,0,0,.22);
+  border-left: 5px solid #d8dcc9;
+  position:relative;
+}
+.item .num{
+  font-family:'JetBrains Mono', monospace; font-size:11px; color:#8a8a70;
+  margin-bottom: 6px; display:block;
+}
+.item .sent{ font-size: 15px; line-height:1.5; margin-bottom:10px;}
+.item .sent strong{ color:#b0451f; text-decoration: underline wavy #b0451f55; }
+.item .sent .gap-word{ color:#1c5a8a; font-weight:700; }
+
+.opts{ display:flex; flex-direction:column; gap:7px; }
+.opts label{
+  display:flex; gap:8px; align-items:flex-start; font-size:13.5px; cursor:pointer;
+  padding:6px 8px; border-radius:6px; transition:background .12s;
+}
+.opts label:hover{ background:#00000008; }
+.opts input{ margin-top:3px; }
+
+.mini-opts{ display:flex; flex-wrap:wrap; gap:8px; }
+.mini-opts label{
+  border:1px solid #00000022; padding:6px 10px; border-radius:20px; font-size:13px; cursor:pointer;
+}
+.mini-opts input{ display:none; }
+.mini-opts label.picked{ background:#1c5a8a; color:#fff; border-color:#1c5a8a; }
+
+select.rule-select, input.gap-input{
+  width:100%; max-width:320px; padding:8px 10px; border-radius:6px;
+  border:1px solid #00000030; font-size:13.5px; font-family:'Inter'; background:#fff;
+}
+input.gap-input{ max-width:120px; text-align:center; font-family:'JetBrains Mono', monospace;}
+
+.feedback{
+  margin-top:10px; padding:9px 12px; border-radius:7px; font-size:13px; line-height:1.5;
+  display:none;
+}
+.feedback.show{ display:block; }
+.feedback.correct{ background: var(--green-soft); border:1px solid #2f7d4f55; color:#1c4a2f;}
+.feedback.incorrect{ background: var(--red-soft); border:1px solid #c0392b55; color:#7a2318;}
+.feedback.revealed{ background:#1c5a8a15; border:1px solid #1c5a8a44; color:#123a5a;}
+.feedback b{ display:block; margin-bottom:2px; }
+
+/* stereotypes */
+.stereo-box{ background: var(--paper); color:#2b2b22; border-radius:10px; padding:18px;
+  box-shadow: 0 6px 16px rgba(0,0,0,.22); }
+.stereo-box textarea{
+  width:100%; min-height: 160px; border-radius:8px; border:1px solid #00000022;
+  padding:12px; font-family:'JetBrains Mono', monospace; font-size:13.5px; resize:vertical;
+  line-height:1.7;
+}
+.stereo-hint{ font-size:12.5px; color:#6b6b55; margin: 8px 0 14px; line-height:1.5;}
+.copy-msg{ font-size:12.5px; color: var(--green); margin-left:10px; opacity:0; transition:opacity .2s;}
+.copy-msg.show{ opacity:1; }
+
+footer{ text-align:center; color:#ffffff44; font-size:11.5px; margin-top:30px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">grammar workbook · articles</div>
+  <h1 class="chalk-underline">a / an / the / — </h1>
+  <p>6 упражнений по 10 заданий на выбор артикля. Проверяйте себя или сразу смотрите ответы с объяснением правила.</p>
+</header>
+
+<details class="cheat">
+  <summary>📋 Шпаргалка по правилам (нажмите, чтобы открыть)</summary>
+  <div class="cheat-grid">
+    <div class="cheat-col a">
+      <h4>a / an</h4>
+      <ul>
+        <li><code>A1</code> ед.ч. исчисл. сущ. — неопределённое: <i>a house</i></li>
+        <li><code>A2</code> a/an + прил. + сущ. ед.ч.: <i>a nice house</i></li>
+        <li><code>A3</code> первое упоминание в истории</li>
+        <li><code>A4</code> what a/an + сущ.!: <i>what a day!</i></li>
+        <li><code>A5</code> once a week / twice a month</li>
+        <li><code>A6</code> a/an + профессия: <i>I am a student</i></li>
+        <li><code>A7</code> устойчивые: a bit, a lot (of), a few, a little, a couple of, a number of, a kind/type of, have a look/rest, take a break, have a good time, in a hurry</li>
+      </ul>
+    </div>
+    <div class="cheat-col t">
+      <h4>the</h4>
+      <ul>
+        <li><code>T1</code> второе упоминание</li>
+        <li><code>T2</code> что-то конкретное: <i>open the door</i></li>
+        <li><code>T3</code> уникальное: the sun, the moon, the Internet</li>
+        <li><code>T4</code> места: go to the shop</li>
+        <li><code>T5</code> превосходная степень: the biggest</li>
+        <li><code>T6</code> устойчивые: the same, the next/previous, the other, the only, at the moment, in the end, by the way, on the other hand, in the morning/afternoon/evening, at the beginning/end</li>
+      </ul>
+    </div>
+    <div class="cheat-col z">
+      <h4>нулевой артикль</h4>
+      <ul>
+        <li><code>Z1</code> обобщение: Women talk more than men</li>
+        <li><code>Z2</code> home/work/school/university/church + at/to/from</li>
+        <li><code>Z3</code> дни недели и месяцы</li>
+        <li><code>Z4</code> next/last/this + day/week/year</li>
+        <li><code>Z5</code> устойчивые: go to bed, be in bed, by bus/car/train/plane, on foot, at night, all day/night, face to face, have breakfast/lunch/dinner</li>
+      </ul>
+    </div>
+  </div>
+</details>
+
+<div class="tabs" id="tabs"></div>
+
+<div id="panels"></div>
+
+<footer>Тренажёр создан для практики артиклей английского языка</footer>
+</div>
+
+<script>
+const RULES = {
+  A1: "a/an перед исчисляемым существительным в ед.ч. — предмет не определён ('какой-то')",
+  A2: "a/an + прилагательное + существительное в ед.ч. (исчисляемое)",
+  A3: "первое упоминание предмета/персонажа в истории",
+  A4: "what a/an + существительное! — восклицание",
+  A5: "once a week / twice a month... — кратность действия",
+  A6: "a/an + профессия/должность",
+  A7: "устойчивое выражение с a/an (a bit, a lot of, a few, a little, a couple of, a number of, a kind/type of, have a look, have a rest, take a break, have a good time, in a hurry)",
+  T1: "второе упоминание того же предмета",
+  T2: "что-то конкретное, понятное из ситуации/контекста",
+  T3: "уникальный предмет, единственный в своём роде (the sun, the moon, the Internet)",
+  T4: "устойчивое обозначение места (go to the shop и т.п.)",
+  T5: "превосходная степень прилагательного (the biggest, the most beautiful)",
+  T6: "устойчивое выражение с the (the same, the next/previous, the other, the only, at the moment, in the end, by the way, on the other hand, in the morning/afternoon/evening, at the beginning/end)",
+  Z1: "обобщение — нулевой артикль",
+  Z2: "home/work/school/university/church + at/to/from — нулевой артикль",
+  Z3: "дни недели и месяцы — нулевой артикль",
+  Z4: "next/last/this + day/week/year... — нулевой артикль",
+  Z5: "устойчивое выражение с нулевым артиклем (go to bed, be in bed, by bus/car/train/plane, on foot, at night, all day/night, face to face, have breakfast/lunch/dinner)"
+};
+
+/* ---------- EXERCISE 1: выбрать объяснение (почему такой артикль) ---------- */
+const ex1 = [
+  {sent:"I saw a dog in the park. <strong>The dog</strong> was brown.", correct:"T1", opts:["T1","A1","T3","T2"]},
+  {sent:"<strong>The sun</strong> is shining today.", correct:"T3", opts:["T3","T2","A3","T4"]},
+  {sent:"She works as <strong>a doctor</strong> in a big hospital.", correct:"A6", opts:["A6","A1","A2","A7"]},
+  {sent:"This is <strong>the biggest</strong> city in Europe.", correct:"T5", opts:["T5","T2","T6","T3"]},
+  {sent:"We go to <strong>school</strong> by bus every day.", correct:"Z2", opts:["Z2","Z1","T4","Z5"]},
+  {sent:"<strong>What a</strong> beautiful house!", correct:"A4", opts:["A4","A2","A1","A7"]},
+  {sent:"I have <strong>a lot of</strong> homework today.", correct:"A7", opts:["A7","A1","A2","T2"]},
+  {sent:"<strong>Dogs</strong> are loyal animals.", correct:"Z1", opts:["Z1","A1","T1","Z4"]},
+  {sent:"I go to the gym <strong>twice a week</strong>.", correct:"A5", opts:["A5","A7","Z3","A1"]},
+  {sent:"My brother goes to <strong>bed</strong> at 10 pm.", correct:"Z5", opts:["Z5","Z2","T2","A1"]}
+];
+
+/* ---------- EXERCISE 2: соотнести предложение с правилом (select из полного списка) ---------- */
+const ex2 = [
+  {sent:"He's <strong>a teacher</strong> at a local school.", correct:"A6"},
+  {sent:"This is <strong>the only</strong> solution we have.", correct:"T6"},
+  {sent:"I usually have <strong>breakfast</strong> at 7 am.", correct:"Z5"},
+  {sent:"Look at <strong>the moon</strong> — it's so bright tonight!", correct:"T3"},
+  {sent:"There's a book on the table. <strong>The book</strong> is mine.", correct:"T1"},
+  {sent:"We meet <strong>once a month</strong>.", correct:"A5"},
+  {sent:"<strong>Cats</strong> are independent animals.", correct:"Z1"},
+  {sent:"Can I <strong>have a look</strong> at your phone?", correct:"A7"},
+  {sent:"<strong>Last year</strong> we went to Spain.", correct:"Z4"},
+  {sent:"This is <strong>the most interesting</strong> film I've seen.", correct:"T5"}
+];
+
+/* ---------- EXERCISE 3: find & correct the mistake (student types the fix) ---------- */
+const ex3 = [
+  {before:"I am", wrong:"the", after:"student at this university.", correct:"a",
+   corrected:"I am <b>a</b> student at this university.", rule:"A6"},
+  {before:"She plays", wrong:"a", after:"piano every evening.", correct:"the",
+   corrected:"She plays <b>the</b> piano every evening.", rule:"T3 (муз. инструменты — the piano/the guitar)"},
+  {before:"", wrong:"A", after:"Sun rises in the east.", correct:"The",
+   corrected:"<b>The</b> Sun rises in the east.", rule:"T3"},
+  {before:"We go to", wrong:"a", after:"school by bus.", correct:"-",
+   corrected:"We go to <b>school</b> (без артикля) by bus.", rule:"Z2"},
+  {before:"This is", wrong:"a", after:"biggest mistake I've ever made.", correct:"the",
+   corrected:"This is <b>the</b> biggest mistake I've ever made.", rule:"T5"},
+  {before:"I have", wrong:"the", after:"little money left.", correct:"a",
+   corrected:"I have <b>a</b> little money left.", rule:"A7"},
+  {before:"He goes to", wrong:"the", after:"bed at 11 pm.", correct:"-",
+   corrected:"He goes to <b>bed</b> (без артикля) at 11 pm.", rule:"Z5"},
+  {before:"", wrong:"What the", after:"wonderful day!", correct:"What a",
+   corrected:"<b>What a</b> wonderful day!", rule:"A4"},
+  {before:"I have English classes on", wrong:"the", after:"Monday.", correct:"-",
+   corrected:"I have English classes on <b>Monday</b> (без артикля).", rule:"Z3"},
+  {before:"This is", wrong:"a", after:"same problem as before.", correct:"the",
+   corrected:"This is <b>the same</b> problem as before.", rule:"T6"}
+];
+
+/* ---------- EXERCISE 4: fill in the gaps ---------- */
+const ex4 = [
+  {before:"I saw", gap:"___", after:"old man in the street.", after2:"___ man was carrying a big bag.", answers:["a","the"], rules:["A1","T1"]},
+  {before:"", gap:"___", after:"Earth goes around ___ Sun.", answers:["the","the"], single:true, rules:["T3","T3"]},
+  {before:"She is", gap:"___", after:"engineer at a big company.", answers:["an"], rules:["A6"]},
+  {before:"What", gap:"___", after:"amazing view!", answers:["a"], rules:["A4"]},
+  {before:"We visit our grandparents once", gap:"___", after:"month.", answers:["a"], rules:["A5"]},
+  {before:"", gap:"___", after:"Elephants are the largest land animals.", answers:["-"], rules:["Z1"]},
+  {before:"I go to", gap:"___", after:"church every Sunday to pray.", answers:["-"], rules:["Z2"]},
+  {before:"This is", gap:"___", after:"most difficult exam I've ever taken.", answers:["the"], rules:["T5"]},
+  {before:"Could you give me", gap:"___", after:"few minutes, please?", answers:["a"], rules:["A7"]},
+  {before:"He always goes to", gap:"___", after:"bed early on weekdays.", answers:["-"], rules:["Z5"]}
+];
+
+/* ---------- EXERCISE 6: what usually comes after? ---------- */
+const ex6 = [
+  {stem:"twice a ___", opts:["week","the week","a week","weeks"], correctIdx:0, rule:"A5"},
+  {stem:"He goes to ___ early.", opts:["bed","the bed","a bed","beds"], correctIdx:0, rule:"Z5"},
+  {stem:"This is the most beautiful ___ I've seen.", opts:["view","a view","the view","views"], correctIdx:0, rule:"T5"},
+  {stem:"What a ___!", opts:["nice surprise","the nice surprise","nice surprises","a nice surprises"], correctIdx:0, rule:"A4"},
+  {stem:"go to ___ (учиться там)", opts:["school","the school","a school","schools"], correctIdx:0, rule:"Z2"},
+  {stem:"the same ___", opts:["problem","a problem","an problem","problems the"], correctIdx:0, rule:"T6"},
+  {stem:"a couple of ___", opts:["minutes","a minutes","the minutes","minute"], correctIdx:0, rule:"A7"},
+  {stem:"the biggest ___ in the world", opts:["building","a building","buildings","the buildings"], correctIdx:0, rule:"T5"},
+  {stem:"by ___ (способ передвижения)", opts:["car","a car","the car","cars"], correctIdx:0, rule:"Z5"},
+  {stem:"at the ___ of the story", opts:["end","a end","an end","the ends"], correctIdx:0, rule:"T6"}
+];
+
+/* ============== RENDER ENGINE ============== */
+const tabsData = [
+  {id:"ex1", label:"1. Выбери правило", title:"Упражнение 1 — на правило", instr:"Выберите верное объяснение, почему в предложении использован именно такой артикль."},
+  {id:"ex2", label:"2. Соотнеси", title:"Упражнение 2 — соотнести с правилом", instr:"Выберите код правила из выпадающего списка, которое объясняет выделенный артикль."},
+  {id:"ex3", label:"3. Find the mistake", title:"Упражнение 3 — найди и исправь ошибку", instr:"В каждом предложении артикль указан неверно (зачёркнут). Впишите правильный вариант (a / an / the / -)."},
+  {id:"ex4", label:"4. Fill in the gaps", title:"Упражнение 4 — заполни пропуски", instr:"Впишите a / an / the, а если артикль не нужен — поставьте «-»."},
+  {id:"ex6", label:"5. What comes after?", title:"Упражнение 5 — что обычно после?", instr:"Выберите, что обычно следует дальше в устойчивом выражении."},
+  {id:"stereo", label:"✍ Стереотипы", title:"Напиши 5 стереотипов", instr:"Используйте нулевой артикль для обобщений (Z1)."}
+];
+
+const tabsEl = document.getElementById('tabs');
+const panelsEl = document.getElementById('panels');
+
+tabsData.forEach((t,i)=>{
+  const b = document.createElement('button');
+  b.className = 'tab-btn' + (i===0?' active':'');
+  b.textContent = t.label;
+  b.onclick = ()=>switchTab(t.id);
+  b.dataset.tab = t.id;
+  tabsEl.appendChild(b);
+});
+
+function switchTab(id){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.tab===id));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active', p.id===id));
+}
+
+function panelHeader(t){
+  return `<div class="panel-head"><h2>${t.title}</h2><div class="instr">${t.instr}</div></div>`;
+}
+
+function controlsHTML(prefix){
+  return `<div class="controls">
+    <button class="action btn-check" onclick="checkEx('${prefix}')">✓ Проверить ответы</button>
+    <button class="action btn-show" onclick="showEx('${prefix}')">👁 Показать ответы</button>
+    <button class="action btn-reset" onclick="resetEx('${prefix}')">↺ Сбросить</button>
+    <span class="score" id="${prefix}-score"></span>
+  </div>`;
+}
+
+/* --- ex1 render --- */
+function renderEx1(){
+  let html = panelHeader(tabsData[0]) + controlsHTML('ex1');
+  ex1.forEach((it,i)=>{
+    html += `<div class="item" id="ex1-item-${i}">
+      <span class="num">Предложение ${i+1}</span>
+      <div class="sent">${it.sent}</div>
+      <div class="opts">
+        ${it.opts.map((code,j)=>`<label><input type="radio" name="ex1-${i}" value="${code}">${RULES[code]}</label>`).join('')}
+      </div>
+      <div class="feedback" id="ex1-fb-${i}"></div>
+    </div>`;
+  });
+  return html;
+}
+
+/* --- ex2 render --- */
+const allCodes = Object.keys(RULES);
+function renderEx2(){
+  let html = panelHeader(tabsData[1]) + controlsHTML('ex2');
+  ex2.forEach((it,i)=>{
+    html += `<div class="item" id="ex2-item-${i}">
+      <span class="num">Предложение ${i+1}</span>
+      <div class="sent">${it.sent}</div>
+      <select class="rule-select" id="ex2-sel-${i}">
+        <option value="">— выберите правило —</option>
+        ${allCodes.map(c=>`<option value="${c}">${c} — ${RULES[c]}</option>`).join('')}
+      </select>
+      <div class="feedback" id="ex2-fb-${i}"></div>
+    </div>`;
+  });
+  return html;
+}
+
+/* --- ex3 render --- */
+function renderEx3(){
+  let html = panelHeader(tabsData[2]) + controlsHTML('ex3');
+  ex3.forEach((it,i)=>{
+    html += `<div class="item" id="ex3-item-${i}">
+      <span class="num">Предложение ${i+1}</span>
+      <div class="sent">${it.before} <s style="color:#c0392b;">${it.wrong}</s> <input class="gap-input" id="ex3-in-${i}" placeholder="a/an/the/-"> ${it.after}</div>
+      <div class="feedback" id="ex3-fb-${i}"></div>
+    </div>`;
+  });
+  return html;
+}
+
+/* --- ex4 render --- */
+function renderEx4(){
+  let html = panelHeader(tabsData[3]) + controlsHTML('ex4');
+  ex4.forEach((it,i)=>{
+    let sentHTML;
+    if(it.single){
+      sentHTML = `<input class="gap-input" id="ex4-in-${i}" placeholder="a/an/the/-"> ${it.after}`;
+    } else if(it.after2){
+      sentHTML = `${it.before} <input class="gap-input" id="ex4-in-${i}" placeholder="a/an/the/-"> ${it.after} <input class="gap-input" id="ex4-in2-${i}" placeholder="a/an/the/-"> ${it.after2}`;
+    } else {
+      sentHTML = `${it.before} <input class="gap-input" id="ex4-in-${i}" placeholder="a/an/the/-"> ${it.after}`;
+    }
+    html += `<div class="item" id="ex4-item-${i}">
+      <span class="num">Предложение ${i+1}</span>
+      <div class="sent">${sentHTML}</div>
+      <div class="feedback" id="ex4-fb-${i}"></div>
+    </div>`;
+  });
+  return html;
+}
+
+/* --- ex6 render --- */
+function renderEx6(){
+  let html = panelHeader(tabsData[5]) + controlsHTML('ex6');
+  ex6.forEach((it,i)=>{
+    html += `<div class="item" id="ex6-item-${i}">
+      <span class="num">Задание ${i+1}</span>
+      <div class="sent">${it.stem}</div>
+      <div class="mini-opts" id="ex6-opts-${i}">
+        ${it.opts.map((o,j)=>`<label onclick="pickMini('ex6',${i},${j})"><input type="radio" name="ex6-${i}" value="${j}">${o}</label>`).join('')}
+      </div>
+      <div class="feedback" id="ex6-fb-${i}"></div>
+    </div>`;
+  });
+  return html;
+}
+
+function pickMini(prefix, i, j){
+  document.querySelectorAll(`#${prefix}-opts-${i} label`).forEach((l,k)=>l.classList.toggle('picked', k===j));
+}
+
+/* --- stereo render --- */
+function renderStereo(){
+  return `<div class="panel-head"><h2>Стереотипы</h2></div>
+  <div class="stereo-box">
+    <p class="stereo-hint">Напишите 5 предложений-стереотипов, используя <b>нулевой артикль</b> для обобщения (правило Z1, например: <i>Men don't like asking for directions.</i> / <i>Women talk more than men.</i>). Каждое предложение — с новой строки.</p>
+    <textarea id="stereo-text" placeholder="1. Cats are more independent than dogs.
+2. Italians love pasta.
+3. ...
+4. ...
+5. ..."></textarea>
+    <div class="controls">
+      <button class="action btn-check" onclick="copyStereo()">📋 Скопировать всё</button>
+      <span class="copy-msg" id="stereo-copy-msg">Скопировано!</span>
+    </div>
+  </div>`;
+}
+
+function copyStereo(){
+  const txt = document.getElementById('stereo-text').value;
+  navigator.clipboard.writeText(txt).then(()=>{
+    const m = document.getElementById('stereo-copy-msg');
+    m.classList.add('show');
+    setTimeout(()=>m.classList.remove('show'), 1800);
+  });
+}
+
+/* build panels */
+const renderers = {ex1:renderEx1, ex2:renderEx2, ex3:renderEx3, ex4:renderEx4, ex6:renderEx6, stereo:renderStereo};
+tabsData.forEach((t,i)=>{
+  const p = document.createElement('div');
+  p.className = 'panel' + (i===0?' active':'');
+  p.id = t.id;
+  p.innerHTML = renderers[t.id]();
+  panelsEl.appendChild(p);
+});
+
+/* ============== CHECK / SHOW / RESET LOGIC ============== */
+function setFb(el, cls, html){
+  el.className = 'feedback show ' + cls;
+  el.innerHTML = html;
+}
+
+function checkEx(prefix){
+  let correctCount = 0, total = 0;
+  if(prefix==='ex1'){
+    total = ex1.length;
+    ex1.forEach((it,i)=>{
+      const sel = document.querySelector(`input[name="ex1-${i}"]:checked`);
+      const fb = document.getElementById(`ex1-fb-${i}`);
+      if(!sel){ setFb(fb,'incorrect','<b>Не выбрано.</b> Правильный ответ: '+RULES[it.correct]); return; }
+      const ok = sel.value === it.correct;
+      if(ok) correctCount++;
+      setFb(fb, ok?'correct':'incorrect', `<b>${ok?'Верно!':'Неверно.'}</b> Правило: ${RULES[it.correct]}`);
+    });
+  } else if(prefix==='ex2'){
+    total = ex2.length;
+    ex2.forEach((it,i)=>{
+      const sel = document.getElementById(`ex2-sel-${i}`).value;
+      const fb = document.getElementById(`ex2-fb-${i}`);
+      if(!sel){ setFb(fb,'incorrect','<b>Не выбрано.</b> Правильный ответ: '+it.correct+' — '+RULES[it.correct]); return; }
+      const ok = sel === it.correct;
+      if(ok) correctCount++;
+      setFb(fb, ok?'correct':'incorrect', `<b>${ok?'Верно!':'Неверно.'}</b> Правило ${it.correct}: ${RULES[it.correct]}`);
+    });
+  } else if(prefix==='ex3'){
+    total = ex3.length;
+    ex3.forEach((it,i)=>{
+      const v = (document.getElementById(`ex3-in-${i}`).value||'').trim();
+      const fb = document.getElementById(`ex3-fb-${i}`);
+      if(!v){ setFb(fb,'incorrect','<b>Не заполнено.</b> Исправление: '+it.corrected+' <br>Правило: '+it.rule); return; }
+      const ok = norm(v)===norm(it.correct);
+      if(ok) correctCount++;
+      setFb(fb, ok?'correct':'incorrect', `<b>${ok?'Верно!':'Неверно.'}</b> Исправление: ${it.corrected}<br>Правило: ${it.rule}`);
+    });
+  } else if(prefix==='ex4'){
+    total = ex4.length;
+    ex4.forEach((it,i)=>{
+      const fb = document.getElementById(`ex4-fb-${i}`);
+      const v1 = (document.getElementById(`ex4-in-${i}`).value||'').trim().toLowerCase();
+      let ok;
+      if(it.after2){
+        const v2 = (document.getElementById(`ex4-in2-${i}`).value||'').trim().toLowerCase();
+        ok = norm(v1)===norm(it.answers[0]) && norm(v2)===norm(it.answers[1]);
+        if(ok) correctCount++;
+        setFb(fb, ok?'correct':'incorrect', `<b>${ok?'Верно!':'Неверно.'}</b> Ответ: «${it.answers[0]}» (${RULES[it.rules[0]]}); «${it.answers[1]}» (${RULES[it.rules[1]]})`);
+      } else {
+        ok = norm(v1)===norm(it.answers[0]);
+        if(ok) correctCount++;
+        setFb(fb, ok?'correct':'incorrect', `<b>${ok?'Верно!':'Неверно.'}</b> Ответ: «${it.answers[0]}» — ${RULES[it.rules[0]]}`);
+      }
+    });
+  } else if(prefix==='ex6'){
+    total = ex6.length;
+    ex6.forEach((it,i)=>{
+      const sel = document.querySelector(`input[name="ex6-${i}"]:checked`);
+      const fb = document.getElementById(`ex6-fb-${i}`);
+      if(!sel){ setFb(fb,'incorrect','<b>Не выбрано.</b> Ответ: «'+it.opts[it.correctIdx]+'» — '+RULES[it.rule]); return; }
+      const ok = parseInt(sel.value) === it.correctIdx;
+      if(ok) correctCount++;
+      setFb(fb, ok?'correct':'incorrect', `<b>${ok?'Верно!':'Неверно.'}</b> Ответ: «${it.opts[it.correctIdx]}» — ${RULES[it.rule]}`);
+    });
+  }
+  document.getElementById(`${prefix}-score`).textContent = `Результат: ${correctCount} / ${total}`;
+}
+
+function norm(v){
+  if(!v) return '';
+  v = v.trim().toLowerCase();
+  if(v==='' || v==='-' || v==='—' || v==='zero' || v==='no article' || v==='нет') return '-';
+  return v;
+}
+
+function showEx(prefix){
+  if(prefix==='ex1'){
+    ex1.forEach((it,i)=>{
+      document.querySelectorAll(`input[name="ex1-${i}"]`).forEach(inp=>{ inp.checked = (inp.value===it.correct); });
+      setFb(document.getElementById(`ex1-fb-${i}`),'revealed',`<b>Ответ:</b> ${RULES[it.correct]}`);
+    });
+  } else if(prefix==='ex2'){
+    ex2.forEach((it,i)=>{
+      document.getElementById(`ex2-sel-${i}`).value = it.correct;
+      setFb(document.getElementById(`ex2-fb-${i}`),'revealed',`<b>Ответ:</b> ${it.correct} — ${RULES[it.correct]}`);
+    });
+  } else if(prefix==='ex3'){
+    ex3.forEach((it,i)=>{
+      document.getElementById(`ex3-in-${i}`).value = it.correct;
+      setFb(document.getElementById(`ex3-fb-${i}`),'revealed',`<b>Ответ:</b> ${it.corrected}<br>Правило: ${it.rule}`);
+    });
+  } else if(prefix==='ex4'){
+    ex4.forEach((it,i)=>{
+      document.getElementById(`ex4-in-${i}`).value = it.answers[0];
+      if(it.after2) document.getElementById(`ex4-in2-${i}`).value = it.answers[1];
+      const txt = it.after2 ? `«${it.answers[0]}» (${RULES[it.rules[0]]}); «${it.answers[1]}» (${RULES[it.rules[1]]})` : `«${it.answers[0]}» — ${RULES[it.rules[0]]}`;
+      setFb(document.getElementById(`ex4-fb-${i}`),'revealed',`<b>Ответ:</b> ${txt}`);
+    });
+  } else if(prefix==='ex6'){
+    ex6.forEach((it,i)=>{
+      document.querySelectorAll(`input[name="ex6-${i}"]`).forEach((inp,j)=>{ inp.checked=(j===it.correctIdx); });
+      document.querySelectorAll(`#ex6-opts-${i} label`).forEach((l,j)=>l.classList.toggle('picked', j===it.correctIdx));
+      setFb(document.getElementById(`ex6-fb-${i}`),'revealed',`<b>Ответ:</b> «${it.opts[it.correctIdx]}» — ${RULES[it.rule]}`);
+    });
+  }
+  document.getElementById(`${prefix}-score`).textContent = 'Ответы показаны';
+}
+
+function resetEx(prefix){
+  const map = {ex1, ex2, ex3, ex4, ex6};
+  const arr = map[prefix];
+  arr.forEach((it,i)=>{
+    const fb = document.getElementById(`${prefix}-fb-${i}`);
+    if(fb){ fb.className='feedback'; fb.innerHTML=''; }
+    if(prefix==='ex1' || prefix==='ex6'){
+      document.querySelectorAll(`input[name="${prefix}-${i}"]`).forEach(inp=>inp.checked=false);
+    }
+    if(prefix==='ex6'){
+      document.querySelectorAll(`#${prefix}-opts-${i} label`).forEach(l=>l.classList.remove('picked'));
+    }
+    if(prefix==='ex2'){ document.getElementById(`ex2-sel-${i}`).value=''; }
+    if(prefix==='ex3'){ document.getElementById(`ex3-in-${i}`).value=''; }
+    if(prefix==='ex4'){
+      document.getElementById(`ex4-in-${i}`).value='';
+      const in2 = document.getElementById(`ex4-in2-${i}`);
+      if(in2) in2.value='';
+    }
+  });
+  document.getElementById(`${prefix}-score`).textContent = '';
+}
+</script>
+</body>
+</html>
