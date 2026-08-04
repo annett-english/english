@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Weather Station · Погода A1–A2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0e2440;
+  --ink-2:#3c5573;
+  --paper:#e9eff5;
+  --card:#ffffff;
+  --line:#d4dee8;
+  --sky:#1f5f9e;
+  --sky-soft:#e7f0fa;
+  --teal:#0d7f72;
+  --teal-soft:#e6f5f2;
+  --red:#b8403b;
+  --red-soft:#fbebea;
+  --amber:#d98a12;
+  --amber-soft:#fdf3e2;
+  --r:10px;
+  --shadow:0 1px 2px rgba(14,36,64,.06), 0 8px 24px -18px rgba(14,36,64,.35);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  font-size:16px;
+  line-height:1.55;
+}
+h1,h2,h3,.eyebrow,button,.pill{font-family:'Space Grotesk','Space Grotesk',system-ui,sans-serif}
+.mono,.ipa,.rank-in,.num{font-family:'IBM Plex Mono',ui-monospace,'Courier New',monospace}
+
+/* ---------- header ---------- */
+header{
+  position:relative;
+  overflow:hidden;
+  background:linear-gradient(170deg,#123a63 0%,#1f5f9e 55%,#3f86c4 100%);
+  color:#fff;
+  padding:34px 20px 30px;
+}
+.hdr-in{max-width:1180px;margin:0 auto;position:relative;z-index:2}
+header h1{margin:0 0 6px;font-size:clamp(26px,4.4vw,42px);letter-spacing:-.02em;line-height:1.08}
+header p{margin:0;max-width:56ch;color:#d5e6f6;font-size:15px}
+.station{
+  display:inline-flex;gap:8px;align-items:center;margin-bottom:14px;
+  font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#a9cdeb;
+}
+.station i{width:7px;height:7px;border-radius:50%;background:#8ed6a0;box-shadow:0 0 0 4px rgba(142,214,160,.25);display:block}
+.sky-art{position:absolute;inset:0;z-index:1;opacity:.55;pointer-events:none}
+.cloud-a{animation:drift 46s linear infinite}
+.cloud-b{animation:drift 70s linear infinite}
+.ray{transform-origin:88px 44px;animation:spin 60s linear infinite}
+@keyframes drift{0%{transform:translateX(-12%)}100%{transform:translateX(112%)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.cloud-a,.cloud-b,.ray{animation:none}}
+
+/* ---------- layout ---------- */
+.wrap{max-width:1180px;margin:0 auto;padding:22px 20px 70px;display:grid;grid-template-columns:minmax(0,1fr) 288px;gap:26px;align-items:start}
+@media(max-width:960px){.wrap{grid-template-columns:1fr;padding-top:16px}}
+
+/* ---------- cards ---------- */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);margin-bottom:22px}
+.card-hd{padding:16px 20px 14px;border-bottom:1px dashed var(--line)}
+.eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--sky);display:flex;gap:8px;align-items:baseline;margin-bottom:5px}
+.eyebrow b{color:var(--ink-2);font-weight:500}
+.card h2{margin:0;font-size:19px;letter-spacing:-.01em}
+.task{margin:6px 0 0;color:var(--ink-2);font-size:14px}
+.card-bd{padding:14px 20px 18px}
+
+/* ---------- vocab ---------- */
+.vocab-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:10px}
+.v{border:1px solid var(--line);border-left:3px solid var(--sky);border-radius:8px;padding:9px 11px;background:#fcfdff}
+.v-top{display:flex;gap:8px;align-items:flex-start}
+.v-en{font-weight:600;font-size:15px;flex:1;line-height:1.3}
+.ipa{color:var(--sky);font-size:12.5px;margin:1px 0 3px}
+.v-ru{font-size:13.5px;color:var(--ink-2)}
+.v-ex{font-size:12.5px;color:#6b7f96;margin-top:4px;font-style:italic}
+.spk{flex:0 0 auto;width:28px;height:28px;border-radius:50%;border:1px solid var(--line);background:var(--sky-soft);color:var(--sky);cursor:pointer;font-size:13px;line-height:1;display:grid;place-items:center;padding:0}
+.spk:hover{background:var(--sky);color:#fff;border-color:var(--sky)}
+
+/* ---------- items ---------- */
+ol.items{list-style:none;margin:0;padding:0;counter-reset:it}
+ol.items>li{counter-increment:it;display:flex;gap:10px;padding:9px 0;border-bottom:1px solid #f0f4f8;flex-wrap:wrap;align-items:center}
+ol.items>li:last-child{border-bottom:0}
+ol.items>li::before{content:counter(it);font-family:'IBM Plex Mono',monospace;font-size:12px;color:#9bb0c6;min-width:18px;padding-top:2px}
+.q{flex:1 1 260px;min-width:0}
+.q .hint{color:var(--ink-2);font-size:13px}
+.gap{font-family:'IBM Plex Mono',monospace;letter-spacing:.06em;background:var(--amber-soft);padding:1px 6px;border-radius:4px;color:#8a5a05}
+input.answer,textarea.free{
+  font:inherit;color:var(--ink);background:#fff;border:1.5px solid var(--line);border-radius:8px;padding:8px 10px;
+}
+input.answer{flex:0 1 260px;min-width:150px;width:260px;max-width:100%}
+input.answer:focus,textarea.free:focus,select.match:focus,input.rank-in:focus{outline:2px solid var(--sky);outline-offset:1px;border-color:var(--sky)}
+input.answer.ok{border-color:var(--teal);background:var(--teal-soft)}
+input.answer.bad{border-color:var(--red);background:var(--red-soft)}
+.mark{font-size:15px;width:18px;display:inline-block}
+.shown{background:var(--teal-soft);color:var(--teal);border:1px solid #b9e0d9;border-radius:6px;padding:2px 8px;font-size:13.5px;font-weight:500}
+select.match{font:inherit;padding:7px 9px;border:1.5px solid var(--line);border-radius:8px;background:#fff;flex:1 1 240px;max-width:100%;color:var(--ink)}
+select.match.ok{border-color:var(--teal);background:var(--teal-soft)}
+select.match.bad{border-color:var(--red);background:var(--red-soft)}
+.half{font-weight:600;flex:0 1 210px}
+input.rank-in{width:62px;text-align:center;font-size:15px;padding:7px 4px;border:1.5px solid var(--line);border-radius:8px;background:#fff}
+input.rank-in.ok{border-color:var(--teal);background:var(--teal-soft)}
+input.rank-in.bad{border-color:var(--red);background:var(--red-soft)}
+.pic{font-size:34px;line-height:1;width:48px;text-align:center;filter:saturate(1.05)}
+textarea.free{width:100%;min-height:52px;resize:vertical;margin-top:4px}
+.stem{font-weight:500}
+.model{background:var(--sky-soft);border:1px solid #cfe2f4;border-radius:8px;padding:10px 12px;font-size:14px;margin:0 0 12px}
+.model b{color:var(--sky)}
+.arrow{color:var(--sky);font-weight:700;padding:0 2px}
+
+/* ---------- buttons ---------- */
+.row-btns{display:flex;flex-wrap:wrap;gap:8px;padding:14px 20px 18px;border-top:1px dashed var(--line);align-items:center}
+button{cursor:pointer;font-size:13.5px;font-weight:500;border-radius:8px;padding:8px 13px;border:1.5px solid transparent;transition:background .13s,color .13s}
+.b-check{background:var(--sky);color:#fff}
+.b-check:hover{background:#174d83}
+.b-show{background:#fff;color:var(--sky);border-color:#bcd6ee}
+.b-show:hover{background:var(--sky-soft)}
+.b-copy{background:var(--teal);color:#fff}
+.b-copy:hover{background:#0a6459}
+.b-clear{background:#fff;color:var(--ink-2);border-color:var(--line)}
+.b-clear:hover{background:#f4f7fa}
+.score{margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--ink-2)}
+.score.done{color:var(--teal);font-weight:500}
+
+/* ---------- toolbar ---------- */
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:12px 16px;margin-bottom:22px}
+.bar{flex:1 1 180px;height:9px;background:#e6ecf3;border-radius:6px;overflow:hidden;min-width:140px}
+.bar>span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--sky),var(--teal));transition:width .35s}
+.tot{font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--ink-2)}
+
+/* ---------- aside ---------- */
+aside{position:sticky;top:16px}
+@media(max-width:960px){aside{position:static}}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden}
+.panel-hd{padding:13px 15px;background:var(--amber-soft);border-bottom:1px solid #f0dcb8}
+.panel-hd h3{margin:0;font-size:15px}
+.panel-hd p{margin:3px 0 0;font-size:12px;color:#8a6a2a}
+.pw{max-height:52vh;overflow:auto}
+.pw table{width:100%;border-collapse:collapse;font-size:13.5px}
+.pw td{padding:7px 10px;border-bottom:1px solid #f1f5f9;vertical-align:middle}
+.pw td.w{font-weight:500}
+.pw td.n{text-align:right;width:34px;font-family:'IBM Plex Mono',monospace;color:var(--red)}
+.pw td.s{width:38px;text-align:right}
+.empty{padding:16px 15px;color:var(--ink-2);font-size:13px}
+.panel-ft{padding:11px 15px;border-top:1px solid var(--line);display:flex;gap:8px}
+.legend{margin:14px 0 0;font-size:12.5px;color:var(--ink-2);background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:12px 14px}
+.legend b{color:var(--ink)}
+.legend ul{margin:6px 0 0;padding-left:17px}
+.legend li{margin-bottom:3px}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(140%);background:var(--ink);color:#fff;padding:10px 18px;border-radius:22px;font-size:14px;z-index:50;transition:transform .28s}
+.toast.on{transform:translateX(-50%) translateY(0)}
+footer{max-width:1180px;margin:0 auto;padding:0 20px 40px;color:#6b7f96;font-size:12.5px}
+</style>
+</head>
+<body>
+
+<header>
+  <svg class="sky-art" viewBox="0 0 1200 200" preserveAspectRatio="none" aria-hidden="true">
+    <g class="ray" stroke="#ffe6a8" stroke-width="2" opacity=".5">
+      <line x1="88" y1="8" x2="88" y2="22"/><line x1="88" y1="66" x2="88" y2="80"/>
+      <line x1="52" y1="44" x2="66" y2="44"/><line x1="110" y1="44" x2="124" y2="44"/>
+      <line x1="63" y1="19" x2="73" y2="29"/><line x1="103" y1="59" x2="113" y2="69"/>
+      <line x1="63" y1="69" x2="73" y2="59"/><line x1="103" y1="29" x2="113" y2="19"/>
+    </g>
+    <circle cx="88" cy="44" r="17" fill="#ffd980" opacity=".75"/>
+    <g class="cloud-a" fill="#ffffff" opacity=".22"><ellipse cx="300" cy="60" rx="70" ry="24"/><ellipse cx="350" cy="52" rx="46" ry="20"/></g>
+    <g class="cloud-b" fill="#ffffff" opacity=".16"><ellipse cx="700" cy="140" rx="96" ry="28"/><ellipse cx="770" cy="130" rx="58" ry="22"/></g>
+  </svg>
+  <div class="hdr-in">
+    <span class="station"><i></i>weather station · a1–a2 · 14 exercises</span>
+    <h1>Погода: слова, которые нужно прописать руками</h1>
+    <p>Сначала послушай и повтори слова. Потом пиши ответы сам — без вариантов на выбор. Каждая ошибка попадает в табличку «Проблемные слова» справа.</p>
+  </div>
+</header>
+
+<div class="wrap">
+  <main>
+    <div class="toolbar">
+      <button class="b-check" id="checkAll">Проверить всё</button>
+      <button class="b-clear" id="resetAll">Очистить всё</button>
+      <div class="bar"><span id="barFill"></span></div>
+      <span class="tot" id="totScore">0 / 0 правильно</span>
+    </div>
+
+    <section class="card" id="vocabCard">
+      <div class="card-hd">
+        <div class="eyebrow">Warm-up <b>напоминание слов</b></div>
+        <h2>Слушай, читай, повторяй</h2>
+        <p class="task">Нажми 🔊 — слово прозвучит. Повтори вслух 2 раза, потом прочитай пример.</p>
+      </div>
+      <div class="card-bd"><div class="vocab-grid" id="vocabGrid"></div></div>
+      <div class="row-btns">
+        <button class="b-check" id="playAll">▶ Прослушать все слова</button>
+        <button class="b-clear" id="stopAll">■ Стоп</button>
+        <span class="score">27 слов и выражений</span>
+      </div>
+    </section>
+
+    <div id="exWrap"></div>
+  </main>
+
+  <aside>
+    <div class="panel">
+      <div class="panel-hd">
+        <h3>⚠ Проблемные слова</h3>
+        <p>Слова, в которых была ошибка</p>
+      </div>
+      <div class="pw" id="pwBox"><div class="empty">Пока пусто. Проверь любое упражнение — ошибки появятся здесь.</div></div>
+      <div class="panel-ft">
+        <button class="b-clear" id="pwClear">Очистить список</button>
+        <button class="b-show" id="pwPlay">🔊 Всё</button>
+      </div>
+    </div>
+    <div class="legend">
+      <b>Как считается результат</b>
+      <ul>
+        <li>Проверяются упражнения 1–8, 10 и 12–14.</li>
+        <li>Упражнения 9 и 11 — твои собственные идеи, их не проверяем: пиши и копируй одной кнопкой.</li>
+        <li>Регистр и точки не важны: <span class="mono">It's raining</span> = <span class="mono">it is raining</span>.</li>
+      </ul>
+    </div>
+  </aside>
+</div>
+
+<footer>Weather Station · тренажёр лексики A1–A2 · озвучка работает через встроенный синтезатор речи браузера (лучше всего в Chrome, Edge, Safari).</footer>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============ VOCAB ============ */
+const VOCAB=[
+ ["temperature","/ˈtemp.rə.tʃər/","температура","The temperature is 25 degrees today."],
+ ["check the weather forecast","/tʃek ðə ˈweð.ər ˈfɔː.kɑːst/","проверить прогноз погоды","I always check the weather forecast before travelling."],
+ ["the minimum temperature is / will be / was","/ˈmɪn.ɪ.məm/","минимальная температура составляет / будет / была","The minimum temperature will be 10 degrees tomorrow."],
+ ["the maximum temperature is / will be / was","/ˈmæk.sɪ.məm/","максимальная температура составляет / будет / была","The maximum temperature was 30 degrees yesterday."],
+ ["It's good weather.","/ɪts ɡʊd ˈweð.ər/","хорошая погода","It's good weather today."],
+ ["It's typical weather.","/ɪts ˈtɪp.ɪ.kəl ˈweð.ər/","типичная погода","This is typical weather for this season."],
+ ["fog","/fɒɡ/","туман","There was thick fog in the morning."],
+ ["rain","/reɪn/","дождь","We had a lot of rain yesterday."],
+ ["cloud","/klaʊd/","облако","There is a dark cloud in the sky."],
+ ["snow","/snəʊ/","снег","The snow is beautiful in winter."],
+ ["sun","/sʌn/","солнце","The sun is shining brightly."],
+ ["wind","/wɪnd/","ветер","The wind is very strong today."],
+ ["foggy","/ˈfɒɡ.i/","туманный","It was foggy this morning."],
+ ["rainy","/ˈreɪ.ni/","дождливый","It was a rainy day."],
+ ["cloudy","/ˈklaʊ.di/","облачный, пасмурный","It will be cloudy tomorrow."],
+ ["snowy","/ˈsnəʊ.i/","снежный","We had a snowy winter."],
+ ["sunny","/ˈsʌn.i/","солнечный","It was sunny yesterday."],
+ ["windy","/ˈwɪn.di/","ветреный","It's windy today."],
+ ["It's windy.","/ɪts ˈwɪn.di/","ветрено","It's windy near the sea."],
+ ["It will be cloudy tomorrow.","/ɪt wɪl bi ˈklaʊ.di təˈmɒr.əʊ/","завтра будет облачно","It will be cloudy tomorrow."],
+ ["It was sunny yesterday.","/ɪt wɒz ˈsʌn.i ˈjes.tə.deɪ/","вчера было солнечно","It was sunny yesterday."],
+ ["It is 35 degrees.","/ɪt ɪz ˈθɜː.ti faɪv dɪˈɡriːz/","35 градусов","It is 35 degrees today."],
+ ["1 degree","/wʌn dɪˈɡriː/","1 градус","It's 1 degree outside."],
+ ["partly cloudy","/ˈpɑːt.li ˈklaʊ.di/","частично облачно, переменная облачность","It will be partly cloudy in the afternoon."],
+ ["it's raining","/ɪts ˈreɪ.nɪŋ/","идёт дождь","It's raining outside."],
+ ["it's snowing","/ɪts ˈsnəʊ.ɪŋ/","идёт снег","It's snowing heavily."],
+ ["degrees","/dɪˈɡriːz/","градусы","It's 20 degrees in the morning."]
+];
+
+/* ============ EXERCISES ============ */
+const EX=[
+{n:1,tag:"spelling",title:"Вставь пропущенные буквы",task:"Впиши слово полностью и правильно.",type:"text",
+ items:[
+  {q:'<span class="gap">t _ mp _ rat _ re</span> <span class="hint">— температура</span>',a:["temperature"],w:"temperature"},
+  {q:'<span class="gap">f _ g</span> <span class="hint">— туман</span>',a:["fog"],w:"fog"},
+  {q:'<span class="gap">cl _ _ d</span> <span class="hint">— облако</span>',a:["cloud"],w:"cloud"},
+  {q:'<span class="gap">sn _ w</span> <span class="hint">— снег</span>',a:["snow"],w:"snow"},
+  {q:'<span class="gap">w _ nd</span> <span class="hint">— ветер</span>',a:["wind"],w:"wind"},
+  {q:'<span class="gap">f _ gg _</span> <span class="hint">— туманный</span>',a:["foggy"],w:"foggy"},
+  {q:'<span class="gap">cl _ _ dy</span> <span class="hint">— облачный</span>',a:["cloudy"],w:"cloudy"},
+  {q:'<span class="gap">s _ nn _</span> <span class="hint">— солнечный</span>',a:["sunny"],w:"sunny"},
+  {q:'<span class="gap">d _ gr _ _ s</span> <span class="hint">— градусы</span>',a:["degrees"],w:"degrees"},
+  {q:'<span class="gap">f _ r _ c _ st</span> <span class="hint">— прогноз</span>',a:["forecast"],w:"forecast"}
+]},
+
+{n:2,tag:"translation",title:"Переведи с русского на английский",task:"Пиши целую фразу так, как в списке слов.",type:"text",
+ items:[
+  {q:'туман',a:["fog"],w:"fog"},
+  {q:'дождливый',a:["rainy"],w:"rainy"},
+  {q:'проверить прогноз погоды',a:["check the weather forecast"],w:"check the weather forecast"},
+  {q:'идёт снег',a:["it is snowing","it snows"],w:"it's snowing"},
+  {q:'завтра будет облачно',a:["it will be cloudy tomorrow","tomorrow it will be cloudy"],w:"It will be cloudy tomorrow."},
+  {q:'вчера было солнечно',a:["it was sunny yesterday","yesterday it was sunny"],w:"It was sunny yesterday."},
+  {q:'сегодня ветрено',a:["it is windy today","today it is windy"],w:"It's windy."},
+  {q:'сегодня 35 градусов',a:["it is 35 degrees today","it is thirty-five degrees today","today it is 35 degrees"],w:"It is 35 degrees."},
+  {q:'переменная облачность',a:["partly cloudy"],w:"partly cloudy"},
+  {q:'типичная погода',a:["typical weather","it is typical weather"],w:"It's typical weather."}
+]},
+
+{n:3,tag:"dictation",title:"Напиши слово на слух",task:"Нажми 🔊, послушай 2–3 раза и запиши слово. Транскрипция появится, если нажать «Показать ответы».",type:"dict",
+ items:[
+  {say:"temperature",a:["temperature"],ipa:"/ˈtemp.rə.tʃər/",w:"temperature"},
+  {say:"forecast",a:["forecast"],ipa:"/ˈfɔː.kɑːst/",w:"forecast"},
+  {say:"degrees",a:["degrees"],ipa:"/dɪˈɡriːz/",w:"degrees"},
+  {say:"weather",a:["weather"],ipa:"/ˈweð.ər/",w:"weather"},
+  {say:"foggy",a:["foggy"],ipa:"/ˈfɒɡ.i/",w:"foggy"},
+  {say:"snowy",a:["snowy"],ipa:"/ˈsnəʊ.i/",w:"snowy"},
+  {say:"windy",a:["windy"],ipa:"/ˈwɪn.di/",w:"windy"},
+  {say:"cloudy",a:["cloudy"],ipa:"/ˈklaʊ.di/",w:"cloudy"},
+  {say:"minimum",a:["minimum"],ipa:"/ˈmɪn.ɪ.məm/",w:"minimum"},
+  {say:"maximum",a:["maximum"],ipa:"/ˈmæk.sɪ.məm/",w:"maximum"}
+]},
+
+{n:4,tag:"definitions",title:"Определения: какое это слово?",task:"Прочитай определение на английском и напиши слово.",type:"text",
+ items:[
+  {q:'water that falls from the sky',a:["rain"],w:"rain"},
+  {q:'white or grey water in the sky',a:["cloud","a cloud"],w:"cloud"},
+  {q:'soft white water that falls in winter',a:["snow"],w:"snow"},
+  {q:'air that moves fast',a:["wind"],w:"wind"},
+  {q:'it gives us light and heat in the day',a:["sun","the sun"],w:"sun"},
+  {q:'you can\u2019t see far because the air is grey and wet',a:["fog"],w:"fog"},
+  {q:'how hot or cold it is',a:["temperature","the temperature"],w:"temperature"},
+  {q:'information about the weather tomorrow',a:["forecast","weather forecast","the weather forecast"],w:"check the weather forecast"},
+  {q:'the lowest temperature of the day',a:["minimum","the minimum temperature","minimum temperature"],w:"minimum"},
+  {q:'the highest temperature of the day',a:["maximum","the maximum temperature","maximum temperature"],w:"maximum"}
+]},
+
+{n:5,tag:"collocations",title:"Сочетаемость: какое слово подходит?",task:"Впиши ОДНО слово. Так эти слова стоят вместе в английском.",type:"text",
+ items:[
+  {q:'I always <span class="gap">____</span> the weather forecast. <span class="hint">(проверяю)</span>',a:["check"],w:"check the weather forecast"},
+  {q:'The <span class="gap">____</span> temperature will be 10 degrees. <span class="hint">(самая низкая)</span>',a:["minimum"],w:"minimum"},
+  {q:'The <span class="gap">____</span> temperature was 30 degrees. <span class="hint">(самая высокая)</span>',a:["maximum"],w:"maximum"},
+  {q:'There was <span class="gap">____</span> fog in the morning. <span class="hint">(густой)</span>',a:["thick"],w:"fog"},
+  {q:'It is 25 <span class="gap">____</span> today.',a:["degrees"],w:"degrees"},
+  {q:'It will be <span class="gap">____</span> cloudy in the afternoon. <span class="hint">(частично)</span>',a:["partly"],w:"partly cloudy"},
+  {q:'This is <span class="gap">____</span> weather for this season. <span class="hint">(типичная)</span>',a:["typical"],w:"It's typical weather."},
+  {q:'The sun is <span class="gap">____</span> brightly. <span class="hint">(светит)</span>',a:["shining"],w:"sun"},
+  {q:'The wind is very <span class="gap">____</span> today. <span class="hint">(сильный)</span>',a:["strong"],w:"wind"},
+  {q:'We had a lot <span class="gap">____</span> rain yesterday.',a:["of"],w:"rain"}
+]},
+
+{n:6,tag:"pictures",title:"Что на картинке?",task:"Напиши то, что просят в скобках: прилагательное, существительное или целую фразу.",type:"pic",
+ items:[
+  {pic:"☀️",q:'<span class="hint">прилагательное: It was ____ yesterday.</span>',a:["sunny"],w:"sunny"},
+  {pic:"🌧️",q:'<span class="hint">прилагательное: It was a ____ day.</span>',a:["rainy"],w:"rainy"},
+  {pic:"❄️",q:'<span class="hint">прилагательное: We had a ____ winter.</span>',a:["snowy"],w:"snowy"},
+  {pic:"🌫️",q:'<span class="hint">прилагательное: It was ____ this morning.</span>',a:["foggy"],w:"foggy"},
+  {pic:"💨",q:'<span class="hint">прилагательное: It\u2019s ____ today.</span>',a:["windy"],w:"windy"},
+  {pic:"☁️",q:'<span class="hint">существительное: There is a dark ____ in the sky.</span>',a:["cloud"],w:"cloud"},
+  {pic:"⛅",q:'<span class="hint">два слова: It will be ____ in the afternoon.</span>',a:["partly cloudy"],w:"partly cloudy"},
+  {pic:"🌡️",q:'<span class="hint">существительное: The ____ is 25 degrees.</span>',a:["temperature"],w:"temperature"},
+  {pic:"🌨️",q:'<span class="hint">Present Continuous: Look outside! ____ .</span>',a:["it is snowing"],w:"it's snowing"},
+  {pic:"🌦️",q:'<span class="hint">Present Continuous: Take an umbrella! ____ .</span>',a:["it is raining"],w:"it's raining"}
+]},
+
+{n:7,tag:"halves",title:"Соедини половинки выражений",task:"Выбери вторую половину каждого выражения.",type:"match",
+ items:[
+  {q:"check the",a:["weather forecast"],w:"check the weather forecast"},
+  {q:"the minimum",a:["temperature will be 10 degrees"],w:"minimum"},
+  {q:"partly",a:["cloudy"],w:"partly cloudy"},
+  {q:"thick",a:["fog"],w:"fog"},
+  {q:"a lot of",a:["rain"],w:"rain"},
+  {q:"The sun is",a:["shining brightly"],w:"sun"},
+  {q:"It will be cloudy",a:["tomorrow"],w:"It will be cloudy tomorrow."},
+  {q:"It was sunny",a:["yesterday"],w:"It was sunny yesterday."},
+  {q:"It is 35",a:["degrees"],w:"It is 35 degrees."},
+  {q:"This is typical weather",a:["for this season"],w:"It's typical weather."}
+]},
+
+{n:8,tag:"what comes next",title:"What usually comes after?",task:"Что обычно идёт дальше? Впиши одно-два слова.",type:"text",
+ items:[
+  {q:'I check the weather <span class="gap">____</span>',a:["forecast"],w:"check the weather forecast"},
+  {q:'It\u2019s raining, so take an <span class="gap">____</span>',a:["umbrella","umbrella!"],w:"it's raining"},
+  {q:'The temperature is 25 <span class="gap">____</span>',a:["degrees"],w:"degrees"},
+  {q:'It\u2019s 1 <span class="gap">____</span>',a:["degree"],w:"1 degree"},
+  {q:'It will be cloudy <span class="gap">____</span>',a:["tomorrow"],w:"It will be cloudy tomorrow."},
+  {q:'It was sunny <span class="gap">____</span>',a:["yesterday"],w:"It was sunny yesterday."},
+  {q:'There was thick <span class="gap">____</span> in the morning',a:["fog"],w:"fog"},
+  {q:'It\u2019s snowing, so wear warm <span class="gap">____</span>',a:["clothes"],w:"it's snowing"},
+  {q:'The minimum <span class="gap">____</span>',a:["temperature"],w:"minimum"},
+  {q:'The wind is very <span class="gap">____</span> today',a:["strong"],w:"wind"}
+]},
+
+{n:9,tag:"rank them",title:"Rank them: от холода к жаре",task:"Впиши номера от 1 (самая холодная) до 10 (самая жаркая). Температуры записаны словами — читай внимательно.",type:"rank",
+ items:[
+  {q:"nineteen degrees",a:[8],w:"degrees"},
+  {q:"minus five degrees",a:[1],w:"degrees"},
+  {q:"thirty degrees",a:[9],w:"degrees"},
+  {q:"one degree",a:[3],w:"1 degree"},
+  {q:"thirteen degrees",a:[6],w:"degrees"},
+  {q:"zero degrees",a:[2],w:"degrees"},
+  {q:"thirty-five degrees",a:[10],w:"It is 35 degrees."},
+  {q:"nine degrees",a:[5],w:"degrees"},
+  {q:"fifteen degrees",a:[7],w:"degrees"},
+  {q:"four degrees",a:[4],w:"degrees"}
+]},
+
+{n:10,tag:"rephrase",title:"Rephrase: скажи то же самое иначе",task:"Перепиши предложение со словом в скобках. Смысл не меняется.",type:"text",wide:true,
+ items:[
+  {q:'There is a lot of rain now. <span class="hint">(raining)</span>',a:["it is raining","it is raining now"],w:"it's raining"},
+  {q:'There is snow now. <span class="hint">(snowing)</span>',a:["it is snowing","it is snowing now"],w:"it's snowing"},
+  {q:'There is a lot of wind today. <span class="hint">(windy)</span>',a:["it is windy today","today it is windy"],w:"windy"},
+  {q:'There were a lot of clouds yesterday. <span class="hint">(cloudy)</span>',a:["it was cloudy yesterday","yesterday it was cloudy"],w:"cloudy"},
+  {q:'There will be sun tomorrow. <span class="hint">(sunny)</span>',a:["it will be sunny tomorrow","tomorrow it will be sunny"],w:"sunny"},
+  {q:'There was fog this morning. <span class="hint">(foggy)</span>',a:["it was foggy this morning","this morning it was foggy"],w:"foggy"},
+  {q:'Tomorrow the lowest temperature will be 10 degrees. <span class="hint">(minimum)</span>',a:["the minimum temperature will be 10 degrees tomorrow","tomorrow the minimum temperature will be 10 degrees","the minimum temperature will be ten degrees tomorrow"],w:"minimum"},
+  {q:'Yesterday the highest temperature was 30 degrees. <span class="hint">(maximum)</span>',a:["the maximum temperature was 30 degrees yesterday","yesterday the maximum temperature was 30 degrees","the maximum temperature was thirty degrees yesterday"],w:"maximum"},
+  {q:'We had a lot of snow last winter. <span class="hint">(snowy)</span>',a:["we had a snowy winter","last winter was snowy","we had a snowy winter last winter"],w:"snowy"},
+  {q:'The weather is nice today. <span class="hint">(good)</span>',a:["it is good weather today","it is good weather"],w:"It's good weather."}
+]},
+
+{n:11,tag:"your ideas",title:"Закончи предложения своими идеями",task:"Пиши свободно — здесь нет одного правильного ответа. Потом скопируй всё одной кнопкой и отправь учителю.",type:"free",
+ items:[
+  {q:"When it\u2019s rainy, I usually"},
+  {q:"I check the weather forecast when"},
+  {q:"My favourite weather is ... because"},
+  {q:"When it\u2019s sunny, I like"},
+  {q:"In winter, when it\u2019s snowy, I"},
+  {q:"I don\u2019t like ... weather because"},
+  {q:"When it\u2019s very windy, I"},
+  {q:"The temperature today is ... degrees, so I"},
+  {q:"Tomorrow it will be ..., so I will"},
+  {q:"Yesterday it was ..., so I"}
+]},
+
+{n:12,tag:"drilling",title:"Repeat & Change (дриллинг)",task:"Возьми слово и сделай три предложения: сегодня → вчера → завтра. Смотри пример.",type:"drill",
+ model:'<b>Пример со словом sunny:</b><br>It\u2019s sunny today. <span class="arrow">→</span> It was sunny yesterday. <span class="arrow">→</span> It will be sunny tomorrow.',
+ items:[
+  {q:"windy"},{q:"rainy"},{q:"cloudy"},{q:"foggy"},{q:"snowy"},
+  {q:"partly cloudy"},{q:"good weather"},{q:"typical weather"},{q:"35 degrees"},{q:"1 degree"}
+]},
+
+{n:13,tag:"revision",title:"Повторение: once / twice / three times",task:"Напиши, как часто. Помни: 1 раз = once, 2 раза = twice (или two times), 3 раза и больше = ... times.",type:"text",wide:true,
+ items:[
+  {q:'I check the weather forecast <span class="gap">____</span> <span class="hint">(1 раз в день)</span>',a:["once a day"],w:"once a day"},
+  {q:'It rains here <span class="gap">____</span> <span class="hint">(2 раза в неделю)</span>',a:["twice a week","two times a week"],w:"twice a week"},
+  {q:'We have fog <span class="gap">____</span> <span class="hint">(3 раза в месяц)</span>',a:["three times a month"],w:"three times a month"},
+  {q:'It snows here <span class="gap">____</span> <span class="hint">(5 раз в год)</span>',a:["five times a year"],w:"five times a year"},
+  {q:'I look at the temperature <span class="gap">____</span> <span class="hint">(4 раза в день)</span>',a:["four times a day"],w:"four times a day"},
+  {q:'We travel <span class="gap">____</span> <span class="hint">(2 раза в год)</span>',a:["twice a year","two times a year"],w:"twice a year"},
+  {q:'The wind is strong <span class="gap">____</span> <span class="hint">(1 раз в неделю)</span>',a:["once a week"],w:"once a week"},
+  {q:'It\u2019s cloudy <span class="gap">____</span> <span class="hint">(10 раз в месяц)</span>',a:["ten times a month","10 times a month"],w:"ten times a month"},
+  {q:'I open the weather app <span class="gap">____</span> <span class="hint">(3 раза в день)</span>',a:["three times a day"],w:"three times a day"},
+  {q:'We have snow <span class="gap">____</span> <span class="hint">(1 раз в месяц)</span>',a:["once a month"],w:"once a month"}
+]},
+
+{n:14,tag:"numbers",title:"nineteen или ninety? Числа и окончания",task:"Слушай 🔊 и пиши. Где цифры — напиши слово. Где слово — напиши цифру. Помни: -teen = длинное [tiːn], -ty = короткое [ti].",type:"num",
+ items:[
+  {say:"thirteen",q:'13 <span class="hint">→ словами</span>',a:["thirteen"],w:"thirteen (13)"},
+  {say:"thirty",q:'30 <span class="hint">→ словами</span>',a:["thirty"],w:"thirty (30)"},
+  {say:"fifteen",q:'15 <span class="hint">→ словами</span>',a:["fifteen"],w:"fifteen (15)"},
+  {say:"fifty",q:'50 <span class="hint">→ словами</span>',a:["fifty"],w:"fifty (50)"},
+  {say:"nineteen",q:'19 <span class="hint">→ словами</span>',a:["nineteen"],w:"nineteen (19)"},
+  {say:"ninety",q:'90 <span class="hint">→ словами</span>',a:["ninety"],w:"ninety (90)"},
+  {say:"fourteen degrees",q:'fourteen <span class="hint">→ цифрой</span>',a:["14"],w:"fourteen (14)"},
+  {say:"forty degrees",q:'forty <span class="hint">→ цифрой</span>',a:["40"],w:"forty (40)"},
+  {say:"seventeen degrees",q:'seventeen <span class="hint">→ цифрой</span>',a:["17"],w:"seventeen (17)"},
+  {say:"seventy degrees",q:'seventy <span class="hint">→ цифрой</span>',a:["70"],w:"seventy (70)"}
+]}
+];
+
+/* ============ SPEECH ============ */
+let voice=null;
+function pickVoice(){
+  const vs=speechSynthesis.getVoices()||[];
+  voice=vs.find(v=>/en-GB/i.test(v.lang))||vs.find(v=>/^en/i.test(v.lang))||null;
+}
+if('speechSynthesis' in window){pickVoice();speechSynthesis.onvoiceschanged=pickVoice;}
+function say(text,rate){
+  if(!('speechSynthesis' in window)){toast("Браузер не умеет озвучивать текст");return;}
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text.replace(/\//g,' ').replace(/\s+/g,' '));
+  u.lang=voice?voice.lang:'en-GB'; if(voice)u.voice=voice; u.rate=rate||.85;
+  speechSynthesis.speak(u);
+}
+function sayList(list,rate){
+  if(!('speechSynthesis' in window)){toast("Браузер не умеет озвучивать текст");return;}
+  speechSynthesis.cancel();
+  list.forEach(t=>{
+    const u=new SpeechSynthesisUtterance(t);
+    u.lang=voice?voice.lang:'en-GB'; if(voice)u.voice=voice; u.rate=rate||.85;
+    speechSynthesis.speak(u);
+  });
+}
+
+/* ============ HELPERS ============ */
+function norm(s){
+  return String(s).toLowerCase()
+    .replace(/[\u2018\u2019\u00b4`]/g,"'")
+    .replace(/\bit's\b/g,'it is').replace(/\bthat's\b/g,'that is')
+    .replace(/\bwon't\b/g,'will not').replace(/\bdon't\b/g,'do not')
+    .replace(/\bcan't\b/g,'cannot')
+    .replace(/[.,!?;:\u2014\u2013-]/g,' ')
+    .replace(/\s+/g,' ').trim();
+}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+let toastT=null;
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('on');
+  clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),1900);
+}
+function copyText(txt){
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(()=>toast("Скопировано ✓"),()=>fallbackCopy(txt));
+  }else fallbackCopy(txt);
+}
+function fallbackCopy(txt){
+  const ta=document.createElement('textarea');
+  ta.value=txt;ta.style.position='fixed';ta.style.opacity='0';
+  document.body.appendChild(ta);ta.select();
+  try{document.execCommand('copy');toast("Скопировано ✓");}catch(e){toast("Не удалось скопировать");}
+  document.body.removeChild(ta);
+}
+
+/* ============ PROBLEM WORDS ============ */
+const problems=new Map();
+function addProblem(word){
+  if(!word)return;
+  problems.set(word,(problems.get(word)||0)+1);
+}
+function renderProblems(){
+  const box=document.getElementById('pwBox');
+  if(problems.size===0){box.innerHTML='<div class="empty">Пока пусто. Проверь любое упражнение — ошибки появятся здесь.</div>';return;}
+  const rows=[...problems.entries()].sort((a,b)=>b[1]-a[1]);
+  box.innerHTML='<table><tbody>'+rows.map(([w,c])=>
+    '<tr><td class="w">'+esc(w)+'</td><td class="n">'+c+'</td>'+
+    '<td class="s"><button class="spk" data-say="'+esc(w)+'" title="Прослушать">🔊</button></td></tr>'
+  ).join('')+'</tbody></table>';
+}
+
+/* ============ RENDER VOCAB ============ */
+document.getElementById('vocabGrid').innerHTML=VOCAB.map(v=>
+ '<div class="v"><div class="v-top"><div class="v-en">'+esc(v[0])+
+ '<div class="ipa">'+esc(v[1])+'</div></div>'+
+ '<button class="spk" data-say="'+esc(v[0])+'" title="Прослушать">🔊</button></div>'+
+ '<div class="v-ru">'+esc(v[2])+'</div><div class="v-ex">'+esc(v[3])+'</div></div>'
+).join('');
+
+/* ============ RENDER EXERCISES ============ */
+const CHECKABLE=new Set(['text','dict','pic','match','rank','num']);
+function renderEx(ex){
+  const s=document.createElement('section');
+  s.className='card';s.dataset.n=ex.n;s.dataset.type=ex.type;s.id='ex'+ex.n;
+  let body='';
+  if(ex.model)body+='<p class="model">'+ex.model+'</p>';
+
+  if(ex.type==='match'){
+    const opts=ex.items.map(i=>i.a[0]);
+    const shuffled=[7,2,9,0,5,3,8,1,6,4].map(i=>opts[i]);
+    body+='<ol class="items">'+ex.items.map((it,k)=>
+      '<li><span class="half">'+esc(it.q)+' ...</span>'+
+      '<select class="match" data-k="'+k+'"><option value="">— выбери —</option>'+
+      shuffled.map(o=>'<option value="'+esc(o)+'">'+esc(o)+'</option>').join('')+
+      '</select><span class="mark"></span><span class="slot"></span></li>').join('')+'</ol>';
+  }
+  else if(ex.type==='rank'){
+    body+='<ol class="items">'+ex.items.map((it,k)=>
+      '<li><input class="rank-in" type="number" min="1" max="10" data-k="'+k+'" inputmode="numeric">'+
+      '<span class="q mono">'+esc(it.q)+'</span>'+
+      '<button class="spk" data-say="'+esc(it.q)+'" title="Прослушать">🔊</button>'+
+      '<span class="mark"></span><span class="slot"></span></li>').join('')+'</ol>';
+  }
+  else if(ex.type==='free'||ex.type==='drill'){
+    body+='<ol class="items">'+ex.items.map((it,k)=>
+      '<li style="display:block"><span class="stem">'+esc(it.q)+
+      (ex.type==='drill'?' <span class="hint">→ today / yesterday / tomorrow</span>':' ...')+'</span>'+
+      '<textarea class="free" data-k="'+k+'" placeholder="'+(ex.type==='drill'?'It\u2019s ... today. It was ... yesterday. It will be ... tomorrow.':'твой ответ по-английски')+'"></textarea></li>').join('')+'</ol>';
+  }
+  else{
+    body+='<ol class="items">'+ex.items.map((it,k)=>{
+      let left='';
+      if(ex.type==='dict'){
+        left='<button class="spk" data-say="'+esc(it.say)+'" title="Прослушать">🔊</button>'+
+             '<span class="q hint">послушай и запиши слово</span>';
+      }else if(ex.type==='pic'){
+        left='<span class="pic">'+it.pic+'</span><span class="q">'+it.q+'</span>';
+      }else if(ex.type==='num'){
+        left='<button class="spk" data-say="'+esc(it.say)+'" title="Прослушать">🔊</button>'+
+             '<span class="q">'+it.q+'</span>';
+      }else{
+        left='<span class="q">'+it.q+'</span>';
+      }
+      return '<li>'+left+'<input class="answer" type="text" data-k="'+k+'" autocomplete="off" spellcheck="false"'+
+        (ex.wide?' style="flex-basis:340px;width:340px"':'')+'><span class="mark"></span><span class="slot"></span></li>';
+    }).join('')+'</ol>';
+  }
+
+  let btns='';
+  if(CHECKABLE.has(ex.type)){
+    btns='<button class="b-check act-check">Проверить</button>'+
+         '<button class="b-show act-show">Показать ответы</button>'+
+         '<button class="b-clear act-clear">Очистить</button>'+
+         '<span class="score">0 / '+ex.items.length+'</span>';
+  }else{
+    btns='<button class="b-copy act-copy">📋 Скопировать все ответы</button>'+
+         '<button class="b-clear act-clear">Очистить</button>'+
+         '<span class="score">'+ex.items.length+' предложений</span>';
+  }
+
+  s.innerHTML=
+    '<div class="card-hd"><div class="eyebrow">Exercise '+String(ex.n).padStart(2,'0')+' <b>'+ex.tag+'</b></div>'+
+    '<h2>'+esc(ex.title)+'</h2><p class="task">'+esc(ex.task)+'</p></div>'+
+    '<div class="card-bd">'+body+'</div><div class="row-btns">'+btns+'</div>';
+  return s;
+}
+const exWrap=document.getElementById('exWrap');
+EX.forEach(ex=>exWrap.appendChild(renderEx(ex)));
+
+/* ============ CHECK / SHOW / CLEAR ============ */
+function fieldsOf(card){
+  return [...card.querySelectorAll('input.answer, select.match, input.rank-in')];
+}
+function checkCard(card,silent){
+  const ex=EX[+card.dataset.n-1];
+  if(!CHECKABLE.has(ex.type))return null;
+  let right=0;
+  fieldsOf(card).forEach(f=>{
+    const it=ex.items[+f.dataset.k];
+    const slot=f.parentElement.querySelector('.slot');
+    const mark=f.parentElement.querySelector('.mark');
+    slot.innerHTML='';
+    const val=f.value.trim();
+    if(val===''){f.classList.remove('ok','bad');mark.textContent='';return;}
+    const good=ex.type==='rank'
+      ? Number(val)===it.a[0]
+      : it.a.some(a=>norm(a)===norm(val));
+    if(good){f.classList.add('ok');f.classList.remove('bad');mark.textContent='✓';right++;}
+    else{f.classList.add('bad');f.classList.remove('ok');mark.textContent='✕';addProblem(it.w);}
+  });
+  const sc=card.querySelector('.score');
+  sc.textContent=right+' / '+ex.items.length;
+  sc.classList.toggle('done',right===ex.items.length);
+  renderProblems();
+  updateTotal();
+  if(!silent&&right===ex.items.length)toast("Упражнение "+ex.n+": всё верно! ✓");
+  return right;
+}
+function showCard(card){
+  const ex=EX[+card.dataset.n-1];
+  if(!CHECKABLE.has(ex.type))return;
+  fieldsOf(card).forEach(f=>{
+    const it=ex.items[+f.dataset.k];
+    const slot=f.parentElement.querySelector('.slot');
+    let txt=ex.type==='rank'?String(it.a[0]):it.a[0];
+    if(ex.type==='dict')txt=it.a[0]+'  '+it.ipa;
+    slot.innerHTML='<span class="shown">'+esc(txt)+'</span>';
+  });
+}
+function clearCard(card){
+  const ex=EX[+card.dataset.n-1];
+  card.querySelectorAll('input.answer, select.match, input.rank-in, textarea.free').forEach(f=>{
+    f.value='';f.classList.remove('ok','bad');
+  });
+  card.querySelectorAll('.slot').forEach(s=>s.innerHTML='');
+  card.querySelectorAll('.mark').forEach(m=>m.textContent='');
+  const sc=card.querySelector('.score');
+  if(CHECKABLE.has(ex.type)){sc.textContent='0 / '+ex.items.length;sc.classList.remove('done');}
+  updateTotal();
+}
+function copyCard(card){
+  const ex=EX[+card.dataset.n-1];
+  const lines=['Exercise '+ex.n+' — '+ex.title,''];
+  card.querySelectorAll('textarea.free').forEach(t=>{
+    const it=ex.items[+t.dataset.k];
+    const v=t.value.trim();
+    lines.push((+t.dataset.k+1)+'. '+it.q+(ex.type==='drill'?': ':' ')+(v||'—'));
+  });
+  copyText(lines.join('\n'));
+}
+function updateTotal(){
+  let right=0,total=0;
+  document.querySelectorAll('#exWrap .card').forEach(card=>{
+    const ex=EX[+card.dataset.n-1];
+    if(!CHECKABLE.has(ex.type))return;
+    total+=ex.items.length;
+    right+=card.querySelectorAll('.ok').length;
+  });
+  document.getElementById('totScore').textContent=right+' / '+total+' правильно';
+  document.getElementById('barFill').style.width=(total?right/total*100:0)+'%';
+}
+
+/* ============ EVENTS ============ */
+document.addEventListener('click',e=>{
+  const sp=e.target.closest('.spk');
+  if(sp){say(sp.dataset.say);return;}
+  const card=e.target.closest('.card');
+  if(card){
+    if(e.target.closest('.act-check')){checkCard(card);return;}
+    if(e.target.closest('.act-show')){showCard(card);return;}
+    if(e.target.closest('.act-clear')){clearCard(card);return;}
+    if(e.target.closest('.act-copy')){copyCard(card);return;}
+  }
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&e.target.matches('input.answer, input.rank-in')){
+    e.preventDefault();
+    const card=e.target.closest('.card');
+    const fs=fieldsOf(card);
+    const i=fs.indexOf(e.target);
+    if(i>-1&&i<fs.length-1)fs[i+1].focus();else checkCard(card);
+  }
+});
+document.getElementById('checkAll').onclick=()=>{
+  document.querySelectorAll('#exWrap .card').forEach(c=>checkCard(c,true));
+  toast("Проверено. Смотри ✓ и ✕");
+};
+document.getElementById('resetAll').onclick=()=>{
+  document.querySelectorAll('#exWrap .card').forEach(clearCard);
+  toast("Все поля очищены");
+};
+document.getElementById('playAll').onclick=()=>sayList(VOCAB.map(v=>v[0]),.82);
+document.getElementById('stopAll').onclick=()=>{if('speechSynthesis' in window)speechSynthesis.cancel();};
+document.getElementById('pwClear').onclick=()=>{problems.clear();renderProblems();toast("Список проблемных слов очищен");};
+document.getElementById('pwPlay').onclick=()=>{
+  if(problems.size===0){toast("Список пуст");return;}
+  sayList([...problems.keys()],.8);
+};
+updateTotal();
+</script>
+</body>
+</html>
