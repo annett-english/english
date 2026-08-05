@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Тренажёр лексики — mixture, catch, thick, grow up, except</title>
+<style>
+  :root{
+    --ink:#17242B;
+    --ink-soft:#4C6069;
+    --paper:#EEF2F1;
+    --card:#FFFFFF;
+    --line:#D6DEDC;
+    --accent:#2D6E7E;
+    --accent-soft:#E3EDEF;
+    --ok:#3B7A55;
+    --ok-soft:#E4F0E8;
+    --bad:#8E3A50;
+    --bad-soft:#F7E7EB;
+    --warm:#A8791B;
+    --warm-soft:#FAF1DC;
+    --display:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+    --sans:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;background:var(--paper);color:var(--ink);
+    font-family:var(--sans);font-size:16px;line-height:1.55;
+    -webkit-text-size-adjust:100%;
+  }
+  a{color:var(--accent)}
+
+  /* ---------- shell ---------- */
+  .wrap{max-width:1180px;margin:0 auto;padding:28px 20px 80px}
+  .layout{display:grid;grid-template-columns:minmax(0,1fr) 288px;gap:28px;align-items:start}
+  @media(max-width:940px){.layout{grid-template-columns:1fr}}
+
+  /* ---------- header ---------- */
+  header.top{border-bottom:2px solid var(--ink);padding-bottom:18px;margin-bottom:26px}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent)}
+  h1{font-family:var(--display);font-size:clamp(28px,4.6vw,44px);line-height:1.08;margin:8px 0 10px;font-weight:600}
+  h1 em{font-style:italic;color:var(--accent)}
+  .lede{color:var(--ink-soft);max-width:62ch;margin:0}
+
+  /* ---------- word bank ---------- */
+  .bank{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:14px}
+  .bank h2,.card h2{font-family:var(--display);font-size:22px;margin:0 0 4px;font-weight:600}
+  .hint{color:var(--ink-soft);font-size:14px;margin:0 0 16px}
+  .words{display:grid;grid-template-columns:repeat(auto-fill,minmax(228px,1fr));gap:10px}
+  .w{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;padding:11px 12px;background:#FBFCFC}
+  .w .en{font-weight:600;font-size:16px}
+  .w .ipa{font-family:var(--mono);font-size:12.5px;color:var(--accent);margin-top:1px}
+  .w .ru{font-size:14px;color:var(--ink-soft);margin-top:4px}
+  .w .ex{font-size:13px;margin-top:6px;color:var(--ink);font-style:italic}
+  .say{margin-top:8px;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+       border:1px solid var(--line);background:#fff;color:var(--accent);border-radius:999px;padding:4px 10px;cursor:pointer}
+  .say:hover{background:var(--accent-soft)}
+
+  .listen{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:16px 0 0;
+          padding-top:14px;border-top:1px dashed var(--line)}
+  .listen .task{font-size:14px;color:var(--ink-soft);flex:1 1 240px}
+
+  /* ---------- warnings ---------- */
+  .warn{background:var(--warm-soft);border:1px solid #E8D6A8;border-radius:14px;padding:18px 20px;margin-bottom:26px}
+  .warn h2{font-family:var(--display);font-size:20px;margin:0 0 8px;font-weight:600}
+  .warn ul{margin:0;padding-left:20px}
+  .warn li{margin:5px 0;font-size:15px}
+  .warn b{color:var(--bad)}
+  .warn code{font-family:var(--mono);font-size:13.5px;background:#fff;border:1px solid #E8D6A8;border-radius:4px;padding:1px 5px}
+
+  /* ---------- exercise cards ---------- */
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:18px}
+  .card .num{font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--accent);text-transform:uppercase}
+  .card .task{font-size:14px;color:var(--ink-soft);margin:2px 0 16px}
+  ol.items{list-style:none;counter-reset:it;margin:0;padding:0}
+  ol.items>li{counter-increment:it;display:grid;grid-template-columns:26px minmax(0,1fr);gap:10px;
+              padding:9px 0;border-top:1px solid #EDF1F0}
+  ol.items>li:first-child{border-top:none}
+  ol.items>li::before{content:counter(it);font-family:var(--mono);font-size:12px;color:var(--ink-soft);padding-top:9px}
+  .q{margin-bottom:6px}
+  .q .gap{font-family:var(--mono);letter-spacing:.06em;background:var(--accent-soft);border-radius:3px;padding:0 4px}
+  .q mark{background:var(--warm-soft);border-bottom:2px solid var(--warm);padding:0 2px;font-weight:600}
+  .q .ru{color:var(--ink-soft)}
+  input.ans,textarea.ans{
+    width:100%;font-family:var(--mono);font-size:15px;color:var(--ink);
+    border:1px solid var(--line);border-radius:8px;padding:9px 11px;background:#FBFCFC;
+  }
+  textarea.ans{min-height:52px;resize:vertical;line-height:1.5}
+  input.ans:focus,textarea.ans:focus{outline:2px solid var(--accent);outline-offset:1px;background:#fff}
+  li.right input.ans,li.right textarea.ans{border-color:var(--ok);background:var(--ok-soft)}
+  li.wrong input.ans,li.wrong textarea.ans{border-color:var(--bad);background:var(--bad-soft)}
+  .verdict{font-size:13.5px;margin-top:5px;display:none}
+  li.right .verdict,li.wrong .verdict,li.shown .verdict{display:block}
+  li.right .verdict{color:var(--ok)}
+  li.wrong .verdict{color:var(--bad)}
+  li.shown .verdict{color:var(--accent)}
+  .verdict b{font-family:var(--mono);font-weight:600}
+
+  /* ---------- buttons ---------- */
+  .row{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;padding-top:14px;border-top:1px solid #EDF1F0}
+  .btn{font-family:var(--sans);font-size:14px;font-weight:500;border-radius:999px;padding:8px 16px;cursor:pointer;
+       border:1px solid var(--ink);background:var(--ink);color:#fff}
+  .btn:hover{background:#0D171C}
+  .btn.ghost{background:#fff;color:var(--ink);border-color:var(--line)}
+  .btn.ghost:hover{border-color:var(--ink)}
+  .btn.copy{background:var(--warm);border-color:var(--warm)}
+  .btn.copy:hover{background:#8E6415}
+  .btn:focus-visible,.say:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .score{font-family:var(--mono);font-size:13px;color:var(--ink-soft);align-self:center;margin-left:auto}
+
+  /* ---------- sidebar ---------- */
+  .side{position:sticky;top:20px;display:flex;flex-direction:column;gap:14px}
+  @media(max-width:940px){.side{position:static}}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
+  .panel h3{font-family:var(--display);font-size:17px;margin:0 0 3px;font-weight:600}
+  .panel .sub{font-size:12.5px;color:var(--ink-soft);margin:0 0 12px}
+  .bar{height:8px;border-radius:999px;background:#E6ECEA;overflow:hidden;margin:10px 0 6px}
+  .bar i{display:block;height:100%;width:0;background:var(--ok);transition:width .35s ease}
+  .total{font-family:var(--mono);font-size:12.5px;color:var(--ink-soft)}
+  table.prob{width:100%;border-collapse:collapse;font-size:14px}
+  table.prob th{text-align:left;font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+                color:var(--ink-soft);font-weight:500;padding:0 0 6px;border-bottom:1px solid var(--line)}
+  table.prob td{padding:7px 0;border-bottom:1px solid #EDF1F0;vertical-align:middle}
+  table.prob td:last-child{text-align:right;white-space:nowrap}
+  .dots{display:inline-flex;gap:3px}
+  .dots i{width:6px;height:6px;border-radius:50%;background:var(--bad);display:block}
+  .cnt{font-family:var(--mono);font-size:12px;color:var(--bad);margin-left:6px}
+  .empty{font-size:13.5px;color:var(--ink-soft);font-style:italic}
+  .nav a{display:block;font-size:13.5px;color:var(--ink-soft);text-decoration:none;padding:4px 0;border-bottom:1px solid #EDF1F0}
+  .nav a:last-child{border-bottom:none}
+  .nav a:hover{color:var(--accent)}
+  .nav a span{font-family:var(--mono);font-size:11px;color:var(--accent);margin-right:6px}
+
+  .toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);opacity:0;pointer-events:none;
+         background:var(--ink);color:#fff;font-size:14px;padding:10px 18px;border-radius:999px;transition:.25s;z-index:50}
+  .toast.on{opacity:1;transform:translate(-50%,0)}
+  @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div class="eyebrow">Vocabulary drill · 11 упражнений · 110 пунктов</div>
+  <h1>mixture · mix · except (for) · <em>catch</em> · grow up · thick</h1>
+  <p class="lede">Слова прописываются руками. Каждое упражнение проверяется отдельно, ответы можно открыть.
+     Ошибки автоматически попадают в таблицу «Проблемные слова» справа.</p>
+</header>
+
+<div class="layout">
+<main>
+
+  <!-- WORD BANK -->
+  <section class="bank">
+    <h2>Напоминание: слова и транскрипция</h2>
+    <p class="hint">Нажми «Прослушать» и повтори вслух, потом закрой перевод рукой и назови слова по-английски.</p>
+    <div class="words" id="bank"></div>
+    <div class="listen">
+      <div class="task"><b>Задание на прослушивание:</b> включи «Прослушать все», запиши слова на слух, потом сверься со списком.</div>
+      <button class="btn ghost" id="playAll">▶ Прослушать все</button>
+      <button class="btn ghost" id="playPhrases">▶ Прослушать словосочетания</button>
+    </div>
+  </section>
+
+  <!-- MISTAKES -->
+  <section class="warn">
+    <h2>На что смотреть, чтобы не ошибиться</h2>
+    <ul>
+      <li><code>mix</code> — глагол (<i>mix the eggs</i>), <code>a mixture</code> — существительное (<i>a mixture <b>of</b> honey and lemon</i>). Не «a mix of» в этом наборе.</li>
+      <li><code>except</code> /ɪkˈsept/ = кроме, <b>≠</b> <code>accept</code> /əkˈsept/ = принимать. Перед существительным можно <code>except for</code>, но не «except of / except than».</li>
+      <li>catch — <b>caught</b> — <b>caught</b>. Никогда «catched».</li>
+      <li>grow up — <b>grew up</b> — <b>grown up</b>. Никогда «growed». <i>He has grown very tall</i> — здесь <b>без</b> up.</li>
+      <li>Антонимы <code>thick</code> зависят от предмета: hair/book → <b>thin</b>; yogurt/sauce → <b>watery / runny</b>; fog/smoke → <b>clear</b>.</li>
+      <li>Простуда «ловится»: <b>catch a cold</b>, не «get ill with a cold» в этом наборе. Автобус тоже: <b>catch the bus</b>.</li>
+    </ul>
+  </section>
+
+  <div id="exercises"></div>
+
+  <div class="card" style="text-align:center">
+    <button class="btn" id="checkAll">Проверить все упражнения</button>
+    <button class="btn ghost" id="resetAll">Начать заново</button>
+  </div>
+
+</main>
+
+<!-- SIDEBAR -->
+<aside class="side">
+  <div class="panel">
+    <h3>Прогресс</h3>
+    <p class="sub">Правильные ответы в проверяемых упражнениях</p>
+    <div class="bar"><i id="progBar"></i></div>
+    <div class="total" id="progText">0 / 0</div>
+  </div>
+
+  <div class="panel">
+    <h3>Проблемные слова</h3>
+    <p class="sub">Появляются здесь после каждой ошибки</p>
+    <div id="probBox"><p class="empty">Пока чисто. Ошибись — и слово окажется здесь.</p></div>
+    <div class="row" style="margin-top:12px;padding-top:12px">
+      <button class="btn ghost" id="clearProb" style="font-size:13px;padding:6px 12px">Очистить список</button>
+    </div>
+  </div>
+
+  <div class="panel nav" id="nav">
+    <h3>Упражнения</h3>
+    <p class="sub">Переход по списку</p>
+  </div>
+</aside>
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============ WORD BANK ============ */
+const BANK=[
+ {en:"mixture",ipa:"/ˈmɪkstʃə/",ru:"смесь (сущ.)",ex:"a mixture of honey and lemon"},
+ {en:"mix (sth)",ipa:"/mɪks/",ru:"смешивать (гл.)",ex:"Mix the flour with the milk.",say:"mix"},
+ {en:"except (for)",ipa:"/ɪkˈsept/",ru:"кроме",ex:"Everyone came except (for) Tom.",say:"except for"},
+ {en:"catch – caught – caught",ipa:"/kætʃ – kɔːt – kɔːt/",ru:"ловить, поймать; успеть на",ex:"I caught a big fish.",say:"catch, caught, caught"},
+ {en:"grow up – grew – grown",ipa:"/ɡrəʊ ʌp – ɡruː – ɡrəʊn/",ru:"расти, взрослеть",ex:"She grew up in a small town.",say:"grow up, grew up, grown up"},
+ {en:"thick",ipa:"/θɪk/",ru:"густой; толстый; плотный",ex:"I like thick yogurt."},
+ {en:"thin",ipa:"/θɪn/",ru:"тонкий (антоним thick)",ex:"a thin book, thin hair"},
+ {en:"watery",ipa:"/ˈwɔːtəri/",ru:"водянистый (антоним thick)",ex:"The soup was watery."},
+ {en:"runny",ipa:"/ˈrʌni/",ru:"жидкий, текучий (антоним thick)",ex:"runny yogurt, a runny sauce"},
+ {en:"clear",ipa:"/klɪə/",ru:"прозрачный, ясный (антоним thick о тумане)",ex:"a clear sky, clear water"}
+];
+const PHRASES=["catch a fish","catch a bus","catch a cold","thick yogurt","thick fog","mix the ingredients","a mixture of oil and vinegar","grow up in a village"];
+
+/* ============ EXERCISES ============ */
+/* a = список принимаемых ответов, t = тег для «проблемных слов», loose = игнорировать a/an/the */
+const EX=[
+{title:"Вставь пропущенные буквы",task:"Впиши слово целиком, без пропусков.",kind:"check",items:[
+ {q:'m i <span class="gap">_</span> t u r e <span class="ru">— смесь</span>',a:["mixture"],t:"mixture"},
+ {q:'e <span class="gap">_</span> c e p t <span class="ru">— кроме</span>',a:["except"],t:"except (for)"},
+ {q:'c a <span class="gap">_</span> g h t <span class="ru">— past of catch</span>',a:["caught"],t:"catch – caught – caught"},
+ {q:'g r <span class="gap">_</span> w <span class="ru">— past of grow</span>',a:["grew"],t:"grow up – grew – grown"},
+ {q:'g r o <span class="gap">_</span> n <span class="ru">— past participle of grow</span>',a:["grown"],t:"grow up – grew – grown"},
+ {q:'t h i <span class="gap">_</span> <span class="ru">— густой</span>',a:["thick"],t:"thick"},
+ {q:'t h i <span class="gap">_</span> <span class="ru">— тонкий</span>',a:["thin"],t:"thin"},
+ {q:'w a t <span class="gap">_</span> r y <span class="ru">— водянистый</span>',a:["watery"],t:"watery"},
+ {q:'r u <span class="gap">_</span> n y <span class="ru">— жидкий, текучий</span>',a:["runny"],t:"runny"},
+ {q:'c l e <span class="gap">_</span> r <span class="ru">— прозрачный</span>',a:["clear"],t:"clear"}
+]},
+
+{title:"Перевод с русского на английский",task:"Пиши целое предложение. Артикли можно опускать — проверка их не считает.",kind:"check",loose:true,items:[
+ {q:"Смешай муку и молоко.",a:["mix flour and milk","mix flour with milk","mix milk and flour"],t:"mix (sth)"},
+ {q:"Это смесь мёда и лимона.",a:["it is mixture of honey and lemon","this is mixture of honey and lemon","it's mixture of honey and lemon"],t:"mixture"},
+ {q:"Все пришли, кроме Тома.",a:["everyone came except tom","everyone came except for tom","everybody came except tom","everybody came except for tom"],t:"except (for)"},
+ {q:"Он поймал большую рыбу.",a:["he caught big fish","he caught large fish"],t:"catch – caught – caught"},
+ {q:"Я вырос в маленьком городе.",a:["i grew up in small town","i grew up in small city"],t:"grow up – grew – grown"},
+ {q:"Мне нравится густой йогурт.",a:["i like thick yogurt","i like thick yoghurt"],t:"thick yogurt"},
+ {q:"Она простудилась вчера.",a:["she caught cold yesterday","she caught a cold yesterday"],t:"catch a cold"},
+ {q:"Мы успели на автобус.",a:["we caught bus","we caught the bus"],t:"catch a bus"},
+ {q:"Суп слишком жидкий.",a:["soup is too watery","soup is too runny","soup is too thin","the soup is too watery"],t:"watery"},
+ {q:"Туман был очень густой.",a:["fog was very thick","the fog was very thick"],t:"thick"}
+]},
+
+{title:"Definitions: напиши слово по определению",task:"Одно слово или фраза из списка.",kind:"check",items:[
+ {q:"a combination of two or more different things put together",a:["mixture","a mixture"],t:"mixture"},
+ {q:"to put different substances together so that they become one",a:["mix","to mix"],t:"mix (sth)"},
+ {q:"used to say that something or someone is not included",a:["except","except for"],t:"except (for)"},
+ {q:"to take hold of something that is moving through the air",a:["catch","to catch"],t:"catch a fish – caught – caught"},
+ {q:"to change from a child into an adult",a:["grow up","to grow up"],t:"grow up – grew – grown"},
+ {q:"(of a liquid) not flowing easily, like good yogurt or a good sauce",a:["thick"],t:"thick"},
+ {q:"containing too much water, so the taste is weak",a:["watery"],t:"watery"},
+ {q:"(of a liquid) flowing too easily, more liquid than it should be",a:["runny"],t:"runny"},
+ {q:"easy to see through; not foggy",a:["clear"],t:"clear"},
+ {q:"having a small distance between two sides; opposite of thick for hair or a book",a:["thin"],t:"thin"}
+]},
+
+{title:"Сочетаемость: одно слово в пропуск",task:"Только пропущенное слово, в нужной форме.",kind:"check",items:[
+ {q:'She ran fast and <span class="gap">______</span> the bus at the last moment.',a:["caught"],t:"catch a bus"},
+ {q:'I <span class="gap">______</span> a terrible cold at the airport.',a:["caught"],t:"catch a cold"},
+ {q:'He sat by the river all day but he didn\'t <span class="gap">______</span> a single fish.',a:["catch"],t:"catch a fish – caught – caught"},
+ {q:'I only buy <span class="gap">______</span> yogurt, the runny one is horrible.',a:["thick"],t:"thick yogurt"},
+ {q:'The <span class="gap">______</span> fog closed the airport for six hours.',a:["thick"],t:"thick"},
+ {q:'My parents <span class="gap">______</span> up in the countryside.',a:["grew"],t:"grow up – grew – grown"},
+ {q:'<span class="gap">______</span> the ingredients in a large bowl.',a:["mix"],t:"mix (sth)"},
+ {q:'The dressing is a <span class="gap">______</span> of oil and vinegar.',a:["mixture"],t:"mixture"},
+ {q:'Everyone knew the answer <span class="gap">______</span> me.',a:["except","except for"],t:"except (for)"},
+ {q:'After the rain the sky was completely <span class="gap">______</span>.',a:["clear"],t:"clear"}
+]},
+
+{title:"Categorise",task:"Напиши, к какому слову относится набор: CATCH, THICK или MIX.",kind:"check",items:[
+ {q:"a train, a plane, the last bus",a:["catch"],t:"catch a bus"},
+ {q:"hair, a book, a slice of bread",a:["thick"],t:"thick"},
+ {q:"the colours, paint, red and blue",a:["mix"],t:"mix (sth)"},
+ {q:"a cold, the flu, a virus",a:["catch"],t:"catch a cold"},
+ {q:"soup, yogurt, sauce (густые)",a:["thick"],t:"thick yogurt"},
+ {q:"flour and water, eggs and sugar",a:["mix"],t:"mix (sth)"},
+ {q:"a ball, a fish, a falling glass",a:["catch"],t:"catch a fish – caught – caught"},
+ {q:"fog, smoke, clouds",a:["thick"],t:"thick"},
+ {q:"business and pleasure, work and family",a:["mix"],t:"mix (sth)"},
+ {q:"a thief, a taxi, the 7 o'clock ferry",a:["catch"],t:"catch a bus"}
+]},
+
+{title:"Predict the ending",task:"Закончи предложение логично, 3–6 слов. Свободный ответ — потом скопируй всё одной кнопкой.",kind:"open",items:[
+ {q:"The recipe says you should mix the eggs with…"},
+ {q:"I eat almost everything except…"},
+ {q:"It was raining and I had no jacket, so I caught…"},
+ {q:"My grandmother grew up in…"},
+ {q:"This yogurt is so thick that…"},
+ {q:"The fog was so thick that…"},
+ {q:"If you add too much water, the sauce will be…"},
+ {q:"I ran to the stop but I didn't catch…"},
+ {q:"When the sky is clear, you can…"},
+ {q:"Their music is a mixture of…"}
+]},
+
+{title:"Find the extra word",task:"В каждом предложении одно лишнее слово. Напиши только его.",kind:"check",items:[
+ {q:"Everyone was there except for of Anna.",a:["of"],t:"except (for)"},
+ {q:"I caught a cold on last week.",a:["on"],t:"catch a cold"},
+ {q:"She grew up herself in a small village.",a:["herself"],t:"grow up – grew – grown"},
+ {q:"Please mix to the flour with the sugar.",a:["to"],t:"mix (sth)"},
+ {q:"This is a mixture of made from honey and nuts.",a:["of"],t:"mixture"},
+ {q:"The yogurt is too much thick for me.",a:["much"],t:"thick yogurt"},
+ {q:"We didn't catch the bus, so we were took a taxi.",a:["were"],t:"catch a bus"},
+ {q:"The sauce was too runny, so I have added some flour.",a:["have"],t:"runny"},
+ {q:"My brother has grown up very tall since last year.",a:["up"],t:"grow up – grew – grown"},
+ {q:"I like all vegetables except than broccoli.",a:["than"],t:"except (for)"}
+]},
+
+{title:"Context: вставь слово в текст",task:"Читай оба текста целиком — подсказка в соседних предложениях.",kind:"check",items:[
+ {q:'<b>Текст 1.</b> For breakfast I always make a smoothie. First I <span class="gap">______</span> banana, milk and yogurt in a blender.',a:["mix"],t:"mix (sth)"},
+ {q:'I only use <span class="gap">______</span> yogurt — the watery one ruins the drink.',a:["thick"],t:"thick yogurt"},
+ {q:'If I add too much milk, the smoothie becomes <span class="gap">______</span> and tastes of nothing.',a:["watery","runny","thin"],t:"watery"},
+ {q:'I put in everything <span class="gap">______</span> (for) sugar, because I don\'t like sweet drinks.',a:["except"],t:"except (for)"},
+ {q:'I hated bananas as a child, but I <span class="gap">______</span> up and now I love them.',a:["grew"],t:"grow up – grew – grown"},
+ {q:'<b>Текст 2.</b> This morning was a disaster. I woke up late and didn\'t <span class="gap">______</span> my usual bus.',a:["catch"],t:"catch a bus"},
+ {q:'I waited in the rain in a thin jacket and of course I <span class="gap">______</span> a cold.',a:["caught"],t:"catch a cold"},
+ {q:'The <span class="gap">______</span> was so thick that the driver could hardly see the road.',a:["fog"],t:"thick"},
+ {q:'A lorry lost a whole box of eggs and there was a strange <span class="gap">______</span> of eggs and rain on the street.',a:["mixture"],t:"mixture"},
+ {q:'By the evening the sky was finally <span class="gap">______</span> and I felt better.',a:["clear"],t:"clear"}
+]},
+
+{title:"Replace the highlighted word",task:"Замени выделенное слово словом из списка (форму сохрани). Напиши только замену.",kind:"check",items:[
+ {q:'Please <mark>combine</mark> the eggs and the sugar.',a:["mix"],t:"mix (sth)"},
+ {q:'This tomato sauce is very <mark>dense</mark>.',a:["thick"],t:"thick"},
+ {q:'The soup is too <mark>liquid</mark> — add some flour.',a:["watery","runny","thin"],t:"watery"},
+ {q:'He <mark>was raised</mark> in a fishing village.',a:["grew up"],t:"grow up – grew – grown"},
+ {q:'<mark>Apart from</mark> John, nobody knew the truth.',a:["except","except for"],t:"except (for)"},
+ {q:'Their style is a <mark>blend</mark> of jazz and folk.',a:["mixture"],t:"mixture"},
+ {q:'Did you <mark>get</mark> the 7 o\'clock train?',a:["catch"],t:"catch a bus"},
+ {q:'She <mark>became ill with</mark> a cold last Friday.',a:["caught"],t:"catch a cold"},
+ {q:'The water in the lake was completely <mark>transparent</mark>.',a:["clear"],t:"clear"},
+ {q:'He <mark>took hold of</mark> the ball with one hand.',a:["caught"],t:"catch a fish – caught – caught"}
+]},
+
+{title:"Expand the sentence",task:"Расширь предложение: добавь минимум 4–5 слов (где, когда, какой, почему). Свободный ответ.",kind:"open",items:[
+ {q:"I caught a fish. →"},
+ {q:"She mixed the ingredients. →"},
+ {q:"The yogurt was thick. →"},
+ {q:"He grew up. →"},
+ {q:"Everyone left except Tom. →"},
+ {q:"The fog was thick. →"},
+ {q:"It is a mixture. →"},
+ {q:"I caught a cold. →"},
+ {q:"The soup was watery. →"},
+ {q:"The water is clear. →"}
+]},
+
+{title:"Закончи предложения своими идеями",task:"Пиши про себя, полными предложениями. Потом скопируй всё одной кнопкой.",kind:"open",items:[
+ {q:"I would never mix … with …"},
+ {q:"I like everything about my city except …"},
+ {q:"The last time I caught a cold was …"},
+ {q:"I grew up thinking that …"},
+ {q:"My favourite thick food is …"},
+ {q:"If I don't catch the last bus, I usually …"},
+ {q:"My personality is a mixture of …"},
+ {q:"I hate it when my coffee is too …"},
+ {q:"I remember a day when the fog was so thick that …"},
+ {q:"When I have grown a bit older, I want to …"}
+]}
+];
+
+/* ============ HELPERS ============ */
+const $=s=>document.querySelector(s);
+const problems={};
+let toastTimer;
+function toast(msg){const t=$("#toast");t.textContent=msg;t.classList.add("on");
+  clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove("on"),1900);}
+function speak(text){
+  if(!("speechSynthesis" in window)){toast("Браузер не умеет озвучивать текст");return;}
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);u.lang="en-GB";u.rate=.85;speechSynthesis.speak(u);
+}
+function speakList(arr){
+  if(!("speechSynthesis" in window)){toast("Браузер не умеет озвучивать текст");return;}
+  speechSynthesis.cancel();
+  arr.forEach(w=>{const u=new SpeechSynthesisUtterance(w);u.lang="en-GB";u.rate=.8;speechSynthesis.speak(u);});
+}
+function norm(s,loose){
+  let t=(s||"").toLowerCase().replace(/[’']/g,"'").replace(/[.,!?;:—–-]+$/g,"").replace(/\s+/g," ").trim();
+  if(loose)t=t.replace(/\b(a|an|the)\b/g," ").replace(/\s+/g," ").trim();
+  return t;
+}
+function plain(html){const d=document.createElement("div");d.innerHTML=html;
+  return d.textContent.replace(/\s+/g," ").trim();}
+
+/* ============ RENDER ============ */
+const bankBox=$("#bank");
+BANK.forEach(w=>{
+  const d=document.createElement("div");d.className="w";
+  d.innerHTML=`<div class="en">${w.en}</div><div class="ipa">${w.ipa}</div>
+    <div class="ru">${w.ru}</div><div class="ex">${w.ex}</div>
+    <button class="say">♪ прослушать</button>`;
+  d.querySelector(".say").onclick=()=>speak(w.say||w.en);
+  bankBox.appendChild(d);
+});
+
+const exBox=$("#exercises"),navBox=$("#nav");
+EX.forEach((ex,i)=>{
+  const n=i+1,id="ex"+n;
+  const card=document.createElement("section");
+  card.className="card";card.id=id;
+  const open=ex.kind==="open";
+  card.innerHTML=`
+    <div class="num">Упражнение ${n} · ${open?"свободный ответ":"с проверкой"}</div>
+    <h2>${ex.title}</h2>
+    <p class="task">${ex.task}</p>
+    <ol class="items"></ol>
+    <div class="row"></div>`;
+  const ol=card.querySelector("ol"),row=card.querySelector(".row");
+
+  ex.items.forEach(it=>{
+    const li=document.createElement("li");
+    li.innerHTML=`<div><div class="q">${it.q}</div>
+      ${open?'<textarea class="ans" rows="2"></textarea>':'<input class="ans" type="text" autocomplete="off" spellcheck="false">'}
+      <div class="verdict"></div></div>`;
+    ol.appendChild(li);
+  });
+
+  if(open){
+    row.innerHTML=`<button class="btn copy">⧉ Скопировать все ответы</button>
+                   <button class="btn ghost clr">Очистить</button>`;
+    row.querySelector(".copy").onclick=()=>copyOpen(ex,ol,n);
+  }else{
+    row.innerHTML=`<button class="btn chk">Проверить</button>
+                   <button class="btn ghost show">Показать ответы</button>
+                   <button class="btn ghost clr">Очистить</button>
+                   <span class="score"></span>`;
+    row.querySelector(".chk").onclick=()=>checkEx(ex,ol,row);
+    row.querySelector(".show").onclick=()=>showEx(ex,ol);
+  }
+  row.querySelector(".clr").onclick=()=>{
+    ol.querySelectorAll("li").forEach(li=>{li.className="";li.querySelector(".ans").value="";
+      li.querySelector(".verdict").textContent="";});
+    const sc=row.querySelector(".score");if(sc)sc.textContent="";updateProgress();
+  };
+
+  ol.addEventListener("keydown",e=>{
+    if(e.key==="Enter"&&e.target.tagName==="INPUT"){e.preventDefault();
+      const all=[...ol.querySelectorAll("input.ans")],k=all.indexOf(e.target);
+      if(k<all.length-1)all[k+1].focus();else row.querySelector(".chk")?.click();}
+  });
+
+  exBox.appendChild(card);
+  const a=document.createElement("a");a.href="#"+id;
+  a.innerHTML=`<span>${String(n).padStart(2,"0")}</span>${ex.title}`;
+  navBox.appendChild(a);
+});
+
+/* ============ CHECK ============ */
+function checkEx(ex,ol,row){
+  let ok=0;
+  [...ol.children].forEach((li,k)=>{
+    const it=ex.items[k],inp=li.querySelector(".ans"),v=li.querySelector(".verdict");
+    const val=inp.value;
+    if(!val.trim()){li.className="";v.textContent="";return;}
+    const hit=it.a.some(x=>norm(x,ex.loose)===norm(val,ex.loose));
+    if(hit){
+      li.className="right";v.innerHTML="✓ верно";ok++;
+    }else{
+      li.className="wrong";v.innerHTML="✗ ответ: <b>"+it.a[0]+"</b>"+(it.a.length>1?" (также: "+it.a.slice(1).join(" / ")+")":"");
+      if(!li.dataset.counted){addProblem(it.t);li.dataset.counted="1";}
+    }
+  });
+  row.querySelector(".score").textContent=ok+" / "+ex.items.length;
+  updateProgress();
+}
+function showEx(ex,ol){
+  [...ol.children].forEach((li,k)=>{
+    const it=ex.items[k],v=li.querySelector(".verdict");
+    if(li.classList.contains("right"))return;
+    li.className="shown";v.innerHTML="→ <b>"+it.a.join(" / ")+"</b>";
+  });
+}
+function addProblem(tag){
+  if(!tag)return;
+  problems[tag]=(problems[tag]||0)+1;renderProblems();
+}
+function renderProblems(){
+  const box=$("#probBox"),keys=Object.keys(problems).sort((a,b)=>problems[b]-problems[a]);
+  if(!keys.length){box.innerHTML='<p class="empty">Пока чисто. Ошибись — и слово окажется здесь.</p>';return;}
+  let html='<table class="prob"><tr><th>Слово</th><th>Ошибки</th></tr>';
+  keys.forEach(k=>{
+    const c=problems[k],dots='<span class="dots">'+'<i></i>'.repeat(Math.min(c,5))+'</span>';
+    html+=`<tr><td>${k}</td><td>${dots}<span class="cnt">${c}</span></td></tr>`;
+  });
+  box.innerHTML=html+"</table>";
+}
+function updateProgress(){
+  let ok=0,total=0;
+  EX.forEach((ex,i)=>{if(ex.kind==="open")return;
+    total+=ex.items.length;
+    ok+=document.querySelectorAll("#ex"+(i+1)+" li.right").length;});
+  $("#progBar").style.width=total?(ok/total*100)+"%":"0";
+  $("#progText").textContent=ok+" / "+total;
+}
+
+/* ============ COPY ============ */
+function copyOpen(ex,ol,n){
+  const lines=[`Упражнение ${n}. ${ex.title}`,""];
+  [...ol.children].forEach((li,k)=>{
+    const a=li.querySelector(".ans").value.trim();
+    lines.push(`${k+1}. ${plain(ex.items[k].q)} ${a||"—"}`);
+  });
+  const text=lines.join("\n");
+  const done=()=>toast("Ответы скопированы в буфер обмена");
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(done).catch(()=>fallback(text,done));
+  }else fallback(text,done);
+}
+function fallback(text,done){
+  const ta=document.createElement("textarea");ta.value=text;
+  ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);
+  ta.select();try{document.execCommand("copy");done();}catch(e){toast("Не удалось скопировать — выдели текст вручную");}
+  ta.remove();
+}
+
+/* ============ GLOBAL ============ */
+$("#playAll").onclick=()=>speakList(BANK.map(w=>w.say||w.en));
+$("#playPhrases").onclick=()=>speakList(PHRASES);
+$("#checkAll").onclick=()=>{
+  EX.forEach((ex,i)=>{if(ex.kind==="open")return;
+    const card=$("#ex"+(i+1));checkEx(ex,card.querySelector("ol"),card.querySelector(".row"));});
+  toast("Все упражнения проверены");
+};
+$("#resetAll").onclick=()=>{
+  document.querySelectorAll(".card .clr").forEach(b=>b.click());
+  document.querySelectorAll("li[data-counted]").forEach(li=>delete li.dataset.counted);
+  Object.keys(problems).forEach(k=>delete problems[k]);
+  renderProblems();updateProgress();window.scrollTo({top:0});
+};
+$("#clearProb").onclick=()=>{
+  Object.keys(problems).forEach(k=>delete problems[k]);
+  document.querySelectorAll("li[data-counted]").forEach(li=>delete li.dataset.counted);
+  renderProblems();toast("Список проблемных слов очищен");
+};
+updateProgress();
+</script>
+</body>
+</html>
