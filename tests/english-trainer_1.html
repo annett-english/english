@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Тренажёр английского · Ошибки, звучание, контекст</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FAF6EC;
+    --paper-2:#F3EDDD;
+    --rule-line:#DCD2B4;
+    --ink:#22314f;
+    --ink-soft:#4a5875;
+    --red:#C0392B;
+    --red-soft:#F4DAD6;
+    --green:#2f7a4f;
+    --green-soft:#DEEAE0;
+    --yellow:#F3D67A;
+    --yellow-soft:#FBF0D2;
+    --graphite:#7a7264;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:
+      repeating-linear-gradient(
+        var(--paper) 0px, var(--paper) 33px,
+        var(--rule-line) 34px, var(--paper) 35px
+      ),
+      linear-gradient(120deg, var(--paper) 0%, var(--paper-2) 100%);
+    color:var(--ink);
+    font-family:'Lora', Georgia, serif;
+    line-height:1.55;
+    padding:0 0 80px 0;
+  }
+  .margin-line{
+    position:fixed;
+    top:0; bottom:0; left:64px;
+    width:2px;
+    background:rgba(192,57,43,0.28);
+    z-index:0;
+  }
+  @media (max-width:760px){ .margin-line{ display:none; } }
+
+  header{
+    position:relative;
+    z-index:1;
+    padding:44px 32px 28px 96px;
+  }
+  @media (max-width:760px){ header{ padding:32px 20px; } }
+  .kicker{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--red);
+    margin:0 0 6px 0;
+  }
+  h1{
+    font-family:'Caveat', cursive;
+    font-weight:700;
+    font-size:52px;
+    margin:0 0 8px 0;
+    color:var(--ink);
+    line-height:1;
+  }
+  header p.sub{
+    margin:0;
+    max-width:640px;
+    color:var(--ink-soft);
+    font-size:16.5px;
+  }
+
+  .wrap{
+    position:relative;
+    z-index:1;
+    display:grid;
+    grid-template-columns: 1fr 300px;
+    gap:28px;
+    padding:0 32px 0 96px;
+    align-items:start;
+  }
+  @media (max-width:980px){
+    .wrap{ grid-template-columns:1fr; padding:0 20px; }
+  }
+
+  main{ min-width:0; }
+
+  /* Sidebar */
+  aside{
+    position:sticky;
+    top:20px;
+    background:var(--yellow-soft);
+    border:1px solid var(--yellow);
+    border-radius:3px;
+    padding:16px 16px 14px;
+    box-shadow: 3px 4px 0 rgba(192,57,43,0.06);
+    transform:rotate(0.6deg);
+  }
+  aside h2{
+    font-family:'Caveat', cursive;
+    font-size:24px;
+    margin:0 0 4px 0;
+    color:var(--red);
+    display:flex; align-items:center; gap:6px;
+  }
+  aside p.hint{
+    font-size:12.5px;
+    color:var(--ink-soft);
+    margin:0 0 10px 0;
+  }
+  #mistakeTable{
+    width:100%;
+    border-collapse:collapse;
+    font-size:14px;
+  }
+  #mistakeTable th{
+    text-align:left;
+    font-family:'JetBrains Mono', monospace;
+    font-size:10.5px;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    color:var(--graphite);
+    border-bottom:1px solid var(--yellow);
+    padding-bottom:4px;
+  }
+  #mistakeTable td{
+    padding:5px 4px;
+    border-bottom:1px dashed rgba(122,114,100,0.3);
+  }
+  #mistakeTable td.cnt{
+    font-family:'JetBrains Mono', monospace;
+    color:var(--red);
+    font-weight:600;
+    text-align:right;
+  }
+  #mistakeEmpty{
+    font-size:13px;
+    color:var(--graphite);
+    font-style:italic;
+  }
+  #clearMistakes{
+    margin-top:10px;
+    background:none;
+    border:1px solid var(--graphite);
+    color:var(--ink-soft);
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    padding:5px 8px;
+    border-radius:3px;
+    cursor:pointer;
+  }
+  #clearMistakes:hover{ border-color:var(--red); color:var(--red); }
+
+  /* Reminder section */
+  section.reminder{ margin:8px 0 40px 0; }
+  section.reminder h2, main h2.section-title{
+    font-family:'Caveat', cursive;
+    font-size:32px;
+    color:var(--ink);
+    margin:0 0 4px 0;
+    border-bottom:2px solid var(--red);
+    display:inline-block;
+    padding-bottom:2px;
+  }
+  section.reminder > p{
+    color:var(--ink-soft);
+    font-size:14.5px;
+    margin:6px 0 16px 0;
+  }
+  .card-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));
+    gap:14px;
+  }
+  .rule-card{
+    background:#fff;
+    border:1px solid var(--rule-line);
+    border-left:4px solid var(--red);
+    border-radius:2px;
+    padding:12px 14px 13px;
+    box-shadow:2px 2px 0 rgba(34,49,79,0.03);
+  }
+  .rule-card .num{
+    font-family:'JetBrains Mono', monospace;
+    font-size:10.5px;
+    color:var(--graphite);
+    letter-spacing:.06em;
+  }
+  .rule-card h3{
+    margin:2px 0 5px 0;
+    font-size:16.5px;
+    color:var(--ink);
+    font-family:'Lora', serif;
+    font-weight:600;
+  }
+  .rule-card p{
+    margin:0 0 6px 0;
+    font-size:13.5px;
+    color:var(--ink-soft);
+  }
+  .rule-card .ex{
+    font-size:13px;
+    font-style:italic;
+    color:var(--green);
+    background:var(--green-soft);
+    padding:4px 7px;
+    border-radius:2px;
+    display:inline-block;
+    margin-top:2px;
+  }
+  .rule-card .wrong{
+    font-size:12.5px;
+    color:var(--red);
+    text-decoration:line-through;
+    margin-right:6px;
+  }
+  .speak-btn{
+    border:none;
+    background:var(--paper-2);
+    color:var(--ink);
+    font-size:12px;
+    padding:2px 7px;
+    border-radius:12px;
+    cursor:pointer;
+    font-family:'JetBrains Mono', monospace;
+    margin-left:4px;
+  }
+  .speak-btn:hover{ background:var(--yellow); }
+
+  /* Exercises */
+  .ex-block{
+    margin:0 0 46px 0;
+    background:rgba(255,255,255,0.55);
+    border:1px solid var(--rule-line);
+    border-radius:4px;
+    padding:20px 22px 22px;
+  }
+  .ex-block .instructions{
+    font-size:14px;
+    color:var(--ink-soft);
+    margin:2px 0 16px 0;
+  }
+  .ex-toolbar{
+    display:flex;
+    gap:10px;
+    margin-bottom:16px;
+    flex-wrap:wrap;
+  }
+  button.primary{
+    background:var(--ink);
+    color:var(--paper);
+    border:none;
+    padding:9px 16px;
+    border-radius:3px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:12.5px;
+    letter-spacing:.03em;
+    cursor:pointer;
+  }
+  button.primary:hover{ background:var(--red); }
+  button.ghost{
+    background:none;
+    border:1px solid var(--ink-soft);
+    color:var(--ink-soft);
+    padding:9px 16px;
+    border-radius:3px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:12.5px;
+    cursor:pointer;
+  }
+  button.ghost:hover{ border-color:var(--red); color:var(--red); }
+
+  .item{
+    display:grid;
+    grid-template-columns: 30px 1fr;
+    gap:10px;
+    padding:12px 0;
+    border-top:1px dashed var(--rule-line);
+  }
+  .item:first-of-type{ border-top:none; }
+  .item .idx{
+    font-family:'JetBrains Mono', monospace;
+    color:var(--graphite);
+    font-size:13px;
+    padding-top:8px;
+  }
+  .item .prompt{
+    font-size:15px;
+    margin:0 0 8px 0;
+    color:var(--ink);
+  }
+  .item .prompt .ipa{
+    font-family:'JetBrains Mono', monospace;
+    font-size:15px;
+    background:var(--paper-2);
+    padding:2px 8px;
+    border-radius:3px;
+    margin-right:8px;
+  }
+  .item input[type=text]{
+    width:100%;
+    max-width:520px;
+    font-family:'Caveat', cursive;
+    font-size:22px;
+    color:var(--ink);
+    background:transparent;
+    border:none;
+    border-bottom:1.5px solid var(--ink-soft);
+    padding:4px 2px;
+    outline:none;
+  }
+  .item input[type=text]:focus{ border-bottom-color:var(--red); }
+  .item input.correct{ border-bottom-color:var(--green); color:var(--green); }
+  .item input.wrong{ border-bottom-color:var(--red); color:var(--red); }
+  .item-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .mark{
+    font-size:18px;
+    width:20px;
+    text-align:center;
+  }
+  .mark.ok{ color:var(--green); }
+  .mark.no{ color:var(--red); }
+  .small-btn{
+    background:none;
+    border:1px solid var(--rule-line);
+    color:var(--ink-soft);
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    padding:3px 8px;
+    border-radius:10px;
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  .small-btn:hover{ border-color:var(--red); color:var(--red); }
+  .answer-reveal{
+    display:none;
+    margin-top:6px;
+    font-size:13.5px;
+    color:var(--ink-soft);
+    background:var(--yellow-soft);
+    border-left:3px solid var(--yellow);
+    padding:5px 9px;
+    border-radius:2px;
+  }
+  .answer-reveal.show{ display:block; }
+  .answer-reveal b{ color:var(--red); font-weight:600; }
+
+  .score-badge{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12.5px;
+    color:var(--ink-soft);
+    align-self:center;
+  }
+
+  footer{
+    text-align:center;
+    color:var(--graphite);
+    font-size:12.5px;
+    margin-top:30px;
+    font-family:'JetBrains Mono', monospace;
+  }
+</style>
+</head>
+<body>
+<div class="margin-line"></div>
+
+<header>
+  <p class="kicker">домашняя тетрадь · red pen edition</p>
+  <h1>Тренажёр английского</h1>
+  <p class="sub">Повтори правила, впиши ответы от руки (в поле), проверь себя и посмотри правильный вариант.
+  Слова, в которых ты ошибаешься, сами попадут в табличку «Проблемные слова» справа.</p>
+</header>
+
+<div class="wrap">
+  <main>
+
+    <section class="reminder">
+      <h2>Повторение перед стартом</h2>
+      <p>11 моментов, где чаще всего случаются ошибки. Нажми 🔊, чтобы услышать произношение.</p>
+      <div class="card-grid" id="ruleCards"></div>
+    </section>
+
+    <section id="exercisesRoot"></section>
+
+  </main>
+
+  <aside>
+    <h2>📌 Проблемные слова</h2>
+    <p class="hint">Появляются автоматически после проверки, если ты ошибся в задании.</p>
+    <table id="mistakeTable">
+      <thead><tr><th>Слово / момент</th><th>Ошибок</th></tr></thead>
+      <tbody id="mistakeBody"></tbody>
+    </table>
+    <div id="mistakeEmpty">Пока пусто — начни выполнять упражнения.</div>
+    <button id="clearMistakes">очистить список</button>
+  </aside>
+</div>
+
+<footer>сделано для тренировки руки, глаза и уха · English practice sheet</footer>
+
+<script>
+/* ---------- helpers ---------- */
+function speak(text){
+  if(!('speechSynthesis' in window)) return;
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-US';
+  u.rate = 0.92;
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(u);
+}
+function normalize(s){
+  return (s||'')
+    .toLowerCase()
+    .replace(/[’']/g,"")
+    .replace(/[.,!?;:"“”]/g,"")
+    .replace(/\s+/g," ")
+    .trim();
+}
+
+/* ---------- mistake tracker (in-memory, resets on page reload) ---------- */
+const mistakes = {}; // label -> count
+function registerMistake(label){
+  if(!label) return;
+  mistakes[label] = (mistakes[label]||0) + 1;
+  renderMistakes();
+}
+function renderMistakes(){
+  const body = document.getElementById('mistakeBody');
+  const empty = document.getElementById('mistakeEmpty');
+  const entries = Object.entries(mistakes).sort((a,b)=>b[1]-a[1]);
+  body.innerHTML = '';
+  if(entries.length===0){ empty.style.display='block'; document.getElementById('mistakeTable').style.display='none'; return; }
+  empty.style.display='none';
+  document.getElementById('mistakeTable').style.display='table';
+  entries.forEach(([label,count])=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${label}</td><td class="cnt">${count}</td>`;
+    body.appendChild(tr);
+  });
+}
+document.getElementById('clearMistakes').addEventListener('click', ()=>{
+  Object.keys(mistakes).forEach(k=>delete mistakes[k]);
+  renderMistakes();
+});
+
+/* ---------- reminder rule cards ---------- */
+const rules = [
+  {n:'01', title:'Have you heard of… vs Do you know…', body:'«Do you know X?» — ты знаком(а) с X лично. «Have you heard of X?» — ты просто слышал(а) о X (знаменитость, факт, место).',
+    wrong:'Do you know Einstein?', ok:'Have you heard of Einstein?'},
+  {n:'02', title:'Двойное отрицание запрещено', body:'После don\'t / doesn\'t / isn\'t нельзя ставить nothing/nobody/no — используем anything/anybody/any.',
+    wrong:'I don\'t know nothing.', ok:'I don\'t know anything.'},
+  {n:'03', title:'associated with', body:'Прилагательное после to be: «связан(-а) с». Ударение на 2-й слог.', speak:'associated with',
+    wrong:'is associate with', ok:'is associated with'},
+  {n:'04', title:'association', body:'Существительное «связь, ассоциация». Ударение на предпоследний слог, «-tion» = [шн].', speak:'association'},
+  {n:'05', title:'hotel', body:'Ударение на второй слог — как в русском «отЕль»! Это совпадение, а не ошибка.', speak:'hotel'},
+  {n:'06', title:'at this moment', body:'«В данный момент» — только с предлогом AT, не in.',
+    wrong:'in this moment', ok:'at this moment'},
+  {n:'07', title:'in the past', body:'«В прошлом» — только с предлогом IN, не at.',
+    wrong:'at the past', ok:'in the past'},
+  {n:'08', title:'answers', body:'Буква w не читается: [ˈænsərz]. Ударение на первый слог.', speak:'answers'},
+  {n:'09', title:'one sheep — two sheep', body:'Sheep — неизменяемое существительное: форма множественного числа совпадает с единственным.', speak:'two sheep'},
+  {n:'10', title:'one fish — two fish', body:'Fish тоже обычно не меняется во множественном числе (кроме значения «виды рыб» — fishes).', speak:'two fish'},
+  {n:'11', title:'Куда ставить also', body:'После глагола to be, но перед смысловым глаголом: «I was also tired», «I also drink coffee».',
+    wrong:'I drink also coffee.', ok:'I also drink coffee.'},
+];
+const ruleCardsEl = document.getElementById('ruleCards');
+rules.forEach(r=>{
+  const card = document.createElement('div');
+  card.className = 'rule-card';
+  let exHtml = '';
+  if(r.wrong && r.ok){
+    exHtml = `<span class="wrong">${r.wrong}</span><span class="ex">${r.ok}</span>`;
+  } else if(r.speak){
+    exHtml = `<span class="ex">пример: ${r.speak}</span>`;
+  }
+  const speakWord = r.speak || (r.ok ? r.ok : r.title);
+  card.innerHTML = `
+    <div class="num">правило ${r.n}</div>
+    <h3>${r.title} <button class="speak-btn" onclick="speak('${speakWord.replace(/'/g,"\\'")}')">🔊</button></h3>
+    <p>${r.body}</p>
+    ${exHtml}
+  `;
+  ruleCardsEl.appendChild(card);
+});
+
+/* ---------- exercises data ---------- */
+const exercises = [
+  {
+    id:'ex1',
+    title:'Упражнение 1 · Find the mistake',
+    instr:'В каждом предложении спрятана ошибка (по правилам выше). Перепиши предложение целиком в исправленном виде.',
+    items:[
+      {prompt:'I don’t know nothing about it.', answer:'I don’t know anything about it.', required:['dont know anything'], mistake:'no double negative'},
+      {prompt:'Do you know Albert Einstein? (ты никогда его не встречал)', answer:'Have you heard of Albert Einstein?', required:['have you heard of'], mistake:'have you heard of'},
+      {prompt:'We saw two sheeps in the field.', answer:'We saw two sheep in the field.', required:['two sheep'], mistake:'sheep (мн.ч.)'},
+      {prompt:'I caught three fishes yesterday.', answer:'I caught three fish yesterday.', required:['three fish'], mistake:'fish (мн.ч.)'},
+      {prompt:'I was happy also.', answer:'I was also happy.', required:['was also happy'], mistake:'место also'},
+      {prompt:'I drink also coffee every morning.', answer:'I also drink coffee every morning.', required:['also drink coffee'], mistake:'место also'},
+      {prompt:'This company is associate with fraud.', answer:'This company is associated with fraud.', required:['associated with fraud'], mistake:'associated with'},
+      {prompt:'In this moment, I’m busy.', answer:'At this moment, I’m busy.', required:['at this moment'], mistake:'at this moment'},
+      {prompt:'At the past, life was different.', answer:'In the past, life was different.', required:['in the past'], mistake:'in the past'},
+      {prompt:'He doesn’t have no money.', answer:'He doesn’t have any money.', required:['have any money'], mistake:'no double negative'},
+    ]
+  },
+  {
+    id:'ex2',
+    title:'Упражнение 2 · Write it down by sound',
+    instr:'Нажми 🔊 и послушай слово, затем впиши то, что услышал(а). Транскрипция — подсказка.',
+    items:[
+      {prompt:'/əˌsoʊsiˈeɪʃn/', speak:'association', answer:'association', required:['association'], mistake:'association (звучание)'},
+      {prompt:'/hoʊˈtel/', speak:'hotel', answer:'hotel', required:['hotel'], mistake:'hotel (ударение)'},
+      {prompt:'/ˈænsərz/', speak:'answers', answer:'answers', required:['answers'], mistake:'answers (звучание)'},
+      {prompt:'/ʃiːp/', speak:'sheep', answer:'sheep', required:['sheep'], mistake:'sheep (звучание)'},
+      {prompt:'/fɪʃ/', speak:'fish', answer:'fish', required:['fish'], mistake:'fish (звучание)'},
+      {prompt:'/ˈmoʊmənt/', speak:'moment', answer:'moment', required:['moment'], mistake:'moment (звучание)'},
+      {prompt:'/pæst/', speak:'past', answer:'past', required:['past'], mistake:'past (звучание)'},
+      {prompt:'/ˈɔːlsoʊ/', speak:'also', answer:'also', required:['also'], mistake:'also (звучание)'},
+      {prompt:'/hɜːrd/', speak:'heard', answer:'heard', required:['heard'], mistake:'heard (звучание)'},
+      {prompt:'/ˈeniθɪŋ/', speak:'anything', answer:'anything', required:['anything'], mistake:'anything (звучание)'},
+    ]
+  },
+  {
+    id:'ex3',
+    title:'Упражнение 3 · Контекст',
+    instr:'Впиши одно недостающее слово / предлог, подходящее по контексту и по правилам выше.',
+    items:[
+      {prompt:'___ you heard of Shakespeare?', answer:'Have', required:['have'], mistake:'have you heard of'},
+      {prompt:'Do you ___ my sister personally?', answer:'know', required:['know'], mistake:'do you know'},
+      {prompt:'I don’t know ___ about cars.', answer:'anything', required:['anything'], mistake:'no double negative'},
+      {prompt:'The hotel is closely ___ with a famous chain.', answer:'associated', required:['associated'], mistake:'associated with'},
+      {prompt:'Their ___ with the local university helped the project.', answer:'association', required:['association'], mistake:'association'},
+      {prompt:'We are meeting ___ this moment.', answer:'at', required:['at'], mistake:'at this moment'},
+      {prompt:'___ the past, people wrote letters.', answer:'In', required:['in'], mistake:'in the past'},
+      {prompt:'All my ___ were correct.', answer:'answers', required:['answers'], mistake:'answers'},
+      {prompt:'I saw two ___ crossing the road.', answer:'sheep', required:['sheep'], mistake:'sheep (мн.ч.)'},
+      {prompt:'She ___ speaks French.', answer:'also', required:['also'], mistake:'место also'},
+    ]
+  },
+  {
+    id:'ex4',
+    title:'Упражнение 4 · Rephrase',
+    instr:'Перефразируй предложение, используя нужную конструкцию из правил выше.',
+    items:[
+      {prompt:'Is Elon Musk someone you know about, even though you\'ve never met him?', answer:'Have you heard of Elon Musk?', required:['have you heard of elon musk'], mistake:'have you heard of'},
+      {prompt:'I know nothing about it. (перефразируй с don\'t)', answer:'I don’t know anything about it.', required:['dont know anything'], mistake:'no double negative'},
+      {prompt:'I drink tea. I drink coffee also. (объедини правильно)', answer:'I also drink coffee.', required:['also drink coffee'], mistake:'место also'},
+      {prompt:'Right now, I\'m busy. (замени right now)', answer:'At this moment, I’m busy.', required:['at this moment'], mistake:'at this moment'},
+      {prompt:'Before, life was different. (замени before)', answer:'In the past, life was different.', required:['in the past'], mistake:'in the past'},
+      {prompt:'I saw one sheep. Then I saw one more sheep.', answer:'I saw two sheep.', required:['two sheep'], mistake:'sheep (мн.ч.)'},
+      {prompt:'I caught one fish. Then another one.', answer:'I caught two fish.', required:['two fish'], mistake:'fish (мн.ч.)'},
+      {prompt:'This brand and that scandal are connected.', answer:'This brand is associated with that scandal.', required:['is associated with'], mistake:'associated with'},
+      {prompt:'The connection between the two companies grew stronger.', answer:'Their association grew stronger.', required:['association'], mistake:'association'},
+      {prompt:'I was hungry also. (исправь порядок слов)', answer:'I was also hungry.', required:['was also hungry'], mistake:'место also'},
+    ]
+  },
+];
+
+/* ---------- render exercises ---------- */
+const root = document.getElementById('exercisesRoot');
+
+exercises.forEach(ex=>{
+  const block = document.createElement('section');
+  block.className = 'ex-block';
+
+  const header = document.createElement('h2');
+  header.className = 'section-title';
+  header.textContent = ex.title;
+  block.appendChild(header);
+
+  const instr = document.createElement('p');
+  instr.className = 'instructions';
+  instr.textContent = ex.instr;
+  block.appendChild(instr);
+
+  const toolbar = document.createElement('div');
+  toolbar.className = 'ex-toolbar';
+  const checkBtn = document.createElement('button');
+  checkBtn.className = 'primary';
+  checkBtn.textContent = 'Проверить всё';
+  const showBtn = document.createElement('button');
+  showBtn.className = 'ghost';
+  showBtn.textContent = 'Показать все ответы';
+  const scoreBadge = document.createElement('span');
+  scoreBadge.className = 'score-badge';
+  toolbar.appendChild(checkBtn);
+  toolbar.appendChild(showBtn);
+  toolbar.appendChild(scoreBadge);
+  block.appendChild(toolbar);
+
+  const inputs = [];
+
+  ex.items.forEach((item, i)=>{
+    const row = document.createElement('div');
+    row.className = 'item';
+
+    const idx = document.createElement('div');
+    idx.className = 'idx';
+    idx.textContent = (i+1)+'.';
+    row.appendChild(idx);
+
+    const body = document.createElement('div');
+
+    const p = document.createElement('p');
+    p.className = 'prompt';
+    if(item.speak){
+      p.innerHTML = `<span class="ipa">${item.prompt}</span>`;
+      const sBtn = document.createElement('button');
+      sBtn.className = 'speak-btn';
+      sBtn.textContent = '🔊 слушать';
+      sBtn.onclick = ()=>speak(item.speak);
+      p.appendChild(sBtn);
+    } else {
+      p.textContent = item.prompt;
+    }
+    body.appendChild(p);
+
+    const rowLine = document.createElement('div');
+    rowLine.className = 'item-row';
+
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.placeholder = 'напиши здесь…';
+    rowLine.appendChild(input);
+
+    const mark = document.createElement('span');
+    mark.className = 'mark';
+    rowLine.appendChild(mark);
+
+    const showOneBtn = document.createElement('button');
+    showOneBtn.className = 'small-btn';
+    showOneBtn.textContent = 'показать ответ';
+    rowLine.appendChild(showOneBtn);
+
+    body.appendChild(rowLine);
+
+    const reveal = document.createElement('div');
+    reveal.className = 'answer-reveal';
+    reveal.innerHTML = `Правильный вариант: <b>${item.answer}</b>`;
+    body.appendChild(reveal);
+
+    showOneBtn.onclick = ()=>{
+      reveal.classList.toggle('show');
+    };
+
+    row.appendChild(body);
+    block.appendChild(row);
+
+    inputs.push({input, mark, reveal, item, checked:false});
+  });
+
+  checkBtn.onclick = ()=>{
+    let correctCount = 0;
+    inputs.forEach(rec=>{
+      const val = normalize(rec.input.value);
+      const isCorrect = rec.item.required.every(req => val.includes(normalize(req)));
+      rec.input.classList.remove('correct','wrong');
+      if(isCorrect){
+        rec.input.classList.add('correct');
+        rec.mark.textContent = '✓';
+        rec.mark.className = 'mark ok';
+        correctCount++;
+      } else {
+        rec.input.classList.add('wrong');
+        rec.mark.textContent = '✗';
+        rec.mark.className = 'mark no';
+        registerMistake(rec.item.mistake);
+      }
+    });
+    scoreBadge.textContent = `результат: ${correctCount} / ${inputs.length}`;
+  };
+
+  showBtn.onclick = ()=>{
+    const anyHidden = inputs.some(rec=>!rec.reveal.classList.contains('show'));
+    inputs.forEach(rec=>{
+      if(anyHidden) rec.reveal.classList.add('show');
+      else rec.reveal.classList.remove('show');
+    });
+    showBtn.textContent = anyHidden ? 'Скрыть все ответы' : 'Показать все ответы';
+  };
+
+  root.appendChild(block);
+});
+
+renderMistakes();
+</script>
+</body>
+</html>
