@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Health &amp; Body — тренажёр лексики</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#eef2f1;
+    --card:#ffffff;
+    --ink:#132029;
+    --ink-soft:#4b5f6b;
+    --line:#d3dedb;
+    --teal:#0b7a75;
+    --teal-dark:#075c58;
+    --coral:#b8433a;
+    --amber:#c98a1e;
+    --ok:#1c7a52;
+    --radius:14px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',system-ui,-apple-system,sans-serif;
+    font-size:15.5px;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  .shell{max-width:1180px;margin:0 auto;padding:28px 20px 90px}
+  .layout{display:grid;grid-template-columns:minmax(0,1fr) 258px;gap:26px;align-items:start}
+
+  /* ---------- header ---------- */
+  header.hero{
+    background:linear-gradient(160deg,#0d2a2c 0%,#123b3a 60%,#14494a 100%);
+    color:#eaf4f2;border-radius:20px;padding:30px 30px 26px;margin-bottom:24px;position:relative;overflow:hidden;
+  }
+  header.hero h1{
+    font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:clamp(26px,4vw,40px);
+    letter-spacing:-.02em;margin:0 0 8px;
+  }
+  header.hero p{margin:0;max-width:56ch;color:#a9cbc6;font-size:14.5px}
+  .pulse{position:absolute;right:-40px;top:-30px;width:220px;height:220px;border-radius:50%;
+    border:1px solid rgba(160,220,212,.35);animation:breath 6s ease-in-out infinite}
+  .pulse:after{content:"";position:absolute;inset:34px;border-radius:50%;border:1px solid rgba(160,220,212,.25);}
+  @keyframes breath{0%,100%{transform:scale(.86);opacity:.5}50%{transform:scale(1.06);opacity:1}}
+  @media (prefers-reduced-motion:reduce){.pulse{animation:none}}
+  .scoreline{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+  .chip{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);color:#dff0ed;
+    font-family:'IBM Plex Mono',monospace;font-size:12.5px;padding:5px 11px;border-radius:999px}
+
+  /* ---------- cards ---------- */
+  section.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:22px 24px;margin-bottom:20px}
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--teal);margin-bottom:6px}
+  h2{font-family:'Space Grotesk',sans-serif;font-size:20px;margin:0 0 4px;letter-spacing:-.01em}
+  .task{color:var(--ink-soft);font-size:14px;margin:0 0 16px}
+
+  /* ---------- word table ---------- */
+  table.words{width:100%;border-collapse:collapse}
+  table.words td{border-bottom:1px solid var(--line);padding:9px 8px;vertical-align:top}
+  table.words tr:last-child td{border-bottom:none}
+  .en{font-weight:600;white-space:nowrap}
+  .ipa{font-size:14px;color:var(--teal-dark);white-space:nowrap}
+  .ru{color:var(--ink-soft);font-size:14px}
+  .note{display:block;font-size:12.5px;color:var(--amber);margin-top:2px}
+  .say{background:none;border:1px solid var(--line);border-radius:8px;cursor:pointer;
+    font-size:14px;padding:2px 7px;color:var(--teal);line-height:1.5}
+  .say:hover{background:#f0f7f6;border-color:var(--teal)}
+
+  /* ---------- exercises ---------- */
+  .item{display:grid;grid-template-columns:26px minmax(0,1fr) 190px;gap:10px;align-items:start;
+    padding:9px 0;border-bottom:1px dashed #e5eceb}
+  .item:last-of-type{border-bottom:none}
+  .num{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:#9aaeb4;padding-top:9px}
+  .q{padding-top:8px;font-size:15px}
+  .q b{background:#fdf3dd;font-weight:600;padding:0 3px;border-radius:3px}
+  .q .gap{font-family:'IBM Plex Mono',monospace;letter-spacing:.06em}
+  .q .hint{display:block;font-size:12.5px;color:var(--ink-soft)}
+  .cell{display:flex;flex-direction:column;gap:4px}
+  input[type=text]{width:100%;font:inherit;padding:7px 10px;border:1px solid var(--line);
+    border-radius:9px;background:#fbfdfc;color:var(--ink)}
+  input[type=text]:focus,textarea:focus{outline:2px solid var(--teal);outline-offset:1px;border-color:var(--teal)}
+  input.ok{border-color:var(--ok);background:#f1f9f5}
+  input.bad{border-color:var(--coral);background:#fdf3f2}
+  .mark{font-size:12.5px;font-weight:600;min-height:1em}
+  .mark.ok{color:var(--ok)}
+  .mark.bad{color:var(--coral)}
+  .reveal{font-size:13px;color:var(--teal-dark);background:#eff7f6;border-left:2px solid var(--teal);
+    padding:3px 8px;border-radius:0 6px 6px 0;display:none}
+  .reveal.show{display:block}
+  .wide .item{grid-template-columns:26px minmax(0,1fr)}
+  .wide input[type=text]{margin-top:6px}
+  textarea{width:100%;font:inherit;padding:9px 11px;border:1px solid var(--line);border-radius:9px;
+    background:#fbfdfc;resize:vertical;min-height:44px;color:var(--ink)}
+
+  .controls{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;align-items:center}
+  button.act{font:inherit;font-weight:500;padding:8px 15px;border-radius:9px;cursor:pointer;border:1px solid var(--teal);
+    background:var(--teal);color:#fff}
+  button.act:hover{background:var(--teal-dark)}
+  button.ghost{background:#fff;color:var(--teal-dark)}
+  button.ghost:hover{background:#f0f7f6}
+  button.plain{background:#fff;border-color:var(--line);color:var(--ink-soft)}
+  button.plain:hover{border-color:var(--ink-soft)}
+  .result{font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--ink-soft)}
+
+  /* ---------- sidebar ---------- */
+  aside{position:sticky;top:20px}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px}
+  .panel h3{font-family:'Space Grotesk',sans-serif;font-size:15px;margin:0 0 3px}
+  .panel .sub{font-size:12.5px;color:var(--ink-soft);margin:0 0 12px}
+  ul.prob{list-style:none;margin:0;padding:0;max-height:52vh;overflow:auto}
+  ul.prob li{display:flex;align-items:center;gap:7px;padding:7px 0;border-bottom:1px solid #eef3f2;font-size:14px}
+  ul.prob li:last-child{border-bottom:none}
+  ul.prob .w{flex:1;min-width:0}
+  ul.prob .w span{display:block;font-size:12px;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .badge{font-family:'IBM Plex Mono',monospace;font-size:11.5px;background:#fdeeec;color:var(--coral);
+    border-radius:999px;padding:2px 7px}
+  .empty{font-size:13px;color:#93a6ac;padding:6px 0}
+  .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);opacity:0;
+    background:var(--ink);color:#fff;padding:10px 18px;border-radius:999px;font-size:14px;
+    transition:.25s;pointer-events:none;z-index:50}
+  .toast.show{opacity:1;transform:translateX(-50%)}
+
+  @media(max-width:900px){
+    .layout{grid-template-columns:1fr}
+    aside{position:static;order:-1}
+    .item{grid-template-columns:22px minmax(0,1fr)}
+    .item .cell{grid-column:2}
+    ul.prob{max-height:none}
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+  <header class="hero">
+    <div class="pulse" aria-hidden="true"></div>
+    <h1>Health &amp; Body: тренажёр лексики</h1>
+    <p>Сначала повтори слова и послушай их. Потом 9 упражнений — везде нужно писать слова руками — и блок со своими идеями.
+       Каждое упражнение можно проверить и посмотреть ответы, а слова с ошибками попадают в список справа.</p>
+    <div class="scoreline">
+      <span class="chip" id="totalScore">Верно: 0 из 0</span>
+      <span class="chip" id="probCount">Проблемных слов: 0</span>
+    </div>
+  </header>
+
+  <div class="layout">
+    <main>
+      <section class="card">
+        <div class="eyebrow">Разминка</div>
+        <h2>Слова, транскрипция, перевод</h2>
+        <p class="task">Нажми 🔊 у слова, чтобы прослушать. Жёлтым отмечены места, где чаще всего ошибаются.</p>
+        <table class="words"><tbody id="wordRows"></tbody></table>
+        <div class="controls">
+          <button class="act ghost" id="playAll">🔊 Прослушать все слова</button>
+          <button class="act plain" id="stopAll">Остановить</button>
+        </div>
+      </section>
+
+      <div id="exercises"></div>
+
+      <section class="card" id="openCard">
+        <div class="eyebrow">Упражнение 10</div>
+        <h2>Закончи предложения своими идеями</h2>
+        <p class="task">Здесь нет правильных ответов — пиши свои мысли, используя лексику урока. Потом скопируй всё одной кнопкой.</p>
+        <div id="openItems"></div>
+        <div class="controls">
+          <button class="act" id="copyOpen">Скопировать мои предложения</button>
+          <button class="act plain" id="copyEverything">Скопировать все ответы (все упражнения)</button>
+          <button class="act plain" id="clearOpen">Очистить</button>
+        </div>
+      </section>
+    </main>
+
+    <aside>
+      <div class="panel">
+        <h3>Проблемные слова</h3>
+        <p class="sub">Сюда попадает всё, где была ошибка.</p>
+        <ul class="prob" id="probList"></ul>
+        <div class="controls">
+          <button class="act plain" id="clearProb">Очистить список</button>
+        </div>
+      </div>
+    </aside>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============ 1. WORD BANK ============ */
+const WORDS = {
+  concentrate_less:{en:"concentrate less", ipa:"/ˈkɒnsntreɪt les/", ru:"хуже концентрироваться", say:"concentrate less"},
+  less_concentrated:{en:"be less concentrated", ipa:"/biː les ˈkɒnsntreɪtɪd/", ru:"быть менее сосредоточенным", say:"be less concentrated"},
+  enough_sleep:{en:"enough sleep", ipa:"/ɪˈnʌf sliːp/", ru:"достаточно сна", say:"enough sleep"},
+  organ:{en:"organ", ipa:"/ˈɔːɡən/", ru:"орган (тела)", say:"organ"},
+  breath:{en:"breath", ipa:"/breθ/", ru:"дыхание (сущ.)", note:"короткое [e], глухое th", say:"breath"},
+  breathe:{en:"breathe", ipa:"/briːð/", ru:"дышать (глагол)", note:"долгое [iː], звонкое th, на конце -e", say:"breathe"},
+  lack_of_exercise:{en:"lack of exercise", ipa:"/læk əv ˈeksəsaɪz/", ru:"недостаток физической активности", say:"lack of exercise"},
+  hardly_ever:{en:"hardly ever", ipa:"/ˈhɑːdli ˈevə/", ru:"почти никогда", note:"не hardly never — второго отрицания нет", say:"hardly ever"},
+  keep_fit:{en:"keep fit", ipa:"/kiːp fɪt/", ru:"держать себя в форме", say:"keep fit"},
+  keep_under_control:{en:"keep … under control", ipa:"/kiːp ˈʌndə kənˈtrəʊl/", ru:"держать … под контролем", note:"under control — без the", say:"keep stress under control"},
+  fast_carbs:{en:"fast (simple) carbs", ipa:"/fɑːst kɑːbz/", ru:"быстрые (простые) углеводы", note:"полностью: carbohydrates /ˌkɑːbəˈhaɪdreɪts/", say:"fast carbs, simple carbohydrates"},
+  complex_carbs:{en:"complex carbs", ipa:"/ˈkɒmpleks kɑːbz/", ru:"сложные углеводы", say:"complex carbs"},
+  fats:{en:"fats", ipa:"/fæts/", ru:"жиры", say:"fats"},
+  proteins:{en:"proteins", ipa:"/ˈprəʊtiːnz/", ru:"белки", say:"proteins"},
+  oxygen:{en:"oxygen", ipa:"/ˈɒksɪdʒən/", ru:"кислород", note:"g читается как [дж]", say:"oxygen"},
+  no_opinion:{en:"I don't have an opinion about this topic.", ipa:"/əˈpɪnjən/", ru:"У меня нет мнения по этой теме.", note:"an opinion — с артиклем", say:"I don't have an opinion about this topic."},
+  suggest:{en:"suggest", ipa:"/səˈdʒest/", ru:"предлагать, советовать", note:"НЕ «саггест»: gg = [дж]; далее suggest doing", say:"suggest, suggest doing"},
+  percent:{en:"percent", ipa:"/pəˈsent/", ru:"процент(ов)", note:"всегда в ед. ч.: 50 percent, не percents", say:"fifty percent"},
+  can_cause:{en:"can cause", ipa:"/kən kɔːz/", ru:"может вызывать", note:"без be: can cause, не can be cause", say:"can cause"},
+  first_time:{en:"I've heard it for the first time", ipa:"/hɜːd/", ru:"слышу это впервые", say:"I've heard it for the first time"},
+  combine_meal:{en:"combine with your meal", ipa:"/kəmˈbaɪn/", ru:"сочетать с приёмом пищи", say:"It's better to combine it with your meal."}
+};
+
+/* ============ 2. SPEECH ============ */
+let voiceEN = null;
+function pickVoice(){
+  const v = speechSynthesis.getVoices();
+  voiceEN = v.find(x=>/en-GB/i.test(x.lang)) || v.find(x=>/^en/i.test(x.lang)) || null;
+}
+if('speechSynthesis' in window){ pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
+function speak(text, rate){
+  if(!('speechSynthesis' in window)){ toast('Браузер не поддерживает озвучку'); return; }
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang='en-GB'; u.rate = rate || .85; if(voiceEN) u.voice = voiceEN;
+  speechSynthesis.speak(u);
+}
+function speakQueue(list){
+  if(!('speechSynthesis' in window)) return;
+  speechSynthesis.cancel();
+  list.forEach(t=>{
+    const u = new SpeechSynthesisUtterance(t);
+    u.lang='en-GB'; u.rate=.85; if(voiceEN) u.voice=voiceEN;
+    speechSynthesis.speak(u);
+  });
+}
+
+/* ============ 3. WORD TABLE ============ */
+const rows = document.getElementById('wordRows');
+Object.entries(WORDS).forEach(([key,w])=>{
+  const tr = document.createElement('tr');
+  tr.innerHTML = `<td class="en">${w.en}</td>
+    <td class="ipa">${w.ipa}</td>
+    <td class="ru">${w.ru}${w.note?`<span class="note">⚠ ${w.note}</span>`:''}</td>
+    <td style="width:44px;text-align:right"></td>`;
+  const b = document.createElement('button');
+  b.className='say'; b.textContent='🔊'; b.title='Прослушать';
+  b.onclick = ()=>speak(w.say);
+  tr.lastElementChild.appendChild(b);
+  rows.appendChild(tr);
+});
+document.getElementById('playAll').onclick = ()=>speakQueue(Object.values(WORDS).map(w=>w.say));
+document.getElementById('stopAll').onclick = ()=>speechSynthesis.cancel();
+
+/* ============ 4. EXERCISE DATA ============ */
+const EXS = [
+{ id:'listen', eyebrow:'Упражнение 1', title:'Послушай и запиши слово', wide:true,
+  task:'Нажми 🔊, прослушай и напиши то, что услышал. Смотри на подсказку в скобках — она поможет выбрать нужное слово.',
+  audio:true,
+  items:[
+    {audio:'breathe', hint:'глагол', a:['breathe'], tag:'breathe'},
+    {audio:'breath', hint:'существительное', a:['breath'], tag:'breath'},
+    {audio:'oxygen', hint:'газ', a:['oxygen'], tag:'oxygen'},
+    {audio:'proteins', hint:'мн. ч.', a:['proteins'], tag:'proteins'},
+    {audio:'suggest', hint:'глагол', a:['suggest'], tag:'suggest'},
+    {audio:'organ', hint:'часть тела', a:['organ'], tag:'organ'},
+    {audio:'carbohydrates', hint:'полное слово, мн. ч.', a:['carbohydrates'], tag:'fast_carbs'},
+    {audio:'fifty percent', hint:'два слова, цифру пиши словом', a:['fifty percent'], tag:'percent'},
+    {audio:'hardly ever', hint:'два слова', a:['hardly ever'], tag:'hardly_ever'},
+    {audio:'keep fit', hint:'два слова', a:['keep fit'], tag:'keep_fit'}
+  ]},
+
+{ id:'letters', eyebrow:'Упражнение 2', title:'Вставь пропущенные буквы',
+  task:'Напиши слово полностью и правильно.',
+  items:[
+    {q:'<span class="gap">br _ _ the</span> — дышать', a:['breathe'], tag:'breathe'},
+    {q:'<span class="gap">br _ _ th</span> — дыхание', a:['breath'], tag:'breath'},
+    {q:'<span class="gap">o _ ygen</span> — кислород', a:['oxygen'], tag:'oxygen'},
+    {q:'<span class="gap">pro _ eins</span> — белки', a:['proteins'], tag:'proteins'},
+    {q:'<span class="gap">su _ _ est</span> — советовать', a:['suggest'], tag:'suggest'},
+    {q:'<span class="gap">car _ ohy _ rates</span> — углеводы', a:['carbohydrates'], tag:'fast_carbs'},
+    {q:'<span class="gap">or _ an</span> — орган', a:['organ'], tag:'organ'},
+    {q:'<span class="gap">per _ ent</span> — процент', a:['percent'], tag:'percent'},
+    {q:'<span class="gap">c _ mpl _ x</span> — сложный', a:['complex'], tag:'complex_carbs'},
+    {q:'<span class="gap">ex _ rc _ se</span> — физическая активность', a:['exercise'], tag:'lack_of_exercise'}
+  ]},
+
+{ id:'translate', eyebrow:'Упражнение 3', title:'Переведи с русского на английский', wide:true,
+  task:'Пиши так, как звучит фраза из списка слов.',
+  items:[
+    {q:'недостаток физической активности', a:['lack of exercise'], tag:'lack_of_exercise'},
+    {q:'достаточно сна', a:['enough sleep'], tag:'enough_sleep'},
+    {q:'держать стресс под контролем', a:['keep stress under control','to keep stress under control'], tag:'keep_under_control'},
+    {q:'держать себя в форме', a:['keep fit','to keep fit'], tag:'keep_fit'},
+    {q:'почти никогда', a:['hardly ever'], tag:'hardly_ever'},
+    {q:'сложные углеводы', a:['complex carbs','complex carbohydrates'], tag:'complex_carbs'},
+    {q:'Он хуже концентрируется.', a:['he concentrates less'], tag:'concentrate_less'},
+    {q:'У меня нет мнения по этой теме.', a:["i don't have an opinion about this topic",'i do not have an opinion about this topic'], tag:'no_opinion'},
+    {q:'Это может вызывать проблемы.', a:['it can cause problems','this can cause problems'], tag:'can_cause'},
+    {q:'Я слышу это впервые.', a:["i've heard it for the first time",'i have heard it for the first time'], tag:'first_time'}
+  ]},
+
+{ id:'defs', eyebrow:'Упражнение 4', title:'Дефиниция → слово', wide:true,
+  task:'Прочитай определение и напиши слово или фразу из списка.',
+  items:[
+    {q:'the air that goes into and out of your lungs <span class="hint">(noun)</span>', a:['breath'], tag:'breath'},
+    {q:'to take air into your lungs and let it out <span class="hint">(verb)</span>', a:['breathe','to breathe'], tag:'breathe'},
+    {q:'a part of the body with a special job, e.g. the heart or the liver', a:['organ','an organ'], tag:'organ'},
+    {q:'one part in every hundred', a:['percent','per cent','one percent'], tag:'percent'},
+    {q:'the gas in the air that every cell needs to live', a:['oxygen'], tag:'oxygen'},
+    {q:'to stay healthy and in good physical shape', a:['keep fit','to keep fit'], tag:'keep_fit'},
+    {q:'almost never <span class="hint">(2 words)</span>', a:['hardly ever'], tag:'hardly_ever'},
+    {q:'the nutrients that build and repair your muscles', a:['proteins','protein'], tag:'proteins'},
+    {q:'sugars that give you quick energy and then you feel tired <span class="hint">(2 words)</span>', a:['fast carbs','simple carbs','fast carbohydrates','simple carbohydrates'], tag:'fast_carbs'},
+    {q:'to tell someone that something is a good idea <span class="hint">(verb)</span>', a:['suggest','to suggest'], tag:'suggest'}
+  ]},
+
+{ id:'colloc', eyebrow:'Упражнение 5', title:'Сочетаемость: допиши слово',
+  task:'Напиши одно пропущенное слово так, чтобы получилась естественная фраза.',
+  items:[
+    {q:'to keep ____ <span class="hint">(быть в форме)</span>', a:['fit'], tag:'keep_fit'},
+    {q:'to keep stress under ____', a:['control'], tag:'keep_under_control'},
+    {q:'____ of exercise', a:['lack'], tag:'lack_of_exercise'},
+    {q:'to get ____ sleep', a:['enough'], tag:'enough_sleep'},
+    {q:'to take a deep ____', a:['breath'], tag:'breath'},
+    {q:'seventy ____ of teenagers', a:['percent','per cent'], tag:'percent'},
+    {q:'____ carbs <span class="hint">(дают быструю энергию)</span>', a:['fast','simple'], tag:'fast_carbs'},
+    {q:'____ carbs <span class="hint">(дают энергию надолго)</span>', a:['complex'], tag:'complex_carbs'},
+    {q:'I ____ ever eat fast food.', a:['hardly'], tag:'hardly_ever'},
+    {q:'Smoking can ____ serious illnesses.', a:['cause'], tag:'can_cause'}
+  ]},
+
+{ id:'context', eyebrow:'Упражнение 6', title:'Контекст: одно слово в пропуск', wide:true,
+  task:'Вставь одно подходящее слово из списка лексики.',
+  items:[
+    {q:'Blood carries ____ to every organ in your body.', a:['oxygen'], tag:'oxygen'},
+    {q:"If you don't get ____ sleep, you can't think clearly.", a:['enough'], tag:'enough_sleep'},
+    {q:'The heart is probably the most important ____ in the body.', a:['organ'], tag:'organ'},
+    {q:'Hold your ____ for ten seconds and then relax.', a:['breath'], tag:'breath'},
+    {q:"It's difficult to ____ when the air is polluted.", a:['breathe'], tag:'breathe'},
+    {q:'____ of exercise can cause heart problems.', a:['lack'], tag:'lack_of_exercise'},
+    {q:'I ____ ever drink coffee in the evening.', a:['hardly'], tag:'hardly_ever'},
+    {q:'Doctors ____ eating more vegetables and less sugar.', a:['suggest'], tag:'suggest'},
+    {q:"It's better to ____ vitamins with your meal.", a:['combine'], tag:'combine_meal'},
+    {q:'When you sleep badly, you ____ less at school.', a:['concentrate'], tag:'concentrate_less'}
+  ]},
+
+{ id:'mistakes', eyebrow:'Упражнение 7', title:'Find two mistakes', wide:true,
+  task:'В каждом предложении ровно две ошибки. Напиши исправленное предложение целиком.',
+  items:[
+    {q:'Lack of exercise can be cause many problem.', a:['lack of exercise can cause many problems'], tag:'can_cause'},
+    {q:'I hardly never breath deeply when I run.', a:['i hardly ever breathe deeply when i run'], tag:'hardly_ever'},
+    {q:"Fifty percents of student don't get enough sleep.", a:["fifty percent of students don't get enough sleep",'fifty percent of students do not get enough sleep'], tag:'percent'},
+    {q:'He suggest to keep fit every day.', a:['he suggests keeping fit every day'], tag:'suggest'},
+    {q:'Keep your stress under the control and breath slowly.', a:['keep your stress under control and breathe slowly'], tag:'keep_under_control'},
+    {q:"I don't have opinion about these topic.", a:["i don't have an opinion about this topic",'i do not have an opinion about this topic'], tag:'no_opinion'},
+    {q:'Fast carbs gives you energy, but complex carb are better.', a:['fast carbs give you energy but complex carbs are better'], tag:'complex_carbs'},
+    {q:'Oxygen go to every organ when you breath.', a:['oxygen goes to every organ when you breathe'], tag:'oxygen'},
+    {q:'I have heared it for first time.', a:["i've heard it for the first time",'i have heard it for the first time'], tag:'first_time'},
+    {q:'Sleeping little make you be less concentrate.', a:['sleeping little makes you be less concentrated'], tag:'less_concentrated'}
+  ]},
+
+{ id:'after', eyebrow:'Упражнение 8', title:'What usually comes after?',
+  task:'Напиши слово, которое обычно идёт дальше.',
+  items:[
+    {q:'lack of …', a:['exercise'], tag:'lack_of_exercise'},
+    {q:'keep … <span class="hint">(о форме)</span>', a:['fit'], tag:'keep_fit'},
+    {q:'take a deep …', a:['breath'], tag:'breath'},
+    {q:'keep your weight under …', a:['control'], tag:'keep_under_control'},
+    {q:'hardly …', a:['ever'], tag:'hardly_ever'},
+    {q:'complex …', a:['carbs','carbohydrates'], tag:'complex_carbs'},
+    {q:'eighty …', a:['percent','per cent'], tag:'percent'},
+    {q:'get enough …', a:['sleep'], tag:'enough_sleep'},
+    {q:"I don't have an opinion about this …", a:['topic'], tag:'no_opinion'},
+    {q:'Junk food can … <span class="hint">(вызывать)</span>', a:['cause'], tag:'can_cause'}
+  ]},
+
+{ id:'replace', eyebrow:'Упражнение 9', title:'Replace the highlighted word', wide:true,
+  task:'Замени выделенную часть лексикой урока. Пиши только новое слово или фразу.',
+  items:[
+    {q:'I <b>almost never</b> eat fast food.', a:['hardly ever'], tag:'hardly_ever'},
+    {q:'<b>Not enough</b> exercise is dangerous for your heart.', a:['lack of'], tag:'lack_of_exercise'},
+    {q:'She wants to <b>stay in good shape</b>.', a:['keep fit'], tag:'keep_fit'},
+    {q:'Try to <b>control</b> your stress. → keep your stress …', a:['under control'], tag:'keep_under_control'},
+    {q:'<b>Sugars that work very quickly</b> give you energy for 20 minutes.', a:['fast carbs','simple carbs','fast carbohydrates'], tag:'fast_carbs'},
+    {q:'My coach <b>recommends</b> drinking more water.', a:['suggests'], tag:'suggest'},
+    {q:'Take a deep <b>inhalation</b> and count to five.', a:['breath'], tag:'breath'},
+    {q:'The <b>gas we need to live</b> goes to the blood in your lungs.', a:['oxygen'], tag:'oxygen'},
+    {q:'Ten <b>percents</b> of my class do sport every day.', a:['percent','per cent'], tag:'percent'},
+    {q:'Stress <b>can be cause of</b> many illnesses.', a:['can cause'], tag:'can_cause'}
+  ]}
+];
+
+const OPEN_ITEMS = [
+  "If I don't get enough sleep, …",
+  "Lack of exercise can …",
+  "I hardly ever …",
+  "To keep fit, I …",
+  "I try to keep … under control because …",
+  "Fast carbs are good when …, but complex carbs …",
+  "Every organ needs oxygen because …",
+  "When I feel nervous, I breathe …",
+  "I don't have an opinion about … because …",
+  "My doctor suggests …"
+];
+
+/* ============ 5. ANSWER CHECKING ============ */
+function norm(s){
+  return (s||'')
+    .toLowerCase()
+    .replace(/[’‘`´]/g,"'")
+    .replace(/[.,!?;:"“”()]/g,' ')
+    .replace(/\s*-\s*/g,' ')
+    .replace(/\s+/g,' ')
+    .trim();
+}
+function isRight(val, answers){
+  const v = norm(val);
+  if(!v) return false;
+  return answers.some(a=>norm(a)===v);
+}
+
+/* ============ 6. PROBLEM WORDS ============ */
+const problems = new Map();
+function addProblem(tag){
+  if(!tag || !WORDS[tag]) return;
+  problems.set(tag,(problems.get(tag)||0)+1);
+  renderProblems();
+}
+function renderProblems(){
+  const ul = document.getElementById('probList');
+  ul.innerHTML='';
+  const list=[...problems.entries()].sort((a,b)=>b[1]-a[1]);
+  document.getElementById('probCount').textContent = 'Проблемных слов: '+list.length;
+  if(!list.length){ ul.innerHTML='<li class="empty">Пока пусто. Проверь упражнение — сюда попадут слова с ошибками.</li>'; return; }
+  list.forEach(([tag,n])=>{
+    const w=WORDS[tag], li=document.createElement('li');
+    li.innerHTML=`<div class="w">${w.en}<span>${w.ipa} · ${w.ru}</span></div><span class="badge">×${n}</span>`;
+    const b=document.createElement('button'); b.className='say'; b.textContent='🔊';
+    b.title='Прослушать'; b.onclick=()=>speak(w.say);
+    li.appendChild(b); ul.appendChild(li);
+  });
+}
+document.getElementById('clearProb').onclick=()=>{problems.clear();renderProblems();toast('Список очищен');};
+renderProblems();
+
+/* ============ 7. RENDER EXERCISES ============ */
+const host=document.getElementById('exercises');
+EXS.forEach(ex=>{
+  const sec=document.createElement('section');
+  sec.className='card'+(ex.wide?' wide':'');
+  sec.innerHTML=`<div class="eyebrow">${ex.eyebrow}</div><h2>${ex.title}</h2><p class="task">${ex.task}</p>`;
+  const body=document.createElement('div');
+  ex.items.forEach((it,i)=>{
+    const row=document.createElement('div'); row.className='item';
+    const qHtml = ex.audio
+      ? `<span class="hint">${it.hint}</span>`
+      : it.q;
+    row.innerHTML=`<div class="num">${String(i+1).padStart(2,'0')}</div><div class="q">${qHtml}</div>`;
+    if(ex.audio){
+      const btn=document.createElement('button');
+      btn.className='say'; btn.textContent='🔊 Прослушать'; btn.style.marginBottom='4px';
+      btn.onclick=()=>speak(it.audio,.8);
+      row.children[1].prepend(btn);
+      row.children[1].insertBefore(document.createElement('br'), row.children[1].children[1]);
+    }
+    const cell=document.createElement('div'); cell.className='cell';
+    const inp=document.createElement('input');
+    inp.type='text'; inp.spellcheck=false; inp.autocapitalize='off';
+    inp.placeholder='твой ответ';
+    inp.dataset.ex=ex.id; inp.dataset.i=i;
+    inp.addEventListener('input',()=>{inp.classList.remove('ok','bad'); mark.textContent=''; mark.className='mark';});
+    inp.addEventListener('keydown',e=>{ if(e.key==='Enter') checkOne(ex,it,inp,mark,rev); });
+    const mark=document.createElement('div'); mark.className='mark';
+    const rev=document.createElement('div'); rev.className='reveal'; rev.textContent='Ответ: '+it.a[0];
+    cell.append(inp,mark,rev);
+    row.appendChild(cell);
+    body.appendChild(row);
+    it._el={inp,mark,rev};
+  });
+  sec.appendChild(body);
+
+  const ctr=document.createElement('div'); ctr.className='controls';
+  const bCheck=document.createElement('button'); bCheck.className='act'; bCheck.textContent='Проверить';
+  const bShow=document.createElement('button'); bShow.className='act ghost'; bShow.textContent='Показать ответы';
+  const bReset=document.createElement('button'); bReset.className='act plain'; bReset.textContent='Сбросить';
+  const res=document.createElement('span'); res.className='result';
+  bCheck.onclick=()=>{
+    let ok=0, blank=0;
+    ex.items.forEach(it=>{
+      if(!it._el.inp.value.trim()){ blank++; }
+      if(checkOne(ex,it,it._el.inp,it._el.mark,it._el.rev)) ok++;
+    });
+    res.textContent=`${ok} из ${ex.items.length} верно`+(blank?` · пустых: ${blank}`:'');
+    updateTotal();
+  };
+  bShow.onclick=()=>{ ex.items.forEach(it=>it._el.rev.classList.add('show')); };
+  bReset.onclick=()=>{
+    ex.items.forEach(it=>{
+      it._el.inp.value=''; it._el.inp.classList.remove('ok','bad');
+      it._el.mark.textContent=''; it._el.mark.className='mark';
+      it._el.rev.classList.remove('show');
+    });
+    res.textContent=''; updateTotal();
+  };
+  ctr.append(bCheck,bShow,bReset,res);
+  sec.appendChild(ctr);
+  host.appendChild(sec);
+});
+
+function checkOne(ex,it,inp,mark,rev){
+  const val=inp.value.trim();
+  if(!val){
+    inp.classList.remove('ok','bad'); mark.textContent=''; mark.className='mark';
+    it._ok=false; return false;
+  }
+  const good=isRight(val,it.a);
+  inp.classList.toggle('ok',good); inp.classList.toggle('bad',!good);
+  mark.className='mark '+(good?'ok':'bad');
+  mark.textContent=good?'✓ верно':'✗ ещё раз';
+  if(!good){ rev.classList.remove('show'); addProblem(it.tag); }
+  it._ok=good;
+  return good;
+}
+function updateTotal(){
+  let ok=0,total=0;
+  EXS.forEach(ex=>ex.items.forEach(it=>{ total++; if(it._ok) ok++; }));
+  document.getElementById('totalScore').textContent=`Верно: ${ok} из ${total}`;
+}
+updateTotal();
+
+/* ============ 8. OPEN-ENDED PART ============ */
+const openHost=document.getElementById('openItems');
+const openInputs=[];
+OPEN_ITEMS.forEach((stem,i)=>{
+  const row=document.createElement('div'); row.className='item';
+  row.style.gridTemplateColumns='26px minmax(0,1fr)';
+  row.innerHTML=`<div class="num">${String(i+1).padStart(2,'0')}</div>`;
+  const box=document.createElement('div');
+  box.innerHTML=`<div class="q" style="padding-top:0;font-weight:500">${stem}</div>`;
+  const ta=document.createElement('textarea');
+  ta.rows=1; ta.placeholder='продолжи по-английски…'; ta.dataset.stem=stem;
+  ta.addEventListener('input',()=>{ta.style.height='auto';ta.style.height=ta.scrollHeight+'px';});
+  box.appendChild(ta); row.appendChild(box); openHost.appendChild(row);
+  openInputs.push(ta);
+});
+
+function copyText(text,msg){
+  const done=()=>toast(msg);
+  if(navigator.clipboard&&window.isSecureContext){
+    navigator.clipboard.writeText(text).then(done,()=>fallback());
+  } else fallback();
+  function fallback(){
+    const t=document.createElement('textarea'); t.value=text;
+    t.style.position='fixed'; t.style.opacity='0'; document.body.appendChild(t);
+    t.select(); document.execCommand('copy'); t.remove(); done();
+  }
+}
+document.getElementById('copyOpen').onclick=()=>{
+  const lines=openInputs.map((ta,i)=>`${i+1}. ${ta.dataset.stem.replace(/…\s*$/,'')} ${ta.value.trim()}`.trim());
+  copyText('MY SENTENCES — Health & Body\n\n'+lines.join('\n'),'Предложения скопированы');
+};
+document.getElementById('clearOpen').onclick=()=>{
+  openInputs.forEach(ta=>{ta.value='';ta.style.height='auto';});
+};
+document.getElementById('copyEverything').onclick=()=>{
+  let out=['HEALTH & BODY — MY ANSWERS',''];
+  EXS.forEach(ex=>{
+    out.push(ex.eyebrow+'. '+ex.title);
+    ex.items.forEach((it,i)=>{
+      out.push(`  ${i+1}. ${it._el.inp.value.trim()||'—'}`);
+    });
+    out.push('');
+  });
+  out.push('Упражнение 10. My own sentences');
+  openInputs.forEach((ta,i)=>out.push(`  ${i+1}. ${ta.dataset.stem.replace(/…\s*$/,'')} ${ta.value.trim()}`.trimEnd()));
+  if(problems.size){
+    out.push('','Проблемные слова:');
+    [...problems.entries()].sort((a,b)=>b[1]-a[1]).forEach(([t,n])=>out.push(`  ${WORDS[t].en} ×${n}`));
+  }
+  copyText(out.join('\n'),'Все ответы скопированы');
+};
+
+/* ============ 9. TOAST ============ */
+let toastTimer;
+function toast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>el.classList.remove('show'),1900);
+}
+</script>
+</body>
+</html>
