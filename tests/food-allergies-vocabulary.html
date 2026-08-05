@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Allergies & Food — тренажёр лексики</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Golos+Text:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#17150F;
+  --ink-soft:#4E4A3D;
+  --oat:#E7EBDD;
+  --paper:#FCFCF8;
+  --amber:#E8A600;
+  --amber-soft:#FFF3D0;
+  --berry:#8E2C48;
+  --berry-soft:#FBE9EE;
+  --leaf:#2E7D4F;
+  --leaf-soft:#E4F1E7;
+  --line:#17150F;
+  --display:"Unbounded",system-ui,sans-serif;
+  --body:"Golos Text",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"Courier New",monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:88px}
+body{
+  margin:0;background:var(--oat);color:var(--ink);font-family:var(--body);
+  font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px 80px}
+
+/* ---------- masthead: allergen label ---------- */
+.masthead{padding:44px 0 26px}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-soft)}
+h1{
+  font-family:var(--display);font-weight:800;text-transform:uppercase;
+  font-size:clamp(30px,6.4vw,62px);line-height:.94;letter-spacing:-.02em;margin:10px 0 0;
+}
+h1 .alt{display:block;color:var(--berry)}
+.masthead p.lede{max-width:56ch;margin:16px 0 0;color:var(--ink-soft)}
+.rule{height:2px;background:var(--line);margin:26px 0 0}
+.rule.dashed{height:0;border-top:2px dashed var(--line);background:none}
+
+/* ---------- sticky nav ---------- */
+.navbar{position:sticky;top:0;z-index:40;background:var(--oat);border-bottom:2px solid var(--line)}
+.navbar-inner{max-width:1180px;margin:0 auto;padding:10px 20px;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}
+.navbar-inner::-webkit-scrollbar{display:none}
+.navchip{
+  flex:0 0 auto;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+  padding:7px 11px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);
+  text-decoration:none;white-space:nowrap;
+}
+.navchip:hover,.navchip:focus-visible{background:var(--amber);outline:none}
+
+/* ---------- layout ---------- */
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 292px;gap:34px;align-items:start;margin-top:34px}
+@media(max-width:940px){.grid{grid-template-columns:1fr}.rail{position:static !important;order:-1}}
+
+/* ---------- word panel ---------- */
+.panel{background:var(--paper);border:2px solid var(--line);padding:22px}
+.panel-head{display:flex;flex-wrap:wrap;gap:12px;align-items:baseline;justify-content:space-between}
+h2{font-family:var(--display);font-weight:600;text-transform:uppercase;font-size:15px;letter-spacing:.06em;margin:0}
+.task{
+  margin:14px 0 20px;padding:12px 14px;background:var(--amber-soft);border-left:5px solid var(--amber);
+  font-size:14px;
+}
+.task b{font-weight:700}
+.words{display:grid;grid-template-columns:repeat(auto-fill,minmax(232px,1fr));gap:12px}
+.word{
+  border:1.5px solid var(--line);padding:11px 12px 12px;display:flex;flex-direction:column;gap:2px;
+  background:var(--paper);position:relative;
+}
+.word .pos{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft)}
+.word .en{font-family:var(--display);font-weight:600;font-size:15.5px;line-height:1.25;padding-right:34px}
+.word .ipa{font-family:var(--mono);font-size:12.5px;color:var(--berry)}
+.word .ru{font-size:13.5px;color:var(--ink-soft)}
+.say{
+  position:absolute;top:9px;right:9px;width:28px;height:28px;border:1.5px solid var(--line);
+  background:var(--paper);cursor:pointer;font-size:13px;line-height:1;display:grid;place-items:center;padding:0;
+}
+.say:hover,.say:focus-visible{background:var(--amber);outline:none}
+.say.on{background:var(--amber)}
+
+/* ---------- buttons ---------- */
+.btn{
+  font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;
+  padding:9px 14px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer;
+}
+.btn:hover,.btn:focus-visible{background:var(--amber);outline:none}
+.btn.solid{background:var(--ink);color:var(--paper)}
+.btn.solid:hover,.btn.solid:focus-visible{background:var(--berry);color:#fff}
+.btn.ghost{border-style:dashed}
+.btnrow{display:flex;flex-wrap:wrap;gap:8px}
+
+/* ---------- exercises ---------- */
+.ex{background:var(--paper);border:2px solid var(--line);margin-top:26px}
+.ex-head{display:flex;gap:14px;padding:18px 20px;border-bottom:2px solid var(--line);align-items:flex-start}
+.ex-num{
+  flex:0 0 auto;width:40px;height:40px;background:var(--ink);color:var(--paper);
+  font-family:var(--mono);font-weight:600;font-size:15px;display:grid;place-items:center;
+}
+.ex-title{font-family:var(--display);font-weight:600;font-size:16px;text-transform:uppercase;letter-spacing:.03em;margin:0}
+.ex-sub{font-size:13.5px;color:var(--ink-soft);margin:5px 0 0}
+.ex-body{padding:8px 20px 20px}
+.ex-foot{padding:0 20px 20px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.tally{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;color:var(--ink-soft);margin-left:auto}
+
+.bank{margin:14px 0 4px;padding:12px 14px;border:1.5px dashed var(--line);background:#fff}
+.bank .bank-label{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft)}
+.bank ul{list-style:none;display:flex;flex-wrap:wrap;gap:6px 8px;margin:8px 0 0;padding:0}
+.bank li{font-family:var(--mono);font-size:12.5px;border:1px solid var(--line);padding:3px 8px}
+
+.item{display:flex;gap:12px;padding:12px 0;border-bottom:1px dotted #C8C6B8;align-items:flex-start}
+.item:last-child{border-bottom:none}
+.item .n{font-family:var(--mono);font-size:12px;color:var(--ink-soft);flex:0 0 22px;padding-top:6px}
+.item .qa{flex:1 1 auto;min-width:0}
+.q{font-size:15px}
+.q mark{background:var(--amber-soft);border-bottom:2px solid var(--amber);padding:0 2px}
+.q .cue{font-family:var(--mono);font-size:13px;color:var(--berry)}
+.q .ru{color:var(--ink-soft)}
+.gap{font-family:var(--mono);letter-spacing:.08em}
+.answer-line{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:7px}
+input.ans{
+  font-family:var(--mono);font-size:14px;color:var(--ink);padding:7px 9px;
+  border:1.5px solid #B9B7A9;background:#fff;min-width:min(320px,100%);flex:0 1 320px;
+}
+input.ans:focus{outline:none;border-color:var(--ink);background:var(--amber-soft)}
+input.ans.wide{flex:1 1 100%;min-width:100%}
+.mark{font-family:var(--mono);font-size:12px;font-weight:600}
+.item.ok input.ans{border-color:var(--leaf);background:var(--leaf-soft)}
+.item.ok .mark{color:var(--leaf)}
+.item.bad input.ans{border-color:var(--berry);background:var(--berry-soft)}
+.item.bad .mark{color:var(--berry)}
+.solution{font-family:var(--mono);font-size:12.5px;color:var(--ink-soft);margin-top:6px;display:none}
+.solution.show{display:block}
+.solution b{color:var(--ink);font-weight:600}
+@media(prefers-reduced-motion:no-preference){
+  .item.bad input.ans{animation:nudge .28s ease}
+  @keyframes nudge{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+}
+textarea.ans{
+  font-family:var(--body);font-size:15px;width:100%;padding:8px 10px;border:1.5px solid #B9B7A9;
+  background:#fff;resize:vertical;min-height:44px;line-height:1.45;
+}
+textarea.ans:focus{outline:none;border-color:var(--ink);background:var(--amber-soft)}
+
+/* ---------- rail ---------- */
+.rail{position:sticky;top:70px;display:flex;flex-direction:column;gap:16px}
+.score{background:var(--ink);color:var(--paper);border:2px solid var(--line);padding:16px}
+.score h2{color:var(--paper)}
+.score .big{font-family:var(--display);font-weight:800;font-size:40px;line-height:1;margin:10px 0 2px}
+.score .of{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:#B9B5A4}
+.bar{height:8px;background:#3A382C;margin-top:12px}
+.bar i{display:block;height:100%;background:var(--amber);width:0;transition:width .3s ease}
+
+.sticker{
+  background:var(--berry-soft);border:2px dashed var(--berry);padding:15px;transform:rotate(-.6deg);
+}
+.sticker h2{color:var(--berry)}
+.sticker .hint{font-size:12.5px;color:var(--ink-soft);margin:8px 0 0}
+.plist{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-direction:column;gap:7px}
+.plist li{display:flex;gap:8px;align-items:center;background:#fff;border:1px solid var(--berry);padding:6px 8px}
+.plist .pw{font-size:13.5px;font-weight:600;flex:1 1 auto;line-height:1.25}
+.plist .cnt{font-family:var(--mono);font-size:11px;background:var(--berry);color:#fff;padding:2px 6px}
+.plist .say{position:static;width:24px;height:24px;border-color:var(--berry);font-size:11px}
+.empty{font-size:13px;color:var(--ink-soft);margin:12px 0 0;font-style:italic}
+
+footer{margin-top:40px;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);text-align:center}
+.toast{
+  position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:var(--ink);color:var(--paper);
+  font-family:var(--mono);font-size:12px;letter-spacing:.06em;padding:11px 16px;z-index:80;
+  opacity:0;pointer-events:none;transition:opacity .2s ease
+}
+.toast.show{opacity:1}
+</style>
+</head>
+<body>
+
+<nav class="navbar" aria-label="Разделы">
+  <div class="navbar-inner" id="nav"></div>
+</nav>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <div class="eyebrow">Vocabulary trainer · B1–B2 · Food & health</div>
+    <h1>Allergies,<span class="alt">gluten &amp; toppings</span></h1>
+    <p class="lede">13 слов, 10 упражнений, 100 пунктов. Пиши ответы руками, проверяй себя и следи за списком проблемных слов справа.</p>
+    <div class="rule"></div>
+  </header>
+
+  <div class="grid">
+    <main>
+
+      <section class="panel" id="warmup">
+        <div class="panel-head">
+          <h2>Ingredients list — слова урока</h2>
+          <div class="btnrow">
+            <button class="btn solid" id="playAll">▶ Прослушать все</button>
+            <button class="btn ghost" id="hideRu">Скрыть перевод</button>
+          </div>
+        </div>
+        <div class="task">
+          <b>Задание перед упражнениями:</b> нажми ▶ на каждом слове, послушай два раза и повтори вслух, копируя интонацию. Потом скрой перевод и проверь, помнишь ли значение.
+        </div>
+        <div class="words" id="words"></div>
+      </section>
+
+      <div id="exercises"></div>
+
+    </main>
+
+    <aside class="rail">
+      <div class="score">
+        <h2>Счёт</h2>
+        <div class="big"><span id="scoreNum">0</span></div>
+        <div class="of">правильных из <span id="scoreTotal">90</span></div>
+        <div class="bar"><i id="scoreBar"></i></div>
+      </div>
+
+      <div class="sticker">
+        <h2>⚠ Проблемные слова</h2>
+        <p class="hint">Сюда попадают слова, в которых была ошибка. Число — сколько раз.</p>
+        <ul class="plist" id="problems"></ul>
+        <p class="empty" id="problemsEmpty">Пока пусто. Начни упражнения.</p>
+        <div class="btnrow" style="margin-top:12px">
+          <button class="btn" id="clearProblems">Очистить список</button>
+        </div>
+      </div>
+
+      <div class="btnrow">
+        <button class="btn ghost" id="resetAll">Сбросить всё</button>
+      </div>
+    </aside>
+  </div>
+
+  <footer>End of worksheet · be allergic to · have an intolerance to · gluten · glucose · topping · filling · cheer yourself up</footer>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* ===================== DATA ===================== */
+const VOCAB = [
+  {en:"be allergic to",         pos:"phrase",     ipa:"/bi əˈlɜːdʒɪk tə/",        ru:"иметь аллергию на (что-то)"},
+  {en:"have an allergy to",     pos:"phrase",     ipa:"/həv ən ˈælədʒi tə/",      ru:"иметь аллергию на (что-то)"},
+  {en:"have an intolerance to", pos:"phrase",     ipa:"/həv ən ɪnˈtɒlərəns tə/",  ru:"иметь непереносимость (чего-то)"},
+  {en:"be intolerant of",       pos:"phrase",     ipa:"/bi ɪnˈtɒlərənt əv/",      ru:"не переносить (какую-то еду)"},
+  {en:"allergic",               pos:"adjective",  ipa:"/əˈlɜːdʒɪk/",              ru:"аллергический; страдающий аллергией"},
+  {en:"intolerant",             pos:"adjective",  ipa:"/ɪnˈtɒlərənt/",            ru:"не переносящий (еду)"},
+  {en:"gluten",                 pos:"noun",       ipa:"/ˈɡluːtn/",                ru:"глютен (белок в пшенице)"},
+  {en:"glucose",                pos:"noun",       ipa:"/ˈɡluːkəʊs/",              ru:"глюкоза (простой сахар)"},
+  {en:"topping",                pos:"noun",       ipa:"/ˈtɒpɪŋ/",                 ru:"то, что сверху: посыпка, топпинг"},
+  {en:"filling",                pos:"noun",       ipa:"/ˈfɪlɪŋ/",                 ru:"начинка (внутри)"},
+  {en:"ready-made food",        pos:"noun phrase",ipa:"/ˌredi ˈmeɪd fuːd/",       ru:"готовая еда (разогреть и есть)"},
+  {en:"take away food",         pos:"noun phrase",ipa:"/ˈteɪkəweɪ fuːd/",         ru:"еда на вынос"},
+  {en:"cheer yourself up",      pos:"phrase",     ipa:"/tʃɪə jɔːˈself ʌp/",       ru:"поднять себе настроение"}
+];
+
+const EXERCISES = [
+{
+  id:"ex1", type:"gap", title:"Вставь пропущенные буквы",
+  sub:"Напиши слово полностью, без пропусков.",
+  items:[
+    {q:'gl _ t _ n', a:["gluten"], w:"gluten"},
+    {q:'gl _ c _ se', a:["glucose"], w:"glucose"},
+    {q:'t _ pp _ ng', a:["topping"], w:"topping"},
+    {q:'f _ ll _ ng', a:["filling"], w:"filling"},
+    {q:'all _ rg _ c', a:["allergic"], w:"allergic"},
+    {q:'int _ l _ rant', a:["intolerant"], w:"intolerant"},
+    {q:'int _ l _ rance', a:["intolerance"], w:"have an intolerance to"},
+    {q:'all _ rgy', a:["allergy"], w:"have an allergy to"},
+    {q:'r _ ady-m _ de food', a:["ready-made food","ready made food"], w:"ready-made food"},
+    {q:'t _ ke aw _ y food', a:["take away food","takeaway food","take-away food"], w:"take away food"}
+  ]
+},
+{
+  id:"ex2", type:"translate", title:"Переведи на английский",
+  sub:"Слово в скобках обязательно используй. Точка в конце не важна.",
+  items:[
+    {q:'У меня аллергия на орехи. <span class="cue">(allergy)</span>', a:["i have an allergy to nuts"], w:"have an allergy to"},
+    {q:'Он аллергик — у него аллергия на кошек. <span class="cue">(allergic)</span>', a:["he is allergic to cats","he's allergic to cats"], w:"be allergic to"},
+    {q:'У моей сестры непереносимость лактозы. <span class="cue">(intolerance)</span>', a:["my sister has an intolerance to lactose"], w:"have an intolerance to"},
+    {q:'Я не переношу глютен. <span class="cue">(intolerant)</span>', a:["i am intolerant of gluten","i'm intolerant of gluten","i am intolerant to gluten","i'm intolerant to gluten"], w:"be intolerant of"},
+    {q:'Этот хлеб без глютена. <span class="cue">(gluten)</span>', a:["this bread is gluten-free","this bread is gluten free","this is gluten-free bread"], w:"gluten"},
+    {q:'Врач проверил уровень глюкозы в крови. <span class="cue">(glucose)</span>', a:["the doctor checked my blood glucose level","the doctor checked the blood glucose level","the doctor checked my glucose level"], w:"glucose"},
+    {q:'Мой любимый топпинг для пиццы — грибы. <span class="cue">(topping)</span>', a:["my favourite pizza topping is mushrooms","my favorite pizza topping is mushrooms"], w:"topping"},
+    {q:'В торте была шоколадная начинка. <span class="cue">(filling)</span>', a:["the cake had a chocolate filling","the cake has a chocolate filling"], w:"filling"},
+    {q:'Мы часто заказываем еду на вынос. <span class="cue">(take away)</span>', a:["we often order take away food","we often order takeaway food","we often buy take away food"], w:"take away food"},
+    {q:'Шоколад всегда поднимает мне настроение. <span class="cue">(cheer up)</span>', a:["chocolate always cheers me up"], w:"cheer yourself up"}
+  ]
+},
+{
+  id:"ex3", type:"def", title:"Дефиниция → слово",
+  sub:"Прочитай определение и напиши слово из списка урока.",
+  items:[
+    {q:'a protein in wheat that some people cannot eat', a:["gluten"], w:"gluten"},
+    {q:'a simple sugar in your blood that gives you energy', a:["glucose"], w:"glucose"},
+    {q:'the food you put <b>on top</b> of a pizza or ice cream', a:["topping","a topping"], w:"topping"},
+    {q:'the food <b>inside</b> a cake, a pie or a sandwich', a:["filling","a filling"], w:"filling"},
+    {q:'food you buy already cooked and only heat up at home', a:["ready-made food","ready made food"], w:"ready-made food"},
+    {q:'food you buy in a restaurant but eat somewhere else', a:["take away food","takeaway food","take-away food"], w:"take away food"},
+    {q:'to do something nice so that you feel happier', a:["cheer yourself up","to cheer yourself up","cheer up"], w:"cheer yourself up"},
+    {q:'a medical condition: your body reacts badly to food, pollen, animals', a:["an allergy","allergy"], w:"have an allergy to"},
+    {q:'adjective: you get a rash or start sneezing because of something', a:["allergic"], w:"allergic"},
+    {q:'adjective: your body cannot digest a food, so you feel ill', a:["intolerant"], w:"intolerant"}
+  ]
+},
+{
+  id:"ex4", type:"choice", title:"Сочетаемость: выбери подходящее слово",
+  sub:"Напиши только нужное слово из скобок в правильной форме.",
+  items:[
+    {q:'Doctors check your blood ____ level. <span class="cue">(gluten / glucose)</span>', a:["glucose"], w:"glucose"},
+    {q:'This bread is ____-free, so I can eat it. <span class="cue">(gluten / glucose)</span>', a:["gluten"], w:"gluten"},
+    {q:'The doughnut had a strawberry ____ inside. <span class="cue">(topping / filling)</span>', a:["filling"], w:"filling"},
+    {q:'Add some nuts as a ____ on your ice cream. <span class="cue">(topping / filling)</span>', a:["topping"], w:"topping"},
+    {q:'One peanut and I get a rash — I am ____ . <span class="cue">(allergic / intolerant)</span>', a:["allergic"], w:"allergic"},
+    {q:'Milk gives me stomach ache, but it is not dangerous — I am ____ . <span class="cue">(allergic / intolerant)</span>', a:["intolerant"], w:"intolerant"},
+    {q:'I just heat a ____ meal in the microwave. <span class="cue">(ready-made / take away)</span>', a:["ready-made","ready made"], w:"ready-made food"},
+    {q:'We ordered ____ food and ate it at home. <span class="cue">(ready-made / take away)</span>', a:["take away","takeaway","take-away"], w:"take away food"},
+    {q:'Shopping always ____ me up. <span class="cue">(cheer / cheers)</span>', a:["cheers"], w:"cheer yourself up"},
+    {q:'I have an ____ to shellfish. <span class="cue">(allergy / allergic)</span>', a:["allergy"], w:"have an allergy to"}
+  ]
+},
+{
+  id:"ex5", type:"halves", title:"Соедини половинки выражений",
+  sub:"Напиши вторую половину каждого выражения. Все варианты — в рамке ниже.",
+  bank:["to peanuts","to lactose","of gluten","to pollen","free bread","level","topping","filling","up","meals"],
+  items:[
+    {q:'be allergic …', a:["to peanuts"], w:"be allergic to"},
+    {q:'have an allergy …', a:["to pollen"], w:"have an allergy to"},
+    {q:'have an intolerance …', a:["to lactose"], w:"have an intolerance to"},
+    {q:'be intolerant …', a:["of gluten"], w:"be intolerant of"},
+    {q:'gluten- …', a:["free bread"], w:"gluten"},
+    {q:'blood glucose …', a:["level"], w:"glucose"},
+    {q:'a pizza …', a:["topping"], w:"topping"},
+    {q:'a chocolate …', a:["filling"], w:"filling"},
+    {q:'cheer yourself …', a:["up"], w:"cheer yourself up"},
+    {q:'ready-made …', a:["meals"], w:"ready-made food"}
+  ]
+},
+{
+  id:"ex6", type:"after", title:"What usually comes after?",
+  sub:"Напиши одно слово, которое обычно идёт дальше.",
+  items:[
+    {q:'be allergic …', a:["to"], w:"be allergic to"},
+    {q:'have an allergy …', a:["to"], w:"have an allergy to"},
+    {q:'have an intolerance …', a:["to"], w:"have an intolerance to"},
+    {q:'She is intolerant … milk.', a:["of","to"], w:"be intolerant of"},
+    {q:'gluten- …', a:["free"], w:"gluten"},
+    {q:'blood glucose …', a:["level","levels"], w:"glucose"},
+    {q:'ready- … food', a:["made"], w:"ready-made food"},
+    {q:'take- … food', a:["away"], w:"take away food"},
+    {q:'cheer yourself …', a:["up"], w:"cheer yourself up"},
+    {q:'ice cream with a chocolate …', a:["topping"], w:"topping"}
+  ]
+},
+{
+  id:"ex7", type:"guess", title:"Guess the word",
+  sub:"По подсказке и первой букве угадай слово. Количество прочерков = количество букв.",
+  items:[
+    {q:'<span class="gap">g _ _ _ _ _</span> — the protein in bread and pasta', a:["gluten"], w:"gluten"},
+    {q:'<span class="gap">g _ _ _ _ _ _</span> — sugar that gives you quick energy', a:["glucose"], w:"glucose"},
+    {q:'<span class="gap">t _ _ _ _ _ _</span> — it goes on top of your dessert', a:["topping"], w:"topping"},
+    {q:'<span class="gap">f _ _ _ _ _ _</span> — it hides inside your pie', a:["filling"], w:"filling"},
+    {q:'<span class="gap">a _ _ _ _ _ _ _</span> — adjective: you sneeze because of cats', a:["allergic"], w:"allergic"},
+    {q:'<span class="gap">i _ _ _ _ _ _ _ _ _</span> — adjective: you cannot digest lactose', a:["intolerant"], w:"intolerant"},
+    {q:'<span class="gap">a _ _ _ _ _ _</span> — noun: a bad reaction of your body', a:["allergy"], w:"have an allergy to"},
+    {q:'<span class="gap">i _ _ _ _ _ _ _ _ _ _</span> — noun: you have this to gluten or lactose', a:["intolerance"], w:"have an intolerance to"},
+    {q:'<span class="gap">t _ _ _ _ _ _ _</span> — noun: pizza in a box that you eat at home', a:["takeaway","take away"], w:"take away food"},
+    {q:'<span class="gap">c _ _ _ _</span> … yourself up — verb: make yourself feel better', a:["cheer"], w:"cheer yourself up"}
+  ]
+},
+{
+  id:"ex8", type:"tf", title:"True or False?",
+  sub:"Напиши true или false.",
+  items:[
+    {q:'Gluten is a type of sugar.', a:["false"], w:"gluten", why:"False — gluten is a <b>protein</b> in wheat. Glucose is the sugar."},
+    {q:'Glucose gives your body energy.', a:["true"], w:"glucose", why:"True."},
+    {q:'A topping is inside the cake, not on top of it.', a:["false"], w:"topping", why:"False — a topping goes <b>on top</b>; inside it is a filling."},
+    {q:'A filling is the part inside a pie or a sandwich.', a:["true"], w:"filling", why:"True."},
+    {q:'If you are lactose intolerant, you can safely drink a lot of milk.', a:["false"], w:"intolerant", why:"False — you will feel ill."},
+    {q:'An allergy can be dangerous for your health.', a:["true"], w:"have an allergy to", why:"True — some allergies are life-threatening."},
+    {q:'Ready-made food is food you cook from scratch at home.', a:["false"], w:"ready-made food", why:"False — it is bought already cooked."},
+    {q:'You eat take away food outside the restaurant.', a:["true"], w:"take away food", why:"True — at home, at work, in a park."},
+    {q:'"Cheer yourself up" means to make yourself feel worse.', a:["false"], w:"cheer yourself up", why:"False — it means to feel <b>better</b>."},
+    {q:'The correct phrase is "I am allergic of nuts".', a:["false"], w:"be allergic to", why:'False — we say <b>allergic to</b> nuts.'}
+  ]
+},
+{
+  id:"ex9", type:"replace", title:"Replace the highlighted words",
+  sub:"Замени выделенную часть словом или выражением из урока. Форму глагола сохрани.",
+  items:[
+    {q:'I <mark>have an allergy to</mark> cats.', a:["am allergic to","'m allergic to","i am allergic to","be allergic to"], w:"be allergic to"},
+    {q:'Sam <mark>is allergic to</mark> bee stings.', a:["has an allergy to","have an allergy to"], w:"have an allergy to"},
+    {q:'My sister <mark>cannot digest</mark> lactose.', a:["is intolerant of","is intolerant to","has an intolerance to"], w:"be intolerant of"},
+    {q:'Bananas give you <mark>simple sugar</mark> for energy.', a:["glucose"], w:"glucose"},
+    {q:'I avoid bread because of <mark>the protein in wheat</mark>.', a:["gluten"], w:"gluten"},
+    {q:'This doughnut has a jam <mark>centre</mark>.', a:["filling"], w:"filling"},
+    {q:'My favourite pizza <mark>ingredient on top</mark> is mushrooms.', a:["topping"], w:"topping"},
+    {q:'We often buy <mark>pre-cooked supermarket meals</mark>.', a:["ready-made food","ready-made meals","ready made food","ready made meals"], w:"ready-made food"},
+    {q:'Let us order <mark>pizza in a box to eat at home</mark>.', a:["take away food","takeaway food","take away pizza","takeaway pizza"], w:"take away food"},
+    {q:'A funny film always <mark>makes me feel happier</mark>.', a:["cheers me up"], w:"cheer yourself up"}
+  ]
+},
+{
+  id:"ex10", type:"open", title:"Закончи предложения своими идеями",
+  sub:"Свободный ответ — проверки нет. Одна кнопка копирует все твои предложения целиком.",
+  items:[
+    {q:'I am allergic to …'},
+    {q:'I think I have an intolerance to …'},
+    {q:'My favourite pizza topping is … because …'},
+    {q:'The best cake filling is …'},
+    {q:'When I feel sad, I cheer myself up by …'},
+    {q:'I eat ready-made food when …'},
+    {q:'I usually order take away food when …'},
+    {q:'Gluten-free products are … in my country.'},
+    {q:'People who are lactose intolerant should …'},
+    {q:'Food that gives me a lot of glucose and energy is …'}
+  ]
+}
+];
+
+/* ===================== HELPERS ===================== */
+const $ = (s,r=document)=>r.querySelector(s);
+const $$ = (s,r=document)=>[...r.querySelectorAll(s)];
+
+function norm(s){
+  return String(s).toLowerCase().replace(/[’‘`]/g,"'")
+    .replace(/\bi'm\b/g,'i am').replace(/\bdon't\b/g,'do not').replace(/\bdoesn't\b/g,'does not')
+    .replace(/\bcan't\b/g,'cannot').replace(/\blet's\b/g,'let us')
+    .replace(/\bshe's\b/g,'she is').replace(/\bhe's\b/g,'he is').replace(/\bit's\b/g,'it is')
+    .replace(/\bfavorite\b/g,'favourite')
+    .replace(/take[\s-]?away/g,'takeaway').replace(/ready[\s-]?made/g,'readymade')
+    .replace(/gluten[\s-]?free/g,'glutenfree')
+    .replace(/\bверно\b|\bправда\b|\bда\b/g,'true').replace(/\bневерно\b|\bложь\b|\bнет\b/g,'false')
+    .replace(/[.,!?;:"“”()]/g,'').replace(/\s+/g,' ').trim();
+}
+function match(input,answers){
+  const v = norm(input);
+  if(!v) return false;
+  return answers.some(a=>norm(a)===v);
+}
+let toastTimer;
+function toast(msg){
+  const t=$("#toast"); t.textContent=msg; t.classList.add('show');
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),1900);
+}
+
+/* ===================== SPEECH ===================== */
+let voice=null;
+function pickVoice(){
+  const vs = speechSynthesis.getVoices();
+  voice = vs.find(v=>/en-GB/i.test(v.lang)) || vs.find(v=>/^en/i.test(v.lang)) || null;
+}
+if('speechSynthesis' in window){ pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
+function speak(text,btn){
+  if(!('speechSynthesis' in window)){ toast('Браузер не поддерживает озвучку'); return; }
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang='en-GB'; u.rate=.85; if(voice) u.voice=voice;
+  if(btn){ btn.classList.add('on'); u.onend=()=>btn.classList.remove('on'); u.onerror=()=>btn.classList.remove('on'); }
+  speechSynthesis.speak(u);
+}
+
+/* ===================== PROBLEM WORDS ===================== */
+const problems = new Map();
+function addProblem(word){
+  if(!word) return;
+  problems.set(word,(problems.get(word)||0)+1);
+  renderProblems();
+}
+function renderProblems(){
+  const ul=$("#problems"), empty=$("#problemsEmpty");
+  ul.innerHTML='';
+  const sorted=[...problems.entries()].sort((a,b)=>b[1]-a[1]);
+  empty.style.display = sorted.length ? 'none' : 'block';
+  sorted.forEach(([w,c])=>{
+    const v = VOCAB.find(x=>x.en===w);
+    const li=document.createElement('li');
+    li.innerHTML = `<span class="pw">${w}${v?`<br><span style="font-weight:400;font-size:11.5px;color:#4E4A3D">${v.ru}</span>`:''}</span>
+                    <span class="cnt">${c}</span>
+                    <button class="say" title="Прослушать" aria-label="Прослушать ${w}">▶</button>`;
+    li.querySelector('.say').addEventListener('click',e=>speak(w,e.currentTarget));
+    ul.appendChild(li);
+  });
+}
+
+/* ===================== SCORE ===================== */
+const closedItems = EXERCISES.filter(e=>e.type!=='open').reduce((n,e)=>n+e.items.length,0);
+$("#scoreTotal").textContent = closedItems;
+function updateScore(){
+  const ok = $$('.item.ok').length;
+  $("#scoreNum").textContent = ok;
+  $("#scoreBar").style.width = (ok/closedItems*100)+'%';
+}
+
+/* ===================== RENDER: WORDS ===================== */
+const wordsBox=$("#words");
+VOCAB.forEach(v=>{
+  const d=document.createElement('div');
+  d.className='word';
+  d.innerHTML=`<span class="pos">${v.pos}</span>
+    <span class="en">${v.en}</span>
+    <span class="ipa">${v.ipa}</span>
+    <span class="ru">${v.ru}</span>
+    <button class="say" title="Прослушать" aria-label="Прослушать ${v.en}">▶</button>`;
+  d.querySelector('.say').addEventListener('click',e=>speak(v.en,e.currentTarget));
+  wordsBox.appendChild(d);
+});
+$("#playAll").addEventListener('click',()=>{
+  if(!('speechSynthesis' in window)){ toast('Браузер не поддерживает озвучку'); return; }
+  speechSynthesis.cancel();
+  VOCAB.forEach(v=>{
+    const u=new SpeechSynthesisUtterance(v.en);
+    u.lang='en-GB'; u.rate=.85; if(voice) u.voice=voice;
+    speechSynthesis.speak(u);
+  });
+});
+$("#hideRu").addEventListener('click',e=>{
+  const hidden = wordsBox.classList.toggle('hide-ru');
+  $$('.word .ru',wordsBox).forEach(el=>el.style.visibility = hidden?'hidden':'visible');
+  e.currentTarget.textContent = hidden ? 'Показать перевод' : 'Скрыть перевод';
+});
+
+/* ===================== RENDER: EXERCISES ===================== */
+const host=$("#exercises");
+EXERCISES.forEach((ex,idx)=>{
+  const sec=document.createElement('section');
+  sec.className='ex'; sec.id=ex.id;
+  const isOpen = ex.type==='open';
+  sec.innerHTML=`
+    <div class="ex-head">
+      <div class="ex-num">${idx+1}</div>
+      <div>
+        <h3 class="ex-title">${ex.title}</h3>
+        <p class="ex-sub">${ex.sub}</p>
+      </div>
+    </div>
+    <div class="ex-body">
+      ${ex.bank?`<div class="bank"><span class="bank-label">Варианты</span><ul>${ex.bank.map(b=>`<li>${b}</li>`).join('')}</ul></div>`:''}
+      <div class="items"></div>
+    </div>
+    <div class="ex-foot"></div>`;
+
+  const itemsBox=$('.items',sec);
+  ex.items.forEach((it,i)=>{
+    const row=document.createElement('div');
+    row.className='item';
+    if(isOpen){
+      row.innerHTML=`<span class="n">${i+1}</span>
+        <div class="qa"><div class="q">${it.q}</div>
+        <div class="answer-line"><textarea class="ans" rows="1" data-prompt="${it.q.replace(/"/g,'&quot;')}" placeholder="твоя идея…"></textarea></div></div>`;
+    }else{
+      row.innerHTML=`<span class="n">${i+1}</span>
+        <div class="qa"><div class="q">${it.q}</div>
+        <div class="answer-line">
+          <input class="ans${ex.type==='translate'||ex.type==='replace'?' wide':''}" type="text" autocomplete="off" spellcheck="false" placeholder="${ex.type==='tf'?'true / false':'напиши ответ'}">
+          <span class="mark"></span>
+        </div>
+        <div class="solution"></div></div>`;
+      row._item=it;
+    }
+    itemsBox.appendChild(row);
+  });
+
+  const foot=$('.ex-foot',sec);
+  if(isOpen){
+    foot.innerHTML=`<button class="btn solid act-copy">⧉ Скопировать все ответы</button>
+                    <button class="btn ghost act-clear">Очистить</button>`;
+    foot.querySelector('.act-copy').addEventListener('click',()=>copyOpen(sec));
+    foot.querySelector('.act-clear').addEventListener('click',()=>{$$('textarea.ans',sec).forEach(t=>{t.value='';t.style.height='auto';});});
+    sec.addEventListener('input',e=>{
+      if(e.target.matches('textarea.ans')){ e.target.style.height='auto'; e.target.style.height=e.target.scrollHeight+'px'; }
+    });
+  }else{
+    foot.innerHTML=`<button class="btn solid act-check">✓ Проверить</button>
+                    <button class="btn act-show">Показать ответы</button>
+                    <button class="btn ghost act-reset">Заново</button>
+                    <span class="tally">— / ${ex.items.length}</span>`;
+    foot.querySelector('.act-check').addEventListener('click',()=>checkEx(sec));
+    foot.querySelector('.act-show').addEventListener('click',()=>showEx(sec));
+    foot.querySelector('.act-reset').addEventListener('click',()=>resetEx(sec));
+    sec.addEventListener('keydown',e=>{
+      if(e.key==='Enter' && e.target.matches('input.ans')){
+        e.preventDefault();
+        const all=$$('input.ans',sec), i=all.indexOf(e.target);
+        if(i<all.length-1) all[i+1].focus(); else checkEx(sec);
+      }
+    });
+  }
+  host.appendChild(sec);
+
+  const chip=document.createElement('a');
+  chip.className='navchip'; chip.href='#'+ex.id; chip.textContent=`${idx+1}. ${ex.title}`;
+  $("#nav").appendChild(chip);
+});
+const chip0=document.createElement('a');
+chip0.className='navchip'; chip0.href='#warmup'; chip0.textContent='★ Слова';
+$("#nav").prepend(chip0);
+
+/* ===================== CHECK / SHOW / RESET ===================== */
+function checkEx(sec){
+  let ok=0, total=0, blank=0;
+  $$('.item',sec).forEach(row=>{
+    const it=row._item; if(!it) return;
+    total++;
+    const input=$('input.ans',row), mark=$('.mark',row);
+    if(!input.value.trim()){ blank++; row.classList.remove('ok','bad'); mark.textContent=''; return; }
+    const good = match(input.value,it.a);
+    row.classList.toggle('ok',good); row.classList.toggle('bad',!good);
+    mark.textContent = good ? '✓ correct' : '✗ try again';
+    if(good){ ok++; } else { addProblem(it.w); }
+  });
+  $('.tally',sec).textContent = `${ok} / ${total}`+(blank?` · пропущено: ${blank}`:'');
+  updateScore();
+  if(ok===total && total) toast('Всё верно 🎉');
+}
+function showEx(sec){
+  $$('.item',sec).forEach(row=>{
+    const it=row._item; if(!it) return;
+    const sol=$('.solution',row);
+    sol.innerHTML = `→ <b>${it.a[0]}</b>`+(it.a.length>1?` <span>(также: ${it.a.slice(1).join(' / ')})</span>`:'')+(it.why?`<br>${it.why}`:'');
+    sol.classList.add('show');
+  });
+}
+function resetEx(sec){
+  $$('.item',sec).forEach(row=>{
+    if(!row._item) return;
+    row.classList.remove('ok','bad');
+    $('input.ans',row).value='';
+    $('.mark',row).textContent='';
+    const sol=$('.solution',row); sol.classList.remove('show'); sol.innerHTML='';
+  });
+  $('.tally',sec).textContent = `— / ${$$('.item',sec).length}`;
+  updateScore();
+}
+
+/* ===================== COPY OPEN ANSWERS ===================== */
+function copyOpen(sec){
+  const lines=[];
+  $$('textarea.ans',sec).forEach((t,i)=>{
+    const prompt=t.dataset.prompt.replace(/<[^>]+>/g,'').replace(/…\s*$/,'').trim();
+    const val=t.value.trim();
+    lines.push(`${i+1}. ${prompt} ${val||'…'}`);
+  });
+  const text = 'Finish the sentences — my ideas\n\n'+lines.join('\n');
+  const done=()=>toast('Ответы скопированы ✓');
+  if(navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(text).then(done).catch(()=>fallbackCopy(text,done));
+  } else fallbackCopy(text,done);
+}
+function fallbackCopy(text,done){
+  const ta=document.createElement('textarea');
+  ta.value=text; ta.style.position='fixed'; ta.style.opacity='0';
+  document.body.appendChild(ta); ta.select();
+  try{ document.execCommand('copy'); done(); }catch(e){ toast('Не удалось скопировать'); }
+  ta.remove();
+}
+
+/* ===================== GLOBAL BUTTONS ===================== */
+$("#clearProblems").addEventListener('click',()=>{problems.clear();renderProblems();toast('Список очищен');});
+$("#resetAll").addEventListener('click',()=>{
+  $$('.ex').forEach(sec=>{ if($('input.ans',sec)) resetEx(sec); });
+  $$('textarea.ans').forEach(t=>t.value='');
+  problems.clear(); renderProblems(); updateScore(); toast('Всё сброшено');
+  window.scrollTo({top:0,behavior:'smooth'});
+});
+
+renderProblems(); updateScore();
+</script>
+</body>
+</html>
