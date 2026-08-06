@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>State Verbs — упражнения</title>
+<style>
+  :root{
+    --bg:#f6f5f1;
+    --card:#ffffff;
+    --ink:#2b2a28;
+    --muted:#7a766e;
+    --accent:#8a5cf6;
+    --accent2:#c9a86a;
+    --good:#2f8f5b;
+    --good-bg:#e8f7ee;
+    --bad:#c94b4b;
+    --bad-bg:#fdecec;
+    --border:#e7e3da;
+    font-family: 'Georgia', 'Times New Roman', serif;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    padding:32px 16px 80px;
+    line-height:1.5;
+  }
+  .wrap{max-width:820px;margin:0 auto;}
+  header{
+    text-align:center;
+    margin-bottom:36px;
+  }
+  header h1{
+    font-size:2.1em;
+    margin:0 0 8px;
+    letter-spacing:.5px;
+  }
+  header p{
+    color:var(--muted);
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size:.95em;
+    margin:0;
+  }
+  .rule-box{
+    background:#fbf8f2;
+    border:1px solid var(--border);
+    border-left:4px solid var(--accent2);
+    border-radius:8px;
+    padding:16px 20px;
+    margin-bottom:40px;
+    font-size:.92em;
+    color:#514d44;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+  }
+  .rule-box b{color:var(--ink);}
+  section.exercise{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:26px 28px 30px;
+    margin-bottom:34px;
+    box-shadow:0 2px 10px rgba(0,0,0,0.03);
+  }
+  .ex-title{
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+    margin-bottom:4px;
+  }
+  .ex-num{
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size:.72em;
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+    color:var(--accent);
+    font-weight:700;
+  }
+  .ex-title h2{
+    font-size:1.25em;
+    margin:0;
+  }
+  .ex-instructions{
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    color:var(--muted);
+    font-size:.9em;
+    margin:4px 0 20px;
+  }
+  .item{
+    padding:12px 0;
+    border-top:1px solid #f0ede5;
+  }
+  .item:first-of-type{border-top:none;}
+  .qnum{
+    font-weight:700;
+    color:var(--accent2);
+    margin-right:6px;
+  }
+  .sentence{font-size:1.02em;}
+  input[type=text]{
+    font-family:'Georgia', serif;
+    font-size:1em;
+    border:none;
+    border-bottom:2px solid #cfc9ba;
+    background:transparent;
+    padding:2px 6px;
+    width:170px;
+    outline:none;
+    color:var(--ink);
+    transition:border-color .2s;
+  }
+  input[type=text]:focus{border-color:var(--accent);}
+  .options{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-top:8px;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+  }
+  .opt-btn{
+    border:1px solid #d9d4c6;
+    background:#fdfcfa;
+    padding:7px 14px;
+    border-radius:20px;
+    cursor:pointer;
+    font-size:.88em;
+    color:var(--ink);
+    transition:all .15s;
+  }
+  .opt-btn:hover{border-color:var(--accent);}
+  .opt-btn.selected{
+    background:#efe8ff;
+    border-color:var(--accent);
+    font-weight:700;
+  }
+  .opt-btn.correct{
+    background:var(--good-bg);
+    border-color:var(--good);
+    color:var(--good);
+    font-weight:700;
+  }
+  .opt-btn.incorrect{
+    background:var(--bad-bg);
+    border-color:var(--bad);
+    color:var(--bad);
+    font-weight:700;
+  }
+  .tf-row{display:flex; gap:10px; margin-top:6px;}
+  .explanation{
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:.85em;
+    color:#5c5848;
+    background:#faf7ef;
+    border-left:3px solid var(--accent2);
+    padding:8px 12px;
+    margin-top:8px;
+    border-radius:0 6px 6px 0;
+    display:none;
+  }
+  .explanation.show{display:block;}
+  .feedback-icon{font-weight:700; margin-left:6px;}
+  .feedback-icon.correct{color:var(--good);}
+  .feedback-icon.incorrect{color:var(--bad);}
+  .buttons{
+    display:flex;
+    gap:12px;
+    margin-top:22px;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+  }
+  button.action{
+    border:none;
+    padding:10px 20px;
+    border-radius:24px;
+    font-size:.9em;
+    cursor:pointer;
+    font-weight:700;
+    letter-spacing:.3px;
+  }
+  .btn-check{background:var(--accent); color:white;}
+  .btn-check:hover{background:#7a4be0;}
+  .btn-show{background:transparent; color:var(--accent2); border:1px solid var(--accent2)!important;}
+  .btn-show:hover{background:#f4ecdd;}
+  .score{
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:.85em;
+    color:var(--muted);
+    margin-top:10px;
+    min-height:18px;
+  }
+  .odd-group{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px 10px;
+    margin-top:8px;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+  }
+  @media (max-width:520px){
+    .odd-group{grid-template-columns:1fr;}
+    section.exercise{padding:20px 16px 24px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>State Verbs</h1>
+  <p>Проверьте себя: 4 упражнения по 10 заданий на глаголы состояния</p>
+</header>
+
+<div class="rule-box">
+  <b>Кратко о правиле:</b> State Verbs (глаголы состояния) обычно не употребляются в Continuous — они описывают состояние, а не действие. Сюда входят: чувства и предпочтения (<i>like, love, hate, prefer</i>), органы чувств (<i>see, hear, smell, taste</i> — часто с <i>can/could</i>), восприятие и мышление (<i>know, believe, understand, remember, think</i>), а также <i>be, have, weigh, fit, belong, own, cost, need</i> и др. Но многие из этих глаголов могут менять значение и переходить в Continuous, когда описывают <b>действие</b>, а не состояние (например, <i>have</i> = «завтракать», <i>see</i> = «встречаться», <i>think</i> = «обдумывать», <i>weigh</i> = «взвешивать»).
+</div>
+
+<!-- EXERCISE 1 -->
+<section class="exercise" id="ex1">
+  <div class="ex-title"><span class="ex-num">Упражнение 1</span><h2>Fill in the gaps</h2></div>
+  <p class="ex-instructions">Раскройте скобки, поставив глагол в Present Simple или Present Continuous. Обратите внимание: в каждой паре предложений используется один и тот же глагол — один раз как state verb, другой раз как обычное действие.</p>
+  <div id="ex1-items"></div>
+  <div class="buttons">
+    <button class="action btn-check" onclick="checkEx1()">Проверить</button>
+    <button class="action btn-show" onclick="showEx1()">Показать ответы</button>
+  </div>
+  <div class="score" id="ex1-score"></div>
+</section>
+
+<!-- EXERCISE 2 -->
+<section class="exercise" id="ex2">
+  <div class="ex-title"><span class="ex-num">Упражнение 2</span><h2>Choose the correct answer</h2></div>
+  <p class="ex-instructions">Выберите правильный вариант глагола.</p>
+  <div id="ex2-items"></div>
+  <div class="buttons">
+    <button class="action btn-check" onclick="checkEx2()">Проверить</button>
+    <button class="action btn-show" onclick="showEx2()">Показать ответы</button>
+  </div>
+  <div class="score" id="ex2-score"></div>
+</section>
+
+<!-- EXERCISE 3 -->
+<section class="exercise" id="ex3">
+  <div class="ex-title"><span class="ex-num">Упражнение 3</span><h2>Circle the odd collocation</h2></div>
+  <p class="ex-instructions">В каждой группе из четырёх вариантов найдите один грамматически неверный (лишний) — обычно это state verb, ошибочно употреблённый в Continuous.</p>
+  <div id="ex3-items"></div>
+  <div class="buttons">
+    <button class="action btn-check" onclick="checkEx3()">Проверить</button>
+    <button class="action btn-show" onclick="showEx3()">Показать ответы</button>
+  </div>
+  <div class="score" id="ex3-score"></div>
+</section>
+
+<!-- EXERCISE 4 -->
+<section class="exercise" id="ex4">
+  <div class="ex-title"><span class="ex-num">Упражнение 4</span><h2>True or False</h2></div>
+  <p class="ex-instructions">Определите, верно (True) или неверно (False) утверждение о правиле State Verbs.</p>
+  <div id="ex4-items"></div>
+  <div class="buttons">
+    <button class="action btn-check" onclick="checkEx4()">Проверить</button>
+    <button class="action btn-show" onclick="showEx4()">Показать ответы</button>
+  </div>
+  <div class="score" id="ex4-score"></div>
+</section>
+
+</div>
+
+<script>
+/* ================= EXERCISE 1 : fill in gaps ================= */
+const ex1data = [
+  {s:"I ___ (see) what you mean now.", ans:["see"], expl:"«See» в значении «понимать» — глагол состояния → Present Simple."},
+  {s:"She ___ (see) the dentist at 5 o'clock tomorrow.", ans:["is seeing"], expl:"«See» = «встречаться (по договорённости)» — действие → Present Continuous."},
+  {s:"I ___ (think) this plan is a bad idea.", ans:["think"], expl:"«Think» = «полагать, считать» — мнение, глагол состояния → Present Simple."},
+  {s:"Be quiet, I ___ (think) about the answer.", ans:["am thinking","'m thinking"], expl:"«Think» = «обдумывать» — процесс, действие → Present Continuous."},
+  {s:"My brother ___ (have) a new car.", ans:["has"], expl:"«Have» = «владеть, иметь» — глагол состояния → Present Simple."},
+  {s:"He ___ (have) breakfast right now.", ans:["is having"], expl:"«Have breakfast» = «завтракать» — действие → Present Continuous."},
+  {s:"This cake ___ (taste) amazing!", ans:["tastes"], expl:"«Taste» = «иметь вкус» — глагол состояния → Present Simple."},
+  {s:"The chef ___ (taste) the soup before serving it.", ans:["is tasting"], expl:"«Taste» = «пробовать на вкус» — действие → Present Continuous."},
+  {s:"This suitcase ___ (weigh) 20 kilos.", ans:["weighs"], expl:"«Weigh» = «весить» — глагол состояния → Present Simple."},
+  {s:"The shop assistant ___ (weigh) my luggage now.", ans:["is weighing"], expl:"«Weigh» = «взвешивать» — действие → Present Continuous."}
+];
+
+function renderEx1(){
+  const c = document.getElementById('ex1-items');
+  c.innerHTML = ex1data.map((it,i)=>`
+    <div class="item">
+      <span class="qnum">${i+1}.</span>
+      <span class="sentence">${it.s.replace('___', `<input type="text" id="ex1-in-${i}" autocomplete="off">`)}</span>
+      <span class="feedback-icon" id="ex1-fb-${i}"></span>
+      <div class="explanation" id="ex1-exp-${i}">${it.expl}</div>
+    </div>`).join('');
+}
+function checkEx1(){
+  let correct=0;
+  ex1data.forEach((it,i)=>{
+    const inp = document.getElementById(`ex1-in-${i}`);
+    const fb = document.getElementById(`ex1-fb-${i}`);
+    const val = inp.value.trim().toLowerCase();
+    const ok = it.ans.some(a=>a.toLowerCase()===val);
+    if(ok){ correct++; fb.textContent='✓'; fb.className='feedback-icon correct'; inp.style.borderColor='var(--good)';}
+    else { fb.textContent='✗'; fb.className='feedback-icon incorrect'; inp.style.borderColor='var(--bad)';}
+  });
+  document.getElementById('ex1-score').textContent = `Результат: ${correct} из ${ex1data.length}`;
+}
+function showEx1(){
+  ex1data.forEach((it,i)=>{
+    document.getElementById(`ex1-in-${i}`).value = it.ans[0];
+    document.getElementById(`ex1-exp-${i}`).classList.add('show');
+    const fb = document.getElementById(`ex1-fb-${i}`);
+    fb.textContent=''; fb.className='feedback-icon';
+    document.getElementById(`ex1-in-${i}`).style.borderColor = 'var(--accent2)';
+  });
+  document.getElementById('ex1-score').textContent = '';
+}
+
+/* ================= EXERCISE 2 : choose the correct answer ================= */
+const ex2data = [
+  {s:"I ___ the answer.", opts:["know","am knowing"], correct:0, expl:"«Know» — глагол восприятия/мышления, не употребляется в Continuous."},
+  {s:"She ___ lunch with her colleagues now.", opts:["has","is having"], correct:1, expl:"«Have lunch» = приём пищи, действие → Continuous."},
+  {s:"This soup ___ of garlic.", opts:["tastes","is tasting"], correct:0, expl:"«Taste» = «иметь вкус» — состояние."},
+  {s:"The film ___ very interesting.", opts:["seems","is seeming"], correct:0, expl:"«Seem» — глагол восприятия, всегда Simple."},
+  {s:"He ___ about moving to Spain.", opts:["thinks","is thinking"], correct:1, expl:"«Think about» = «обдумывать» — процесс → Continuous."},
+  {s:"My new shoes ___ perfectly.", opts:["fit","are fitting"], correct:0, expl:"«Fit» = «подходить по размеру» — состояние."},
+  {s:"The workers ___ new windows in our house.", opts:["fit","are fitting"], correct:1, expl:"«Fit» = «устанавливать» — действие → Continuous."},
+  {s:"This bag ___ to my sister.", opts:["belongs","is belonging"], correct:0, expl:"«Belong» — глагол состояния, не бывает в Continuous."},
+  {s:"Jack ___ very rude to the waiter right now.", opts:["is","is being"], correct:1, expl:"«Be being + прилагательное» — временное поведение, а не постоянная черта характера."},
+  {s:"Sarah ___ in a new TV series this year.", opts:["appears","is appearing"], correct:1, expl:"«Appear» = «сниматься, выступать» — действие → Continuous."}
+];
+
+function renderEx2(){
+  const c = document.getElementById('ex2-items');
+  c.innerHTML = ex2data.map((it,i)=>`
+    <div class="item">
+      <span class="qnum">${i+1}.</span>
+      <span class="sentence">${it.s}</span>
+      <div class="options" id="ex2-opts-${i}">
+        ${it.opts.map((o,oi)=>`<button type="button" class="opt-btn" data-i="${i}" data-o="${oi}" onclick="selectEx2(${i},${oi})">${o}</button>`).join('')}
+      </div>
+      <div class="explanation" id="ex2-exp-${i}">${it.expl}</div>
+    </div>`).join('');
+}
+const ex2sel = {};
+function selectEx2(i,o){
+  ex2sel[i]=o;
+  document.querySelectorAll(`#ex2-opts-${i} .opt-btn`).forEach(b=>b.classList.remove('selected'));
+  document.querySelector(`#ex2-opts-${i} .opt-btn[data-o="${o}"]`).classList.add('selected');
+}
+function checkEx2(){
+  let correct=0;
+  ex2data.forEach((it,i)=>{
+    const btns = document.querySelectorAll(`#ex2-opts-${i} .opt-btn`);
+    btns.forEach(b=>b.classList.remove('correct','incorrect'));
+    const sel = ex2sel[i];
+    if(sel===it.correct){
+      correct++;
+      btns[sel].classList.add('correct');
+    } else if(sel!==undefined){
+      btns[sel].classList.add('incorrect');
+      btns[it.correct].classList.add('correct');
+    } else {
+      btns[it.correct].classList.add('correct');
+    }
+  });
+  document.getElementById('ex2-score').textContent = `Результат: ${correct} из ${ex2data.length}`;
+}
+function showEx2(){
+  ex2data.forEach((it,i)=>{
+    const btns = document.querySelectorAll(`#ex2-opts-${i} .opt-btn`);
+    btns.forEach(b=>b.classList.remove('correct','incorrect','selected'));
+    btns[it.correct].classList.add('correct');
+    document.getElementById(`ex2-exp-${i}`).classList.add('show');
+  });
+  document.getElementById('ex2-score').textContent = '';
+}
+
+/* ================= EXERCISE 3 : odd collocation ================= */
+const ex3data = [
+  {opts:["She is knowing the truth","She knows the truth","She knew the truth","She has known the truth"], odd:0, expl:"«Know» — state verb, форма Continuous невозможна."},
+  {opts:["I am seeing what you mean","I see what you mean","I saw what you mean","I don't see what you mean"], odd:0, expl:"«See» = «понимать» — не употребляется в Continuous."},
+  {opts:["He is having a new laptop","He has a new laptop","He had a new laptop","He doesn't have a new laptop"], odd:0, expl:"«Have» = «владеть» — состояние, не Continuous."},
+  {opts:["This cake tastes great","This cake is tasting great","The chef is tasting the cake","The chef tastes the cake every day to check it"], odd:1, expl:"«Taste» в значении «иметь вкус» не бывает в Continuous."},
+  {opts:["The suitcase weighs 10 kg","The suitcase is weighing 10 kg","She is weighing the suitcase","She weighs the suitcase every morning"], odd:1, expl:"«Weigh» = «иметь вес» — состояние, не Continuous."},
+  {opts:["I am understanding your problem","I understand your problem","I understood your problem","I don't understand your problem"], odd:0, expl:"«Understand» — глагол восприятия, только Simple."},
+  {opts:["The dress fits me perfectly","The dress is fitting me perfectly","They are fitting a new carpet","They fit a new carpet every year"], odd:1, expl:"«Fit» = «быть впору» — состояние, не Continuous."},
+  {opts:["He is being lazy today","He is being tall today","He is polite by nature","He was being rude yesterday"], odd:1, expl:"«Tall» — постоянный признак внешности, с ним нельзя «be being»; так говорят только о поведении (careful, polite, rude, lazy…)."},
+  {opts:["I am owning three cars","I own three cars","I owned three cars before","I don't own any cars"], odd:0, expl:"«Own» — глагол состояния, не бывает в Continuous."},
+  {opts:["The milk smells bad","The milk is smelling bad","She is smelling the milk","She smells the milk to check it"], odd:1, expl:"«Smell» = «иметь запах» — состояние, не Continuous."}
+];
+function renderEx3(){
+  const c = document.getElementById('ex3-items');
+  c.innerHTML = ex3data.map((it,i)=>`
+    <div class="item">
+      <span class="qnum">${i+1}.</span>
+      <div class="odd-group" id="ex3-opts-${i}">
+        ${it.opts.map((o,oi)=>`<button type="button" class="opt-btn" data-o="${oi}" onclick="selectEx3(${i},${oi})">${String.fromCharCode(65+oi)}) ${o}</button>`).join('')}
+      </div>
+      <div class="explanation" id="ex3-exp-${i}">${it.expl}</div>
+    </div>`).join('');
+}
+const ex3sel = {};
+function selectEx3(i,o){
+  ex3sel[i]=o;
+  document.querySelectorAll(`#ex3-opts-${i} .opt-btn`).forEach(b=>b.classList.remove('selected'));
+  document.querySelector(`#ex3-opts-${i} .opt-btn[data-o="${o}"]`).classList.add('selected');
+}
+function checkEx3(){
+  let correct=0;
+  ex3data.forEach((it,i)=>{
+    const btns = document.querySelectorAll(`#ex3-opts-${i} .opt-btn`);
+    btns.forEach(b=>b.classList.remove('correct','incorrect'));
+    const sel = ex3sel[i];
+    if(sel===it.odd){ correct++; btns[sel].classList.add('correct'); }
+    else if(sel!==undefined){ btns[sel].classList.add('incorrect'); btns[it.odd].classList.add('correct'); }
+    else { btns[it.odd].classList.add('correct'); }
+  });
+  document.getElementById('ex3-score').textContent = `Результат: ${correct} из ${ex3data.length}`;
+}
+function showEx3(){
+  ex3data.forEach((it,i)=>{
+    const btns = document.querySelectorAll(`#ex3-opts-${i} .opt-btn`);
+    btns.forEach(b=>b.classList.remove('correct','incorrect','selected'));
+    btns[it.odd].classList.add('correct');
+    document.getElementById(`ex3-exp-${i}`).classList.add('show');
+  });
+  document.getElementById('ex3-score').textContent = '';
+}
+
+/* ================= EXERCISE 4 : true/false ================= */
+const ex4data = [
+  {s:"State verbs describe actions rather than states.", ans:false, expl:"Наоборот — State Verbs описывают состояние, а не действие."},
+  {s:"«Enjoy» can be used in continuous tenses to express specific preference.", ans:true, expl:"Да, например: I'm enjoying this party a lot (конкретное, текущее удовольствие)."},
+  {s:"«I love this song, I'm loving it» is standard correct grammar.", ans:false, expl:"«Love» — классический state verb, стандартная норма — только Simple: I love this song."},
+  {s:"Verbs like «see», «hear», «smell» are often used with can/could to refer to what we perceive at the moment of speaking.", ans:true, expl:"Верно: I can see his car parked outside."},
+  {s:"«Have» always means «possess» and can never be used in continuous tenses.", ans:false, expl:"«Have» может значить и действие: He's having a shower — Continuous возможен."},
+  {s:"«He is being rude» describes a permanent character trait.", ans:false, expl:"Это описывает временное поведение, а не постоянную черту характера (для этого — He is rude)."},
+  {s:"«This dress fits you perfectly» means the dress is currently being altered.", ans:false, expl:"Значит, что размер подходит идеально, а не что платье сейчас подгоняют."},
+  {s:"«Look», «feel», «hurt» and «ache» can be used in either simple or continuous tenses with no difference in meaning.", ans:true, expl:"Верно, например: You look / are looking great today — оба варианта верны."},
+  {s:"«I'm seeing my doctor tomorrow» means «I perceive my doctor with my eyes tomorrow».", ans:false, expl:"Значит «у меня назначена встреча с врачом завтра», а не «вижу глазами»."},
+  {s:"«The chicken weighs 2 kilos» is an example of a state verb describing a fixed characteristic.", ans:true, expl:"Верно — «weigh» = «иметь вес» — состояние."}
+];
+function renderEx4(){
+  const c = document.getElementById('ex4-items');
+  c.innerHTML = ex4data.map((it,i)=>`
+    <div class="item">
+      <span class="qnum">${i+1}.</span>
+      <span class="sentence">${it.s}</span>
+      <div class="tf-row" id="ex4-opts-${i}">
+        <button type="button" class="opt-btn" data-o="true" onclick="selectEx4(${i},true)">True</button>
+        <button type="button" class="opt-btn" data-o="false" onclick="selectEx4(${i},false)">False</button>
+      </div>
+      <div class="explanation" id="ex4-exp-${i}">${it.expl}</div>
+    </div>`).join('');
+}
+const ex4sel = {};
+function selectEx4(i,v){
+  ex4sel[i]=v;
+  document.querySelectorAll(`#ex4-opts-${i} .opt-btn`).forEach(b=>b.classList.remove('selected'));
+  document.querySelector(`#ex4-opts-${i} .opt-btn[data-o="${v}"]`).classList.add('selected');
+}
+function checkEx4(){
+  let correct=0;
+  ex4data.forEach((it,i)=>{
+    const tBtn = document.querySelector(`#ex4-opts-${i} .opt-btn[data-o="true"]`);
+    const fBtn = document.querySelector(`#ex4-opts-${i} .opt-btn[data-o="false"]`);
+    tBtn.classList.remove('correct','incorrect');
+    fBtn.classList.remove('correct','incorrect');
+    const sel = ex4sel[i];
+    const correctBtn = it.ans ? tBtn : fBtn;
+    if(sel===it.ans){ correct++; correctBtn.classList.add('correct'); }
+    else if(sel!==undefined){
+      (sel ? tBtn : fBtn).classList.add('incorrect');
+      correctBtn.classList.add('correct');
+    } else {
+      correctBtn.classList.add('correct');
+    }
+  });
+  document.getElementById('ex4-score').textContent = `Результат: ${correct} из ${ex4data.length}`;
+}
+function showEx4(){
+  ex4data.forEach((it,i)=>{
+    const tBtn = document.querySelector(`#ex4-opts-${i} .opt-btn[data-o="true"]`);
+    const fBtn = document.querySelector(`#ex4-opts-${i} .opt-btn[data-o="false"]`);
+    tBtn.classList.remove('correct','incorrect','selected');
+    fBtn.classList.remove('correct','incorrect','selected');
+    (it.ans ? tBtn : fBtn).classList.add('correct');
+    document.getElementById(`ex4-exp-${i}`).classList.add('show');
+  });
+  document.getElementById('ex4-score').textContent = '';
+}
+
+renderEx1();
+renderEx2();
+renderEx3();
+renderEx4();
+</script>
+</body>
+</html>
