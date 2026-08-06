@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Формальные слова — тренажёр</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#10131A;
+  --paper:#EEF1F6;
+  --card:#FFFFFF;
+  --blue:#2B4C8C;
+  --blue-soft:#E7ECF7;
+  --gold:#A8761F;
+  --gold-soft:#FBF1DC;
+  --rose:#AE3F36;
+  --rose-soft:#FBEAE8;
+  --green:#2C6B4F;
+  --green-soft:#E6F1EA;
+  --muted:#5D6675;
+  --line:#D6DCE7;
+  --display:'Fraunces',Georgia,serif;
+  --body:'Inter',-apple-system,Segoe UI,Roboto,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:var(--body);font-size:16px;line-height:1.55;
+}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px 80px}
+
+/* ---------- header ---------- */
+header.top{background:var(--ink);color:#fff;padding:38px 0 30px;margin-bottom:28px}
+header.top .wrap{padding-bottom:0}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:#9AA6BB}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(30px,5vw,46px);line-height:1.05;margin:10px 0 8px}
+h1 em{font-style:normal;color:#E2B95F}
+header.top p{margin:0;color:#B9C3D4;max-width:60ch}
+
+/* ---------- word cards ---------- */
+.section-title{font-family:var(--display);font-size:24px;font-weight:700;margin:0 0 4px}
+.section-note{color:var(--muted);font-size:14px;margin:0 0 18px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.wcard{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.wcard .plain{font-size:13px;color:var(--muted)}
+.wcard .plain s{color:#93A0B4}
+.wcard .arrow{color:var(--gold);font-family:var(--mono)}
+.wcard .formal{font-family:var(--display);font-size:21px;font-weight:700;margin-top:2px}
+.wcard .ipa{font-family:var(--mono);font-size:12.5px;color:var(--blue)}
+.wcard .ru{font-size:13.5px;color:var(--muted);margin-top:4px}
+
+/* ---------- layout ---------- */
+.layout{display:grid;grid-template-columns:1fr 268px;gap:26px;align-items:start;margin-top:34px}
+@media(max-width:900px){.layout{grid-template-columns:1fr}}
+
+/* ---------- exercise ---------- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 22px;margin-bottom:20px}
+.ex h3{font-family:var(--display);font-size:20px;font-weight:700;margin:0 0 4px;display:flex;gap:10px;align-items:baseline}
+.ex h3 .num{font-family:var(--mono);font-size:13px;color:var(--gold);font-weight:500}
+.ex .task{color:var(--muted);font-size:14px;margin:0 0 16px}
+.items{display:flex;flex-direction:column;gap:10px}
+.item{display:grid;grid-template-columns:26px 1fr;gap:10px;padding:9px 10px;border-radius:9px;border:1px solid transparent}
+.item .idx{font-family:var(--mono);font-size:13px;color:#9AA6BB;padding-top:7px}
+.q{font-size:15px;margin-bottom:6px}
+.q .gap{font-family:var(--mono);letter-spacing:.08em;background:var(--blue-soft);padding:1px 6px;border-radius:4px}
+.q .cue{font-family:var(--mono);font-size:12.5px;color:var(--gold);background:var(--gold-soft);padding:2px 7px;border-radius:20px;margin-left:6px;white-space:nowrap}
+.q .sit{display:block;font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--blue);margin-bottom:3px}
+input[type=text],select,textarea{
+  font-family:var(--body);font-size:15px;color:var(--ink);
+  border:1px solid var(--line);border-radius:8px;padding:8px 11px;background:#FCFDFF;width:100%;
+}
+input.short{max-width:230px}
+textarea{resize:vertical;min-height:44px;line-height:1.45}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--blue);outline-offset:1px;border-color:var(--blue)}
+.opts{display:flex;flex-direction:column;gap:5px;margin-top:4px}
+.opt{display:flex;gap:8px;align-items:flex-start;font-size:15px;cursor:pointer;padding:4px 6px;border-radius:6px}
+.opt:hover{background:var(--blue-soft)}
+.opt input{margin-top:5px;accent-color:var(--blue)}
+.drill{display:grid;grid-template-columns:120px 1fr 1fr;gap:8px;align-items:center}
+.drill .seed{font-family:var(--display);font-size:18px;font-weight:700}
+@media(max-width:640px){.drill{grid-template-columns:1fr}}
+.item.ok{background:var(--green-soft);border-color:#BFD9C9}
+.item.bad{background:var(--rose-soft);border-color:#EFC9C5}
+.fb{font-family:var(--mono);font-size:12.5px;margin-top:5px;display:block}
+.fb.ok{color:var(--green)}
+.fb.bad{color:var(--rose)}
+.model{display:block;margin-top:6px;font-size:14.5px;color:var(--blue);border-left:3px solid var(--blue);padding:2px 0 2px 10px;background:var(--blue-soft);border-radius:0 6px 6px 0}
+.model b{font-weight:600}
+
+/* ---------- buttons ---------- */
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
+button{font-family:var(--body);font-size:14px;font-weight:500;border-radius:8px;padding:8px 14px;cursor:pointer;border:1px solid var(--line);background:#fff;color:var(--ink)}
+button:hover{border-color:var(--blue);color:var(--blue)}
+button.primary{background:var(--blue);border-color:var(--blue);color:#fff}
+button.primary:hover{background:#223D73;color:#fff}
+button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.score{font-family:var(--mono);font-size:13px;color:var(--muted);margin-left:auto}
+.score b{color:var(--ink)}
+
+/* ---------- sidebar ---------- */
+aside{position:sticky;top:18px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
+.panel h4{font-family:var(--display);font-size:17px;margin:0 0 2px}
+.panel .sub{font-size:12.5px;color:var(--muted);margin:0 0 12px}
+#problemList{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+#problemList li{display:flex;justify-content:space-between;gap:8px;align-items:center;font-size:14px;background:var(--rose-soft);border:1px solid #EFC9C5;border-radius:8px;padding:6px 9px}
+#problemList li .n{font-family:var(--mono);font-size:12px;color:var(--rose)}
+.empty{font-size:13px;color:var(--muted);background:var(--paper);border-radius:8px;padding:10px;text-align:center}
+.nav{margin-top:14px;padding-top:12px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:3px}
+.nav a{font-family:var(--mono);font-size:12.5px;color:var(--muted);text-decoration:none;padding:2px 0}
+.nav a:hover{color:var(--blue)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:26px;background:var(--ink);color:#fff;font-size:14px;padding:10px 18px;border-radius:24px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:50}
+.toast.show{opacity:1}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <div class="eyebrow">Register upgrade · B1 → B2</div>
+    <h1>Простое слово → <em>формальное слово</em></h1>
+    <p>Восемь пар слов, девять упражнений. Ответы вписываются руками, проверка и образцы — по кнопкам под каждым упражнением.</p>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <h2 class="section-title">Напоминание</h2>
+  <p class="section-note">Слева — как говорим обычно, справа — как это звучит в формальной речи.</p>
+  <div class="cards" id="cards"></div>
+
+  <div class="layout">
+    <main id="exercises"></main>
+
+    <aside>
+      <div class="panel">
+        <h4>Проблемные слова</h4>
+        <p class="sub">Здесь появляются слова, в которых была ошибка.</p>
+        <ul id="problemList"></ul>
+        <div class="nav" id="nav"></div>
+        <button style="width:100%;margin-top:12px" onclick="clearProblems()">Очистить список</button>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============ 1. СЛОВА ============ */
+const WORDS = [
+  {f:'demonstrate', ipa:'/ˈdemənstreɪt/', s:'show',                  ru:'показывать, демонстрировать'},
+  {f:'commence',    ipa:'/kəˈmens/',      s:'start',                 ru:'начинать(ся)'},
+  {f:'announce',    ipa:'/əˈnaʊns/',      s:'tell officially',        ru:'объявлять официально'},
+  {f:'view',        ipa:'/vjuː/',         s:'think about something',  ru:'мнение, взгляд (in my view)'},
+  {f:'appropriate', ipa:'/əˈprəʊpriət/',  s:'right / suitable',       ru:'подходящий, уместный'},
+  {f:'a lady',      ipa:'/ˈleɪdi/',       s:'woman',                  ru:'женщина (вежливо), дама'},
+  {f:'be aware of', ipa:'/əˈweə(r)/',     s:'know / understand',      ru:'знать, быть в курсе'},
+  {f:'response',    ipa:'/rɪˈspɒns/',     s:'answer',                 ru:'ответ, отклик'}
+];
+document.getElementById('cards').innerHTML = WORDS.map(w=>`
+  <div class="wcard">
+    <div class="plain"><s>${w.s}</s> <span class="arrow">→</span></div>
+    <div class="formal">${w.f}</div>
+    <div class="ipa">${w.ipa}</div>
+    <div class="ru">${w.ru}</div>
+  </div>`).join('');
+
+/* ============ 2. ДАННЫЕ УПРАЖНЕНИЙ ============ */
+const HALVES = [
+  'announcement','demonstration','response','course of action','aware of the risks',
+  'view on the matter','legal proceedings','the results publicly','a strong commitment','gentlemen'
+];
+
+const EX = [
+/* --- 1. пропущенные буквы --- */
+{
+ id:'ex1', num:'01', title:'Вставьте пропущенные буквы', type:'text',
+ task:'Впишите слово полностью, без пропусков.',
+ items:[
+  {q:'d <span class="gap">_</span> m <span class="gap">_</span> nstr <span class="gap">_</span> te', a:['demonstrate'], w:'demonstrate'},
+  {q:'c <span class="gap">_</span> mm <span class="gap">_</span> nce', a:['commence'], w:'commence'},
+  {q:'ann <span class="gap">_</span> <span class="gap">_</span> nce', a:['announce'], w:'announce'},
+  {q:'appr <span class="gap">_</span> pri <span class="gap">_</span> te', a:['appropriate'], w:'appropriate'},
+  {q:'r <span class="gap">_</span> sp <span class="gap">_</span> nse', a:['response'], w:'response'},
+  {q:'aw <span class="gap">_</span> r <span class="gap">_</span>', a:['aware'], w:'be aware of'},
+  {q:'v <span class="gap">_</span> <span class="gap">_</span> w', a:['view'], w:'view'},
+  {q:'l <span class="gap">_</span> dy', a:['lady','a lady'], w:'a lady'},
+  {q:'demonstr <span class="gap">_</span> ti <span class="gap">_</span> n', a:['demonstration'], w:'demonstrate'},
+  {q:'ann <span class="gap">_</span> uncem <span class="gap">_</span> nt', a:['announcement'], w:'announce'}
+ ]
+},
+/* --- 2. дефиниции --- */
+{
+ id:'ex2', num:'02', title:'Дефиниция → слово', type:'text',
+ task:'Прочитайте определение и впишите формальное слово.',
+ items:[
+  {q:'to show something clearly, with proof or an example', a:['demonstrate'], w:'demonstrate'},
+  {q:'to begin (formal word for “start”)', a:['commence'], w:'commence'},
+  {q:'to tell people something publicly and officially', a:['announce'], w:'announce'},
+  {q:'a polite word for a woman', a:['lady','a lady'], w:'a lady'},
+  {q:'suitable or correct for a particular situation', a:['appropriate'], w:'appropriate'},
+  {q:'a spoken or written answer', a:['response'], w:'response'},
+  {q:'to know that something exists or is true — to be ___ of it', a:['aware'], w:'be aware of'},
+  {q:'your opinion about something — “in my ___”', a:['view'], w:'view'},
+  {q:'an official public statement (noun)', a:['announcement'], w:'announce'},
+  {q:'an act of showing how something works (noun)', a:['demonstration'], w:'demonstrate'}
+ ]
+},
+/* --- 3. контекст --- */
+{
+ id:'ex3', num:'03', title:'Контекст: одно слово в пропуск', type:'text',
+ task:'Впишите нужное слово в правильной форме.',
+ items:[
+  {q:'The meeting will <span class="gap">______</span> at 9 a.m. sharp.', a:['commence'], w:'commence'},
+  {q:'The director will <span class="gap">______</span> the new policy tomorrow.', a:['announce'], w:'announce'},
+  {q:'Could you <span class="gap">______</span> how this program works?', a:['demonstrate'], w:'demonstrate'},
+  {q:'I have not received a <span class="gap">______</span> to my email yet.', a:['response'], w:'response'},
+  {q:'Jeans are not <span class="gap">______</span> for a job interview.', a:['appropriate'], w:'appropriate'},
+  {q:'In my <span class="gap">______</span>, the price is far too high.', a:['view'], w:'view'},
+  {q:'Please be <span class="gap">______</span> that the office closes at six.', a:['aware'], w:'be aware of'},
+  {q:'A <span class="gap">______</span> from the bank is waiting at reception.', a:['lady'], w:'a lady'},
+  {q:'The <span class="gap">______</span> of the merger surprised everyone. (noun)', a:['announcement'], w:'announce'},
+  {q:'Her <span class="gap">______</span> of the new machine was very clear. (noun)', a:['demonstration'], w:'demonstrate'}
+ ]
+},
+/* --- 4. половинки --- */
+{
+ id:'ex4', num:'04', title:'Соедините половинки выражений', type:'select',
+ task:'Выберите вторую половину для каждого выражения.',
+ options:HALVES,
+ items:[
+  {q:'make a formal …',        a:'announcement',          w:'announce'},
+  {q:'give a live …',          a:'demonstration',         w:'demonstrate'},
+  {q:'send a prompt …',        a:'response',              w:'response'},
+  {q:'take the appropriate …', a:'course of action',      w:'appropriate'},
+  {q:'be fully …',             a:'aware of the risks',    w:'be aware of'},
+  {q:'hold a different …',     a:'view on the matter',    w:'view'},
+  {q:'commence …',             a:'legal proceedings',     w:'commence'},
+  {q:'announce …',             a:'the results publicly',  w:'announce'},
+  {q:'demonstrate …',          a:'a strong commitment',   w:'demonstrate'},
+  {q:'Ladies and …',           a:'gentlemen',             w:'a lady'}
+ ]
+},
+/* --- 5. rephrase --- */
+{
+ id:'ex5', num:'05', title:'Rephrase: скажите формально', type:'keyword',
+ task:'Перепишите предложение целиком, используя слово в скобках. Проверка смотрит, есть ли нужное слово.',
+ items:[
+  {q:'The show starts at seven.', cue:'commence', root:'commenc', model:'The show commences at seven.', w:'commence'},
+  {q:'Let me show you how it works.', cue:'demonstrate', root:'demonstrat', model:'Allow me to demonstrate how it works.', w:'demonstrate'},
+  {q:'They told everybody about the merger yesterday.', cue:'announce', root:'announc', model:'They announced the merger yesterday.', w:'announce'},
+  {q:'I haven’t got an answer yet.', cue:'response', root:'response', model:'I have not received a response yet.', w:'response'},
+  {q:'That shirt isn’t right for the office.', cue:'appropriate', root:'appropriate', model:'That shirt is not appropriate for the office.', w:'appropriate'},
+  {q:'What do you think about the plan?', cue:'view', root:'view', model:'What is your view on the plan?', w:'view'},
+  {q:'I know about the delay.', cue:'aware', root:'aware', model:'I am aware of the delay.', w:'be aware of'},
+  {q:'A woman phoned for you.', cue:'lady', root:'lady', model:'A lady telephoned for you.', w:'a lady'},
+  {q:'We know that prices are going up.', cue:'aware', root:'aware', model:'We are aware that prices are rising.', w:'be aware of'},
+  {q:'The talks will start next Monday.', cue:'commence', root:'commenc', model:'The talks will commence next Monday.', w:'commence'}
+ ]
+},
+/* --- 6. natural? --- */
+{
+ id:'ex6', num:'06', title:'Which sentence sounds natural?', type:'radio',
+ task:'Смотрите на ситуацию: где нужен формальный вариант, а где он звучит странно.',
+ items:[
+  {sit:'Письмо клиенту', o:['The project will commence on Monday.','The project’ll kick off Monday, yeah?'], a:0, w:'commence'},
+  {sit:'Смс другу про кино', o:['The film commences at eight.','The film starts at eight.'], a:1, w:'commence'},
+  {sit:'Презентация для инвесторов', o:['Let me demonstrate the key features.','Lemme show you the cool bits.'], a:0, w:'demonstrate'},
+  {sit:'Разговор с младшим братом', o:['I am aware of it.','Yeah, I know.'], a:1, w:'be aware of'},
+  {sit:'Официальная жалоба в банк', o:['I still haven’t got an answer from you.','I have not yet received a response.'], a:1, w:'response'},
+  {sit:'Обед с коллегой, болтаете', o:['I hold the view that it is excessively expensive.','I think it’s a bit too pricey.'], a:1, w:'view'},
+  {sit:'Пресс-релиз компании', o:['We are pleased to announce a new partnership.','We wanna tell you we’ve got a new partner.'], a:0, w:'announce'},
+  {sit:'Речь на официальном приёме', o:['Ladies and gentlemen, welcome.','Hey everyone, welcome!'], a:0, w:'a lady'},
+  {sit:'Письмо руководителю', o:['Jeans aren’t really right for the meeting, I guess.','Jeans are not appropriate for the meeting.'], a:1, w:'appropriate'},
+  {sit:'Говорите другу, что его искали', o:['A lady was enquiring about you.','Some woman was asking for you.'], a:1, w:'a lady'}
+ ]
+},
+/* --- 7. finish the dialogue --- */
+{
+ id:'ex7', num:'07', title:'Finish the dialogue', type:'open',
+ task:'Допишите реплику B, обязательно со словом в скобках. Свои варианты и образцы можно скопировать одной кнопкой.',
+ items:[
+  {q:'A: When does the ceremony begin?<br>B: …', cue:'commence', model:'It commences at seven o’clock.', w:'commence'},
+  {q:'A: I sent my CV two weeks ago.<br>B: …', cue:'response', model:'I am afraid I have not received a response yet.', w:'response'},
+  {q:'A: Can you explain how the app works?<br>B: …', cue:'demonstrate', model:'Of course — allow me to demonstrate the main features.', w:'demonstrate'},
+  {q:'A: Should I wear jeans to the conference?<br>B: …', cue:'appropriate', model:'No, jeans are not appropriate for a conference.', w:'appropriate'},
+  {q:'A: Did you hear about the merger?<br>B: …', cue:'aware', model:'Yes, I am aware of it.', w:'be aware of'},
+  {q:'A: What do you think of the proposal?<br>B: …', cue:'view', model:'In my view, it is promising but rather expensive.', w:'view'},
+  {q:'A: Someone is waiting at reception.<br>B: …', cue:'a lady', model:'Yes, a lady from the accounts department is waiting for me.', w:'a lady'},
+  {q:'A: When will you tell the staff?<br>B: …', cue:'announce', model:'We will announce the decision on Friday.', w:'announce'},
+  {q:'A: How do I know the system is safe?<br>B: …', cue:'demonstrate', model:'We can demonstrate its safety with the test results.', w:'demonstrate'},
+  {q:'A: Has the course already begun?<br>B: …', cue:'commence', model:'No, it commences next Monday.', w:'commence'}
+ ]
+},
+/* --- 8. expand --- */
+{
+ id:'ex8', num:'08', title:'Expand the sentence', type:'open',
+ task:'Достройте предложение: добавьте когда / где / почему / кто. Минимум 8–10 слов.',
+ items:[
+  {q:'The meeting commenced …', cue:'when + where', model:'The board meeting commenced at 9 a.m. in the main conference room.', w:'commence'},
+  {q:'They announced the results …', cue:'when + how', model:'They announced the results on Friday evening on the company website.', w:'announce'},
+  {q:'She demonstrated the device …', cue:'to whom + why', model:'She demonstrated the device to our clients to prove how simple it is.', w:'demonstrate'},
+  {q:'I received a response …', cue:'from whom + when', model:'I received a response from the manager only three days later.', w:'response'},
+  {q:'This dress is appropriate …', cue:'for what', model:'This dress is appropriate for a formal dinner, but not for the office.', w:'appropriate'},
+  {q:'I am aware …', cue:'of what + since when', model:'I am aware of the problem, and I have been aware of it since Monday.', w:'be aware of'},
+  {q:'In my view, …', cue:'opinion + reason', model:'In my view, the plan is too risky, because we have no extra budget.', w:'view'},
+  {q:'A lady called …', cue:'who + why', model:'A lady from the insurance company called to confirm my appointment.', w:'a lady'},
+  {q:'The course commences …', cue:'when + where', model:'The course commences next September at the university’s new campus.', w:'commence'},
+  {q:'We made an announcement …', cue:'about what + where', model:'We made an announcement about the new prices at yesterday’s staff meeting.', w:'announce'}
+ ]
+},
+/* --- 9. drilling --- */
+{
+ id:'ex9', num:'09', title:'Repeat & Change (дриллинг)', type:'drill',
+ task:'Схема: слово → словосочетание → своё предложение. Пример: suffer → suffer from stress → Many people suffer from stress.',
+ items:[
+  {seed:'demonstrate',   m1:'demonstrate a new method', m2:'Our teacher demonstrated a new method of learning words.', w:'demonstrate'},
+  {seed:'commence',      m1:'commence the lesson',      m2:'We commence the lesson at four o’clock every Tuesday.', w:'commence'},
+  {seed:'announce',      m1:'announce the winner',      m2:'The judges will announce the winner tonight.', w:'announce'},
+  {seed:'response',      m1:'a quick response',         m2:'Thank you for your quick response to my request.', w:'response'},
+  {seed:'appropriate',   m1:'appropriate clothes',      m2:'You should wear appropriate clothes to the ceremony.', w:'appropriate'},
+  {seed:'view',          m1:'in my view',               m2:'In my view, learning formal words is really useful.', w:'view'},
+  {seed:'be aware of',   m1:'be aware of the rules',    m2:'All students must be aware of the exam rules.', w:'be aware of'},
+  {seed:'a lady',        m1:'an elderly lady',          m2:'An elderly lady asked me for directions this morning.', w:'a lady'},
+  {seed:'announcement',  m1:'an important announcement',m2:'The director made an important announcement yesterday.', w:'announce'},
+  {seed:'demonstration', m1:'a short demonstration',    m2:'He gave a short demonstration of the new software.', w:'demonstrate'}
+ ]
+}
+];
+
+/* ============ 3. РЕНДЕР ============ */
+const norm = s => (s||'').toLowerCase()
+  .replace(/[’']/g,"'")
+  .replace(/[.,!?;:"()]/g,'')
+  .replace(/\s+/g,' ').trim();
+
+function renderEx(ex){
+  let body='';
+  ex.items.forEach((it,i)=>{
+    const id=`${ex.id}_${i}`;
+    let field='';
+    if(ex.type==='text'){
+      field=`<div class="q">${it.q}</div><input type="text" class="short" id="${id}" autocomplete="off" spellcheck="false">`;
+    } else if(ex.type==='select'){
+      const opts=ex.options.map(o=>`<option value="${o}">${o}</option>`).join('');
+      field=`<div class="q">${it.q}</div><select id="${id}"><option value="">— выберите —</option>${opts}</select>`;
+    } else if(ex.type==='radio'){
+      field=`<div class="q"><span class="sit">${it.sit}</span></div>
+        <div class="opts">${it.o.map((o,k)=>`<label class="opt"><input type="radio" name="${id}" value="${k}"><span>${o}</span></label>`).join('')}</div>`;
+    } else if(ex.type==='keyword'){
+      field=`<div class="q">${it.q}<span class="cue">${it.cue}</span></div><textarea id="${id}" rows="1" spellcheck="false"></textarea>`;
+    } else if(ex.type==='open'){
+      field=`<div class="q">${it.q}<span class="cue">${it.cue}</span></div><textarea id="${id}" rows="1" spellcheck="false"></textarea>`;
+    } else if(ex.type==='drill'){
+      field=`<div class="drill"><div class="seed">${it.seed}</div>
+        <input type="text" id="${id}_a" placeholder="словосочетание" spellcheck="false">
+        <input type="text" id="${id}_b" placeholder="своё предложение" spellcheck="false"></div>`;
+    }
+    body+=`<div class="item" id="row_${id}"><div class="idx">${i+1}</div><div>${field}<span class="fb" id="fb_${id}"></span></div></div>`;
+  });
+
+  const checkable=['text','select','radio','keyword'].includes(ex.type);
+  const bar = checkable
+    ? `<button class="primary" onclick="check('${ex.id}')">Проверить</button>
+       <button onclick="reveal('${ex.id}')">Показать ответы</button>
+       <button onclick="clearEx('${ex.id}')">Стереть</button>
+       <span class="score" id="score_${ex.id}"></span>`
+    : `<button class="primary" onclick="reveal('${ex.id}')">Показать образцы</button>
+       <button onclick="copyText('${ex.id}','model')">Скопировать образцы</button>
+       <button onclick="copyText('${ex.id}','mine')">Скопировать мои ответы</button>
+       <button onclick="clearEx('${ex.id}')">Стереть</button>`;
+
+  return `<section class="ex" id="${ex.id}">
+    <h3><span class="num">${ex.num}</span>${ex.title}</h3>
+    <p class="task">${ex.task}</p>
+    <div class="items">${body}</div>
+    <div class="bar">${bar}</div>
+  </section>`;
+}
+document.getElementById('exercises').innerHTML = EX.map(renderEx).join('');
+document.getElementById('nav').innerHTML = EX.map(e=>`<a href="#${e.id}">${e.num} · ${e.title}</a>`).join('');
+
+/* ============ 4. ПРОВЕРКА ============ */
+const problems = {};
+function markProblem(w){ problems[w]=(problems[w]||0)+1; renderProblems(); }
+function renderProblems(){
+  const list=document.getElementById('problemList');
+  const keys=Object.keys(problems).sort((a,b)=>problems[b]-problems[a]);
+  list.innerHTML = keys.length
+    ? keys.map(k=>`<li><span>${k}</span><span class="n">${problems[k]}</span></li>`).join('')
+    : `<li style="background:var(--paper);border-color:var(--line);justify-content:center;color:var(--muted);font-size:13px">Пока пусто — ошибок нет</li>`;
+}
+function clearProblems(){ for(const k in problems) delete problems[k]; renderProblems(); toast('Список очищен'); }
+renderProblems();
+
+function setRow(id, state, msg){
+  const row=document.getElementById('row_'+id);
+  const fb=document.getElementById('fb_'+id);
+  row.classList.remove('ok','bad'); fb.className='fb';
+  if(state){ row.classList.add(state); fb.classList.add(state); }
+  fb.textContent = msg||'';
+}
+
+function check(exId){
+  const ex=EX.find(e=>e.id===exId);
+  let right=0;
+  ex.items.forEach((it,i)=>{
+    const id=`${exId}_${i}`;
+    let ok=false, msg='';
+    if(ex.type==='text'){
+      const v=norm(document.getElementById(id).value);
+      if(!v){ setRow(id,null,''); return; }
+      ok=it.a.some(a=>norm(a)===v);
+      msg = ok?'верно':'ошибка — проверьте написание';
+    } else if(ex.type==='select'){
+      const v=document.getElementById(id).value;
+      if(!v){ setRow(id,null,''); return; }
+      ok = v===it.a;
+      msg = ok?'верно':'не та половина';
+    } else if(ex.type==='radio'){
+      const sel=document.querySelector(`input[name="${id}"]:checked`);
+      if(!sel){ setRow(id,null,''); return; }
+      ok = Number(sel.value)===it.a;
+      msg = ok?'верно':'этот вариант не подходит к ситуации';
+    } else if(ex.type==='keyword'){
+      const v=norm(document.getElementById(id).value);
+      if(!v){ setRow(id,null,''); return; }
+      const hasWord=v.includes(norm(it.root));
+      const longEnough=v.split(' ').length>=4;
+      ok = hasWord && longEnough;
+      msg = ok ? 'слово на месте' : (!hasWord ? `нет слова «${it.cue}»` : 'слишком коротко — перепишите всё предложение');
+    }
+    if(ok) right++; else markProblem(it.w);
+    setRow(id, ok?'ok':'bad', msg);
+  });
+  const sc=document.getElementById('score_'+exId);
+  if(sc) sc.innerHTML=`Верно: <b>${right}</b> / ${ex.items.length}`;
+}
+
+function reveal(exId){
+  const ex=EX.find(e=>e.id===exId);
+  ex.items.forEach((it,i)=>{
+    const id=`${exId}_${i}`;
+    const fb=document.getElementById('fb_'+id);
+    if(ex.type==='text'){ fb.className='fb ok'; fb.textContent='→ '+it.a[0]; }
+    else if(ex.type==='select'){ fb.className='fb ok'; fb.textContent='→ '+it.a; }
+    else if(ex.type==='radio'){ fb.className='fb ok'; fb.textContent='→ вариант '+(it.a+1); }
+    else { fb.className='fb'; fb.innerHTML=`<span class="model"><b>Образец:</b> ${it.model}</span>`; }
+  });
+}
+
+function clearEx(exId){
+  const ex=EX.find(e=>e.id===exId);
+  ex.items.forEach((it,i)=>{
+    const id=`${exId}_${i}`;
+    if(ex.type==='drill'){
+      document.getElementById(id+'_a').value='';
+      document.getElementById(id+'_b').value='';
+    } else if(ex.type==='radio'){
+      document.querySelectorAll(`input[name="${id}"]`).forEach(r=>r.checked=false);
+    } else {
+      const el=document.getElementById(id); if(el) el.value='';
+    }
+    setRow(id,null,'');
+  });
+  const sc=document.getElementById('score_'+exId); if(sc) sc.textContent='';
+}
+
+/* ============ 5. КОПИРОВАНИЕ ============ */
+function copyText(exId, kind){
+  const ex=EX.find(e=>e.id===exId);
+  const lines=[`${ex.num} · ${ex.title} — ${kind==='model'?'образцы':'мои ответы'}`,''];
+  ex.items.forEach((it,i)=>{
+    const id=`${exId}_${i}`;
+    if(ex.type==='drill'){
+      const a=document.getElementById(id+'_a').value.trim();
+      const b=document.getElementById(id+'_b').value.trim();
+      lines.push(kind==='model'
+        ? `${i+1}. ${it.seed} → ${it.m1} → ${it.m2}`
+        : `${i+1}. ${it.seed} → ${a||'—'} → ${b||'—'}`);
+    } else {
+      const v=(document.getElementById(id).value||'').trim();
+      lines.push(kind==='model' ? `${i+1}. ${it.model}` : `${i+1}. ${v||'—'}`);
+    }
+  });
+  const text=lines.join('\n');
+  const done=()=>toast(kind==='model'?'Образцы скопированы':'Ваши ответы скопированы');
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(done).catch(()=>fallback(text,done));
+  } else fallback(text,done);
+}
+function fallback(text,done){
+  const ta=document.createElement('textarea');
+  ta.value=text; ta.style.position='fixed'; ta.style.opacity='0';
+  document.body.appendChild(ta); ta.select();
+  try{ document.execCommand('copy'); done(); }catch(e){ toast('Не удалось скопировать'); }
+  document.body.removeChild(ta);
+}
+let tId;
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(tId); tId=setTimeout(()=>t.classList.remove('show'),1800);
+}
+
+/* Enter = проверить упражнение */
+document.addEventListener('keydown',e=>{
+  if(e.key!=='Enter'||e.shiftKey) return;
+  const sec=e.target.closest('.ex'); if(!sec) return;
+  if(['text','select','radio','keyword'].includes(EX.find(x=>x.id===sec.id).type)){
+    e.preventDefault(); check(sec.id);
+  }
+});
+</script>
+</body>
+</html>
