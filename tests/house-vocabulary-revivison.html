@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>План дома · словарь и упражнения</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#132436;
+    --ink-2:#1c3552;
+    --ink-3:#28496b;
+    --paper:#f2ead6;
+    --paper-dim:#a9b6c4;
+    --accent:#e3a73b;
+    --accent-2:#7fae8b;
+    --error:#d1654a;
+    --line: rgba(242,234,214,0.07);
+    --mono: 'IBM Plex Mono', monospace;
+    --display: 'Fraunces', serif;
+    --body: 'Inter', sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--ink); color:var(--paper); font-family:var(--body);
+    margin:0; min-height:100vh; line-height:1.5;
+  }
+  .grid-bg{
+    position:fixed; inset:0; z-index:-1;
+    background-color:var(--ink);
+    background-image:
+      repeating-linear-gradient(0deg, var(--line) 0 1px, transparent 1px 28px),
+      repeating-linear-gradient(90deg, var(--line) 0 1px, transparent 1px 28px);
+  }
+  :focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+  a{ transition: color .15s, border-color .15s; }
+  .btn, .wb-play, input, select, textarea{ transition: box-shadow .15s, border-color .15s, background .15s, filter .15s; }
+  @media (prefers-reduced-motion: reduce){ *{ transition:none !important; scroll-behavior:auto !important; } }
+
+  /* ---- Title block (blueprint stamp) ---- */
+  .titleblock{
+    display:flex; justify-content:space-between; align-items:flex-end;
+    padding:32px 40px; border-bottom:2px solid var(--accent); gap:24px; flex-wrap:wrap;
+  }
+  .tb-eyebrow{ font-family:var(--mono); letter-spacing:.14em; color:var(--accent); font-size:11px; text-transform:uppercase; }
+  h1{ font-family:var(--display); font-size:clamp(30px,5vw,50px); margin:8px 0 0; font-weight:600; line-height:1.05; }
+  .tb-sub{ display:block; font-size:17px; font-weight:400; color:var(--paper-dim); font-style:italic; margin-top:4px; }
+  .tb-stamp{ display:flex; font-family:var(--mono); border:1px solid var(--ink-3); border-radius:6px; overflow:hidden; }
+  .tb-stamp div{ padding:8px 16px; border-left:1px solid var(--ink-3); display:flex; flex-direction:column; gap:4px; }
+  .tb-stamp div:first-child{ border-left:none; }
+  .tb-stamp span{ font-size:9px; color:var(--paper-dim); letter-spacing:.1em; }
+  .tb-stamp strong{ font-size:13px; color:var(--accent); font-weight:600; }
+
+  /* ---- Word bank ---- */
+  .wordbank{ padding:28px 40px; border-bottom:1px solid var(--ink-3); }
+  .wordbank h2{ font-family:var(--display); font-weight:600; font-size:21px; display:flex; align-items:center; gap:14px; margin:0 0 4px; flex-wrap:wrap; }
+  .wordbank p.lead{ color:var(--paper-dim); font-size:13px; margin:0 0 16px; }
+  .wb-table{ display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:10px; }
+  .wb-item{ background:var(--ink-2); border:1px solid var(--ink-3); border-radius:7px; padding:10px 12px; display:flex; justify-content:space-between; align-items:center; gap:10px; }
+  .wb-word{ font-weight:600; }
+  .wb-trans{ font-family:var(--mono); color:var(--accent); font-size:11px; display:block; margin-top:1px; }
+  .wb-ru{ color:var(--paper-dim); font-size:12.5px; display:block; margin-top:1px; }
+  .wb-play{ background:none; border:1px solid var(--accent); color:var(--accent); border-radius:50%; width:30px; height:30px; cursor:pointer; flex-shrink:0; font-size:13px; }
+  .wb-play:hover{ background:var(--accent); color:var(--ink); }
+
+  /* ---- Layout ---- */
+  .layout{ display:grid; grid-template-columns:250px 1fr; align-items:start; }
+  .sidebar{ position:sticky; top:0; padding:24px 18px; border-right:1px solid var(--ink-3); height:100vh; overflow:auto; }
+  .problem-card{ background:var(--ink-2); border:1px solid var(--error); border-radius:8px; padding:14px; }
+  .problem-card h3{ margin:0 0 4px; font-size:14px; color:var(--error); font-family:var(--display); }
+  .problem-card .hint{ font-size:11.5px; color:var(--paper-dim); margin:0 0 10px; }
+  #problemTable{ width:100%; border-collapse:collapse; font-size:12.5px; }
+  #problemTable td{ padding:5px 2px; border-bottom:1px solid var(--ink-3); }
+  .sheet-nav{ margin-top:26px; display:flex; flex-direction:column; gap:4px; }
+  .sheet-nav-title{ font-family:var(--mono); font-size:10px; letter-spacing:.1em; color:var(--paper-dim); text-transform:uppercase; margin-bottom:6px; }
+  .sheet-nav a{ color:var(--paper-dim); text-decoration:none; font-family:var(--mono); font-size:11.5px; padding:6px 8px; border-radius:4px; border-left:2px solid transparent; }
+  .sheet-nav a:hover{ color:var(--accent); border-left-color:var(--accent); background:var(--ink-2); }
+
+  #exercises{ padding:26px 40px 90px; min-width:0; }
+  .exercise{ margin-bottom:58px; scroll-margin-top:16px; }
+  .ex-head{ display:flex; align-items:baseline; gap:14px; border-bottom:1px solid var(--ink-3); padding-bottom:10px; margin-bottom:6px; flex-wrap:wrap; }
+  .ex-sheet{ font-family:var(--mono); color:var(--accent); font-size:12px; border:1px solid var(--accent); padding:2px 8px; border-radius:4px; flex-shrink:0; }
+  .ex-title{ font-family:var(--display); font-size:23px; font-weight:600; margin:0; }
+  .ex-instructions{ color:var(--paper-dim); font-size:13.5px; margin:8px 0 14px; max-width:72ch; }
+  .ex-note{ font-family:var(--mono); font-size:11.5px; color:var(--accent); background:var(--ink-2); border:1px dashed var(--ink-3); border-radius:6px; padding:8px 12px; margin:0 0 16px; max-width:80ch; }
+
+  .items{ display:flex; flex-direction:column; gap:10px; }
+  .item{ background:var(--ink-2); border:1px solid var(--ink-3); border-radius:8px; padding:12px 14px; display:flex; align-items:flex-start; gap:12px; flex-wrap:wrap; }
+  .item-num{ font-family:var(--mono); color:var(--accent); width:20px; flex-shrink:0; padding-top:8px; }
+  .item-prompt{ flex:1; min-width:180px; padding-top:6px; }
+  .item-prompt.full{ flex-basis:100%; }
+  .item input[type=text]{ background:var(--ink); border:1px solid var(--ink-3); color:var(--paper); padding:9px 11px; border-radius:5px; font-family:var(--body); min-width:170px; font-size:14px; }
+  .item select{ background:var(--ink); border:1px solid var(--ink-3); color:var(--paper); padding:9px 11px; border-radius:5px; font-family:var(--body); font-size:14px; }
+  .item input.correct, .item select.correct{ border-color:var(--accent-2); box-shadow:0 0 0 1px var(--accent-2) inset; }
+  .item input.incorrect, .item select.incorrect{ border-color:var(--error); box-shadow:0 0 0 1px var(--error) inset; }
+  .reveal{ font-family:var(--mono); font-size:12px; color:var(--accent); display:none; width:100%; margin-top:6px; }
+  .reveal.show{ display:block; }
+  .icon-box{ width:66px; height:66px; background:var(--ink); border:1px solid var(--ink-3); border-radius:6px; flex-shrink:0; padding:6px; }
+  .blueprint-icon{ width:100%; height:100%; stroke:var(--accent); stroke-width:3; fill:none; stroke-linecap:round; stroke-linejoin:round; }
+  textarea{ width:100%; background:var(--ink); border:1px solid var(--ink-3); color:var(--paper); padding:10px 11px; border-radius:6px; font-family:var(--body); min-height:56px; resize:vertical; font-size:14px; margin-top:6px; }
+  .example-item{ background:var(--ink); border:1px dashed var(--ink-3); }
+
+  .ex-actions{ display:flex; gap:10px; margin-top:16px; flex-wrap:wrap; align-items:center; }
+  .btn{ background:var(--accent); border:none; color:var(--ink); padding:9px 16px; border-radius:6px; font-weight:600; cursor:pointer; font-family:var(--body); font-size:13.5px; }
+  .btn:hover{ filter:brightness(1.1); }
+  .btn.secondary{ background:transparent; border:1px solid var(--paper-dim); color:var(--paper); }
+  .btn.secondary:hover{ border-color:var(--accent); color:var(--accent); }
+  .score{ font-family:var(--mono); font-size:12.5px; color:var(--paper-dim); }
+
+  footer.foot{ padding:22px 40px; border-top:1px solid var(--ink-3); font-family:var(--mono); font-size:11px; color:var(--paper-dim); }
+
+  @media (max-width:880px){
+    .layout{ grid-template-columns:1fr; }
+    .sidebar{ position:static; height:auto; border-right:none; border-bottom:1px solid var(--ink-3); }
+    .titleblock, .wordbank, #exercises{ padding-left:20px; padding-right:20px; }
+  }
+</style>
+</head>
+<body>
+<div class="grid-bg"></div>
+
+<header class="titleblock">
+  <div class="tb-main">
+    <span class="tb-eyebrow">Рабочая тетрадь · English vocabulary</span>
+    <h1>План дома<span class="tb-sub">словарь комнат и мебели</span></h1>
+  </div>
+  <div class="tb-stamp">
+    <div><span>Листы</span><strong>A-01 … A-06</strong></div>
+    <div><span>Масштаб</span><strong>1:1</strong></div>
+    <div><span>Дата</span><strong id="todayDate">—</strong></div>
+  </div>
+</header>
+
+<section class="wordbank" id="wordbank">
+  <h2>Повторим слова <button id="playAll" class="btn secondary" style="font-size:12px;padding:6px 12px;">🔊 Прослушать все</button></h2>
+  <p class="lead">Нажми на кружок 🔊, чтобы услышать произношение слова.</p>
+  <div class="wb-table" id="wbTable"></div>
+</section>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="problem-card">
+      <h3>⚠ Проблемные слова</h3>
+      <p class="hint">Здесь появятся слова, в которых были ошибки.</p>
+      <table id="problemTable"><tbody></tbody></table>
+      <button id="clearProblems" class="btn secondary" style="margin-top:10px;font-size:11px;padding:5px 10px;">Очистить список</button>
+    </div>
+    <nav class="sheet-nav" id="sheetNav">
+      <div class="sheet-nav-title">Содержание</div>
+    </nav>
+  </aside>
+
+  <main id="exercises"></main>
+</div>
+
+<footer class="foot">© Учебный материал · House &amp; Furniture Vocabulary · распечатывать не нужно — пиши прямо в полях</footer>
+
+<script>
+/* ============ DATA ============ */
+const wordBank = [
+  ["stairs","/steəz/","лестница"],
+  ["carpet","/ˈkɑːpɪt/","ковёр, ковровое покрытие"],
+  ["mirror","/ˈmɪrə/","зеркало"],
+  ["living room","/ˈlɪvɪŋ ruːm/","гостиная"],
+  ["armchair","/ˈɑːmtʃeə/","кресло"],
+  ["study","/ˈstʌdi/","кабинет (домашний офис)"],
+  ["shelf / shelves","/ʃelf / ʃelvz/","полка / полки"],
+  ["desk","/desk/","письменный стол"],
+  ["dining room","/ˈdaɪnɪŋ ruːm/","обеденная комната"],
+  ["plant","/plɑːnt/","растение"],
+  ["fridge","/frɪdʒ/","холодильник"],
+  ["sink","/sɪŋk/","раковина"],
+  ["counter","/ˈkaʊntə/","столешница"],
+  ["oven","/ˈʌvən/","духовка"],
+  ["cupboard","/ˈkʌbəd/","шкаф для посуды"],
+  ["wardrobe / closet","/ˈwɔːdrəʊb/","шкаф для одежды"],
+  ["lamp","/læmp/","лампа"],
+  ["rug","/rʌɡ/","коврик"],
+  ["garage","/ˈɡærɑːʒ/","гараж"],
+  ["bathroom","/ˈbɑːθruːm/","ванная комната"],
+  ["washbasin","/ˈwɒʃbeɪsn/","умывальник"],
+  ["shower","/ˈʃaʊə/","душ"],
+  ["microwave","/ˈmaɪkrəweɪv/","микроволновка"],
+  ["ceiling","/ˈsiːlɪŋ/","потолок"],
+  ["floor","/flɔː/","пол"],
+  ["TV stand","/ˌtiːˈviː stænd/","тумба под телевизор"],
+  ["coffee table","/ˈkɒfi ˌteɪbl/","журнальный столик"],
+  ["furniture","/ˈfɜːnɪtʃə/","мебель"],
+  ["guests","/ɡests/","гости"],
+  ["stranger","/ˈstreɪndʒə/","незнакомец"]
+];
+
+const ex1Data = [
+  {pattern:"c_rp_t", answer:"carpet"},
+  {pattern:"m_rr_r", answer:"mirror"},
+  {pattern:"_rmcha_r", answer:"armchair"},
+  {pattern:"c_pb_ard", answer:"cupboard"},
+  {pattern:"w_rdr_be", answer:"wardrobe"},
+  {pattern:"sh_w_r", answer:"shower"},
+  {pattern:"ce_li_g", answer:"ceiling"},
+  {pattern:"f_rnit_re", answer:"furniture"},
+  {pattern:"str_ng_r", answer:"stranger"},
+  {pattern:"m_cro_ave", answer:"microwave"}
+];
+
+const ex2Data = [
+  {ru:"гостиная", answers:["living room"]},
+  {ru:"кабинет (домашний офис)", answers:["study","home office"]},
+  {ru:"обеденная комната", answers:["dining room"]},
+  {ru:"шкаф для одежды", answers:["wardrobe","closet"]},
+  {ru:"журнальный столик", answers:["coffee table"]},
+  {ru:"тумба под телевизор", answers:["tv stand"]},
+  {ru:"умывальник", answers:["washbasin"]},
+  {ru:"гараж", answers:["garage"]},
+  {ru:"растение", answers:["plant"]},
+  {ru:"гости", answers:["guests"]}
+];
+
+const ex3Data = ["stairs","sink","oven","rug","lamp","desk","shelf","floor","plant","fridge"];
+
+const ex4Data = [
+  {def:"A piece of glass that reflects your image when you look at it.", answers:["mirror"]},
+  {def:"A tall piece of furniture where you hang and store your clothes.", answers:["wardrobe","closet"]},
+  {def:"A kitchen appliance used to bake or roast food.", answers:["oven"]},
+  {def:"An appliance that keeps food and drinks cold.", answers:["fridge"]},
+  {def:"A set of steps that connect two floors of a building.", answers:["stairs"]},
+  {def:"A place where you stand and wash your whole body under running water.", answers:["shower"]},
+  {def:"A low table usually placed in front of a sofa.", answers:["coffee table"]},
+  {def:"A piece of furniture that a television sits on.", answers:["tv stand"]},
+  {def:"A piece of furniture with doors and shelves, used to store dishes or food.", answers:["cupboard"]},
+  {def:"A basin with taps, used for washing hands or dishes.", answers:["sink"]}
+];
+
+const ICONS = {
+  armchair:`<svg viewBox="0 0 100 100" class="blueprint-icon"><rect x="22" y="18" width="56" height="28" rx="6"/><rect x="16" y="44" width="68" height="26" rx="6"/><rect x="10" y="30" width="12" height="40" rx="4"/><rect x="78" y="30" width="12" height="40" rx="4"/><line x1="22" y1="70" x2="22" y2="86"/><line x1="78" y1="70" x2="78" y2="86"/></svg>`,
+  lamp:`<svg viewBox="0 0 100 100" class="blueprint-icon"><polygon points="34,18 66,18 78,46 22,46"/><line x1="50" y1="46" x2="50" y2="78"/><line x1="28" y1="84" x2="72" y2="84"/></svg>`,
+  mirror:`<svg viewBox="0 0 100 100" class="blueprint-icon"><ellipse cx="50" cy="42" rx="24" ry="32"/><ellipse cx="50" cy="42" rx="17" ry="25"/><line x1="50" y1="74" x2="50" y2="88"/><line x1="36" y1="88" x2="64" y2="88"/></svg>`,
+  stairs:`<svg viewBox="0 0 100 100" class="blueprint-icon"><polyline points="12,88 12,72 30,72 30,56 48,56 48,40 66,40 66,24 88,24"/></svg>`,
+  plant:`<svg viewBox="0 0 100 100" class="blueprint-icon"><polygon points="36,68 64,68 58,90 42,90"/><path d="M50 68 C 40 50, 30 45, 20 30"/><path d="M50 68 C 60 45, 70 40, 82 22"/><path d="M50 68 C 50 42, 50 30, 50 12"/></svg>`,
+  desk:`<svg viewBox="0 0 100 100" class="blueprint-icon"><rect x="14" y="34" width="72" height="8"/><line x1="20" y1="42" x2="20" y2="84"/><line x1="80" y1="42" x2="80" y2="84"/><rect x="58" y="42" width="20" height="16"/></svg>`,
+  wardrobe:`<svg viewBox="0 0 100 100" class="blueprint-icon"><rect x="26" y="12" width="48" height="76" rx="2"/><line x1="50" y1="12" x2="50" y2="88"/><circle cx="45" cy="50" r="2.5" fill="var(--accent)"/><circle cx="55" cy="50" r="2.5" fill="var(--accent)"/></svg>`,
+  shower:`<svg viewBox="0 0 100 100" class="blueprint-icon"><line x1="50" y1="10" x2="50" y2="26"/><circle cx="50" cy="34" r="14"/><line x1="38" y1="52" x2="34" y2="64"/><line x1="50" y1="52" x2="50" y2="66"/><line x1="62" y1="52" x2="66" y2="64"/></svg>`,
+  coffeeTable:`<svg viewBox="0 0 100 100" class="blueprint-icon"><rect x="16" y="44" width="68" height="8" rx="2"/><line x1="22" y1="52" x2="22" y2="76"/><line x1="78" y1="52" x2="78" y2="76"/><line x1="34" y1="52" x2="34" y2="70"/><line x1="66" y1="52" x2="66" y2="70"/></svg>`,
+  fridge:`<svg viewBox="0 0 100 100" class="blueprint-icon"><rect x="30" y="10" width="40" height="80" rx="4"/><line x1="30" y1="32" x2="70" y2="32"/><line x1="64" y1="16" x2="64" y2="26"/><line x1="64" y1="40" x2="64" y2="54"/></svg>`
+};
+
+const ex5Data = [
+  {icon:"armchair", answers:["armchair"]},
+  {icon:"lamp", answers:["lamp"]},
+  {icon:"mirror", answers:["mirror"]},
+  {icon:"stairs", answers:["stairs"]},
+  {icon:"plant", answers:["plant"]},
+  {icon:"desk", answers:["desk"]},
+  {icon:"wardrobe", answers:["wardrobe","closet"]},
+  {icon:"shower", answers:["shower"]},
+  {icon:"coffeeTable", answers:["coffee table"]},
+  {icon:"fridge", answers:["fridge"]}
+];
+
+const ex7Data = [
+  {word:"armchair", answer:"Living room"},
+  {word:"coffee table", answer:"Living room"},
+  {word:"TV stand", answer:"Living room"},
+  {word:"fridge", answer:"Kitchen"},
+  {word:"oven", answer:"Kitchen"},
+  {word:"microwave", answer:"Kitchen"},
+  {word:"cupboard", answer:"Kitchen"},
+  {word:"shower", answer:"Bathroom"},
+  {word:"washbasin", answer:"Bathroom"},
+  {word:"bathroom mirror", answer:"Bathroom"}
+];
+
+/* ============ HELPERS ============ */
+function normalize(s){
+  return s.toString().trim().toLowerCase().replace(/\s+/g,' ').replace(/ё/g,'е');
+}
+function isCorrect(value, answers){
+  const v = normalize(value);
+  return answers.some(a => normalize(a) === v);
+}
+function speak(text){
+  if(!('speechSynthesis' in window)){ alert('Озвучка не поддерживается в этом браузере'); return; }
+  const clean = text.split('/')[0].split('(')[0].trim();
+  const u = new SpeechSynthesisUtterance(clean);
+  u.lang = 'en-GB'; u.rate = 0.88;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+}
+
+let problemWords = {};
+function addProblem(word){
+  problemWords[word] = (problemWords[word]||0) + 1;
+  renderProblems();
+}
+function renderProblems(){
+  const tbody = document.querySelector('#problemTable tbody');
+  const entries = Object.entries(problemWords).sort((a,b)=>b[1]-a[1]);
+  if(!entries.length){
+    tbody.innerHTML = '<tr><td style="color:var(--paper-dim);font-size:11.5px;padding-top:6px;">Пока пусто</td></tr>';
+    return;
+  }
+  tbody.innerHTML = entries.map(([w,c]) =>
+    `<tr><td>${w}</td><td style="text-align:right;color:var(--error);font-family:var(--mono);">×${c}</td></tr>`
+  ).join('');
+}
+
+function itemWrap(num, inner){
+  return `<div class="item"><span class="item-num">${num}.</span>${inner}</div>`;
+}
+
+/* ============ RENDERERS ============ */
+function renderBlank(){
+  return ex1Data.map((d,i) => itemWrap(i+1, `
+    <div class="item-prompt"><span style="font-family:var(--mono);font-size:19px;letter-spacing:2px;color:var(--paper);">${d.pattern}</span></div>
+    <input type="text" data-answers='${JSON.stringify([d.answer])}' data-word="${d.answer}" placeholder="впиши слово целиком">
+    <div class="reveal">Ответ: ${d.answer}</div>
+  `)).join('');
+}
+function renderTranslate(){
+  return ex2Data.map((d,i) => itemWrap(i+1, `
+    <div class="item-prompt">${d.ru}</div>
+    <input type="text" data-answers='${JSON.stringify(d.answers)}' data-word="${d.answers[0]}" placeholder="type in English">
+    <div class="reveal">Ответ: ${d.answers.join(' / ')}</div>
+  `)).join('');
+}
+function renderDictation(){
+  return ex3Data.map((w,i) => itemWrap(i+1, `
+    <div class="item-prompt">
+      <button class="wb-play" data-word="${w}" title="Прослушать">🔊</button>
+      <span style="color:var(--paper-dim);font-size:12.5px;margin-left:8px;">нажми и напиши услышанное слово</span>
+    </div>
+    <input type="text" data-answers='${JSON.stringify([w])}' data-word="${w}" placeholder="write the word">
+    <div class="reveal">Ответ: ${w}</div>
+  `)).join('');
+}
+function renderDefinition(){
+  return ex4Data.map((d,i) => itemWrap(i+1, `
+    <div class="item-prompt full" style="flex-basis:100%;">${d.def}</div>
+    <input type="text" data-answers='${JSON.stringify(d.answers)}' data-word="${d.answers[0]}" placeholder="write the word">
+    <div class="reveal">Ответ: ${d.answers.join(' / ')}</div>
+  `)).join('');
+}
+function renderPicture(){
+  return ex5Data.map((d,i) => itemWrap(i+1, `
+    <div class="icon-box">${ICONS[d.icon]}</div>
+    <input type="text" data-answers='${JSON.stringify(d.answers)}' data-word="${d.answers[0]}" placeholder="what is it?">
+    <div class="reveal">Ответ: ${d.answers.join(' / ')}</div>
+  `)).join('');
+}
+function renderCategorise(){
+  const opts = ['Living room','Kitchen','Bathroom'];
+  return ex7Data.map((d,i) => itemWrap(i+1, `
+    <div class="item-prompt">${d.word}</div>
+    <select data-answers='${JSON.stringify([d.answer])}' data-word="${d.word}">
+      <option value="">— выбери комнату —</option>
+      ${opts.map(o=>`<option value="${o}">${o}</option>`).join('')}
+    </select>
+    <div class="reveal">Ответ: ${d.answer}</div>
+  `)).join('');
+}
+/* ============ EXERCISES CONFIG ============ */
+const EXERCISES = [
+  {sheet:"A-01", title:"Fill in the missing letters", instructions:"Впиши пропущенные буквы и напиши слово целиком.", renderer:renderBlank, mode:"check"},
+  {sheet:"A-02", title:"Translate: RU → EN", instructions:"Переведи слово или фразу на английский.", renderer:renderTranslate, mode:"check"},
+  {sheet:"A-03", title:"Listen and write", instructions:"Нажми на 🔊 и запиши слово, которое услышал(а).", renderer:renderDictation, mode:"check"},
+  {sheet:"A-04", title:"Guess the word: definition", instructions:"Прочитай определение и напиши слово, которое оно описывает.", renderer:renderDefinition, mode:"check"},
+  {sheet:"A-05", title:"Guess the word: picture", instructions:"Посмотри на чертёж предмета и напиши слово.", renderer:renderPicture, mode:"check"},
+  {sheet:"A-06", title:"Categorise", instructions:"Определи, в какой комнате обычно находится предмет.", renderer:renderCategorise, mode:"check"}
+];
+
+/* ============ BUILD PAGE ============ */
+function buildWordBank(){
+  document.getElementById('wbTable').innerHTML = wordBank.map(w => `
+    <div class="wb-item">
+      <div>
+        <span class="wb-word">${w[0]}</span>
+        <span class="wb-trans">${w[1]}</span>
+        <span class="wb-ru">${w[2]}</span>
+      </div>
+      <button class="wb-play" data-word="${w[0]}" title="Прослушать">🔊</button>
+    </div>`).join('');
+}
+
+function buildExercises(){
+  const main = document.getElementById('exercises');
+  main.innerHTML = EXERCISES.map((ex, idx) => {
+    const id = 'ex' + idx;
+    let actions = '';
+    if(ex.mode === 'check'){
+      actions = `
+        <div class="ex-actions">
+          <button class="btn" data-action="check" data-ex="${id}">Проверить</button>
+          <button class="btn secondary" data-action="reveal" data-ex="${id}" data-show="Показать ответы" data-hide="Скрыть ответы">Показать ответы</button>
+          <button class="btn secondary" data-action="reset" data-ex="${id}">Очистить</button>
+          <span class="score" id="score-${id}"></span>
+        </div>`;
+    } else if(ex.mode === 'model'){
+      actions = `
+        <div class="ex-actions">
+          <button class="btn secondary" data-action="reveal" data-ex="${id}" data-show="Показать варианты ответов" data-hide="Скрыть варианты ответов">Показать варианты ответов</button>
+        </div>`;
+    } else if(ex.mode === 'expand'){
+      actions = `
+        <div class="ex-actions">
+          <button class="btn" data-action="copy" data-ex="${id}">Скопировать все ответы</button>
+          <span class="score" id="score-${id}"></span>
+        </div>`;
+    }
+    const example = ex.mode === 'expand' ? `
+      <div class="item example-item">
+        <span class="item-num">✎</span>
+        <div class="item-prompt full" style="flex-basis:100%;"><em>Пример:</em> There is a sofa. → <strong>There is a big grey sofa in the corner of the living room, next to the bookshelf.</strong></div>
+      </div>` : '';
+    const note = ex.note ? `<div class="ex-note">${ex.note}</div>` : '';
+    return `
+      <section class="exercise" id="${id}">
+        <div class="ex-head">
+          <span class="ex-sheet">${ex.sheet}</span>
+          <h2 class="ex-title">${idx+1}. ${ex.title}</h2>
+        </div>
+        <p class="ex-instructions">${ex.instructions}</p>
+        ${note}
+        <div class="items">${example}${ex.renderer()}</div>
+        ${actions}
+      </section>`;
+  }).join('');
+}
+
+function buildNav(){
+  document.getElementById('sheetNav').innerHTML =
+    '<div class="sheet-nav-title">Содержание</div>' +
+    EXERCISES.map((ex, idx) => `<a href="#ex${idx}">${ex.sheet} · ${ex.title}</a>`).join('');
+}
+
+/* ============ ACTIONS ============ */
+function checkExercise(id){
+  const section = document.getElementById(id);
+  const inputs = section.querySelectorAll('input[data-answers], select[data-answers]');
+  let correct = 0, total = 0;
+  inputs.forEach(inp => {
+    if(!inp.value){ inp.classList.remove('correct','incorrect'); return; }
+    total++;
+    const answers = JSON.parse(inp.dataset.answers);
+    if(isCorrect(inp.value, answers)){
+      inp.classList.add('correct'); inp.classList.remove('incorrect'); correct++;
+    } else {
+      inp.classList.add('incorrect'); inp.classList.remove('correct');
+      addProblem(inp.dataset.word);
+    }
+  });
+  const scoreEl = document.getElementById('score-' + id);
+  if(scoreEl) scoreEl.textContent = total ? `${correct} / ${total} правильно` : 'сначала заполни поля';
+}
+
+function toggleReveal(btn){
+  const section = document.getElementById(btn.dataset.ex);
+  const showing = btn.dataset.showing === '1';
+  section.querySelectorAll('.reveal').forEach(r => r.classList.toggle('show', !showing));
+  btn.dataset.showing = showing ? '0' : '1';
+  btn.textContent = showing ? btn.dataset.show : btn.dataset.hide;
+}
+
+function resetExercise(id){
+  const section = document.getElementById(id);
+  section.querySelectorAll('input[data-answers], select[data-answers]').forEach(inp => {
+    inp.value = ''; inp.classList.remove('correct','incorrect');
+  });
+  section.querySelectorAll('.reveal').forEach(r => r.classList.remove('show'));
+  const revealBtn = section.querySelector('[data-action="reveal"]');
+  if(revealBtn){ revealBtn.dataset.showing = '0'; revealBtn.textContent = revealBtn.dataset.show; }
+  const scoreEl = section.querySelector('.score');
+  if(scoreEl) scoreEl.textContent = '';
+}
+
+function copyExpand(id){
+  const section = document.getElementById(id);
+  const areas = section.querySelectorAll('.expand-input');
+  let text = '';
+  areas.forEach((ta, i) => { text += `${i+1}. ${ta.dataset.base}\n→ ${ta.value || '(пусто)'}\n\n`; });
+  const scoreEl = document.getElementById('score-' + id);
+  navigator.clipboard.writeText(text).then(() => {
+    if(scoreEl){ scoreEl.textContent = 'Скопировано ✓'; setTimeout(() => scoreEl.textContent = '', 2500); }
+  }).catch(() => { alert('Не удалось скопировать. Вот текст:\n\n' + text); });
+}
+
+/* ============ INIT ============ */
+document.addEventListener('click', e => {
+  const t = e.target;
+  if(t.classList.contains('wb-play')) speak(t.dataset.word);
+  if(t.dataset.action === 'check') checkExercise(t.dataset.ex);
+  if(t.dataset.action === 'reveal') toggleReveal(t);
+  if(t.dataset.action === 'reset') resetExercise(t.dataset.ex);
+  if(t.dataset.action === 'copy') copyExpand(t.dataset.ex);
+});
+document.getElementById('clearProblems').onclick = () => { problemWords = {}; renderProblems(); };
+document.getElementById('playAll').onclick = async () => {
+  for(const w of wordBank){ speak(w[0]); await new Promise(r => setTimeout(r, 1000)); }
+};
+
+buildWordBank();
+buildExercises();
+buildNav();
+renderProblems();
+document.getElementById('todayDate').textContent = new Date().toLocaleDateString('ru-RU');
+</script>
+</body>
+</html>
