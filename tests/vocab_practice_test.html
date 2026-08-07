@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Прогулка по лесу: практика слов</title>
+<style>
+  :root{
+    --bark:#3e2f24;
+    --forest:#2f4a3c;
+    --forest-dark:#20342a;
+    --pond:#3f7a8c;
+    --pond-light:#e4f1f4;
+    --moss:#6d8f5b;
+    --sand:#f4ede1;
+    --paper:#fffdf8;
+    --ink:#2a2620;
+    --ok:#3f8a52;
+    --bad:#b8503f;
+    --muted:#8a8073;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family: 'Georgia', 'Iowan Old Style', serif;
+    background: var(--sand);
+    color: var(--ink);
+    line-height:1.5;
+  }
+  header.hero{
+    background: linear-gradient(160deg, var(--forest) 0%, var(--forest-dark) 65%, var(--bark) 130%);
+    color: var(--sand);
+    padding: 40px 24px 56px;
+    position:relative;
+    overflow:hidden;
+  }
+  header.hero::after{
+    content:"";
+    position:absolute; right:-60px; bottom:-80px;
+    width:260px; height:260px; border-radius:50%;
+    background: radial-gradient(circle, rgba(244,237,225,0.10), transparent 70%);
+  }
+  header.hero h1{
+    font-size: clamp(24px, 4vw, 34px);
+    margin:0 0 6px;
+    font-weight: 600;
+    letter-spacing:.3px;
+  }
+  header.hero p.sub{
+    margin:0; color:#d9e3d6; font-size:15px; max-width:620px;
+  }
+  .wrap{
+    max-width:1180px; margin:-30px auto 60px; padding:0 20px;
+    display:grid; grid-template-columns: 1fr 260px; gap:22px;
+    align-items:start;
+  }
+  @media (max-width:880px){ .wrap{grid-template-columns:1fr;} }
+
+  .card{
+    background:var(--paper);
+    border-radius:14px;
+    box-shadow: 0 10px 30px rgba(46,36,20,.08), 0 1px 0 rgba(46,36,20,.04);
+    border:1px solid #e9e0cf;
+    padding:22px 24px;
+    margin-bottom:22px;
+  }
+  .word-table{width:100%; border-collapse:collapse; font-size:15px;}
+  .word-table th{
+    text-align:left; font-size:12px; text-transform:uppercase; letter-spacing:.08em;
+    color:var(--muted); font-weight:600; padding:8px 10px; border-bottom:2px solid #e9e0cf;
+  }
+  .word-table td{padding:10px; border-bottom:1px solid #f0ead9; vertical-align:middle;}
+  .word-table tr:last-child td{border-bottom:none;}
+  .en-word{font-weight:700; color:var(--forest-dark);}
+  .transcription{color:var(--pond); font-style:italic;}
+  .listen-btn{
+    background:var(--pond); color:#fff; border:none; border-radius:20px;
+    padding:6px 14px; font-size:13px; cursor:pointer; font-family:inherit;
+    display:inline-flex; align-items:center; gap:6px;
+  }
+  .listen-btn:hover{background:#336577;}
+  .listen-btn:active{transform:scale(.97);}
+
+  h2.ex-title{
+    font-size:19px; color:var(--forest-dark); margin:0 0 4px; display:flex; align-items:center; gap:10px;
+  }
+  .ex-num{
+    background:var(--moss); color:#fff; font-size:13px; font-weight:700;
+    width:28px; height:28px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center;
+    flex:none;
+  }
+  .ex-instr{color:var(--muted); font-size:14px; margin:0 0 16px; padding-left:38px;}
+  .item{
+    display:grid; grid-template-columns: 30px 1fr 220px; gap:10px; align-items:start;
+    padding:10px 0; border-bottom:1px dashed #ecdfc4;
+  }
+  .item:last-of-type{border-bottom:none;}
+  .item .n{color:var(--muted); font-weight:700; padding-top:8px;}
+  .item .prompt{padding-top:6px; font-size:15px;}
+  .item .prompt .ru{color:var(--pond); font-size:13px; display:block; margin-top:2px;}
+  .item input[type=text], .item textarea{
+    width:100%; border:1.5px solid #ddd0b3; border-radius:8px; padding:8px 10px;
+    font-family:inherit; font-size:14.5px; background:#fffef9;
+  }
+  .item textarea{resize:vertical; min-height:44px;}
+  .item input[type=text]:focus, .item textarea:focus{outline:none; border-color:var(--pond);}
+  .item.correct input, .item.correct textarea{border-color:var(--ok); background:#f1f8f1;}
+  .item.wrong input, .item.wrong textarea{border-color:var(--bad); background:#fbf1ef;}
+  .feedback{font-size:12.5px; margin-top:4px; min-height:16px;}
+  .feedback.ok{color:var(--ok);}
+  .feedback.bad{color:var(--bad);}
+  .answer-reveal{
+    display:none; font-size:13px; background:var(--pond-light); border-radius:6px; padding:6px 8px; margin-top:6px; color:#215061;
+  }
+  .answer-reveal.show{display:block;}
+
+  .ex-actions{display:flex; gap:10px; margin-top:16px; padding-left:38px; flex-wrap:wrap;}
+  .btn{
+    border:none; border-radius:8px; padding:9px 16px; font-size:13.5px; cursor:pointer;
+    font-family:inherit; font-weight:600;
+  }
+  .btn-check{background:var(--forest); color:#fff;}
+  .btn-check:hover{background:var(--forest-dark);}
+  .btn-show{background:#fff; color:var(--forest); border:1.5px solid var(--forest);}
+  .btn-copy{background:var(--bark); color:#fff;}
+  .btn-copy:hover{opacity:.9;}
+  .score-tag{font-size:13px; color:var(--muted); align-self:center;}
+  .toast{
+    position:fixed; bottom:22px; left:50%; transform:translateX(-50%);
+    background:var(--forest-dark); color:#fff; padding:10px 18px; border-radius:20px; font-size:13.5px;
+    opacity:0; pointer-events:none; transition:opacity .25s; z-index:50;
+  }
+  .toast.show{opacity:1;}
+
+  aside.sidebar{position:sticky; top:20px;}
+  .sidebar .card{margin-bottom:16px;}
+  .sidebar h3{margin:0 0 10px; font-size:15px; color:var(--forest-dark);}
+  .problem-list{list-style:none; margin:0; padding:0; font-size:14px;}
+  .problem-list li{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:7px 0; border-bottom:1px solid #f0ead9;
+  }
+  .problem-list li:last-child{border-bottom:none;}
+  .pcount{
+    background:var(--bad); color:#fff; font-size:11px; border-radius:10px;
+    padding:1px 8px; font-weight:700;
+  }
+  .empty-note{color:var(--muted); font-size:13.5px;}
+  .progress-note{font-size:13px; color:var(--muted); margin-top:2px;}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <h1>🌿 Прогулка по лесу: слова о природе и животных</h1>
+  <p class="sub">Повторите 7 слов, прослушайте произношение, а затем пройдите 11 упражнений — по 10 заданий в каждом. Пишите ответы от руки в поля ввода.</p>
+</header>
+
+<div class="wrap">
+  <main>
+
+    <section class="card" id="wordbank">
+      <h2 class="ex-title"><span class="ex-num">★</span> Слова для повторения</h2>
+      <p class="ex-instr">Нажмите «🔊 Слушать», чтобы услышать произношение каждого слова.</p>
+      <table class="word-table">
+        <thead><tr><th>Слово</th><th>Транскрипция</th><th>Перевод</th><th></th></tr></thead>
+        <tbody id="wordbank-body"></tbody>
+      </table>
+    </section>
+
+    <div id="exercises"></div>
+
+  </main>
+
+  <aside class="sidebar">
+    <div class="card">
+      <h3>⚠️ Проблемные слова</h3>
+      <ul class="problem-list" id="problem-list"></ul>
+      <p class="empty-note" id="problem-empty">Пока ошибок нет — продолжайте в том же духе!</p>
+    </div>
+    <div class="card">
+      <h3>📊 Прогресс</h3>
+      <p class="progress-note" id="progress-note">Проверено заданий: 0</p>
+    </div>
+  </aside>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ---------- DATA ----------
+const words = [
+  {en:"come across (an animal)", ru:"случайно встретить/увидеть животное", tr:"/kʌm əˈkrɒs/", say:"come across"},
+  {en:"interact with", ru:"общаться, взаимодействовать с", tr:"/ˌɪntərˈækt wɪð/", say:"interact with"},
+  {en:"fence", ru:"забор, ограда", tr:"/fens/", say:"fence"},
+  {en:"pond", ru:"пруд", tr:"/pɒnd/", say:"pond"},
+  {en:"be surrounded by", ru:"быть окружённым", tr:"/biː səˈraʊndɪd baɪ/", say:"be surrounded by"},
+  {en:"wet", ru:"мокрый, влажный", tr:"/wet/", say:"wet"},
+  {en:"breeze", ru:"лёгкий ветерок, бриз", tr:"/briːz/", say:"breeze"},
+];
+
+// problem word mistake counter
+const mistakes = {}; // word -> count
+words.forEach(w => mistakes[w.en] = 0);
+let checkedCount = 0;
+
+// Exercises: type "strict" (auto-checked) or "creative" (sample answer only)
+const exercises = [
+  {
+    id:"ex1", type:"strict",
+    title:"Упражнение 1. Вставьте пропущенные буквы",
+    instr:"Впишите слово целиком, ориентируясь на пропуски и перевод.",
+    items:[
+      {prompt:"c_me acr_ss", ru:"случайно встретить/увидеть", answers:["come across"], word:"come across (an animal)"},
+      {prompt:"int_r_ct w_th", ru:"общаться, взаимодействовать с", answers:["interact with"], word:"interact with"},
+      {prompt:"fe_ce", ru:"забор", answers:["fence"], word:"fence"},
+      {prompt:"p_nd", ru:"пруд", answers:["pond"], word:"pond"},
+      {prompt:"be surr_und_d b_", ru:"быть окружённым", answers:["be surrounded by"], word:"be surrounded by"},
+      {prompt:"w_t", ru:"мокрый", answers:["wet"], word:"wet"},
+      {prompt:"bre_ze", ru:"лёгкий ветерок", answers:["breeze"], word:"breeze"},
+      {prompt:"c_mes acr_ss", ru:"случайно встречает (3 л. ед.ч.)", answers:["comes across"], word:"come across (an animal)"},
+      {prompt:"interac_ing w_th", ru:"взаимодействующий с", answers:["interacting with"], word:"interact with"},
+      {prompt:"su_round_d b_", ru:"окружённый", answers:["surrounded by"], word:"be surrounded by"},
+    ]
+  },
+  {
+    id:"ex2", type:"strict",
+    title:"Упражнение 2. Переведите с русского на английский",
+    instr:"Переведите предложение целиком, используя нужное слово из списка.",
+    items:[
+      {prompt:"Мы случайно встретили лису в лесу.", answers:["we came across a fox in the forest"], word:"come across (an animal)"},
+      {prompt:"Детям нравится общаться с животными в зоопарке.", answers:["children like to interact with animals at the zoo"], word:"interact with"},
+      {prompt:"Вокруг сада стоит высокий забор.", answers:["there is a high fence around the garden"], word:"fence"},
+      {prompt:"В парке есть небольшой пруд с утками.", answers:["there is a small pond with ducks in the park"], word:"pond"},
+      {prompt:"Дом был окружён деревьями.", answers:["the house was surrounded by trees"], word:"be surrounded by"},
+      {prompt:"Моя одежда была мокрой после дождя.", answers:["my clothes were wet after the rain"], word:"wet"},
+      {prompt:"Лёгкий ветерок дул с моря.", answers:["a light breeze was blowing from the sea"], word:"breeze"},
+      {prompt:"Вчера мы наткнулись на старую хижину в лесу.", answers:["yesterday we came across an old hut in the forest"], word:"come across (an animal)"},
+      {prompt:"Собаки любят взаимодействовать друг с другом.", answers:["dogs like to interact with each other"], word:"interact with"},
+      {prompt:"Трава была мокрой от росы.", answers:["the grass was wet with dew"], word:"wet"},
+    ]
+  },
+  {
+    id:"ex3", type:"strict", audio:true,
+    title:"Упражнение 3. Запишите слово на слух",
+    instr:"Нажмите «🔊» и напишите то, что услышите, по-английски.",
+    items:[
+      {prompt:"come across", say:"come across", ru:"", answers:["come across"], word:"come across (an animal)"},
+      {prompt:"interact with", say:"interact with", ru:"", answers:["interact with"], word:"interact with"},
+      {prompt:"fence", say:"fence", ru:"", answers:["fence"], word:"fence"},
+      {prompt:"pond", say:"pond", ru:"", answers:["pond"], word:"pond"},
+      {prompt:"be surrounded by", say:"be surrounded by", ru:"", answers:["be surrounded by"], word:"be surrounded by"},
+      {prompt:"wet", say:"wet", ru:"", answers:["wet"], word:"wet"},
+      {prompt:"breeze", say:"breeze", ru:"", answers:["breeze"], word:"breeze"},
+      {prompt:"a wooden fence", say:"a wooden fence", ru:"", answers:["a wooden fence"], word:"fence"},
+      {prompt:"a small pond", say:"a small pond", ru:"", answers:["a small pond"], word:"pond"},
+      {prompt:"a cool breeze", say:"a cool breeze", ru:"", answers:["a cool breeze"], word:"breeze"},
+    ]
+  },
+  {
+    id:"ex4", type:"strict",
+    title:"Упражнение 4. Дефиниция",
+    instr:"По определению на английском напишите нужное слово.",
+    items:[
+      {prompt:"to find or see an animal by chance while walking or travelling", answers:["come across"], word:"come across (an animal)"},
+      {prompt:"to communicate or spend time with someone or something", answers:["interact with"], word:"interact with"},
+      {prompt:"a structure of wood, metal, etc. around an area of land", answers:["fence"], word:"fence"},
+      {prompt:"a small area of still water, smaller than a lake", answers:["pond"], word:"pond"},
+      {prompt:"to have people or things all around you", answers:["be surrounded by","surrounded by"], word:"be surrounded by"},
+      {prompt:"covered with water or not dry", answers:["wet"], word:"wet"},
+      {prompt:"a light, gentle wind", answers:["breeze"], word:"breeze"},
+      {prompt:"a barrier that marks the border of a garden or field", answers:["fence"], word:"fence"},
+      {prompt:"to meet an animal unexpectedly on a walk", answers:["come across"], word:"come across (an animal)"},
+      {prompt:"a small pool of water where ducks might swim", answers:["pond"], word:"pond"},
+    ]
+  },
+  {
+    id:"ex5", type:"strict",
+    title:"Упражнение 5. Сочетаемость слов",
+    instr:"Впишите пропущенное слово, чтобы получилось правильное словосочетание.",
+    items:[
+      {prompt:"come ___ a bear", answers:["across"], word:"come across (an animal)"},
+      {prompt:"interact ___ other animals", answers:["with"], word:"interact with"},
+      {prompt:"a wooden ___", answers:["fence"], word:"fence"},
+      {prompt:"a duck ___", answers:["pond"], word:"pond"},
+      {prompt:"be surrounded ___ mountains", answers:["by"], word:"be surrounded by"},
+      {prompt:"get ___ in the rain", answers:["wet"], word:"wet"},
+      {prompt:"a gentle ___", answers:["breeze"], word:"breeze"},
+      {prompt:"jump over the ___", answers:["fence"], word:"fence"},
+      {prompt:"swim in the ___", answers:["pond"], word:"pond"},
+      {prompt:"a cool sea ___", answers:["breeze"], word:"breeze"},
+    ]
+  },
+  {
+    id:"ex6", type:"strict",
+    title:"Упражнение 6. Find two mistakes",
+    instr:"В каждом предложении две ошибки. Напишите предложение полностью в исправленном виде.",
+    items:[
+      {prompt:"We come across a fox yesterday in forest.", answers:["we came across a fox yesterday in the forest"], word:"come across (an animal)"},
+      {prompt:"The dog like interact with other dogs.", answers:["the dog likes to interact with other dogs"], word:"interact with"},
+      {prompt:"There is a high fence around garden for protect it.", answers:["there is a high fence around the garden to protect it"], word:"fence"},
+      {prompt:"We seen a duck swimming in pond.", answers:["we saw a duck swimming in the pond"], word:"pond"},
+      {prompt:"The house were surround by tall trees.", answers:["the house was surrounded by tall trees"], word:"be surrounded by"},
+      {prompt:"My clothes was very wetter after the rain.", answers:["my clothes were very wet after the rain"], word:"wet"},
+      {prompt:"A light breeze were blow from the sea.", answers:["a light breeze was blowing from the sea"], word:"breeze"},
+      {prompt:"Yesterday we come across a old hut.", answers:["yesterday we came across an old hut"], word:"come across (an animal)"},
+      {prompt:"Dogs likes interact each other.", answers:["dogs like to interact with each other"], word:"interact with"},
+      {prompt:"The grass are wet from a dew this morning.", answers:["the grass was wet from dew this morning"], word:"wet"},
+    ]
+  },
+  {
+    id:"ex7", type:"strict",
+    title:"Упражнение 7. Замените выделенное слово",
+    instr:"Замените слово в <u>кавычках</u> на подходящее слово/фразу из списка (в нужной форме).",
+    items:[
+      {prompt:'We "found" an old map while cleaning the attic.', answers:["came across"], word:"come across (an animal)"},
+      {prompt:'Children love to "play and talk" with dolphins during the show.', answers:["interact with"], word:"interact with"},
+      {prompt:'There was a wooden "barrier" around the field.', answers:["fence"], word:"fence"},
+      {prompt:'Ducks were swimming in the small "lake" behind the house.', answers:["pond"], word:"pond"},
+      {prompt:'The village was "encircled" by mountains.', answers:["surrounded by"], word:"be surrounded by"},
+      {prompt:'My shoes got completely "soaked" in the rain.', answers:["wet"], word:"wet"},
+      {prompt:'A gentle "gust" of wind cooled us down.', answers:["breeze"], word:"breeze"},
+      {prompt:'I "unexpectedly saw" a deer near the river.', answers:["came across"], word:"come across (an animal)"},
+      {prompt:'Wild animals rarely "communicate" with humans.', answers:["interact with"], word:"interact with"},
+      {prompt:'The old barn had a broken "rail" around it.', answers:["fence"], word:"fence"},
+    ]
+  },
+  {
+    id:"ex8", type:"creative",
+    title:"Упражнение 8. Build the chunk",
+    instr:"Соберите слова в правильном порядке. Проверка автоматическая не производится — сверьтесь с образцом.",
+    items:[
+      {prompt:"across / bear / a / came / we", sample:"We came across a bear."},
+      {prompt:"with / dogs / interact / other / cats", sample:"Cats interact with other dogs."},
+      {prompt:"garden / fence / around / a / the / is / there", sample:"There is a fence around the garden."},
+      {prompt:"in / swimming / pond / ducks / the / are", sample:"Ducks are swimming in the pond."},
+      {prompt:"mountains / surrounded / village / by / is / the", sample:"The village is surrounded by mountains."},
+      {prompt:"was / after / wet / the / grass / rain / the", sample:"The grass was wet after the rain."},
+      {prompt:"blowing / breeze / a / was / cool", sample:"A cool breeze was blowing."},
+      {prompt:"forest / across / hut / we / an / came / old / in / the", sample:"We came across an old hut in the forest."},
+      {prompt:"with / love / to / children / animals / interact", sample:"Children love to interact with animals."},
+      {prompt:"by / surrounded / trees / house / tall / was / the", sample:"The house was surrounded by tall trees."},
+    ]
+  },
+  {
+    id:"ex9", type:"creative",
+    title:"Упражнение 9. Predict the ending",
+    instr:"Допишите предложение своими словами. Сравните со вариантом-образцом.",
+    items:[
+      {prompt:"We were walking through the forest when suddenly we came across…", sample:"…a family of deer standing near a stream."},
+      {prompt:"At the zoo, visitors are allowed to interact with…", sample:"…some of the friendlier animals, like goats and rabbits."},
+      {prompt:"Around the old house there was a tall wooden fence because…", sample:"…the owners wanted to keep wild animals out."},
+      {prompt:"In the middle of the park there is a small pond where…", sample:"…children like to feed the ducks."},
+      {prompt:"The cabin was completely surrounded by…", sample:"…tall pine trees and thick fog."},
+      {prompt:"After the storm, everything outside was wet, especially…", sample:"…the wooden bench under the old oak tree."},
+      {prompt:"A cool breeze started blowing, and we felt…", sample:"…relieved after the hot afternoon sun."},
+      {prompt:"On our hike, we came across…", sample:"…an abandoned cabin covered in moss."},
+      {prompt:"Farm animals often interact with…", sample:"…each other and with the people who take care of them."},
+      {prompt:"The garden had a low fence so that…", sample:"…visitors could still see the flowers clearly."},
+    ]
+  },
+  {
+    id:"ex10", type:"creative",
+    title:"Упражнение 10. Expand the sentence",
+    instr:"Расширьте короткое предложение, добавив детали и указанное слово.",
+    items:[
+      {prompt:"We saw an animal. (come across)", sample:"While hiking yesterday, we came across a wild deer near the river."},
+      {prompt:"The dogs played. (interact with)", sample:"The dogs happily interacted with each other at the park."},
+      {prompt:"There was a barrier. (fence)", sample:"There was a tall wooden fence separating the two gardens."},
+      {prompt:"There was water. (pond)", sample:"Behind the house there was a small, quiet pond full of fish."},
+      {prompt:"The town had mountains. (be surrounded by)", sample:"The small town was surrounded by snow-capped mountains."},
+      {prompt:"The ground was not dry. (wet)", sample:"After the storm, the ground was still wet and muddy."},
+      {prompt:"The wind blew. (breeze)", sample:"A gentle breeze blew across the field all afternoon."},
+      {prompt:"We found something old. (come across)", sample:"On the beach, we came across an old, rusty anchor."},
+      {prompt:"People and animals got along. (interact with)", sample:"The children carefully interacted with the rescued birds."},
+      {prompt:"The field had a border. (fence)", sample:"A low stone fence marked the border of the field."},
+    ]
+  },
+  {
+    id:"ex11", type:"creative",
+    title:"Упражнение 11. Закончите предложения своими идеями",
+    instr:"Допишите каждое предложение, используя собственные мысли.",
+    items:[
+      {prompt:"If I came across a wild animal in the forest, I would…", sample:"…stay calm and slowly walk away."},
+      {prompt:"I like to interact with animals such as…", sample:"…cats, dogs, and horses."},
+      {prompt:"In my dream house, there would be a fence because…", sample:"…I would feel safer and more private."},
+      {prompt:"Near my house there is/isn't a pond where…", sample:"…ducks and frogs live in summer."},
+      {prompt:"My favorite place is surrounded by…", sample:"…tall trees and quiet hills."},
+      {prompt:"I don't like when my clothes get wet because…", sample:"…it makes me feel cold and uncomfortable."},
+      {prompt:"On a warm day, I enjoy feeling the breeze when…", sample:"…I sit outside near the sea."},
+      {prompt:"Once, I came across… and it was…", sample:"…a lost kitten, and it was very surprising."},
+      {prompt:"Some people prefer not to interact with…", sample:"…strangers or unfamiliar animals."},
+      {prompt:"A good garden fence should be…", sample:"…strong, tall, and easy to maintain."},
+    ]
+  },
+];
+
+// ---------- HELPERS ----------
+function speak(text){
+  if(!('speechSynthesis' in window)) return;
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-US';
+  u.rate = 0.92;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+}
+function normalize(s){
+  return (s||"").toLowerCase().trim().replace(/[.,!?;:'"`]/g,"").replace(/\s+/g," ");
+}
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 1800);
+}
+function updateSidebar(){
+  const list = document.getElementById('problem-list');
+  const empty = document.getElementById('problem-empty');
+  const entries = Object.entries(mistakes).filter(([,c])=>c>0).sort((a,b)=>b[1]-a[1]);
+  list.innerHTML = "";
+  if(entries.length===0){ empty.style.display='block'; return; }
+  empty.style.display='none';
+  entries.forEach(([w,c])=>{
+    const li = document.createElement('li');
+    li.innerHTML = `<span>${w}</span><span class="pcount">${c}</span>`;
+    list.appendChild(li);
+  });
+  document.getElementById('progress-note').textContent = `Проверено заданий: ${checkedCount}`;
+}
+
+// ---------- RENDER WORD BANK ----------
+const wbBody = document.getElementById('wordbank-body');
+words.forEach(w=>{
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td class="en-word">${w.en}</td>
+    <td class="transcription">${w.tr}</td>
+    <td>${w.ru}</td>
+    <td><button class="listen-btn" onclick="speak('${w.say.replace(/'/g,"\\'")}')">🔊 Слушать</button></td>
+  `;
+  wbBody.appendChild(tr);
+});
+
+// ---------- RENDER EXERCISES ----------
+const exContainer = document.getElementById('exercises');
+exercises.forEach((ex, exIdx)=>{
+  const section = document.createElement('section');
+  section.className = 'card';
+  section.id = ex.id;
+
+  let itemsHtml = "";
+  ex.items.forEach((it, i)=>{
+    const audioBtn = ex.audio ? `<button class="listen-btn" style="margin-bottom:6px;" onclick="speak('${it.say.replace(/'/g,"\\'")}')">🔊</button><br>` : "";
+    const ruLine = it.ru ? `<span class="ru">${it.ru}</span>` : "";
+    const inputTag = (ex.type==='creative')
+      ? `<textarea id="${ex.id}-i${i}" placeholder="Ваш ответ..."></textarea>`
+      : `<input type="text" id="${ex.id}-i${i}" placeholder="Ваш ответ..." autocomplete="off">`;
+    const answerText = ex.type==='creative' ? it.sample : it.answers[0];
+    itemsHtml += `
+      <div class="item" id="${ex.id}-item${i}">
+        <div class="n">${i+1}.</div>
+        <div class="prompt">${audioBtn}${it.prompt}${ruLine}
+          <div class="feedback" id="${ex.id}-fb${i}"></div>
+          <div class="answer-reveal" id="${ex.id}-ans${i}">✅ ${ex.type==='creative' ? 'Образец: ' : 'Ответ: '}${answerText}</div>
+        </div>
+        <div>${inputTag}</div>
+      </div>
+    `;
+  });
+
+  const checkBtn = ex.type==='strict' ? `<button class="btn btn-check" onclick="checkExercise('${ex.id}')">✔ Проверить</button>` : "";
+  const scoreTag = ex.type==='strict' ? `<span class="score-tag" id="${ex.id}-score"></span>` : "";
+
+  section.innerHTML = `
+    <h2 class="ex-title"><span class="ex-num">${exIdx+1}</span> ${ex.title}</h2>
+    <p class="ex-instr">${ex.instr}</p>
+    ${itemsHtml}
+    <div class="ex-actions">
+      ${checkBtn}
+      <button class="btn btn-show" onclick="showAnswers('${ex.id}')">👁 Показать ответы</button>
+      <button class="btn btn-copy" onclick="copyAnswers('${ex.id}')">📋 Скопировать ответы</button>
+      ${scoreTag}
+    </div>
+  `;
+  exContainer.appendChild(section);
+});
+
+// ---------- ACTIONS ----------
+function checkExercise(exId){
+  const ex = exercises.find(e=>e.id===exId);
+  let correctCount = 0;
+  ex.items.forEach((it, i)=>{
+    const input = document.getElementById(`${exId}-i${i}`);
+    const itemDiv = document.getElementById(`${exId}-item${i}`);
+    const fb = document.getElementById(`${exId}-fb${i}`);
+    const val = normalize(input.value);
+    const isCorrect = it.answers.some(a => normalize(a) === val) && val.length>0;
+    itemDiv.classList.remove('correct','wrong');
+    if(isCorrect){
+      itemDiv.classList.add('correct');
+      fb.textContent = '✔ Верно';
+      fb.className = 'feedback ok';
+      correctCount++;
+    } else {
+      itemDiv.classList.add('wrong');
+      fb.textContent = val.length===0 ? 'Поле не заполнено' : '✘ Неверно, попробуйте ещё раз';
+      fb.className = 'feedback bad';
+      if(it.word){ mistakes[it.word] = (mistakes[it.word]||0) + 1; }
+    }
+  });
+  checkedCount++;
+  document.getElementById(`${exId}-score`).textContent = `Результат: ${correctCount} / ${ex.items.length}`;
+  updateSidebar();
+}
+
+function showAnswers(exId){
+  const ex = exercises.find(e=>e.id===exId);
+  ex.items.forEach((it,i)=>{
+    document.getElementById(`${exId}-ans${i}`).classList.toggle('show');
+  });
+}
+
+function copyAnswers(exId){
+  const ex = exercises.find(e=>e.id===exId);
+  const lines = ex.items.map((it,i)=>{
+    const ans = ex.type==='creative' ? it.sample : it.answers[0];
+    return `${i+1}. ${ans}`;
+  });
+  const text = lines.join('\n');
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(text).then(()=>toast('Ответы скопированы в буфер обмена!'))
+      .catch(()=>toast('Не удалось скопировать. Скопируйте вручную.'));
+  } else {
+    toast('Копирование недоступно в этом браузере.');
+  }
+}
+
+updateSidebar();
+</script>
+</body>
+</html>
