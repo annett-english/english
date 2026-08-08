@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A1 · Vocabulary Practice</title>
+<style>
+:root{
+  --paper:#EEF2ED;
+  --card:#FFFFFF;
+  --ink:#1F2A24;
+  --ink-soft:#5B6B62;
+  --accent:#2F6F5E;
+  --accent-dark:#204F42;
+  --accent2:#B8792A;
+  --wrong:#C1443B;
+  --wrong-bg:#FBE9E7;
+  --right:#3C7A4E;
+  --right-bg:#E7F3EA;
+  --line:#D9E0DA;
+  --radius:14px;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:"Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  line-height:1.5;
+  padding-bottom:60px;
+}
+h1,h2,h3{
+  font-family:Georgia,"Iowan Old Style","Palatino Linotype",serif;
+  color:var(--accent-dark);
+  margin:0 0 8px;
+}
+header.top{
+  background:linear-gradient(135deg,var(--accent) 0%,var(--accent-dark) 100%);
+  color:#fff;
+  padding:36px 24px 28px;
+  text-align:center;
+}
+header.top h1{color:#fff; font-size:2rem; letter-spacing:.3px;}
+header.top p{margin:6px 0 0; color:#DCEAE4; font-size:.98rem;}
+nav.tabs{
+  position:sticky; top:0; z-index:50;
+  background:#fff;
+  border-bottom:1px solid var(--line);
+  display:flex; flex-wrap:wrap; gap:6px;
+  padding:10px 16px;
+  justify-content:center;
+  box-shadow:0 2px 8px rgba(0,0,0,.04);
+}
+nav.tabs a{
+  text-decoration:none;
+  color:var(--accent-dark);
+  background:var(--paper);
+  border:1px solid var(--line);
+  padding:6px 12px;
+  border-radius:999px;
+  font-size:.82rem;
+  white-space:nowrap;
+}
+nav.tabs a:hover{background:var(--accent); color:#fff; border-color:var(--accent);}
+
+.layout{
+  max-width:1180px;
+  margin:24px auto;
+  padding:0 18px;
+  display:grid;
+  grid-template-columns:1fr 260px;
+  gap:22px;
+  align-items:start;
+}
+aside.sidebar{
+  position:sticky; top:70px;
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:16px;
+}
+aside.sidebar h3{font-size:1rem; margin-bottom:4px;}
+aside.sidebar .hint{font-size:.78rem; color:var(--ink-soft); margin-bottom:10px;}
+table.problem-table{width:100%; border-collapse:collapse; font-size:.85rem;}
+table.problem-table th{
+  text-align:left; color:var(--ink-soft); font-weight:600;
+  border-bottom:1px solid var(--line); padding:4px 4px;
+}
+table.problem-table td{padding:5px 4px; border-bottom:1px dashed var(--line);}
+table.problem-table td.count{
+  text-align:center; font-weight:700; color:var(--wrong);
+}
+.empty-note{color:var(--ink-soft); font-size:.82rem; font-style:italic;}
+
+main.content section.card, main.content section.intro{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:22px 24px;
+  margin-bottom:20px;
+}
+section.intro .word-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(230px,1fr));
+  gap:12px;
+  margin-top:14px;
+}
+.word-card{
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:10px 12px;
+  background:linear-gradient(180deg,#fff, #FBFCFA);
+}
+.word-card .en{font-weight:700; font-size:1.05rem; color:var(--accent-dark);}
+.word-card .ipa{color:var(--accent2); font-size:.85rem; margin-left:4px;}
+.word-card .ru{color:var(--ink-soft); font-size:.88rem; margin:2px 0 6px;}
+button.play-btn, button.small-btn{
+  border:none; background:var(--accent); color:#fff;
+  padding:5px 10px; border-radius:8px; font-size:.78rem; cursor:pointer;
+}
+button.play-btn:hover, button.small-btn:hover{background:var(--accent-dark);}
+
+.ex-head{display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:8px; border-bottom:1px dashed var(--line); padding-bottom:10px; margin-bottom:14px;}
+.ex-head .tag{font-size:.72rem; text-transform:uppercase; letter-spacing:.06em; color:var(--accent2); font-weight:700;}
+.ex-instructions{font-size:.9rem; color:var(--ink-soft); margin-bottom:14px;}
+.ex-controls{display:flex; gap:8px; flex-wrap:wrap;}
+.ex-controls button{
+  border:1px solid var(--accent); background:#fff; color:var(--accent-dark);
+  padding:7px 14px; border-radius:8px; font-size:.82rem; cursor:pointer; font-weight:600;
+}
+.ex-controls button.primary{background:var(--accent); color:#fff;}
+.ex-controls button:hover{opacity:.85;}
+.score{font-size:.85rem; font-weight:700; color:var(--accent-dark); margin-left:6px;}
+
+.items-grid{display:grid; gap:12px; margin-top:14px;}
+.item{
+  display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+  border:1px solid var(--line); border-radius:10px; padding:10px 12px;
+  background:#FCFDFC;
+}
+.item .num{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:22px; height:22px; border-radius:50%;
+  background:var(--accent-dark); color:#fff; font-size:.72rem; font-weight:700;
+  flex-shrink:0;
+}
+.item-top{display:flex; align-items:center; gap:8px; flex:1 1 220px;}
+.item-bottom{display:flex; align-items:center; gap:8px;}
+.emoji{font-size:1.7rem;}
+.tense-tag{
+  font-size:.68rem; background:var(--accent2); color:#fff; padding:2px 7px;
+  border-radius:6px; font-weight:700; margin-right:4px;
+}
+input.hand-input{
+  font-family:"Segoe Print","Bradley Hand","Comic Sans MS",cursive,sans-serif;
+  font-size:1rem;
+  border:none;
+  border-bottom:2px dashed var(--accent2);
+  background:transparent;
+  padding:5px 4px;
+  min-width:170px;
+  outline:none;
+  color:var(--ink);
+}
+input.hand-input:focus{border-bottom-color:var(--accent);}
+input.hand-input.right{border-bottom-style:solid; border-bottom-color:var(--right); background:var(--right-bg);}
+input.hand-input.wrong{border-bottom-style:solid; border-bottom-color:var(--wrong); background:var(--wrong-bg);}
+select.check-select{
+  font-size:.92rem; padding:5px 8px; border-radius:8px; border:2px dashed var(--accent2); background:#fff;
+}
+select.check-select.right{border-style:solid; border-color:var(--right); background:var(--right-bg);}
+select.check-select.wrong{border-style:solid; border-color:var(--wrong); background:var(--wrong-bg);}
+button.reveal-btn{
+  border:1px solid var(--line); background:#fff; border-radius:8px; cursor:pointer;
+  padding:4px 8px; font-size:.85rem;
+}
+.answer-tag{
+  font-size:.82rem; color:var(--accent-dark); font-weight:700;
+  background:#EFEAD9; padding:3px 8px; border-radius:6px;
+}
+textarea.free-input{
+  width:100%; min-height:52px; font-family:inherit; font-size:.92rem;
+  border:1px solid var(--line); border-radius:8px; padding:8px; resize:vertical;
+}
+.rephrase-item, .expand-item{
+  border:1px solid var(--line); border-radius:10px; padding:12px 14px; margin-bottom:12px; background:#FCFDFC;
+}
+.rephrase-item .base, .expand-item .base{font-size:.95rem; margin-bottom:4px;}
+.rephrase-item .cue, .expand-item .cue{font-size:.78rem; color:var(--accent2); font-weight:600; margin-bottom:8px;}
+.model-answer{
+  display:none; margin-top:8px; font-size:.88rem; background:#EFEAD9; padding:8px 10px; border-radius:8px; color:var(--accent-dark);
+}
+.model-answer.shown{display:block;}
+
+.dialogue-box{
+  border:1px solid var(--line); border-radius:10px; padding:16px 18px; background:#FCFDFC; line-height:2.1;
+}
+.dialogue-box b{color:var(--accent-dark);}
+.dialogue-box input.hand-input{min-width:110px; margin:0 3px;}
+.dialogue-answers{
+  display:none; margin-top:14px; background:#EFEAD9; border-radius:10px; padding:12px 14px; font-size:.88rem;
+}
+.dialogue-answers.shown{display:block;}
+
+.drill-demo{
+  border:1px dashed var(--accent2); border-radius:10px; padding:12px 14px; margin-bottom:16px; background:#FBF6EC; font-size:.9rem;
+}
+.drill-demo .step{margin:2px 0;}
+.drill-item{border:1px solid var(--line); border-radius:10px; padding:12px 14px; margin-bottom:12px;}
+.drill-item .word{font-weight:700; color:var(--accent-dark); margin-bottom:6px;}
+.drill-item .steps{display:grid; gap:6px;}
+.drill-item label{font-size:.75rem; color:var(--ink-soft); display:block; margin-bottom:2px;}
+
+.copy-status{font-size:.8rem; color:var(--right); margin-left:6px;}
+footer{text-align:center; color:var(--ink-soft); font-size:.8rem; padding:24px;}
+
+@media (max-width: 860px){
+  .layout{grid-template-columns:1fr;}
+  aside.sidebar{position:static;}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <h1>A1 · Vocabulary Practice</h1>
+  <p>hear · head · hair · hand · arm · tissues · tablet · side dishes · main dishes · tell sb · wait for</p>
+</header>
+
+<nav class="tabs">
+  <a href="#intro">Слова</a>
+  <a href="#ex1">1. Буквы</a>
+  <a href="#ex2">2. Перевод</a>
+  <a href="#ex3">3. На слух</a>
+  <a href="#ex4">4. Картинки</a>
+  <a href="#ex5">5. Половинки</a>
+  <a href="#ex6">6. Rephrase</a>
+  <a href="#ex7">7. Диалог</a>
+  <a href="#ex8">8. Expand</a>
+  <a href="#ex9">9. Repeat &amp; Change</a>
+  <a href="#ex10">10. Questions</a>
+</nav>
+
+<div class="layout">
+  <main class="content">
+
+    <section class="intro" id="intro">
+      <h2>🔤 Повторим слова</h2>
+      <p class="ex-instructions">Прочитайте перевод и транскрипцию. Нажмите ▶️, чтобы прослушать произношение каждого слова.</p>
+      <div class="word-grid" id="wordGrid"></div>
+    </section>
+
+    <section class="card" id="ex1">
+      <div class="ex-head">
+        <div><span class="tag">Упражнение 1</span><h2>Insert the missing letters</h2></div>
+        <span class="score" id="ex1-score"></span>
+      </div>
+      <p class="ex-instructions">Впишите пропущенные буквы и напишите слово целиком.</p>
+      <div class="items-grid" id="ex1Items"></div>
+      <div class="ex-controls">
+        <button class="primary" onclick="checkSection('ex1')">✅ Проверить</button>
+        <button onclick="revealSection('ex1')">👁 Показать все ответы</button>
+      </div>
+    </section>
+
+    <section class="card" id="ex2">
+      <div class="ex-head">
+        <div><span class="tag">Упражнение 2</span><h2>Translate into English</h2></div>
+        <span class="score" id="ex2-score"></span>
+      </div>
+      <p class="ex-instructions">Переведите слово с русского на английский.</p>
+      <div class="items-grid" id="ex2Items"></div>
+      <div class="ex-controls">
+        <button class="primary" onclick="checkSection('ex2')">✅ Проверить</button>
+        <button onclick="revealSection('ex2')">👁 Показать все ответы</button>
+      </div>
+    </section>
+
+    <section class="card" id="ex3">
+      <div class="ex-head">
+        <div><span class="tag">Упражнение 3</span><h2>Listen and write</h2></div>
+        <span class="score" id="ex3-score"></span>
+      </div>
+      <p class="ex-instructions">Нажмите ▶️, послушайте слово и напишите его по звуку.</p>
+      <div class="items-grid" id="ex3Items"></div>
+      <div class="ex-controls">
+        <button class="primary" onclick="checkSection('ex3')">✅ Проверить</button>
+        <button onclick="revealSection('ex3')">👁 Показать все ответы</button>
+      </div>
+    </section>
+
+    <section class="card" id="ex4">
+      <div class="ex-head">
+        <div><span class="tag">Упражнение 4</span><h2>Look and write</h2></div>
+        <span class="score" id="ex4-score"></span>
+      </div>
+      <p class="ex-instructions">Посмотрите на картинку-подсказку и напишите нужное слово.</p>
+      <div class="items-grid" id="ex4Items"></div>
+      <div class="ex-controls">
+        <button class="primary" onclick="checkSection('ex4')">✅ Проверить</button>
+        <button onclick="revealSection('ex4')">👁 Показать все ответы</button>
+      </div>
+    </section>
+
+    <section class="card" id="ex5">
+      <div class="ex-head">
+        <div><span class="tag">Упражнение 5</span><h2>Match the halves</h2></div>
+        <span class="score" id="ex5-score"></span>
+      </div>
+      <p class="ex-instructions">Выберите вторую половинку, чтобы получилось верное выражение.</p>
+      <div class="items-grid" id="ex5Items"></div>
+      <div class="ex-controls">
+        <button class="primary" onclick="checkSection('ex5')">✅ Проверить</button>
+        <button onclick="revealSection('ex5')">👁 Показать все ответы</button>
+      </div>
+    </section>
+
+    <section class="card" id="ex6">
+      <div class="ex-head">
+        <div><span class="tag">Упражнение 6</span><h2>Rephrase</h2></div>
+      </div>
+      <p class="ex-instructions">Перефразируйте предложение, используя слово в скобках. Здесь возможно несколько вариантов, поэтому просто сверьте свой ответ с образцом.</p>
+      <div id="ex6Items"></div>
+    </section>
+
+    <section class="card" id="ex7">
+      <div class="ex-head">
+        <div><span class="tag">Упражнение 7</span><h2>Finish the dialogue</h2></div>
+      </div>
+      <p class="ex-instructions">Заполните пропуски в диалоге у врача.</p>
+      <div class="dialogue-box" id="dialogueBox"></div>
+      <div class="ex-controls" style="margin-top:12px;">
+        <button class="primary" onclick="toggleDialogueAnswers()">👁 Показать ответы</button>
+        <button onclick="copyDialogueAnswers(this)">📋 Скопировать ответы</button>
+        <span class="copy-status" id="copyStatus7"></span>
+      </div>
+      <div class="dialogue-answers" id="dialogueAnswers"></div>
+    </section>
+
+    <section class="card" id="ex8">
+      <div class="ex-head">
+        <div><span class="tag">Упражнение 8</span><h2>Expand the sentence</h2></div>
+      </div>
+      <p class="ex-instructions">Расширьте короткое предложение, добавив детали (место, время, причину и т.д.).</p>
+      <div id="ex8Items"></div>
+    </section>
+
+    <section class="card" id="ex9">
+      <div class="ex-head">
+        <div><span class="tag">Упражнение 9</span><h2>Drilling: Repeat &amp; Change</h2></div>
+      </div>
+      <p class="ex-instructions">По образцу составьте свою цепочку для каждого слова: слово → слово + окружение → полное предложение.</p>
+      <div class="drill-demo">
+        <div class="step"><b>suffer</b></div>
+        <div class="step">suffer → <b>suffer from stress</b></div>
+        <div class="step">suffer from stress → <b>Many people suffer from stress.</b></div>
+      </div>
+      <div id="ex9Items"></div>
+      <div class="ex-controls">
+        <button onclick="copyDrillAnswers(this)">📋 Скопировать мои ответы</button>
+        <span class="copy-status" id="copyStatus9"></span>
+      </div>
+    </section>
+
+    <section class="card" id="ex10">
+      <div class="ex-head">
+        <div><span class="tag">Упражнение 10</span><h2>Make questions</h2></div>
+        <span class="score" id="ex10-score"></span>
+      </div>
+      <p class="ex-instructions">Превратите утверждение в общий вопрос. Обратите внимание на время: Present Simple / Past Simple / Present Continuous.</p>
+      <div class="items-grid" id="ex10Items"></div>
+      <div class="ex-controls">
+        <button class="primary" onclick="checkSection('ex10')">✅ Проверить</button>
+        <button onclick="revealSection('ex10')">👁 Показать все ответы</button>
+      </div>
+    </section>
+
+  </main>
+
+  <aside class="sidebar">
+    <h3>⚠️ Проблемные слова</h3>
+    <p class="hint">Слова, в которых были ошибки, появятся здесь автоматически.</p>
+    <table class="problem-table">
+      <thead><tr><th>Слово</th><th class="count">Ошибок</th></tr></thead>
+      <tbody id="problemBody"></tbody>
+    </table>
+    <p class="empty-note" id="emptyNote">Пока нет ошибок 🎉</p>
+  </aside>
+</div>
+
+<footer>Сделано для практики лексики уровня A1 · пишите слова руками — так они лучше запоминаются 🙂</footer>
+
+<script>
+/* ---------- word bank ---------- */
+const WORDS = [
+  {en:"hear", ipa:"/hɪə(r)/", ru:"слышать"},
+  {en:"head", ipa:"/hed/", ru:"голова"},
+  {en:"hair", ipa:"/heə(r)/", ru:"волосы"},
+  {en:"hand", ipa:"/hænd/", ru:"рука (кисть)"},
+  {en:"arm", ipa:"/ɑːm/", ru:"рука (от кисти до плеча)"},
+  {en:"tissues", ipa:"/ˈtɪʃuːz/", ru:"салфетки / платочки"},
+  {en:"tablet", ipa:"/ˈtæblət/", ru:"таблетка"},
+  {en:"side dishes", ipa:"/saɪd ˈdɪʃɪz/", ru:"гарниры"},
+  {en:"main dishes", ipa:"/meɪn ˈdɪʃɪz/", ru:"основные блюда"},
+  {en:"tell sb", ipa:"/tel/", ru:"сказать кому-то"},
+  {en:"wait for", ipa:"/weɪt fɔː(r)/", ru:"ждать (кого-то/что-то)"}
+];
+
+function speak(text){
+  if(!('speechSynthesis' in window)){ alert('Ваш браузер не поддерживает озвучивание.'); return; }
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-GB';
+  u.rate = 0.85;
+  const voices = window.speechSynthesis.getVoices();
+  const en = voices.find(v=>v.lang && v.lang.startsWith('en'));
+  if(en) u.voice = en;
+  window.speechSynthesis.speak(u);
+}
+
+document.getElementById('wordGrid').innerHTML = WORDS.map(w=>`
+  <div class="word-card">
+    <div><span class="en">${w.en}</span><span class="ipa">${w.ipa}</span></div>
+    <div class="ru">${w.ru}</div>
+    <button type="button" class="play-btn" onclick="speak('${w.en.replace("'","\\'")}')">▶️ Слушать</button>
+  </div>
+`).join('');
+
+/* ---------- mistake tracking ---------- */
+const mistakeCounts = {};
+function registerMistake(word){
+  if(!word) return;
+  mistakeCounts[word] = (mistakeCounts[word]||0) + 1;
+  renderProblemWords();
+}
+function renderProblemWords(){
+  const entries = Object.entries(mistakeCounts).sort((a,b)=>b[1]-a[1]);
+  const body = document.getElementById('problemBody');
+  const note = document.getElementById('emptyNote');
+  if(entries.length === 0){
+    body.innerHTML = '';
+    note.style.display = 'block';
+    return;
+  }
+  note.style.display = 'none';
+  body.innerHTML = entries.map(([w,c])=>`<tr><td>${w}</td><td class="count">${c}</td></tr>`).join('');
+}
+
+/* ---------- helpers ---------- */
+function normalize(str){
+  return (str||'').toLowerCase().replace(/[^\w\s']/g,'').replace(/\s+/g,' ').trim();
+}
+
+function renderStd(containerId, items){
+  document.getElementById(containerId).innerHTML = items.map((it,i)=>`
+    <div class="item" data-word="${it.word}">
+      <div class="item-top"><span class="num">${i+1}</span>${it.promptHTML}</div>
+      <div class="item-bottom">
+        <input type="text" class="check-input hand-input" data-answer="${it.answer}" placeholder="write here" autocomplete="off" spellcheck="false">
+        <button type="button" class="reveal-btn" onclick="toggleReveal(this)">👁</button>
+        <span class="answer-tag" hidden>${it.answer.split('|')[0]}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggleReveal(btn){
+  const tag = btn.nextElementSibling;
+  tag.hidden = !tag.hidden;
+}
+
+function checkSection(id){
+  const sec = document.getElementById(id);
+  let correct = 0, total = 0;
+  sec.querySelectorAll('.check-input').forEach(inp=>{
+    total++;
+    const answers = inp.dataset.answer.split('|').map(normalize);
+    const val = normalize(inp.value);
+    const item = inp.closest('.item');
+    if(val !== '' && answers.includes(val)){
+      inp.classList.remove('wrong'); inp.classList.add('right'); correct++;
+    } else {
+      inp.classList.remove('right'); inp.classList.add('wrong');
+      registerMistake(item ? item.dataset.word : '');
+    }
+  });
+  sec.querySelectorAll('.check-select').forEach(sel=>{
+    total++;
+    const item = sel.closest('.item');
+    if(sel.value && sel.value === sel.dataset.answer){
+      sel.classList.remove('wrong'); sel.classList.add('right'); correct++;
+    } else {
+      sel.classList.remove('right'); sel.classList.add('wrong');
+      registerMistake(item ? item.dataset.word : '');
+    }
+  });
+  const scoreEl = document.getElementById(id+'-score');
+  if(scoreEl) scoreEl.textContent = `Верно: ${correct} / ${total}`;
+}
+
+function revealSection(id){
+  document.getElementById(id).querySelectorAll('.answer-tag').forEach(t=> t.hidden = false);
+}
+
+/* ---------- Ex1 fill in the letters ---------- */
+renderStd('ex1Items', [
+  {word:'hear', promptHTML:'h_ar', answer:'hear'},
+  {word:'head', promptHTML:'he_d', answer:'head'},
+  {word:'hair', promptHTML:'ha_r', answer:'hair'},
+  {word:'hand', promptHTML:'h_nd', answer:'hand'},
+  {word:'arm', promptHTML:'a_m', answer:'arm'},
+  {word:'tissues', promptHTML:'ti_sues', answer:'tissues'},
+  {word:'tablet', promptHTML:'tabl_t', answer:'tablet'},
+  {word:'side dishes', promptHTML:'si_e dishes', answer:'side dishes'}
+]);
+
+/* ---------- Ex2 translation ---------- */
+renderStd('ex2Items', [
+  {word:'hear', promptHTML:'слышать', answer:'hear'},
+  {word:'head', promptHTML:'голова', answer:'head'},
+  {word:'hair', promptHTML:'волосы', answer:'hair'},
+  {word:'hand', promptHTML:'рука (кисть)', answer:'hand'},
+  {word:'arm', promptHTML:'рука (от кисти до плеча)', answer:'arm'},
+  {word:'tablet', promptHTML:'таблетка', answer:'tablet'},
+  {word:'main dishes', promptHTML:'основные блюда', answer:'main dishes'},
+  {word:'wait for', promptHTML:'ждать (кого-то/что-то)', answer:'wait for'}
+]);
+
+/* ---------- Ex3 listen and write ---------- */
+const ex3Words = ['hear','head','hair','hand','arm','tissues','tablet','wait for'];
+renderStd('ex3Items', ex3Words.map(w=>({
+  word:w,
+  promptHTML:`<button type="button" class="play-btn" onclick="speak('${w.replace("'","\\'")}')">▶️ Слушать</button>`,
+  answer:w
+})));
+
+/* ---------- Ex4 picture ---------- */
+renderStd('ex4Items', [
+  {word:'hear', promptHTML:'<span class="emoji">👂🎵</span>', answer:'hear'},
+  {word:'head', promptHTML:'<span class="emoji">🤕</span>', answer:'head|headache'},
+  {word:'hair', promptHTML:'<span class="emoji">💇</span>', answer:'hair'},
+  {word:'hand', promptHTML:'<span class="emoji">✋</span>', answer:'hand'},
+  {word:'arm', promptHTML:'<span class="emoji">💪</span>', answer:'arm'},
+  {word:'tissues', promptHTML:'<span class="emoji">🤧</span>', answer:'tissues'},
+  {word:'tablet', promptHTML:'<span class="emoji">💊</span>', answer:'tablet'},
+  {word:'side dishes', promptHTML:'<span class="emoji">🥗</span>', answer:'side dishes|side dish'}
+]);
+
+/* ---------- Ex5 match the halves ---------- */
+const ex5Right = ['hair','a headache','your arms','tissues','a tablet','some side dishes','the truth','the bus'];
+const ex5Data = [
+  {word:'hair', left:'brush your …', answer:'hair'},
+  {word:'head', left:'have a bad …', answer:'a headache'},
+  {word:'arm', left:'cross …', answer:'your arms'},
+  {word:'tissues', left:'a box of …', answer:'tissues'},
+  {word:'tablet', left:'take …', answer:'a tablet'},
+  {word:'side dishes', left:'order some …', answer:'some side dishes'},
+  {word:'tell sb', left:'tell sb …', answer:'the truth'},
+  {word:'wait for', left:'wait for …', answer:'the bus'}
+];
+document.getElementById('ex5Items').innerHTML = ex5Data.map((it,i)=>`
+  <div class="item" data-word="${it.word}">
+    <div class="item-top"><span class="num">${i+1}</span>${it.left}</div>
+    <div class="item-bottom">
+      <select class="check-select" data-answer="${it.answer}">
+        <option value="">-- choose --</option>
+        ${ex5Right.map(r=>`<option value="${r}">${r}</option>`).join('')}
+      </select>
+      <button type="button" class="reveal-btn" onclick="toggleReveal(this)">👁</button>
+      <span class="answer-tag" hidden>${it.answer}</span>
+    </div>
+  </div>
+`).join('');
+
+/* ---------- Ex6 rephrase (self-check) ---------- */
+const ex6Data = [
+  {base:"I can't listen to you.", cue:'(hear)', model:"I can't hear you."},
+  {base:'My mum gives me medicine for the pain.', cue:'(tablet)', model:'My mum gives me a tablet for the pain.'},
+  {base:"Please don't leave, stay here until I come.", cue:'(wait for)', model:'Please wait for me.'},
+  {base:'I have pain in my head.', cue:'(headache)', model:'I have a headache.'},
+  {base:'She is talking about her problem to her friend.', cue:'(tell sb)', model:'She is telling her friend about her problem.'},
+  {base:'I need something to clean my nose.', cue:'(tissues)', model:'I need some tissues.'},
+  {base:'We ordered vegetables with our meat.', cue:'(side dishes)', model:'We ordered some side dishes with our meat.'},
+  {base:'My shoulders and hands hurt after training.', cue:'(arm)', model:'My arms hurt after training.'}
+];
+document.getElementById('ex6Items').innerHTML = ex6Data.map((it,i)=>`
+  <div class="rephrase-item">
+    <div class="base"><span class="num" style="display:inline-flex;width:20px;height:20px;background:var(--accent-dark);color:#fff;border-radius:50%;align-items:center;justify-content:center;font-size:.7rem;margin-right:6px;">${i+1}</span>${it.base}</div>
+    <div class="cue">${it.cue}</div>
+    <textarea class="free-input" rows="1" placeholder="Ваш вариант..."></textarea>
+    <button type="button" class="reveal-btn" style="margin-top:6px;" onclick="this.nextElementSibling.classList.toggle('shown')">👁 Показать ответ</button>
+    <div class="model-answer">${it.model}</div>
+  </div>
+`).join('');
+
+/* ---------- Ex7 dialogue ---------- */
+const dialogueAnswers = ['headache','hear','hand','arm','tablet','tissues','tell','wait for'];
+document.getElementById('dialogueBox').innerHTML = `
+  <p><b>Doctor:</b> Hello! What's the problem today?</p>
+  <p><b>Patient:</b> I have a terrible <input type="text" class="hand-input" data-blank="1" placeholder="1">. I can't <input type="text" class="hand-input" data-blank="2" placeholder="2"> well either — everything sounds far away.</p>
+  <p><b>Doctor:</b> I see. Let me look... Can you give me your <input type="text" class="hand-input" data-blank="3" placeholder="3">, please? I need to check your pulse.</p>
+  <p><b>Patient:</b> Sure. Ouch, my <input type="text" class="hand-input" data-blank="4" placeholder="4"> hurts too, from my shoulder to my wrist.</p>
+  <p><b>Doctor:</b> OK, take this <input type="text" class="hand-input" data-blank="5" placeholder="5"> twice a day, and use some <input type="text" class="hand-input" data-blank="6" placeholder="6"> if your nose is blocked.</p>
+  <p><b>Patient:</b> Thank you, doctor. Should I <input type="text" class="hand-input" data-blank="7" placeholder="7"> you if it gets worse?</p>
+  <p><b>Doctor:</b> Yes, please do. And <input type="text" class="hand-input" data-blank="8" placeholder="8"> the results — I'll call you tomorrow.</p>
+`;
+document.getElementById('dialogueAnswers').innerHTML = '<b>Ответы:</b><br>' + dialogueAnswers.map((a,i)=>`${i+1}. ${a}`).join(' &nbsp;·&nbsp; ');
+function toggleDialogueAnswers(){
+  document.getElementById('dialogueAnswers').classList.toggle('shown');
+}
+function copyDialogueAnswers(btn){
+  const text = dialogueAnswers.map((a,i)=>`${i+1}. ${a}`).join('\n');
+  navigator.clipboard.writeText(text).then(()=>{
+    const s = document.getElementById('copyStatus7');
+    s.textContent = 'Скопировано ✓';
+    setTimeout(()=> s.textContent='', 1800);
+  });
+}
+
+/* ---------- Ex8 expand the sentence ---------- */
+const ex8Data = [
+  {base:'I have a headache.', model:"I have a terrible headache because I didn't sleep well last night."},
+  {base:'She has long hair.', model:'She has long, curly brown hair that she washes every day.'},
+  {base:"He can't hear me.", model:"He can't hear me well because the music is too loud."},
+  {base:'Take a tablet.', model:"Take a tablet after breakfast if the pain doesn't stop."},
+  {base:'We need tissues.', model:'We need some tissues because everyone has a cold today.'},
+  {base:'Wait for the bus.', model:'Wait for the bus at the stop near the supermarket.'},
+  {base:'Tell me the truth.', model:'Please tell me the truth about what happened yesterday.'},
+  {base:'We ordered side dishes.', model:'We ordered some side dishes, like salad and rice, with our chicken.'}
+];
+document.getElementById('ex8Items').innerHTML = ex8Data.map((it,i)=>`
+  <div class="expand-item">
+    <div class="base"><span class="num" style="display:inline-flex;width:20px;height:20px;background:var(--accent-dark);color:#fff;border-radius:50%;align-items:center;justify-content:center;font-size:.7rem;margin-right:6px;">${i+1}</span>${it.base}</div>
+    <textarea class="free-input" rows="1" placeholder="Расширьте предложение..."></textarea>
+    <button type="button" class="reveal-btn" style="margin-top:6px;" onclick="this.nextElementSibling.classList.toggle('shown')">👁 Показать пример</button>
+    <div class="model-answer">${it.model}</div>
+  </div>
+`).join('');
+
+/* ---------- Ex9 drilling ---------- */
+const drillWords = ['hear','head','hair','hand','arm','tissues','tablet','wait for'];
+document.getElementById('ex9Items').innerHTML = drillWords.map((w,i)=>`
+  <div class="drill-item" data-word="${w}">
+    <div class="word">${i+1}. ${w}</div>
+    <div class="steps">
+      <div>
+        <label>Шаг 2: ${w} + окружение</label>
+        <input type="text" class="hand-input drill-input" data-step="2" data-base="${w}" placeholder="например: ${w} + ...">
+      </div>
+      <div>
+        <label>Шаг 3: полное предложение</label>
+        <input type="text" class="hand-input drill-input" data-step="3" data-base="${w}" placeholder="Составьте предложение">
+      </div>
+    </div>
+  </div>
+`).join('');
+function copyDrillAnswers(btn){
+  let lines = [];
+  document.querySelectorAll('#ex9Items .drill-item').forEach(item=>{
+    const w = item.dataset.word;
+    const step2 = item.querySelector('[data-step="2"]').value.trim();
+    const step3 = item.querySelector('[data-step="3"]').value.trim();
+    lines.push(`${w} → ${step2 || '...'} → ${step3 || '...'}`);
+  });
+  navigator.clipboard.writeText(lines.join('\n')).then(()=>{
+    const s = document.getElementById('copyStatus9');
+    s.textContent = 'Скопировано ✓';
+    setTimeout(()=> s.textContent='', 1800);
+  });
+}
+
+/* ---------- Ex10 make questions ---------- */
+renderStd('ex10Items', [
+  {word:'questions (grammar)', promptHTML:'<span class="tense-tag">Present Simple</span> She hears the radio every morning.', answer:'does she hear the radio every morning'},
+  {word:'questions (grammar)', promptHTML:'<span class="tense-tag">Present Simple</span> He tells his friends funny stories.', answer:'does he tell his friends funny stories'},
+  {word:'questions (grammar)', promptHTML:'<span class="tense-tag">Past Simple</span> They waited for the bus for an hour.', answer:'did they wait for the bus for an hour'},
+  {word:'questions (grammar)', promptHTML:'<span class="tense-tag">Past Simple</span> She had a headache yesterday.', answer:'did she have a headache yesterday'},
+  {word:'questions (grammar)', promptHTML:'<span class="tense-tag">Present Continuous</span> He is holding tissues in his hand.', answer:'is he holding tissues in his hand'},
+  {word:'questions (grammar)', promptHTML:'<span class="tense-tag">Present Continuous</span> They are ordering side dishes now.', answer:'are they ordering side dishes now'},
+  {word:'questions (grammar)', promptHTML:'<span class="tense-tag">Present Simple</span> The doctor gives him a tablet.', answer:'does the doctor give him a tablet'},
+  {word:'questions (grammar)', promptHTML:'<span class="tense-tag">Past Simple</span> Her arm hurt after the match.', answer:'did her arm hurt after the match'}
+]);
+
+renderProblemWords();
+
+if('speechSynthesis' in window){
+  window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+}
+</script>
+</body>
+</html>
