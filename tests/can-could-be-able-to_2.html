@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Can · Could · Be able to — тренажёр</title>
+<style>
+  :root{
+    --ink:#1c2b2e;
+    --paper:#f6f3ea;
+    --card:#ffffff;
+    --accent:#2f6f5e;
+    --accent-dark:#1f4f42;
+    --gold:#c08a2e;
+    --line:#dcd5c2;
+    --wrong:#b5433a;
+    --wrong-bg:#fbeceb;
+    --right:#2f6f5e;
+    --right-bg:#e9f2ec;
+    --shadow: 0 2px 10px rgba(28,43,46,0.08);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family: "Iowan Old Style","Palatino Linotype", Georgia, serif;
+    background:
+      radial-gradient(circle at 10% 0%, rgba(47,111,94,0.06), transparent 40%),
+      var(--paper);
+    color:var(--ink);
+    line-height:1.5;
+    padding-bottom:60px;
+  }
+  header{
+    padding:48px 20px 30px;
+    text-align:center;
+    border-bottom:2px solid var(--line);
+    background: linear-gradient(180deg, rgba(47,111,94,0.06), transparent);
+  }
+  header .eyebrow{
+    letter-spacing:0.25em;
+    text-transform:uppercase;
+    font-size:12px;
+    color:var(--gold);
+    margin-bottom:10px;
+  }
+  header h1{
+    font-size:clamp(28px,5vw,46px);
+    margin:0 0 8px;
+    font-weight:600;
+    letter-spacing:0.5px;
+  }
+  header h1 span{ color:var(--accent);}
+  header p.sub{
+    max-width:640px;
+    margin:0 auto;
+    color:#4b5a56;
+    font-size:16px;
+  }
+  .wrap{ max-width:760px; margin:0 auto; padding:0 20px;}
+  .rule-toggle{
+    display:block;
+    margin:26px auto 0;
+    background:var(--accent-dark);
+    color:#f6f3ea;
+    border:none;
+    padding:12px 22px;
+    border-radius:30px;
+    font-family: Georgia, serif;
+    font-size:15px;
+    cursor:pointer;
+    box-shadow:var(--shadow);
+  }
+  .rule-toggle:hover{ background:var(--accent);}
+  .rule-box{
+    display:none;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-left:5px solid var(--gold);
+    padding:22px 24px;
+    margin:18px 0 6px;
+    border-radius:6px;
+    font-size:15.5px;
+    box-shadow:var(--shadow);
+  }
+  .rule-box.show{ display:block;}
+  .rule-box h3{ margin-top:0; color:var(--accent-dark);}
+  .rule-box table{border-collapse:collapse; width:100%; margin:14px 0; font-size:14.5px;}
+  .rule-box td, .rule-box th{ border:1px solid var(--line); padding:6px 10px; text-align:left; vertical-align:top;}
+  .rule-box th{ background:#f0ece0;}
+  .rule-box .ex{ color:#5b6a66; font-style:italic;}
+
+  section.exercise{
+    margin-top:46px;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:8px;
+    box-shadow:var(--shadow);
+    overflow:hidden;
+  }
+  .ex-head{
+    background: linear-gradient(135deg, var(--accent-dark), var(--accent));
+    color:#f6f3ea;
+    padding:18px 24px;
+  }
+  .ex-head .num{
+    font-size:12px;
+    letter-spacing:.2em;
+    text-transform:uppercase;
+    color:#d8e8de;
+    display:block;
+    margin-bottom:4px;
+  }
+  .ex-head h2{ margin:0; font-size:20px; font-weight:600;}
+  .ex-head .hint{ font-size:13px; color:#d8e8de; margin-top:4px;}
+  .ex-body{ padding:22px 24px 12px;}
+  ol.items{ list-style:none; margin:0; padding:0; counter-reset:item;}
+  ol.items li{
+    counter-increment:item;
+    display:flex;
+    gap:12px;
+    padding:14px 0;
+    border-bottom:1px dashed var(--line);
+    align-items:flex-start;
+  }
+  ol.items li:last-child{ border-bottom:none;}
+  ol.items li .qnum{
+    flex:0 0 26px;
+    font-weight:700;
+    color:var(--gold);
+    padding-top:6px;
+  }
+  .qbody{ flex:1;}
+  .sentence{ font-size:16px;}
+  .sentence input, .sentence select{
+    font-family: inherit;
+    font-size:16px;
+    border:none;
+    border-bottom:2px solid var(--accent);
+    background:transparent;
+    padding:2px 4px;
+    color:var(--ink);
+  }
+  .sentence input{ width:180px; max-width:60vw;}
+  .sentence select{ cursor:pointer; padding:4px 6px;}
+  .sentence input:focus, .sentence select:focus{ outline:none; border-bottom-color:var(--gold);}
+  .wrong-sentence{
+    font-size:15.5px;
+    color:#7a4a45;
+    margin-bottom:6px;
+  }
+  .wrong-sentence .bad{ text-decoration:line-through; text-decoration-color:var(--wrong); }
+  .task-label{ font-size:13px; color:#7a8985; margin-bottom:4px; font-style:italic;}
+  .feedback{
+    margin-top:6px;
+    font-size:14px;
+    display:none;
+    padding:8px 12px;
+    border-radius:5px;
+  }
+  .feedback.show{ display:block;}
+  .feedback.correct{ background:var(--right-bg); color:var(--right);}
+  .feedback.incorrect{ background:var(--wrong-bg); color:var(--wrong);}
+  .feedback .answer-line{ font-weight:700; margin-bottom:2px;}
+  .feedback .explain{ font-style:italic; color:#5b6a66; font-weight:400;}
+  .feedback.incorrect .explain{ color:#7a4a45;}
+
+  .ex-actions{
+    display:flex;
+    gap:10px;
+    padding:16px 24px 22px;
+    flex-wrap:wrap;
+    align-items:center;
+    border-top:1px solid var(--line);
+    background:#fbfaf5;
+  }
+  button.action{
+    font-family: Georgia, serif;
+    font-size:14.5px;
+    padding:10px 18px;
+    border-radius:24px;
+    border:1px solid var(--accent);
+    background:var(--accent);
+    color:#fff;
+    cursor:pointer;
+  }
+  button.action.secondary{ background:transparent; color:var(--accent-dark);}
+  button.action:hover{ opacity:0.88;}
+  .score{ margin-left:auto; font-size:14.5px; font-weight:700; color:var(--accent-dark);}
+  footer{ text-align:center; margin-top:50px; color:#7a8985; font-size:13px;}
+  @media(max-width:480px){
+    .sentence input{ width:130px;}
+    .ex-head{ padding:16px 18px;}
+    .ex-body{ padding:18px 18px 8px;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">Ability & Possibility</div>
+  <h1>Can · Could · <span>Be able to</span></h1>
+  <p class="sub">Тренажёр по теме «can / could / be able to»: 4 упражнения разного типа — заполнение пропусков, поиск и исправление ошибок, перефразирование и тест с выбором варианта. По 10 предложений в каждом, с объяснением к каждому ответу.</p>
+  <button class="rule-toggle" onclick="document.querySelector('.rule-box').classList.toggle('show')">📘 Показать правило</button>
+  <div class="rule-box">
+    <h3>Кратко о правиле</h3>
+    <p><b>can</b> и <b>could</b> — модальные глаголы. У них есть только форма настоящего (<i>can</i>, может использоваться и для будущего) и форма прошедшего/условного времени (<i>could</i>). Во всех остальных формах (инфинитив, герундий, перфект, будущее, после других модальных глаголов) вместо них используется <b>be able to</b>.</p>
+    <table>
+      <tr><th>Значение</th><th>Форма</th><th>Пример</th></tr>
+      <tr><td>Настоящая способность / разрешение</td><td>can / can't</td><td class="ex">I can swim.</td></tr>
+      <tr><td>Общая способность в прошлом</td><td>could / couldn't</td><td class="ex">She could read at four.</td></tr>
+      <tr><td>Конкретное достижение в прошлом (утв.)</td><td>was/were able to (не could)</td><td class="ex">We were able to land safely.</td></tr>
+      <tr><td>Отрицание конкретного случая в прошлом</td><td>couldn't / wasn't able to</td><td class="ex">He couldn't open the door.</td></tr>
+      <tr><td>Будущее</td><td>will be able to</td><td class="ex">You'll be able to drive next year.</td></tr>
+      <tr><td>После модальных (may, must, might…)</td><td>be able to</td><td class="ex">He might be able to help.</td></tr>
+      <tr><td>Инфинитив / герундий / перфект</td><td>to be able to / being able to / have been able to</td><td class="ex">I'd love to be able to sing.</td></tr>
+      <tr><td>Формальный стиль в present/past</td><td>am/is/are able to; was/were able to</td><td class="ex">I am able to accept your invitation.</td></tr>
+    </table>
+  </div>
+</header>
+
+<div class="wrap" id="exercises"></div>
+
+<footer>Тренажёр «Can / Could / Be able to» · заполните ответ и нажмите «Проверить»</footer>
+
+<script>
+/* ================= EXERCISE 1: GAP FILL (mixed forms) ================= */
+const EX1 = {
+  type:"gap",
+  title:"Упражнение 1. Заполните пропуски (смешанные формы)",
+  hint:"Впишите правильную форму: can, could, was/were able to, will be able to и т.д.",
+  items:[
+    { text:"I ___ swim across the whole lake without stopping.", answer:"can", alt:[], explain:"Способность в настоящем — can." },
+    { text:"When I was young, I ___ climb any tree in the garden.", answer:"could", alt:[], explain:"Общая способность в прошлом — could." },
+    { text:"Despite the traffic, she ___ arrive at the airport on time.", answer:"was able to", alt:["managed to"], explain:"Единичное достижение в прошлом — was able to, не could." },
+    { text:"If you practise daily, you ___ speak fluent English soon.", answer:"will be able to", alt:["'ll be able to"], explain:"Будущая способность — will be able to." },
+    { text:"Luke ___ swim since he was three years old.", answer:"has been able to", alt:[], explain:"Present Perfect — has been able to (у can нет перфектной формы)." },
+    { text:"He might ___ help you with the translation.", answer:"be able to", alt:[], explain:"После модального might нельзя ставить can — be able to." },
+    { text:"I would like ___ speak Spanish fluently.", answer:"to be able to", alt:[], explain:"После would like нужен инфинитив — to be able to." },
+    { text:"She loves ___ work from home three days a week.", answer:"being able to", alt:[], explain:"После love + герундий — being able to." },
+    { text:"Unfortunately, my colleagues ___ come to yesterday's meeting.", answer:"weren't able to", alt:["were not able to","couldn't","could not"], explain:"Отрицание конкретного случая в прошлом — weren't able to / couldn't." },
+    { text:"Fortunately, I ___ accept your invitation.", answer:"am able to", alt:[], explain:"Формальный стиль в настоящем времени — am able to." }
+  ]
+};
+
+/* ================= EXERCISE 2: ERROR CORRECTION ================= */
+const EX2 = {
+  type:"error",
+  title:"Упражнение 2. Найдите и исправьте ошибку",
+  hint:"В каждом предложении есть одна ошибка, связанная с can / could / be able to. Впишите правильный вариант.",
+  items:[
+    { wrong:"I would like can speak Italian one day.", bad:"can", answer:"to be able to", explain:"После would like нужен инфинитив — to be able to, а не can." },
+    { wrong:"Despite the heavy traffic, she could arrive at the airport on time.", bad:"could", answer:"was able to", explain:"Единичное достижение в прошлом — was able to, а не could." },
+    { wrong:"He must can finish the report by Friday.", bad:"can", answer:"be able to", explain:"После модального must нельзя ставить can — be able to." },
+    { wrong:"Next year, if you study hard, you can speak fluent Spanish.", bad:"can", answer:"will be able to", explain:"Будущая способность выражается через will be able to." },
+    { wrong:"I've can swim since I was four years old.", bad:"can", answer:"been able to", explain:"Present Perfect — I've been able to (у can нет перфектной формы)." },
+    { wrong:"She loves can work from home.", bad:"can", answer:"being able to", explain:"После loves нужен герундий — being able to." },
+    { wrong:"Unfortunately, they can't attend yesterday's meeting.", bad:"can't", answer:"weren't able to", explain:"Речь о прошлом (yesterday) — нужна форма прошедшего времени: weren't able to / couldn't." },
+    { wrong:"When I was young, I was able to swim very well every summer.", bad:"was able to", answer:"could", explain:"Общая, повторяющаяся способность в прошлом — could, а не was able to." },
+    { wrong:"He might can help you tomorrow.", bad:"can", answer:"be able to", explain:"Два модальных глагола подряд невозможны — be able to." },
+    { wrong:"I'm proud that I can speak three languages since childhood.", bad:"can", answer:"have been able to", explain:"Since childhood указывает на Present Perfect — have been able to." }
+  ]
+};
+
+/* ================= EXERCISE 3: TRANSFORMATION / REPHRASE ================= */
+const EX3 = {
+  type:"gap",
+  title:"Упражнение 3. Перефразируйте (transformation)",
+  hint:"Допишите второе предложение так, чтобы оно означало то же самое, что и первое, используя слово-подсказку.",
+  items:[
+    { text:"She managed to solve the puzzle. (ABLE) → She ___ solve the puzzle.", answer:"was able to", alt:["managed to"], explain:"Единичное достижение в прошлом — was able to." },
+    { text:"It's possible for him to lift very heavy weights. (CAN) → He ___ lift very heavy weights.", answer:"can", alt:[], explain:"Способность в настоящем — can." },
+    { text:"My grandmother knew how to speak four languages. (COULD) → My grandmother ___ speak four languages.", answer:"could", alt:[], explain:"Общая способность в прошлом — could." },
+    { text:"I want the chance to visit you next year. (ABLE) → I want ___ visit you next year.", answer:"to be able to", alt:[], explain:"Инфинитив после want — to be able to." },
+    { text:"He has had the ability to drive since he was seventeen. (BEEN) → He ___ drive since he was seventeen.", answer:"has been able to", alt:[], explain:"Present Perfect — has been able to." },
+    { text:"Unfortunately, we didn't manage to book the tickets. (ABLE) → Unfortunately, we ___ book the tickets.", answer:"weren't able to", alt:["were not able to","couldn't","could not"], explain:"Отрицание конкретного случая в прошлом — weren't able to." },
+    { text:"I'm sure that you'll have the ability to run faster in the future. (ABLE) → I'm sure you ___ run faster in the future.", answer:"will be able to", alt:["'ll be able to"], explain:"Будущая способность — will be able to." },
+    { text:"She enjoys having the freedom to work whenever she wants. (BEING) → She enjoys ___ work whenever she wants.", answer:"being able to", alt:[], explain:"Герундий после enjoys — being able to." },
+    { text:"It's not possible for me to help you today. (CAN'T) → I ___ help you today.", answer:"can't", alt:["cannot"], explain:"Невозможность в настоящем — can't." },
+    { text:"Despite the rain, they succeeded in finishing the match. (ABLE) → Despite the rain, they ___ finish the match.", answer:"were able to", alt:["managed to"], explain:"Единичное достижение вопреки трудностям — were able to." }
+  ]
+};
+
+/* ================= EXERCISE 4: MULTIPLE CHOICE REVIEW ================= */
+const EX4 = {
+  type:"mc",
+  title:"Упражнение 4. Тест: выберите правильный вариант",
+  hint:"Смешанное повторение — выберите верную форму из списка.",
+  items:[
+    { text:"When I was a child, I ___ read very quickly.", options:["could","was able to","can"], correct:0, explain:"Общая способность в прошлом — could." },
+    { text:"After trying many times, she ___ open the heavy door.", options:["could","was able to","can"], correct:1, explain:"Единичное достижение в прошлом — was able to." },
+    { text:"He might ___ come to the party later.", options:["can","be able to","could"], correct:1, explain:"После модального might — be able to." },
+    { text:"I would love ___ paint like Picasso.", options:["can","to be able to","being able to"], correct:1, explain:"Инфинитив после would love — to be able to." },
+    { text:"She enjoys ___ travel without a fixed plan.", options:["can","to be able to","being able to"], correct:2, explain:"Герундий после enjoys — being able to." },
+    { text:"If you study hard, you ___ pass the exam easily.", options:["can","could","will be able to"], correct:2, explain:"Будущая способность — will be able to." },
+    { text:"Fortunately, I ___ accept your invitation.", options:["am able to","can able","could be"], correct:0, explain:"Формальный present — am able to." },
+    { text:"Luke ___ swim since he was three.", options:["can","has been able to","could"], correct:1, explain:"Present Perfect — has been able to." },
+    { text:"The team ___ finish the marathon despite the injury.", options:["couldn't","were able to","can't"], correct:1, explain:"Единичное достижение вопреки трудностям — were able to." },
+    { text:"As a young man, my grandfather ___ run ten kilometres without stopping.", options:["was able to","could","can"], correct:1, explain:"Общая способность в прошлом — could." }
+  ]
+};
+
+const DATA = [EX1, EX2, EX3, EX4];
+
+function normalize(s){
+  return s.trim().toLowerCase()
+    .replace(/’/g,"'")
+    .replace(/\s+/g," ")
+    .replace(/[.,!?]+$/,"");
+}
+function isCorrect(userVal, item){
+  const u = normalize(userVal);
+  if(u === "") return false;
+  const candidates = [item.answer, ...(item.alt||[])].map(normalize);
+  return candidates.includes(u);
+}
+
+function buildGapItem(item, i, inputId){
+  const li = document.createElement("li");
+  const parts = item.text.split("___");
+  li.innerHTML = `
+    <span class="qnum">${i+1}.</span>
+    <div class="qbody">
+      <div class="sentence">${parts[0]}<input type="text" id="${inputId}" autocomplete="off" spellcheck="false">${parts[1]}</div>
+      <div class="feedback" id="fb-${inputId}"></div>
+    </div>`;
+  return li;
+}
+
+function buildErrorItem(item, i, inputId){
+  const li = document.createElement("li");
+  const highlighted = item.wrong.replace(item.bad, `<span class="bad">${item.bad}</span>`);
+  li.innerHTML = `
+    <span class="qnum">${i+1}.</span>
+    <div class="qbody">
+      <div class="wrong-sentence">${highlighted}</div>
+      <div class="task-label">Напишите правильный вариант вместо выделенного слова:</div>
+      <div class="sentence"><input type="text" id="${inputId}" autocomplete="off" spellcheck="false"></div>
+      <div class="feedback" id="fb-${inputId}"></div>
+    </div>`;
+  return li;
+}
+
+function buildMcItem(item, i, inputId){
+  const li = document.createElement("li");
+  let opts = `<option value="">— выберите —</option>`;
+  item.options.forEach((opt, idx)=>{ opts += `<option value="${idx}">${opt}</option>`; });
+  li.innerHTML = `
+    <span class="qnum">${i+1}.</span>
+    <div class="qbody">
+      <div class="sentence">${item.text.replace("___", "")}
+        <select id="${inputId}">${opts}</select>
+      </div>
+      <div class="feedback" id="fb-${inputId}"></div>
+    </div>`;
+  return li;
+}
+
+function buildExercise(ex, exIndex){
+  const section = document.createElement("section");
+  section.className = "exercise";
+  section.id = "ex-" + exIndex;
+
+  const head = document.createElement("div");
+  head.className = "ex-head";
+  head.innerHTML = `<span class="num">Часть ${exIndex+1} из ${DATA.length}</span>
+    <h2>${ex.title}</h2>
+    <div class="hint">${ex.hint}</div>`;
+  section.appendChild(head);
+
+  const body = document.createElement("div");
+  body.className = "ex-body";
+  const ol = document.createElement("ol");
+  ol.className = "items";
+
+  ex.items.forEach((item, i)=>{
+    const inputId = `ex${exIndex}-q${i}`;
+    let li;
+    if(ex.type === "gap") li = buildGapItem(item, i, inputId);
+    else if(ex.type === "error") li = buildErrorItem(item, i, inputId);
+    else if(ex.type === "mc") li = buildMcItem(item, i, inputId);
+    ol.appendChild(li);
+  });
+  body.appendChild(ol);
+  section.appendChild(body);
+
+  const actions = document.createElement("div");
+  actions.className = "ex-actions";
+  actions.innerHTML = `
+    <button class="action" onclick="checkExercise(${exIndex})">✔ Проверить</button>
+    <button class="action secondary" onclick="showAnswers(${exIndex})">💡 Показать ответы</button>
+    <button class="action secondary" onclick="resetExercise(${exIndex})">↺ Сбросить</button>
+    <span class="score" id="score-${exIndex}"></span>`;
+  section.appendChild(actions);
+
+  return section;
+}
+
+function checkExercise(exIndex){
+  const ex = DATA[exIndex];
+  let correctCount = 0;
+  ex.items.forEach((item, i)=>{
+    const inputId = `ex${exIndex}-q${i}`;
+    const fb = document.getElementById("fb-"+inputId);
+    let ok = false;
+    if(ex.type === "mc"){
+      const sel = document.getElementById(inputId);
+      ok = sel.value !== "" && parseInt(sel.value,10) === item.correct;
+      if(ok) correctCount++;
+      const correctLabel = item.options[item.correct];
+      fb.className = "feedback show " + (ok ? "correct" : "incorrect");
+      fb.innerHTML = ok
+        ? `<div class="answer-line">✔ Верно!</div><div class="explain">${item.explain}</div>`
+        : `<div class="answer-line">✘ Неверно. Правильный ответ: ${correctLabel}</div><div class="explain">${item.explain}</div>`;
+    } else {
+      const input = document.getElementById(inputId);
+      ok = isCorrect(input.value, item);
+      if(ok) correctCount++;
+      fb.className = "feedback show " + (ok ? "correct" : "incorrect");
+      fb.innerHTML = ok
+        ? `<div class="answer-line">✔ Верно!</div><div class="explain">${item.explain}</div>`
+        : `<div class="answer-line">✘ Неверно. Правильный ответ: ${item.answer}</div><div class="explain">${item.explain}</div>`;
+    }
+  });
+  document.getElementById("score-"+exIndex).textContent = `Результат: ${correctCount} / ${ex.items.length}`;
+}
+
+function showAnswers(exIndex){
+  const ex = DATA[exIndex];
+  ex.items.forEach((item, i)=>{
+    const inputId = `ex${exIndex}-q${i}`;
+    const fb = document.getElementById("fb-"+inputId);
+    if(ex.type === "mc"){
+      document.getElementById(inputId).value = item.correct;
+      fb.className = "feedback show correct";
+      fb.innerHTML = `<div class="answer-line">Ответ: ${item.options[item.correct]}</div><div class="explain">${item.explain}</div>`;
+    } else {
+      document.getElementById(inputId).value = item.answer;
+      fb.className = "feedback show correct";
+      fb.innerHTML = `<div class="answer-line">Ответ: ${item.answer}</div><div class="explain">${item.explain}</div>`;
+    }
+  });
+  document.getElementById("score-"+exIndex).textContent = "Показаны все правильные ответы";
+}
+
+function resetExercise(exIndex){
+  const ex = DATA[exIndex];
+  ex.items.forEach((item, i)=>{
+    const inputId = `ex${exIndex}-q${i}`;
+    const el = document.getElementById(inputId);
+    el.value = "";
+    const fb = document.getElementById("fb-"+inputId);
+    fb.className = "feedback";
+    fb.innerHTML = "";
+  });
+  document.getElementById("score-"+exIndex).textContent = "";
+}
+
+const container = document.getElementById("exercises");
+DATA.forEach((ex, i)=> container.appendChild(buildExercise(ex, i)));
+</script>
+
+</body>
+</html>
