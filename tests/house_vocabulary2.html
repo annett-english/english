@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Дом и квартира — практика лексики</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#122436;
+    --bg2:#0d1c2a;
+    --paper:#faf6ec;
+    --paper-line:#e3dac2;
+    --ink:#1f3348;
+    --ink-soft:#4a5d70;
+    --accent:#c1573d;
+    --accent2:#e0a83f;
+    --success:#3f8b6a;
+    --error:#c1433a;
+    --muted-blue:#8fb0cd;
+    --line-blue:rgba(255,255,255,.14);
+    --grid:rgba(255,255,255,.05);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(circle at 1px 1px, var(--grid) 1px, transparent 1px) 0 0/26px 26px,
+      linear-gradient(180deg,var(--bg),var(--bg2));
+    color:var(--paper);
+    font-family:'IBM Plex Sans',sans-serif;
+    line-height:1.5;
+    padding-bottom:60px;
+  }
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  a{color:inherit;}
+
+  /* ---------- HEADER ---------- */
+  header{
+    padding:38px 24px 30px;
+    position:relative;
+    overflow:hidden;
+    border-bottom:1px dashed var(--line-blue);
+  }
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    letter-spacing:.18em;
+    font-size:12px;
+    color:var(--accent2);
+    text-transform:uppercase;
+    margin-bottom:10px;
+  }
+  h1{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:clamp(28px,5vw,44px);
+    margin:0 0 10px;
+    letter-spacing:-.01em;
+    color:#fff;
+  }
+  header p.sub{
+    color:var(--muted-blue);
+    max-width:640px;
+    font-size:15px;
+    margin:0;
+  }
+  .house-svg{
+    position:absolute;
+    right:20px;
+    top:10px;
+    width:220px;
+    opacity:.55;
+    pointer-events:none;
+  }
+  @media(max-width:760px){ .house-svg{display:none;} }
+
+  /* ---------- LAYOUT ---------- */
+  .layout{
+    max-width:1180px;
+    margin:0 auto;
+    padding:28px 24px 0;
+    display:grid;
+    grid-template-columns:1fr 260px;
+    gap:26px;
+    align-items:start;
+  }
+  @media(max-width:900px){
+    .layout{grid-template-columns:1fr;}
+    aside{order:-1;position:static !important;}
+  }
+  main{min-width:0;}
+
+  /* ---------- PAPER CARD ---------- */
+  .card{
+    background:var(--paper);
+    color:var(--ink);
+    border-radius:4px;
+    box-shadow:0 14px 30px rgba(0,0,0,.28);
+    margin-bottom:26px;
+    position:relative;
+    border-top:5px solid var(--accent2);
+  }
+  .card-inner{padding:22px 24px 26px;}
+  .card .tag{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--accent);
+    font-weight:600;
+    margin-bottom:6px;
+    display:block;
+  }
+  .card h2{
+    margin:0 0 6px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:21px;
+    color:var(--ink);
+  }
+  .card .instr{
+    color:var(--ink-soft);
+    font-size:14.5px;
+    margin:0 0 16px;
+  }
+
+  /* ---------- VOCAB TABLE ---------- */
+  .vocab-toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;}
+  table.vocab{
+    width:100%;
+    border-collapse:collapse;
+    font-size:14px;
+  }
+  table.vocab th{
+    text-align:left;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:var(--ink-soft);
+    border-bottom:2px solid var(--paper-line);
+    padding:6px 8px;
+  }
+  table.vocab td{
+    padding:7px 8px;
+    border-bottom:1px solid var(--paper-line);
+    vertical-align:middle;
+  }
+  table.vocab tr:hover td{background:rgba(193,87,61,.06);}
+  .en-word{font-weight:600;}
+  .transcr{color:var(--ink-soft);font-style:italic;font-size:13px;}
+  .listen-btn{
+    border:none;background:var(--accent2);color:#1f3348;
+    width:28px;height:28px;border-radius:50%;cursor:pointer;
+    font-size:13px;display:inline-flex;align-items:center;justify-content:center;
+    transition:transform .15s;
+  }
+  .listen-btn:hover{transform:scale(1.12);}
+  .vocab-scroll{max-height:360px;overflow-y:auto;border:1px solid var(--paper-line);border-radius:4px;padding:0 6px;}
+
+  /* ---------- BUTTONS ---------- */
+  .btn{
+    font-family:'IBM Plex Sans',sans-serif;
+    font-weight:600;
+    font-size:13.5px;
+    border:none;
+    padding:9px 16px;
+    border-radius:5px;
+    cursor:pointer;
+    transition:filter .15s, transform .1s;
+  }
+  .btn:active{transform:translateY(1px);}
+  .btn-primary{background:var(--ink);color:#fff;}
+  .btn-primary:hover{filter:brightness(1.2);}
+  .btn-outline{background:transparent;color:var(--ink);border:1.5px solid var(--ink);}
+  .btn-outline:hover{background:var(--ink);color:#fff;}
+  .btn-accent{background:var(--accent);color:#fff;}
+  .btn-accent:hover{filter:brightness(1.12);}
+  .btn-ghost{background:#eee5cf;color:var(--ink);}
+  .btn-ghost:hover{background:#e3d6b3;}
+  .btn-sm{padding:6px 11px;font-size:12.5px;}
+
+  .ex-toolbar{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0 4px;}
+  .ex-score{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:13px;
+    color:var(--ink-soft);
+    align-self:center;
+    margin-left:auto;
+  }
+
+  /* ---------- EXERCISE ITEMS ---------- */
+  .item{
+    display:grid;
+    grid-template-columns:26px 1fr;
+    gap:10px;
+    padding:11px 0;
+    border-bottom:1px dashed var(--paper-line);
+  }
+  .item:last-child{border-bottom:none;}
+  .item-num{
+    font-family:'IBM Plex Mono',monospace;
+    color:var(--accent);
+    font-weight:700;
+    padding-top:6px;
+  }
+  .item-task{font-size:15px;margin-bottom:6px;}
+  .item-hint{color:var(--ink-soft);font-size:13px;margin-bottom:6px;}
+  .item-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+  .item-input{
+    flex:1;
+    min-width:180px;
+    padding:8px 10px;
+    border:1.5px solid var(--paper-line);
+    border-radius:5px;
+    font-size:14.5px;
+    font-family:'IBM Plex Sans',sans-serif;
+    background:#fff;
+    color:var(--ink);
+  }
+  .item-input:focus{outline:none;border-color:var(--accent);}
+  .item-input.correct{border-color:var(--success);background:#eef7f1;}
+  .item-input.wrong{border-color:var(--error);background:#fbecea;}
+  textarea.item-input{min-height:44px;resize:vertical;font-family:'IBM Plex Sans',sans-serif;}
+  .result-icon{font-weight:700;font-size:15px;width:20px;text-align:center;}
+  .result-icon.ok{color:var(--success);}
+  .result-icon.bad{color:var(--error);}
+  .answer-reveal{
+    display:none;
+    margin-top:6px;
+    font-size:13.5px;
+    background:#eef3e9;
+    border-left:3px solid var(--success);
+    padding:6px 10px;
+    border-radius:3px;
+    color:#2f4a3a;
+  }
+  .answer-reveal.show{display:block;}
+  .speak-inline{
+    border:none;background:var(--ink);color:#fff;
+    width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:14px;flex-shrink:0;
+  }
+
+  /* ---------- SIDEBAR ---------- */
+  aside{
+    position:sticky;
+    top:20px;
+  }
+  .side-card{
+    background:var(--paper);
+    color:var(--ink);
+    border-radius:4px;
+    padding:16px 16px 18px;
+    box-shadow:0 10px 24px rgba(0,0,0,.25);
+    border-top:5px solid var(--accent);
+  }
+  .side-card h3{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:14px;
+    margin:0 0 4px;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+  }
+  .side-card p.desc{font-size:12.5px;color:var(--ink-soft);margin:0 0 12px;}
+  #problem-list{list-style:none;margin:0;padding:0;font-size:13.5px;}
+  #problem-list li{
+    display:flex;justify-content:space-between;gap:6px;
+    padding:6px 0;border-bottom:1px dashed var(--paper-line);
+  }
+  #problem-list li:last-child{border-bottom:none;}
+  .badge{
+    background:var(--error);color:#fff;font-family:'IBM Plex Mono',monospace;
+    font-size:11px;border-radius:10px;padding:1px 7px;flex-shrink:0;
+  }
+  .empty-note{color:var(--ink-soft);font-size:13px;font-style:italic;}
+  #clear-problems{margin-top:12px;width:100%;}
+
+  footer{
+    text-align:center;
+    color:var(--muted-blue);
+    font-size:12.5px;
+    margin-top:20px;
+    padding:0 20px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <svg class="house-svg" viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <polyline points="20,90 100,25 180,90" stroke="#faf6ec" stroke-width="2.5"/>
+    <rect x="35" y="90" width="130" height="60" stroke="#faf6ec" stroke-width="2"/>
+    <rect x="90" y="115" width="24" height="35" stroke="#e0a83f" stroke-width="2"/>
+    <rect x="50" y="100" width="20" height="20" stroke="#e0a83f" stroke-width="1.5"/>
+    <rect x="130" y="100" width="20" height="20" stroke="#e0a83f" stroke-width="1.5"/>
+    <line x1="140" y1="55" x2="140" y2="20" stroke="#c1573d" stroke-width="3"/>
+    <line x1="0" y1="150" x2="200" y2="150" stroke="#faf6ec" stroke-width="1" stroke-dasharray="4 4"/>
+  </svg>
+  <div class="eyebrow">Модуль лексики · дом &amp; квартира</div>
+  <h1>Дом и квартира</h1>
+  <p class="sub">Повтори слова, послушай произношение и пропиши их руками в семи упражнениях. Каждое — по 10 пунктов, с проверкой и показом ответов.</p>
+</header>
+
+<div class="layout">
+  <main>
+
+    <!-- VOCAB REMINDER -->
+    <section class="card" id="vocab-card">
+      <div class="card-inner">
+        <span class="tag">Шаг 0 · напоминание</span>
+        <h2>Словарь темы</h2>
+        <p class="instr">Нажми на 🔊, чтобы прослушать произношение слова. Транскрипция и перевод — рядом.</p>
+        <div class="vocab-toolbar">
+          <button class="btn btn-outline btn-sm" onclick="speakAll()">🔊 Прослушать весь список</button>
+        </div>
+        <div class="vocab-scroll">
+          <table class="vocab">
+            <thead><tr><th></th><th>Word</th><th>Транскрипция</th><th>Перевод</th></tr></thead>
+            <tbody id="vocab-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <div id="exercises"></div>
+
+  </main>
+
+  <aside>
+    <div class="side-card">
+      <h3>⚠ Проблемные слова</h3>
+      <p class="desc">Здесь появляются слова, в которых ты ошиб(ла)ся. Исправь их первыми!</p>
+      <ul id="problem-list"></ul>
+      <p class="empty-note" id="empty-note">Пока ошибок нет — отличное начало.</p>
+      <button class="btn btn-ghost btn-sm" id="clear-problems" onclick="clearProblems()">Очистить список</button>
+    </div>
+  </aside>
+</div>
+
+<footer>Все ответы вводятся вручную — так лучше запоминаются слова и написание.</footer>
+
+<script>
+/* ================= VOCAB DATA ================= */
+const vocab = [
+ ["bookcase","книжный шкаф","/ˈbʊkkeɪs/"],
+ ["turn the house into","превратить дом в","/tɜːn ðə haʊs ˈɪntuː/"],
+ ["plain","простой, обычный","/pleɪn/"],
+ ["overlook","выходить окнами на (вид)","/ˌəʊvəˈlʊk/"],
+ ["hang","вешать","/hæŋ/"],
+ ["tidy","аккуратный / убирать","/ˈtaɪdi/"],
+ ["property","собственность, недвижимость","/ˈprɒpəti/"],
+ ["remain","оставаться","/rɪˈmeɪn/"],
+ ["be made from/of","быть сделанным из","/biː meɪd frɒm/ɒv/"],
+ ["terrace","терраса","/ˈterəs/"],
+ ["chimney","дымоход, труба","/ˈtʃɪmni/"],
+ ["roof","крыша","/ruːf/"],
+ ["basement","подвал","/ˈbeɪsmənt/"],
+ ["gate","калитка, ворота","/geɪt/"],
+ ["entrance","вход","/ˈentrəns/"],
+ ["wall","стена","/wɔːl/"],
+ ["attic","чердак","/ˈætɪk/"],
+ ["path","тропинка, дорожка","/pɑːθ/"],
+ ["balcony","балкон","/ˈbælkəni/"],
+ ["ground floor","первый этаж","/ɡraʊnd flɔː/"],
+ ["top floor","верхний этаж","/tɒp flɔː/"],
+ ["cosy","уютный","/ˈkəʊzi/"],
+ ["an open fire","открытый камин","/ən ˈəʊpən ˈfaɪə/"],
+ ["modern","современный","/ˈmɒdən/"],
+ ["wooden floor","деревянный пол","/ˈwʊdən flɔː/"],
+ ["spacious","просторный","/ˈspeɪʃəs/"],
+ ["light","светлый","/laɪt/"],
+ ["the ceilings","потолки","/ðə ˈsiːlɪŋz/"],
+ ["coffee table","журнальный столик","/ˈkɒfi ˈteɪbl/"],
+ ["wardrobe","шкаф для одежды","/ˈwɔːdrəʊb/"],
+ ["curtains","шторы","/ˈkɜːtnz/"],
+ ["TV stand","тумба под телевизор","/ˌtiːˈviː stænd/"],
+ ["the country","сельская местность","/ðə ˈkʌntri/"],
+ ["the outskirts","окраина","/ðə ˈaʊtskɜːts/"],
+ ["city","город","/ˈsɪti/"],
+ ["the suburb","пригород","/ðə ˈsʌbɜːb/"],
+ ["the village","деревня","/ðə ˈvɪlɪdʒ/"],
+ ["the coast","побережье","/ðə kəʊst/"],
+ ["cupboard","шкафчик, буфет","/ˈkʌbəd/"],
+ ["floor lamp","торшер","/flɔː læmp/"],
+ ["washbasin","раковина (умывальник)","/ˈwɒʃbeɪsn/"]
+];
+
+function speak(text){
+  if(!('speechSynthesis' in window)) return;
+  const u = new SpeechSynthesisUtterance(text.replace(/\/.*?\//,''));
+  u.lang = 'en-GB';
+  u.rate = 0.85;
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(u);
+}
+function speakAll(){
+  let i=0;
+  function next(){
+    if(i>=vocab.length) return;
+    const u = new SpeechSynthesisUtterance(vocab[i][0]);
+    u.lang='en-GB'; u.rate=0.85;
+    u.onend = ()=>{ i++; setTimeout(next,150); };
+    window.speechSynthesis.speak(u);
+  }
+  window.speechSynthesis.cancel();
+  next();
+}
+
+const vocabBody = document.getElementById('vocab-body');
+vocab.forEach(([word,ru,tr])=>{
+  const row = document.createElement('tr');
+  row.innerHTML = `
+    <td><button class="listen-btn" onclick="speak('${word.replace(/'/g,"\\'")}')">🔊</button></td>
+    <td class="en-word">${word}</td>
+    <td class="transcr">${tr}</td>
+    <td>${ru}</td>`;
+  vocabBody.appendChild(row);
+});
+
+/* ================= PROBLEM WORDS ================= */
+let problems = {}; // word -> count
+function registerMistake(word){
+  problems[word] = (problems[word]||0)+1;
+  renderProblems();
+}
+function clearProblems(){
+  problems = {};
+  renderProblems();
+}
+function renderProblems(){
+  const list = document.getElementById('problem-list');
+  const note = document.getElementById('empty-note');
+  const entries = Object.entries(problems).sort((a,b)=>b[1]-a[1]);
+  list.innerHTML='';
+  if(entries.length===0){ note.style.display='block'; return; }
+  note.style.display='none';
+  entries.forEach(([word,count])=>{
+    const li = document.createElement('li');
+    li.innerHTML = `<span>${word}</span><span class="badge">${count}</span>`;
+    list.appendChild(li);
+  });
+}
+renderProblems();
+
+/* ================= EXERCISES DATA ================= */
+// answer strings may contain alternatives separated by "|"
+const exercises = [
+  {
+    title:"Упражнение 1. Вставь пропущенные буквы",
+    instr:"Впиши слово целиком в поле ответа, ориентируясь на пропуски и перевод-подсказку.",
+    type:"fill",
+    items:[
+      {task:"b__kc__e", hint:"книжный шкаф", answer:"bookcase"},
+      {task:"terr__ce", hint:"терраса", answer:"terrace"},
+      {task:"ch_mn_y", hint:"дымоход", answer:"chimney"},
+      {task:"b__s__ment", hint:"подвал", answer:"basement"},
+      {task:"b_lc_ny", hint:"балкон", answer:"balcony"},
+      {task:"sp_c__us", hint:"просторный", answer:"spacious"},
+      {task:"c_rt__ns", hint:"шторы", answer:"curtains"},
+      {task:"w_rdr_be", hint:"шкаф для одежды", answer:"wardrobe"},
+      {task:"c_pb__rd", hint:"шкафчик, буфет", answer:"cupboard"},
+      {task:"w_shb_s_n", hint:"раковина (умывальник)", answer:"washbasin"}
+    ]
+  },
+  {
+    title:"Упражнение 2. Перевод с русского на английский",
+    instr:"Переведи слово или выражение на английский язык.",
+    type:"translate",
+    items:[
+      {task:"простой, обычный", answer:"plain"},
+      {task:"выходить окнами на (о виде)", answer:"overlook"},
+      {task:"вешать", answer:"hang"},
+      {task:"аккуратный / убирать", answer:"tidy"},
+      {task:"собственность, недвижимость", answer:"property"},
+      {task:"оставаться", answer:"remain"},
+      {task:"быть сделанным из", answer:"be made from|be made of|be made from/of"},
+      {task:"крыша", answer:"roof"},
+      {task:"вход", answer:"entrance"},
+      {task:"чердак", answer:"attic"}
+    ]
+  },
+  {
+    title:"Упражнение 3. Пропиши слово по звуку",
+    instr:"Нажми 🔊, прослушай произношение и напиши услышанное слово по-английски.",
+    type:"dictation",
+    items:[
+      {task:"gate", answer:"gate", tr:"/geɪt/"},
+      {task:"path", answer:"path", tr:"/pɑːθ/"},
+      {task:"ground floor", answer:"ground floor", tr:"/ɡraʊnd flɔː/"},
+      {task:"top floor", answer:"top floor", tr:"/tɒp flɔː/"},
+      {task:"cosy", answer:"cosy", tr:"/ˈkəʊzi/"},
+      {task:"modern", answer:"modern", tr:"/ˈmɒdən/"},
+      {task:"wooden floor", answer:"wooden floor", tr:"/ˈwʊdən flɔː/"},
+      {task:"light", answer:"light", tr:"/laɪt/"},
+      {task:"floor lamp", answer:"floor lamp", tr:"/flɔː læmp/"},
+      {task:"wall", answer:"wall", tr:"/wɔːl/"}
+    ]
+  },
+  {
+    title:"Упражнение 4. Дефиниция",
+    instr:"Прочитай определение на английском и напиши, какое это слово.",
+    type:"definition",
+    items:[
+      {task:"A small table, usually placed in front of a sofa, where you put drinks, magazines, etc.", answer:"coffee table"},
+      {task:"A piece of furniture designed to hold a television set.", answer:"TV stand"},
+      {task:"The upper interior surfaces of a room.", answer:"the ceilings|ceilings"},
+      {task:"A fire that burns in a fireplace without a glass screen, giving a traditional, cosy feeling.", answer:"an open fire|open fire"},
+      {task:"The areas of a town or city that are furthest from the centre.", answer:"the outskirts|outskirts"},
+      {task:"A residential area on the edge of a city, often quieter than the centre.", answer:"the suburb|suburb"},
+      {task:"A small community in a rural area, smaller than a town.", answer:"the village|village"},
+      {task:"The land next to the sea.", answer:"the coast|coast"},
+      {task:"A large town, usually the administrative and economic centre of a region.", answer:"city"},
+      {task:"The place where you go into a building.", answer:"entrance"}
+    ]
+  },
+  {
+    title:"Упражнение 5. Сочетаемость слов",
+    instr:"Заполни пропуск в предложении подходящим словом или выражением из темы.",
+    type:"collocation",
+    items:[
+      {task:"They decided to ______ the old barn ______ a cosy cottage.", hint:"превратить X в Y", answer:"turn|turn ... into"},
+      {task:"This house ______ made ______ wood and stone.", hint:"быть сделанным из", answer:"is|be made from|be made of"},
+      {task:"The bedroom windows ______ a beautiful garden.", hint:"выходить окнами на", answer:"overlook"},
+      {task:"Please ______ your coat on the hook by the door.", hint:"вешать", answer:"hang"},
+      {task:"She always keeps her room ______.", hint:"аккуратный", answer:"tidy"},
+      {task:"This ______ has been in our family for generations.", hint:"собственность", answer:"property"},
+      {task:"Despite the renovation, the old fireplace will ______ in the living room.", hint:"оставаться", answer:"remain"},
+      {task:"The kitchen and living room are on the ______.", hint:"первый этаж", answer:"ground floor"},
+      {task:"Our bedroom is on the ______, so we have a great view.", hint:"верхний этаж", answer:"top floor"},
+      {task:"The living room is very ______, with enough space for two sofas.", hint:"просторный", answer:"spacious"}
+    ]
+  },
+  {
+    title:"Упражнение 6. Would you rather…",
+    instr:"Ответь полным предложением: I would rather … because … Строгой проверки нет — сравни свой ответ с образцом.",
+    type:"open",
+    items:[
+      {task:"Would you rather live in the city or in the village?", sample:"I would rather live in the village because it's quiet and close to nature."},
+      {task:"Would you rather have a house with a basement or an attic?", sample:"I would rather have an attic because it can be turned into a cosy bedroom."},
+      {task:"Would you rather have a balcony or a terrace?", sample:"I would rather have a terrace because it's more spacious for guests."},
+      {task:"Would you rather live on the ground floor or the top floor?", sample:"I would rather live on the top floor because it overlooks the whole street."},
+      {task:"Would you rather have an open fire or modern central heating?", sample:"I would rather have an open fire because it feels cosy in winter."},
+      {task:"Would you rather live in the suburbs or on the outskirts of town?", sample:"I would rather live in the suburbs because they are closer to the city centre."},
+      {task:"Would you rather have a spacious living room or a cosy small one?", sample:"I would rather have a cosy small living room because it feels warmer."},
+      {task:"Would you rather have a house made of wood or of stone?", sample:"I would rather have a house made of stone because it remains warm longer."},
+      {task:"Would you rather live near the coast or in the country?", sample:"I would rather live near the coast because I love the sea view."},
+      {task:"Would you rather have a wooden floor or a carpeted floor?", sample:"I would rather have a wooden floor because it's easier to keep tidy."}
+    ]
+  },
+  {
+    title:"Упражнение 7. Expand the sentence",
+    instr:"Расширь короткое предложение, используя слова в скобках. Строгой проверки нет — сравни свой вариант с образцом.",
+    type:"open",
+    items:[
+      {task:"The house is old. (property, remain)", sample:"This old property has remained in excellent condition for over a century."},
+      {task:"There is a fire. (open fire, cosy)", sample:"There is a lovely open fire that makes the living room feel warm and cosy."},
+      {task:"The room is big. (spacious, light)", sample:"The room is spacious and full of light thanks to the large windows."},
+      {task:"We have a garden. (path, gate)", sample:"We have a beautiful garden with a stone path leading to a wooden gate."},
+      {task:"The kitchen has a table. (coffee table, TV stand)", sample:"Besides the kitchen table, there's a coffee table and a TV stand in the living room."},
+      {task:"I live in a flat. (top floor, balcony)", sample:"I live in a flat on the top floor, which has a lovely balcony."},
+      {task:"The house has a roof. (chimney, attic)", sample:"The house has a sloping roof with a tall chimney and a small attic underneath it."},
+      {task:"They moved to a village. (the country, cosy)", sample:"They moved to a small village in the country and now live in a cosy cottage."},
+      {task:"The bathroom is small. (washbasin, cupboard)", sample:"The small bathroom has just enough space for a washbasin and a cupboard."},
+      {task:"We overlook the sea. (the coast, entrance)", sample:"Our house overlooks the coast, and the entrance faces the garden."}
+    ]
+  }
+];
+
+/* ================= RENDER EXERCISES ================= */
+const exWrap = document.getElementById('exercises');
+
+function checkAnswer(raw, answerField){
+  const norm = s => s.toLowerCase().trim().replace(/\s+/g,' ').replace(/[.,!?]/g,'');
+  const alts = answerField.split('|').map(norm);
+  return alts.includes(norm(raw));
+}
+
+exercises.forEach((ex, exIdx)=>{
+  const section = document.createElement('section');
+  section.className = 'card';
+  const inner = document.createElement('div');
+  inner.className = 'card-inner';
+
+  inner.innerHTML = `
+    <span class="tag">Шаг ${exIdx+1} / 7</span>
+    <h2>${ex.title}</h2>
+    <p class="instr">${ex.instr}</p>
+    <div id="items-${exIdx}"></div>
+    <div class="ex-toolbar">
+      ${ex.type!=='open' ? `<button class="btn btn-primary btn-sm" onclick="checkExercise(${exIdx})">Проверить</button>` : ''}
+      <button class="btn btn-outline btn-sm" onclick="revealExercise(${exIdx})">Показать ответы</button>
+      <button class="btn btn-ghost btn-sm" onclick="copyExercise(${exIdx})">📋 Скопировать ответы</button>
+      ${ex.type!=='open' ? `<span class="ex-score" id="score-${exIdx}"></span>` : ''}
+    </div>
+  `;
+  section.appendChild(inner);
+  exWrap.appendChild(section);
+
+  const itemsHost = inner.querySelector(`#items-${exIdx}`);
+  ex.items.forEach((item, i)=>{
+    const div = document.createElement('div');
+    div.className = 'item';
+    let taskHtml = '';
+    if(ex.type==='dictation'){
+      taskHtml = `<div class="item-row" style="margin-bottom:6px;">
+          <button class="speak-inline" onclick="speak('${item.task.replace(/'/g,"\\'")}')">🔊</button>
+          <span class="item-hint">Прослушай и напиши слово</span>
+        </div>`;
+    } else if(ex.type==='fill'){
+      taskHtml = `<div class="item-task mono">${item.task}</div><div class="item-hint">${item.hint}</div>`;
+    } else if(ex.type==='translate'){
+      taskHtml = `<div class="item-task">${item.task}</div>`;
+    } else if(ex.type==='definition'){
+      taskHtml = `<div class="item-task">${item.task}</div>`;
+    } else if(ex.type==='collocation'){
+      taskHtml = `<div class="item-task">${item.task}</div>${item.hint?`<div class="item-hint">подсказка: ${item.hint}</div>`:''}`;
+    } else if(ex.type==='open'){
+      taskHtml = `<div class="item-task">${item.task}</div>`;
+    }
+
+    const inputHtml = ex.type==='open'
+      ? `<div class="item-row"><textarea class="item-input" id="in-${exIdx}-${i}" placeholder="Твой ответ..."></textarea></div>`
+      : `<div class="item-row">
+           <input class="item-input" id="in-${exIdx}-${i}" type="text" placeholder="Твой ответ..." autocomplete="off">
+           <span class="result-icon" id="icon-${exIdx}-${i}"></span>
+         </div>`;
+
+    const revealHtml = ex.type==='open'
+      ? `<div class="answer-reveal" id="ans-${exIdx}-${i}">Образец ответа: ${item.sample}</div>`
+      : `<div class="answer-reveal" id="ans-${exIdx}-${i}">Правильный ответ: <strong>${item.answer.split('|')[0]}</strong>${ex.type==='dictation' && item.tr ? ' &nbsp;'+item.tr : ''}</div>`;
+
+    div.innerHTML = `<div class="item-num mono">${i+1}</div><div>${taskHtml}${inputHtml}${revealHtml}</div>`;
+    itemsHost.appendChild(div);
+  });
+});
+
+function checkExercise(exIdx){
+  const ex = exercises[exIdx];
+  let correct = 0;
+  ex.items.forEach((item,i)=>{
+    const input = document.getElementById(`in-${exIdx}-${i}`);
+    const icon = document.getElementById(`icon-${exIdx}-${i}`);
+    const val = input.value;
+    if(val.trim()===''){
+      input.classList.remove('correct','wrong');
+      icon.textContent='';
+      return;
+    }
+    const ok = checkAnswer(val, item.answer);
+    if(ok){
+      correct++;
+      input.classList.add('correct'); input.classList.remove('wrong');
+      icon.textContent='✓'; icon.className='result-icon ok';
+    } else {
+      input.classList.add('wrong'); input.classList.remove('correct');
+      icon.textContent='✗'; icon.className='result-icon bad';
+      registerMistake(item.answer.split('|')[0]);
+    }
+  });
+  const scoreEl = document.getElementById(`score-${exIdx}`);
+  if(scoreEl) scoreEl.textContent = `Результат: ${correct} / ${ex.items.length}`;
+}
+
+function revealExercise(exIdx){
+  const ex = exercises[exIdx];
+  ex.items.forEach((item,i)=>{
+    document.getElementById(`ans-${exIdx}-${i}`).classList.add('show');
+  });
+}
+
+function copyExercise(exIdx){
+  const ex = exercises[exIdx];
+  const lines = ex.items.map((item,i)=>{
+    const ans = ex.type==='open' ? item.sample : item.answer.split('|')[0];
+    return `${i+1}. ${ans}`;
+  });
+  const text = `${ex.title}\n${lines.join('\n')}`;
+  navigator.clipboard.writeText(text).then(()=>{
+    flashCopied(exIdx);
+  }).catch(()=>{
+    alert('Не удалось скопировать. Скопируй вручную:\n\n'+text);
+  });
+}
+
+function flashCopied(exIdx){
+  const btns = document.querySelectorAll(`#exercises .card:nth-of-type(${exIdx+1}) .btn-ghost`);
+  btns.forEach(b=>{
+    const original = b.textContent;
+    b.textContent = '✓ Скопировано';
+    setTimeout(()=>{ b.textContent = original; }, 1400);
+  });
+}
+</script>
+</body>
+</html>
