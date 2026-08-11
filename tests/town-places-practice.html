@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Town & City Places — практика слов</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EEF1F4;
+    --paper2:#E1E7ED;
+    --card:#FFFFFF;
+    --ink:#152A43;
+    --ink-soft:#4C6178;
+    --line:#A9BACB;
+    --line-soft:#D2DBE3;
+    --amber:#E2A63B;
+    --teal:#2E8F7E;
+    --teal-bg:#E4F3EF;
+    --brick:#C1483B;
+    --brick-bg:#FBE9E7;
+    --violet:#6C5CA6;
+    --violet-bg:#EFECF7;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  .mono{font-family:'JetBrains Mono',monospace;}
+  h1,h2,h3,.signage{font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:.03em;}
+
+  /* ===== Layout grid ===== */
+  .page{
+    display:grid;
+    grid-template-columns: 1fr 300px;
+    grid-template-areas:
+      "hero hero"
+      "content aside";
+    gap:0 28px;
+    max-width:1180px;
+    margin:0 auto;
+    padding:0 20px 80px;
+  }
+  @media (max-width:920px){
+    .page{grid-template-columns:1fr; grid-template-areas:"hero" "aside" "content"; gap:20px;}
+  }
+  .hero{grid-area:hero;}
+  .content{grid-area:content; min-width:0;}
+  .aside{grid-area:aside;}
+
+  /* ===== Hero / signage board ===== */
+  .hero{
+    background:var(--ink);
+    color:var(--paper);
+    margin:0 -20px 28px;
+    padding:36px 20px 28px;
+    position:relative;
+    overflow:hidden;
+  }
+  .hero::before{
+    content:"";
+    position:absolute; inset:0;
+    background-image:repeating-linear-gradient(0deg, rgba(255,255,255,.04) 0 1px, transparent 1px 28px),
+                      repeating-linear-gradient(90deg, rgba(255,255,255,.04) 0 1px, transparent 1px 28px);
+    pointer-events:none;
+  }
+  .hero-inner{max-width:1140px; margin:0 auto; position:relative;}
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:'JetBrains Mono',monospace; font-size:12px;
+    letter-spacing:.12em; text-transform:uppercase;
+    color:var(--amber); border:1px solid var(--amber);
+    padding:4px 10px; border-radius:999px; margin-bottom:14px;
+  }
+  .hero h1{
+    font-size:clamp(28px,4.2vw,46px);
+    margin:0 0 6px;
+    line-height:1.05;
+  }
+  .hero p.sub{
+    font-family:'Inter',sans-serif; color:#C7D2DE; max-width:640px;
+    font-size:15px; margin:0 0 26px;
+  }
+
+  /* line of stations */
+  .line-track{position:relative; padding:18px 4px 6px; overflow-x:auto;}
+  .line-track::before{
+    content:"";
+    position:absolute; left:22px; right:22px; top:38px; height:3px;
+    background:var(--amber); border-radius:2px; opacity:.85;
+  }
+  .stations{display:flex; gap:10px; min-width:max-content; position:relative;}
+  .station{
+    width:150px; flex:0 0 auto;
+    display:flex; flex-direction:column; align-items:center;
+    text-align:center; padding-top:6px;
+  }
+  .stop-dot{
+    width:16px; height:16px; border-radius:50%;
+    background:var(--paper); border:3px solid var(--amber);
+    margin-bottom:8px; position:relative; z-index:1;
+    cursor:pointer;
+  }
+  .stop-dot.bonus{border-color:var(--violet);}
+  .station .en{font-family:'Oswald',sans-serif; font-size:14px; letter-spacing:.02em; color:#fff;}
+  .station .ipa{font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--amber); margin-top:2px;}
+  .station .ru{font-size:12px; color:#AEBDCC; margin-top:2px;}
+  .listen-btn{
+    margin-top:8px; border:1px solid rgba(255,255,255,.3); background:transparent;
+    color:#fff; border-radius:999px; width:30px; height:30px; cursor:pointer;
+    display:flex; align-items:center; justify-content:center; font-size:14px;
+    transition:.15s;
+  }
+  .listen-btn:hover{background:rgba(255,255,255,.12); border-color:var(--amber); color:var(--amber);}
+
+  /* ===== Aside: problem words board ===== */
+  .board{
+    position:sticky; top:16px;
+    background:var(--ink); color:var(--paper);
+    border-radius:var(--radius);
+    padding:18px 16px 16px;
+    font-family:'JetBrains Mono',monospace;
+  }
+  .board h3{
+    font-family:'Oswald',sans-serif; font-size:15px; color:var(--amber);
+    margin:0 0 4px; letter-spacing:.06em;
+  }
+  .board .hint{font-size:11px; color:#9FB0C1; margin:0 0 12px; font-family:'Inter',sans-serif;}
+  .board ul{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px;}
+  .board li{
+    display:flex; justify-content:space-between; gap:8px;
+    background:rgba(255,255,255,.06); border-radius:6px;
+    padding:7px 10px; font-size:13px;
+  }
+  .board li .cnt{color:var(--brick); font-weight:700;}
+  .board .empty{font-size:12px; color:#8FA2B4; font-family:'Inter',sans-serif; font-style:italic;}
+  .board .reset{
+    margin-top:12px; width:100%; background:transparent; border:1px solid #3A4E64;
+    color:#B9C6D3; font-family:'Inter',sans-serif; font-size:12px; padding:7px;
+    border-radius:6px; cursor:pointer;
+  }
+  .board .reset:hover{border-color:var(--brick); color:var(--brick);}
+
+  /* ===== Exercise cards ===== */
+  .ex{
+    background:var(--card); border-radius:var(--radius);
+    border:1px solid var(--line-soft);
+    padding:22px 22px 20px; margin-bottom:26px;
+  }
+  .ex-head{display:flex; align-items:baseline; gap:12px; margin-bottom:4px; flex-wrap:wrap;}
+  .ex-num{
+    font-family:'Oswald',sans-serif; font-size:13px; color:#fff; background:var(--ink);
+    padding:2px 9px; border-radius:4px; letter-spacing:.05em;
+  }
+  .ex h2{font-size:19px; margin:0; color:var(--ink);}
+  .ex .desc{font-size:14px; color:var(--ink-soft); margin:6px 0 18px;}
+
+  .item{
+    display:grid; grid-template-columns:26px 1fr; gap:10px 12px;
+    padding:10px 0; border-top:1px dashed var(--line-soft);
+  }
+  .item:first-of-type{border-top:none;}
+  .idx{font-family:'JetBrains Mono',monospace; color:var(--ink-soft); font-size:13px; padding-top:8px;}
+  .item-body{min-width:0;}
+  .prompt{font-size:14.5px; margin-bottom:7px; color:var(--ink);}
+  .prompt b{color:var(--ink);}
+  input[type=text], textarea{
+    width:100%; font-family:'Inter',sans-serif; font-size:14.5px;
+    border:1.5px solid var(--line-soft); border-radius:7px;
+    padding:8px 10px; background:#FCFCFD; color:var(--ink);
+    transition:.15s;
+  }
+  textarea{resize:vertical; min-height:44px; font-family:'Inter',sans-serif;}
+  input[type=text]:focus, textarea:focus{outline:none; border-color:var(--ink-soft); background:#fff;}
+  input.correct{border-color:var(--teal); background:var(--teal-bg);}
+  input.incorrect{border-color:var(--brick); background:var(--brick-bg);}
+  .fb{font-size:12.5px; margin-top:5px; display:none;}
+  .fb.show{display:block;}
+  .fb.ok{color:var(--teal);}
+  .fb.bad{color:var(--brick);}
+  .answer-key{
+    font-size:12.5px; color:var(--violet); margin-top:5px; display:none;
+    font-family:'JetBrains Mono',monospace;
+  }
+  .answer-key.show{display:block;}
+  .two-step{display:flex; flex-direction:column; gap:8px;}
+  .two-step label{font-size:12px; color:var(--ink-soft); font-family:'JetBrains Mono',monospace; text-transform:uppercase; letter-spacing:.04em;}
+  .mini-play{
+    border:1px solid var(--line); background:#fff; border-radius:999px;
+    width:26px; height:26px; cursor:pointer; font-size:12px; margin-right:6px;
+    display:inline-flex; align-items:center; justify-content:center; vertical-align:middle;
+  }
+  .mini-play:hover{border-color:var(--amber); color:#B5822B;}
+
+  .ex-actions{display:flex; gap:10px; margin-top:16px; flex-wrap:wrap;}
+  button.btn{
+    font-family:'Oswald',sans-serif; letter-spacing:.03em; font-size:13px;
+    text-transform:uppercase; border:none; border-radius:7px; padding:10px 16px;
+    cursor:pointer; transition:.15s;
+  }
+  .btn.primary{background:var(--ink); color:#fff;}
+  .btn.primary:hover{background:#0D1F35;}
+  .btn.ghost{background:transparent; color:var(--ink); border:1.5px solid var(--line);}
+  .btn.ghost:hover{border-color:var(--ink);}
+  .btn.copy{background:var(--violet); color:#fff;}
+  .btn.copy:hover{background:#594B8F;}
+  .ex-score{font-family:'JetBrains Mono',monospace; font-size:12.5px; color:var(--ink-soft); align-self:center;}
+
+  .model-box{
+    background:var(--violet-bg); border:1px dashed var(--violet); border-radius:8px;
+    padding:12px 14px; margin-bottom:16px; font-size:13.5px; color:#3E3564;
+  }
+  .model-box .chain{font-family:'JetBrains Mono',monospace; font-size:13px; margin-top:4px; line-height:1.7;}
+  .model-box .chain .arrow{color:var(--violet); margin:0 6px;}
+
+  .subhead{
+    font-family:'Oswald',sans-serif; font-size:14px; color:var(--ink);
+    text-transform:uppercase; letter-spacing:.04em; margin:20px 0 6px;
+    border-bottom:2px solid var(--amber); display:inline-block; padding-bottom:2px;
+  }
+
+  footer.note{
+    text-align:center; font-size:12px; color:var(--ink-soft); margin-top:10px;
+  }
+  @media (max-width:500px){
+    .hero{padding:26px 16px 22px;}
+    .ex{padding:18px 16px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- ===== HERO ===== -->
+  <div class="hero">
+    <div class="hero-inner">
+      <span class="eyebrow">● Vocabulary Line · Town &amp; City Places</span>
+      <h1>Places in town</h1>
+      <p class="sub">Повтори слова перед стартом: нажми на кружок или на кнопку 🔊, чтобы услышать произношение. Затем пройди 6 упражнений ниже — каждое можно проверить или посмотреть готовые ответы.</p>
+      <div class="line-track">
+        <div class="stations" id="stations"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== ASIDE: problem words ===== -->
+  <aside class="aside">
+    <div class="board">
+      <h3>⚠ Проблемные слова</h3>
+      <p class="hint">Сюда попадают слова, в которых ты ошибся(-лась) хотя бы раз</p>
+      <ul id="problemList"></ul>
+      <p class="empty" id="problemEmpty">Пока нет ошибок — так держать!</p>
+      <button class="reset" id="resetProblems">Очистить список</button>
+    </div>
+  </aside>
+
+  <!-- ===== CONTENT ===== -->
+  <main class="content">
+
+    <!-- EX 1 -->
+    <section class="ex" id="ex1">
+      <div class="ex-head"><span class="ex-num">Упр. 1</span><h2>Вставь пропущенные буквы</h2></div>
+      <p class="desc">Впиши слово целиком вместо примера с пропусками.</p>
+      <div class="items" id="ex1-items"></div>
+      <div class="ex-actions">
+        <button class="btn primary" data-check="ex1">Проверить</button>
+        <button class="btn ghost" data-reveal="ex1">Показать ответы</button>
+        <span class="ex-score" id="ex1-score"></span>
+      </div>
+    </section>
+
+    <!-- EX 2 -->
+    <section class="ex" id="ex2">
+      <div class="ex-head"><span class="ex-num">Упр. 2</span><h2>Переведи с русского на английский</h2></div>
+      <p class="desc">Напиши английское слово или словосочетание.</p>
+      <div class="items" id="ex2-items"></div>
+      <div class="ex-actions">
+        <button class="btn primary" data-check="ex2">Проверить</button>
+        <button class="btn ghost" data-reveal="ex2">Показать ответы</button>
+        <span class="ex-score" id="ex2-score"></span>
+      </div>
+    </section>
+
+    <!-- EX 3 -->
+    <section class="ex" id="ex3">
+      <div class="ex-head"><span class="ex-num">Упр. 3</span><h2>Послушай и запиши слово</h2></div>
+      <p class="desc">Нажми 🔊, чтобы услышать слово, и запиши его по звуку.</p>
+      <div class="items" id="ex3-items"></div>
+      <div class="ex-actions">
+        <button class="btn primary" data-check="ex3">Проверить</button>
+        <button class="btn ghost" data-reveal="ex3">Показать ответы</button>
+        <span class="ex-score" id="ex3-score"></span>
+      </div>
+    </section>
+
+    <!-- EX 4 -->
+    <section class="ex" id="ex4">
+      <div class="ex-head"><span class="ex-num">Упр. 4</span><h2>Guess the word — по определению</h2></div>
+      <p class="desc">Прочитай определение и напиши, какое это слово.</p>
+      <div class="items" id="ex4-items"></div>
+      <div class="ex-actions">
+        <button class="btn primary" data-check="ex4">Проверить</button>
+        <button class="btn ghost" data-reveal="ex4">Показать ответы</button>
+        <span class="ex-score" id="ex4-score"></span>
+      </div>
+    </section>
+
+    <!-- EX 5 -->
+    <section class="ex" id="ex5">
+      <div class="ex-head"><span class="ex-num">Упр. 5</span><h2>Build the chunk → Expand the sentence</h2></div>
+      <p class="desc">Сначала составь словосочетание (chunk) с данным словом, затем разверни его в полное предложение.</p>
+      <div class="model-box">
+        Образец / Model:
+        <div class="chain"><b>suffer</b><span class="arrow">→</span><b>suffer from stress</b><span class="arrow">→</span>Many people suffer from stress.</div>
+      </div>
+      <div class="items" id="ex5-items"></div>
+      <div class="ex-actions">
+        <button class="btn primary" data-check="ex5">Проверить chunk</button>
+        <button class="btn ghost" data-reveal="ex5">Показать ответы</button>
+        <span class="ex-score" id="ex5-score"></span>
+      </div>
+    </section>
+
+    <!-- EX 6 -->
+    <section class="ex" id="ex6">
+      <div class="ex-head"><span class="ex-num">Упр. 6</span><h2>Твои идеи: предложения и дриллинг</h2></div>
+      <p class="desc">Здесь нет «правильного» ответа — пиши свои варианты. Ответы можно скопировать одной кнопкой.</p>
+
+      <div class="subhead">A · Закончи предложения</div>
+      <div class="items" id="ex6a-items"></div>
+      <div class="ex-actions">
+        <button class="btn copy" data-copy="ex6a">📋 Скопировать ответы A</button>
+      </div>
+
+      <div class="subhead">B · Repeat &amp; Change (дриллинг)</div>
+      <p class="desc">По образцу выше (suffer → suffer from stress → Many people suffer from stress) составь свою цепочку для каждого слова.</p>
+      <div class="items" id="ex6b-items"></div>
+      <div class="ex-actions">
+        <button class="btn copy" data-copy="ex6b">📋 Скопировать ответы B</button>
+      </div>
+    </section>
+
+    <footer class="note">Made for practising town &amp; city vocabulary · нажми 🔊, чтобы услышать произношение</footer>
+  </main>
+</div>
+
+<script>
+/* ================= DATA ================= */
+const WORDS = [
+  {en:'railway station', ru:'вокзал', ipa:'ˈreɪlweɪ ˌsteɪʃn', mask:'r_ilw_y st_ti_n', alt:['railway station','train station']},
+  {en:'bridge', ru:'мост', ipa:'brɪdʒ', mask:'br_d_e', alt:['bridge']},
+  {en:'square', ru:'площадь', ipa:'skweə', mask:'sq_ar_', alt:['square']},
+  {en:'art gallery', ru:'художественная галерея', ipa:'ɑːt ˈɡæləri', mask:'_rt g_ller_', alt:['art gallery']},
+  {en:'shopping centre', ru:'торговый центр', ipa:'ˈʃɒpɪŋ ˈsentə', mask:'sh_pp_ng c_ntre', alt:['shopping centre','shopping center','shopping mall']},
+  {en:'town hall', ru:'ратуша, мэрия', ipa:'taʊn hɔːl', mask:'t_wn h_ll', alt:['town hall','city hall']},
+  {en:'post office', ru:'почта', ipa:'pəʊst ˈɒfɪs', mask:'p_st _ffic_', alt:['post office']},
+  {en:'department store', ru:'универмаг', ipa:'dɪˈpɑːtmənt stɔː', mask:'dep_rtm_nt st_re', alt:['department store']},
+  {en:'police station', ru:'полицейский участок', ipa:'pəˈliːs ˈsteɪʃn', mask:'p_l_ce st_ti_n', alt:['police station']},
+  {en:'castle', ru:'замок', ipa:'ˈkɑːsl', mask:'c_stl_', alt:['castle']},
+];
+const BONUS = {en:'suffer', ru:'страдать', ipa:'ˈsʌfə'};
+
+const DEFINITIONS = [
+  "A place where trains stop and people get on or off.",
+  "A structure built over a river or road so people or vehicles can cross.",
+  "An open public space in a town, often surrounded by buildings.",
+  "A building where paintings and other artworks are shown to the public.",
+  "A large building with many different shops inside.",
+  "The building where the local government of a town works.",
+  "A place where you can buy stamps and send letters or parcels.",
+  "A large shop selling many different kinds of goods on different floors.",
+  "A building where police officers work.",
+  "An old, large building, often with high walls, built to protect people in the past."
+]; // matches WORDS order
+
+const CHAIN = [
+  {chunk:'cross the bridge', sentence:'We crossed the bridge to get to the old town.'},
+  {chunk:'walk across the square', sentence:'We walked across the square to the fountain.'},
+  {chunk:'go to the art gallery', sentence:'She goes to the art gallery every weekend.'},
+  {chunk:'meet at the shopping centre', sentence:"Let's meet at the shopping centre after school."},
+  {chunk:'get married at the town hall', sentence:'They got married at the town hall in June.'},
+  {chunk:'send a parcel at the post office', sentence:'I sent a parcel at the post office yesterday.'},
+  {chunk:'buy a coat at the department store', sentence:'I bought a coat at the department store.'},
+  {chunk:'report it to the police station', sentence:'He reported the theft to the police station.'},
+  {chunk:'visit the castle', sentence:'Tourists love to visit the castle every summer.'},
+  {chunk:'wait at the railway station', sentence:'We waited at the railway station for an hour.'},
+]; // order: bridge, square, art gallery, shopping centre, town hall, post office, department store, police station, castle, railway station
+const CHAIN_WORD_ORDER = [1,2,3,4,5,6,7,8,9,0]; // indices into WORDS matching CHAIN order
+
+const STARTERS = [
+  "I usually go to the railway station when …",
+  "If you want to cross the river quickly, you can use the bridge to …",
+  "In the centre of our town there is a big square where …",
+  "Last weekend I visited an art gallery and …",
+  "My favourite shopping centre is … because …",
+  "The town hall in our city is famous for …",
+  "I need to go to the post office to …",
+  "At the department store you can buy …",
+  "If something is stolen, you should go to the police station to …",
+  "Long ago, kings and queens lived in a castle that …",
+];
+
+/* ================= STATE ================= */
+const problems = {}; // word.en -> count
+
+/* ================= HELPERS ================= */
+function norm(s){
+  return (s||'').toLowerCase().trim().replace(/[.!?]+$/,'').replace(/\s+/g,' ');
+}
+function speak(text){
+  if(!('speechSynthesis' in window)) return;
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-GB'; u.rate = 0.9;
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(u);
+}
+function addProblem(en){
+  problems[en] = (problems[en]||0) + 1;
+  renderProblems();
+}
+function renderProblems(){
+  const ul = document.getElementById('problemList');
+  const empty = document.getElementById('problemEmpty');
+  const entries = Object.entries(problems).sort((a,b)=>b[1]-a[1]);
+  ul.innerHTML = '';
+  if(entries.length===0){ empty.style.display='block'; return; }
+  empty.style.display='none';
+  entries.forEach(([en,cnt])=>{
+    const w = WORDS.find(x=>x.en===en) || BONUS;
+    const li = document.createElement('li');
+    li.innerHTML = `<span>${en} <span style="color:#8FA2B4">— ${w.ru}</span></span><span class="cnt">✕${cnt}</span>`;
+    ul.appendChild(li);
+  });
+}
+document.getElementById('resetProblems').addEventListener('click', ()=>{
+  Object.keys(problems).forEach(k=>delete problems[k]);
+  renderProblems();
+});
+
+/* ================= HERO STATIONS ================= */
+(function renderStations(){
+  const wrap = document.getElementById('stations');
+  [...WORDS, BONUS].forEach((w,i)=>{
+    const isBonus = w===BONUS;
+    const st = document.createElement('div');
+    st.className='station';
+    st.innerHTML = `
+      <div class="stop-dot ${isBonus?'bonus':''}" title="${w.en}"></div>
+      <div class="en">${w.en}${isBonus?' ★':''}</div>
+      <div class="ipa">/${w.ipa}/</div>
+      <div class="ru">${w.ru}</div>
+      <button class="listen-btn" aria-label="listen">🔊</button>
+    `;
+    st.querySelector('.stop-dot').addEventListener('click',()=>speak(w.en));
+    st.querySelector('.listen-btn').addEventListener('click',()=>speak(w.en));
+    wrap.appendChild(st);
+  });
+})();
+
+/* ================= GENERIC ITEM BUILDER ================= */
+function buildItem(idx, promptHTML, inputName, extraHTML=''){
+  const div = document.createElement('div');
+  div.className='item';
+  div.innerHTML = `
+    <div class="idx">${idx+1}.</div>
+    <div class="item-body">
+      <div class="prompt">${promptHTML}</div>
+      ${extraHTML || `<input type="text" data-name="${inputName}" autocomplete="off" spellcheck="false">`}
+      <div class="fb"></div>
+      <div class="answer-key"></div>
+    </div>
+  `;
+  return div;
+}
+
+/* ================= EX 1: missing letters ================= */
+const ex1Wrap = document.getElementById('ex1-items');
+WORDS.forEach((w,i)=>{
+  const item = buildItem(i, `<span class="mono" style="font-size:15px;letter-spacing:1px">${w.mask}</span> <span style="color:#8FA2B4">(${w.ru})</span>`, 'w');
+  item.dataset.word = w.en;
+  item.querySelector('.answer-key').textContent = 'Ответ: ' + w.en;
+  ex1Wrap.appendChild(item);
+});
+
+/* ================= EX 2: RU -> EN ================= */
+const ex2Wrap = document.getElementById('ex2-items');
+WORDS.forEach((w,i)=>{
+  const item = buildItem(i, `Переведи: <b>${w.ru}</b>`, 'w');
+  item.dataset.word = w.en;
+  item.querySelector('.answer-key').textContent = 'Ответ: ' + w.en;
+  ex2Wrap.appendChild(item);
+});
+
+/* ================= EX 3: dictation ================= */
+const ex3Wrap = document.getElementById('ex3-items');
+WORDS.forEach((w,i)=>{
+  const extra = `<div><button class="mini-play" type="button">🔊</button><input type="text" data-name="w" autocomplete="off" spellcheck="false" style="width:calc(100% - 40px); display:inline-block;"></div>`;
+  const item = buildItem(i, `Прослушай слово и запиши его`, 'w', extra);
+  item.dataset.word = w.en;
+  item.querySelector('.answer-key').textContent = 'Ответ: ' + w.en;
+  item.querySelector('.mini-play').addEventListener('click',()=>speak(w.en));
+  ex3Wrap.appendChild(item);
+});
+
+/* ================= EX 4: definitions ================= */
+const ex4Wrap = document.getElementById('ex4-items');
+WORDS.forEach((w,i)=>{
+  const item = buildItem(i, `${DEFINITIONS[i]}`, 'w');
+  item.dataset.word = w.en;
+  item.querySelector('.answer-key').textContent = 'Ответ: ' + w.en;
+  ex4Wrap.appendChild(item);
+});
+
+/* ================= EX 5: build the chunk -> expand sentence ================= */
+const ex5Wrap = document.getElementById('ex5-items');
+CHAIN.forEach((c,i)=>{
+  const w = WORDS[CHAIN_WORD_ORDER[i]];
+  const extra = `
+    <div class="two-step">
+      <div>
+        <label>Chunk (word → phrase)</label>
+        <input type="text" data-name="chunk" autocomplete="off" spellcheck="false" placeholder="e.g. cross the bridge">
+      </div>
+      <div>
+        <label>Expand the sentence</label>
+        <textarea data-name="sentence" placeholder="Write a full sentence with your chunk…"></textarea>
+      </div>
+    </div>`;
+  const item = buildItem(i, `<button class="mini-play" type="button">🔊</button><b>${w.en}</b> <span style="color:#8FA2B4">(${w.ru})</span>`, '', extra);
+  item.dataset.word = w.en;
+  item.querySelector('.mini-play').addEventListener('click',()=>speak(w.en));
+  item.querySelector('.answer-key').innerHTML = `Пример ответа: <b>${c.chunk}</b><br>${c.sentence}`;
+  ex5Wrap.appendChild(item);
+});
+
+/* ================= EX 6A: finish sentences ================= */
+const ex6aWrap = document.getElementById('ex6a-items');
+STARTERS.forEach((s,i)=>{
+  const item = document.createElement('div');
+  item.className='item';
+  item.innerHTML = `
+    <div class="idx">${i+1}.</div>
+    <div class="item-body">
+      <div class="prompt">${s}</div>
+      <textarea data-name="s"></textarea>
+    </div>`;
+  ex6aWrap.appendChild(item);
+});
+
+/* ================= EX 6B: Repeat & Change drilling ================= */
+const ex6bWrap = document.getElementById('ex6b-items');
+WORDS.forEach((w,i)=>{
+  const item = document.createElement('div');
+  item.className='item';
+  item.innerHTML = `
+    <div class="idx">${i+1}.</div>
+    <div class="item-body">
+      <div class="prompt"><button class="mini-play" type="button">🔊</button><b>${w.en}</b> <span style="color:#8FA2B4">(${w.ru})</span></div>
+      <div class="two-step">
+        <div><label>Твой chunk</label><input type="text" data-name="chunk" autocomplete="off" spellcheck="false"></div>
+        <div><label>Твоё предложение</label><textarea data-name="sentence"></textarea></div>
+      </div>
+    </div>`;
+  item.querySelector('.mini-play').addEventListener('click',()=>speak(w.en));
+  ex6bWrap.appendChild(item);
+});
+
+/* ================= CHECK LOGIC ================= */
+function checkSimpleExercise(id, dataArr){
+  const wrap = document.getElementById(id+'-items');
+  const items = [...wrap.children];
+  let correctCount = 0;
+  items.forEach((item,i)=>{
+    const w = dataArr[i];
+    const input = item.querySelector('input[data-name="w"]');
+    const userVal = input.value;
+    const accepted = w.alt || [w.en];
+    const ok = accepted.some(a=>norm(a)===norm(userVal));
+    input.classList.remove('correct','incorrect');
+    const fb = item.querySelector('.fb');
+    fb.classList.add('show');
+    if(userVal.trim()===''){
+      input.classList.remove('correct','incorrect');
+      fb.classList.remove('show');
+      return;
+    }
+    if(ok){
+      input.classList.add('correct');
+      fb.textContent = '✓ Верно!';
+      fb.className = 'fb show ok';
+      correctCount++;
+    } else {
+      input.classList.add('incorrect');
+      fb.textContent = '✗ Правильный ответ: ' + w.en;
+      fb.className = 'fb show bad';
+      addProblem(w.en);
+    }
+  });
+  document.getElementById(id+'-score').textContent = `Правильно: ${correctCount} / ${items.length}`;
+}
+
+function checkEx5(){
+  const wrap = document.getElementById('ex5-items');
+  const items = [...wrap.children];
+  let correctCount = 0;
+  items.forEach((item,i)=>{
+    const c = CHAIN[i];
+    const w = WORDS[CHAIN_WORD_ORDER[i]];
+    const input = item.querySelector('input[data-name="chunk"]');
+    const userVal = input.value;
+    const fb = item.querySelector('.fb');
+    if(userVal.trim()===''){
+      input.classList.remove('correct','incorrect');
+      fb.classList.remove('show');
+      return;
+    }
+    // flexible match: chunk must contain the core word and share enough words with model
+    const ok = norm(userVal) === norm(c.chunk) || norm(userVal).includes(norm(w.en));
+    fb.classList.add('show');
+    if(ok){
+      input.classList.remove('incorrect'); input.classList.add('correct');
+      fb.textContent = '✓ Хороший chunk!';
+      fb.className = 'fb show ok';
+      correctCount++;
+    } else {
+      input.classList.remove('correct'); input.classList.add('incorrect');
+      fb.textContent = '✗ Возможный вариант: ' + c.chunk;
+      fb.className = 'fb show bad';
+      addProblem(w.en);
+    }
+  });
+  document.getElementById('ex5-score').textContent = `Chunk верно: ${correctCount} / ${items.length}`;
+}
+
+document.querySelectorAll('[data-check]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const id = btn.dataset.check;
+    if(id==='ex1') checkSimpleExercise('ex1', WORDS);
+    else if(id==='ex2') checkSimpleExercise('ex2', WORDS);
+    else if(id==='ex3') checkSimpleExercise('ex3', WORDS);
+    else if(id==='ex4') checkSimpleExercise('ex4', WORDS);
+    else if(id==='ex5') checkEx5();
+  });
+});
+
+document.querySelectorAll('[data-reveal]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const id = btn.dataset.reveal;
+    const wrap = document.getElementById(id+'-items');
+    const keys = wrap.querySelectorAll('.answer-key');
+    const showing = keys[0] && keys[0].classList.contains('show');
+    keys.forEach(k=>k.classList.toggle('show', !showing));
+    btn.textContent = showing ? 'Показать ответы' : 'Скрыть ответы';
+  });
+});
+
+/* ================= COPY LOGIC ================= */
+function copyExercise(id){
+  const wrap = document.getElementById(id+'-items');
+  const items = [...wrap.children];
+  let lines = [];
+  if(id==='ex6a'){
+    items.forEach((item,i)=>{
+      const prompt = item.querySelector('.prompt').textContent.trim();
+      const val = item.querySelector('textarea[data-name="s"]').value.trim();
+      lines.push(`${i+1}. ${prompt}\n${val}`);
+    });
+  } else if(id==='ex6b'){
+    items.forEach((item,i)=>{
+      const word = WORDS[i].en;
+      const chunk = item.querySelector('input[data-name="chunk"]').value.trim();
+      const sentence = item.querySelector('textarea[data-name="sentence"]').value.trim();
+      lines.push(`${i+1}. ${word} → ${chunk} → ${sentence}`);
+    });
+  }
+  const text = lines.join('\n\n');
+  navigator.clipboard.writeText(text).then(()=>{
+    const btn = document.querySelector(`[data-copy="${id}"]`);
+    const old = btn.textContent;
+    btn.textContent = '✓ Скопировано!';
+    setTimeout(()=>{btn.textContent = old;}, 1600);
+  }).catch(()=>{
+    alert('Не удалось скопировать автоматически. Текст:\n\n'+text);
+  });
+}
+document.querySelectorAll('[data-copy]').forEach(btn=>{
+  btn.addEventListener('click', ()=>copyExercise(btn.dataset.copy));
+});
+
+renderProblems();
+</script>
+</body>
+</html>
