@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Workbook · Разбор ошибок</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f1f4f0;
+    --paper-alt:#e7ece4;
+    --ink:#20293d;
+    --ink-soft:#54607a;
+    --teal:#1f7a63;
+    --teal-deep:#155e4c;
+    --amber:#c8862c;
+    --red:#b5433a;
+    --line:#c9d2c4;
+    --card:#fbfcfa;
+    --shadow: 0 1px 0 rgba(32,41,61,.05), 0 8px 20px -12px rgba(32,41,61,.18);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(ellipse at top left, #eef2ea 0%, var(--paper) 45%),
+      var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    line-height:1.5;
+    padding-bottom:80px;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:0 22px;}
+
+  /* ---- HERO ---- */
+  header.hero{
+    padding:46px 0 30px;
+    border-bottom:2px solid var(--line);
+    margin-bottom:28px;
+    position:relative;
+  }
+  header.hero .eyebrow{
+    font-family:'Space Mono',monospace;
+    font-size:12.5px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--teal-deep);
+    margin-bottom:10px;
+  }
+  header.hero h1{
+    font-family:'Fraunces',serif;
+    font-weight:700;
+    font-size:clamp(30px,4.4vw,46px);
+    margin:0 0 10px;
+    letter-spacing:-.01em;
+  }
+  header.hero p.sub{
+    font-size:16px;
+    color:var(--ink-soft);
+    max-width:640px;
+    margin:0;
+  }
+  .score-pill{
+    position:absolute;
+    right:0; top:46px;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:12px 18px;
+    box-shadow:var(--shadow);
+    font-family:'Space Mono',monospace;
+    font-size:13px;
+    text-align:center;
+    min-width:120px;
+  }
+  .score-pill .num{font-size:26px;font-weight:700;color:var(--teal-deep);display:block;font-family:'Fraunces',serif;}
+  @media (max-width:760px){ .score-pill{position:static; margin-top:16px; display:inline-block;} }
+
+  /* ---- LAYOUT ---- */
+  .layout{display:grid;grid-template-columns:270px 1fr;gap:34px;align-items:start;}
+  @media (max-width:900px){ .layout{grid-template-columns:1fr;} }
+
+  aside{position:sticky; top:16px;}
+  @media (max-width:900px){ aside{position:static;} }
+
+  .side-card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:18px 18px 20px;
+    box-shadow:var(--shadow);
+    margin-bottom:20px;
+  }
+  .side-card h3{
+    font-family:'Fraunces',serif;
+    font-size:16px;
+    margin:0 0 4px;
+    color:var(--ink);
+  }
+  .side-card .hint{font-size:12.5px;color:var(--ink-soft);margin-bottom:12px;}
+  table.problem-table{width:100%;border-collapse:collapse;font-size:13px;}
+  table.problem-table th{
+    text-align:left;font-family:'Space Mono',monospace;font-weight:400;
+    font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-soft);
+    border-bottom:1px solid var(--line);padding:4px 4px 6px;
+  }
+  table.problem-table td{padding:7px 4px;border-bottom:1px dashed var(--line);vertical-align:top;}
+  table.problem-table tr:last-child td{border-bottom:none;}
+  .pw-count{
+    display:inline-block;min-width:20px;text-align:center;
+    background:var(--red);color:#fff;border-radius:8px;font-size:11px;padding:1px 6px;font-family:'Space Mono',monospace;
+  }
+  .empty-note{font-size:12.5px;color:var(--ink-soft);font-style:italic;}
+
+  nav.ex-nav a{
+    display:block;padding:6px 0;font-size:13.5px;color:var(--ink-soft);text-decoration:none;border-bottom:1px dashed transparent;
+  }
+  nav.ex-nav a:hover{color:var(--teal-deep);border-color:var(--line);}
+
+  /* ---- VOCAB REMINDER ---- */
+  section.vocab{margin-bottom:42px;}
+  section.vocab h2{
+    font-family:'Fraunces',serif;font-size:22px;margin:0 0 4px;
+  }
+  section.vocab .lead{color:var(--ink-soft);font-size:14px;margin:0 0 18px;}
+  .vocab-grid{
+    display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;
+  }
+  .vcard{
+    background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px 14px;
+    display:flex;flex-direction:column;gap:4px;
+  }
+  .vcard .row1{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
+  .vcard .en{font-weight:600;font-size:14.5px;color:var(--ink);}
+  .vcard .transcr{font-family:'Space Mono',monospace;font-size:12px;color:var(--teal-deep);}
+  .vcard .ru{font-size:13px;color:var(--ink-soft);}
+  .listen-btn{
+    border:none;background:var(--teal);color:#fff;width:26px;height:26px;border-radius:50%;
+    cursor:pointer;flex:none;font-size:13px;display:flex;align-items:center;justify-content:center;
+    transition:transform .12s ease, background .12s ease;
+  }
+  .listen-btn:hover{background:var(--teal-deep);transform:scale(1.06);}
+
+  /* ---- EXERCISE BLOCKS ---- */
+  section.exercise{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:26px 26px 22px;
+    margin-bottom:26px;
+    box-shadow:var(--shadow);
+    scroll-margin-top:16px;
+  }
+  section.exercise .exhead{
+    display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;
+    margin-bottom:6px;
+  }
+  section.exercise .exnum{
+    font-family:'Space Mono',monospace;color:var(--teal-deep);font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;
+  }
+  section.exercise h2{
+    font-family:'Fraunces',serif;font-size:21px;margin:2px 0 6px;
+  }
+  section.exercise p.instr{font-size:14px;color:var(--ink-soft);margin:0 0 18px;max-width:720px;}
+
+  .item{
+    border-top:1px solid var(--line);
+    padding:14px 0;
+    display:grid;
+    grid-template-columns:34px 1fr;
+    gap:12px;
+    align-items:start;
+  }
+  .item:first-of-type{border-top:none;}
+  .item .idx{
+    font-family:'Fraunces',serif;font-weight:600;color:var(--teal-deep);font-size:16px;padding-top:4px;
+  }
+  .item .prompt{font-size:14.5px;margin-bottom:8px;}
+  .item .prompt .ru{color:var(--ink-soft);font-size:12.5px;display:block;margin-top:2px;}
+  .item .src{
+    background:var(--paper-alt);border-radius:8px;padding:8px 10px;font-size:14px;margin-bottom:8px;
+  }
+  input.answer-input, textarea.answer-input{
+    width:100%;
+    border:1.5px solid var(--line);
+    background:#fff;
+    border-radius:9px;
+    padding:9px 11px;
+    font-size:14.5px;
+    font-family:'Inter',sans-serif;
+    color:var(--ink);
+    transition:border-color .15s ease, box-shadow .15s ease;
+  }
+  textarea.answer-input{resize:vertical;min-height:44px;}
+  input.answer-input:focus, textarea.answer-input:focus{
+    outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(31,122,99,.13);
+  }
+  input.answer-input.correct{border-color:var(--teal);background:#eef8f4;}
+  input.answer-input.wrong{border-color:var(--red);background:#fbecea;}
+  .feedback{font-size:12.5px;margin-top:5px;min-height:16px;font-family:'Space Mono',monospace;}
+  .feedback.correct{color:var(--teal-deep);}
+  .feedback.wrong{color:var(--red);}
+  .feedback .key{color:var(--ink-soft);}
+
+  .exfoot{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:18px;}
+  .btn{
+    border:none;border-radius:9px;padding:10px 16px;font-size:13.5px;font-weight:600;cursor:pointer;
+    font-family:'Inter',sans-serif;transition:transform .1s ease, background .15s ease;
+  }
+  .btn:active{transform:translateY(1px);}
+  .btn-primary{background:var(--teal);color:#fff;}
+  .btn-primary:hover{background:var(--teal-deep);}
+  .btn-ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line);}
+  .btn-ghost:hover{border-color:var(--ink-soft);}
+  .btn-amber{background:var(--amber);color:#fff;}
+  .btn-amber:hover{background:#a86e1f;}
+  .ex-score{font-family:'Space Mono',monospace;font-size:13px;color:var(--ink-soft);margin-left:auto;}
+  .copy-note{font-size:12px;color:var(--teal-deep);font-family:'Space Mono',monospace;opacity:0;transition:opacity .2s ease;}
+  .copy-note.show{opacity:1;}
+
+  .divider-note{
+    background:var(--paper-alt);border-left:3px solid var(--amber);
+    padding:9px 13px;border-radius:0 8px 8px 0;font-size:13px;color:var(--ink-soft);margin-bottom:16px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="eyebrow">Workbook · Работа над ошибками</div>
+    <h1>Грамматика и словосочетания</h1>
+    <p class="sub">Короткое повторение слов, 7 упражнений по 10 заданий, проверка ответов и отслеживание проблемных мест — пиши ответы от руки в поля ниже.</p>
+    <div class="score-pill">
+      <span class="num" id="global-score">0/40</span>
+      правильных ответов
+    </div>
+  </header>
+
+  <div class="layout">
+
+    <aside>
+      <div class="side-card">
+        <h3>⚠ Проблемные слова</h3>
+        <div class="hint">Сюда попадают темы, в которых ты ошибся. Обновляется автоматически.</div>
+        <table class="problem-table" id="problem-table">
+          <thead><tr><th>Тема</th><th style="text-align:right">Ошибок</th></tr></thead>
+          <tbody id="problem-tbody">
+            <tr><td colspan="2" class="empty-note">Пока чисто ✓</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="side-card">
+        <h3>Навигация</h3>
+        <nav class="ex-nav">
+          <a href="#vocab">🔊 Повторение слов</a>
+          <a href="#ex1">1. Вставь пропуск</a>
+          <a href="#ex2">2. Найди ошибку</a>
+          <a href="#ex3">3. Что идёт дальше?</a>
+          <a href="#ex4">4. Закончи фразу</a>
+          <a href="#ex5">5. Repeat & Change</a>
+          <a href="#ex6">6. Перевод RU→EN</a>
+          <a href="#ex7">7. Погода: времена</a>
+        </nav>
+      </div>
+    </aside>
+
+    <main>
+      <section class="vocab" id="vocab">
+        <h2>Повторение слов</h2>
+        <p class="lead">Прочитай, прослушай произношение 🔊 и вспомни перевод — это база для всех упражнений ниже.</p>
+        <div class="vocab-grid" id="vocab-grid"></div>
+      </section>
+
+      <div id="exercises-root"></div>
+    </main>
+
+  </div>
+</div>
+
+<script>
+/* ============ DATA ============ */
+const VOCAB = [
+  {c:'c1', en:"wait for smb / sth", tr:"/weɪt fɔːr/", ru:"ждать кого-то / что-то (с предлогом for)"},
+  {c:'c2', en:"this / last / next + week/month/year", tr:"/ðɪs, lɑːst, nekst/", ru:"в этом / прошлом / следующем... — без предлога!"},
+  {c:'c3', en:"prefer", tr:"/prɪˈfɜːr/", ru:"предпочитать — самостоятельный глагол (без am/is/was перед ним)"},
+  {c:'c4', en:"come back from vacation", tr:"/kʌm bæk frəm veɪˈkeɪʃn/", ru:"вернуться из отпуска (не on vacation)"},
+  {c:'c5', en:"ticket price", tr:"/ˈtɪkɪt praɪs/", ru:"цена билета (не ticket cost)"},
+  {c:'c6', en:"from ... to ...", tr:"/frəm ... tuː/", ru:"от ... до ..."},
+  {c:'c7', en:"in the early morning", tr:"/ɪn ði ˈɜːli ˈmɔːnɪŋ/", ru:"рано утром"},
+  {c:'c8', en:"What will the weather be like?", tr:"/wɒt wɪl ðə ˈweðər bi laɪk/", ru:"Какая будет погода? (конструкция разрывается)"},
+  {c:'c9', en:"it snows / rains", tr:"/ɪt snəʊz, reɪnz/", ru:"идёт снег / дождь — глагол меняется по временам"},
+  {c:'c10', en:"dirty — clean", tr:"/ˈdɜːti — kliːn/", ru:"грязный — чистый"},
+];
+
+const CONCEPT_LABEL = {
+  c1:"wait for", c2:"next/last/this + время (без предлога)", c3:"prefer (глагол)",
+  c4:"come back from vacation", c5:"ticket price", c6:"from...to...",
+  c7:"in the early morning", c8:"What will the weather be like?",
+  c9:"snow/rain по временам", c10:"dirty — clean"
+};
+
+/* ---- helpers ---- */
+function norm(s){
+  return (s||"").toLowerCase()
+    .replace(/[.,!?;:"'`’]/g,"")
+    .replace(/\s+/g," ")
+    .trim();
+}
+function matches(item, raw){
+  const val = norm(raw);
+  if(!val) return false;
+  if(item.mode === 'keywords'){
+    return item.keywords.every(k => val.includes(norm(k)));
+  }
+  return item.answers.some(a => norm(a) === val);
+}
+
+const problemWords = {}; // concept -> count
+
+function registerMistake(concept){
+  if(!concept) return;
+  problemWords[concept] = (problemWords[concept]||0) + 1;
+  renderProblemTable();
+}
+function renderProblemTable(){
+  const tbody = document.getElementById('problem-tbody');
+  const entries = Object.entries(problemWords).sort((a,b)=>b[1]-a[1]);
+  if(entries.length===0){
+    tbody.innerHTML = '<tr><td colspan="2" class="empty-note">Пока чисто ✓</td></tr>';
+    return;
+  }
+  tbody.innerHTML = entries.map(([c,count])=>
+    `<tr><td>${CONCEPT_LABEL[c]||c}</td><td style="text-align:right"><span class="pw-count">${count}</span></td></tr>`
+  ).join("");
+}
+
+let globalCorrect = 0, globalTotal = 0;
+function updateGlobalScore(){
+  document.getElementById('global-score').textContent = `${globalCorrect}/${globalTotal}`;
+}
+
+/* ============ VOCAB RENDER ============ */
+function speak(text){
+  if(!('speechSynthesis' in window)) return;
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-US';
+  u.rate = 0.92;
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(u);
+}
+function renderVocab(){
+  const grid = document.getElementById('vocab-grid');
+  grid.innerHTML = VOCAB.map(v => `
+    <div class="vcard">
+      <div class="row1">
+        <div>
+          <div class="en">${v.en}</div>
+          <div class="transcr">${v.tr}</div>
+        </div>
+        <button class="listen-btn" title="Прослушать" onclick="speak(${JSON.stringify(v.en)})">🔊</button>
+      </div>
+      <div class="ru">${v.ru}</div>
+    </div>
+  `).join("");
+}
+
+/* ============ EXERCISE DATA ============ */
+
+// EX1 — fill in the blank
+const EX1 = [
+  {concept:'c1', prompt:"I'm waiting ___ a bus.", mode:'exact', answers:['for']},
+  {concept:'c2', prompt:"See you ___ week!", mode:'exact', answers:['next']},
+  {concept:'c3', prompt:"I ___ tea to coffee.", mode:'exact', answers:['prefer']},
+  {concept:'c4', prompt:"They came back ___ vacation yesterday.", mode:'exact', answers:['from']},
+  {concept:'c5', prompt:"What's the ___ of the ticket?", mode:'exact', answers:['price']},
+  {concept:'c6', prompt:"The shop is open ___ 9 ___ 6. (two words)", mode:'keywords', keywords:['from','to']},
+  {concept:'c7', prompt:"I get up ___ the early morning.", mode:'exact', answers:['in']},
+  {concept:'c8', prompt:"___ will the weather be like tomorrow?", mode:'exact', answers:['what']},
+  {concept:'c9', prompt:"It often ___ (snow) in winter.", mode:'exact', answers:['snows']},
+  {concept:'c10', prompt:"My room is ___, I need to clean it.", mode:'exact', answers:['dirty']},
+];
+
+// EX2 — find the mistake (student writes only the fix)
+const EX2 = [
+  {concept:'c1', src:"I'm waiting a friend.", full:"I'm waiting for a friend.", mode:'exact', answers:['for']},
+  {concept:'c2', src:"See you in next week!", full:"See you next week!", mode:'exact', answers:['next week','next']},
+  {concept:'c3', src:"I am prefer tea to coffee.", full:"I prefer tea to coffee.", mode:'exact', answers:['prefer']},
+  {concept:'c4', src:"They came back on vacation.", full:"They came back from vacation.", mode:'exact', answers:['from']},
+  {concept:'c5', src:"What's the cost of the ticket?", full:"What's the price of the ticket?", mode:'exact', answers:['price']},
+  {concept:'c6', src:"The shop works since 9 till 6.", full:"The shop is open from 9 to 6.", mode:'keywords', keywords:['from','to']},
+  {concept:'c7', src:"I wake up in early morning.", full:"I wake up in the early morning.", mode:'exact', answers:['the early morning','in the early morning']},
+  {concept:'c8', src:"What the weather will be like?", full:"What will the weather be like?", mode:'exact', answers:['what will the weather be like']},
+  {concept:'c9', src:"It often snow in winter.", full:"It often snows in winter.", mode:'exact', answers:['snows']},
+  {concept:'c10', src:"My hands are very clear after I touched the ground.", full:"My hands are very dirty after I touched the ground.", mode:'exact', answers:['dirty']},
+];
+
+// EX3 — collocations: what usually comes after?
+const EX3 = [
+  {concept:'c1', prompt:"wait for ___", mode:'keywords', keywords:[], answers:['a bus','a friend','a taxi','the bus','a train','my friend'], mode2:true},
+  {concept:'c2', prompt:"next ___", mode:'exact', answers:['week','month','year']},
+  {concept:'c3', prompt:"I prefer tea ___ coffee.", mode:'exact', answers:['to']},
+  {concept:'c4', prompt:"come back ___ vacation", mode:'exact', answers:['from']},
+  {concept:'c5', prompt:"ticket ___", mode:'exact', answers:['price']},
+  {concept:'c6', prompt:"from Monday ___ Friday", mode:'exact', answers:['to']},
+  {concept:'c7', prompt:"in the early ___", mode:'exact', answers:['morning']},
+  {concept:'c8', prompt:"What will the weather be ___?", mode:'exact', answers:['like']},
+  {concept:'c9', prompt:"It often ___ in winter.", mode:'exact', answers:['snows']},
+  {concept:'c10', prompt:"dirty ≠ ___ (антоним)", mode:'exact', answers:['clean']},
+];
+// fix EX3 item1 mode
+EX3[0] = {concept:'c1', prompt:"wait for ___", mode:'exact', answers:['a bus','a friend','a taxi','the bus','a train','my friend']};
+
+// EX6 — translation RU -> EN (keyword-checked, lenient)
+const EX6 = [
+  {concept:'c1', ru:"Я жду автобус.", full:"I'm waiting for a bus.", mode:'keywords', keywords:['wait','for','bus']},
+  {concept:'c2', ru:"Увидимся на следующей неделе!", full:"See you next week!", mode:'keywords', keywords:['next week']},
+  {concept:'c3', ru:"Я предпочитаю чай кофе.", full:"I prefer tea to coffee.", mode:'keywords', keywords:['prefer','tea','coffee']},
+  {concept:'c4', ru:"Они вернулись из отпуска.", full:"They came back from vacation.", mode:'keywords', keywords:['back','from','vacation']},
+  {concept:'c5', ru:"Какая цена билета?", full:"What's the ticket price? / What's the price of the ticket?", mode:'keywords', keywords:['price','ticket']},
+  {concept:'c6', ru:"Магазин открыт с 9 до 6.", full:"The shop is open from 9 to 6.", mode:'keywords', keywords:['from','to']},
+  {concept:'c7', ru:"Я встаю рано утром.", full:"I get up in the early morning.", mode:'keywords', keywords:['early morning']},
+  {concept:'c8', ru:"Какая будет погода?", full:"What will the weather be like?", mode:'keywords', keywords:['will','weather','like']},
+  {concept:'c9', ru:"Зимой часто идёт снег.", full:"It often snows in winter.", mode:'keywords', keywords:['snow','winter']},
+  {concept:'c10', ru:"Моя комната грязная, а кухня чистая.", full:"My room is dirty, but the kitchen is clean.", mode:'keywords', keywords:['dirty','clean']},
+];
+
+// EX7 — weather verb tenses
+const EX7 = [
+  {concept:'c9', prompt:"It often ___ (snow) in winter.", mode:'exact', answers:['snows']},
+  {concept:'c9', prompt:"Look! It ___ (snow) right now.", mode:'exact', answers:['is snowing']},
+  {concept:'c9', prompt:"It ___ (snow) a lot last winter.", mode:'exact', answers:['snowed']},
+  {concept:'c9', prompt:"It ___ (rain) heavily yesterday evening.", mode:'exact', answers:['rained','was raining']},
+  {concept:'c9', prompt:"It never ___ (rain) in the desert.", mode:'exact', answers:['rains']},
+  {concept:'c9', prompt:"While we were walking, it ___ (start) to rain.", mode:'exact', answers:['started']},
+  {concept:'c9', prompt:"It ___ (rain) right now, so take an umbrella.", mode:'exact', answers:['is raining']},
+  {concept:'c9', prompt:"Usually it ___ (snow) here in December.", mode:'exact', answers:['snows']},
+  {concept:'c9', prompt:"When I woke up, it ___ already ___ (snow).", mode:'keywords', keywords:['was','snowing']},
+  {concept:'c10', prompt:"The streets become ___ (clean) after it rains.", mode:'exact', answers:['clean']},
+];
+
+// EX4 — complete with your own ideas (open, copy-all)
+const EX4 = [
+  "I'm waiting for ___.",
+  "Next week I am going to ___.",
+  "Last month I ___.",
+  "I prefer ___ to ___.",
+  "I came back from vacation and ___.",
+  "The price of the ticket was ___.",
+  "The shop is open from ___ to ___.",
+  "In the early morning I usually ___.",
+  "What will the weather be like ___?",
+  "My room is dirty, so I need to ___.",
+];
+
+// EX5 — Repeat & Change drilling (example + own version)
+const EX5 = [
+  {example:"I'm waiting for a bus.", starter:"I'm waiting for ___."},
+  {example:"Next week I'm visiting my grandparents.", starter:"Next week I'm ___."},
+  {example:"I prefer tea to coffee.", starter:"I prefer ___ to ___."},
+  {example:"We came back from vacation last Sunday.", starter:"I came back from vacation ___."},
+  {example:"The ticket price was $50.", starter:"The ticket price was ___."},
+  {example:"The gym is open from 7 to 22.", starter:"The ___ is open from ___ to ___."},
+  {example:"I go jogging in the early morning.", starter:"I ___ in the early morning."},
+  {example:"What will the weather be like tomorrow?", starter:"What will the weather be like ___?"},
+  {example:"It often snows here in December.", starter:"It often ___ here in ___."},
+  {example:"My desk is always dirty, but my shelf is clean.", starter:"My ___ is always dirty, but my ___ is clean."},
+];
+
+/* ============ RENDER ENGINE ============ */
+
+function checkableItemBlock(idx, promptHTML, extraSrcHTML){
+  return `
+    <div class="item" data-idx="${idx}">
+      <div class="idx">${idx+1}.</div>
+      <div>
+        ${extraSrcHTML||""}
+        <div class="prompt">${promptHTML}</div>
+        <input type="text" class="answer-input" placeholder="твой ответ" autocomplete="off">
+        <div class="feedback"></div>
+      </div>
+    </div>`;
+}
+
+function buildCheckableExercise({id, num, title, instr, items, srcKey, promptKey, fullKey}){
+  const itemsHTML = items.map((it,idx)=>{
+    const src = srcKey ? `<div class="src">${it[srcKey]}</div>` : "";
+    const prompt = it[promptKey];
+    return checkableItemBlock(idx, prompt, src);
+  }).join("");
+
+  return `
+  <section class="exercise" id="${id}">
+    <div class="exhead"><span class="exnum">Упражнение ${num} · 10 заданий</span></div>
+    <h2>${title}</h2>
+    <p class="instr">${instr}</p>
+    <div class="items">${itemsHTML}</div>
+    <div class="exfoot">
+      <button class="btn btn-primary" onclick="checkExercise('${id}')">Проверить ответы</button>
+      <button class="btn btn-ghost" onclick="showAnswers('${id}')">Показать ответы</button>
+      <span class="ex-score" id="${id}-score"></span>
+    </div>
+  </section>`;
+}
+
+function buildOpenExercise({id, num, title, instr, items, exampleWrap}){
+  const itemsHTML = items.map((it,idx)=>{
+    const example = exampleWrap ? `<div class="src"><b>Пример:</b> ${it.example}</div>` : "";
+    const starterText = exampleWrap ? it.starter : it;
+    return `
+    <div class="item" data-idx="${idx}">
+      <div class="idx">${idx+1}.</div>
+      <div>
+        ${example}
+        <div class="prompt">${exampleWrap ? "Твоя идея:" : starterText}</div>
+        <textarea class="answer-input open-input" placeholder="напиши свой вариант" rows="1">${exampleWrap? "" : ""}</textarea>
+      </div>
+    </div>`;
+  }).join("");
+
+  return `
+  <section class="exercise" id="${id}">
+    <div class="exhead"><span class="exnum">Упражнение ${num} · 10 заданий</span></div>
+    <h2>${title}</h2>
+    <p class="instr">${instr}</p>
+    <div class="items">${itemsHTML}</div>
+    <div class="exfoot">
+      <button class="btn btn-amber" onclick="copyExercise('${id}')">Скопировать все ответы</button>
+      <span class="copy-note" id="${id}-copynote">Скопировано ✓</span>
+    </div>
+  </section>`;
+}
+
+/* ============ CHECK / SHOW / COPY ============ */
+
+function checkExercise(id){
+  const map = { ex1:EX1, ex2:EX2, ex3:EX3, ex6:EX6, ex7:EX7 };
+  const promptKeyMap = { ex1:'prompt', ex2:null, ex3:'prompt', ex6:null, ex7:'prompt' };
+  const data = map[id];
+  const section = document.getElementById(id);
+  const inputs = section.querySelectorAll('.answer-input');
+  let correctCount = 0;
+
+  // account for previous scoring of this exercise (avoid double counting in global score)
+  const prevScore = section.dataset.scored ? parseInt(section.dataset.prevCorrect||'0') : 0;
+
+  inputs.forEach((input, idx)=>{
+    const item = data[idx];
+    const feedback = input.parentElement.querySelector('.feedback');
+    const ok = matches(item, input.value);
+    input.classList.remove('correct','wrong');
+    if(ok){
+      input.classList.add('correct');
+      feedback.className = 'feedback correct';
+      feedback.textContent = '✓ верно';
+      correctCount++;
+    } else {
+      input.classList.add('wrong');
+      feedback.className = 'feedback wrong';
+      const answerText = item.full || (item.answers ? item.answers[0] : (item.keywords||[]).join(' + '));
+      feedback.innerHTML = '✗ правильный ответ: <span class="key">' + answerText + '</span>';
+      registerMistake(item.concept);
+    }
+  });
+
+  document.getElementById(id+'-score').textContent = `${correctCount}/10`;
+
+  globalTotal += 10 - prevScore*0; // total fixed by first check
+  if(!section.dataset.scored){
+    globalTotal += 0; // handled below
+  }
+  // simpler: recompute global totals from scratch each time
+  recomputeGlobalScore();
+  section.dataset.scored = "1";
+}
+
+function recomputeGlobalScore(){
+  const ids = ['ex1','ex2','ex3','ex6','ex7'];
+  let correct=0, total=0;
+  ids.forEach(id=>{
+    const section = document.getElementById(id);
+    if(section && section.dataset.scored){
+      const scoreText = document.getElementById(id+'-score').textContent;
+      const [c,t] = scoreText.split('/').map(Number);
+      correct += c; total += t;
+    }
+  });
+  globalCorrect = correct; globalTotal = total;
+  updateGlobalScore();
+}
+
+function showAnswers(id){
+  const map = { ex1:EX1, ex2:EX2, ex3:EX3, ex6:EX6, ex7:EX7 };
+  const data = map[id];
+  const section = document.getElementById(id);
+  const inputs = section.querySelectorAll('.answer-input');
+  inputs.forEach((input, idx)=>{
+    const item = data[idx];
+    const feedback = input.parentElement.querySelector('.feedback');
+    const answerText = item.full || (item.answers ? item.answers.join(' / ') : (item.keywords||[]).join(' + '));
+    feedback.className = 'feedback';
+    feedback.innerHTML = 'ответ: <span class="key">' + answerText + '</span>';
+  });
+}
+
+function copyExercise(id){
+  const section = document.getElementById(id);
+  const items = section.querySelectorAll('.item');
+  let lines = [];
+  items.forEach((item, idx)=>{
+    const prompt = item.querySelector('.prompt') ? item.querySelector('.prompt').textContent.trim() : '';
+    const val = item.querySelector('.answer-input').value.trim();
+    lines.push(`${idx+1}. ${prompt}\n   → ${val || '(пусто)'}`);
+  });
+  const text = lines.join('\n\n');
+  navigator.clipboard.writeText(text).then(()=>{
+    const note = document.getElementById(id+'-copynote');
+    note.classList.add('show');
+    setTimeout(()=>note.classList.remove('show'), 1800);
+  }).catch(()=>{
+    alert("Не удалось скопировать автоматически. Выдели текст вручную.");
+  });
+}
+
+/* ============ BUILD PAGE ============ */
+function buildAll(){
+  const root = document.getElementById('exercises-root');
+  root.innerHTML = `
+    ${buildCheckableExercise({
+      id:'ex1', num:1, title:"Вставь пропущенное слово",
+      instr:"Впиши от руки нужное слово или предлог. Основа — слова из повторения выше.",
+      items: EX1, promptKey:'prompt'
+    })}
+
+    ${buildCheckableExercise({
+      id:'ex2', num:2, title:"Find the mistakes — найди ошибку",
+      instr:"В каждом предложении есть одна ошибка на сочетаемость слов. Впиши только исправленное слово/фразу.",
+      items: EX2, srcKey:'src', promptKey:'src'
+    })}
+
+    ${(()=>{
+      // custom render for ex2 needs both src(sentence) and a separate input prompt line - patch below
+      return "";
+    })()}
+
+    ${buildCheckableExercise({
+      id:'ex3', num:3, title:"What usually comes after? — сочетаемость",
+      instr:"Допиши, какое слово обычно идёт следом в этом устойчивом сочетании.",
+      items: EX3, promptKey:'prompt'
+    })}
+
+    ${buildOpenExercise({
+      id:'ex4', num:4, title:"Закончи предложение своей идеей",
+      instr:"Допиши каждое предложение своими словами. Ошибок здесь нет — просто практика речи. В конце скопируй все ответы одной кнопкой.",
+      items: EX4, exampleWrap:false
+    })}
+
+    ${buildOpenExercise({
+      id:'ex5', num:5, title:"Repeat & Change — дриллинг",
+      instr:"Посмотри на пример и составь своё предложение по той же модели, подставив свои идеи. Скопируй все ответы одной кнопкой.",
+      items: EX5, exampleWrap:true
+    })}
+
+    ${buildCheckableExercise({
+      id:'ex6', num:6, title:"Перевод RU → EN",
+      instr:"Переведи предложение на английский. Проверка гибкая — засчитываются разные формулировки, главное — ключевые слова.",
+      items: EX6, promptKey:'ru'
+    })}
+
+    ${buildCheckableExercise({
+      id:'ex7', num:7, title:"Погода: it snows / it rains — времена",
+      instr:"Поставь глагол snow/rain (и др.) в правильную форму — присмотрись к временнóму маркеру в предложении.",
+      items: EX7, promptKey:'prompt'
+    })}
+  `;
+
+  // Patch EX2 rendering: replace prompt text with proper instruction + shown sentence
+  fixEx2Rendering();
+
+  renderVocab();
+  autoGrowTextareas();
+}
+
+function fixEx2Rendering(){
+  const section = document.getElementById('ex2');
+  const items = section.querySelectorAll('.item');
+  items.forEach((itemEl, idx)=>{
+    const data = EX2[idx];
+    const srcDiv = itemEl.querySelector('.src');
+    const promptDiv = itemEl.querySelector('.prompt');
+    srcDiv.innerHTML = `<b>Предложение:</b> ${data.src}`;
+    promptDiv.textContent = "Что нужно исправить? Напиши правильный вариант:";
+  });
+}
+
+function autoGrowTextareas(){
+  document.querySelectorAll('.open-input').forEach(ta=>{
+    ta.addEventListener('input', function(){
+      this.style.height = 'auto';
+      this.style.height = (this.scrollHeight)+'px';
+    });
+  });
+}
+
+document.addEventListener('DOMContentLoaded', buildAll);
+</script>
+</body>
+</html>
