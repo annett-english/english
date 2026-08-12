@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sport Vocabulary — тренажёр</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --pitch-900:#0c2f22;
+    --pitch-800:#123c2b;
+    --pitch-700:#1a5238;
+    --pitch-line: rgba(255,255,255,.14);
+    --paper:#f6f4ec;
+    --paper-dim:#eae6d8;
+    --ink:#12211a;
+    --ink-soft:#4a5850;
+    --orange:#ff6a3d;
+    --orange-dark:#d94e22;
+    --yellow:#ffc145;
+    --good:#1f8a4c;
+    --bad:#d0392b;
+    --card-radius: 14px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family:'Inter',sans-serif;
+    line-height:1.5;
+  }
+  .mono{font-family:'Space Mono',monospace;}
+  .display{font-family:'Bebas Neue',sans-serif; letter-spacing:.03em;}
+
+  /* ===== HERO / SCOREBOARD ===== */
+  .hero{
+    background:
+      repeating-linear-gradient(90deg, transparent 0 78px, var(--pitch-line) 78px 79px),
+      linear-gradient(160deg, var(--pitch-900), var(--pitch-700));
+    color:#fbf9f2;
+    padding: 40px 24px 30px;
+    position:relative;
+    overflow:hidden;
+  }
+  .hero::after{
+    content:"";
+    position:absolute; left:50%; top:-140px; width:280px; height:280px;
+    border:2px solid var(--pitch-line); border-radius:50%;
+    transform:translateX(-50%);
+  }
+  .hero-inner{max-width:1180px; margin:0 auto; position:relative; z-index:1;}
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:'Space Mono',monospace; font-size:12px; letter-spacing:.14em;
+    text-transform:uppercase; color:var(--yellow);
+    border:1px solid rgba(255,193,69,.4); padding:5px 12px; border-radius:999px;
+  }
+  h1.hero-title{
+    font-size: clamp(40px, 7vw, 74px);
+    margin:14px 0 6px;
+    line-height:.94;
+  }
+  .hero-sub{max-width:640px; color:#d8e3da; font-size:15.5px; margin:0 0 22px;}
+  .scoreboard{
+    display:flex; flex-wrap:wrap; gap:14px; align-items:center;
+  }
+  .scoreboard-panel{
+    background:#08201700;
+    background:linear-gradient(180deg,#0a1f16,#050f0a);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:10px;
+    padding:10px 18px;
+    display:flex; flex-direction:column; gap:2px; min-width:150px;
+  }
+  .scoreboard-panel .label{font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:#93a89c; font-family:'Space Mono',monospace;}
+  .scoreboard-panel .value{font-family:'Space Mono',monospace; font-size:26px; color:var(--yellow); font-weight:700;}
+  .hero-actions{display:flex; gap:10px; flex-wrap:wrap;}
+
+  /* ===== BUTTONS ===== */
+  .btn{
+    font-family:'Inter',sans-serif; font-weight:600; font-size:13.5px;
+    border-radius:8px; border:1.5px solid transparent; cursor:pointer;
+    padding:9px 16px; display:inline-flex; align-items:center; gap:6px;
+    transition:transform .12s ease, background .15s ease, border-color .15s ease;
+  }
+  .btn:active{transform:scale(.97);}
+  .btn-primary{background:var(--orange); color:#fff;}
+  .btn-primary:hover{background:var(--orange-dark);}
+  .btn-ghost{background:transparent; border-color:rgba(255,255,255,.35); color:#fff;}
+  .btn-ghost:hover{border-color:#fff;}
+  .btn-light{background:#fff; border-color:var(--paper-dim); color:var(--ink);}
+  .btn-light:hover{border-color:var(--orange);}
+  .btn-mini{font-size:12px; padding:6px 10px;}
+  .btn-icon{
+    border:1.5px solid var(--paper-dim); background:#fff; border-radius:8px;
+    width:36px; height:36px; cursor:pointer; font-size:15px; flex:none;
+  }
+  .btn-icon:hover{border-color:var(--orange);}
+
+  /* ===== LAYOUT ===== */
+  .layout{
+    max-width:1180px; margin:0 auto; padding: 26px 24px 80px;
+    display:grid; grid-template-columns: 1fr 280px; gap:26px; align-items:start;
+  }
+  main{min-width:0;}
+  .card{
+    background:#fff; border:1px solid var(--paper-dim); border-radius:var(--card-radius);
+    padding:22px 22px 24px; margin-bottom:20px;
+  }
+  .sec-head{display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; margin-bottom:14px;}
+  .sec-title-row{display:flex; align-items:center; gap:12px;}
+  .num-badge{
+    font-family:'Space Mono',monospace; font-weight:700; font-size:13px;
+    background:var(--pitch-900); color:var(--yellow); border-radius:7px;
+    width:34px; height:34px; display:flex; align-items:center; justify-content:center; flex:none;
+  }
+  h2.sec-title{font-size:21px; margin:0;}
+  .sec-desc{font-size:13.5px; color:var(--ink-soft); margin:0 0 16px;}
+  .sec-tools{display:flex; gap:8px; flex-wrap:wrap; align-items:center;}
+  .sec-score{font-family:'Space Mono',monospace; font-size:13px; color:var(--ink-soft); margin-left:4px;}
+
+  /* ===== INTRO VOCAB TABLE ===== */
+  .vocab-table{width:100%; border-collapse:collapse; font-size:14.5px;}
+  .vocab-table th{
+    text-align:left; font-family:'Space Mono',monospace; font-size:11px; text-transform:uppercase;
+    letter-spacing:.08em; color:var(--ink-soft); padding:8px 10px; border-bottom:2px solid var(--pitch-900);
+  }
+  .vocab-table td{padding:10px; border-bottom:1px solid var(--paper-dim); vertical-align:middle;}
+  .vocab-table tr:last-child td{border-bottom:none;}
+  .vocab-word{font-weight:700;}
+  .vocab-trans{color:var(--ink-soft);}
+
+  .note-box{
+    margin-top:18px; background:#fff6ec; border:1.5px dashed var(--orange); border-radius:10px;
+    padding:16px 18px; font-size:13.8px;
+  }
+  .note-box .note-title{font-weight:800; color:var(--orange-dark); margin-bottom:6px; font-family:'Bebas Neue',sans-serif; font-size:19px; letter-spacing:.02em;}
+  .note-box ol{margin:6px 0 0; padding-left:20px;}
+  .note-box li{margin-bottom:3px;}
+
+  .colloc-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:12px; margin-top:16px;}
+  .colloc-card{border:1px solid var(--paper-dim); border-radius:10px; padding:12px 14px; background:var(--paper);}
+  .colloc-card .colloc-head{font-family:'Bebas Neue',sans-serif; font-size:20px; color:var(--pitch-900); letter-spacing:.03em; margin-bottom:6px;}
+  .colloc-card ul{margin:0; padding-left:16px; font-size:13.2px; color:var(--ink);}
+  .colloc-card li{margin-bottom:3px;}
+
+  /* ===== EXERCISE ITEMS ===== */
+  .item{display:flex; gap:12px; padding:12px 0; border-bottom:1px solid var(--paper-dim);}
+  .item:last-child{border-bottom:none;}
+  .item-num{
+    font-family:'Space Mono',monospace; font-weight:700; font-size:13px; color:#fff;
+    background:var(--pitch-700); border-radius:6px; width:26px; height:26px; flex:none;
+    display:flex; align-items:center; justify-content:center; margin-top:2px;
+  }
+  .item-body{flex:1; min-width:0;}
+  .item-prompt{font-size:14.5px; margin-bottom:8px;}
+  .item-prompt .blank{font-family:'Space Mono',monospace; font-weight:700; color:var(--orange-dark); letter-spacing:.05em;}
+  .item-row{display:flex; gap:8px; align-items:center;}
+  .item-input, textarea.item-input{
+    flex:1; min-width:0; border:1.5px solid var(--paper-dim); border-radius:8px;
+    padding:9px 12px; font-size:14px; font-family:'Inter',sans-serif;
+    background:var(--paper);
+  }
+  textarea.item-input{resize:vertical; min-height:40px; font-family:'Inter',sans-serif;}
+  .item-input:focus, textarea.item-input:focus{outline:none; border-color:var(--pitch-700); background:#fff;}
+  .item-input.is-correct{border-color:var(--good); background:#eef9f1;}
+  .item-input.is-wrong{border-color:var(--bad); background:#fdedeb;}
+  .item-feedback{width:20px; text-align:center; font-weight:800; flex:none;}
+  .item-feedback.ok{color:var(--good);}
+  .item-feedback.bad{color:var(--bad);}
+  .item-answer{font-size:13px; color:var(--ink-soft); margin-top:6px; min-height:1px;}
+  .item-answer b{color:var(--pitch-900);}
+  .item-hint{font-size:12px; color:var(--ink-soft); font-style:italic; margin-top:3px;}
+
+  /* ===== SIDEBAR ===== */
+  .sidebar{position:sticky; top:20px; display:flex; flex-direction:column; gap:16px;}
+  .side-card{background:#fff; border:1px solid var(--paper-dim); border-radius:var(--card-radius); padding:16px 16px 18px;}
+  .side-title{
+    font-family:'Bebas Neue',sans-serif; font-size:20px; letter-spacing:.02em; color:var(--pitch-900);
+    display:flex; align-items:center; gap:8px; margin:0 0 4px;
+  }
+  .side-sub{font-size:12px; color:var(--ink-soft); margin:0 0 12px;}
+  .problem-table{width:100%; border-collapse:collapse; font-size:13px;}
+  .problem-table th{text-align:left; font-size:10.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-soft); padding:4px 0; border-bottom:1px solid var(--paper-dim);}
+  .problem-table td{padding:6px 0; border-bottom:1px solid var(--paper-dim);}
+  .problem-table tr:last-child td{border-bottom:none;}
+  .problem-word{font-weight:700;}
+  .problem-count{
+    font-family:'Space Mono',monospace; background:#fdedeb; color:var(--bad); border-radius:6px;
+    padding:1px 7px; font-size:12px; font-weight:700;
+  }
+  .empty-note{font-size:12.5px; color:var(--ink-soft); font-style:italic;}
+  .side-card .btn-mini{width:100%; justify-content:center; margin-top:10px;}
+
+  .tips-list{margin:0; padding-left:18px; font-size:12.8px; color:var(--ink-soft);}
+  .tips-list li{margin-bottom:6px;}
+
+  /* ===== PAST FORMS TABLE ===== */
+  .past-table{width:100%; border-collapse:collapse; font-size:14px;}
+  .past-table th{text-align:left; font-family:'Space Mono',monospace; font-size:10.5px; text-transform:uppercase; letter-spacing:.08em; color:var(--ink-soft); padding:6px 8px; border-bottom:2px solid var(--pitch-900);}
+  .past-table td{padding:7px 8px; border-bottom:1px solid var(--paper-dim); vertical-align:middle;}
+  .past-table input{width:100%; border:1.5px solid var(--paper-dim); border-radius:7px; padding:7px 9px; font-size:13.5px; background:var(--paper);}
+  .past-table input:focus{outline:none; border-color:var(--pitch-700); background:#fff;}
+  .past-table input.is-correct{border-color:var(--good); background:#eef9f1;}
+  .past-table input.is-wrong{border-color:var(--bad); background:#fdedeb;}
+  .base-cell{font-weight:800; font-family:'Space Mono',monospace;}
+
+  /* ===== TOAST ===== */
+  #toast{
+    position:fixed; left:50%; bottom:26px; transform:translateX(-50%) translateY(20px);
+    background:var(--pitch-900); color:#fff; padding:11px 20px; border-radius:9px;
+    font-size:13.5px; font-weight:600; opacity:0; pointer-events:none; transition:all .25s ease;
+    z-index:999; display:flex; align-items:center; gap:8px;
+  }
+  #toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+
+  footer{text-align:center; color:var(--ink-soft); font-size:12.5px; padding:10px 24px 40px;}
+
+  @media (max-width: 880px){
+    .layout{grid-template-columns:1fr;}
+    .sidebar{position:static;}
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <span class="eyebrow">⚽ Sport verbs & collocations</span>
+    <h1 class="hero-title display">TRAIN. THROW.<br>SCORE. BEAT.</h1>
+    <p class="hero-sub">Тренажёр по спортивной лексике: 10 упражнений, письменная практика, произношение и отслеживание проблемных слов.</p>
+    <div class="scoreboard">
+      <div class="scoreboard-panel">
+        <span class="label">Проверено верно</span>
+        <span class="value mono" id="global-score">0 / 100</span>
+      </div>
+      <div class="scoreboard-panel">
+        <span class="label">Проблемные слова</span>
+        <span class="value mono" id="global-problems">0</span>
+      </div>
+      <div class="hero-actions">
+        <button class="btn btn-primary" onclick="checkAll()">✓ Проверить все упражнения</button>
+        <button class="btn btn-ghost" onclick="resetAll()">↺ Сбросить всё</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="layout">
+  <main>
+
+    <!-- ===================== INTRO ===================== -->
+    <section class="card" id="intro">
+      <div class="sec-head">
+        <div class="sec-title-row">
+          <span class="num-badge">★</span>
+          <h2 class="sec-title">Слова урока</h2>
+        </div>
+        <div class="sec-tools">
+          <button class="btn btn-light btn-mini" onclick="speakAll(introWords.map(w=>w.speak))">🔊 Прослушать все слова</button>
+        </div>
+      </div>
+      <p class="sec-desc">Прочитайте, послушайте произношение и переведите — эти слова используются во всех упражнениях ниже.</p>
+
+      <table class="vocab-table">
+        <thead><tr><th></th><th>Word</th><th>Transcription</th><th>Перевод</th></tr></thead>
+        <tbody id="vocab-tbody"></tbody>
+      </table>
+
+      <div class="note-box">
+        <div class="note-title">BEAT — три значения</div>
+        <ol>
+          <li><b>Beat = превзойти результат</b> — beat a record / beat a score / beat a target</li>
+          <li><b>Beat (sb) = бить / ударять / избивать</b> — My heart was beating. / He beat the man and ran away.</li>
+          <li><b>Beat = победить кого-то</b> — PSG beat Chelsea.</li>
+        </ol>
+      </div>
+
+      <div class="colloc-grid" id="colloc-grid"></div>
+    </section>
+
+    <!-- ===================== EX 1 ===================== -->
+    <section class="card" id="ex1">
+      <div class="sec-head">
+        <div class="sec-title-row"><span class="num-badge">1</span><h2 class="sec-title">Вставьте пропущенные буквы</h2></div>
+        <div class="sec-tools">
+          <button class="btn btn-primary btn-mini" onclick="checkExercise('ex1', ex1Data)">Проверить</button>
+          <button class="btn btn-light btn-mini" onclick="revealExercise('ex1', ex1Data)">Показать ответы</button>
+          <button class="btn btn-light btn-mini" onclick="copyExercise('ex1', ex1Data)">📋 Копировать ответы</button>
+        </div>
+      </div>
+      <p class="sec-desc">Напишите слово полностью. <span class="sec-score" id="ex1-score">0 / 10 верно</span></p>
+      <div id="ex1-list"></div>
+    </section>
+
+    <!-- ===================== EX 2 ===================== -->
+    <section class="card" id="ex2">
+      <div class="sec-head">
+        <div class="sec-title-row"><span class="num-badge">2</span><h2 class="sec-title">Перевод с русского на английский</h2></div>
+        <div class="sec-tools">
+          <button class="btn btn-primary btn-mini" onclick="checkExercise('ex2', ex2Data)">Проверить</button>
+          <button class="btn btn-light btn-mini" onclick="revealExercise('ex2', ex2Data)">Показать ответы</button>
+          <button class="btn btn-light btn-mini" onclick="copyExercise('ex2', ex2Data)">📋 Копировать ответы</button>
+        </div>
+      </div>
+      <p class="sec-desc">Переведите словосочетание целиком. <span class="sec-score" id="ex2-score">0 / 10 верно</span></p>
+      <div id="ex2-list"></div>
+    </section>
+
+    <!-- ===================== EX 3 ===================== -->
+    <section class="card" id="ex3">
+      <div class="sec-head">
+        <div class="sec-title-row"><span class="num-badge">3</span><h2 class="sec-title">Напишите слово на слух</h2></div>
+        <div class="sec-tools">
+          <button class="btn btn-primary btn-mini" onclick="checkExercise('ex3', ex3Data)">Проверить</button>
+          <button class="btn btn-light btn-mini" onclick="revealExercise('ex3', ex3Data)">Показать ответы</button>
+          <button class="btn btn-light btn-mini" onclick="copyExercise('ex3', ex3Data)">📋 Копировать ответы</button>
+        </div>
+      </div>
+      <p class="sec-desc">Нажмите 🔊, послушайте слово и запишите его по-английски. <span class="sec-score" id="ex3-score">0 / 10 верно</span></p>
+      <div id="ex3-list"></div>
+    </section>
+
+    <!-- ===================== EX 4 ===================== -->
+    <section class="card" id="ex4">
+      <div class="sec-head">
+        <div class="sec-title-row"><span class="num-badge">4</span><h2 class="sec-title">Дефиниция → слово</h2></div>
+        <div class="sec-tools">
+          <button class="btn btn-primary btn-mini" onclick="checkExercise('ex4', ex4Data)">Проверить</button>
+          <button class="btn btn-light btn-mini" onclick="revealExercise('ex4', ex4Data)">Показать ответы</button>
+          <button class="btn btn-light btn-mini" onclick="copyExercise('ex4', ex4Data)">📋 Копировать ответы</button>
+        </div>
+      </div>
+      <p class="sec-desc">Прочитайте определение и напишите нужное слово. <span class="sec-score" id="ex4-score">0 / 10 верно</span></p>
+      <div id="ex4-list"></div>
+    </section>
+
+    <!-- ===================== EX 5 ===================== -->
+    <section class="card" id="ex5">
+      <div class="sec-head">
+        <div class="sec-title-row"><span class="num-badge">5</span><h2 class="sec-title">Сочетаемость слов (collocations)</h2></div>
+        <div class="sec-tools">
+          <button class="btn btn-primary btn-mini" onclick="checkExercise('ex5', ex5Data)">Проверить</button>
+          <button class="btn btn-light btn-mini" onclick="revealExercise('ex5', ex5Data)">Показать ответы</button>
+          <button class="btn btn-light btn-mini" onclick="copyExercise('ex5', ex5Data)">📋 Копировать ответы</button>
+        </div>
+      </div>
+      <p class="sec-desc">Вставьте пропущенный глагол в начальной форме (train / kick / throw / score / do / beat). <span class="sec-score" id="ex5-score">0 / 10 верно</span></p>
+      <div id="ex5-list"></div>
+    </section>
+
+    <!-- ===================== EX 6 ===================== -->
+    <section class="card" id="ex6">
+      <div class="sec-head">
+        <div class="sec-title-row"><span class="num-badge">6</span><h2 class="sec-title">Find two mistakes</h2></div>
+        <div class="sec-tools">
+          <button class="btn btn-light btn-mini" onclick="revealExercise('ex6', ex6Data)">Показать ответы</button>
+          <button class="btn btn-light btn-mini" onclick="copyExercise('ex6', ex6Data)">📋 Копировать ответы</button>
+        </div>
+      </div>
+      <p class="sec-desc">В каждом предложении по две ошибки. Перепишите предложение правильно.</p>
+      <div id="ex6-list"></div>
+    </section>
+
+    <!-- ===================== EX 7 ===================== -->
+    <section class="card" id="ex7">
+      <div class="sec-head">
+        <div class="sec-title-row"><span class="num-badge">7</span><h2 class="sec-title">Rephrase</h2></div>
+        <div class="sec-tools">
+          <button class="btn btn-light btn-mini" onclick="revealExercise('ex7', ex7Data)">Показать ответы</button>
+          <button class="btn btn-light btn-mini" onclick="copyExercise('ex7', ex7Data)">📋 Копировать ответы</button>
+        </div>
+      </div>
+      <p class="sec-desc">Перефразируйте предложение, используя слово из урока в скобках.</p>
+      <div id="ex7-list"></div>
+    </section>
+
+    <!-- ===================== EX 8 ===================== -->
+    <section class="card" id="ex8">
+      <div class="sec-head">
+        <div class="sec-title-row"><span class="num-badge">8</span><h2 class="sec-title">Predict the ending</h2></div>
+        <div class="sec-tools">
+          <button class="btn btn-light btn-mini" onclick="revealExercise('ex8', ex8Data)">Показать пример</button>
+          <button class="btn btn-light btn-mini" onclick="copyExercise('ex8', ex8Data, true)">📋 Копировать мои ответы</button>
+        </div>
+      </div>
+      <p class="sec-desc">Придумайте своё окончание предложения. Единственно верного ответа нет — можно показать пример для вдохновения.</p>
+      <div id="ex8-list"></div>
+    </section>
+
+    <!-- ===================== EX 9 ===================== -->
+    <section class="card" id="ex9">
+      <div class="sec-head">
+        <div class="sec-title-row"><span class="num-badge">9</span><h2 class="sec-title">Закончите предложения своими идеями</h2></div>
+        <div class="sec-tools">
+          <button class="btn btn-light btn-mini" onclick="revealExercise('ex9', ex9Data)">Показать пример</button>
+          <button class="btn btn-light btn-mini" onclick="copyExercise('ex9', ex9Data, true)">📋 Копировать мои ответы</button>
+        </div>
+      </div>
+      <p class="sec-desc">Расскажите о себе, используя лексику урока.</p>
+      <div id="ex9-list"></div>
+    </section>
+
+    <!-- ===================== EX 10 ===================== -->
+    <section class="card" id="ex10">
+      <div class="sec-head">
+        <div class="sec-title-row"><span class="num-badge">10</span><h2 class="sec-title">Прошедшие формы глаголов</h2></div>
+        <div class="sec-tools">
+          <button class="btn btn-primary btn-mini" onclick="checkPast()">Проверить</button>
+          <button class="btn btn-light btn-mini" onclick="revealPast()">Показать ответы</button>
+          <button class="btn btn-light btn-mini" onclick="copyPast()">📋 Копировать ответы</button>
+        </div>
+      </div>
+      <p class="sec-desc">Заполните Past Simple и Past Participle. <span class="sec-score" id="ex10-score">0 / 10 верно</span></p>
+      <table class="past-table">
+        <thead><tr><th style="width:22%">Base form</th><th>Past Simple</th><th>Past Participle</th></tr></thead>
+        <tbody id="ex10-tbody"></tbody>
+      </table>
+    </section>
+
+  </main>
+
+  <!-- ===================== SIDEBAR ===================== -->
+  <aside class="sidebar">
+    <div class="side-card">
+      <h3 class="side-title">🚩 Проблемные слова</h3>
+      <p class="side-sub">Сюда автоматически попадают слова, в которых вы ошиблись.</p>
+      <table class="problem-table" id="problem-table">
+        <thead><tr><th>Слово</th><th>Ошибок</th></tr></thead>
+        <tbody id="problem-tbody"></tbody>
+      </table>
+      <p class="empty-note" id="problem-empty">Пока ошибок нет — отлично!</p>
+      <button class="btn btn-light btn-mini" onclick="clearProblems()">Очистить список</button>
+    </div>
+
+    <div class="side-card">
+      <h3 class="side-title">💡 Как заниматься</h3>
+      <ul class="tips-list">
+        <li>Сначала прослушайте и прочитайте слова в начале страницы.</li>
+        <li>Выполняйте упражнения по порядку — от простого к сложному.</li>
+        <li>Нажимайте «Проверить», чтобы увидеть зелёные/красные подсказки.</li>
+        <li>Ответы можно скопировать одной кнопкой и вставить в тетрадь или чат.</li>
+        <li>Проблемные слова справа — повторите их перед следующим занятием.</li>
+      </ul>
+    </div>
+  </aside>
+</div>
+
+<footer>Sport Vocabulary Practice · нажимайте 🔊, чтобы услышать произношение (нужен браузер с поддержкой Web Speech API, например Chrome)</footer>
+<div id="toast"></div>
+
+<script>
+/* ===================================================================
+   DATA
+=================================================================== */
+const introWords = [
+  {word:'train', speak:'train', trans:'/treɪn/', ru:'тренироваться'},
+  {word:'go swimming', speak:'go swimming', trans:'/ɡəʊ ˈswɪmɪŋ/', ru:'ходить плавать'},
+  {word:'throw', speak:'throw', trans:'/θrəʊ/', ru:'бросать'},
+  {word:'do yoga', speak:'do yoga', trans:'/duː ˈjəʊɡə/', ru:'заниматься йогой'},
+  {word:'get fit', speak:'get fit', trans:'/ɡet fɪt/', ru:'привести себя в форму'},
+  {word:'get injured', speak:'get injured', trans:'/ɡet ˈɪndʒəd/', ru:'получить травму'},
+  {word:'score', speak:'score', trans:'/skɔː/', ru:'забивать (гол), набирать очки'},
+  {word:'kick', speak:'kick', trans:'/kɪk/', ru:'бить ногой, пинать'},
+  {word:'beat', speak:'beat', trans:'/biːt/', ru:'побеждать / превосходить / бить'},
+];
+
+const collocations = [
+  {head:'TRAIN', items:['train for a competition','train with a team','train three times a week']},
+  {head:'KICK', items:['kick a ball','kick the ball into the goal','kick someone / something']},
+  {head:'THROW', items:['throw a ball','throw something to someone','throw something at someone']},
+  {head:'SCORE', items:['score a goal','score a point','score 20 points']},
+  {head:'DO', items:['do exercise','do yoga','do a workout']},
+];
+
+// ---- Exercise 1: missing letters ----
+const ex1Data = [
+  {q:'tr<span class="blank">__</span>n', a:['train'], tag:'train'},
+  {q:'sc<span class="blank">__</span>re', a:['score'], tag:'score'},
+  {q:'b<span class="blank">__</span>t', a:['beat'], tag:'beat'},
+  {q:'thr<span class="blank">__</span>w', a:['throw'], tag:'throw'},
+  {q:'k<span class="blank">__</span>ck', a:['kick'], tag:'kick'},
+  {q:'inj<span class="blank">__</span>red', a:['injured'], tag:'injured'},
+  {q:'y<span class="blank">__</span>ga', a:['yoga'], tag:'yoga'},
+  {q:'sw<span class="blank">_</span>mming', a:['swimming'], tag:'swimming'},
+  {q:'f<span class="blank">_</span>t', a:['fit'], tag:'fit'},
+  {q:'comp<span class="blank">__</span>tition', a:['competition'], tag:'competition'},
+];
+
+// ---- Exercise 2: RU -> EN ----
+const ex2Data = [
+  {q:'тренироваться три раза в неделю', a:['train three times a week'], tag:'train'},
+  {q:'забить гол', a:['score a goal'], tag:'score'},
+  {q:'пнуть мяч', a:['kick a ball','kick the ball'], tag:'kick'},
+  {q:'получить травму', a:['get injured'], tag:'injured'},
+  {q:'побить рекорд', a:['beat a record'], tag:'beat'},
+  {q:'бросить мяч кому-то', a:['throw a ball to someone','throw the ball to someone'], tag:'throw'},
+  {q:'заниматься йогой', a:['do yoga'], tag:'yoga'},
+  {q:'ходить плавать', a:['go swimming'], tag:'swimming'},
+  {q:'привести себя в форму', a:['get fit'], tag:'fit'},
+  {q:'победить команду', a:['beat a team'], tag:'beat'},
+];
+
+// ---- Exercise 3: dictation ----
+const ex3Data = [
+  {q:'Нажмите 🔊 и напишите услышанное слово', a:['train'], tag:'train', speak:'train'},
+  {q:'Нажмите 🔊 и напишите услышанное слово', a:['kick'], tag:'kick', speak:'kick'},
+  {q:'Нажмите 🔊 и напишите услышанное слово', a:['throw'], tag:'throw', speak:'throw'},
+  {q:'Нажмите 🔊 и напишите услышанное слово', a:['score'], tag:'score', speak:'score'},
+  {q:'Нажмите 🔊 и напишите услышанное слово', a:['beat'], tag:'beat', speak:'beat'},
+  {q:'Нажмите 🔊 и напишите услышанное слово', a:['injured'], tag:'injured', speak:'injured'},
+  {q:'Нажмите 🔊 и напишите услышанное слово', a:['competition'], tag:'competition', speak:'competition'},
+  {q:'Нажмите 🔊 и напишите услышанное слово', a:['record'], tag:'record', speak:'record'},
+  {q:'Нажмите 🔊 и напишите услышанное слово', a:['goal'], tag:'goal', speak:'goal'},
+  {q:'Нажмите 🔊 и напишите услышанное слово', a:['workout'], tag:'workout', speak:'workout'},
+];
+
+// ---- Exercise 4: definitions ----
+const ex4Data = [
+  {q:'To hit a ball with your foot.', a:['kick'], tag:'kick'},
+  {q:'To win against someone in a game or competition.', a:['beat'], tag:'beat'},
+  {q:'To hurt part of your body, especially during sport.', a:['get injured','injured'], tag:'injured'},
+  {q:'To make your body healthier and stronger through regular exercise.', a:['get fit'], tag:'fit'},
+  {q:'To send a ball through the air using your hand or arm.', a:['throw'], tag:'throw'},
+  {q:'To get a goal or a point in a game.', a:['score'], tag:'score'},
+  {q:'A type of exercise with stretching, breathing and calm movements, often done on a mat.', a:['yoga','do yoga'], tag:'yoga'},
+  {q:'To practise regularly in order to improve at a sport.', a:['train'], tag:'train'},
+  {q:'The best result ever achieved in a sport.', a:['record'], tag:'record'},
+  {q:'To move through water using your arms and legs, for exercise or fun.', a:['swim','go swimming'], tag:'swimming'},
+];
+
+// ---- Exercise 5: collocations ----
+const ex5Data = [
+  {q:'<span class="blank">______</span> for a competition', a:['train'], tag:'train'},
+  {q:'<span class="blank">______</span> with a team', a:['train'], tag:'train'},
+  {q:'<span class="blank">______</span> a ball into the goal', a:['kick'], tag:'kick'},
+  {q:'<span class="blank">______</span> something at someone', a:['throw'], tag:'throw'},
+  {q:'<span class="blank">______</span> something to someone', a:['throw'], tag:'throw'},
+  {q:'<span class="blank">______</span> a goal', a:['score'], tag:'score'},
+  {q:'<span class="blank">______</span> 20 points', a:['score'], tag:'score'},
+  {q:'<span class="blank">______</span> yoga', a:['do'], tag:'do'},
+  {q:'<span class="blank">______</span> a workout', a:['do'], tag:'do'},
+  {q:'<span class="blank">______</span> a record', a:['beat'], tag:'beat'},
+];
+
+// ---- Exercise 6: find two mistakes ----
+const ex6Data = [
+  {q:'He beated the record last year in swim.', a:['He beat the record last year in swimming.'], tag:'beat'},
+  {q:'They trains with they team on Mondays.', a:['They train with their team on Mondays.'], tag:'train'},
+  {q:'She throw the ball to he yesterday.', a:['She threw the ball to him yesterday.'], tag:'throw'},
+  {q:'I get injure while I doing yoga.', a:['I got injured while I was doing yoga.'], tag:'injured'},
+  {q:'He score a two goals in the match.', a:['He scored two goals in the match.'], tag:'score'},
+  {q:'We go swim every weekend for get fit.', a:['We go swimming every weekend to get fit.'], tag:'swimming'},
+  {q:'She kick the ball into goal and win the game.', a:['She kicked the ball into the goal and won the game.'], tag:'kick'},
+  {q:'My hearts was beat very fast after the training.', a:['My heart was beating very fast after the training.'], tag:'beat'},
+  {q:'PSG beated Chelsea in they last match.', a:['PSG beat Chelsea in their last match.'], tag:'beat'},
+  {q:'He do yoga and swimming for stay fit.', a:['He does yoga and swimming to stay fit.'], tag:'do'},
+];
+
+// ---- Exercise 7: rephrase ----
+const ex7Data = [
+  {q:'Real Madrid won against Barcelona. (beat)', a:['Real Madrid beat Barcelona.'], tag:'beat'},
+  {q:'He practises football three times a week. (train)', a:['He trains three times a week.'], tag:'train'},
+  {q:'She hurt her leg during the match. (get injured)', a:['She got injured during the match.'], tag:'injured'},
+  {q:'He hit the ball with his foot. (kick)', a:['He kicked the ball.'], tag:'kick'},
+  {q:'They made their bodies healthier by exercising. (get fit)', a:['They got fit by exercising.'], tag:'fit'},
+  {q:'He got a new highest result for the 100m. (beat a record)', a:['He beat the record for the 100m.'], tag:'beat'},
+  {q:'She sent the ball through the air to her teammate. (throw)', a:['She threw the ball to her teammate.'], tag:'throw'},
+  {q:'He got three points in the game. (score)', a:['He scored three points in the game.'], tag:'score'},
+  {q:'We swim regularly on weekends. (go swimming)', a:['We go swimming on weekends.'], tag:'swimming'},
+  {q:'She does stretching and breathing exercises every morning. (do yoga)', a:['She does yoga every morning.'], tag:'yoga'},
+];
+
+// ---- Exercise 8: predict the ending ----
+const ex8Data = [
+  {q:'If you train hard every day, ...', a:['...you will get fit and improve your skills quickly.'], tag:'train'},
+  {q:'She kicked the ball so hard that ...', a:['...it flew over the goalkeeper and into the net.'], tag:'kick'},
+  {q:'He was doing yoga when suddenly ...', a:['...he heard a strange noise outside.'], tag:'yoga'},
+  {q:'They trained for three months, and finally ...', a:['...they won the competition.'], tag:'train'},
+  {q:'During the match, she got injured, so ...', a:['...the coach had to bring on another player.'], tag:'injured'},
+  {q:'He threw the ball at the last second, and ...', a:['...his team scored the winning point.'], tag:'throw'},
+  {q:'Our team beat the champions because ...', a:['...we trained harder than anyone else.'], tag:'beat'},
+  {q:'After the game, my heart was beating fast because ...', a:['...I had run for the whole ninety minutes.'], tag:'beat'},
+  {q:'If you want to get fit, you should ...', a:['...train regularly and eat healthy food.'], tag:'fit'},
+  {q:'He scored the winning goal, and the crowd ...', a:['...went wild with excitement.'], tag:'score'},
+];
+
+// ---- Exercise 9: complete with own ideas ----
+const ex9Data = [
+  {q:'My favourite way to get fit is ...', a:['...going swimming every morning.'], tag:'fit'},
+  {q:'I usually train for ...', a:['...about an hour, three times a week.'], tag:'train'},
+  {q:'Last time I got injured, I ...', a:['...had to rest for two weeks.'], tag:'injured'},
+  {q:'I would love to beat ...', a:['...my own personal best time.'], tag:'beat'},
+  {q:'If I could learn one new sport, I would choose ... because ...', a:['...yoga, because it helps me relax.'], tag:'yoga'},
+  {q:'My favourite team always tries to score by ...', a:['...passing the ball quickly between players.'], tag:'score'},
+  {q:'When I play sports, I sometimes kick ...', a:['...the ball too hard and it goes out.'], tag:'kick'},
+  {q:'I think the best way to relax after training is ...', a:['...to stretch and drink water.'], tag:'train'},
+  {q:'I have never tried to do yoga, but ...', a:['...I would like to try it one day.'], tag:'yoga'},
+  {q:'Going swimming makes me feel ...', a:['...calm and full of energy.'], tag:'swimming'},
+];
+
+// ---- Exercise 10: past forms ----
+const pastData = [
+  {base:'beat',  past:['beat'],    part:['beaten']},
+  {base:'throw', past:['threw'],   part:['thrown']},
+  {base:'kick',  past:['kicked'],  part:['kicked']},
+  {base:'score', past:['scored'],  part:['scored']},
+  {base:'train', past:['trained'], part:['trained']},
+  {base:'do',    past:['did'],     part:['done']},
+  {base:'get',   past:['got'],     part:['got','gotten']},
+  {base:'go',    past:['went'],    part:['gone']},
+  {base:'swim',  past:['swam'],    part:['swum']},
+  {base:'win',   past:['won'],     part:['won']},
+];
+
+/* ===================================================================
+   RENDER INTRO
+=================================================================== */
+document.getElementById('vocab-tbody').innerHTML = introWords.map(w=>`
+  <tr>
+    <td><button class="btn-icon" onclick="speak('${w.speak}')" title="Слушать">🔊</button></td>
+    <td class="vocab-word">${w.word}</td>
+    <td class="vocab-trans mono">${w.trans}</td>
+    <td>${w.ru}</td>
+  </tr>`).join('');
+
+document.getElementById('colloc-grid').innerHTML = collocations.map(c=>`
+  <div class="colloc-card">
+    <div class="colloc-head">${c.head}</div>
+    <ul>${c.items.map(i=>`<li>${i}</li>`).join('')}</ul>
+  </div>`).join('');
+
+/* ===================================================================
+   RENDER CHECKABLE EXERCISES (1,2,3,4,5)
+=================================================================== */
+function renderCheckable(exId, data){
+  const el = document.getElementById(exId+'-list');
+  el.innerHTML = data.map((item,i)=>`
+    <div class="item">
+      <span class="item-num">${i+1}</span>
+      <div class="item-body">
+        <div class="item-prompt">${item.q}</div>
+        <div class="item-row">
+          <input type="text" class="item-input" id="${exId}-input-${i}" autocomplete="off" placeholder="Ваш ответ...">
+          ${item.speak ? `<button class="btn-icon" onclick="speak('${item.speak}')" title="Слушать">🔊</button>` : ''}
+          <span class="item-feedback" id="${exId}-fb-${i}"></span>
+        </div>
+        <div class="item-answer" id="${exId}-ans-${i}"></div>
+      </div>
+    </div>`).join('');
+}
+renderCheckable('ex1', ex1Data);
+renderCheckable('ex2', ex2Data);
+renderCheckable('ex3', ex3Data);
+renderCheckable('ex4', ex4Data);
+renderCheckable('ex5', ex5Data);
+
+/* ===================================================================
+   RENDER REVEAL-ONLY (6,7) — textarea for full sentence
+=================================================================== */
+function renderReveal(exId, data){
+  const el = document.getElementById(exId+'-list');
+  el.innerHTML = data.map((item,i)=>`
+    <div class="item">
+      <span class="item-num">${i+1}</span>
+      <div class="item-body">
+        <div class="item-prompt">${item.q}</div>
+        <div class="item-row">
+          <textarea class="item-input" id="${exId}-input-${i}" placeholder="Ваш вариант..."></textarea>
+        </div>
+        <div class="item-answer" id="${exId}-ans-${i}"></div>
+      </div>
+    </div>`).join('');
+}
+renderReveal('ex6', ex6Data);
+renderReveal('ex7', ex7Data);
+
+/* ===================================================================
+   RENDER OPEN (8,9)
+=================================================================== */
+function renderOpen(exId, data){
+  const el = document.getElementById(exId+'-list');
+  el.innerHTML = data.map((item,i)=>`
+    <div class="item">
+      <span class="item-num">${i+1}</span>
+      <div class="item-body">
+        <div class="item-prompt">${item.q}</div>
+        <div class="item-row">
+          <input type="text" class="item-input" id="${exId}-input-${i}" autocomplete="off" placeholder="Ваша идея...">
+        </div>
+        <div class="item-answer" id="${exId}-ans-${i}"></div>
+      </div>
+    </div>`).join('');
+}
+renderOpen('ex8', ex8Data);
+renderOpen('ex9', ex9Data);
+
+/* ===================================================================
+   RENDER PAST FORMS TABLE
+=================================================================== */
+document.getElementById('ex10-tbody').innerHTML = pastData.map((v,i)=>`
+  <tr>
+    <td class="base-cell">${v.base}</td>
+    <td><input type="text" id="ex10-past-${i}" autocomplete="off" placeholder="Past Simple"></td>
+    <td><input type="text" id="ex10-part-${i}" autocomplete="off" placeholder="Past Participle"></td>
+  </tr>`).join('');
+
+/* ===================================================================
+   CORE LOGIC
+=================================================================== */
+function norm(s){
+  return (s||'').toString().trim().toLowerCase().replace(/[.!?,;:]+$/,'').replace(/\s+/g,' ');
+}
+function isCorrect(value, answers){
+  const n = norm(value);
+  if(!n) return false;
+  return answers.some(a => norm(a) === n);
+}
+
+function speak(text){
+  if(!('speechSynthesis' in window)){ alert('Ваш браузер не поддерживает озвучивание. Попробуйте Chrome.'); return; }
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-GB'; u.rate = 0.9;
+  window.speechSynthesis.speak(u);
+}
+function speakAll(words){
+  if(!('speechSynthesis' in window)){ alert('Ваш браузер не поддерживает озвучивание. Попробуйте Chrome.'); return; }
+  window.speechSynthesis.cancel();
+  words.forEach(w=>{
+    const u = new SpeechSynthesisUtterance(w);
+    u.lang = 'en-GB'; u.rate = 0.9;
+    window.speechSynthesis.speak(u);
+  });
+}
+
+/* ---- problem words tracking ---- */
+let problemWords = {};
+try{ problemWords = JSON.parse(localStorage.getItem('sportVocabProblemsV1')) || {}; }catch(e){ problemWords = {}; }
+
+function addProblem(tag){
+  if(!tag) return;
+  problemWords[tag] = (problemWords[tag] || 0) + 1;
+  saveProblems();
+  renderProblems();
+}
+function saveProblems(){
+  localStorage.setItem('sportVocabProblemsV1', JSON.stringify(problemWords));
+}
+function renderProblems(){
+  const entries = Object.entries(problemWords).sort((a,b)=>b[1]-a[1]);
+  const tbody = document.getElementById('problem-tbody');
+  const empty = document.getElementById('problem-empty');
+  document.getElementById('global-problems').textContent = entries.length;
+  if(entries.length === 0){
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  tbody.innerHTML = entries.map(([word,count])=>`
+    <tr><td class="problem-word">${word}</td><td><span class="problem-count">${count}</span></td></tr>`).join('');
+}
+function clearProblems(){
+  problemWords = {};
+  saveProblems();
+  renderProblems();
+}
+renderProblems();
+
+/* ---- check / reveal / copy for exercises 1-5 ---- */
+function checkExercise(exId, data){
+  let correct = 0;
+  data.forEach((item,i)=>{
+    const inp = document.getElementById(`${exId}-input-${i}`);
+    const fb = document.getElementById(`${exId}-fb-${i}`);
+    const ok = isCorrect(inp.value, item.a);
+    inp.classList.remove('is-correct','is-wrong');
+    if(ok){
+      inp.classList.add('is-correct'); fb.textContent = '✓'; fb.className = 'item-feedback ok'; correct++;
+    } else {
+      inp.classList.add('is-wrong'); fb.textContent = '✗'; fb.className = 'item-feedback bad';
+      addProblem(item.tag);
+    }
+  });
+  const scoreEl = document.getElementById(exId+'-score');
+  if(scoreEl) scoreEl.textContent = `${correct} / ${data.length} верно`;
+  updateGlobalScore();
+  toast(`Проверено: ${correct} из ${data.length} верно`);
+}
+
+function revealExercise(exId, data){
+  data.forEach((item,i)=>{
+    const el = document.getElementById(`${exId}-ans-${i}`);
+    if(el) el.innerHTML = 'Ответ: <b>' + item.a[0] + '</b>';
+  });
+}
+
+function copyExercise(exId, data, useUserInput){
+  let text;
+  if(useUserInput){
+    text = data.map((item,i)=>{
+      const inp = document.getElementById(`${exId}-input-${i}`);
+      const val = inp ? inp.value.trim() : '';
+      return `${i+1}. ${item.q}\n   → ${val || '(нет ответа)'}`;
+    }).join('\n');
+  } else {
+    text = data.map((item,i)=>`${i+1}. ${item.a[0]}`).join('\n');
+  }
+  copyToClipboard(text);
+}
+
+/* ---- past forms (exercise 10) ---- */
+function checkPast(){
+  let correct = 0;
+  pastData.forEach((v,i)=>{
+    const pastInp = document.getElementById(`ex10-past-${i}`);
+    const partInp = document.getElementById(`ex10-part-${i}`);
+    const pastOk = isCorrect(pastInp.value, v.past);
+    const partOk = isCorrect(partInp.value, v.part);
+    pastInp.classList.remove('is-correct','is-wrong');
+    partInp.classList.remove('is-correct','is-wrong');
+    pastInp.classList.add(pastOk ? 'is-correct' : 'is-wrong');
+    partInp.classList.add(partOk ? 'is-correct' : 'is-wrong');
+    if(pastOk && partOk) correct++;
+    else addProblem(v.base);
+  });
+  document.getElementById('ex10-score').textContent = `${correct} / ${pastData.length} верно`;
+  updateGlobalScore();
+  toast(`Проверено: ${correct} из ${pastData.length} верно`);
+}
+function revealPast(){
+  pastData.forEach((v,i)=>{
+    document.getElementById(`ex10-past-${i}`).value = v.past[0];
+    document.getElementById(`ex10-part-${i}`).value = v.part[0];
+  });
+}
+function copyPast(){
+  const text = pastData.map(v => `${v.base} — ${v.past[0]} — ${v.part[0]}`).join('\n');
+  copyToClipboard(text);
+}
+
+/* ---- global helpers ---- */
+function checkAll(){
+  checkExercise('ex1', ex1Data);
+  checkExercise('ex2', ex2Data);
+  checkExercise('ex3', ex3Data);
+  checkExercise('ex4', ex4Data);
+  checkExercise('ex5', ex5Data);
+  checkPast();
+  toast('Проверены все упражнения с ответами');
+}
+
+function updateGlobalScore(){
+  let total = 0, correct = 0;
+  [['ex1',ex1Data],['ex2',ex2Data],['ex3',ex3Data],['ex4',ex4Data],['ex5',ex5Data]].forEach(([exId,data])=>{
+    data.forEach((item,i)=>{
+      const inp = document.getElementById(`${exId}-input-${i}`);
+      total++;
+      if(inp && inp.classList.contains('is-correct')) correct++;
+    });
+  });
+  pastData.forEach((v,i)=>{
+    const pastInp = document.getElementById(`ex10-past-${i}`);
+    const partInp = document.getElementById(`ex10-part-${i}`);
+    total++;
+    if(pastInp && partInp && pastInp.classList.contains('is-correct') && partInp.classList.contains('is-correct')) correct++;
+  });
+  document.getElementById('global-score').textContent = `${correct} / ${total}`;
+}
+
+function resetAll(){
+  document.querySelectorAll('.item-input').forEach(el=>{ el.value=''; el.classList.remove('is-correct','is-wrong'); });
+  document.querySelectorAll('.item-answer').forEach(el=>el.innerHTML='');
+  document.querySelectorAll('.item-feedback').forEach(el=>{ el.textContent=''; el.className='item-feedback'; });
+  document.querySelectorAll('.past-table input').forEach(el=>{ el.value=''; el.classList.remove('is-correct','is-wrong'); });
+  document.querySelectorAll('.sec-score').forEach(el=>{
+    const total = el.textContent.split('/')[1] ? el.textContent.split('/')[1].trim().split(' ')[0] : '10';
+    el.textContent = `0 / ${total} верно`;
+  });
+  document.getElementById('global-score').textContent = '0 / 100';
+  toast('Все поля очищены');
+}
+
+function copyToClipboard(text){
+  navigator.clipboard.writeText(text).then(()=>{
+    toast('Ответы скопированы в буфер обмена!');
+  }).catch(()=>{
+    toast('Не удалось скопировать — выделите текст вручную');
+  });
+}
+
+let toastTimer;
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove('show'), 2200);
+}
+</script>
+</body>
+</html>
