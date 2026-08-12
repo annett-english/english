@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vocabulary Drill · Тетрадь слов</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F5F0E4;
+    --paper-line:#DCD2B8;
+    --ink:#232741;
+    --ink-soft:#61637A;
+    --accent:#356E8C;
+    --accent-dark:#254D63;
+    --accent-soft:#DCE9EE;
+    --correct:#4B7A5B;
+    --correct-bg:#E3EFE4;
+    --incorrect:#AF4B32;
+    --incorrect-bg:#F6E3DB;
+    --mustard:#CC9A3B;
+    --card-bg:#FFFEFA;
+    --radius:10px;
+    --shadow: 0 2px 0 rgba(35,39,65,0.06), 0 10px 24px -14px rgba(35,39,65,0.25);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    line-height:1.5;
+    padding-bottom:80px;
+  }
+  ::selection{background:var(--mustard);color:#fff;}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    position:relative;
+    padding:52px 24px 40px 64px;
+    background:
+      repeating-linear-gradient(180deg, transparent 0 39px, var(--paper-line) 39px 40px),
+      var(--paper);
+    border-bottom:2px solid var(--ink);
+    overflow:hidden;
+  }
+  .spiral{
+    position:absolute;
+    left:14px;top:0;bottom:0;
+    width:24px;
+    display:flex;flex-direction:column;justify-content:space-evenly;align-items:center;
+  }
+  .spiral span{
+    width:14px;height:14px;border-radius:50%;
+    border:3px solid var(--ink);
+    background:var(--paper);
+    box-shadow: 10px 0 0 -3px transparent;
+  }
+  .hero-inner{max-width:760px;}
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--accent-dark);
+    background:var(--accent-soft);
+    display:inline-block;padding:4px 10px;border-radius:5px;
+    margin-bottom:14px;
+  }
+  h1.title{
+    font-family:'Fraunces',serif;
+    font-weight:700;
+    font-size:clamp(32px,5vw,46px);
+    margin:0 0 6px;
+    letter-spacing:-0.01em;
+  }
+  .subtitle{
+    font-size:15.5px;color:var(--ink-soft);max-width:560px;
+  }
+  .subtitle b{color:var(--ink);}
+
+  section{padding:36px 24px;max-width:1080px;margin:0 auto;}
+  h2.section-title{
+    font-family:'Fraunces',serif;
+    font-size:23px;font-weight:600;
+    margin:0 0 4px;
+    display:flex;align-items:baseline;gap:10px;
+  }
+  .section-desc{color:var(--ink-soft);font-size:14px;margin:0 0 20px;}
+
+  /* ---------- REMINDER CARDS ---------- */
+  .reminder-wrap{
+    background:
+      repeating-linear-gradient(180deg, transparent 0 34px, var(--paper-line) 34px 35px);
+    border:1px solid var(--paper-line);
+    border-radius:14px;
+    padding:20px 20px 8px;
+  }
+  .cards-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(230px,1fr));
+    gap:12px;
+    margin-bottom:12px;
+  }
+  .flash{
+    background:var(--card-bg);
+    border:1px solid var(--paper-line);
+    border-left:4px solid var(--accent);
+    border-radius:8px;
+    padding:12px 14px;
+    box-shadow:var(--shadow);
+  }
+  .flash-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
+  .flash-en{font-weight:600;font-size:15px;}
+  .flash-ipa{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;color:var(--ink-soft);margin-top:2px;
+  }
+  .flash-ru{font-size:13.5px;color:var(--ink-soft);margin-top:6px;}
+  .listen-btn{
+    border:1px solid var(--accent);
+    background:var(--accent-soft);
+    color:var(--accent-dark);
+    border-radius:50%;
+    width:30px;height:30px;flex:none;
+    font-size:14px;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    transition:transform .12s ease, background .12s ease;
+  }
+  .listen-btn:hover{background:var(--accent);color:#fff;transform:scale(1.06);}
+
+  /* ---------- PROBLEM WORDS ---------- */
+  .problem-card{
+    background:var(--card-bg);
+    border:1px solid var(--paper-line);
+    border-radius:12px;
+    box-shadow:var(--shadow);
+    overflow:hidden;
+  }
+  table.problem-table{width:100%;border-collapse:collapse;font-size:14px;}
+  table.problem-table th{
+    text-align:left;background:var(--incorrect-bg);color:var(--incorrect);
+    font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.05em;text-transform:uppercase;
+    padding:10px 14px;
+  }
+  table.problem-table td{padding:9px 14px;border-top:1px solid var(--paper-line);}
+  table.problem-table tr:nth-child(even) td{background:#FAF7F0;}
+  .empty-state{padding:22px;text-align:center;color:var(--ink-soft);font-size:14px;}
+  .clear-btn{
+    font-family:'IBM Plex Mono',monospace;font-size:12px;
+    background:none;border:1px solid var(--paper-line);color:var(--ink-soft);
+    padding:5px 10px;border-radius:6px;cursor:pointer;margin:10px 14px 14px auto;display:block;
+  }
+  .clear-btn:hover{border-color:var(--incorrect);color:var(--incorrect);}
+
+  /* ---------- TABS ---------- */
+  .tabs-wrap{
+    position:sticky;top:0;z-index:20;
+    background:var(--paper);
+    border-bottom:2px solid var(--ink);
+    padding:14px 24px 0;
+  }
+  .tabs{
+    max-width:1080px;margin:0 auto;
+    display:flex;gap:6px;flex-wrap:wrap;
+  }
+  .tab-btn{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12.5px;font-weight:600;letter-spacing:.02em;
+    background:var(--card-bg);
+    border:1px solid var(--ink);
+    border-bottom:none;
+    padding:9px 13px 8px;
+    border-radius:8px 8px 0 0;
+    cursor:pointer;color:var(--ink-soft);
+    transform:translateY(3px);
+    transition:transform .12s ease, color .12s ease, background .12s ease;
+  }
+  .tab-btn .tnum{color:var(--accent);margin-right:5px;}
+  .tab-btn.active{
+    background:var(--ink);color:#fff;transform:translateY(0);
+  }
+  .tab-btn.active .tnum{color:var(--mustard);}
+
+  /* ---------- EXERCISE PANEL ---------- */
+  .panel{display:none;}
+  .panel.active{display:block;}
+  .ex-head{
+    display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:10px;
+    margin-bottom:6px;
+  }
+  .ex-score{
+    font-family:'IBM Plex Mono',monospace;font-size:13px;
+    background:var(--card-bg);border:1px solid var(--paper-line);
+    padding:6px 12px;border-radius:8px;
+  }
+  .ex-score b{color:var(--accent-dark);}
+  .qlist{list-style:none;margin:18px 0;padding:0;display:flex;flex-direction:column;gap:12px;}
+  .qrow{
+    background:var(--card-bg);
+    border:1px solid var(--paper-line);
+    border-radius:10px;
+    padding:13px 16px;
+    box-shadow:var(--shadow);
+  }
+  .qrow.correct{border-color:var(--correct);background:var(--correct-bg);}
+  .qrow.incorrect{border-color:var(--incorrect);background:var(--incorrect-bg);}
+  .qnum{
+    font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--accent-dark);
+    background:var(--accent-soft);border-radius:5px;padding:1px 7px;margin-right:8px;
+  }
+  .qprompt{font-size:15px;margin-bottom:9px;}
+  .qprompt .ru{color:var(--accent-dark);font-weight:600;}
+  .qprompt .en-quote{font-style:italic;color:var(--ink-soft);}
+  .qbody{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  .qinput{
+    flex:1;min-width:200px;
+    font-family:'IBM Plex Mono',monospace;font-size:14.5px;
+    padding:8px 11px;border:1.5px solid var(--paper-line);border-radius:7px;
+    background:#fff;color:var(--ink);
+  }
+  .qinput:focus{outline:none;border-color:var(--accent);}
+  textarea.qinput{min-height:56px;resize:vertical;width:100%;}
+  .mini-listen{
+    border:1px solid var(--accent);background:var(--accent-soft);color:var(--accent-dark);
+    border-radius:6px;padding:7px 9px;cursor:pointer;font-size:13px;flex:none;
+  }
+  .mini-listen:hover{background:var(--accent);color:#fff;}
+  .status-icon{font-size:16px;width:20px;text-align:center;flex:none;}
+  .reveal{
+    font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--incorrect);
+    display:none;margin-top:7px;padding-top:7px;border-top:1px dashed var(--paper-line);
+  }
+  .reveal.show{display:block;}
+  .reveal b{color:var(--correct);}
+  .choices{display:flex;flex-direction:column;gap:7px;margin-top:2px;}
+  .choice-opt{
+    display:flex;gap:8px;align-items:flex-start;font-size:14.5px;
+    background:#fff;border:1.5px solid var(--paper-line);border-radius:7px;padding:8px 11px;cursor:pointer;
+  }
+  .choice-opt:hover{border-color:var(--accent);}
+  .choice-opt input{margin-top:3px;}
+
+  .ex-controls{display:flex;gap:10px;flex-wrap:wrap;margin:20px 0 44px;}
+  .btn{
+    font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;
+    padding:10px 18px;border-radius:8px;cursor:pointer;border:1.5px solid var(--ink);
+    background:var(--ink);color:#fff;transition:opacity .12s ease;
+  }
+  .btn:hover{opacity:.85;}
+  .btn.secondary{background:#fff;color:var(--ink);}
+  .btn.ghost{background:transparent;color:var(--ink-soft);border-color:var(--paper-line);}
+
+  footer{text-align:center;color:var(--ink-soft);font-size:12.5px;padding:20px;font-family:'IBM Plex Mono',monospace;}
+
+  @media (max-width:640px){
+    .hero{padding-left:52px;}
+    .spiral{left:8px;width:18px;}
+    section{padding:28px 16px;}
+    .tabs-wrap{padding:12px 16px 0;}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="spiral">
+    <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+  </div>
+  <div class="hero-inner">
+    <span class="eyebrow">Тетрадь слов · 8 упражнений · 80 пунктов</span>
+    <h1 class="title">Vocabulary Drill</h1>
+    <p class="subtitle">Сначала повтори слова в карточках ниже — <b>нажми на 🔊</b>, чтобы услышать произношение. Затем пройди упражнения по вкладкам: перевод, диктант на слух, дефиниции, сочетаемость, перефраз, выбор естественной фразы, антонимы и синонимы. Все ошибки автоматически попадают в таблицу «Проблемные слова».</p>
+  </div>
+</header>
+
+<section id="reminder-section">
+  <h2 class="section-title">📖 Повторение</h2>
+  <p class="section-desc">24 ключевые единицы с транскрипцией и переводом. Нажми на кружок, чтобы прослушать.</p>
+  <div class="reminder-wrap">
+    <div class="cards-grid" id="cardsGrid"></div>
+  </div>
+</section>
+
+<section id="problem-section">
+  <h2 class="section-title">🚩 Проблемные слова</h2>
+  <p class="section-desc">Здесь копятся слова, в которых были допущены ошибки — во всех упражнениях.</p>
+  <div class="problem-card">
+    <div id="problemTableWrap"><div class="empty-state">Пока нет ошибок — так держать! Начни упражнения ниже.</div></div>
+    <button class="clear-btn" id="clearProblems">очистить список</button>
+  </div>
+</section>
+
+<div class="tabs-wrap">
+  <div class="tabs" id="tabsBar"></div>
+</div>
+
+<main>
+  <section id="exercise-container" style="padding-top:28px;"></section>
+</main>
+
+<footer>сделано для практики словаря · прогресс не сохраняется после перезагрузки страницы</footer>
+
+<script>
+/* ===================== DATA ===================== */
+
+const reminder = [
+  {en:"be tied up", ipa:"biː taɪd ʌp", ru:"быть очень занятым, загруженным"},
+  {en:"be swamped with work", ipa:"biː swɒmpt wɪð wɜːk", ru:"быть загруженным работой"},
+  {en:"have my hands full", ipa:"hæv maɪ hændz fʊl", ru:"быть очень занятым чем-то"},
+  {en:"be on the fence", ipa:"biː ɒn ðə fens", ru:"быть в нерешительности, сомневаться"},
+  {en:"let her hair down", ipa:"let hɜː heə daʊn", ru:"расслабиться"},
+  {en:"let the cat out of the bag", ipa:"let ðə kæt aʊt əv ðə bæg", ru:"выдать секрет, проболтаться"},
+  {en:"stand firmly on your feet", ipa:"stænd ˈfɜːmli ɒn jɔː fiːt", ru:"твёрдо стоять на ногах"},
+  {en:"coruscate", ipa:"ˈkɒrəskeɪt", ru:"сверкать, блистать (знаниями)"},
+  {en:"out of touch with reality", ipa:"aʊt əv tʌtʃ wɪð riˈæləti", ru:"оторванный от реальности"},
+  {en:"of my own accord", ipa:"əv maɪ əʊn əˈkɔːd", ru:"по собственному желанию"},
+  {en:"etched in mind", ipa:"etʃt ɪn maɪnd", ru:"врезалось в память"},
+  {en:"sneak out", ipa:"sniːk aʊt", ru:"улизнуть, сбежать"},
+  {en:"take root", ipa:"teɪk ruːt", ru:"укореняться, пускать корни"},
+  {en:"since the dawn of time", ipa:"sɪns ðə dɔːn əv taɪm", ru:"испокон веков"},
+  {en:"clear the air", ipa:"klɪər ði eə", ru:"прояснить ситуацию"},
+  {en:"at my wits' end", ipa:"æt maɪ wɪts end", ru:"на грани, ум за разум заходит"},
+  {en:"a mile a minute", ipa:"ə maɪl ə ˈmɪnɪt", ru:"очень быстро"},
+  {en:"any port in a storm", ipa:"ˈeni pɔːt ɪn ə stɔːm", ru:"в бурю любая гавань хороша"},
+  {en:"drunk as a lord", ipa:"drʌŋk əz ə lɔːd", ru:"пьяный в стельку"},
+  {en:"pull sb's leg", ipa:"pʊl ə leg", ru:"морочить голову, подшучивать"},
+  {en:"cut corners", ipa:"kʌt ˈkɔːnəz", ru:"халтурить"},
+  {en:"get cold feet", ipa:"get kəʊld fiːt", ru:"струсить, занервничать"},
+  {en:"head over heels in love", ipa:"hed ˈəʊvə hiːlz ɪn lʌv", ru:"по уши влюблённый"},
+  {en:"pass the buck", ipa:"pɑːs ðə bʌk", ru:"сваливать ответственность"}
+];
+
+// EX 1 — перевод с русского на английский
+const ex1 = [
+  {ru:"выдать секрет, проболтаться", answers:["let the cat out of the bag"]},
+  {ru:"быть в нерешительности, сомневаться", answers:["be on the fence"]},
+  {ru:"быть оторванным от реальности", answers:["be out of touch with reality","out of touch with reality"]},
+  {ru:"врезалось в память", answers:["etched in mind","etched in my mind"]},
+  {ru:"твёрдо стоять на ногах", answers:["stand firmly on your feet","be steady on your feet","stand firmly on my feet"]},
+  {ru:"на грани, ум за разум заходит", answers:["at my wits' end","at wits end","at my wits end"]},
+  {ru:"пьяный в стельку", answers:["drunk as a lord","drunk as a skunk"]},
+  {ru:"морочить голову, подшучивать, дурачить", answers:["pull a leg","pull someone's leg","pull sb's leg","pull his leg","pull her leg"]},
+  {ru:"халтурить", answers:["cut corners"]},
+  {ru:"сваливать ответственность", answers:["pass the buck"]}
+];
+
+// EX 2 — диктант: прописать слово по звуку
+const ex2 = [
+  {say:"viburnum", answers:["viburnum"]},
+  {say:"champignon", answers:["champignon"]},
+  {say:"banister", answers:["banister"]},
+  {say:"sconce", answers:["sconce"]},
+  {say:"porcini", answers:["porcini"]},
+  {say:"interrogate", answers:["interrogate"]},
+  {say:"harmless", answers:["harmless"]},
+  {say:"filling", answers:["filling"]},
+  {say:"invalidate", answers:["invalidate"]},
+  {say:"ruminate", answers:["ruminate"]}
+];
+
+// EX 3 — дефиниция -> слово
+const ex3 = [
+  {def:"A feeling of great mental or emotional pain and suffering.", answers:["mental anguish","anguish"]},
+  {def:"A small handrail running along the side of a staircase.", answers:["banister"]},
+  {def:"A decorative wall-mounted light fixture, often shaped for candles.", answers:["sconce"]},
+  {def:"To question someone closely and often aggressively to get information.", answers:["interrogate"]},
+  {def:"Not able to cause any harm or damage.", answers:["harmless"]},
+  {def:"A natural talent or ability to learn a particular skill.", answers:["aptitude","have an aptitude for"]},
+  {def:"To think deeply about something for a long period of time.", answers:["ruminate","ruminate on"]},
+  {def:"To make something legally or officially worthless.", answers:["invalidate"]},
+  {def:"A woman with magical powers who charms or bewitches people.", answers:["enchantress"]},
+  {def:"A tenant who rents a room in someone else's house.", answers:["roomer","lodger"]}
+];
+
+// EX 4 — сочетаемость фраз (collocations)
+const ex4 = [
+  {sentence:"I'm really ___ up at work this week — no free time at all.", answers:["tied"]},
+  {sentence:"Don't worry, it's just a scratch — completely ___.", answers:["harmless"]},
+  {sentence:"She showed real ___ for languages from a young age.", answers:["aptitude"]},
+  {sentence:"He was drunk as a ___ after the party.", answers:["lord","skunk"]},
+  {sentence:"They finally decided to ___ the air after their argument.", answers:["clear"]},
+  {sentence:"The company invested in the project to the ___ of $2 million.", answers:["tune"]},
+  {sentence:"He's been dragging his ___ about signing the contract.", answers:["feet"]},
+  {sentence:"She fell head over ___ in love with him.", answers:["heels"]},
+  {sentence:"It's such a ___ movie — really hard to watch.", answers:["disturbing","gut-wrenching"]},
+  {sentence:"Rent is $900 a month, ___ utilities.", answers:["including"]}
+];
+
+// EX 5 — Rephrase (перефразируй, используя нужную идиому)
+const ex5 = [
+  {sentence:"I have too much work and no free time.", use:"be swamped with work", required:["swamped with work"]},
+  {sentence:"He revealed the secret by accident.", use:"let the cat out of the bag", required:["cat out of the bag"]},
+  {sentence:"She relaxed completely after the exams.", use:"let her hair down", required:["hair down"]},
+  {sentence:"He is extremely busy right now.", use:"have my hands full", required:["hands full"]},
+  {sentence:"We need to clarify things after the misunderstanding.", use:"clear the air", required:["clear the air"]},
+  {sentence:"He got scared and backed out of the wedding.", use:"get cold feet", required:["cold feet"]},
+  {sentence:"She is completely in love with him.", use:"head over heels", required:["head over heels"]},
+  {sentence:"He always blames someone else for his mistakes.", use:"pass the buck", required:["pass the buck"]},
+  {sentence:"The company is getting worse and worse.", use:"go downhill", required:["downhill"]},
+  {sentence:"He stopped talking to his family entirely.", use:"go no contact", required:["no contact"]}
+];
+
+// EX 6 — Which sentence sounds natural?
+const ex6 = [
+  {a:"I am tied up with work today.", b:"I am tied with work today.", correct:"a"},
+  {a:"She let down her hair to relax.", b:"She let her hair down to relax.", correct:"b"},
+  {a:"He stood firmly on his feet after the accident.", b:"He stood firm on his foots after the accident.", correct:"a"},
+  {a:"It's etched in my mind forever.", b:"It's etched into my head forever.", correct:"a"},
+  {a:"They took a root in the new city.", b:"They took root in the new city.", correct:"b"},
+  {a:"Since the dawn of the time, humans have told stories.", b:"Since the dawn of time, humans have told stories.", correct:"b"},
+  {a:"He is at his wit end.", b:"He is at his wits' end.", correct:"b"},
+  {a:"She has an aptitude to languages.", b:"She has an aptitude for languages.", correct:"b"},
+  {a:"He always cuts the corners at work.", b:"He always cuts corners at work.", correct:"b"},
+  {a:"The rent is $900 including the utilities.", b:"The rent is $900 including utilities.", correct:"b"}
+];
+
+// EX 7 — Antonym hunt
+const ex7 = [
+  {word:"harmless", answers:["harmful","dangerous"]},
+  {word:"lofty (ideal)", answers:["modest","humble","low"]},
+  {word:"ostentatious", answers:["modest","understated","plain"]},
+  {word:"furnished", answers:["unfurnished"]},
+  {word:"invalidate", answers:["validate","confirm"]},
+  {word:"wasted (drunk)", answers:["sober"]},
+  {word:"disturbing", answers:["calming","soothing","comforting"]},
+  {word:"cut corners", answers:["do it properly","do it thoroughly","do a thorough job"]},
+  {word:"clear (nail polish)", answers:["opaque"]},
+  {word:"go downhill", answers:["improve","get better","go uphill"]}
+];
+
+// EX 8 — Synonym hunt
+const ex8 = [
+  {word:"harmless", answers:["safe","innocuous"]},
+  {word:"pastime", answers:["hobby"]},
+  {word:"enchantress", answers:["sorceress","witch"]},
+  {word:"interrogate", answers:["question","grill"]},
+  {word:"ruminate", answers:["ponder","reflect","think over"]},
+  {word:"sneak out", answers:["slip away","slip out"]},
+  {word:"an awful lot of", answers:["a huge amount of","loads of","tons of"]},
+  {word:"ostentatious", answers:["showy","flashy"]},
+  {word:"gut-wrenching", answers:["heartbreaking","devastating"]},
+  {word:"lend a hand", answers:["help out","assist"]}
+];
+
+const exercises = [
+  {id:"ex1", label:"Перевод RU → EN", icon:"1", type:"text", items:ex1,
+   desc:"Переведи русское слово/фразу на английский.",
+   promptFn:i=>`Переведи: <span class="ru">«${i.ru}»</span>`},
+  {id:"ex2", label:"Диктант на слух", icon:"2", type:"dictation", items:ex2,
+   desc:"Нажми 🔊, прослушай слово и пропиши его по звуку.",
+   promptFn:i=>`Прослушай и запиши слово:`},
+  {id:"ex3", label:"Дефиниция", icon:"3", type:"text", items:ex3,
+   desc:"По определению угадай и напиши нужное слово/фразу.",
+   promptFn:i=>`<span class="en-quote">«${i.def}»</span>`},
+  {id:"ex4", label:"Сочетаемость", icon:"4", type:"text", items:ex4,
+   desc:"Заполни пропуск словом, которое образует естественное сочетание.",
+   promptFn:i=>i.sentence.replace("___","<b>___</b>")},
+  {id:"ex5", label:"Rephrase", icon:"5", type:"textarea", items:ex5,
+   desc:"Перефразируй предложение, используя указанную идиому.",
+   promptFn:i=>`«${i.sentence}» — используй: <span class="ru">${i.use}</span>`},
+  {id:"ex6", label:"Natural sentence", icon:"6", type:"choice", items:ex6,
+   desc:"Which sentence sounds natural? Выбери вариант A или B."},
+  {id:"ex7", label:"Antonym hunt", icon:"7", type:"text", items:ex7,
+   desc:"Подбери антоним к слову.",
+   promptFn:i=>`Antonym for: <span class="ru">${i.word}</span>`},
+  {id:"ex8", label:"Synonym hunt", icon:"8", type:"text", items:ex8,
+   desc:"Подбери синоним к слову.",
+   promptFn:i=>`Synonym for: <span class="ru">${i.word}</span>`}
+];
+
+/* Lookup for RU translations, used when logging problem words that
+   don't already carry a ru field (ex2, ex3, ex7, ex8 use EN prompts). */
+const ruLookup = {};
+reminder.forEach(r=>ruLookup[r.en.toLowerCase()]=r.ru);
+[
+  ["viburnum","калина"],["champignon","шампиньоны"],["banister","перила (лестницы)"],
+  ["sconce","бра, подсвечник"],["porcini","белый гриб (боровик)"],["interrogate","допрашивать"],
+  ["harmless","безвредный, безобидный"],["filling","пломба"],["invalidate","аннулировать; обесценивать"],
+  ["ruminate","раздумывать, размышлять"],["mental anguish","душевные муки, страдания"],
+  ["aptitude","иметь склонность к чему-то"],["enchantress","волшебница, чародейка"],
+  ["roomer","квартирант"],["lofty (ideal)","высокий идеал"],["ostentatious","показной, хвастливый"],
+  ["furnished","с мебелью"],["wasted (drunk)","мертвецки пьяный"],["disturbing","тревожный"],
+  ["cut corners","халтурить"],["clear (nail polish)","прозрачный лак для ногтей"],
+  ["go downhill","ухудшаться, идти под откос"],["pastime","времяпрепровождение"],
+  ["sneak out","улизнуть, сбежать"],["an awful lot of","ужасно много"],["gut-wrenching","мучительный, душераздирающий"],
+  ["lend a hand","протянуть руку помощи"]
+].forEach(([en,ru])=>ruLookup[en.toLowerCase()]=ru);
+
+/* ===================== RENDER: REMINDER CARDS ===================== */
+const cardsGrid = document.getElementById('cardsGrid');
+reminder.forEach(item=>{
+  const card = document.createElement('div');
+  card.className = 'flash';
+  card.innerHTML = `
+    <div class="flash-top">
+      <div>
+        <div class="flash-en">${item.en}</div>
+        <div class="flash-ipa">/${item.ipa}/</div>
+      </div>
+      <button class="listen-btn" aria-label="Прослушать" title="Прослушать">🔊</button>
+    </div>
+    <div class="flash-ru">${item.ru}</div>`;
+  card.querySelector('.listen-btn').addEventListener('click',()=>speak(item.en));
+  cardsGrid.appendChild(card);
+});
+
+/* ===================== SPEECH ===================== */
+function speak(text){
+  if(!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-US';
+  u.rate = 0.85;
+  window.speechSynthesis.speak(u);
+}
+
+/* ===================== PROBLEM WORDS ===================== */
+let problemWords = {}; // key: en text -> {en, ru, count}
+
+function logMistake(enKey, ruText){
+  const key = enKey.trim();
+  const lower = key.toLowerCase();
+  const ru = ruText || ruLookup[lower] || '—';
+  if(!problemWords[lower]) problemWords[lower] = {en:key, ru, count:0};
+  problemWords[lower].count++;
+  renderProblemWords();
+}
+
+function renderProblemWords(){
+  const wrap = document.getElementById('problemTableWrap');
+  const list = Object.values(problemWords).sort((a,b)=>b.count-a.count);
+  if(list.length===0){
+    wrap.innerHTML = `<div class="empty-state">Пока нет ошибок — так держать! Начни упражнения ниже.</div>`;
+    return;
+  }
+  let rows = list.map(r=>`<tr><td><b>${r.en}</b></td><td>${r.ru}</td><td>${r.count}</td></tr>`).join('');
+  wrap.innerHTML = `<table class="problem-table">
+    <thead><tr><th>Слово / фраза</th><th>Перевод</th><th>Ошибок</th></tr></thead>
+    <tbody>${rows}</tbody></table>`;
+}
+document.getElementById('clearProblems').addEventListener('click',()=>{
+  problemWords = {};
+  renderProblemWords();
+});
+
+/* ===================== NORMALIZATION & CHECKING ===================== */
+function normalize(s){
+  return (s||'').toLowerCase().trim()
+    .replace(/[’]/g,"'")
+    .replace(/[^\p{L}\p{N}\s']/gu,'')
+    .replace(/\s+/g,' ');
+}
+function checkExact(answers, val){
+  const norm = normalize(val);
+  if(!norm) return false;
+  return answers.some(a=>normalize(a)===norm);
+}
+function checkContains(required, val){
+  const norm = normalize(val);
+  if(!norm) return false;
+  return required.every(r=>norm.includes(normalize(r)));
+}
+
+/* ===================== TABS ===================== */
+const tabsBar = document.getElementById('tabsBar');
+const container = document.getElementById('exercise-container');
+
+exercises.forEach((ex,idx)=>{
+  const btn = document.createElement('button');
+  btn.className = 'tab-btn' + (idx===0?' active':'');
+  btn.innerHTML = `<span class="tnum">${ex.icon}</span>${ex.label}`;
+  btn.addEventListener('click',()=>activateTab(idx));
+  btn.dataset.idx = idx;
+  tabsBar.appendChild(btn);
+});
+
+function activateTab(idx){
+  [...tabsBar.children].forEach((b,i)=>b.classList.toggle('active', i===idx));
+  [...container.children].forEach((p,i)=>p.classList.toggle('active', i===idx));
+  window.scrollTo({top: document.getElementById('problem-section').offsetTop, behavior:'smooth'});
+}
+
+/* ===================== BUILD PANELS ===================== */
+exercises.forEach((ex,exIdx)=>{
+  const panel = document.createElement('div');
+  panel.className = 'panel' + (exIdx===0?' active':'');
+  panel.id = 'panel-'+ex.id;
+
+  panel.innerHTML = `
+    <div class="ex-head">
+      <div>
+        <h2 class="section-title"><span class="tnum" style="color:var(--accent);font-family:'IBM Plex Mono',monospace;">${ex.icon}</span> ${ex.label}</h2>
+        <p class="section-desc" style="margin-bottom:0;">${ex.desc}</p>
+      </div>
+      <div class="ex-score" id="score-${ex.id}">Результат: <b>—</b> / 10</div>
+    </div>
+    <ul class="qlist" id="qlist-${ex.id}"></ul>
+    <div class="ex-controls">
+      <button class="btn" data-action="check" data-ex="${ex.id}">✓ Проверить упражнение</button>
+      <button class="btn secondary" data-action="reveal" data-ex="${ex.id}">👁 Показать ответы</button>
+      <button class="btn ghost" data-action="reset" data-ex="${ex.id}">↺ Сбросить</button>
+    </div>
+  `;
+  container.appendChild(panel);
+
+  const qlist = panel.querySelector(`#qlist-${ex.id}`);
+  ex.items.forEach((item,i)=>{
+    const li = document.createElement('li');
+    li.className = 'qrow';
+    li.dataset.i = i;
+
+    let bodyHtml = '';
+    if(ex.type==='choice'){
+      bodyHtml = `
+        <div class="choices">
+          <label class="choice-opt"><input type="radio" name="${ex.id}-${i}" value="a"> A) ${item.a}</label>
+          <label class="choice-opt"><input type="radio" name="${ex.id}-${i}" value="b"> B) ${item.b}</label>
+        </div>`;
+    } else if(ex.type==='dictation'){
+      bodyHtml = `
+        <button class="mini-listen" data-say="${item.say}">🔊 Слушать</button>
+        <input class="qinput" type="text" placeholder="напиши слово…" autocomplete="off" spellcheck="false">
+        <span class="status-icon"></span>`;
+    } else if(ex.type==='textarea'){
+      bodyHtml = `<textarea class="qinput" placeholder="напиши предложение…"></textarea><span class="status-icon"></span>`;
+    } else {
+      bodyHtml = `<input class="qinput" type="text" placeholder="ответ…" autocomplete="off" spellcheck="false"><span class="status-icon"></span>`;
+    }
+
+    const promptText = ex.type==='choice' ? 'Which sentence sounds natural?' : (ex.promptFn ? ex.promptFn(item) : '');
+
+    li.innerHTML = `
+      <div class="qprompt"><span class="qnum">${i+1}</span>${promptText}</div>
+      <div class="qbody">${bodyHtml}</div>
+      <div class="reveal"></div>
+    `;
+
+    if(ex.type==='dictation'){
+      li.querySelector('.mini-listen').addEventListener('click',(e)=>speak(e.target.dataset.say));
+    }
+
+    qlist.appendChild(li);
+  });
+});
+
+/* ===================== CHECK / REVEAL / RESET ===================== */
+document.addEventListener('click',(e)=>{
+  const btn = e.target.closest('button[data-action]');
+  if(!btn) return;
+  const exId = btn.dataset.ex;
+  const ex = exercises.find(x=>x.id===exId);
+  const action = btn.dataset.action;
+  if(action==='check') checkExercise(ex);
+  if(action==='reveal') revealExercise(ex);
+  if(action==='reset') resetExercise(ex);
+});
+
+function getMistakeKey(ex, item){
+  if(ex.type==='text' || ex.type==='dictation' || ex.type==='textarea'){
+    if(item.answers) return {en:item.answers[0], ru:item.ru};
+    if(item.required) return {en:item.use, ru: ruLookup[item.use.toLowerCase()] };
+    if(item.word) return {en:item.word.replace(/\s*\(.*?\)\s*/,''), ru:null};
+    if(item.say) return {en:item.say, ru:null};
+    if(item.def) return {en:item.answers[0], ru:null};
+  }
+  if(ex.type==='choice'){
+    const correctText = item.correct==='a'?item.a:item.b;
+    return {en: correctText, ru:null};
+  }
+  return {en:'?', ru:null};
+}
+
+function checkExercise(ex){
+  const qlist = document.getElementById(`qlist-${ex.id}`);
+  let correctCount = 0;
+
+  ex.items.forEach((item,i)=>{
+    const row = qlist.children[i];
+    row.classList.remove('correct','incorrect');
+    let isCorrect = false;
+
+    if(ex.type==='choice'){
+      const checked = row.querySelector('input[type=radio]:checked');
+      if(checked){
+        isCorrect = checked.value === item.correct;
+      }
+    } else if(ex.type==='textarea'){
+      const val = row.querySelector('textarea').value;
+      isCorrect = checkContains(item.required, val);
+    } else {
+      const val = row.querySelector('input').value;
+      isCorrect = checkExact(item.answers, val);
+    }
+
+    row.classList.add(isCorrect?'correct':'incorrect');
+    const icon = row.querySelector('.status-icon');
+    if(icon) icon.textContent = isCorrect ? '✓' : '✕';
+
+    if(isCorrect) correctCount++;
+    else {
+      const mk = getMistakeKey(ex,item);
+      logMistake(mk.en, mk.ru);
+    }
+  });
+
+  document.getElementById(`score-${ex.id}`).innerHTML = `Результат: <b>${correctCount}</b> / 10`;
+}
+
+function revealExercise(ex){
+  const qlist = document.getElementById(`qlist-${ex.id}`);
+  ex.items.forEach((item,i)=>{
+    const row = qlist.children[i];
+    const rev = row.querySelector('.reveal');
+    let text = '';
+    if(ex.type==='choice'){
+      const correctText = item.correct==='a'?`A) ${item.a}`:`B) ${item.b}`;
+      text = `Правильный вариант: <b>${correctText}</b>`;
+    } else if(ex.type==='textarea'){
+      text = `Пример: <b>используй фразу «${item.use}»</b> в своём предложении (например: "${item.sentence.replace(/\.$/,'')} — I ${item.use}.")`;
+    } else {
+      text = `Ответ: <b>${item.answers.join(' / ')}</b>`;
+    }
+    rev.innerHTML = text;
+    rev.classList.add('show');
+  });
+}
+
+function resetExercise(ex){
+  const qlist = document.getElementById(`qlist-${ex.id}`);
+  ex.items.forEach((item,i)=>{
+    const row = qlist.children[i];
+    row.classList.remove('correct','incorrect');
+    const rev = row.querySelector('.reveal');
+    rev.classList.remove('show');
+    rev.innerHTML='';
+    const icon = row.querySelector('.status-icon');
+    if(icon) icon.textContent='';
+    if(ex.type==='choice'){
+      row.querySelectorAll('input[type=radio]').forEach(r=>r.checked=false);
+    } else {
+      const inp = row.querySelector('input, textarea');
+      if(inp) inp.value='';
+    }
+  });
+  document.getElementById(`score-${ex.id}`).innerHTML = `Результат: <b>—</b> / 10`;
+}
+</script>
+</body>
+</html>
