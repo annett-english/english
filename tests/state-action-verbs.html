@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>State vs Action Verbs — тренажёр</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#EEF1F4;
+  --panel:#FFFFFF;
+  --ink:#20242B;
+  --ink-soft:#565D68;
+  --line:#D8DEE4;
+  --state:#5C4B8A;     /* plum — STATE */
+  --state-bg:#EFEAF7;
+  --action:#C2703A;    /* amber/rust — ACTION */
+  --action-bg:#FBEADE;
+  --sight:#3E6B8A;
+  --taste:#B8863C;
+  --smell:#4F8A6B;
+  --think:#6C4F77;
+  --have:#A85C6B;
+  --weigh:#4A6572;
+  --correct:#3F8F5F;
+  --wrong:#C74B4B;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:'Inter',sans-serif;
+  line-height:1.55;
+  padding-bottom:80px;
+}
+.wrap{max-width:920px;margin:0 auto;padding:0 24px;}
+
+/* HERO */
+.hero{
+  background:linear-gradient(180deg,#20242B 0%, #2B3040 100%);
+  color:#F3F1EA;
+  padding:64px 24px 56px;
+  position:relative;
+  overflow:hidden;
+}
+.hero .wrap{position:relative;z-index:2;}
+.eyebrow{
+  font-family:'JetBrains Mono',monospace;
+  font-size:12.5px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:#B9BFD1;
+  margin-bottom:14px;
+}
+h1{
+  font-family:'Fraunces',serif;
+  font-weight:700;
+  font-size:44px;
+  line-height:1.08;
+  margin:0 0 18px;
+  letter-spacing:-.01em;
+}
+h1 em{font-style:italic;font-weight:500;color:#E3A876;}
+.hero p{
+  max-width:600px;
+  color:#C7CBD6;
+  font-size:16.5px;
+  margin:0;
+}
+.badge-row{display:flex;gap:10px;margin-top:28px;flex-wrap:wrap;}
+.pill{
+  font-family:'JetBrains Mono',monospace;
+  font-size:12px;
+  font-weight:600;
+  letter-spacing:.04em;
+  padding:6px 14px;
+  border-radius:100px;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+}
+.pill.state{background:var(--state);color:#fff;}
+.pill.action{background:transparent;color:#E3A876;border:1.5px solid #E3A876;}
+
+/* RULE BOX */
+section{padding:56px 0;border-top:1px solid var(--line);}
+section:first-of-type{border-top:none;}
+.kicker{
+  font-family:'JetBrains Mono',monospace;
+  font-size:12px;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--ink-soft);
+  margin-bottom:8px;
+}
+h2{
+  font-family:'Fraunces',serif;
+  font-size:29px;
+  font-weight:600;
+  margin:0 0 20px;
+  letter-spacing:-.005em;
+}
+.rule-card{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:28px 30px;
+  margin-bottom:22px;
+}
+.rule-card p{margin:0 0 12px;font-size:15.5px;}
+.rule-card p:last-child{margin-bottom:0;}
+.rule-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px;}
+@media(max-width:640px){.rule-grid{grid-template-columns:1fr;}}
+.rule-tile{
+  border-radius:10px;
+  padding:16px 18px;
+}
+.rule-tile.state{background:var(--state-bg);border:1px solid #DCD2EE;}
+.rule-tile.action{background:var(--action-bg);border:1px solid #F0D6BC;}
+.rule-tile .tag{
+  font-family:'JetBrains Mono',monospace;
+  font-size:11.5px;
+  font-weight:700;
+  letter-spacing:.08em;
+  margin-bottom:6px;
+}
+.rule-tile.state .tag{color:var(--state);}
+.rule-tile.action .tag{color:var(--action);}
+.rule-tile ul{margin:6px 0 0;padding-left:18px;font-size:14.5px;}
+
+/* EXAMPLE TABLE (given example, solved) */
+.example-table{width:100%;border-collapse:collapse;margin-top:8px;font-size:14.5px;}
+.example-table th{
+  text-align:left;font-family:'JetBrains Mono',monospace;font-size:11px;
+  letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);
+  padding:8px 10px;border-bottom:2px solid var(--line);
+}
+.example-table td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top;}
+.example-table tr:last-child td{border-bottom:none;}
+.letter-badge{
+  display:inline-block;min-width:24px;text-align:center;
+  font-family:'JetBrains Mono',monospace;font-weight:700;font-size:12px;
+  background:var(--ink);color:#fff;border-radius:6px;padding:2px 7px;margin-right:8px;
+}
+
+/* EXERCISE BLOCKS */
+.ex-header{
+  display:flex;justify-content:space-between;align-items:flex-end;gap:16px;
+  margin-bottom:22px;flex-wrap:wrap;
+}
+.ex-desc{color:var(--ink-soft);font-size:14.5px;max-width:560px;margin-top:6px;}
+.btn{
+  font-family:'Inter',sans-serif;
+  font-weight:600;
+  font-size:13.5px;
+  padding:10px 18px;
+  border-radius:9px;
+  border:1.5px solid var(--ink);
+  background:var(--ink);
+  color:#fff;
+  cursor:pointer;
+  transition:transform .12s ease, opacity .12s ease;
+}
+.btn:hover{opacity:.88;}
+.btn:active{transform:scale(.97);}
+.btn.ghost{background:transparent;color:var(--ink);}
+.btn.small{padding:7px 13px;font-size:12.5px;border-radius:7px;}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;}
+
+.item{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:20px 22px;
+  margin-bottom:14px;
+}
+.item-num{
+  font-family:'JetBrains Mono',monospace;
+  font-size:12px;color:var(--ink-soft);font-weight:600;margin-bottom:8px;
+}
+.item-sentence{font-size:16px;margin-bottom:14px;}
+.gap-blank{
+  display:inline-block;border-bottom:2px dotted var(--line);
+  min-width:36px;
+}
+select, input[type=text]{
+  font-family:'Inter',sans-serif;
+  font-size:14.5px;
+  padding:9px 12px;
+  border-radius:8px;
+  border:1.5px solid var(--line);
+  background:#FBFCFD;
+  color:var(--ink);
+  width:100%;
+  max-width:460px;
+}
+select:focus, input[type=text]:focus, textarea:focus{
+  outline:none;border-color:var(--ink);
+}
+.feedback{
+  margin-top:12px;padding:12px 14px;border-radius:9px;font-size:14px;
+  display:none;
+}
+.feedback.show{display:block;}
+.feedback.correct{background:#E7F4EC;border:1px solid #BFE4CC;color:#215C38;}
+.feedback.wrong{background:#FBEAEA;border:1px solid #F0C6C6;color:#8C2E2E;}
+.feedback .verdict{font-weight:700;margin-bottom:4px;}
+.feedback .expl{color:inherit;opacity:.92;}
+.state-tag, .action-tag{
+  font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;
+  letter-spacing:.04em;padding:2px 8px;border-radius:100px;margin-right:6px;
+}
+.state-tag{background:var(--state);color:#fff;}
+.action-tag{background:var(--action);color:#fff;}
+
+.answer-reveal{
+  margin-top:10px;font-size:13.5px;color:var(--ink-soft);
+  display:none;padding-top:10px;border-top:1px dashed var(--line);
+}
+.answer-reveal.show{display:block;}
+.answer-reveal b{color:var(--ink);}
+
+.score-strip{
+  display:flex;align-items:center;gap:10px;margin-top:18px;
+  font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--ink-soft);
+}
+.score-strip b{color:var(--ink);}
+
+/* DRILL SECTION */
+.drill-example{
+  background:var(--ink);color:#F3F1EA;border-radius:12px;padding:20px 22px;margin-bottom:22px;
+}
+.drill-example .kicker{color:#B9BFD1;}
+.drill-example .pair{display:flex;gap:10px;margin-top:6px;font-size:14.5px;flex-wrap:wrap;}
+.drill-row{
+  background:var(--panel);border:1px solid var(--line);border-radius:12px;
+  padding:16px 20px;margin-bottom:12px;display:flex;gap:14px;align-items:center;flex-wrap:wrap;
+}
+.drill-row .num{font-family:'JetBrains Mono',monospace;color:var(--ink-soft);font-size:13px;min-width:22px;}
+.drill-row input{flex:1;min-width:220px;}
+.drill-row .arrow{color:var(--ink-soft);font-size:15px;}
+.copy-box{
+  margin-top:18px;background:#FBFCFD;border:1.5px dashed var(--line);border-radius:10px;padding:16px 18px;
+}
+.copy-box textarea{
+  width:100%;min-height:160px;border:none;background:transparent;
+  font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--ink-soft);resize:vertical;
+}
+.copy-box textarea:focus{outline:none;}
+.toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:var(--ink);color:#fff;padding:11px 20px;border-radius:100px;font-size:13.5px;
+  font-family:'Inter',sans-serif;font-weight:600;opacity:0;pointer-events:none;
+  transition:all .25s ease;z-index:50;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+footer{padding:40px 24px;text-align:center;color:var(--ink-soft);font-size:13px;font-family:'JetBrains Mono',monospace;}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="wrap">
+    <div class="eyebrow">Grammar lab · Verb 01</div>
+    <h1>State verbs <em>vs</em> Action verbs</h1>
+    <p>Одни и те же глаголы (think, taste, see, smell, have, weigh) могут описывать <b>состояние</b> (факт, не требующий усилия) или <b>действие</b> (то, что человек делает сознательно, прямо сейчас). От смысла зависит форма — Simple или Continuous.</p>
+    <div class="badge-row">
+      <span class="pill state">● STATE → Simple</span>
+      <span class="pill action">○ ACTION → Continuous</span>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- RULE -->
+  <section>
+    <div class="kicker">Правило</div>
+    <h2>Один глагол — два смысла</h2>
+    <div class="rule-card">
+      <p>Глаголы восприятия и обладания (think, taste, see, smell, have, weigh, look, feel и др.) обычно не употребляются в Continuous, потому что описывают <b>состояние</b> — факт, не имеющий начала/процесса.</p>
+      <p>Но если тот же глагол называет <b>сознательное действие</b>, которое человек выполняет активно и которое можно «остановить» в любой момент — он ведёт себя как обычный глагол действия и спокойно принимает форму Continuous.</p>
+      <div class="rule-grid">
+        <div class="rule-tile state">
+          <div class="tag">STATE — SIMPLE</div>
+          <ul>
+            <li>мнение, вера — <i>think</i></li>
+            <li>вкус/запах предмета — <i>taste, smell</i></li>
+            <li>способность видеть — <i>see</i></li>
+            <li>обладание — <i>have</i></li>
+            <li>вес предмета — <i>weigh</i></li>
+          </ul>
+        </div>
+        <div class="rule-tile action">
+          <div class="tag">ACTION — CONTINUOUS</div>
+          <ul>
+            <li>обдумывать — <i>think</i></li>
+            <li>пробовать на вкус / нюхать — <i>taste, smell</i></li>
+            <li>встречаться с кем-то — <i>see</i></li>
+            <li>проводить время / принимать (душ, еду) — <i>have</i></li>
+            <li>взвешивать — <i>weigh</i></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="kicker" style="margin-top:26px;">Пример (уже решённый)</div>
+    <div class="rule-card">
+      <table class="example-table">
+        <tr><th>Предложение</th><th>Значение</th></tr>
+        <tr><td><span class="letter-badge">A1</span>I think he's lying.</td><td><span class="state-tag">state</span> a) believe</td></tr>
+        <tr><td><span class="letter-badge">A2</span>I'm thinking about the problem.</td><td><span class="action-tag">action</span> b) have an opinion → обдумывать</td></tr>
+        <tr><td><span class="letter-badge">B1</span>This soup tastes delicious.</td><td><span class="state-tag">state</span> c) have the flavour</td></tr>
+        <tr><td><span class="letter-badge">B2</span>The chef is tasting the soup.</td><td><span class="action-tag">action</span> d) test the flavour</td></tr>
+        <tr><td><span class="letter-badge">C1</span>I see what you mean.</td><td><span class="state-tag">state</span> e) understand</td></tr>
+        <tr><td><span class="letter-badge">C2</span>I'm seeing my doctor tomorrow.</td><td><span class="action-tag">action</span> f) meet</td></tr>
+        <tr><td><span class="letter-badge">C3</span>I can see you.</td><td><span class="state-tag">state</span> m) an ability of eyes</td></tr>
+        <tr><td><span class="letter-badge">D1</span>The perfume smells wonderful.</td><td><span class="state-tag">state</span> g) have a smell</td></tr>
+        <tr><td><span class="letter-badge">D2</span>She is smelling the flowers.</td><td><span class="action-tag">action</span> h) sniff / use your nose</td></tr>
+        <tr><td><span class="letter-badge">E1</span>Bob has a Porsche.</td><td><span class="state-tag">state</span> i) possess</td></tr>
+        <tr><td><span class="letter-badge">E2</span>He's having a shower.</td><td><span class="action-tag">action</span> j) take / do an activity</td></tr>
+        <tr><td><span class="letter-badge">F1</span>The chicken weighs two kilos.</td><td><span class="state-tag">state</span> k) have a weight</td></tr>
+        <tr><td><span class="letter-badge">F2</span>The butcher is weighing the chicken.</td><td><span class="action-tag">action</span> l) measure the weight</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- EXERCISE 1 — choose explanation -->
+  <section id="ex1">
+    <div class="ex-header">
+      <div>
+        <div class="kicker">Упражнение 1 · 10 пунктов</div>
+        <h2>Выберите объяснение</h2>
+        <div class="ex-desc">Как в примере выше — выберите, какое значение подходит к глаголу в предложении.</div>
+      </div>
+      <div class="btn-row">
+        <button class="btn" onclick="checkAll('ex1')">Проверить</button>
+        <button class="btn ghost" onclick="showAll('ex1')">Показать ответы</button>
+      </div>
+    </div>
+    <div id="ex1-items"></div>
+    <div class="score-strip" id="ex1-score"></div>
+  </section>
+
+  <!-- EXERCISE 2 — fill in the gaps -->
+  <section id="ex2">
+    <div class="ex-header">
+      <div>
+        <div class="kicker">Упражнение 2 · 10 пунктов</div>
+        <h2>Fill in the gaps</h2>
+        <div class="ex-desc">Впишите глагол в скобках в правильной форме — Simple или Continuous.</div>
+      </div>
+      <div class="btn-row">
+        <button class="btn" onclick="checkAll('ex2')">Проверить</button>
+        <button class="btn ghost" onclick="showAll('ex2')">Показать ответы</button>
+      </div>
+    </div>
+    <div id="ex2-items"></div>
+    <div class="score-strip" id="ex2-score"></div>
+  </section>
+
+  <!-- EXERCISE 3 — translate -->
+  <section id="ex3">
+    <div class="ex-header">
+      <div>
+        <div class="kicker">Упражнение 3 · 10 пунктов</div>
+        <h2>Translate</h2>
+        <div class="ex-desc">Переведите предложение на английский, обращая внимание на state/action.</div>
+      </div>
+      <div class="btn-row">
+        <button class="btn" onclick="checkAll('ex3')">Проверить</button>
+        <button class="btn ghost" onclick="showAll('ex3')">Показать ответы</button>
+      </div>
+    </div>
+    <div id="ex3-items"></div>
+    <div class="score-strip" id="ex3-score"></div>
+  </section>
+
+  <!-- EXERCISE 4 — drilling -->
+  <section id="ex4">
+    <div class="ex-header">
+      <div>
+        <div class="kicker">Упражнение 4 · Drilling</div>
+        <h2>Repeat & Change</h2>
+        <div class="ex-desc">Возьмите глагол и придумайте свою пару предложений: одно — state (Simple), другое — action (Continuous). Пример ниже задаёт образец.</div>
+      </div>
+    </div>
+
+    <div class="drill-example">
+      <div class="kicker">Образец</div>
+      <div class="pair">
+        <span><span class="state-tag">state</span> This soup tastes delicious.</span>
+        <span class="arrow">→</span>
+        <span><span class="action-tag">action</span> The chef is tasting the soup.</span>
+      </div>
+    </div>
+
+    <div id="ex4-items"></div>
+
+    <div class="btn-row" style="margin-top:6px;">
+      <button class="btn" onclick="copyDrill()">Скопировать все ответы</button>
+      <button class="btn ghost" onclick="fillDrillHint()">Подсказка (глаголы)</button>
+    </div>
+    <div class="copy-box">
+      <textarea id="drill-output" placeholder="Здесь появится текст после нажатия «Скопировать все ответы»…" readonly></textarea>
+    </div>
+  </section>
+
+</div>
+
+<div class="toast" id="toast">Скопировано в буфер обмена</div>
+
+<footer>state / action verbs · grammar lab</footer>
+
+<script>
+/* ---------- DATA ---------- */
+
+// Exercise 1: choose explanation (one-to-one with example bank a-j)
+const ex1data = [
+  {sentence:"I think we should leave now.", tag:"state",
+   options:["believe / have an opinion","think something over (обдумывать)","have a flavour","test the flavour","have a smell","sniff / use your nose","have a weight","measure the weight","possess","do an activity"],
+   correct:0,
+   expl:"«think» = верить, иметь мнение → состояние, поэтому Simple."},
+  {sentence:"She's thinking about changing her job.", tag:"action",
+   options:["believe / have an opinion","think something over (обдумывать)","have a flavour","test the flavour","have a smell","sniff / use your nose","have a weight","measure the weight","possess","do an activity"],
+   correct:1,
+   expl:"«think about» = сознательно обдумывать → процесс, поэтому Continuous."},
+  {sentence:"This cake tastes amazing.", tag:"state",
+   options:["believe / have an opinion","think something over (обдумывать)","have a flavour","test the flavour","have a smell","sniff / use your nose","have a weight","measure the weight","possess","do an activity"],
+   correct:2,
+   expl:"«taste» = обладать вкусом (характеристика предмета) → состояние."},
+  {sentence:"He's tasting the sauce to check the seasoning.", tag:"action",
+   options:["believe / have an opinion","think something over (обдумывать)","have a flavour","test the flavour","have a smell","sniff / use your nose","have a weight","measure the weight","possess","do an activity"],
+   correct:3,
+   expl:"Человек намеренно пробует соус → действие, поэтому Continuous."},
+  {sentence:"The flowers smell wonderful.", tag:"state",
+   options:["believe / have an opinion","think something over (обдумывать)","have a flavour","test the flavour","have a smell","sniff / use your nose","have a weight","measure the weight","possess","do an activity"],
+   correct:4,
+   expl:"«smell» = иметь запах (свойство предмета) → состояние."},
+  {sentence:"She's smelling the milk to see if it's off.", tag:"action",
+   options:["believe / have an opinion","think something over (обдумывать)","have a flavour","test the flavour","have a smell","sniff / use your nose","have a weight","measure the weight","possess","do an activity"],
+   correct:5,
+   expl:"Она намеренно нюхает молоко носом → действие."},
+  {sentence:"The bag weighs five kilos.", tag:"state",
+   options:["believe / have an opinion","think something over (обдумывать)","have a flavour","test the flavour","have a smell","sniff / use your nose","have a weight","measure the weight","possess","do an activity"],
+   correct:6,
+   expl:"«weigh» = иметь вес (факт) → состояние."},
+  {sentence:"The shop assistant is weighing the fruit.", tag:"action",
+   options:["believe / have an opinion","think something over (обдумывать)","have a flavour","test the flavour","have a smell","sniff / use your nose","have a weight","measure the weight","possess","do an activity"],
+   correct:7,
+   expl:"Продавец совершает действие — взвешивает фрукты на весах → Continuous."},
+  {sentence:"Tom has two sisters.", tag:"state",
+   options:["believe / have an opinion","think something over (обдумывать)","have a flavour","test the flavour","have a smell","sniff / use your nose","have a weight","measure the weight","possess","do an activity"],
+   correct:8,
+   expl:"«have» = обладать (родственные связи) → состояние."},
+  {sentence:"We're having lunch at the moment.", tag:"action",
+   options:["believe / have an opinion","think something over (обдумывать)","have a flavour","test the flavour","have a smell","sniff / use your nose","have a weight","measure the weight","possess","do an activity"],
+   correct:9,
+   expl:"«have lunch» = совершать действие (есть) → Continuous."},
+];
+
+// Exercise 2: fill in the gaps
+const ex2data = [
+  {before:"Look! Tom ", verb:"taste", after:" the soup — he wants to check the salt.",
+   answers:["is tasting"], tag:"action",
+   expl:"Том сознательно пробует суп прямо сейчас → действие → Present Continuous."},
+  {before:"This soup ", verb:"taste", after:" too salty for me.",
+   answers:["tastes"], tag:"state",
+   expl:"Описывается вкус самого супа (факт) → состояние → Present Simple."},
+  {before:"I ", verb:"think", after:" you're right about this.",
+   answers:["think"], tag:"state",
+   expl:"Мнение, а не процесс мышления → состояние → Present Simple."},
+  {before:"Please be quiet, I ", verb:"think", after:" about the answer.",
+   answers:["am thinking","'m thinking"], tag:"action",
+   expl:"Сейчас идёт мыслительный процесс → действие → Present Continuous."},
+  {before:"She ", verb:"have", after:" three cats and a dog.",
+   answers:["has"], tag:"state",
+   expl:"Обладание (питомцы) → состояние → Present Simple."},
+  {before:"We ", verb:"have", after:" dinner right now, can I call you back?",
+   answers:["are having"], tag:"action",
+   expl:"Приём пищи в момент речи → действие → Present Continuous."},
+  {before:"He ", verb:"see", after:" his dentist tomorrow at 5pm.",
+   answers:["is seeing"], tag:"action",
+   expl:"«see» = встречаться (запись к врачу) → запланированное действие → Present Continuous."},
+  {before:"I ", verb:"see", after:" a strange light in the sky.",
+   answers:["see","can see"], tag:"state",
+   expl:"Способность видеть глазами → состояние → Present Simple (или can see)."},
+  {before:"This box ", verb:"weigh", after:" ten kilos.",
+   answers:["weighs"], tag:"state",
+   expl:"Вес предмета — факт → состояние → Present Simple."},
+  {before:"The nurse ", verb:"weigh", after:" the baby right now.",
+   answers:["is weighing"], tag:"action",
+   expl:"Медсестра выполняет действие — взвешивает малыша → Present Continuous."},
+];
+
+// Exercise 3: translate
+const ex3data = [
+  {ru:"Мне кажется, ты прав.", answers:["i think you're right","i think you are right"], tag:"state",
+   expl:"«думать/полагать» = мнение → состояние → I think... (Simple)."},
+  {ru:"Я обдумываю это предложение (сейчас).", answers:["i'm thinking about this offer","i am thinking about this offer","i'm thinking this offer over"], tag:"action",
+   expl:"Процесс размышления прямо сейчас → действие → Continuous."},
+  {ru:"Этот суп очень вкусный.", answers:["this soup tastes very delicious","this soup tastes delicious","this soup tastes very good"], tag:"state",
+   expl:"Вкус блюда — характеристика → состояние → Simple."},
+  {ru:"Повар пробует суп.", answers:["the chef is tasting the soup","a chef is tasting the soup"], tag:"action",
+   expl:"Повар сознательно дегустирует → действие → Continuous."},
+  {ru:"Я вижу дом вдалеке.", answers:["i can see a house in the distance","i see a house in the distance"], tag:"state",
+   expl:"Способность видеть → состояние → Simple / can see."},
+  {ru:"Я встречаюсь с врачом завтра.", answers:["i'm seeing a doctor tomorrow","i am seeing a doctor tomorrow","i'm seeing the doctor tomorrow"], tag:"action",
+   expl:"«see» = встреча/приём → запланированное действие → Continuous."},
+  {ru:"Духи прекрасно пахнут.", answers:["the perfume smells wonderful","this perfume smells wonderful"], tag:"state",
+   expl:"Запах предмета — свойство → состояние → Simple."},
+  {ru:"Она нюхает цветы.", answers:["she's smelling the flowers","she is smelling the flowers"], tag:"action",
+   expl:"Она использует нос сознательно → действие → Continuous."},
+  {ru:"У Боба есть Порше.", answers:["bob has a porsche"], tag:"state",
+   expl:"Обладание → состояние → Simple."},
+  {ru:"Он сейчас принимает душ.", answers:["he's having a shower","he is having a shower"], tag:"action",
+   expl:"«have a shower» = совершать действие → Continuous."},
+];
+
+/* ---------- RENDER EX1 ---------- */
+const ex1box = document.getElementById('ex1-items');
+ex1data.forEach((it,i)=>{
+  const div = document.createElement('div');
+  div.className='item';
+  div.innerHTML = `
+    <div class="item-num">1.${i+1}</div>
+    <div class="item-sentence">${it.sentence}</div>
+    <select id="ex1-sel-${i}">
+      <option value="-1">— выберите значение —</option>
+      ${it.options.map((o,j)=>`<option value="${j}">${String.fromCharCode(97+j)}) ${o}</option>`).join('')}
+    </select>
+    <div class="feedback" id="ex1-fb-${i}"></div>
+  `;
+  ex1box.appendChild(div);
+});
+
+/* ---------- RENDER EX2 ---------- */
+const ex2box = document.getElementById('ex2-items');
+ex2data.forEach((it,i)=>{
+  const div = document.createElement('div');
+  div.className='item';
+  div.innerHTML = `
+    <div class="item-num">2.${i+1}</div>
+    <div class="item-sentence">${it.before}<b>(${it.verb})</b> <input type="text" id="ex2-in-${i}" placeholder="ваш ответ" style="max-width:200px;display:inline-block;">${it.after}</div>
+    <div class="feedback" id="ex2-fb-${i}"></div>
+  `;
+  ex2box.appendChild(div);
+});
+
+/* ---------- RENDER EX3 ---------- */
+const ex3box = document.getElementById('ex3-items');
+ex3data.forEach((it,i)=>{
+  const div = document.createElement('div');
+  div.className='item';
+  div.innerHTML = `
+    <div class="item-num">3.${i+1}</div>
+    <div class="item-sentence">${it.ru}</div>
+    <input type="text" id="ex3-in-${i}" placeholder="translate into English">
+    <div class="feedback" id="ex3-fb-${i}"></div>
+  `;
+  ex3box.appendChild(div);
+});
+
+/* ---------- RENDER EX4 (drill) ---------- */
+const drillVerbs = ["think","taste","see","smell","have","weigh","look","feel","measure","sound"];
+const ex4box = document.getElementById('ex4-items');
+drillVerbs.forEach((v,i)=>{
+  const div = document.createElement('div');
+  div.className='drill-row';
+  div.innerHTML = `
+    <div class="num">${i+1}.</div>
+    <span class="state-tag">state</span>
+    <input type="text" id="drill-state-${i}" placeholder="ваше предложение с «${v}» (Simple)">
+    <span class="arrow">→</span>
+    <span class="action-tag">action</span>
+    <input type="text" id="drill-action-${i}" placeholder="ваше предложение с «${v}» (Continuous)">
+  `;
+  ex4box.appendChild(div);
+});
+
+/* ---------- LOGIC ---------- */
+function normalize(s){
+  return s.toLowerCase().trim().replace(/[.!?]+$/,'').replace(/\s+/g,' ').replace(/’/g,"'");
+}
+
+function checkAll(exId){
+  if(exId==='ex1'){
+    let score=0;
+    ex1data.forEach((it,i)=>{
+      const sel = document.getElementById(`ex1-sel-${i}`);
+      const fb = document.getElementById(`ex1-fb-${i}`);
+      const val = parseInt(sel.value);
+      const ok = val===it.correct;
+      if(ok) score++;
+      fb.className = 'feedback show ' + (ok?'correct':'wrong');
+      fb.innerHTML = `<div class="verdict">${ok?'✓ Верно':'✗ Неверно'} — <span class="${it.tag==='state'?'state-tag':'action-tag'}">${it.tag}</span></div><div class="expl">${it.expl}</div>`;
+    });
+    document.getElementById('ex1-score').innerHTML = `Результат: <b>${score} / ${ex1data.length}</b>`;
+  }
+  if(exId==='ex2'){
+    let score=0;
+    ex2data.forEach((it,i)=>{
+      const inp = document.getElementById(`ex2-in-${i}`);
+      const fb = document.getElementById(`ex2-fb-${i}`);
+      const val = normalize(inp.value);
+      const ok = it.answers.some(a=>normalize(a)===val);
+      if(ok) score++;
+      fb.className = 'feedback show ' + (ok?'correct':'wrong');
+      fb.innerHTML = `<div class="verdict">${ok?'✓ Верно':'✗ Неверно'} — <span class="${it.tag==='state'?'state-tag':'action-tag'}">${it.tag}</span> правильный ответ: <b>${it.answers[0]}</b></div><div class="expl">${it.expl}</div>`;
+    });
+    document.getElementById('ex2-score').innerHTML = `Результат: <b>${score} / ${ex2data.length}</b>`;
+  }
+  if(exId==='ex3'){
+    let score=0;
+    ex3data.forEach((it,i)=>{
+      const inp = document.getElementById(`ex3-in-${i}`);
+      const fb = document.getElementById(`ex3-fb-${i}`);
+      const val = normalize(inp.value);
+      const ok = it.answers.some(a=>normalize(a)===val);
+      if(ok) score++;
+      fb.className = 'feedback show ' + (ok?'correct':'wrong');
+      fb.innerHTML = `<div class="verdict">${ok?'✓ Верно':'✗ Неверно / другой вариант'} — <span class="${it.tag==='state'?'state-tag':'action-tag'}">${it.tag}</span></div><div class="expl">Пример ответа: <b>${it.answers[0]}</b>. ${it.expl}</div>`;
+    });
+    document.getElementById('ex3-score').innerHTML = `Результат: <b>${score} / ${ex3data.length}</b> (сверка приблизительная — проверьте смысл вручную, если система не засчитала верный вариант)`;
+  }
+}
+
+function showAll(exId){
+  if(exId==='ex1'){
+    ex1data.forEach((it,i)=>{
+      document.getElementById(`ex1-sel-${i}`).value = it.correct;
+      const fb = document.getElementById(`ex1-fb-${i}`);
+      fb.className='feedback show correct';
+      fb.innerHTML = `<div class="verdict">Ответ: ${String.fromCharCode(97+it.correct)}) ${it.options[it.correct]} — <span class="${it.tag==='state'?'state-tag':'action-tag'}">${it.tag}</span></div><div class="expl">${it.expl}</div>`;
+    });
+  }
+  if(exId==='ex2'){
+    ex2data.forEach((it,i)=>{
+      document.getElementById(`ex2-in-${i}`).value = it.answers[0];
+      const fb = document.getElementById(`ex2-fb-${i}`);
+      fb.className='feedback show correct';
+      fb.innerHTML = `<div class="verdict">Ответ: <b>${it.answers[0]}</b> — <span class="${it.tag==='state'?'state-tag':'action-tag'}">${it.tag}</span></div><div class="expl">${it.expl}</div>`;
+    });
+  }
+  if(exId==='ex3'){
+    ex3data.forEach((it,i)=>{
+      document.getElementById(`ex3-in-${i}`).value = it.answers[0];
+      const fb = document.getElementById(`ex3-fb-${i}`);
+      fb.className='feedback show correct';
+      fb.innerHTML = `<div class="verdict">Ответ: <b>${it.answers[0]}</b> — <span class="${it.tag==='state'?'state-tag':'action-tag'}">${it.tag}</span></div><div class="expl">${it.expl}</div>`;
+    });
+  }
+}
+
+/* ---------- DRILL ---------- */
+function fillDrillHint(){
+  drillVerbs.forEach((v,i)=>{
+    const s = document.getElementById(`drill-state-${i}`);
+    const a = document.getElementById(`drill-action-${i}`);
+    if(!s.value) s.placeholder = `подсказка: используйте «${v}» как состояние (факт)`;
+    if(!a.value) a.placeholder = `подсказка: используйте «${v}» как действие (сейчас/процесс)`;
+  });
+}
+
+function copyDrill(){
+  let lines = [];
+  drillVerbs.forEach((v,i)=>{
+    const s = document.getElementById(`drill-state-${i}`).value.trim();
+    const a = document.getElementById(`drill-action-${i}`).value.trim();
+    if(s || a){
+      lines.push(`${i+1}. [${v}]`);
+      lines.push(`   state:  ${s || '—'}`);
+      lines.push(`   action: ${a || '—'}`);
+    }
+  });
+  const text = lines.length ? lines.join('\n') : 'Пока ничего не заполнено.';
+  document.getElementById('drill-output').value = text;
+  navigator.clipboard.writeText(text).then(()=>{
+    const t = document.getElementById('toast');
+    t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'), 1800);
+  }).catch(()=>{
+    // fallback: text is still visible in textarea for manual copy
+  });
+}
+</script>
+</body>
+</html>
