@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>English Practice — Listen/Hear, Time, Every, New</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F6F1E7;
+    --paper-dark:#EEE6D6;
+    --ink:#26313C;
+    --ink-soft:#61707C;
+    --accent:#2F6F6F;
+    --accent-light:#DCEAE9;
+    --warm:#C1553F;
+    --warm-light:#F5DCD5;
+    --correct:#3F7D4F;
+    --correct-light:#E1EFDF;
+    --incorrect:#B4483A;
+    --incorrect-light:#FBE4DF;
+    --card:#FFFFFF;
+    --line:#DED2B8;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    line-height:1.5;
+    padding-bottom:60px;
+  }
+  h1,h2,h3{font-family:'Fraunces',serif; font-weight:700; margin:0 0 8px;}
+  .wrap{max-width:1180px;margin:0 auto;padding:28px 20px;}
+  header.top{
+    background:var(--ink);
+    color:var(--paper);
+    padding:34px 20px 40px;
+    border-bottom:6px solid var(--warm);
+  }
+  header.top .wrap{padding:0 20px;}
+  header.top h1{font-size:32px;color:var(--paper);}
+  header.top p{color:#C9D3D8;max-width:640px;margin:6px 0 0;font-size:15px;}
+
+  /* Vocab reminder */
+  .vocab-card{
+    background:var(--card);
+    border-radius:14px;
+    padding:22px 24px;
+    margin-top:-26px;
+    box-shadow:0 10px 30px rgba(38,49,60,.15);
+  }
+  .vocab-card h2{font-size:19px;color:var(--accent);}
+  .vocab-card .sub{color:var(--ink-soft);font-size:13.5px;margin-bottom:14px;}
+  table.vocab{width:100%;border-collapse:collapse;font-size:14.5px;}
+  table.vocab th{
+    text-align:left;font-family:'Inter';font-size:11.5px;letter-spacing:.06em;
+    text-transform:uppercase;color:var(--ink-soft);padding:6px 10px;border-bottom:2px solid var(--line);
+  }
+  table.vocab td{padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:middle;}
+  table.vocab tr:hover td{background:var(--paper-dark);}
+  .transcription{font-family:'JetBrains Mono',monospace;color:var(--accent);font-size:13px;}
+  .note{font-size:12.5px;color:var(--warm);font-style:italic;}
+  button.listen-btn{
+    border:none;background:var(--accent-light);color:var(--accent);
+    width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:14px;
+    display:inline-flex;align-items:center;justify-content:center;transition:.15s;
+  }
+  button.listen-btn:hover{background:var(--accent);color:#fff;}
+
+  /* layout */
+  .layout{display:flex;gap:26px;align-items:flex-start;margin-top:30px;}
+  main{flex:1;min-width:0;}
+  aside{
+    width:270px;position:sticky;top:20px;flex-shrink:0;
+  }
+  .sticky-note{
+    background:#FFF7D6;
+    border:1px solid #E9DD9E;
+    border-radius:4px;
+    padding:18px 18px 14px;
+    box-shadow:2px 4px 10px rgba(0,0,0,.08);
+    transform:rotate(-.6deg);
+  }
+  .sticky-note h3{font-size:16px;color:var(--warm);margin-bottom:4px;}
+  .sticky-note p.hint{font-size:12px;color:#8a7c3c;margin:0 0 10px;}
+  table.problem{width:100%;font-size:13px;border-collapse:collapse;}
+  table.problem td{padding:5px 4px;border-bottom:1px dashed #E9DD9E;}
+  table.problem td.count{text-align:right;font-weight:700;color:var(--warm);}
+  .empty-msg{font-size:12.5px;color:#9c9268;}
+
+  /* nav tabs */
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:22px;}
+  .tabs a{
+    text-decoration:none;font-size:12.5px;font-weight:600;color:var(--ink);
+    background:var(--card);border:1px solid var(--line);padding:7px 12px;border-radius:20px;
+  }
+  .tabs a:hover{border-color:var(--accent);color:var(--accent);}
+
+  /* exercise cards */
+  .exercise{
+    background:var(--card);border-radius:14px;padding:24px 26px;margin-bottom:22px;
+    border-left:5px solid var(--accent);
+  }
+  .exercise .ex-num{font-family:'JetBrains Mono';font-size:12px;color:var(--accent);letter-spacing:.08em;}
+  .exercise h2{font-size:21px;margin-top:2px;}
+  .exercise .task{color:var(--ink-soft);font-size:14px;margin-bottom:16px;}
+  .item{
+    display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--paper-dark);
+  }
+  .item:last-of-type{border-bottom:none;}
+  .item .idx{
+    width:22px;flex-shrink:0;font-weight:700;color:var(--ink-soft);padding-top:8px;font-size:13px;
+  }
+  .item .body{flex:1;min-width:0;}
+  .item .prompt{font-size:14.5px;margin-bottom:6px;}
+  .item .prompt .ru{color:var(--ink-soft);}
+  .item input[type=text]{
+    width:100%;max-width:340px;padding:8px 10px;border:1.5px solid var(--line);border-radius:8px;
+    font-size:14px;font-family:'Inter';background:var(--paper);
+  }
+  .item textarea{
+    width:100%;min-height:52px;padding:8px 10px;border:1.5px solid var(--line);border-radius:8px;
+    font-size:14px;font-family:'Inter';background:var(--paper);resize:vertical;
+  }
+  .item input:focus,.item textarea:focus{outline:none;border-color:var(--accent);}
+  .item.correct input{border-color:var(--correct);background:var(--correct-light);}
+  .item.incorrect input{border-color:var(--incorrect);background:var(--incorrect-light);}
+  .feedback{font-size:12.5px;margin-top:5px;}
+  .feedback.correct{color:var(--correct);}
+  .feedback.incorrect{color:var(--incorrect);}
+  .sample-box{
+    display:none;margin-top:6px;font-size:13px;background:var(--accent-light);color:var(--accent);
+    padding:7px 10px;border-radius:8px;
+  }
+  .sample-box.show{display:block;}
+  .ex-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;}
+  button.act{
+    border:none;padding:9px 16px;border-radius:8px;font-size:13.5px;font-weight:600;cursor:pointer;
+    transition:.15s;
+  }
+  button.check{background:var(--accent);color:#fff;}
+  button.check:hover{background:#255959;}
+  button.reveal{background:var(--paper-dark);color:var(--ink);}
+  button.reveal:hover{background:var(--line);}
+  button.copy{background:var(--warm);color:#fff;}
+  button.copy:hover{background:#a1432f;}
+  .toast{
+    position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+    background:var(--ink);color:var(--paper);padding:10px 18px;border-radius:8px;font-size:13.5px;
+    opacity:0;pointer-events:none;transition:opacity .25s; z-index:999;
+  }
+  .toast.show{opacity:1;}
+  .score{font-size:13px;color:var(--ink-soft);margin-top:10px;}
+  @media(max-width:820px){
+    .layout{flex-direction:column;}
+    aside{width:100%;position:static;}
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <h1>Listen&nbsp;vs&nbsp;Hear · Every · Time · New</h1>
+    <p>Повторение слов и грамматики + 9 письменных упражнений. Прописывай слова руками, проверяй себя и следи за колонкой «Проблемные слова» справа.</p>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="vocab-card">
+    <h2>Повторяем слова</h2>
+    <div class="sub">Нажми 🔊, чтобы прослушать произношение, затем прочитай перевод и транскрипцию.</div>
+    <table class="vocab" id="vocabTable"></table>
+  </div>
+
+  <div class="layout">
+    <main>
+      <div class="tabs" id="tabs"></div>
+      <div id="exercisesRoot"></div>
+    </main>
+    <aside>
+      <div class="sticky-note">
+        <h3>⚠️ Проблемные слова</h3>
+        <p class="hint">Сюда попадают слова, в которых ты ошиб(ла)ся</p>
+        <table class="problem" id="problemTable"></table>
+        <div class="empty-msg" id="emptyMsg">Пока всё чисто ✨</div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ---------------- VOCAB ---------------- */
+const vocab = [
+  {w:"listen to", ru:"слушать (специально, целенаправленно)", tr:"/ˈlɪs.ən tuː/"},
+  {w:"hear", ru:"слышать (случайно, невольно)", tr:"/hɪər/"},
+  {w:"in the morning", ru:"утром", tr:"/ɪn ðə ˈmɔːnɪŋ/"},
+  {w:"in the early morning", ru:"рано утром", tr:"/ɪn ði ˈɜːli ˈmɔːnɪŋ/"},
+  {w:"every morning / week / month", ru:"каждое утро/неделю/месяц — БЕЗ предлога in", tr:"/ˈevri ˈmɔːnɪŋ, wiːk, mʌnθ/"},
+  {w:"time (uncountable)", ru:"время — how much time", tr:"/taɪm/"},
+  {w:"time / times (countable)", ru:"раз — how many times", tr:"/taɪmz/"},
+  {w:"a lot of", ru:"много — используется везде (+/-/?)", tr:"/ə ˈlɒt əv/"},
+  {w:"much", ru:"много — обычно в вопросах и отрицаниях", tr:"/mʌtʃ/"},
+  {w:"new", ru:"новый — произносится как в New York", tr:"/njuː/"},
+];
+const vocabTable = document.getElementById("vocabTable");
+vocabTable.innerHTML = "<tr><th></th><th>Слово / фраза</th><th>Перевод</th><th>Транскрипция</th></tr>" +
+  vocab.map((v,i)=>`<tr><td><button class="listen-btn" onclick="speak('${v.w.split(' / ')[0].replace(/'/g,"")}')">🔊</button></td>
+  <td><strong>${v.w}</strong></td><td>${v.ru}</td><td class="transcription">${v.tr}</td></tr>`).join("");
+
+function speak(text){
+  if(!('speechSynthesis' in window)) return;
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-US'; u.rate = 0.9;
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(u);
+}
+
+/* ---------------- PROBLEM WORDS TRACKER ---------------- */
+const problemWords = {};
+function markProblem(word){
+  if(!word) return;
+  problemWords[word] = (problemWords[word]||0)+1;
+  renderProblems();
+}
+function renderProblems(){
+  const tbl = document.getElementById("problemTable");
+  const empty = document.getElementById("emptyMsg");
+  const entries = Object.entries(problemWords).sort((a,b)=>b[1]-a[1]);
+  if(entries.length===0){ tbl.innerHTML=""; empty.style.display="block"; return; }
+  empty.style.display="none";
+  tbl.innerHTML = entries.map(([w,c])=>`<tr><td>${w}</td><td class="count">${c}×</td></tr>`).join("");
+}
+
+/* ---------------- HELPERS ---------------- */
+function norm(s){
+  return (s||"").toLowerCase().trim().replace(/\\s+/g," ").replace(/[.,!?]/g,"");
+}
+function isCorrect(user, answer){
+  const answers = Array.isArray(answer)? answer : [answer];
+  return answers.some(a => norm(a) === norm(user));
+}
+function showToast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"), 1800);
+}
+
+/* ---------------- EXERCISE DATA ---------------- */
+const exercises = [
+{
+  id:"ex1", type:"closed",
+  title:"1. Вставь пропущенные буквы",
+  task:"Впиши полное слово/фразу вместо пропуска.",
+  items:[
+    {ru:"I could h__r someone crying next door.", a:"hear", word:"hear"},
+    {ru:"Every evening I l_st_n t_ the news before bed.", a:"listen to", word:"listen to"},
+    {ru:"She goes jogging ev_ry m_rn_ng.", a:"every morning", word:"every morning / week / month"},
+    {ru:"Have you seen her n_w car?", a:"new", word:"new"},
+    {ru:"We don't have a l_t _f time left.", a:"a lot of", word:"a lot of"},
+    {ru:"The birds start singing in the e_rly m_rn_ng.", a:"early morning", word:"in the early morning"},
+    {ru:"H_w m_ch time do you need?", a:"how much", word:"much"},
+    {ru:"He calls his mother ev_ry w__k.", a:"every week", word:"every morning / week / month"},
+    {ru:"I've told you a hundred t_m_s already.", a:"times", word:"time / times (countable)"},
+    {ru:"They pay the rent ev_ry m_nth.", a:"every month", word:"every morning / week / month"},
+  ]
+},
+{
+  id:"ex2", type:"closed",
+  title:"2. Переведи с русского",
+  task:"Переведи предложение на английский полностью.",
+  items:[
+    {ru:"Она услышала странный звук ночью.", a:["she heard a strange sound at night","she heard a strange sound in the night"], word:"hear"},
+    {ru:"У нас в этом году новый учитель.", a:"we have a new teacher this year", word:"new"},
+    {ru:"Мне нравится слушать музыку по вечерам.", a:"i like listening to music in the evenings", word:"listen to"},
+    {ru:"У меня не так много времени.", a:"i don't have much time", word:"time (uncountable)"},
+    {ru:"Сколько раз ты ему звонил?", a:"how many times did you call him", word:"time / times (countable)"},
+    {ru:"У них много друзей.", a:"they have a lot of friends", word:"a lot of"},
+    {ru:"Рано утром на улице было тихо.", a:"it was quiet outside in the early morning", word:"in the early morning"},
+    {ru:"Каждую неделю мы ходим в бассейн.", a:"every week we go to the swimming pool", word:"every morning / week / month"},
+    {ru:"Каждый месяц она навещает бабушку.", a:"every month she visits her grandmother", word:"every morning / week / month"},
+    {ru:"Он всегда встаёт утром в шесть часов.", a:"he always gets up in the morning at six o'clock", word:"in the morning"},
+  ]
+},
+{
+  id:"ex3", type:"closed",
+  title:"3. Дефиниция → слово",
+  task:"Прочитай определение на английском и напиши нужное слово/фразу.",
+  items:[
+    {ru:"To pay attention to sounds on purpose, e.g. music or a person talking.", a:"listen to", word:"listen to"},
+    {ru:"To notice a sound with your ears, often without trying.", a:"hear", word:"hear"},
+    {ru:"Recently made or bought — not old.", a:"new", word:"new"},
+    {ru:"Happens once every 7 days.", a:"every week", word:"every morning / week / month"},
+    {ru:"Happens once every 30 days or so.", a:"every month", word:"every morning / week / month"},
+    {ru:"A word used with uncountable nouns to ask 'how ___?' in questions/negatives.", a:"much", word:"much"},
+    {ru:"A phrase meaning 'a large quantity of' — used in positive sentences too.", a:"a lot of", word:"a lot of"},
+    {ru:"The part of the day right after sunrise, very soon after waking up.", a:"in the early morning", word:"in the early morning"},
+    {ru:"Happens once every day — no preposition needed before it.", a:"every morning", word:"every morning / week / month"},
+    {ru:"A countable word for an occasion something happens, e.g. 'three ___ a day'.", a:"times", word:"time / times (countable)"},
+  ]
+},
+{
+  id:"ex4", type:"closed",
+  title:"4. Сочетаемость слов (Word combinability)",
+  task:"Впиши одно недостающее слово, чтобы получилось верное сочетание.",
+  items:[
+    {ru:"I don't have much time, but I have a lot ___ energy.", a:"of", word:"a lot of"},
+    {ru:"Can you hear that? — No, I can't ___ anything.", a:"hear", word:"hear"},
+    {ru:"He likes to ___ to podcasts on his way to work.", a:"listen", word:"listen to"},
+    {ru:"It's freezing outside ___ the early morning.", a:"in", word:"in the early morning"},
+    {ru:"I go to the gym ___ week (no extra preposition needed).", a:"every", word:"every morning / week / month"},
+    {ru:"How ___ money did you spend?", a:"much", word:"much"},
+    {ru:"I've read this book three ___ .", a:"times", word:"time / times (countable)"},
+    {ru:"That's a ___ idea — I really like it!", a:"new", word:"new"},
+    {ru:"We don't need a lot ___ sugar, just a little.", a:"of", word:"a lot of"},
+    {ru:"She always wakes up early ___ the morning.", a:"in", word:"in the morning"},
+  ]
+},
+{
+  id:"ex5", type:"closed",
+  title:"5. Find the mistake",
+  task:"Найди в предложении лишнее/неверное слово и впиши именно это слово.",
+  items:[
+    {ru:"I heard to a strange noise last night.", a:"to", word:"hear"},
+    {ru:"She listen to the radio every morning.", a:"listen", word:"listen to"},
+    {ru:"I don't have much of time today.", a:"of", word:"time (uncountable)"},
+    {ru:"How much friends do you have?", a:"much", word:"much"},
+    {ru:"We meet in every Monday morning.", a:"in", word:"every morning / week / month"},
+    {ru:"He goes jogging on every morning.", a:"on", word:"every morning / week / month"},
+    {ru:"This is a new's car.", a:"new's", word:"new"},
+    {ru:"I've called him three time today.", a:"time", word:"time / times (countable)"},
+    {ru:"She has a much of hobbies.", a:"much", word:"a lot of"},
+    {ru:"Did you heard that noise?", a:"heard", word:"hear"},
+  ]
+},
+{
+  id:"ex6", type:"open",
+  title:"6. Correct the mistake",
+  task:"Перепиши каждое предложение из упр. 5 полностью правильно.",
+  items:[
+    {ru:"I heard to a strange noise last night.", sample:"I heard a strange noise last night."},
+    {ru:"She listen to the radio every morning.", sample:"She listens to the radio every morning."},
+    {ru:"I don't have much of time today.", sample:"I don't have much time today."},
+    {ru:"How much friends do you have?", sample:"How many friends do you have?"},
+    {ru:"We meet in every Monday morning.", sample:"We meet every Monday morning."},
+    {ru:"He goes jogging on every morning.", sample:"He goes jogging every morning."},
+    {ru:"This is a new's car.", sample:"This is a new car."},
+    {ru:"I've called him three time today.", sample:"I've called him three times today."},
+    {ru:"She has a much of hobbies.", sample:"She has a lot of hobbies."},
+    {ru:"Did you heard that noise?", sample:"Did you hear that noise?"},
+  ]
+},
+{
+  id:"ex7", type:"open",
+  title:"7. Rephrase",
+  task:"Перефразируй предложение, используя указанное слово/фразу.",
+  items:[
+    {ru:"I have very little time. (используй much)", sample:"I don't have much time."},
+    {ru:"He wakes up very early. (используй in the early morning)", sample:"He wakes up in the early morning."},
+    {ru:"She has many friends. (используй a lot of)", sample:"She has a lot of friends."},
+    {ru:"I called him five times already. (перефразируй, сохранив times)", sample:"I've already called him five times."},
+    {ru:"He often plays music and pays attention to it. (используй listen to)", sample:"He often listens to music."},
+    {ru:"By accident, I noticed the phone ringing. (используй hear)", sample:"I heard the phone ringing."},
+    {ru:"This car was bought recently. (используй new)", sample:"This is a new car."},
+    {ru:"We clean the house once every 7 days. (используй every week)", sample:"We clean the house every week."},
+    {ru:"This happens once every 30 days. (используй every month)", sample:"This happens every month."},
+    {ru:"He does this each day at dawn, without exception. (используй every morning)", sample:"He does this every morning."},
+  ]
+},
+{
+  id:"ex8", type:"open",
+  title:"8. Finish the dialogue",
+  task:"Допиши реплику B, используя слова из блока повторения.",
+  items:[
+    {ru:"A: Did you hear the news? B: ___", sample:"No, I didn't. What happened?"},
+    {ru:"A: What time do you usually get up? B: ___", sample:"I usually get up early in the morning."},
+    {ru:"A: Do you listen to podcasts? B: ___", sample:"Yes, I listen to them every morning."},
+    {ru:"A: How much time do you have? B: ___", sample:"I don't have much time, only ten minutes."},
+    {ru:"A: How many times have you been to London? B: ___", sample:"I've been there three times."},
+    {ru:"A: Is this your new phone? B: ___", sample:"Yes, I bought it last week."},
+    {ru:"A: Do you go to the gym every week? B: ___", sample:"Yes, I go every week, on Mondays."},
+    {ru:"A: Did you hear that noise? B: ___", sample:"Yes, I heard it too. What was it?"},
+    {ru:"A: What do you do every month? B: ___", sample:"I visit my grandparents every month."},
+    {ru:"A: Do you prefer mornings or evenings? B: ___", sample:"I love the early morning — it's so quiet."},
+  ]
+},
+{
+  id:"ex9", type:"open",
+  title:"9. Expand the sentence / Repeat & Change",
+  task:"Сначала расширь предложение (добавь детали), а затем придумай СВОЙ похожий пример по образцу.",
+  items:[
+    {ru:"Base: I listen to music. → Expand + придумай свой пример.", sample:"Expand: Every morning I listen to music while having breakfast. | Own: Every evening I listen to podcasts before bed."},
+    {ru:"Base: She heard something. → Expand + придумай свой пример.", sample:"Expand: Late at night, she heard something strange outside the window. | Own: Suddenly, he heard footsteps behind him."},
+    {ru:"Base: He has a new car. → Expand + придумай свой пример.", sample:"Expand: He bought a new car last week and drives it every day. | Own: They have a new flat in the city center."},
+    {ru:"Base: We meet every week. → Expand + придумай свой пример.", sample:"Expand: We meet every week on Fridays to discuss the project. | Own: I visit the gym every week on Mondays and Thursdays."},
+    {ru:"Base: I don't have much time. → Expand + придумай свой пример.", sample:"Expand: I don't have much time this week because of exams. | Own: We don't have much money left for the trip."},
+    {ru:"Base: They travel every month. → Expand + придумай свой пример.", sample:"Expand: They travel every month to visit relatives abroad. | Own: She calls her sister every month to catch up."},
+    {ru:"Base: He gets up in the early morning. → Expand + придумай свой пример.", sample:"Expand: He gets up in the early morning to go for a run before work. | Own: I wake up in the early morning to watch the sunrise."},
+    {ru:"Base: I've been there many times. → Expand + придумай свой пример.", sample:"Expand: I've been there many times, mostly in summer. | Own: We've tried that restaurant three times already."},
+    {ru:"Base: She listens to the radio. → Expand + придумай свой пример.", sample:"Expand: She listens to the radio every morning while making coffee. | Own: He listens to audiobooks on his way to work."},
+    {ru:"Base: We have a lot of homework. → Expand + придумай свой пример.", sample:"Expand: We have a lot of homework this week because of the test. | Own: They have a lot of plans for the summer."},
+  ]
+}
+];
+
+/* ---------------- RENDER ---------------- */
+const root = document.getElementById("exercisesRoot");
+const tabsEl = document.getElementById("tabs");
+
+exercises.forEach(ex=>{
+  tabsEl.innerHTML += `<a href="#${ex.id}">${ex.title.split('. ')[0]}. ${ex.title.split('. ')[1]}</a>`;
+
+  const section = document.createElement("div");
+  section.className = "exercise";
+  section.id = ex.id;
+
+  let itemsHtml = "";
+  ex.items.forEach((it,i)=>{
+    if(ex.type==="closed"){
+      itemsHtml += `
+      <div class="item" data-idx="${i}">
+        <div class="idx">${i+1}.</div>
+        <div class="body">
+          <div class="prompt">${it.ru}</div>
+          <input type="text" placeholder="Твой ответ..." data-ans='${JSON.stringify(it.a)}' data-word="${it.word||''}">
+          <div class="feedback"></div>
+        </div>
+      </div>`;
+    } else {
+      itemsHtml += `
+      <div class="item" data-idx="${i}">
+        <div class="idx">${i+1}.</div>
+        <div class="body">
+          <div class="prompt">${it.ru}</div>
+          <textarea placeholder="Твой ответ..."></textarea>
+          <div class="sample-box">💡 Пример: ${it.sample}</div>
+        </div>
+      </div>`;
+    }
+  });
+
+  const actions = ex.type==="closed"
+    ? `<div class="ex-actions">
+         <button class="act check" onclick="checkExercise('${ex.id}')">✅ Проверить</button>
+         <button class="act reveal" onclick="revealExercise('${ex.id}')">👁 Показать ответы</button>
+       </div>
+       <div class="score" id="score-${ex.id}"></div>`
+    : `<div class="ex-actions">
+         <button class="act reveal" onclick="toggleSamples('${ex.id}')">💡 Показать/скрыть примеры</button>
+         <button class="act copy" onclick="copyAnswers('${ex.id}')">📋 Скопировать все ответы</button>
+       </div>`;
+
+  section.innerHTML = `
+    <div class="ex-num">Упражнение ${ex.id.replace('ex','')} / 9</div>
+    <h2>${ex.title}</h2>
+    <div class="task">${ex.task}</div>
+    ${itemsHtml}
+    ${actions}
+  `;
+  root.appendChild(section);
+});
+
+/* ---------------- LOGIC ---------------- */
+function checkExercise(exId){
+  const section = document.getElementById(exId);
+  const items = section.querySelectorAll(".item");
+  let correctCount = 0;
+  items.forEach(item=>{
+    const input = item.querySelector("input");
+    const feedback = item.querySelector(".feedback");
+    const answer = JSON.parse(input.dataset.ans);
+    const word = input.dataset.word;
+    const ok = isCorrect(input.value, answer);
+    item.classList.remove("correct","incorrect");
+    if(input.value.trim()===""){
+      feedback.textContent = "";
+      return;
+    }
+    if(ok){
+      item.classList.add("correct");
+      feedback.textContent = "✓ верно";
+      feedback.className = "feedback correct";
+      correctCount++;
+    } else {
+      item.classList.add("incorrect");
+      feedback.textContent = "✗ неверно";
+      feedback.className = "feedback incorrect";
+      markProblem(word);
+    }
+  });
+  document.getElementById("score-"+exId).textContent = `Результат: ${correctCount} / ${items.length}`;
+}
+
+function revealExercise(exId){
+  const section = document.getElementById(exId);
+  const items = section.querySelectorAll(".item");
+  items.forEach(item=>{
+    const input = item.querySelector("input");
+    const feedback = item.querySelector(".feedback");
+    const answer = JSON.parse(input.dataset.ans);
+    const correctText = Array.isArray(answer) ? answer[0] : answer;
+    feedback.textContent = "Ответ: " + correctText;
+    feedback.className = "feedback correct";
+  });
+}
+
+function toggleSamples(exId){
+  const section = document.getElementById(exId);
+  section.querySelectorAll(".sample-box").forEach(box=>box.classList.toggle("show"));
+}
+
+function copyAnswers(exId){
+  const section = document.getElementById(exId);
+  const items = section.querySelectorAll(".item");
+  let text = section.querySelector("h2").textContent + "\\n\\n";
+  items.forEach((item,i)=>{
+    const ta = item.querySelector("textarea");
+    text += `${i+1}. ${ta.value.trim() || "(пусто)"}\\n`;
+  });
+  navigator.clipboard.writeText(text).then(()=>{
+    showToast("Ответы скопированы в буфер обмена 📋");
+  }).catch(()=>{
+    showToast("Не удалось скопировать — скопируй вручную");
+  });
+}
+
+renderProblems();
+</script>
+</body>
+</html>
