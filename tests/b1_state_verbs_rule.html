@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>State Verbs (B1) — правило и практика</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F4F6F2; --panel:#FFFFFF; --ink:#16233A; --ink-soft:#45526B;
+    --accent:#1F8A8A; --accent-dark:#166868; --accent-2:#E1A94C;
+    --good:#2F8F58; --good-bg:#E7F5EC; --bad:#D6533F; --bad-bg:#FCEAE6; --line:#DCE3DC;
+    --mono:'IBM Plex Mono', monospace;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0; background:var(--bg); color:var(--ink); font-family:'Inter',sans-serif; line-height:1.5;}
+  h1,h2,h3{font-family:'Fraunces',serif; margin:0 0 .3em; letter-spacing:-.01em;}
+  .hero{background:linear-gradient(160deg,#16233A 0%,#1C3352 65%,#1F8A8A 140%); color:#F4F6F2; padding:52px 24px 40px; position:relative; overflow:hidden;}
+  .hero::after{content:""; position:absolute; right:-60px; top:-60px; width:280px; height:280px; border:1px solid rgba(244,246,242,.15); border-radius:50%;}
+  .hero::before{content:""; position:absolute; right:20px; bottom:-90px; width:220px; height:220px; border:1px solid rgba(225,169,76,.25); border-radius:50%;}
+  .hero-inner{max-width:1120px; margin:0 auto; position:relative; z-index:1;}
+  .eyebrow{font-family:var(--mono); text-transform:uppercase; letter-spacing:.14em; font-size:12px; color:var(--accent-2); margin-bottom:14px; display:flex; gap:10px; align-items:center;}
+  .eyebrow::before{content:"§"; color:var(--accent-2);}
+  .hero h1{font-size:clamp(28px,4.4vw,44px); font-weight:600; max-width:800px;}
+  .hero p.lead{max-width:680px; color:#D9E2EC; font-size:16px; margin-top:10px;}
+  .hero-tags{display:flex; gap:10px; flex-wrap:wrap; margin-top:22px;}
+  .hero-tags span{font-family:var(--mono); font-size:12px; padding:6px 12px; border-radius:20px; border:1px solid rgba(244,246,242,.25); color:#F4F6F2;}
+
+  nav.jumpbar{position:sticky; top:0; z-index:20; background:rgba(244,246,242,.92); backdrop-filter:blur(6px); border-bottom:1px solid var(--line); display:flex; gap:2px; overflow-x:auto; padding:10px 16px;}
+  nav.jumpbar a{font-family:var(--mono); font-size:12.5px; white-space:nowrap; color:var(--ink-soft); text-decoration:none; padding:8px 12px; border-radius:8px; border:1px solid transparent;}
+  nav.jumpbar a:hover{border-color:var(--line); background:#fff;}
+
+  .layout{max-width:1120px; margin:0 auto; padding:32px 20px 90px; display:grid; grid-template-columns:1fr 260px; gap:28px; align-items:start;}
+  @media (max-width:860px){ .layout{grid-template-columns:1fr;} .sidebar{order:-1;} }
+  .sidebar{position:sticky; top:64px;}
+  .problem-box{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:16px 16px 14px;}
+  .problem-box h3{font-size:15px; display:flex; align-items:center; gap:8px;}
+  .problem-box h3::before{content:"⚠"; color:var(--accent-2);}
+  .problem-box p.hint{font-size:12.5px; color:var(--ink-soft); margin-top:-4px; margin-bottom:10px;}
+  #problemList{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px; min-height:20px;}
+  #problemList li{display:flex; justify-content:space-between; align-items:center; font-size:13.5px; background:var(--bad-bg); color:var(--bad); border-radius:8px; padding:6px 10px;}
+  #problemList li span{font-family:var(--mono); font-size:11.5px; opacity:.85;}
+  .empty-state{font-size:12.5px; color:var(--ink-soft); font-style:italic;}
+  .problem-box button{margin-top:12px; width:100%; background:transparent; border:1px solid var(--line); color:var(--ink-soft); font-size:12px; padding:7px; border-radius:8px; cursor:pointer; font-family:var(--mono);}
+  .problem-box button:hover{background:#eef0ec;}
+
+  section.card{background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:26px 24px 24px; margin-bottom:24px; scroll-margin-top:70px;}
+  .card-head{display:flex; justify-content:space-between; align-items:flex-start; gap:16px; flex-wrap:wrap; margin-bottom:14px;}
+  .card-head .num{font-family:var(--mono); font-size:12px; color:#fff; background:var(--accent); padding:2px 9px; border-radius:20px; margin-right:8px; vertical-align:middle;}
+  .card-head h2{font-size:20px;}
+  .card-sub{color:var(--ink-soft); font-size:13.5px; margin-top:2px;}
+  .btnrow{display:flex; gap:8px; flex-wrap:wrap;}
+  button.act{font-family:'Inter'; font-size:13px; font-weight:600; padding:9px 14px; border-radius:9px; border:1px solid var(--accent); background:var(--accent); color:#fff; cursor:pointer; transition:.15s;}
+  button.act:hover{background:var(--accent-dark); border-color:var(--accent-dark);}
+  button.act.secondary{background:#fff; color:var(--accent); border-color:var(--accent);}
+  button.act.secondary:hover{background:#EAF6F6;}
+  button.act.amber{background:var(--accent-2); border-color:var(--accent-2); color:#3A2A08;}
+  button.act.amber:hover{filter:brightness(.95);}
+
+  .rule-box{background:#FAFBF9; border:1px solid var(--line); border-radius:12px; padding:16px 18px; margin-bottom:8px;}
+  .rule-box p{margin:0 0 10px; font-size:14px; color:var(--ink-soft);}
+  .rule-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-top:8px;}
+  @media (max-width:640px){.rule-grid{grid-template-columns:1fr;}}
+  .rule-item{background:#fff; border:1px solid var(--line); border-radius:10px; padding:10px 12px;}
+  .rule-item .tag{font-family:var(--mono); font-size:11px; color:#fff; background:var(--accent-dark); padding:2px 8px; border-radius:10px; margin-right:6px;}
+  .rule-item .words{font-size:13px; color:var(--ink-soft); margin-top:4px;}
+  .rule-note{font-size:12.5px; color:var(--accent-dark); background:#EAF6F6; border-left:3px solid var(--accent); padding:8px 12px; border-radius:0 8px 8px 0; margin-top:10px;}
+
+  ol.qlist{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:12px;}
+  ol.qlist li{background:#FAFBF9; border:1px solid var(--line); border-radius:10px; padding:12px 14px; display:flex; flex-direction:column; gap:8px;}
+  ol.qlist li .qtext{font-size:14.5px;}
+  ol.qlist li .qtext b.hl{background:#FDEBD3; padding:1px 5px; border-radius:4px; font-weight:600;}
+  ol.qlist li .qmeta{font-size:12px; color:var(--ink-soft); font-family:var(--mono);}
+  ol.qlist li .qrow{display:flex; gap:8px; align-items:center; flex-wrap:wrap;}
+  ol.qlist li input[type=text]{flex:1; min-width:160px; padding:8px 10px; border-radius:7px; border:1px solid var(--line); font-size:14px; font-family:'Inter'; background:#fff;}
+  ol.qlist li input[type=text]:focus{outline:2px solid var(--accent); outline-offset:1px;}
+  ol.qlist li select{padding:8px 10px; border-radius:7px; border:1px solid var(--line); font-size:14px; background:#fff; font-family:'Inter';}
+  ol.qlist li input.correct, ol.qlist li select.correct{border-color:var(--good); background:var(--good-bg);}
+  ol.qlist li input.incorrect, ol.qlist li select.incorrect{border-color:var(--bad); background:var(--bad-bg);}
+  .radio-opts{display:flex; gap:14px; flex-wrap:wrap;}
+  .radio-opts label{display:flex; align-items:center; gap:6px; font-size:14px; background:#fff; border:1px solid var(--line); padding:7px 12px; border-radius:8px; cursor:pointer;}
+  .radio-opts label.correct{border-color:var(--good); background:var(--good-bg); color:var(--good);}
+  .radio-opts label.incorrect{border-color:var(--bad); background:var(--bad-bg); color:var(--bad);}
+  .feedback{font-size:12.5px; font-family:var(--mono);}
+  .feedback.good{color:var(--good);}
+  .feedback.bad{color:var(--bad);}
+  .comment{font-size:13px; color:var(--ink-soft); background:#EEF6F3; border-left:3px solid var(--accent); padding:7px 11px; border-radius:0 8px 8px 0; display:none;}
+  .comment.show{display:block;}
+  ol.qlist li textarea{width:100%; min-height:56px; padding:9px 10px; border-radius:7px; border:1px solid var(--line); font-family:'Inter'; font-size:14px; resize:vertical; background:#fff;}
+  ol.qlist li textarea:focus{outline:2px solid var(--accent); outline-offset:1px;}
+  .idx{font-family:var(--mono); color:var(--accent-dark); font-weight:600; margin-right:4px;}
+  .scene{font-size:26px; letter-spacing:2px; margin-bottom:2px;}
+  footer{text-align:center; padding:30px 20px 60px; color:var(--ink-soft); font-size:12.5px; font-family:var(--mono);}
+  .toast{position:fixed; bottom:22px; left:50%; transform:translateX(-50%) translateY(20px); background:var(--ink); color:#fff; padding:10px 18px; border-radius:20px; font-size:13px; opacity:0; pointer-events:none; transition:.25s; z-index:50; box-shadow:0 6px 18px rgba(0,0,0,.2);}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow">grammar · B1 · state verbs</div>
+    <h1>State Verbs — правило и практика</h1>
+    <p class="lead">Глаголы состояния описывают состояние, а не действие, поэтому обычно не используются в Continuous. Повторите правило, а затем пройдите 8 упражнений по 10 заданий — каждый ответ можно проверить и увидеть объяснение, почему он верный.</p>
+    <div class="hero-tags"><span>4 категории</span><span>8 упражнений</span><span>10 пунктов в каждом</span><span>💬 объяснения к ответам</span></div>
+  </div>
+</div>
+
+<nav class="jumpbar">
+  <a href="#rule">Правило</a>
+  <a href="#ex1">1. Категории</a>
+  <a href="#ex2">2. Simple/Cont</a>
+  <a href="#ex3">3. Gaps</a>
+  <a href="#ex4">4. Translate</a>
+  <a href="#ex5">5. По картинке</a>
+  <a href="#ex6">6. Замена слова</a>
+  <a href="#ex7">7. Rephrase</a>
+  <a href="#ex8">8. Закончи фразу</a>
+</nav>
+
+<div class="layout">
+  <main>
+
+    <section class="card" id="rule">
+      <div class="card-head"><div><span class="num">§</span><h2 style="display:inline">Правило: State Verbs</h2>
+        <div class="card-sub">Verbs are verbs which describe a state rather than an action and therefore do not normally have continuous forms.</div></div></div>
+      <div class="rule-box">
+        <div class="rule-grid">
+          <div class="rule-item"><span class="tag">a</span><b>likes / dislikes</b>
+            <div class="words">like, love, dislike, hate, enjoy, prefer, adore — <i>e.g. I love chocolate ice cream.</i></div></div>
+          <div class="rule-item"><span class="tag">b</span><b>senses</b>
+            <div class="words">see, hear, smell, taste, feel, look, sound — <i>e.g. This soup tastes great.</i></div></div>
+          <div class="rule-item"><span class="tag">c</span><b>perception / mind</b>
+            <div class="words">know, believe, understand, realise, remember, forget, notice, recognise, think, seem, see(=understand), expect(=think)</div></div>
+          <div class="rule-item"><span class="tag">d</span><b>прочие</b>
+            <div class="words">be, contain, include, belong, need, matter, cost, mean, own, want, owe, have(=possess), require, weigh, wish, keep(=continue)</div></div>
+        </div>
+        <div class="rule-note">⚡ Многие из этих глаголов иногда используются в Continuous, но тогда меняется значение — оно становится «динамическим» (действие, а не состояние). Например: <b>think</b> (мнение → state) vs <b>am thinking</b> (обдумываю сейчас → action); <b>have</b> (владею → state) vs <b>am having</b> (принимаю душ/завтракаю → action); <b>be</b> (характер → state) vs <b>is being</b> (ведёт себя сейчас → action).</div>
+      </div>
+    </section>
+
+    <section class="card" id="ex1">
+      <div class="card-head"><div><span class="num">1</span><h2 style="display:inline">Распредели глаголы по категориям</h2>
+        <div class="card-sub">Выбери категорию (a/b/c/d) для каждого глагола.</div></div>
+        <div class="btnrow"><button class="act" onclick="checkExercise('ex1')">Проверить</button><button class="act secondary" onclick="showAnswers('ex1')">Показать ответы</button></div>
+      </div>
+      <ol class="qlist" id="ex1-list"></ol>
+    </section>
+
+    <section class="card" id="ex2">
+      <div class="card-head"><div><span class="num">2</span><h2 style="display:inline">Choose the correct answer: Present Simple / Continuous</h2>
+        <div class="card-sub">Выбери правильный вариант — обрати внимание, меняется ли значение глагола.</div></div>
+        <div class="btnrow"><button class="act" onclick="checkExercise('ex2')">Проверить</button><button class="act secondary" onclick="showAnswers('ex2')">Показать ответы</button></div>
+      </div>
+      <ol class="qlist" id="ex2-list"></ol>
+    </section>
+
+    <section class="card" id="ex3">
+      <div class="card-head"><div><span class="num">3</span><h2 style="display:inline">Fill in the gaps</h2>
+        <div class="card-sub">Впиши глагол в скобках в правильной форме (Present Simple или Continuous).</div></div>
+        <div class="btnrow"><button class="act" onclick="checkExercise('ex3')">Проверить</button><button class="act secondary" onclick="showAnswers('ex3')">Показать ответы</button></div>
+      </div>
+      <ol class="qlist" id="ex3-list"></ol>
+    </section>
+
+    <section class="card" id="ex4">
+      <div class="card-head"><div><span class="num">4</span><h2 style="display:inline">Translate</h2>
+        <div class="card-sub">Переведи предложение на английский, используя глагол состояния.</div></div>
+        <div class="btnrow"><button class="act" onclick="checkExercise('ex4')">Проверить</button><button class="act secondary" onclick="showAnswers('ex4')">Показать ответы</button></div>
+      </div>
+      <ol class="qlist" id="ex4-list"></ol>
+    </section>
+
+    <section class="card" id="ex5">
+      <div class="card-head"><div><span class="num">5</span><h2 style="display:inline">Составь предложение по картинке</h2>
+        <div class="card-sub">Опиши сценку одним предложением, используя указанный глагол состояния.</div></div>
+        <div class="btnrow"><button class="act secondary" onclick="revealAll('ex5')">Показать примеры ответов</button><button class="act amber" onclick="copyAnswers('ex5')">📋 Скопировать все ответы</button></div>
+      </div>
+      <ol class="qlist" id="ex5-list"></ol>
+    </section>
+
+    <section class="card" id="ex6">
+      <div class="card-head"><div><span class="num">6</span><h2 style="display:inline">Replace the highlighted word</h2>
+        <div class="card-sub">Замени выделенную часть одним глаголом состояния из правила.</div></div>
+        <div class="btnrow"><button class="act" onclick="checkExercise('ex6')">Проверить</button><button class="act secondary" onclick="showAnswers('ex6')">Показать ответы</button></div>
+      </div>
+      <ol class="qlist" id="ex6-list"></ol>
+    </section>
+
+    <section class="card" id="ex7">
+      <div class="card-head"><div><span class="num">7</span><h2 style="display:inline">Rephrase</h2>
+        <div class="card-sub">Перефразируй предложение, используя глагол состояния. Пример: <i>This cake has a very nice smell. → This cake smells delicious.</i></div></div>
+        <div class="btnrow"><button class="act secondary" onclick="revealAll('ex7')">Показать примеры ответов</button><button class="act amber" onclick="copyAnswers('ex7')">📋 Скопировать все ответы</button></div>
+      </div>
+      <ol class="qlist" id="ex7-list"></ol>
+    </section>
+
+    <section class="card" id="ex8">
+      <div class="card-head"><div><span class="num">8</span><h2 style="display:inline">Закончи предложение</h2>
+        <div class="card-sub">Допиши предложение своей идеей, используя указанный глагол состояния.</div></div>
+        <div class="btnrow"><button class="act amber" onclick="copyAnswers('ex8')">📋 Скопировать все ответы</button></div>
+      </div>
+      <ol class="qlist" id="ex8-list"></ol>
+    </section>
+
+  </main>
+
+  <aside class="sidebar">
+    <div class="problem-box">
+      <h3>Проблемные слова</h3>
+      <p class="hint">Глаголы/задания, в которых были ошибки</p>
+      <ul id="problemList"></ul>
+      <div class="empty-state" id="problemEmpty">Пока ошибок нет — отлично!</div>
+      <button onclick="resetProblems()">Очистить список</button>
+    </div>
+  </aside>
+</div>
+
+<footer>State Verbs Lab · B1 grammar practice</footer>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================= UTIL ================= */
+function seededShuffle(arr, seed){
+  const a = arr.slice(); let s = seed;
+  const rand = () => { s = (s*9301+49297) % 233280; return s/233280; };
+  for(let i=a.length-1;i>0;i--){ const j = Math.floor(rand()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+function norm(str){ return (str||"").trim().toLowerCase().replace(/[.!?]+$/,""); }
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(t._tm); t._tm = setTimeout(()=>t.classList.remove('show'), 1900);
+}
+
+/* ================= PROBLEM WORDS ================= */
+function loadProblems(){ try{ return JSON.parse(localStorage.getItem('sv2_problemWords')||'{}'); }catch(e){ return {}; } }
+function saveProblems(obj){ localStorage.setItem('sv2_problemWords', JSON.stringify(obj)); }
+function addProblem(word){ const p = loadProblems(); p[word]=(p[word]||0)+1; saveProblems(p); renderProblems(); }
+function renderProblems(){
+  const p = loadProblems();
+  const list = document.getElementById('problemList');
+  const empty = document.getElementById('problemEmpty');
+  const entries = Object.entries(p).sort((a,b)=>b[1]-a[1]);
+  list.innerHTML = '';
+  if(entries.length===0){ empty.style.display='block'; return; }
+  empty.style.display='none';
+  entries.forEach(([word,count])=>{
+    const li = document.createElement('li');
+    li.innerHTML = `<b>${word}</b><span>×${count}</span>`;
+    list.appendChild(li);
+  });
+}
+function resetProblems(){ localStorage.removeItem('sv2_problemWords'); renderProblems(); toast('Список очищен'); }
+
+/* ================= DATA ================= */
+// Ex1: categorise
+const CATS = [
+  {word:"adore",     cat:"a", comment:"adore — сильная симпатия (likes & dislikes), группа (a)."},
+  {word:"sound",     cat:"b", comment:"sound — глагол чувственного восприятия (senses), группа (b): звучать, восприниматься на слух."},
+  {word:"remember",  cat:"c", comment:"remember — ментальное восприятие/память (perception), группа (c)."},
+  {word:"contain",   cat:"d", comment:"contain — «прочий» стативный глагол (группа d): содержать в себе."},
+  {word:"hate",      cat:"a", comment:"hate — антипатия (likes & dislikes), группа (a)."},
+  {word:"taste",     cat:"b", comment:"taste — глагол чувственного восприятия (senses), группа (b): иметь вкус."},
+  {word:"believe",   cat:"c", comment:"believe — ментальное восприятие (perception), группа (c): считать, полагать."},
+  {word:"cost",      cat:"d", comment:"cost — «прочий» стативный глагол (группа d): стоить."},
+  {word:"prefer",    cat:"a", comment:"prefer — предпочтение (likes & dislikes), группа (a)."},
+  {word:"notice",    cat:"c", comment:"notice — ментальное восприятие (perception), группа (c): замечать."}
+];
+const CAT_LABELS = {a:"a) likes/dislikes", b:"b) senses", c:"c) perception", d:"d) прочие"};
+
+// Ex2: choose correct answer (present simple vs continuous)
+const CHOOSE = [
+  {sentence:"I ___ that Paris is a beautiful city.", options:["think","am thinking"], correct:0, comment:"think = мнение (state) → Present Simple. 'am thinking' было бы верно, если бы think значило «обдумываю» (действие)."},
+  {sentence:"Right now I ___ about buying a new phone.", options:["think","am thinking"], correct:1, comment:"здесь think = обдумывать, взвешивать (action, происходит сейчас) → Present Continuous."},
+  {sentence:"They ___ two cats and a dog.", options:["have","are having"], correct:0, comment:"have = владеть (possess) — state → Present Simple."},
+  {sentence:"She ___ a shower at the moment.", options:["has","is having"], correct:1, comment:"have a shower = принимать душ (действие) → Present Continuous, хотя have обычно stative."},
+  {sentence:"This soup ___ amazing — try it!", options:["tastes","is tasting"], correct:0, comment:"taste = обладать вкусом (state, описание) → Present Simple."},
+  {sentence:"The chef ___ the soup to check the salt.", options:["tastes","is tasting"], correct:1, comment:"taste = пробовать на вкус (действие, происходящее сейчас) → Present Continuous."},
+  {sentence:"I ___ my dentist tomorrow at 5pm.", options:["see","am seeing"], correct:1, comment:"see = встречаться (запланированная встреча, действие) → Present Continuous."},
+  {sentence:"I ___ a bird outside the window right now.", options:["see","am seeing"], correct:0, comment:"see = воспринимать глазами (state, часто с can) → Present Simple."},
+  {sentence:"He ___ very rude today — that's unusual for him.", options:["is","is being"], correct:1, comment:"be + прилагательное описывает временное поведение (action) → is being."},
+  {sentence:"She ___ a kind and patient person.", options:["is","is being"], correct:0, comment:"постоянная черта характера (state) → Present Simple: is."}
+];
+
+// Ex3: fill in the gaps
+const GAPS = [
+  {sentence:"Look! It ___ (rain) heavily outside.", answer:"is raining", comment:"rain — динамический глагол, действие происходит сейчас → Present Continuous."},
+  {sentence:"This bag ___ (weigh) about five kilos.", answer:"weighs", comment:"weigh — стативный глагол (группа d) → Present Simple."},
+  {sentence:"I ___ (not / understand) this exercise at all right now.", answer:"don't understand", comment:"understand — ментальное восприятие (group c), не бывает в Continuous."},
+  {sentence:"We ___ (have) dinner with friends at the moment.", answer:"are having", comment:"have dinner = есть, ужинать — действие → Present Continuous."},
+  {sentence:"This jacket ___ (belong) to my brother.", answer:"belongs", comment:"belong — стативный глагол (группа d) → Present Simple."},
+  {sentence:"He ___ (think) about changing his job these days.", answer:"is thinking", comment:"think = обдумывать (действие, происходящее в эти дни) → Present Continuous."},
+  {sentence:"I ___ (not / believe) in ghosts.", answer:"don't believe", comment:"believe — ментальное восприятие (group c), не бывает в Continuous."},
+  {sentence:"Look, she ___ (taste) the cake to see if it's sweet enough.", answer:"is tasting", comment:"taste = пробовать (действие сейчас) → Present Continuous."},
+  {sentence:"This suitcase ___ (weigh) twenty kilos — it's really heavy.", answer:"weighs", comment:"weigh — стативный глагол → Present Simple."},
+  {sentence:"They ___ (own) a small café in the town centre.", answer:"own", comment:"own — стативный глагол (группа d) → Present Simple."}
+];
+
+// Ex4: translate
+const TRANSLATE = [
+  {ru:"Этот суп пахнет восхитительно.", answer:"This soup smells amazing.", keyword:"smell", comment:"smell — сенсорный глагол (группа b), описывает состояние, не действие."},
+  {ru:"Я не понимаю этот вопрос.", answer:"I don't understand this question.", keyword:"understand", comment:"understand — ментальное восприятие (группа c), Present Simple."},
+  {ru:"Эта сумка весит десять килограммов.", answer:"This bag weighs ten kilos.", keyword:"weigh", comment:"weigh — «прочий» стативный глагол (группа d)."},
+  {ru:"Мы должны ему много денег.", answer:"We owe him a lot of money.", keyword:"owe", comment:"owe — «прочий» стативный глагол (группа d): быть должным."},
+  {ru:"Она обожает шоколад.", answer:"She adores chocolate.", keyword:"adore", comment:"adore — сильная симпатия (группа a)."},
+  {ru:"Эта книга принадлежит мне.", answer:"This book belongs to me.", keyword:"belong", comment:"belong — «прочий» стативный глагол (группа d)."},
+  {ru:"Мне кажется, он прав.", answer:"He seems to be right.", keyword:"seem", comment:"seem — ментальное восприятие (группа c): казаться."},
+  {ru:"Цена включает завтрак.", answer:"The price includes breakfast.", keyword:"include", comment:"include — «прочий» стативный глагол (группа d)."},
+  {ru:"Я хочу купить новую машину.", answer:"I want to buy a new car.", keyword:"want", comment:"want — «прочий» стативный глагол (группа d): желание."},
+  {ru:"Это не имеет значения.", answer:"It doesn't matter.", keyword:"matter", comment:"matter — «прочий» стативный глагол (группа d): иметь значение."}
+];
+
+// Ex5: sentence from a "picture" (emoji scene)
+const PICTURES = [
+  {scene:"🍫🍦", word:"adore", model:"I adore chocolate ice cream.", comment:"adore — likes/dislikes (группа a): сильная симпатия."},
+  {scene:"🌧️☔", word:"sound", model:"The rain sounds really heavy today.", comment:"sound — senses (группа b): как что-то звучит."},
+  {scene:"👜💰", word:"cost", model:"This bag costs a lot of money.", comment:"cost — «прочий» стативный глагол (группа d)."},
+  {scene:"📦📚", word:"contain", model:"This box contains old books.", comment:"contain — «прочий» стативный глагол (группа d)."},
+  {scene:"🌸👃", word:"smell", model:"These flowers smell wonderful.", comment:"smell — senses (группа b)."},
+  {scene:"🤔💭", word:"believe", model:"I believe you are right.", comment:"believe — perception (группа c)."},
+  {scene:"⚖️🎒", word:"weigh", model:"This backpack weighs five kilos.", comment:"weigh — «прочий» стативный глагол (группа d)."},
+  {scene:"🏠👪", word:"belong", model:"This house belongs to my family.", comment:"belong — «прочий» стативный глагол (группа d)."},
+  {scene:"😴🥱", word:"seem", model:"She seems very tired today.", comment:"seem — perception (группа c): казаться."},
+  {scene:"🎂😋", word:"taste", model:"This cake tastes delicious.", comment:"taste — senses (группа b)."}
+];
+
+// Ex6: replace the highlighted word
+const REPLACE = [
+  {sentence:"I <b class='hl'>think</b> pizza is the best food ever.", answer:"believe", comment:"believe — считать, полагать; тот же смысл мнения (группа c)."},
+  {sentence:"This song <b class='hl'>is nice to listen to</b>.", answer:"sounds", comment:"sound — как что-то звучит (группа b)."},
+  {sentence:"I <b class='hl'>have a strong desire</b> to see the ocean.", answer:"wish", comment:"wish — сильное желание (группа d)."},
+  {sentence:"The ticket price <b class='hl'>has</b> insurance as part of it.", answer:"includes", comment:"include — включать в себя (группа d)."},
+  {sentence:"They <b class='hl'>possess</b> a big garden behind the house.", answer:"own", comment:"own — владеть (группа d)."},
+  {sentence:"He <b class='hl'>looks</b> a bit nervous before the exam.", answer:"seems", comment:"seem — производить впечатление (группа c)."},
+  {sentence:"This cake <b class='hl'>has a lovely aroma</b>.", answer:"smells", comment:"smell — пахнуть (группа b)."},
+  {sentence:"This task <b class='hl'>needs</b> extra concentration.", answer:"requires", comment:"require — требовать(ся) (группа d)."},
+  {sentence:"This parcel <b class='hl'>has a weight of</b> two kilos.", answer:"weighs", comment:"weigh — весить (группа d)."},
+  {sentence:"This ring <b class='hl'>is</b> my grandmother's.", answer:"belongs", comment:"belong (to) — принадлежать (группа d)."}
+];
+
+// Ex7: rephrase
+const REPHRASE = [
+  {sentence:"This flower has a very nice smell.", word:"smell", model:"This flower smells lovely.", comment:"smell — глагол состояния описывает запах напрямую (группа b)."},
+  {sentence:"This coffee has a bitter taste.", word:"taste", model:"This coffee tastes bitter.", comment:"taste — глагол состояния (группа b)."},
+  {sentence:"I have an understanding of this rule.", word:"understand", model:"I understand this rule.", comment:"understand — ментальное восприятие (группа c)."},
+  {sentence:"I have a strong wish to travel the world.", word:"wish", model:"I wish I could travel the world.", comment:"wish — желание (группа d)."},
+  {sentence:"This bag has a weight of three kilos.", word:"weigh", model:"This bag weighs three kilos.", comment:"weigh — «прочий» стативный глагол (группа d)."},
+  {sentence:"This car has a price of $20,000.", word:"cost", model:"This car costs $20,000.", comment:"cost — «прочий» стативный глагол (группа d)."},
+  {sentence:"This box has old letters inside it.", word:"contain", model:"This box contains old letters.", comment:"contain — «прочий» стативный глагол (группа d)."},
+  {sentence:"I have a debt of $50 to my friend.", word:"owe", model:"I owe my friend $50.", comment:"owe — быть должным (группа d)."},
+  {sentence:"This description gives the impression of being true.", word:"seem", model:"This description seems true.", comment:"seem — perception (группа c)."},
+  {sentence:"This plan needs a lot of time.", word:"require", model:"This plan requires a lot of time.", comment:"require — «прочий» стативный глагол (группа d)."}
+];
+
+// Ex8: finish the sentence
+const FINISH = [
+  "I really believe that …",
+  "This place smells like …",
+  "I don't understand why …",
+  "My favourite food tastes …",
+  "This bag weighs about …",
+  "I wish I could …",
+  "It doesn't matter to me if …",
+  "My dream house would need to …",
+  "I own something that means a lot to me — it's …",
+  "At the moment I'm thinking about … (think = действие, обдумываю)"
+];
+
+/* ================= RENDER: closed exercises ================= */
+function renderSelect(containerId, items){
+  const ol = document.getElementById(containerId);
+  items.forEach((item,i)=>{
+    const li = document.createElement('li');
+    li.dataset.answer = item.cat;
+    li.dataset.word = item.word;
+    li.dataset.comment = item.comment;
+    li.innerHTML = `
+      <div class="qtext"><span class="idx">${i+1}.</span><b>${item.word}</b></div>
+      <div class="qrow">
+        <select>
+          <option value="">— выбери категорию —</option>
+          <option value="a">a) likes/dislikes</option>
+          <option value="b">b) senses</option>
+          <option value="c">c) perception</option>
+          <option value="d">d) прочие</option>
+        </select>
+        <span class="feedback"></span>
+      </div>
+      <div class="comment"></div>`;
+    ol.appendChild(li);
+  });
+}
+renderSelect('ex1-list', seededShuffle(CATS,11));
+
+function renderRadio(containerId, items){
+  const ol = document.getElementById(containerId);
+  items.forEach((item,i)=>{
+    const li = document.createElement('li');
+    li.dataset.answer = String(item.correct);
+    li.dataset.word = item.options[item.correct];
+    li.dataset.comment = item.comment;
+    const opts = item.options.map((opt,oi)=>`
+      <label data-idx="${oi}"><input type="radio" name="r-${containerId}-${i}" value="${oi}"> ${opt}</label>`).join('');
+    li.innerHTML = `
+      <div class="qtext"><span class="idx">${i+1}.</span>${item.sentence}</div>
+      <div class="qrow"><div class="radio-opts">${opts}</div></div>
+      <div class="feedback"></div>
+      <div class="comment"></div>`;
+    ol.appendChild(li);
+  });
+}
+renderRadio('ex2-list', seededShuffle(CHOOSE,22));
+
+function renderText(containerId, items, questionFn, answerFn, commentFn, metaFn, placeholder){
+  const ol = document.getElementById(containerId);
+  items.forEach((item,i)=>{
+    const li = document.createElement('li');
+    li.dataset.answer = norm(answerFn(item));
+    li.dataset.word = answerFn(item);
+    li.dataset.comment = commentFn(item);
+    li.dataset.keyword = item.keyword ? norm(item.keyword) : '';
+    li.innerHTML = `
+      <div class="qtext"><span class="idx">${i+1}.</span>${questionFn(item)}</div>
+      ${metaFn ? `<div class="qmeta">${metaFn(item)}</div>` : ''}
+      <div class="qrow"><input type="text" placeholder="${placeholder||'твой ответ...'}"><span class="feedback"></span></div>
+      <div class="comment"></div>`;
+    ol.appendChild(li);
+  });
+}
+renderText('ex3-list', seededShuffle(GAPS,33), (i)=>i.sentence, (i)=>i.answer, (i)=>i.comment, null, 'напиши форму глагола...');
+renderText('ex4-list', seededShuffle(TRANSLATE,44), (i)=>`«${i.ru}»`, (i)=>i.answer, (i)=>i.comment, null, 'перевод на английском...');
+renderText('ex6-list', seededShuffle(REPLACE,66), (i)=>i.sentence, (i)=>i.answer, (i)=>i.comment, ()=>`замени выделенную часть одним словом`, 'слово-замена...');
+
+/* ================= RENDER: reveal-only (5,7) ================= */
+function renderReveal(containerId, items, questionFn, modelFn, commentFn){
+  const ol = document.getElementById(containerId);
+  items.forEach((item,i)=>{
+    const li = document.createElement('li');
+    li.dataset.model = modelFn(item);
+    li.dataset.comment = commentFn(item);
+    li.innerHTML = `
+      <div class="qtext"><span class="idx">${i+1}.</span>${questionFn(item)}</div>
+      <textarea placeholder="напиши своё предложение..."></textarea>
+      <div class="comment"></div>`;
+    ol.appendChild(li);
+  });
+}
+renderReveal('ex5-list', seededShuffle(PICTURES,55),
+  (i)=>`<div class="scene">${i.scene}</div>слово: <b>${i.word}</b>`,
+  (i)=>i.model, (i)=>i.comment);
+renderReveal('ex7-list', seededShuffle(REPHRASE,77),
+  (i)=>`${i.sentence} <span class="qmeta">(слово: ${i.word})</span>`,
+  (i)=>i.model, (i)=>i.comment);
+
+/* ================= RENDER: open (8) ================= */
+function renderOpen(containerId, items){
+  const ol = document.getElementById(containerId);
+  items.forEach((q,i)=>{
+    const li = document.createElement('li');
+    li.innerHTML = `<div class="qtext"><span class="idx">${i+1}.</span>${q}</div><textarea placeholder="напиши свой ответ..."></textarea>`;
+    ol.appendChild(li);
+  });
+}
+renderOpen('ex8-list', seededShuffle(FINISH,88));
+
+/* ================= CHECK / SHOW / REVEAL / COPY ================= */
+function checkExercise(id){
+  const items = document.querySelectorAll(`#${id}-list li`);
+  let correctCount = 0;
+  items.forEach(li=>{
+    const comment = li.querySelector('.comment');
+    const fb = li.querySelector('.feedback');
+    const answer = li.dataset.answer;
+    const word = li.dataset.word;
+    const select = li.querySelector('select');
+    const radios = li.querySelectorAll('input[type=radio]');
+    const text = li.querySelector('input[type=text]');
+
+    if(select){
+      const val = select.value;
+      select.classList.remove('correct','incorrect');
+      if(!val){ fb.textContent=''; comment.classList.remove('show'); return; }
+      const ok = val === answer;
+      select.classList.add(ok ? 'correct':'incorrect');
+      fb.textContent = ok ? '✓ верно' : `✗ верная категория: ${CAT_LABELS[answer]}`;
+      fb.className = 'feedback ' + (ok?'good':'bad');
+      comment.textContent = '💬 ' + li.dataset.comment;
+      comment.classList.add('show');
+      if(ok) correctCount++; else addProblem(word);
+    } else if(radios.length){
+      const labels = li.querySelectorAll('.radio-opts label');
+      let checkedIdx = -1;
+      radios.forEach(r=>{ if(r.checked) checkedIdx = r.value; });
+      labels.forEach(l=>l.classList.remove('correct','incorrect'));
+      if(checkedIdx === -1){ fb.textContent=''; comment.classList.remove('show'); return; }
+      const ok = String(checkedIdx) === answer;
+      labels.forEach((l,li2)=>{
+        if(String(li2) === answer) l.classList.add('correct');
+        else if(String(li2) === String(checkedIdx)) l.classList.add('incorrect');
+      });
+      fb.textContent = ok ? '✓ верно' : `✗ верный вариант: ${word}`;
+      fb.className = 'feedback ' + (ok?'good':'bad');
+      comment.textContent = '💬 ' + li.dataset.comment;
+      comment.classList.add('show');
+      if(ok) correctCount++; else addProblem(word);
+    } else if(text){
+      const val = norm(text.value);
+      text.classList.remove('correct','incorrect');
+      if(!val){ fb.textContent=''; comment.classList.remove('show'); return; }
+      const keyword = li.dataset.keyword;
+      const ok = val === answer || (keyword && val.includes(keyword));
+      text.classList.add(ok ? 'correct':'incorrect');
+      fb.textContent = ok ? '✓ верно' : `✗ пример верного ответа: ${word}`;
+      fb.className = 'feedback ' + (ok?'good':'bad');
+      comment.textContent = '💬 ' + li.dataset.comment;
+      comment.classList.add('show');
+      if(ok) correctCount++; else addProblem(word);
+    }
+  });
+  toast(`Проверено! Правильно: ${correctCount} из ${items.length}`);
+}
+
+function showAnswers(id){
+  const items = document.querySelectorAll(`#${id}-list li`);
+  items.forEach(li=>{
+    const comment = li.querySelector('.comment');
+    const select = li.querySelector('select');
+    const radios = li.querySelectorAll('input[type=radio]');
+    const text = li.querySelector('input[type=text]');
+    if(select){ select.value = li.dataset.answer; select.classList.remove('incorrect'); select.classList.add('correct'); }
+    else if(radios.length){
+      const labels = li.querySelectorAll('.radio-opts label');
+      radios.forEach(r=>{ r.checked = String(r.value)===li.dataset.answer; });
+      labels.forEach((l,i)=>{ l.classList.remove('correct','incorrect'); if(String(i)===li.dataset.answer) l.classList.add('correct'); });
+    } else if(text){ text.value = li.dataset.word; text.classList.remove('incorrect'); text.classList.add('correct'); }
+    li.querySelector('.feedback') && (li.querySelector('.feedback').textContent = '');
+    comment.textContent = '💬 ' + li.dataset.comment;
+    comment.classList.add('show');
+  });
+  toast('Показаны все ответы с объяснением');
+}
+
+function revealAll(id){
+  const items = document.querySelectorAll(`#${id}-list li`);
+  items.forEach(li=>{
+    const comment = li.querySelector('.comment');
+    comment.innerHTML = `💬 <b>Пример:</b> ${li.dataset.model} <br><span style="opacity:.85">${li.dataset.comment}</span>`;
+    comment.classList.add('show');
+  });
+  toast('Показаны примеры ответов с объяснением');
+}
+
+function copyAnswers(id){
+  const items = document.querySelectorAll(`#${id}-list li`);
+  let text = '';
+  items.forEach((li,i)=>{
+    const q = li.querySelector('.qtext').innerText;
+    const a = li.querySelector('textarea').value.trim() || '(пусто)';
+    text += `${i+1}. ${q}\n→ ${a}\n\n`;
+  });
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(()=>toast('Ответы скопированы в буфер обмена')).catch(()=>fallbackCopy(text));
+  } else { fallbackCopy(text); }
+}
+function fallbackCopy(text){
+  const ta = document.createElement('textarea');
+  ta.value = text; document.body.appendChild(ta); ta.select();
+  try{ document.execCommand('copy'); toast('Ответы скопированы в буфер обмена'); }
+  catch(e){ toast('Не удалось скопировать автоматически'); }
+  document.body.removeChild(ta);
+}
+
+/* ================= INIT ================= */
+renderProblems();
+</script>
+</body>
+</html>
