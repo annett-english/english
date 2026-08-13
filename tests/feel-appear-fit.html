@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Feel / Appear / Fit — практика</title>
+<style>
+  :root{
+    --paper:#f6f1e7;
+    --ink:#2b2a28;
+    --ink-soft:#5c574d;
+    --rule:#d8cfba;
+    --accent:#8a5a3b;   /* terracotta-brown, ink-stamp feel */
+    --accent-2:#3f6b5c; /* muted pine green */
+    --good:#3f6b5c;
+    --bad:#a4423a;
+    --good-bg:#e7efe9;
+    --bad-bg:#f5e6e3;
+    --card:#fffdf8;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    background-image:
+      radial-gradient(circle at 1px 1px, rgba(0,0,0,0.035) 1px, transparent 0);
+    background-size:22px 22px;
+    color:var(--ink);
+    font-family:'Georgia','Iowan Old Style',serif;
+    line-height:1.5;
+    padding:0 0 80px;
+  }
+  header.top{
+    max-width:900px;
+    margin:0 auto;
+    padding:48px 24px 28px;
+    text-align:center;
+    border-bottom:2px solid var(--rule);
+  }
+  header.top .eyebrow{
+    font-family:'Courier New',monospace;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    font-size:12px;
+    color:var(--accent);
+  }
+  header.top h1{
+    font-size:clamp(30px,5vw,46px);
+    margin:10px 0 6px;
+    font-weight:700;
+  }
+  header.top p{
+    color:var(--ink-soft);
+    font-size:16px;
+    max-width:640px;
+    margin:0 auto;
+  }
+  .rulebox{
+    max-width:820px;
+    margin:32px auto;
+    padding:22px 26px;
+    background:var(--card);
+    border:1px solid var(--rule);
+    border-left:6px solid var(--accent);
+    border-radius:2px;
+    font-family:Georgia, serif;
+  }
+  .rulebox h2{margin-top:0;font-size:20px;color:var(--accent);}
+  .rulebox table{width:100%;border-collapse:collapse;margin-top:10px;font-size:15px;}
+  .rulebox td{padding:5px 8px;vertical-align:top;border-top:1px dotted var(--rule);}
+  .rulebox td.ex{color:var(--ink-soft);font-style:italic;}
+  nav.toc{
+    max-width:900px;margin:28px auto;padding:0 24px;
+    display:flex;flex-wrap:wrap;gap:10px;justify-content:center;
+  }
+  nav.toc a{
+    text-decoration:none;
+    font-family:'Courier New',monospace;
+    font-size:13px;
+    letter-spacing:.03em;
+    color:var(--ink);
+    background:var(--card);
+    border:1px solid var(--rule);
+    padding:7px 12px;
+    border-radius:20px;
+  }
+  nav.toc a:hover{border-color:var(--accent);color:var(--accent);}
+  main{max-width:900px;margin:0 auto;padding:0 24px;}
+  section.ex{
+    background:var(--card);
+    border:1px solid var(--rule);
+    border-radius:3px;
+    margin:30px 0;
+    padding:28px 28px 24px;
+    position:relative;
+  }
+  section.ex .tag{
+    position:absolute;
+    top:-13px;left:24px;
+    background:var(--accent);
+    color:#fff;
+    font-family:'Courier New',monospace;
+    font-size:12px;
+    letter-spacing:.08em;
+    padding:4px 10px;
+    border-radius:20px;
+  }
+  section.ex h2{
+    margin:6px 0 4px;
+    font-size:22px;
+  }
+  section.ex .instr{
+    color:var(--ink-soft);
+    font-size:14.5px;
+    margin-bottom:18px;
+    font-style:italic;
+  }
+  .item{
+    border-top:1px dashed var(--rule);
+    padding:16px 0;
+  }
+  .item:first-of-type{border-top:none;}
+  .qnum{
+    font-weight:700;
+    color:var(--accent);
+    margin-right:6px;
+    font-family:'Courier New',monospace;
+  }
+  .qtext{font-size:16px;}
+  .qtext b{color:var(--ink);}
+  .options{margin-top:10px;display:flex;flex-direction:column;gap:6px;}
+  .options label{
+    display:flex;gap:8px;align-items:flex-start;
+    font-size:15px;
+    cursor:pointer;
+    padding:4px 8px;
+    border-radius:4px;
+  }
+  .options label:hover{background:#efe9d9;}
+  .options input{margin-top:4px;}
+  select.selans{
+    margin-top:8px;
+    font-family:Georgia, serif;
+    font-size:15px;
+    padding:6px 8px;
+    border:1px solid var(--rule);
+    border-radius:4px;
+    background:#fff;
+    width:100%;
+    max-width:520px;
+  }
+  input[type=text].ans{
+    margin-top:8px;
+    width:100%;
+    max-width:520px;
+    padding:8px 10px;
+    font-family:Georgia, serif;
+    font-size:15px;
+    border:1px solid var(--rule);
+    border-radius:4px;
+    background:#fff;
+  }
+  textarea.ans{
+    margin-top:8px;
+    width:100%;
+    max-width:640px;
+    min-height:60px;
+    padding:8px 10px;
+    font-family:Georgia, serif;
+    font-size:15px;
+    border:1px solid var(--rule);
+    border-radius:4px;
+    background:#fff;
+    resize:vertical;
+  }
+  .feedback{
+    margin-top:10px;
+    padding:10px 12px;
+    border-radius:4px;
+    font-size:14.5px;
+    display:none;
+  }
+  .feedback.show{display:block;}
+  .feedback.good{background:var(--good-bg);color:var(--good);border:1px solid var(--good);}
+  .feedback.bad{background:var(--bad-bg);color:var(--bad);border:1px solid var(--bad);}
+  .feedback .correct-ans{font-weight:700;}
+  .feedback .comment{display:block;margin-top:4px;color:var(--ink-soft);font-style:italic;}
+  .mic{
+    display:inline-block;
+    background:var(--accent-2);
+    color:#fff;
+    font-family:'Courier New',monospace;
+    font-size:12px;
+    padding:3px 9px;
+    border-radius:20px;
+    margin-left:8px;
+    vertical-align:middle;
+  }
+  .btnrow{
+    margin-top:20px;
+    display:flex;gap:12px;flex-wrap:wrap;align-items:center;
+  }
+  button{
+    font-family:'Courier New',monospace;
+    font-size:14px;
+    letter-spacing:.03em;
+    padding:10px 18px;
+    border-radius:20px;
+    border:1px solid var(--ink);
+    background:var(--ink);
+    color:#fff;
+    cursor:pointer;
+  }
+  button.secondary{
+    background:transparent;
+    color:var(--ink);
+  }
+  button:hover{opacity:.85;}
+  .score{
+    font-family:'Courier New',monospace;
+    font-size:14px;
+    color:var(--ink-soft);
+  }
+  .score b{color:var(--accent);}
+  footer{
+    text-align:center;
+    color:var(--ink-soft);
+    font-size:13px;
+    margin-top:50px;
+    font-family:'Courier New',monospace;
+  }
+  @media (max-width:600px){
+    header.top{padding:32px 16px 22px;}
+    section.ex{padding:22px 16px 18px;}
+    .rulebox{margin:24px 16px;padding:18px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="eyebrow">Grammar Workbook · Verbs of Appearance &amp; State</div>
+  <h1>Feel · Appear · Fit</h1>
+  <p>Значения глаголов feel / appear / fit, а также look / feel / hurt / ache в Present Simple и Present Continuous. 7 упражнений — проверяйте себя или сразу смотрите ответы с объяснением.</p>
+</header>
+
+<div class="rulebox">
+  <h2>📌 Правило: значения feel, appear, fit</h2>
+  <table>
+    <tr><td><b>feel</b> — чувствовать себя</td><td class="ex">I feel tired.</td></tr>
+    <tr><td><b>feel</b> — ощущать на ощупь</td><td class="ex">The fabric feels soft. / Feel the surface.</td></tr>
+    <tr><td><b>appear</b> — казаться, выглядеть</td><td class="ex">She appears tired. He appears to be happy.</td></tr>
+    <tr><td><b>appear</b> — появляться</td><td class="ex">A man suddenly appeared at the door.</td></tr>
+    <tr><td><b>appear</b> — выступать / сниматься</td><td class="ex">She appeared in several films.</td></tr>
+    <tr><td><b>fit</b> — подходить по размеру</td><td class="ex">These shoes don't fit me.</td></tr>
+    <tr><td><b>fit</b> — соответствовать</td><td class="ex">This description doesn't fit him.</td></tr>
+    <tr><td><b>fit</b> — быть в хорошей форме</td><td class="ex">She's very fit. I want to get fit.</td></tr>
+    <tr><td><b>fit</b> — вмещать / вписывать</td><td class="ex">We need to fit everything into one suitcase.</td></tr>
+  </table>
+</div>
+
+<div class="rulebox">
+  <h2>📌 Правило: look, feel, hurt, ache — Simple или Continuous?</h2>
+  <p style="margin:0 0 8px;font-size:15px;">Оба времени возможны, когда мы говорим о временном состоянии / о том, что происходит сейчас.</p>
+  <table>
+    <tr><td><b>Present Simple</b> — состояние в целом</td><td class="ex">You look tired. My back hurts.</td></tr>
+    <tr><td><b>Present Continuous</b> — акцент на «прямо сейчас»</td><td class="ex">You're looking tired today. My back is hurting.</td></tr>
+  </table>
+  <p style="margin:8px 0 0;font-size:14px;color:var(--ink-soft);">👉 Разница — в акценте: обычное состояние или «именно сейчас / в этот период».</p>
+</div>
+
+<nav class="toc">
+  <a href="#ex1">1. Перевод</a>
+  <a href="#ex2">2. Значение слова</a>
+  <a href="#ex3">3. Fill in — feel/appear/fit</a>
+  <a href="#ex4">4. Rephrase Simple ⇄ Continuous</a>
+  <a href="#ex5">5. Правило: сопоставь</a>
+  <a href="#ex6">6. Simple или Continuous?</a>
+  <a href="#ex7">7. Ответь на вопросы 🎤</a>
+</nav>
+
+<main id="app"></main>
+
+<footer>сделано для практики · нажимайте «Проверить» или «Показать ответы» в каждом упражнении</footer>
+
+<script>
+const exercises = [
+{
+  id:"ex1", tag:"Упражнение 1", title:"Перевод RU → EN",
+  instr:"Переведите предложения на английский, используя feel / appear / fit в нужном значении.",
+  type:"text",
+  items:[
+    {q:"Я чувствую себя уставшим.", answers:["i feel tired"], show:"I feel tired.", comment:"feel = чувствовать себя (своё состояние)."},
+    {q:"Эти туфли мне не подходят (по размеру).", answers:["these shoes dont fit me","these shoes do not fit me"], show:"These shoes don't fit me.", comment:"fit = подходить по размеру."},
+    {q:"Она выглядит уставшей.", answers:["she appears tired"], show:"She appears tired.", comment:"appear = казаться, выглядеть (как look, но более книжно/формально)."},
+    {q:"Ткань на ощупь мягкая.", answers:["the fabric feels soft"], show:"The fabric feels soft.", comment:"feel = ощущаться на ощупь (какой предмет)."},
+    {q:"Она в хорошей физической форме.", answers:["shes very fit","she is very fit"], show:"She's very fit.", comment:"fit = быть в хорошей физической форме."},
+    {q:"Нам нужно уместить всё в один чемодан.", answers:["we need to fit everything into one suitcase"], show:"We need to fit everything into one suitcase.", comment:"fit = вмещать / уместить."},
+    {q:"Внезапно у двери появился мужчина.", answers:["a man suddenly appeared at the door"], show:"A man suddenly appeared at the door.", comment:"appear = появляться, возникать."},
+    {q:"Статья появилась в газете.", answers:["the article appeared in the newspaper"], show:"The article appeared in the newspaper.", comment:"appear = появляться (о публикации, тексте)."},
+    {q:"Он снимался в нескольких фильмах.", answers:["he appeared in several films"], show:"He appeared in several films.", comment:"appear = сниматься/выступать на экране, сцене."},
+    {q:"Это описание ему не соответствует.", answers:["this description doesnt fit him","this description does not fit him"], show:"This description doesn't fit him.", comment:"fit = соответствовать, подходить (по смыслу)."}
+  ]
+},
+{
+  id:"ex2", tag:"Упражнение 2", title:"Какое это значение?",
+  instr:"Выберите верный перевод/значение выделенного глагола в предложении.",
+  type:"radio",
+  items:[
+    {q:"I <b>feel</b> tired.", options:["чувствовать себя","ощущать на ощупь","быть в форме"], correct:0, comment:"Речь о собственном состоянии человека."},
+    {q:"The fabric <b>feels</b> soft.", options:["чувствовать себя","ощущаться на ощупь","появляться"], correct:1, comment:"Так говорят о текстуре предмета, не о человеке."},
+    {q:"<b>Feel</b> the surface.", options:["ощупай, потрогай","почувствуй себя","подойди по размеру"], correct:0, comment:"Действие — потрогать что-то, чтобы проверить."},
+    {q:"These shoes don't <b>fit</b> me.", options:["вмещать","подходить по размеру","соответствовать по смыслу"], correct:1, comment:"Речь об обуви и размере ноги."},
+    {q:"This description doesn't <b>fit</b> him.", options:["подходить по размеру","вмещать","соответствовать / подходить по смыслу"], correct:2, comment:"Описание может «подходить» человеку только в переносном смысле."},
+    {q:"We need to <b>fit</b> everything into one suitcase.", options:["вмещать / уместить","быть в форме","появляться"], correct:0, comment:"Речь о том, чтобы всё поместилось в чемодан."},
+    {q:"She's very <b>fit</b>.", options:["подходит по размеру","в хорошей физической форме","соответствует"], correct:1, comment:"Fit как прилагательное = спортивный, в хорошей форме."},
+    {q:"She <b>appears</b> tired.", options:["казаться / выглядеть","появляться","выступать"], correct:0, comment:"Appear + прилагательное = казаться каким-то."},
+    {q:"A man suddenly <b>appeared</b> at the door.", options:["выступил","появился","показался (мнение)"], correct:1, comment:"Речь о физическом появлении человека."},
+    {q:"She <b>appeared</b> in several films.", options:["казалась","появилась внезапно","снималась / выступала"], correct:2, comment:"Appear in a film/play = сниматься, участвовать."}
+  ]
+},
+{
+  id:"ex3", tag:"Упражнение 3", title:"Fill in the gaps — feel / appear / fit",
+  instr:"Вставьте нужный глагол (feel, appear, fit) в правильной форме.",
+  type:"text",
+  items:[
+    {q:"These gloves ___ perfectly on my hands.", answers:["fit"], show:"fit", comment:"fit = подходить по размеру."},
+    {q:"She always ___ calm in stressful situations.", answers:["appears"], show:"appears", comment:"3-е лицо ед. число, Present Simple: appears = кажется."},
+    {q:"This key doesn't ___ the lock.", answers:["fit"], show:"fit", comment:"fit = подходить (технически)."},
+    {q:"The silk ___ very smooth.", answers:["feels"], show:"feels", comment:"feels = ощущается на ощупь."},
+    {q:"A rainbow suddenly ___ in the sky.", answers:["appeared"], show:"appeared", comment:"Past Simple: appeared = появилась."},
+    {q:"He ___ to be very confident.", answers:["appears"], show:"appears", comment:"appear to be = казаться (кем-то/каким-то)."},
+    {q:"We can't ___ all these boxes in the car.", answers:["fit"], show:"fit", comment:"fit = вместить."},
+    {q:"Do you ___ cold? Put on a jacket.", answers:["feel"], show:"feel", comment:"feel cold = чувствовать себя холодно/мёрзнуть."},
+    {q:"Her name ___ on the list.", answers:["appears"], show:"appears", comment:"appear = фигурировать, появляться (в списке, тексте)."},
+    {q:"He's really ___ ; he runs every day.", answers:["fit"], show:"fit", comment:"fit (прил.) = в хорошей физической форме."}
+  ]
+},
+{
+  id:"ex4", tag:"Упражнение 4", title:"Rephrase: Present Simple ⇄ Present Continuous",
+  instr:"Перефразируйте предложение, поменяв Present Simple на Present Continuous (или наоборот), сохранив смысл — акцент на «сейчас/в этот период».",
+  type:"text",
+  items:[
+    {q:"You look tired. → (сделайте акцент на «сегодня»)", answers:["youre looking tired today","you are looking tired today"], show:"You're looking tired today.", comment:"Continuous подчёркивает, что это заметно именно сегодня/сейчас."},
+    {q:"I feel sick. → (акцент на «сейчас»)", answers:["im feeling sick","i am feeling sick"], show:"I'm feeling sick.", comment:"Continuous = именно в данный момент, а не вообще."},
+    {q:"My back hurts. → (акцент на «прямо сейчас»)", answers:["my back is hurting"], show:"My back is hurting.", comment:"is hurting — боль ощущается в этот момент."},
+    {q:"My legs ache. → (акцент на «сейчас»)", answers:["my legs are aching"], show:"My legs are aching.", comment:"are aching — временное состояние в данный момент."},
+    {q:"She looks upset. → (акцент на «сейчас»)", answers:["shes looking upset","she is looking upset"], show:"She's looking upset.", comment:"Continuous — заметно именно в этот момент."},
+    {q:"His arm hurts. → (акцент на «сейчас»)", answers:["his arm is hurting"], show:"His arm is hurting.", comment:"Continuous подчёркивает текущий момент боли."},
+    {q:"We feel excited. → (акцент на «сейчас»)", answers:["were feeling excited","we are feeling excited"], show:"We're feeling excited.", comment:"Continuous — эмоция именно сейчас."},
+    {q:"Their feet ache. → (акцент на «сейчас»)", answers:["their feet are aching"], show:"Their feet are aching.", comment:"Continuous — боль в этот момент."},
+    {q:"He is looking pale today. → (в общем, как факт)", answers:["he looks pale"], show:"He looks pale.", comment:"Simple — констатация состояния без акцента на «именно сейчас»."},
+    {q:"They are feeling nervous right now. → (в общем, как факт)", answers:["they feel nervous"], show:"They feel nervous.", comment:"Simple — общее описание состояния."}
+  ]
+},
+{
+  id:"ex5", tag:"Упражнение 5", title:"Сопоставьте предложение и правило",
+  instr:"Для каждого предложения выберите объяснение, которое описывает его значение.",
+  type:"select",
+  options:[
+    "seem / look as if something is true — казаться, выглядеть как будто",
+    "take part in a film, play or show — сниматься, выступать",
+    "have some appearance — иметь какой-то вид, выглядеть",
+    "direct your eyes at something — смотреть на что-то",
+    "be the right size — подходить по размеру",
+    "put or install something — устанавливать, монтировать",
+    "describe someone's usual character or permanent quality — обычная черта характера",
+    "describe someone's temporary behaviour — временное поведение",
+    "have a particular texture — иметь определённую текстуру на ощупь",
+    "touch something to check it — потрогать, чтобы проверить"
+  ],
+  items:[
+    {q:"You look tired today.", correct:2, comment:"look tired = иметь усталый вид, «выглядеть»."},
+    {q:"Sarah is looking at the picture.", correct:3, comment:"look at = направлять взгляд на что-то, физическое действие."},
+    {q:"This dress fits me perfectly.", correct:4, comment:"fit = подходить по размеру."},
+    {q:"They are fitting new windows in the house.", correct:5, comment:"fit (в контексте ремонта) = устанавливать, монтировать."},
+    {q:"He is usually very polite.", correct:6, comment:"usually указывает на постоянную черту характера."},
+    {q:"He is being very rude today.", correct:7, comment:"be being + прил. = временное, необычное поведение сегодня."},
+    {q:"The baby's hair feels like silk.", correct:8, comment:"feel like = иметь текстуру, ощущаться как что-то."},
+    {q:"The doctor is feeling the baby's face.", correct:9, comment:"feel = ощупывать, трогать, чтобы проверить."},
+    {q:"He appears to be nervous.", correct:0, comment:"appear to be = казаться, производить впечатление."},
+    {q:"He is appearing in a new film.", correct:1, comment:"appear in a film = сниматься, участвовать."}
+  ]
+},
+{
+  id:"ex6", tag:"Упражнение 6", title:"Present Simple или Present Continuous?",
+  instr:"Выберите правильную форму глагола, ориентируясь на слова-подсказки (usually, right now, today, always и т.д.).",
+  type:"radio",
+  items:[
+    {q:"I <b>usually</b> ___ great in the mornings.", options:["feel","am feeling"], correct:0, comment:"usually — постоянная привычка → Present Simple."},
+    {q:"Wait, I ___ dizzy <b>right now</b>.", options:["feel","am feeling"], correct:1, comment:"right now — состояние именно в этот момент → Continuous."},
+    {q:"My head ___ terribly <b>at the moment</b>.", options:["hurts","is hurting"], correct:1, comment:"at the moment — акцент на текущий момент → Continuous."},
+    {q:"Old wounds <b>sometimes</b> ___ before it rains.", options:["hurt","are hurting"], correct:0, comment:"sometimes описывает повторяющуюся закономерность → Simple."},
+    {q:"You ___ great <b>today</b>! Did you cut your hair?", options:["look","are looking"], correct:1, comment:"today — наблюдение именно сейчас/сегодня → Continuous."},
+    {q:"He <b>always</b> ___ so serious in photos.", options:["looks","is looking"], correct:0, comment:"always — обобщение, постоянная особенность → Simple."},
+    {q:"My feet ___ badly <b>right now</b>, after standing all day.", options:["ache","are aching"], correct:1, comment:"right now — состояние в текущий момент → Continuous."},
+    {q:"Old injuries <b>usually</b> ___ in cold weather.", options:["ache","are aching"], correct:0, comment:"usually — типичная закономерность → Simple."},
+    {q:"She ___ very pale <b>right now</b> — I think she's about to faint.", options:["looks","is looking"], correct:1, comment:"right now — конкретный момент → Continuous."},
+    {q:"He <b>never</b> ___ upset, even in difficult situations.", options:["looks","is looking"], correct:0, comment:"never — общая черта характера/поведения → Simple."}
+  ]
+},
+{
+  id:"ex7", tag:"Упражнение 7", title:"Ответьте на вопросы",
+  instr:"Ответьте на вопросы устно — запишите голосовое сообщение и отправьте учителю 🎤. Можно кратко записать план ответа в поле ниже (не проверяется автоматически).",
+  type:"textarea",
+  items:[
+    {q:"How do you usually feel in the morning?", show:"Например: I usually feel energetic in the morning, but today I feel a bit tired.", comment:"Используйте feel + прилагательное."},
+    {q:"Do these jeans fit you well? Why / why not?", show:"Например: These jeans fit me perfectly. / They don't fit me — they're too tight.", comment:"fit = подходить по размеру."},
+    {q:"Describe someone who appears calm but is actually nervous.", show:"Например: My friend appears calm before exams, but she's actually very nervous.", comment:"appear + прил. = казаться."},
+    {q:"What does silk / velvet feel like?", show:"Например: Silk feels smooth and soft to the touch.", comment:"feel like = ощущаться на ощупь."},
+    {q:"Tell about a time something suddenly appeared or someone appeared unexpectedly.", show:"Например: A cat suddenly appeared in the garden.", comment:"appear = появляться."},
+    {q:"Is it easy to get fit? What do you do to stay fit?", show:"Например: I try to stay fit by running three times a week.", comment:"fit (прил.) = в хорошей физической форме."},
+    {q:"Does your back or head ever hurt? When?", show:"Например: My back sometimes hurts after a long day at the computer.", comment:"hurt = болеть; sometimes → Simple."},
+    {q:"How are you feeling right now, at this moment?", show:"Например: I'm feeling quite relaxed right now.", comment:"Present Continuous — акцент на «сейчас»."},
+    {q:"Have you ever appeared on TV, in a video or on stage?", show:"Например: I once appeared in a school play.", comment:"appear = выступать, участвовать."},
+    {q:"Can you fit all your things into one bag when you travel?", show:"Например: I can never fit everything into one suitcase!", comment:"fit = вмещать."}
+  ]
+}
+];
+
+function normalize(s){
+  return s.toLowerCase()
+    .replace(/['’]/g,"")
+    .replace(/[.,!?;:]/g,"")
+    .replace(/\s+/g," ")
+    .trim();
+}
+
+function renderExercise(ex, idx){
+  const section = document.createElement("section");
+  section.className = "ex";
+  section.id = ex.id;
+  section.innerHTML = `<div class="tag">${ex.tag}</div><h2>${ex.title}</h2><p class="instr">${ex.instr}</p>`;
+
+  ex.items.forEach((item, i) => {
+    const div = document.createElement("div");
+    div.className = "item";
+    let inner = `<div class="qtext"><span class="qnum">${i+1}.</span> ${item.q}`;
+    if(ex.type === "textarea") inner += ` <span class="mic">🎤 voice</span>`;
+    inner += `</div>`;
+
+    if(ex.type === "text"){
+      inner += `<input type="text" class="ans" data-idx="${i}" placeholder="ваш ответ...">`;
+    } else if(ex.type === "radio"){
+      inner += `<div class="options">` + item.options.map((opt,oi)=>
+        `<label><input type="radio" name="${ex.id}-q${i}" value="${oi}"> ${opt}</label>`
+      ).join("") + `</div>`;
+    } else if(ex.type === "select"){
+      inner += `<select class="selans" data-idx="${i}"><option value="-1">— выберите объяснение —</option>` +
+        ex.options.map((opt,oi)=>`<option value="${oi}">${opt}</option>`).join("") + `</select>`;
+    } else if(ex.type === "textarea"){
+      inner += `<textarea class="ans" data-idx="${i}" placeholder="кратко запишите план ответа (необязательно)"></textarea>`;
+    }
+
+    inner += `<div class="feedback" data-fb="${i}"></div>`;
+    div.innerHTML = inner;
+    section.appendChild(div);
+  });
+
+  const btnrow = document.createElement("div");
+  btnrow.className = "btnrow";
+  btnrow.innerHTML = `
+    <button data-action="check">Проверить</button>
+    <button class="secondary" data-action="reveal">Показать ответы</button>
+    <button class="secondary" data-action="reset">Очистить</button>
+    <span class="score" data-score></span>
+  `;
+  section.appendChild(btnrow);
+
+  section.querySelector('[data-action="check"]').addEventListener("click", () => checkExercise(ex, section));
+  section.querySelector('[data-action="reveal"]').addEventListener("click", () => revealExercise(ex, section));
+  section.querySelector('[data-action="reset"]').addEventListener("click", () => resetExercise(ex, section));
+
+  return section;
+}
+
+function checkExercise(ex, section){
+  let correctCount = 0;
+  ex.items.forEach((item, i) => {
+    const fb = section.querySelector(`[data-fb="${i}"]`);
+    fb.classList.remove("show","good","bad");
+    let isCorrect = null;
+
+    if(ex.type === "text"){
+      const input = section.querySelector(`input.ans[data-idx="${i}"]`);
+      const val = normalize(input.value);
+      if(val.length === 0){ fb.classList.add("show","bad"); fb.innerHTML = `Введите ответ. <span class="correct-ans">Правильный вариант: ${item.show}</span><span class="comment">${item.comment}</span>`; return; }
+      isCorrect = item.answers.some(a => normalize(a) === val);
+    } else if(ex.type === "radio"){
+      const checked = section.querySelector(`input[name="${ex.id}-q${i}"]:checked`);
+      if(!checked){ fb.classList.add("show","bad"); fb.innerHTML = `Выберите вариант. <span class="correct-ans">Правильный: ${item.options[item.correct]}</span><span class="comment">${item.comment}</span>`; return; }
+      isCorrect = parseInt(checked.value) === item.correct;
+    } else if(ex.type === "select"){
+      const sel = section.querySelector(`select.selans[data-idx="${i}"]`);
+      const val = parseInt(sel.value);
+      if(val === -1){ fb.classList.add("show","bad"); fb.innerHTML = `Выберите вариант. <span class="correct-ans">Правильный: ${ex.options[item.correct]}</span><span class="comment">${item.comment}</span>`; return; }
+      isCorrect = val === item.correct;
+    } else if(ex.type === "textarea"){
+      // open-ended, not auto-graded
+      fb.classList.add("show","good");
+      fb.innerHTML = `Записано. <span class="comment">${item.comment}</span>`;
+      return;
+    }
+
+    if(isCorrect){
+      correctCount++;
+      fb.classList.add("show","good");
+      fb.innerHTML = `✅ Верно! <span class="comment">${item.comment}</span>`;
+    } else {
+      fb.classList.add("show","bad");
+      const correctText = ex.type === "text" ? item.show : (ex.type === "radio" ? item.options[item.correct] : ex.options[item.correct]);
+      fb.innerHTML = `❌ Неверно. <span class="correct-ans">Правильный ответ: ${correctText}</span><span class="comment">${item.comment}</span>`;
+    }
+  });
+
+  const scoreEl = section.querySelector("[data-score]");
+  if(ex.type === "textarea"){
+    scoreEl.innerHTML = `Ответы записаны — не забудьте отправить 🎤 голосовое учителю.`;
+  } else {
+    scoreEl.innerHTML = `Результат: <b>${correctCount} / ${ex.items.length}</b>`;
+  }
+}
+
+function revealExercise(ex, section){
+  ex.items.forEach((item, i) => {
+    const fb = section.querySelector(`[data-fb="${i}"]`);
+    fb.classList.remove("bad");
+    fb.classList.add("show","good");
+    const answerText = ex.type === "text" ? item.show : (ex.type === "radio" ? item.options[item.correct] : (ex.type === "select" ? ex.options[item.correct] : item.show));
+    fb.innerHTML = `<span class="correct-ans">Ответ: ${answerText}</span><span class="comment">${item.comment}</span>`;
+  });
+  const scoreEl = section.querySelector("[data-score]");
+  scoreEl.innerHTML = "Показаны все ответы.";
+}
+
+function resetExercise(ex, section){
+  section.querySelectorAll("input.ans, textarea.ans").forEach(el => el.value = "");
+  section.querySelectorAll("input[type=radio]").forEach(el => el.checked = false);
+  section.querySelectorAll("select.selans").forEach(el => el.value = "-1");
+  section.querySelectorAll(".feedback").forEach(el => { el.classList.remove("show","good","bad"); el.innerHTML=""; });
+  section.querySelector("[data-score]").innerHTML = "";
+}
+
+const app = document.getElementById("app");
+exercises.forEach((ex,i) => app.appendChild(renderExercise(ex,i)));
+</script>
+</body>
+</html>
