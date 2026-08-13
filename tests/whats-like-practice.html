@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>What's ... like? — тренажёр</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#16213e;
+  --navy-deep:#0e1730;
+  --paper:#f4efe1;
+  --gold:#c99a2e;
+  --gold-dim:#a67f22;
+  --teal:#3f8a83;
+  --ok:#3f8f5f;
+  --ok-bg:#e4f3e8;
+  --err:#c1502e;
+  --err-bg:#fbe7de;
+  --ink:#1c2333;
+  --muted:#6b7280;
+  --line:#d8cfb6;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--navy);
+  background-image:
+    radial-gradient(circle at 10% 0%, rgba(201,154,46,0.10), transparent 40%),
+    radial-gradient(circle at 90% 10%, rgba(63,138,131,0.12), transparent 45%);
+  font-family:'Inter',sans-serif;
+  color:var(--ink);
+  min-height:100vh;
+  padding:32px 16px 80px;
+}
+.wrap{max-width:900px;margin:0 auto;}
+
+/* ---- HERO ---- */
+.hero{
+  background:var(--navy-deep);
+  border:1px solid rgba(201,154,46,0.35);
+  border-radius:18px;
+  padding:36px 32px 28px;
+  color:var(--paper);
+  position:relative;
+  overflow:hidden;
+  margin-bottom:28px;
+}
+.hero::before{
+  content:"";
+  position:absolute; inset:0;
+  background-image:repeating-linear-gradient(135deg, rgba(255,255,255,0.025) 0 2px, transparent 2px 22px);
+  pointer-events:none;
+}
+.hero .eyebrow{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:12px; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--gold); margin-bottom:10px;
+}
+.hero h1{
+  font-family:'Fraunces',serif;
+  font-weight:700;
+  font-size:clamp(28px,5vw,42px);
+  margin:0 0 8px;
+  line-height:1.1;
+}
+.hero h1 em{color:var(--gold); font-style:normal;}
+.hero p.sub{color:#c9cfe0; max-width:60ch; margin:0; font-size:15px; line-height:1.55;}
+
+/* rule box styled like a boarding pass */
+.rulebox{
+  margin-top:24px;
+  background:var(--paper);
+  color:var(--ink);
+  border-radius:12px;
+  display:grid;
+  grid-template-columns:1fr;
+  position:relative;
+}
+.rulebox .stub-cut{
+  position:relative;
+  padding:20px 24px 22px;
+}
+.rule-title{
+  font-family:'Fraunces',serif; font-weight:600; font-size:19px; margin:0 0 12px;
+  display:flex; align-items:center; gap:8px;
+}
+.rule-title .dot{width:9px;height:9px;border-radius:50%;background:var(--teal);display:inline-block;}
+.rule-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+  margin-bottom:14px;
+}
+@media (max-width:680px){.rule-grid{grid-template-columns:1fr;}}
+.rule-card{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:12px 14px;
+}
+.rule-card .tag{
+  font-family:'IBM Plex Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:.08em;
+  color:var(--teal); margin-bottom:6px; display:block;
+}
+.rule-card .formula{
+  font-family:'IBM Plex Mono',monospace; font-size:13.5px; color:var(--navy); margin-bottom:6px;
+}
+.rule-card .example{font-size:13.5px; color:var(--muted);}
+.rule-note{
+  border-top:1px dashed var(--line);
+  padding-top:12px; margin-top:2px;
+  font-size:13.5px; color:var(--muted); line-height:1.55;
+}
+.rule-note b{color:var(--ink);}
+
+/* ---- EXERCISE SECTIONS ---- */
+.exercise{
+  background:var(--paper);
+  border-radius:16px;
+  margin-bottom:24px;
+  overflow:hidden;
+  border:1px solid rgba(201,154,46,0.25);
+}
+.ex-head{
+  padding:20px 24px 14px;
+  display:flex; align-items:flex-start; gap:16px;
+  border-bottom:1px dashed var(--line);
+}
+.stamp{
+  flex:0 0 auto;
+  width:52px;height:52px;border-radius:50%;
+  border:2px solid var(--gold-dim);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Fraunces',serif; font-weight:700; font-size:20px;
+  color:var(--gold-dim);
+  transform:rotate(-6deg);
+  background:repeating-radial-gradient(circle, rgba(201,154,46,0.06) 0 2px, transparent 2px 6px);
+}
+.ex-head h2{
+  font-family:'Fraunces',serif; font-size:21px; margin:2px 0 4px; font-weight:600;
+}
+.ex-head .instr{font-size:14px; color:var(--muted); line-height:1.5;}
+.ex-body{padding:18px 24px 22px;}
+
+.item{
+  padding:14px 0;
+  border-bottom:1px solid var(--line);
+}
+.item:last-of-type{border-bottom:none;}
+.item .qnum{
+  font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--teal); margin-bottom:6px; letter-spacing:.04em;
+}
+.item .qtext{font-size:15px; margin-bottom:10px; line-height:1.5;}
+.item .qtext .blank{
+  display:inline-block; border-bottom:2px solid var(--gold-dim); min-width:64px; height:1em;
+}
+.item .picture{font-size:26px; margin-right:6px;}
+
+.opts{display:flex; flex-wrap:wrap; gap:8px;}
+.opt-btn{
+  font-family:'Inter',sans-serif; font-size:13.5px;
+  padding:8px 13px; border-radius:8px; border:1px solid var(--line);
+  background:#fff; cursor:pointer; transition:all .15s ease;
+}
+.opt-btn:hover{border-color:var(--gold-dim);}
+.opt-btn.selected{border-color:var(--navy); background:#eef1f8;}
+.opt-btn.correct{background:var(--ok-bg); border-color:var(--ok); color:var(--ok);}
+.opt-btn.incorrect{background:var(--err-bg); border-color:var(--err); color:var(--err);}
+
+.text-input{
+  width:100%; max-width:480px;
+  padding:9px 12px; border-radius:8px; border:1px solid var(--line);
+  font-family:'IBM Plex Mono',monospace; font-size:13.5px;
+  background:#fff;
+}
+.text-input.correct{border-color:var(--ok); background:var(--ok-bg);}
+.text-input.incorrect{border-color:var(--err); background:var(--err-bg);}
+
+.explain{
+  margin-top:9px; font-size:13px; line-height:1.5; color:var(--muted);
+  background:#fff; border-left:3px solid var(--teal); padding:8px 12px; border-radius:0 8px 8px 0;
+  display:none;
+}
+.explain.show{display:block;}
+.explain b{color:var(--ink);}
+.model-answer{color:var(--navy); font-family:'IBM Plex Mono',monospace; font-size:13px; margin-top:2px; display:block;}
+
+.controls{
+  display:flex; flex-wrap:wrap; gap:10px; margin-top:18px; align-items:center;
+}
+.btn{
+  font-family:'Inter',sans-serif; font-weight:600; font-size:13.5px;
+  padding:10px 18px; border-radius:9px; border:none; cursor:pointer;
+  transition:transform .1s ease, opacity .15s ease;
+}
+.btn:active{transform:scale(0.97);}
+.btn-primary{background:var(--navy); color:var(--paper);}
+.btn-secondary{background:#fff; color:var(--navy); border:1px solid var(--line);}
+.btn-ghost{background:transparent; color:var(--teal); border:1px solid var(--teal);}
+.btn-copy{background:var(--gold); color:var(--navy-deep);}
+.score{
+  margin-left:auto; font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--muted);
+}
+.score.good{color:var(--ok);}
+.copied-msg{
+  font-size:12.5px; color:var(--ok); font-family:'IBM Plex Mono',monospace; display:none;
+}
+.copied-msg.show{display:inline;}
+
+.context-box{
+  background:#fff; border:1px solid var(--line); border-radius:10px;
+  padding:14px 16px; margin-bottom:16px; font-size:14px; line-height:1.6; color:var(--ink);
+}
+.context-box .flag{font-size:18px; margin-right:6px;}
+
+footer{
+  text-align:center; color:#9aa3c2; font-size:12.5px; margin-top:20px; font-family:'IBM Plex Mono',monospace;
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero">
+    <div class="eyebrow">Grammar Passport · Question Formation</div>
+    <h1>What's it <em>like</em>?<br>Тренажёр вопросов «какой?»</h1>
+    <p class="sub">Отработка структуры <b style="color:#fff">What's / What was / What will ... be like?</b> — 7 упражнений, в каждом по 8 заданий. Проверяйте себя кнопками, читайте объяснения, копируйте готовые ответы.</p>
+
+    <div class="rulebox">
+      <div class="stub-cut">
+        <p class="rule-title"><span class="dot"></span>Правило</p>
+        <div class="rule-grid">
+          <div class="rule-card">
+            <span class="tag">Present</span>
+            <div class="formula">What + is/are + S + like?</div>
+            <div class="example">What's the weather like?</div>
+          </div>
+          <div class="rule-card">
+            <span class="tag">Past</span>
+            <div class="formula">What + was/were + S + like?</div>
+            <div class="example">What was the trip like?</div>
+          </div>
+          <div class="rule-card">
+            <span class="tag">Future</span>
+            <div class="formula">What + will + S + be + like?</div>
+            <div class="example">What will the exam be like?</div>
+          </div>
+        </div>
+        <div class="rule-note">
+          Вопрос <b>What ... like?</b> спрашивает про <b>качество / впечатление / характер</b> — «какой (он) по своим качествам?» Он <b>не совпадает</b> с «What does ... look like?» (внешность) и не требует ответа да/нет. Слово <b>like</b> здесь — предлог и всегда стоит в конце вопроса; форма не меняется (не likes, не liked). После <b>will</b> обязательно нужен глагол <b>be</b>: <i>What will it be like</i>, а не <i>What will it like</i>.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXERCISE 1 -->
+  <section class="exercise" id="ex1">
+    <div class="ex-head">
+      <div class="stamp">1</div>
+      <div>
+        <h2>Choose the correct answer</h2>
+        <div class="instr">Выберите правильный вариант, чтобы закончить вопрос.</div>
+      </div>
+    </div>
+    <div class="ex-body" id="ex1-items"></div>
+    <div class="controls">
+      <button class="btn btn-primary" onclick="checkMCQ('ex1')">Проверить</button>
+      <button class="btn btn-secondary" onclick="revealMCQ('ex1')">Показать ответы</button>
+      <button class="btn btn-ghost" onclick="resetMCQ('ex1')">Сбросить</button>
+      <span class="score" id="ex1-score"></span>
+    </div>
+  </section>
+
+  <!-- EXERCISE 2 -->
+  <section class="exercise" id="ex2">
+    <div class="ex-head">
+      <div class="stamp">2</div>
+      <div>
+        <h2>Fill in the gaps</h2>
+        <div class="instr">Впишите правильную форму глагола be (is / are / was / were / will be).</div>
+      </div>
+    </div>
+    <div class="ex-body" id="ex2-items"></div>
+    <div class="controls">
+      <button class="btn btn-primary" onclick="checkText('ex2')">Проверить</button>
+      <button class="btn btn-secondary" onclick="revealText('ex2')">Показать ответы</button>
+      <button class="btn btn-ghost" onclick="resetText('ex2')">Сбросить</button>
+      <span class="score" id="ex2-score"></span>
+    </div>
+  </section>
+
+  <!-- EXERCISE 3 -->
+  <section class="exercise" id="ex3">
+    <div class="ex-head">
+      <div class="stamp">3</div>
+      <div>
+        <h2>Translate</h2>
+        <div class="instr">Переведите предложение на английский, используя структуру What ... like?</div>
+      </div>
+    </div>
+    <div class="ex-body" id="ex3-items"></div>
+    <div class="controls">
+      <button class="btn btn-primary" onclick="checkText('ex3')">Проверить</button>
+      <button class="btn btn-secondary" onclick="revealText('ex3')">Показать ответы</button>
+      <button class="btn btn-ghost" onclick="resetText('ex3')">Сбросить</button>
+      <span class="score" id="ex3-score"></span>
+    </div>
+  </section>
+
+  <!-- EXERCISE 4 -->
+  <section class="exercise" id="ex4">
+    <div class="ex-head">
+      <div class="stamp">4</div>
+      <div>
+        <h2>Составь предложение по картинке</h2>
+        <div class="instr">По эмодзи-подсказке и ситуации составьте вопрос What ... like? в нужном времени.</div>
+      </div>
+    </div>
+    <div class="ex-body" id="ex4-items"></div>
+    <div class="controls">
+      <button class="btn btn-primary" onclick="checkText('ex4')">Проверить</button>
+      <button class="btn btn-secondary" onclick="revealText('ex4')">Показать ответы</button>
+      <button class="btn btn-ghost" onclick="resetText('ex4')">Сбросить</button>
+      <span class="score" id="ex4-score"></span>
+    </div>
+  </section>
+
+  <!-- EXERCISE 5 -->
+  <section class="exercise" id="ex5">
+    <div class="ex-head">
+      <div class="stamp">5</div>
+      <div>
+        <h2>What usually comes after?</h2>
+        <div class="instr">Выберите ответ, который логично следует за вопросом What ... like? (описание качества, а не да/нет и не факты вроде цены/даты).</div>
+      </div>
+    </div>
+    <div class="ex-body" id="ex5-items"></div>
+    <div class="controls">
+      <button class="btn btn-primary" onclick="checkMCQ('ex5')">Проверить</button>
+      <button class="btn btn-secondary" onclick="revealMCQ('ex5')">Показать ответы</button>
+      <button class="btn btn-ghost" onclick="resetMCQ('ex5')">Сбросить</button>
+      <span class="score" id="ex5-score"></span>
+    </div>
+  </section>
+
+  <!-- EXERCISE 6 -->
+  <section class="exercise" id="ex6">
+    <div class="ex-head">
+      <div class="stamp">6</div>
+      <div>
+        <h2>Друг вернулся из Китая 🇨🇳</h2>
+        <div class="instr">Твой друг Макс вернулся из поездки в Китай. Составь 8 вопросов What was ... like?, чтобы расспросить его о поездке.</div>
+      </div>
+    </div>
+    <div class="ex-body">
+      <div class="context-box"><span class="flag">✈️</span>Max has just come back from a two-week trip to China. Ask him about it using <b>What was ... like?</b></div>
+      <div id="ex6-items"></div>
+    </div>
+    <div class="controls">
+      <button class="btn btn-primary" onclick="checkText('ex6')">Проверить</button>
+      <button class="btn btn-secondary" onclick="revealText('ex6')">Показать ответы</button>
+      <button class="btn btn-ghost" onclick="resetText('ex6')">Сбросить</button>
+      <button class="btn btn-copy" onclick="copyAnswers('ex6')">📋 Скопировать все ответы</button>
+      <span class="copied-msg" id="ex6-copied">Скопировано!</span>
+      <span class="score" id="ex6-score"></span>
+    </div>
+  </section>
+
+  <!-- EXERCISE 7 -->
+  <section class="exercise" id="ex7">
+    <div class="ex-head">
+      <div class="stamp">7</div>
+      <div>
+        <h2>Drilling: Repeat &amp; Change</h2>
+        <div class="instr">Модель: <i>weather / tomorrow</i> → <b>What will the weather be like tomorrow?</b> Повторите структуру по образцу, но подставьте свою идею для каждой темы (время указано в скобках).</div>
+      </div>
+    </div>
+    <div class="ex-body" id="ex7-items"></div>
+    <div class="controls">
+      <button class="btn btn-primary" onclick="checkText('ex7')">Проверить (по ключевым словам)</button>
+      <button class="btn btn-secondary" onclick="revealText('ex7')">Показать пример ответа</button>
+      <button class="btn btn-ghost" onclick="resetText('ex7')">Сбросить</button>
+      <button class="btn btn-copy" onclick="copyAnswers('ex7')">📋 Скопировать мои ответы</button>
+      <span class="copied-msg" id="ex7-copied">Скопировано!</span>
+      <span class="score" id="ex7-score"></span>
+    </div>
+  </section>
+
+  <footer>Grammar Passport — What ... like? · сделайте закладку, чтобы вернуться к практике</footer>
+</div>
+
+<script>
+/* ---------------- DATA ---------------- */
+
+const ex1 = [
+ {q:"What ___ your new teacher like? (this term)", opts:["is","was","will be","does"], correct:0,
+  exp:"Present: речь о качествах учителя сейчас, поэтому нужен present be — <b>is</b> (subject singular)."},
+ {q:"What ___ the party like last night?", opts:["is","was","will be","were"], correct:1,
+  exp:"Маркер <b>last night</b> = прошедшее время, subject <i>the party</i> единственное число → <b>was</b>."},
+ {q:"What ___ the weather like tomorrow?", opts:["is","was","will be","does"], correct:2,
+  exp:"Маркер <b>tomorrow</b> = будущее. После <b>will</b> нужен глагол <b>be</b>, поэтому целиком — <b>will be</b>."},
+ {q:"What ___ your parents like when they were young?", opts:["was","were","will be","are"], correct:1,
+  exp:"Subject <i>your parents</i> — множественное число, действие в прошлом → <b>were</b>."},
+ {q:"What's your new phone ___?", opts:["like","liking","likes","alike"], correct:0,
+  exp:"В этой конструкции <b>like</b> — неизменяемый предлог в конце вопроса, никогда не добавляем -s/-ing."},
+ {q:"What ___ the exam like next week?", opts:["is","was","will be","were"], correct:2,
+  exp:"Экзамен ещё не состоялся (<b>next week</b>) — предсказание/будущее → <b>will be</b>."},
+ {q:"What ___ London like when you visited it?", opts:["is","was","will be","does"], correct:1,
+  exp:"Однократное действие в прошлом (<i>when you visited</i>) → <b>was</b>."},
+ {q:"___ the food like at that new restaurant?", opts:["What's","What does","Which is","How's"], correct:0,
+  exp:"Мы тренируем именно фиксированную конструкцию <b>What's ... like?</b> для описания качества; <i>What does</i> требует смыслового глагола, а не be."}
+];
+
+const ex2 = [
+ {q:"What ___ the film like? I haven't seen it, but people say it's amazing.", accepted:["is"], exp:"Мнение о фильме прямо сейчас, subject singular (<i>the film</i>) → present <b>is</b>."},
+ {q:"What ___ the interview like yesterday?", accepted:["was"], exp:"Маркер <b>yesterday</b> + singular subject <i>the interview</i> → <b>was</b>."},
+ {q:"What ___ your grandparents like when they were young?", accepted:["were"], exp:"Plural subject <i>grandparents</i> + прошлое → <b>were</b>."},
+ {q:"What ___ the new office like next year, after the renovation?", accepted:["will be"], exp:"Событие в будущем (<b>next year</b>) → <b>will be</b> (will + be, не просто will)."},
+ {q:"What ___ his new car like? I saw it in the photo.", accepted:["is"], exp:"Описываем машину как она есть сейчас → present <b>is</b>."},
+ {q:"What ___ your holidays like last summer?", accepted:["were"], exp:"<i>Holidays</i> во множественном числе + <b>last summer</b> (прошлое) → <b>were</b>."},
+ {q:"What ___ the traffic like tomorrow morning during the strike?", accepted:["will be"], exp:"Маркер <b>tomorrow morning</b> — будущее предсказание → <b>will be</b>."},
+ {q:"What ___ Paris like when you lived there?", accepted:["was"], exp:"Ситуация в прошлом, subject singular (<i>Paris</i>) → <b>was</b>."}
+];
+
+const ex3 = [
+ {q:"Какая погода в Лондоне?", accepted:["what is the weather like in london","what's the weather like in london"], exp:"Present, вопрос о качестве погоды сейчас: <b>What's/What is the weather like in London?</b>"},
+ {q:"Каким был твой отпуск?", accepted:["what was your holiday like"], exp:"Past, subject singular <i>your holiday</i> → <b>What was your holiday like?</b>"},
+ {q:"Какой будет вечеринка в субботу?", accepted:["what will the party be like on saturday"], exp:"Future + be после will: <b>What will the party be like on Saturday?</b>"},
+ {q:"Какими были твои родители в молодости?", accepted:["what were your parents like when they were young"], exp:"Plural + past: <b>What were your parents like when they were young?</b>"},
+ {q:"Какой этот новый учитель?", accepted:["what is the new teacher like","what's the new teacher like"], exp:"Present, singular subject: <b>What's the new teacher like?</b>"},
+ {q:"Каким будет экзамен на следующей неделе?", accepted:["what will the exam be like next week"], exp:"Future + be: <b>What will the exam be like next week?</b>"},
+ {q:"Каким был Лондон, когда ты его посетил?", accepted:["what was london like when you visited it","what was london like when you visited"], exp:"Past, singular subject <i>London</i>: <b>What was London like when you visited it?</b>"},
+ {q:"Какая еда в этом ресторане?", accepted:["what is the food like in this restaurant","what's the food like in this restaurant"], exp:"Present, singular subject <i>the food</i>: <b>What's the food like in this restaurant?</b>"}
+];
+
+const ex4 = [
+ {q:"🌦️ Завтра — прогноз погоды", accepted:["what will the weather be like tomorrow"], exp:"Ситуация в будущем → <b>What will the weather be like tomorrow?</b>"},
+ {q:"🏖️🕶️ Отпуск в прошлом году", accepted:["what was your holiday like last year"], exp:"Прошлое, singular <i>holiday</i> → <b>What was your holiday like last year?</b>"},
+ {q:"👩‍🏫 Новая учительница, прямо сейчас", accepted:["what is the new teacher like","what's the new teacher like"], exp:"Настоящее время, оцениваем сейчас → <b>What's the new teacher like?</b>"},
+ {q:"🏙️ Город в 2030 году", accepted:["what will the city be like in 2030"], exp:"Далёкое будущее → <b>What will the city be like in 2030?</b>"},
+ {q:"🎂🎉 Вечеринка вчера вечером", accepted:["what was the party like yesterday","what was the party like last night"], exp:"Прошлое, singular <i>the party</i> → <b>What was the party like yesterday?</b>"},
+ {q:"👴👵 Бабушка и дедушка в молодости", accepted:["what were your grandparents like when they were young"], exp:"Plural + прошлое → <b>What were your grandparents like when they were young?</b>"},
+ {q:"🍜 Новый ресторан, сегодня", accepted:["what is the food like at the new restaurant","what's the food like at the new restaurant"], exp:"Настоящее время → <b>What's the food like at the new restaurant?</b>"},
+ {q:"✈️ Полёт на следующей неделе", accepted:["what will the flight be like next week"], exp:"Будущее событие → <b>What will the flight be like next week?</b>"}
+];
+
+const ex5 = [
+ {q:"What's the weather like today?", opts:["It's sunny and warm.","Yes, it's nice.","It's Thursday."], correct:0,
+  exp:"Нужно описание качества (прилагательные <i>sunny, warm</i>), а не да/нет и не дата."},
+ {q:"What was the trip like?", opts:["It was amazing, we saw so much!","It cost $500.","We went in July."], correct:0,
+  exp:"Ответ описывает впечатление от поездки, а не цену или дату."},
+ {q:"What will the new job be like?", opts:["It'll probably be challenging but interesting.","It starts on Monday.","It's in London."], correct:0,
+  exp:"Нужен прогноз/оценка качеств работы, а не факты о старте или месте."},
+ {q:"What's your sister like?", opts:["She's kind and funny.","She's 165 cm tall.","She's 24."], correct:0,
+  exp:"Речь о характере, а не о внешности/возрасте — для внешности используют <i>What does she look like?</i>"},
+ {q:"What was the exam like?", opts:["It was really hard.","It was on Tuesday.","It lasted two hours."], correct:0,
+  exp:"Нужна оценка сложности экзамена, а не дата или продолжительность."},
+ {q:"What's your new flat like?", opts:["It's small but cosy.","It's on the 5th floor.","It costs £900 a month."], correct:0,
+  exp:"Описание качества квартиры, а не этаж или цена."},
+ {q:"What will the weather be like this weekend?", opts:["It'll be cold and windy.","It's Saturday and Sunday.","We'll go to the beach."], correct:0,
+  exp:"Прогноз погоды описывается прилагательными, а не датой или планами."},
+ {q:"What was the concert like?", opts:["It was unforgettable — great music and atmosphere.","It started at 8pm.","Tickets were expensive."], correct:0,
+  exp:"Нужно впечатление от концерта, а не время начала или цена билетов."}
+];
+
+const ex6 = [
+ {q:"Спроси про погоду в Китае", accepted:["what was the weather like in china"], exp:"Singular subject <i>the weather</i> + прошлое → <b>What was the weather like in China?</b>"},
+ {q:"Спроси про еду", accepted:["what was the food like"], exp:"Singular <i>the food</i> → <b>What was the food like?</b>"},
+ {q:"Спроси про людей", accepted:["what were the people like"], exp:"<i>People</i> — уже множественное число → <b>What were the people like?</b> (не <i>was</i>)."},
+ {q:"Спроси про отель", accepted:["what was the hotel like"], exp:"Singular <i>the hotel</i> → <b>What was the hotel like?</b>"},
+ {q:"Спроси про Великую Китайскую стену", accepted:["what was the great wall like"], exp:"Singular, конкретный объект → <b>What was the Great Wall like?</b>"},
+ {q:"Спроси про Пекин (город)", accepted:["what was beijing like"], exp:"Singular <i>Beijing</i> → <b>What was Beijing like?</b>"},
+ {q:"Спроси про культуру", accepted:["what was the culture like"], exp:"Singular <i>the culture</i> → <b>What was the culture like?</b>"},
+ {q:"Спроси про поездку в целом", accepted:["what was the whole trip like","what was the trip like"], exp:"Обобщающий вопрос о впечатлении → <b>What was the whole trip like?</b>"}
+];
+
+const ex7 = [
+ {q:"(present) твой лучший друг — какой он?", model:"What's your best friend like?", exp:"Модель: настоящее время, singular subject → is."},
+ {q:"(past) прошлые выходные — какими были?", model:"What was last weekend like?", exp:"Прошлое, singular subject → was."},
+ {q:"(future) твоя будущая работа — какой будет?", model:"What will your future job be like?", exp:"Будущее + be после will."},
+ {q:"(present) эта школа — какая она?", model:"What's this school like?", exp:"Настоящее время, singular subject → is."},
+ {q:"(past) твой первый день в школе — каким был?", model:"What was your first day at school like?", exp:"Прошлое, singular subject → was."},
+ {q:"(future) жизнь через 20 лет — какой будет?", model:"What will life be like in 20 years?", exp:"Будущее + be."},
+ {q:"(present) соцсети сейчас — какие они?", model:"What's social media like nowadays?", exp:"Настоящее время → is (social media в разговорном английском часто как ед.ч.)."},
+ {q:"(past) фильм, который ты посмотрел — каким был?", model:"What was the film like?", exp:"Прошлое, singular subject → was."}
+];
+
+/* ---------------- RENDER: MCQ ---------------- */
+function renderMCQ(id, data){
+  const box = document.getElementById(id+"-items");
+  box.innerHTML = data.map((it,i)=>`
+    <div class="item">
+      <div class="qnum">№${i+1}</div>
+      <div class="qtext">${it.q}</div>
+      <div class="opts" data-idx="${i}">
+        ${it.opts.map((o,j)=>`<button type="button" class="opt-btn" data-opt="${j}" onclick="selectOpt('${id}',${i},${j},this)">${o}</button>`).join("")}
+      </div>
+      <div class="explain" id="${id}-exp-${i}"><b>Почему:</b> ${it.exp}</div>
+    </div>`).join("");
+}
+function selectOpt(id, i, j, el){
+  const group = el.parentElement;
+  [...group.children].forEach(b=>b.classList.remove("selected"));
+  el.classList.add("selected");
+  group.dataset.selected = j;
+}
+function checkMCQ(id){
+  const data = window[id];
+  let score=0;
+  data.forEach((it,i)=>{
+    const group = document.querySelector(`#${id}-items .opts[data-idx="${i}"]`);
+    const sel = group.dataset.selected;
+    [...group.children].forEach((b,j)=>{
+      b.classList.remove("correct","incorrect");
+      if(j==it.correct) b.classList.add("correct");
+      else if(sel!==undefined && j==sel) b.classList.add("incorrect");
+    });
+    document.getElementById(`${id}-exp-${i}`).classList.add("show");
+    if(sel!==undefined && +sel===it.correct) score++;
+  });
+  const s = document.getElementById(id+"-score");
+  s.textContent = `${score} / ${data.length} верно`;
+  s.className = "score" + (score===data.length ? " good":"");
+}
+function revealMCQ(id){
+  const data = window[id];
+  data.forEach((it,i)=>{
+    const group = document.querySelector(`#${id}-items .opts[data-idx="${i}"]`);
+    [...group.children].forEach((b,j)=>{
+      b.classList.remove("incorrect");
+      if(j==it.correct) b.classList.add("correct"); else b.classList.remove("correct");
+    });
+    document.getElementById(`${id}-exp-${i}`).classList.add("show");
+  });
+  document.getElementById(id+"-score").textContent = "Ответы показаны";
+}
+function resetMCQ(id){
+  const data = window[id];
+  data.forEach((it,i)=>{
+    const group = document.querySelector(`#${id}-items .opts[data-idx="${i}"]`);
+    delete group.dataset.selected;
+    [...group.children].forEach(b=>b.classList.remove("selected","correct","incorrect"));
+    document.getElementById(`${id}-exp-${i}`).classList.remove("show");
+  });
+  document.getElementById(id+"-score").textContent = "";
+}
+
+/* ---------------- RENDER: TEXT / OPEN ---------------- */
+function renderText(id, data, opts){
+  opts = opts || {};
+  const box = document.getElementById(id+"-items");
+  box.innerHTML = data.map((it,i)=>`
+    <div class="item">
+      <div class="qnum">№${i+1}</div>
+      <div class="qtext">${opts.picture ? `<span class="picture"></span>`:""}${it.q}</div>
+      <input class="text-input" type="text" id="${id}-in-${i}" placeholder="${opts.placeholder||'Введите ответ...'}">
+      <div class="explain" id="${id}-exp-${i}">
+        <b>Почему:</b> ${it.exp}
+        ${it.model ? `<span class="model-answer">Пример: ${it.model}</span>` : (it.accepted? `<span class="model-answer">Ответ: ${it.accepted[0]}</span>`:"")}
+      </div>
+    </div>`).join("");
+}
+function normalize(str){
+  return str.toLowerCase()
+    .replace(/what is/g,"what's")
+    .replace(/’/g,"'")
+    .replace(/[^\w\s']/g,"")
+    .replace(/\s+/g," ")
+    .trim();
+}
+function checkText(id){
+  const data = window[id];
+  let score=0, gradable=0;
+  data.forEach((it,i)=>{
+    const input = document.getElementById(`${id}-in-${i}`);
+    const val = normalize(input.value);
+    document.getElementById(`${id}-exp-${i}`).classList.add("show");
+    if(it.accepted){
+      gradable++;
+      const ok = it.accepted.some(a=>normalize(a)===val);
+      input.classList.remove("correct","incorrect");
+      if(val==="") { }
+      else input.classList.add(ok?"correct":"incorrect");
+      if(ok) score++;
+    } else if(it.model){
+      // free/open item: soft keyword check only (не входит в общий счёт)
+      input.classList.remove("correct","incorrect");
+      if(val.length>0){
+        const okish = val.includes("what") && (val.includes("like"));
+        input.classList.add(okish?"correct":"incorrect");
+      }
+    }
+  });
+  const s = document.getElementById(id+"-score");
+  if(gradable>0){
+    s.textContent = `${score} / ${gradable} верно`;
+    s.className = "score" + (score===gradable ? " good":"");
+  } else {
+    s.textContent = "Сравните с примером ответа";
+  }
+}
+function revealText(id){
+  const data = window[id];
+  data.forEach((it,i)=>{
+    const input = document.getElementById(`${id}-in-${i}`);
+    input.value = it.model || (it.accepted ? it.accepted[0] : "");
+    input.classList.remove("incorrect");
+    input.classList.add("correct");
+    document.getElementById(`${id}-exp-${i}`).classList.add("show");
+  });
+  document.getElementById(id+"-score").textContent = "Ответы показаны";
+}
+function resetText(id){
+  const data = window[id];
+  data.forEach((it,i)=>{
+    const input = document.getElementById(`${id}-in-${i}`);
+    input.value="";
+    input.classList.remove("correct","incorrect");
+    document.getElementById(`${id}-exp-${i}`).classList.remove("show");
+  });
+  document.getElementById(id+"-score").textContent = "";
+}
+
+/* ---------------- COPY ---------------- */
+function copyAnswers(id){
+  const data = window[id];
+  let lines = data.map((it,i)=>{
+    const input = document.getElementById(`${id}-in-${i}`);
+    const userVal = input.value.trim();
+    const answer = userVal || it.model || (it.accepted?it.accepted[0]:"");
+    return `${i+1}. ${answer}`;
+  });
+  const text = lines.join("\n");
+  navigator.clipboard.writeText(text).then(()=>{
+    const msg = document.getElementById(id+"-copied");
+    msg.classList.add("show");
+    setTimeout(()=>msg.classList.remove("show"), 2000);
+  });
+}
+
+/* ---------------- INIT ---------------- */
+renderMCQ("ex1", ex1);
+renderText("ex2", ex2, {placeholder:"is / was / will be ..."});
+renderText("ex3", ex3, {placeholder:"What's / What was ..."});
+renderText("ex4", ex4, {picture:true, placeholder:"What's / What was / What will ..."});
+renderMCQ("ex5", ex5);
+renderText("ex6", ex6, {placeholder:"What was ... like?"});
+renderText("ex7", ex7, {placeholder:"Напишите свой вопрос по образцу..."});
+</script>
+</body>
+</html>
