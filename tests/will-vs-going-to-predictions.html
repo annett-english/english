@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FORECAST · Will vs Be going to (predictions)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0F1B2D;
+    --bg-soft: #13233A;
+    --card: #16283F;
+    --card-hi: #1C3049;
+    --line: #2A415F;
+    --text: #EDEFF4;
+    --text-dim: #A9B6CA;
+    --gold: #E8B44C;
+    --teal: #4FB6C7;
+    --good: #6FCF97;
+    --bad: #E2665A;
+    --serif: 'Source Serif 4', Georgia, serif;
+    --sans: 'Space Grotesk', system-ui, sans-serif;
+    --mono: 'JetBrains Mono', monospace;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(ellipse 900px 500px at 15% -10%, rgba(79,182,199,0.14), transparent 60%),
+      radial-gradient(ellipse 700px 500px at 100% 0%, rgba(232,180,76,0.10), transparent 60%),
+      var(--bg);
+    color:var(--text);
+    font-family:var(--serif);
+    line-height:1.55;
+    padding-bottom:80px;
+  }
+  ::selection{ background:var(--gold); color:#12213A; }
+
+  /* ---------- decorative drifting clouds ---------- */
+  .sky{ position:relative; overflow:hidden; }
+  .cloud{
+    position:absolute; opacity:.10; filter:blur(1px);
+    animation: drift 60s linear infinite;
+  }
+  .cloud svg{ display:block; }
+  .c1{ top:6%; left:-10%; width:260px; animation-duration:70s; }
+  .c2{ top:22%; left:-20%; width:180px; animation-duration:55s; animation-delay:-15s; }
+  .c3{ top:2%; left:-30%; width:120px; animation-duration:90s; animation-delay:-40s; }
+  @keyframes drift{ from{ transform:translateX(0);} to{ transform:translateX(140vw);} }
+  @media (prefers-reduced-motion: reduce){ .cloud{ animation:none; } }
+
+  header.hero{
+    max-width:920px; margin:0 auto; padding:64px 24px 40px; text-align:left;
+  }
+  .eyebrow{
+    font-family:var(--mono); letter-spacing:.14em; text-transform:uppercase;
+    font-size:12.5px; color:var(--teal); display:flex; align-items:center; gap:10px; margin-bottom:18px;
+  }
+  .eyebrow .dot{ width:7px; height:7px; border-radius:50%; background:var(--gold); box-shadow:0 0 10px var(--gold); }
+  h1{
+    font-family:var(--sans); font-weight:700; font-size:clamp(32px,5vw,52px);
+    margin:0 0 10px; line-height:1.05; letter-spacing:-0.01em;
+  }
+  h1 em{ font-style:normal; color:var(--gold); }
+  .sub{ color:var(--text-dim); font-size:18px; max-width:640px; margin:0 0 30px; }
+
+  .rulebox{
+    border:1px solid var(--line); background:var(--card);
+    border-radius:14px; padding:22px 24px; position:relative; overflow:hidden;
+  }
+  .rulebox::before{
+    content:""; position:absolute; left:0; top:0; bottom:0; width:4px;
+    background:linear-gradient(180deg,var(--gold),var(--teal));
+  }
+  .rulebox h3{ font-family:var(--sans); margin:0 0 8px; font-size:14px; letter-spacing:.08em; text-transform:uppercase; color:var(--gold); }
+  .rulebox p{ margin:6px 0; color:var(--text); }
+  .rulebox .examples{ margin-top:12px; display:grid; gap:6px; font-family:var(--mono); font-size:14.5px; color:var(--teal); }
+  .rulebox .examples span{ color:var(--text-dim); font-family:var(--serif); }
+
+  .rulebox2{ margin-top:16px; }
+  .rule-grid{ display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:18px; }
+  @media(max-width:680px){ .rule-grid{ grid-template-columns:1fr; } }
+  .rule-card{ border:1px solid var(--line); border-radius:12px; padding:16px 18px; background:var(--bg-soft); }
+  .rule-card h4{ margin:0 0 8px; font-family:var(--sans); font-size:15px; }
+  .rule-card.will h4{ color:var(--teal); }
+  .rule-card.going h4{ color:var(--gold); }
+  .rule-card p{ margin:0 0 6px; font-size:14.5px; color:var(--text-dim); }
+  .rule-card .ex{ font-family:var(--mono); font-size:13.5px; color:var(--text); }
+
+  /* ---------- nav ---------- */
+  nav{
+    position:sticky; top:0; z-index:50; backdrop-filter:blur(10px);
+    background:rgba(15,27,45,0.85); border-bottom:1px solid var(--line);
+    padding:12px 24px; display:flex; gap:8px; overflow-x:auto; scrollbar-width:none;
+  }
+  nav::-webkit-scrollbar{ display:none; }
+  nav a{
+    font-family:var(--mono); font-size:12.5px; color:var(--text-dim); text-decoration:none;
+    border:1px solid var(--line); padding:7px 12px; border-radius:999px; white-space:nowrap;
+    transition:all .15s ease;
+  }
+  nav a:hover{ color:var(--text); border-color:var(--teal); }
+
+  main{ max-width:920px; margin:0 auto; padding:0 24px; }
+
+  section.ex{ margin-top:56px; scroll-margin-top:70px; }
+  .ex-head{ display:flex; align-items:baseline; gap:14px; margin-bottom:6px; flex-wrap:wrap; }
+  .ex-num{ font-family:var(--mono); color:var(--gold); font-size:14px; }
+  .ex-title{ font-family:var(--sans); font-weight:600; font-size:24px; margin:0; }
+  .ex-instructions{ color:var(--text-dim); margin:8px 0 22px; font-size:15.5px; max-width:680px; }
+
+  .item{
+    border:1px solid var(--line); background:var(--card); border-radius:12px;
+    padding:16px 18px; margin-bottom:12px; transition:border-color .2s ease;
+  }
+  .item.correct{ border-color:var(--good); }
+  .item.wrong{ border-color:var(--bad); }
+  .item-row{ display:flex; align-items:flex-start; gap:12px; }
+  .item-index{ font-family:var(--mono); color:var(--text-dim); font-size:13px; padding-top:3px; min-width:20px; }
+  .item-body{ flex:1; }
+  .prompt{ font-size:16px; }
+  .prompt .base{ color:var(--gold); font-family:var(--mono); font-size:13.5px; }
+
+  input[type=text], textarea{
+    background:var(--bg-soft); border:1px solid var(--line); color:var(--text);
+    border-radius:8px; padding:8px 10px; font-family:var(--mono); font-size:14.5px;
+    width:220px; max-width:100%;
+  }
+  textarea{ width:100%; min-height:56px; font-family:var(--serif); font-size:15px; resize:vertical; }
+  input[type=text]:focus, textarea:focus{ outline:2px solid var(--teal); outline-offset:1px; }
+
+  .mcq-options{ display:flex; gap:10px; flex-wrap:wrap; margin-top:8px; }
+  .mcq-options label{
+    border:1px solid var(--line); border-radius:8px; padding:7px 12px; cursor:pointer;
+    font-family:var(--mono); font-size:13.5px; color:var(--text-dim); display:flex; gap:7px; align-items:center;
+    transition:all .15s ease;
+  }
+  .mcq-options label:hover{ border-color:var(--teal); color:var(--text); }
+  .mcq-options input{ accent-color:var(--gold); }
+  .mcq-options label.picked{ border-color:var(--gold); color:var(--text); background:rgba(232,180,76,0.08); }
+
+  .explain{
+    margin-top:10px; padding:10px 12px; border-radius:8px; font-size:14px;
+    background:var(--bg-soft); border:1px dashed var(--line); color:var(--text-dim); display:none;
+  }
+  .explain.show{ display:block; }
+  .explain b{ color:var(--text); }
+  .tag{
+    display:inline-block; font-family:var(--mono); font-size:11px; padding:2px 7px; border-radius:5px; margin-right:8px;
+  }
+  .tag.ok{ background:rgba(111,207,151,.15); color:var(--good); }
+  .tag.no{ background:rgba(226,102,90,.15); color:var(--bad); }
+
+  .ex-actions{ display:flex; gap:10px; align-items:center; margin:18px 0 6px; flex-wrap:wrap; }
+  button{
+    font-family:var(--sans); font-weight:600; font-size:14px; cursor:pointer;
+    border-radius:8px; padding:10px 16px; border:1px solid transparent; transition:all .15s ease;
+  }
+  .btn-primary{ background:var(--gold); color:#12213A; }
+  .btn-primary:hover{ background:#f0c169; }
+  .btn-ghost{ background:transparent; border-color:var(--line); color:var(--text); }
+  .btn-ghost:hover{ border-color:var(--teal); color:var(--teal); }
+  .btn-copy{ background:transparent; border-color:var(--teal); color:var(--teal); }
+  .btn-copy:hover{ background:rgba(79,182,199,0.1); }
+
+  .score{ font-family:var(--mono); font-size:13.5px; color:var(--text-dim); margin-left:auto; }
+  .score b{ color:var(--gold); }
+
+  .model-answer{ margin-top:8px; font-size:13.5px; color:var(--teal); font-family:var(--mono); display:none; }
+  .model-answer.show{ display:block; }
+
+  footer{ max-width:920px; margin:70px auto 0; padding:24px; text-align:center; color:var(--text-dim); font-family:var(--mono); font-size:12.5px; border-top:1px solid var(--line); }
+
+  .copied-toast{
+    position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:var(--gold); color:#12213A; font-family:var(--sans); font-weight:600; font-size:14px;
+    padding:10px 18px; border-radius:999px; opacity:0; pointer-events:none; transition:all .25s ease; z-index:100;
+  }
+  .copied-toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<div class="copied-toast" id="toast">Скопировано ✓</div>
+
+<div class="sky">
+  <div class="cloud c1"><svg viewBox="0 0 200 80" width="260"><path d="M30 60 Q10 60 10 45 Q10 30 28 30 Q32 12 55 12 Q80 12 84 32 Q100 32 100 48 Q100 60 84 60 Z" fill="#EDEFF4"/></svg></div>
+  <div class="cloud c2"><svg viewBox="0 0 200 80" width="180"><path d="M30 60 Q10 60 10 45 Q10 30 28 30 Q32 12 55 12 Q80 12 84 32 Q100 32 100 48 Q100 60 84 60 Z" fill="#4FB6C7"/></svg></div>
+  <div class="cloud c3"><svg viewBox="0 0 200 80" width="120"><path d="M30 60 Q10 60 10 45 Q10 30 28 30 Q32 12 55 12 Q80 12 84 32 Q100 32 100 48 Q100 60 84 60 Z" fill="#E8B44C"/></svg></div>
+
+  <header class="hero">
+    <div class="eyebrow"><span class="dot"></span> A2 GRAMMAR FORECAST · Предсказания будущего</div>
+    <h1>Will <em>vs</em> Be going to</h1>
+    <p class="sub">Как правильно предсказывать будущее по-английски: по ощущению («will») или по видимым доказательствам («be going to»). 7 упражнений, в каждом по 8 заданий — с проверкой, объяснением и готовыми ответами.</p>
+
+    <div class="rulebox">
+      <h3>Главное правило: be going to для предсказаний</h3>
+      <p>We use <b>be going to</b> for predictions when we know or can see that something is going to happen.</p>
+      <div class="examples">
+        <div><span>1.</span> Look at the clouds. It’s going to rain.</div>
+        <div><span>2.</span> They’re playing very well. They’re going to win.</div>
+      </div>
+
+      <div class="rule-grid">
+        <div class="rule-card going">
+          <h4>☁️ BE GOING TO</h4>
+          <p>Предсказание на основе того, что мы видим или знаем прямо сейчас — есть доказательство.</p>
+          <p class="ex">Look! The plate is falling — it’s going to break.</p>
+        </div>
+        <div class="rule-card will">
+          <h4>✨ WILL</h4>
+          <p>Предсказание-мнение, без явных доказательств — то, что мы думаем или чувствуем.</p>
+          <p class="ex">I think it will be sunny next week.</p>
+        </div>
+      </div>
+    </div>
+  </header>
+</div>
+
+<nav id="nav"></nav>
+
+<main id="main"></main>
+
+<footer>FORECAST WORKSHEET · WILL vs BE GOING TO (predictions) · A2</footer>
+
+<script>
+/* ============================= HELPERS ============================= */
+function normalize(s){
+  s = (s||'').toLowerCase().trim();
+  s = s.replace(/’/g, "'");
+  s = s.replace(/\bwon't\b/g, 'will not');
+  s = s.replace(/\bisn't\b/g, 'is not');
+  s = s.replace(/\baren't\b/g, 'are not');
+  s = s.replace(/\bdon't\b/g, 'do not');
+  s = s.replace(/\bdoesn't\b/g, 'does not');
+  s = s.replace(/'re\b/g, ' are');
+  s = s.replace(/'s\b/g, ' is');
+  s = s.replace(/'ll\b/g, ' will');
+  s = s.replace(/'m\b/g, ' am');
+  s = s.replace(/[.!?,]/g, '');
+  s = s.replace(/\s+/g, ' ').trim();
+  return s;
+}
+function matches(input, answers){
+  const n = normalize(input);
+  if(!n) return false;
+  return answers.some(a => normalize(a) === n);
+}
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg || 'Скопировано ✓';
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 1600);
+}
+function copyText(text){
+  navigator.clipboard?.writeText(text).then(()=>toast()).catch(()=>{
+    const ta=document.createElement('textarea'); ta.value=text; document.body.appendChild(ta);
+    ta.select(); document.execCommand('copy'); ta.remove(); toast();
+  });
+}
+
+/* ============================= DATA ============================= */
+
+const EX1 = { // fill: will/won't drill
+  id:'ex1', num:'01', title:'Правило Will', type:'fill',
+  instructions:'Заполни пропуск глаголом в форме will/won’t, ориентируясь на слова-подсказки (I think, I’m sure, Maybe, probably, I don’t think — предсказание-мнение, без доказательств).',
+  items:[
+    {prompt:'I think it ___ tomorrow.', base:'rain', answers:['will rain'], explain:'“I think” — это личное мнение без доказательств → используем will.'},
+    {prompt:'She ___ the test, I’m sure.', base:'not / pass', answers:['will not pass'], explain:'“I’m sure” выражает уверенность-мнение, а не факт перед глазами → will + not.'},
+    {prompt:'Maybe he ___ to the party.', base:'come', answers:['will come'], explain:'“Maybe” — предположение о будущем, доказательств нет → will.'},
+    {prompt:'I don’t think they ___ the match.', base:'win', answers:['will win'], explain:'После “I don’t think” глагол остаётся в утвердительной форме will + verb, отрицание уже выражено фразой “I don’t think”.'},
+    {prompt:'I’m sure you ___ this film.', base:'love', answers:['will love'], explain:'Личное убеждение говорящего, а не видимый факт → will.'},
+    {prompt:'Probably it ___ sunny at the weekend.', base:'be', answers:['will be'], explain:'“Probably” = предположение о будущем без конкретных доказательств → will.'},
+    {prompt:'I think he ___ the gift.', base:'not / like', answers:['will not like'], explain:'Мнение говорящего о реакции другого человека — доказательств нет → won’t (will not).'},
+    {prompt:'I’m sure we ___ again one day.', base:'meet', answers:['will meet'], explain:'Предсказание на далёкое будущее, основанное на чувстве, а не на факте → will.'},
+  ]
+};
+
+const EX2 = { // fill: forms +/-/?
+  id:'ex2', num:'02', title:'Форма + / − / ? с Will', type:'fill',
+  instructions:'Составь предложение в указанной форме, используя will. Пиши полным предложением (сокращения will → ’ll и will not → won’t допускаются).',
+  items:[
+    {prompt:'she / be famous', tagType:'( + )', answers:['she will be famous'], explain:'Утверждение: subject + will + base verb → She will be famous.'},
+    {prompt:'they / arrive late', tagType:'( − )', answers:['they will not arrive late'], explain:'Отрицание: subject + will not (won’t) + base verb → They won’t arrive late.'},
+    {prompt:'you / need help', tagType:'( ? )', answers:['will you need help'], explain:'Вопрос: Will + subject + base verb → Will you need help?'},
+    {prompt:'I / forget your birthday', tagType:'( − )', answers:['i will not forget your birthday'], explain:'Отрицание: I won’t forget your birthday.'},
+    {prompt:'it / rain tomorrow', tagType:'( ? )', answers:['will it rain tomorrow'], explain:'Вопрос: Will it rain tomorrow?'},
+    {prompt:'we / win the game', tagType:'( + )', answers:['we will win the game'], explain:'Утверждение: We will win the game.'},
+    {prompt:'he / find a new job', tagType:'( ? )', answers:['will he find a new job'], explain:'Вопрос: Will he find a new job?'},
+    {prompt:'the shop / close early', tagType:'( − )', answers:['the shop will not close early'], explain:'Отрицание: The shop won’t close early.'},
+  ]
+};
+
+const EX3 = { // mcq: find the mistake
+  id:'ex3', num:'03', title:'Find the Mistake', type:'mcq',
+  instructions:'В каждом предложении есть ошибка. Выбери правильный вариант из четырёх и прочитай объяснение.',
+  items:[
+    {prompt:'❌ Look at the sky! It will rain soon.',
+      options:['It will rain soon.','It is going to rain soon.','It going to rain soon.','It is going to rains soon.'],
+      correct:1, explain:'Мы видим доказательство прямо сейчас (тёмное небо) → be going to, а не will.'},
+    {prompt:'❌ She is go to win the race.',
+      options:['She is going to win the race.','She will going to win the race.','She is going win the race.','She going to win the race.'],
+      correct:0, explain:'Конструкция: be + going to + base verb. Пропущено окончание -ing у глагола be going.'},
+    {prompt:'❌ I think it going to be cold tomorrow.',
+      options:['I think it is going to be cold tomorrow.','I think it will going to be cold.','I think it goes to be cold tomorrow.','I think it will to be cold tomorrow.'],
+      correct:0, explain:'Пропущен глагол be (is) — обязательная часть конструкции be going to.'},
+    {prompt:'❌ They will to pass the exam, I’m sure.',
+      options:['They are going to pass the exam.','They are going pass the exam.','They will pass the exam, I’m sure.','They going to pass the exam.'],
+      correct:2, explain:'После will глагол идёт без частицы to: will + base verb → They will pass the exam.'},
+    {prompt:'❌ Look at those clouds — I think it will rain.',
+      options:['Look at those clouds — it is going to rain.','Look at those clouds — I think it going to rain.','Look at those clouds — it will raining.','Look at those clouds — it is going rain.'],
+      correct:0, explain:'Есть видимое доказательство (тучи) → нужно be going to, а не will.'},
+    {prompt:'❌ He isn’t going pass his driving test.',
+      options:['He isn’t going to pass his driving test.','He doesn’t going to pass his driving test.','He won’t going to pass.','He isn’t go to pass his test.'],
+      correct:0, explain:'Отрицание be going to: isn’t/aren’t + going to + base verb. Пропущено to.'},
+    {prompt:'❌ I’m sure she going to be a great teacher.',
+      options:['I’m sure she is going to be a great teacher.','I’m sure she will going to be a great teacher.','I’m sure she is go to be a great teacher.','I’m sure she going be a great teacher.'],
+      correct:0, explain:'Пропущен глагол is перед going to.'},
+    {prompt:'❌ We not going to win this game.',
+      options:['We are not going to win this game.','We not are going to win this game.','We aren’t go to win this game.','We won’t going to win this game.'],
+      correct:0, explain:'Отрицание be going to требует am/is/are + not перед going to.'},
+  ]
+};
+
+const EX4 = { // mcq: choose will / going to (prediction meaning)
+  id:'ex4', num:'04', title:'Will или Be going to?', type:'mcq',
+  instructions:'Выбери правильный вариант: если есть видимое доказательство прямо сейчас — be going to; если это личное мнение/предположение — will.',
+  items:[
+    {prompt:'Look out! That glass is right at the edge — it ___ fall!',
+      options:['will','is going to'], correct:1, explain:'Мы видим стакан на краю стола прямо сейчас — явное доказательство → is going to.'},
+    {prompt:'I think it ___ be a great year for our team.',
+      options:['will','is going to'], correct:0, explain:'Это личное мнение о будущем без видимых доказательств → will.'},
+    {prompt:'She’s five months pregnant. She ___ have a baby in the spring.',
+      options:['will','is going to'], correct:1, explain:'Есть чёткий видимый/известный факт, на основе которого делаем вывод → is going to.'},
+    {prompt:'Maybe one day people ___ travel to other planets for holidays.',
+      options:['will','is going to'], correct:0, explain:'Предположение о далёком будущем, доказательств нет → will.'},
+    {prompt:'The sky is completely black — I’m certain we ___ have a storm tonight.',
+      options:['will','is going to'], correct:1, explain:'Наблюдаемое прямо сейчас доказательство (чёрное небо) → be going to.'},
+    {prompt:'I’m sure she ___ love the present you bought her.',
+      options:['will','is going to'], correct:0, explain:'Личная уверенность/мнение о чужой реакции, а не видимый факт → will.'},
+    {prompt:'He’s not studying at all — he ___ fail the exam.',
+      options:['will','is going to'], correct:1, explain:'Видимая сейчас ситуация (он не учится) позволяет предсказать результат → be going to.'},
+    {prompt:'I don’t think it ___ rain this weekend — the forecast looks good.',
+      options:['will','is going to'], correct:0, explain:'Общее мнение/предположение о будущем → will.'},
+  ]
+};
+
+const EX5 = { // fill: correct form of be going to / will
+  id:'ex5', num:'05', title:'Fill in the Gaps (be going to / will)', type:'fill',
+  instructions:'Заполни пропуск правильной формой — be going to или will — и глаголом в скобках.',
+  items:[
+    {prompt:'Look at those clouds! It ___ soon.', base:'rain', answers:['is going to rain'], explain:'Видимое доказательство (тучи) прямо сейчас → is going to rain.'},
+    {prompt:'I think our team ___ the match.', base:'win', answers:['will win'], explain:'Мнение/надежда говорящего, без доказательств → will win.'},
+    {prompt:'She’s bought a lot of paint. She ___ her room this weekend.', base:'decorate', answers:['is going to decorate'], explain:'Уже купила краску — конкретное доказательство плана → is going to decorate.'},
+    {prompt:'Maybe robots ___ all our jobs in the future.', base:'do', answers:['will do'], explain:'Предположение о далёком будущем → will do.'},
+    {prompt:'Careful! That vase ___ off the shelf!', base:'fall', answers:['is going to fall'], explain:'Мы видим это прямо сейчас → is going to fall.'},
+    {prompt:'I’m sure you ___ your driving test.', base:'pass', answers:['will pass'], explain:'Личная уверенность без видимого доказательства → will pass.'},
+    {prompt:'He’s packed his suitcase. He ___ tomorrow.', base:'travel', answers:['is going to travel'], explain:'Чемодан уже собран — видимое доказательство плана → is going to travel.'},
+    {prompt:'I don’t think it ___ cold tomorrow.', base:'be', answers:['will be'], explain:'Личное мнение о погоде → will be.'},
+  ]
+};
+
+const EX6 = { // open: finish sentences with own ideas
+  id:'ex6', num:'06', title:'Закончи предложения своими идеями', type:'open',
+  instructions:'Закончи каждое предложение своей идеей, используя will или be going to. Когда закончишь — нажми «Скопировать все ответы», чтобы скопировать их одним нажатием.',
+  items:[
+    {prompt:'Look at the sky. I think…', model:'Look at the sky. I think it’s going to snow tonight.'},
+    {prompt:'In ten years, I think people will…', model:'In ten years, I think people will work from home more often.'},
+    {prompt:'Tonight I’m going to…', model:'Tonight I’m going to watch a film with my family.'},
+    {prompt:'I’m sure my best friend will…', model:'I’m sure my best friend will help me with my homework.'},
+    {prompt:'Next weekend I’m going to…', model:'Next weekend I’m going to visit my grandparents.'},
+    {prompt:'I don’t think I will… this year.', model:'I don’t think I will travel abroad this year.'},
+    {prompt:'One day, robots are going to…', model:'One day, robots are going to clean our houses.'},
+    {prompt:'By the end of this year, I will…', model:'By the end of this year, I will finish my English course.'},
+  ]
+};
+
+const EX7 = { // open: Repeat & Change drilling
+  id:'ex7', num:'07', title:'Drilling: Repeat & Change', type:'open',
+  instructions:'Посмотри на пример-модель и напиши своё собственное предложение по такому же образцу (та же структура will/be going to, но своя идея). Когда закончишь — скопируй все ответы одной кнопкой.',
+  items:[
+    {prompt:'Model: Look at the clouds! It’s going to rain.', model:'Look at the queue outside the shop! It’s going to be a busy day.'},
+    {prompt:'Model: I think the weather will be nice tomorrow.', model:'I think the film will be really exciting.'},
+    {prompt:'Model: She’s packed her bags. She’s going to travel.', model:'He’s bought new boots. He’s going to go hiking.'},
+    {prompt:'Model: I’m sure you will love this book.', model:'I’m sure you will enjoy this song.'},
+    {prompt:'Model: He’s studying hard. He’s going to pass the exam.', model:'They’re training every day. They’re going to win the tournament.'},
+    {prompt:'Model: Maybe one day robots will clean our houses.', model:'Maybe one day cars will fly through the city.'},
+    {prompt:'Model: Look! The plate is falling! It’s going to break.', model:'Look! The ladder is shaking! It’s going to fall.'},
+    {prompt:'Model: I don’t think it will rain this weekend.', model:'I don’t think we will finish the project on time.'},
+  ]
+};
+
+const ALL = [EX1, EX2, EX3, EX4, EX5, EX6, EX7];
+
+/* ============================= RENDER ============================= */
+
+const nav = document.getElementById('nav');
+const main = document.getElementById('main');
+
+ALL.forEach(ex=>{
+  const a = document.createElement('a');
+  a.href = '#' + ex.id;
+  a.textContent = ex.num + ' · ' + ex.title;
+  nav.appendChild(a);
+
+  const section = document.createElement('section');
+  section.className = 'ex';
+  section.id = ex.id;
+
+  const head = document.createElement('div');
+  head.innerHTML = `
+    <div class="ex-head">
+      <span class="ex-num">EX ${ex.num}</span>
+      <h2 class="ex-title">${ex.title}</h2>
+    </div>
+    <p class="ex-instructions">${ex.instructions}</p>
+  `;
+  section.appendChild(head);
+
+  const list = document.createElement('div');
+  list.className = 'list';
+  section.appendChild(list);
+
+  ex.items.forEach((item, i)=>{
+    const div = document.createElement('div');
+    div.className = 'item';
+    div.dataset.index = i;
+
+    if(ex.type === 'fill'){
+      div.innerHTML = `
+        <div class="item-row">
+          <div class="item-index">${i+1}.</div>
+          <div class="item-body">
+            <div class="prompt">${item.prompt} ${item.base ? `<span class="base">(${item.base})</span>` : ''} ${item.tagType ? `<span class="base">${item.tagType}</span>` : ''}</div>
+            <div style="margin-top:8px;"><input type="text" placeholder="твой ответ..." data-role="input"></div>
+            <div class="explain" data-role="explain"><span class="tag-slot"></span><b>Ответ:</b> ${item.answers[0]} — ${item.explain}</div>
+          </div>
+        </div>`;
+    } else if(ex.type === 'mcq'){
+      const opts = item.options.map((opt, oi)=>`
+        <label data-oi="${oi}">
+          <input type="radio" name="${ex.id}-${i}" value="${oi}"> ${opt}
+        </label>`).join('');
+      div.innerHTML = `
+        <div class="item-row">
+          <div class="item-index">${i+1}.</div>
+          <div class="item-body">
+            <div class="prompt">${item.prompt}</div>
+            <div class="mcq-options" data-role="options">${opts}</div>
+            <div class="explain" data-role="explain"><span class="tag-slot"></span><b>Правильный ответ:</b> ${item.options[item.correct]} — ${item.explain}</div>
+          </div>
+        </div>`;
+    } else if(ex.type === 'open'){
+      div.innerHTML = `
+        <div class="item-row">
+          <div class="item-index">${i+1}.</div>
+          <div class="item-body">
+            <div class="prompt">${item.prompt}</div>
+            <div style="margin-top:8px;"><textarea placeholder="напиши свою идею..." data-role="input"></textarea></div>
+            <div class="model-answer" data-role="model">💡 Пример: ${item.model}</div>
+          </div>
+        </div>`;
+    }
+    list.appendChild(div);
+  });
+
+  const actions = document.createElement('div');
+  actions.className = 'ex-actions';
+
+  if(ex.type === 'fill' || ex.type === 'mcq'){
+    actions.innerHTML = `
+      <button class="btn-primary" data-act="check">Проверить ответы</button>
+      <button class="btn-ghost" data-act="reveal">Показать ответы</button>
+      <span class="score" data-role="score"></span>
+    `;
+  } else {
+    actions.innerHTML = `
+      <button class="btn-ghost" data-act="models">Показать примеры ответов</button>
+      <button class="btn-copy" data-act="copy">Скопировать все ответы</button>
+    `;
+  }
+  section.appendChild(actions);
+  main.appendChild(section);
+
+  /* ---- interactivity ---- */
+  if(ex.type === 'mcq'){
+    section.querySelectorAll('.mcq-options').forEach(group=>{
+      group.addEventListener('change', (e)=>{
+        group.querySelectorAll('label').forEach(l=>l.classList.remove('picked'));
+        const picked = group.querySelector('input:checked');
+        if(picked) picked.closest('label').classList.add('picked');
+      });
+    });
+  }
+
+  actions.addEventListener('click', (e)=>{
+    const act = e.target.dataset.act;
+    if(!act) return;
+
+    if(act === 'check'){
+      let correctCount = 0;
+      section.querySelectorAll('.item').forEach((div, i)=>{
+        const item = ex.items[i];
+        let isCorrect = false;
+        if(ex.type === 'fill'){
+          const val = div.querySelector('[data-role="input"]').value;
+          isCorrect = matches(val, item.answers);
+        } else if(ex.type === 'mcq'){
+          const picked = div.querySelector('input:checked');
+          isCorrect = picked && parseInt(picked.value) === item.correct;
+        }
+        div.classList.remove('correct','wrong');
+        div.classList.add(isCorrect ? 'correct' : 'wrong');
+        const explain = div.querySelector('[data-role="explain"]');
+        const tagSlot = explain.querySelector('.tag-slot');
+        tagSlot.innerHTML = isCorrect ? '<span class="tag ok">верно</span>' : '<span class="tag no">неверно</span>';
+        explain.classList.add('show');
+        if(isCorrect) correctCount++;
+      });
+      section.querySelector('[data-role="score"]').innerHTML = `<b>${correctCount}/${ex.items.length}</b> правильно`;
+    }
+
+    if(act === 'reveal'){
+      section.querySelectorAll('.item').forEach((div, i)=>{
+        const explain = div.querySelector('[data-role="explain"]');
+        const tagSlot = explain.querySelector('.tag-slot');
+        tagSlot.innerHTML = '';
+        explain.classList.add('show');
+      });
+    }
+
+    if(act === 'models'){
+      section.querySelectorAll('[data-role="model"]').forEach(m=>m.classList.add('show'));
+    }
+
+    if(act === 'copy'){
+      const lines = [];
+      section.querySelectorAll('.item').forEach((div, i)=>{
+        const val = div.querySelector('[data-role="input"]').value.trim();
+        lines.push(`${i+1}. ${val || '(пусто)'}`);
+      });
+      copyText(lines.join('\n'));
+    }
+  });
+});
+</script>
+</body>
+</html>
