@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Check-in — Airport Vocabulary Practice</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0D2036;
+  --ink-soft:#2A4460;
+  --paper:#E9EDF2;
+  --card:#FFFFFF;
+  --line:#C7D1DC;
+  --amber:#E4A33A;
+  --amber-deep:#9C6B10;
+  --ok:#17795E;
+  --no:#B3372C;
+  --muted:#69798C;
+  --radius:4px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:'Barlow',-apple-system,Segoe UI,Roboto,sans-serif;
+  font-size:16.5px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+.mono{font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace}
+
+/* ---------- top board ---------- */
+.board{
+  background:var(--ink);
+  color:#EDF2F7;
+  border-bottom:3px solid var(--amber);
+  position:sticky;top:0;z-index:40;
+}
+.board-in{
+  max-width:1180px;margin:0 auto;padding:10px 20px;
+  display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+}
+.flap{
+  font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.16em;
+  background:#081726;color:var(--amber);
+  padding:5px 9px;border-radius:3px;
+  border:1px solid #21384f;white-space:nowrap;
+}
+.board h1{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:22px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;
+  margin:0;flex:1 1 auto;
+}
+.tally{font-family:'IBM Plex Mono',monospace;font-size:13px;color:#9FB3C8;white-space:nowrap}
+.tally b{color:var(--amber);font-weight:500}
+
+.wrap{max-width:1180px;margin:0 auto;padding:26px 20px 90px}
+
+/* ---------- generic card ---------- */
+.card{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:22px;margin-bottom:26px;
+}
+.eyebrow{
+  font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--amber-deep);margin:0 0 6px;
+}
+h2.title{
+  font-family:'Barlow Condensed',sans-serif;font-weight:600;
+  font-size:26px;letter-spacing:.05em;text-transform:uppercase;
+  margin:0 0 4px;line-height:1.15;
+}
+.lead{color:var(--muted);font-size:14.5px;margin:0 0 16px}
+
+/* ---------- vocab ---------- */
+.vtable{width:100%;border-collapse:collapse}
+.vtable th{
+  font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--muted);text-align:left;font-weight:500;
+  padding:0 10px 8px;border-bottom:1px solid var(--line);
+}
+.vtable td{padding:10px;border-bottom:1px dashed var(--line);vertical-align:top}
+.vtable tr:last-child td{border-bottom:none}
+.vword{font-weight:600;font-size:17px}
+.vipa{font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--ink-soft);white-space:nowrap}
+.vru{color:var(--ink-soft);font-size:15px}
+body.hide-ru .vru{filter:blur(5px);cursor:pointer;user-select:none}
+.spk{
+  background:none;border:1px solid var(--line);color:var(--ink-soft);
+  width:32px;height:30px;border-radius:3px;cursor:pointer;font-size:14px;line-height:1;
+}
+.spk:hover{border-color:var(--amber);color:var(--amber-deep)}
+.spk.playing{background:var(--amber);border-color:var(--amber);color:#fff}
+
+/* ---------- columns ---------- */
+.cols{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:26px;align-items:start}
+@media (max-width:960px){
+  .cols{grid-template-columns:1fr}
+  .stub{order:-1;position:static !important}
+}
+
+/* ---------- boarding-pass stub (problem words) ---------- */
+.stub{
+  position:sticky;top:74px;
+  background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  border-left:2px dashed var(--ink-soft);
+  padding:18px;
+}
+.stub h3{
+  font-family:'Barlow Condensed',sans-serif;font-size:19px;letter-spacing:.08em;
+  text-transform:uppercase;margin:0 0 2px;
+}
+.stub .sub{font-size:12.5px;color:var(--muted);margin:0 0 12px}
+#problems{list-style:none;margin:0;padding:0}
+#problems li{
+  display:flex;align-items:center;gap:8px;
+  padding:7px 0;border-bottom:1px dashed var(--line);font-size:15px;
+}
+#problems li:last-child{border-bottom:none}
+#problems .pw{flex:1 1 auto;font-weight:500;line-height:1.25}
+#problems .pw small{display:block;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted)}
+.cnt{
+  font-family:'IBM Plex Mono',monospace;font-size:12px;
+  background:#FBEFD9;color:var(--amber-deep);border:1px solid #EBD3A2;
+  padding:1px 7px;border-radius:20px;
+}
+.empty{font-size:13.5px;color:var(--muted);line-height:1.45}
+
+/* ---------- exercises ---------- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);margin-bottom:22px;overflow:hidden}
+.ex-head{padding:16px 20px 14px;border-bottom:1px solid var(--line);background:#F7F9FB}
+.ex-num{
+  font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.16em;
+  color:#fff;background:var(--ink);padding:3px 8px;border-radius:2px;
+}
+.ex-head h3{
+  font-family:'Barlow Condensed',sans-serif;font-size:23px;letter-spacing:.04em;
+  text-transform:uppercase;margin:9px 0 2px;font-weight:600;
+}
+.ex-head p{margin:0;font-size:14px;color:var(--muted)}
+.ex-body{padding:18px 20px}
+
+ol.items{list-style:none;counter-reset:it;margin:0;padding:0}
+ol.items>li{
+  counter-increment:it;position:relative;
+  padding:11px 0 11px 34px;border-bottom:1px dashed var(--line);
+}
+ol.items>li:last-child{border-bottom:none}
+ol.items>li::before{
+  content:counter(it,decimal-leading-zero);
+  position:absolute;left:0;top:13px;
+  font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);
+}
+.q{margin-bottom:7px}
+.q b{color:var(--ink);font-weight:600}
+.blank{font-family:'IBM Plex Mono',monospace;color:var(--amber-deep);letter-spacing:.05em}
+.ansrow{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+input.in{
+  font-family:'Barlow',sans-serif;font-size:16px;color:var(--ink);
+  padding:8px 11px;border:1px solid var(--line);border-radius:3px;background:#FCFDFE;
+  width:290px;max-width:100%;
+}
+input.in:focus,textarea:focus,.chip:focus-visible,.btn:focus-visible,.spk:focus-visible,.line:focus-visible{
+  outline:2px solid var(--amber);outline-offset:2px;
+}
+li.right input.in{border-color:var(--ok);background:#F1F9F6}
+li.wrong input.in{border-color:var(--no);background:#FCF2F1}
+.mark{font-family:'IBM Plex Mono',monospace;font-size:14px}
+li.right .mark{color:var(--ok)}
+li.wrong .mark{color:var(--no)}
+.sol{font-size:14.5px;color:var(--ok);margin-top:6px;display:none}
+.sol.on{display:block}
+.sol b{font-weight:600}
+
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{
+  font-family:'Barlow',sans-serif;font-size:15px;
+  background:#FCFDFE;border:1px solid var(--line);border-radius:3px;
+  padding:7px 13px;cursor:pointer;color:var(--ink-soft);
+}
+.chip:hover{border-color:var(--ink-soft)}
+.chip.sel{background:var(--ink);border-color:var(--ink);color:#fff}
+.chip.good{background:#E7F4EF;border-color:var(--ok);color:var(--ok)}
+.chip.bad{background:#FBEDEC;border-color:var(--no);color:var(--no)}
+
+textarea{
+  font-family:'Barlow',sans-serif;font-size:16px;color:var(--ink);line-height:1.45;
+  width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:3px;
+  background:#FCFDFE;resize:vertical;min-height:62px;
+}
+.hint{font-size:13.5px;color:var(--muted);margin:0 0 7px}
+.model{
+  display:none;margin-top:7px;font-size:14.5px;color:var(--ok);
+  border-left:2px solid var(--ok);padding-left:10px;
+}
+.model.on{display:block}
+
+/* dialogue lines */
+.pool{display:flex;flex-direction:column;gap:7px}
+.line{
+  text-align:left;font-family:'Barlow',sans-serif;font-size:15.5px;line-height:1.4;
+  background:#FCFDFE;border:1px solid var(--line);border-radius:3px;
+  padding:9px 12px;cursor:pointer;color:var(--ink);display:flex;gap:9px;align-items:flex-start;
+}
+.line:hover{border-color:var(--ink-soft)}
+.line .who{
+  font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.1em;
+  color:#fff;background:var(--ink-soft);padding:2px 5px;border-radius:2px;margin-top:2px;flex:0 0 auto;
+}
+.line .who.p{background:var(--amber-deep)}
+.line .pos{
+  font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);flex:0 0 auto;margin-top:3px;width:18px;
+}
+.line.used{opacity:.35;pointer-events:none}
+.line.good{border-color:var(--ok);background:#F1F9F6}
+.line.bad{border-color:var(--no);background:#FCF2F1}
+.slot-head{
+  font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--muted);margin:14px 0 7px;
+}
+.turn{border-left:2px solid var(--line);padding-left:12px;margin-bottom:4px}
+.turn .said{margin-bottom:6px}
+.turn .said .who{
+  font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.1em;
+  color:#fff;background:var(--ink-soft);padding:2px 5px;border-radius:2px;margin-right:7px;
+}
+
+.btnrow{display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
+.btn{
+  font-family:'Barlow Condensed',sans-serif;font-size:15px;letter-spacing:.09em;text-transform:uppercase;
+  background:var(--ink);color:#fff;border:1px solid var(--ink);
+  padding:9px 15px;border-radius:3px;cursor:pointer;font-weight:600;
+}
+.btn:hover{background:var(--ink-soft);border-color:var(--ink-soft)}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn.ghost:hover{background:#F0F3F6;border-color:var(--ink-soft)}
+.btn.amber{background:var(--amber);border-color:var(--amber);color:#261702}
+.btn.amber:hover{background:#D0902B;border-color:#D0902B}
+.score{font-family:'IBM Plex Mono',monospace;font-size:13.5px;color:var(--muted);margin-left:auto}
+.score.done{color:var(--ok)}
+
+.checklist{list-style:none;margin:0 0 14px;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:6px}
+.checklist li{font-size:15px}
+.checklist label{display:flex;gap:8px;align-items:flex-start;cursor:pointer}
+.situation{
+  background:#F7F9FB;border:1px solid var(--line);border-left:3px solid var(--amber);
+  padding:13px 15px;margin:0 0 15px;font-size:15.5px;
+}
+.situation b{font-weight:600}
+.toast{
+  position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(14px);
+  background:var(--ink);color:#fff;padding:10px 18px;border-radius:3px;font-size:15px;
+  opacity:0;pointer-events:none;transition:opacity .18s ease,transform .18s ease;z-index:60;
+}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+footer{text-align:center;color:var(--muted);font-size:13px;padding:10px 0 0}
+@media (prefers-reduced-motion:reduce){*{transition:none !important;animation:none !important}}
+</style>
+</head>
+<body>
+
+<div class="board">
+  <div class="board-in">
+    <span class="flap">GATE&nbsp;B1 · CHECK-IN</span>
+    <h1>Airport check-in — vocabulary &amp; dialogues</h1>
+    <span class="tally">Правильных ответов: <b id="tally">0</b> / 50</span>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- ============ VOCAB ============ -->
+  <section class="card">
+    <p class="eyebrow">Before you start</p>
+    <h2 class="title">Слова урока</h2>
+    <p class="lead">Прочитайте, послушайте и повторите вслух. Потом спрячьте перевод и проверьте себя.</p>
+    <table class="vtable">
+      <thead><tr><th>Word / phrase</th><th>Transcription</th><th>Перевод</th><th></th></tr></thead>
+      <tbody id="vocabBody"></tbody>
+    </table>
+    <div class="btnrow">
+      <button class="btn amber" id="playAll">▶ Прослушать все слова</button>
+      <button class="btn ghost" id="toggleRu">Спрятать перевод</button>
+    </div>
+  </section>
+
+  <div class="cols">
+    <main>
+      <div id="exercises"></div>
+
+      <div class="btnrow" style="border-top:none">
+        <button class="btn" id="copyEverything">📋 Скопировать все письменные ответы</button>
+        <button class="btn ghost" id="resetAll">Начать заново</button>
+      </div>
+      <footer>Check-in desk · practice sheet</footer>
+    </main>
+
+    <!-- ============ PROBLEM WORDS ============ -->
+    <aside class="stub">
+      <h3>Проблемные слова</h3>
+      <p class="sub">Сюда попадают слова, в которых вы ошиблись.</p>
+      <ul id="problems"></ul>
+      <div class="btnrow" style="margin-top:12px;padding-top:12px">
+        <button class="btn ghost" id="clearProblems" style="font-size:13px;padding:7px 11px">Очистить список</button>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   DATA
+   ============================================================ */
+const VOCAB = [
+  {key:'pwa', en:'permitted weight allowance', ipa:'/pəˌmɪtɪd ˈweɪt əˌlaʊəns/', ru:'допустимый вес багажа, норма провоза'},
+  {key:'hya', en:'here you are',              ipa:'/ˌhɪə juː ˈɑː/',            ru:'вот, пожалуйста (когда даёте что-то)'},
+  {key:'pi',  en:'prohibited items',          ipa:'/prəˌhɪbɪtɪd ˈaɪtəmz/',     ru:'запрещённые предметы'},
+  {key:'un',  en:'unattended',                ipa:'/ˌʌnəˈtendɪd/',             ru:'без присмотра, оставленный без внимания'},
+  {key:'lug', en:'luggage',                   ipa:'/ˈlʌɡɪdʒ/',                 ru:'багаж (неисчисляемое: some luggage)'},
+  {key:'sca', en:'scales',                    ipa:'/skeɪlz/',                  ru:'весы (обычно во мн. числе)'},
+  {key:'ws',  en:'a window seat',             ipa:'/ə ˈwɪndəʊ siːt/',          ru:'место у окна'},
+  {key:'as',  en:'an aisle seat',             ipa:'/ən ˈaɪl siːt/',            ru:'место у прохода (aisle = /aɪl/, s не читается)'},
+  {key:'tya', en:'there you are',             ipa:'/ˌðeə juː ˈɑː/',            ru:'вот, держите (когда выдают/возвращают)'}
+];
+const V = Object.fromEntries(VOCAB.map(v=>[v.key,v]));
+
+const EX = [
+  /* ---------- 1. DEFINITIONS ---------- */
+  {id:'ex1', type:'text', num:'EXERCISE 01',
+   title:'Definitions — write the word',
+   lead:'Прочитайте определение и напишите слово или фразу из списка. Артикль a / an можно не писать.',
+   items:[
+    {key:'lug', q:'Bags, cases and suitcases that you take with you when you travel (this word is uncountable).'},
+    {key:'as',  q:'A seat next to the passage between the rows of seats on a plane.'},
+    {key:'pi',  q:'Things you are not allowed to take on board, for example knives or lighters.'},
+    {key:'hya', q:'What you say when you hand your passport to the ground staff.'},
+    {key:'sca', q:'The machine that shows how heavy your suitcase is.'},
+    {key:'pwa', q:'The maximum weight of the bags you can take without paying extra.'},
+    {key:'un',  q:'Left alone, with nobody watching or looking after it.'},
+    {key:'tya', q:'What the ground staff say when they give you your boarding pass.'},
+    {key:'ws',  q:'A seat where you can look outside and lean against the side of the plane.'},
+    {key:'pi',  q:'Perfume over 100 millilitres, scissors and matches are all examples of these.'}
+   ]},
+
+  /* ---------- 2. CONTEXT ---------- */
+  {id:'ex2', type:'text', num:'EXERCISE 02',
+   title:'Context — fill in the gap',
+   lead:'Впишите подходящее слово или фразу из списка. Форма слова не меняется.',
+   items:[
+    {key:'sca', q:'Could you put your case on the ___, please?'},
+    {key:'ws',  q:'I’d like ___, please — I love looking at the clouds.'},
+    {key:'hya', q:'— May I see your passport, please? — Yes, of course. ___.'},
+    {key:'un',  q:'Never leave your bags ___ in the terminal — security will take them away.'},
+    {key:'pwa', q:'Your case is 19 kilos, so it’s just inside the ___.'},
+    {key:'lug', q:'You can collect your ___ at belt six after landing.'},
+    {key:'tya', q:'___. That’s your boarding pass and your passport back.'},
+    {key:'pi',  q:'Have you seen the list of ___ for hand luggage?'},
+    {key:'as',  q:'I always choose ___ because I can get up and walk around easily.'},
+    {key:'lug', q:'My hand ___ is quite small, so I don’t need to check it in.'}
+   ]},
+
+  /* ---------- 3. TRUE / FALSE ---------- */
+  {id:'ex3', type:'tf', num:'EXERCISE 03',
+   title:'True or false?',
+   lead:'Прочитайте утверждение о значении слова и выберите True или False.',
+   items:[
+    {key:'pi',  q:'“Prohibited items” are things you can take on board with no problem.', a:false},
+    {key:'pwa', q:'If your bag is inside the permitted weight allowance, you don’t have to pay extra.', a:true},
+    {key:'sca', q:'You put your suitcase on the scales so the ground staff can see how heavy it is.', a:true},
+    {key:'as',  q:'An aisle seat is the seat next to the window.', a:false},
+    {key:'un',  q:'If a bag is unattended, nobody is looking after it.', a:true},
+    {key:'hya', q:'You say “Here you are” when you give something to another person.', a:true},
+    {key:'lug', q:'In English we can say “two luggages” and “a luggage”.', a:false},
+    {key:'tya', q:'The ground staff can say “There you are” when they hand you your boarding pass.', a:true},
+    {key:'ws',  q:'A window seat is the best choice if you want to walk around during the flight.', a:false},
+    {key:'sca', q:'“Scales” is normally used in the plural: put the case on the scales.', a:true}
+   ]},
+
+  /* ---------- 4. FINISH THE SENTENCES ---------- */
+  {id:'ex4', type:'free', num:'EXERCISE 04',
+   title:'Finish the sentences with your own ideas',
+   lead:'Закончите предложения — своими словами, 5–12 слов. Потом скопируйте всё одной кнопкой и отправьте преподавателю.',
+   copyLabel:'📋 Скопировать мои ответы',
+   items:[
+    {q:'I usually choose a window seat because…', model:'…I can sleep and nobody wakes me up.'},
+    {q:'I never leave my luggage unattended because…', model:'…security can take it away or somebody can steal it.'},
+    {q:'If your bag is over the permitted weight allowance, you have to…', model:'…pay extra or move some things into your hand luggage.'},
+    {q:'The most common prohibited items at airports are…', model:'…large bottles of liquid, knives, scissors and lighters.'},
+    {q:'When the ground staff ask for my passport, I say “Here you are” and…', model:'…give them my passport and my e-booking confirmation.'},
+    {q:'When someone hands me my boarding pass and says “There you are”, I answer…', model:'…“Thank you very much.”'},
+    {q:'Before I leave home, I put my suitcase on the scales because…', model:'…I don’t want a surprise at the check-in desk.'},
+    {q:'An aisle seat is better than a window seat when…', model:'…the flight is long and I want to stand up often.'},
+    {q:'My hand luggage always contains…', model:'…my documents, my phone, a book and one small bottle of water.'},
+    {q:'Airport security take prohibited items away because…', model:'…they can be dangerous for the passengers and the crew.'}
+   ]},
+
+  /* ---------- 5. WHICH WORD FITS? ---------- */
+  {id:'ex5', type:'mc', num:'EXERCISE 05',
+   title:'Which word fits?',
+   lead:'Выберите правильный вариант. Один вариант — верный.',
+   items:[
+    {key:'hya', q:'— Your boarding pass, please. — Yes, ___.', opts:['here you are','there you are','scales'], a:0},
+    {key:'pwa', q:'I’m afraid your case is five kilos over the ___.', opts:['prohibited items','permitted weight allowance','luggage'], a:1},
+    {key:'un',  q:'Please don’t leave your bags ___ in the terminal.', opts:['unattended','luggage','prohibited items'], a:0},
+    {key:'sca', q:'Could you put your case on the ___, please?', opts:['scales','an aisle seat','luggage'], a:0},
+    {key:'as',  q:'I hate climbing over other people, so I always book ___.', opts:['a window seat','an aisle seat','the scales'], a:1},
+    {key:'pi',  q:'Liquids over 100 millilitres are on the list of ___.', opts:['permitted weight allowance','unattended','prohibited items'], a:2},
+    {key:'lug', q:'You can collect your ___ from belt three.', opts:['luggage','scales','prohibited items'], a:0},
+    {key:'ws',  q:'I love watching take-off, so I always ask for ___.', opts:['an aisle seat','luggage','a window seat'], a:2},
+    {key:'pi',  q:'Security officers take away all ___ at the security check.', opts:['prohibited items','permitted weight allowance','window seats'], a:0},
+    {key:'tya', q:'Here’s your passport and your boarding card. ___.', opts:['On the scales','There you are','Unattended'], a:1}
+   ]},
+
+  /* ---------- 6. PUT THE DIALOGUE IN ORDER ---------- */
+  {id:'ex6', type:'order', num:'EXERCISE 06',
+   title:'Put the dialogue in order',
+   lead:'At the check-in desk. Нажимайте на реплики в правильном порядке — они перейдут в правую колонку. GS = ground staff, PAX = passenger (это вы).',
+   lines:[
+    {w:'GS',  t:'Morning, madam. May I see your passport, please?'},
+    {w:'PAX', t:'Yes, of course. Here you are.'},
+    {w:'GS',  t:'Mrs M McDonald, travelling alone.'},
+    {w:'PAX', t:'That’s right.'},
+    {w:'GS',  t:'Fine. Do you have your e-booking confirmation?'},
+    {w:'PAX', t:'Yes, er, here it is.'},
+    {w:'GS',  t:'Mm hm, that’s all fine. One moment, please (typing). Do you have any luggage, other than hand luggage?'},
+    {w:'PAX', t:'Yes, there’s this case.'},
+    {w:'GS',  t:'On the scales, please. OK, that’s just inside the permitted weight allowance.'},
+    {w:'GS',  t:'Did you pack your bag yourself? And have you left it unattended at any time before or since arriving at the airport?'}
+   ]},
+
+  /* ---------- 7. FINISH THE DIALOGUE ---------- */
+  {id:'ex7', type:'dialogue', num:'EXERCISE 07',
+   title:'Finish the dialogue',
+   lead:'Вы — пассажир. Напишите свою реплику после каждой фразы сотрудника аэропорта. Подсказка в скобках — что сказать. Потом скопируйте всё одной кнопкой.',
+   copyLabel:'📋 Скопировать мой диалог',
+   items:[
+    {who:'GS',  said:'Have you seen the list of prohibited items for hand luggage?',
+     hint:'(скажите «да» и что у вас только маленький флакон духов меньше 100 мл)',
+     model:'Yes, I’ve just got one small bottle of perfume. It’s under 100 millilitres, I’m sure.'},
+    {who:'GS',  said:'I see. You might have to show that at the security check.',
+     hint:'(согласитесь и спросите, есть ли задержка рейса)',
+     model:'Right. Oh, er, is there any delay on the flight?'},
+    {who:'GS',  said:'No, it should be on time today. Now, would you prefer an aisle seat or a window seat?',
+     hint:'(выберите место и попросите ближе к началу салона)',
+     model:'An aisle seat, please, and as near the front as possible.'},
+    {who:'GS',  said:'Mm hm (typing). I can give you K3, on the aisle.',
+     hint:'(скажите, что это подходит, и поблагодарите)',
+     model:'Oh, that’s fine, thank you.'},
+    {who:'GS',  said:'There you are. There’s your boarding pass. Watch the screens for the boarding gate once you’re in the departure lounge.',
+     hint:'(поблагодарите и спросите, где зал вылета)',
+     model:'Thank you. And where’s the departure lounge, please?'},
+    {who:'GS',  said:'Have a good flight. Next, please!',
+     hint:'(вежливо попрощайтесь)',
+     model:'Thank you very much. Goodbye.'},
+    {who:'SEC', said:'Do you have any liquids or other prohibited items in your hand luggage?',
+     hint:'(скажите про духи — они меньше 100 мл)',
+     model:'Just one small bottle of perfume — it’s under 100 millilitres.'},
+    {who:'SEC', said:'Your boarding pass, please.',
+     hint:'(подайте посадочный талон — используйте фразу из урока)',
+     model:'Here you are.'},
+    {who:'STF', said:'Excuse me, is this your case? You left it unattended by the seats.',
+     hint:'(извинитесь и объясните, что отошли на секунду)',
+     model:'Oh, sorry, yes, it’s mine. I only left it for a second — I won’t leave my luggage unattended again.'},
+    {who:'STF', said:'Here’s your case. There you are.',
+     hint:'(поблагодарите)',
+     model:'Thank you very much. That’s very kind of you.'}
+   ]},
+
+  /* ---------- 8. YOUR OWN DIALOGUE ---------- */
+  {id:'ex8', type:'own', num:'EXERCISE 08',
+   title:'Write your own dialogue',
+   lead:'Напишите диалог на 12–16 реплик. Отмечайте галочками фразы, которые вы уже использовали.',
+   copyLabel:'📋 Скопировать мой диалог',
+   situation:'<b>Situation.</b> You are flying from Warsaw to London on your own. You have one big suitcase and one small bag as hand luggage. In your hand luggage there is a bottle of perfume (90 ml) and a pair of scissors you forgot about. Your suitcase is a little heavy. You want to sit near the front, and you don’t like climbing over other people. Write the conversation between <b>you (PAX)</b> and the <b>ground staff (GS)</b> at the check-in desk: passport → e-booking confirmation → suitcase and scales → security questions → seat → boarding pass.',
+   checklist:['permitted weight allowance','here you are','prohibited items','unattended','luggage','scales','a window seat','an aisle seat','there you are','ваш собственный вопрос сотруднику'],
+   model:'GS: Good morning, sir. May I see your passport, please?\nPAX: Yes, of course. Here you are.\nGS: Thank you. Do you have your e-booking confirmation?\nPAX: Yes, here it is.\nGS: Do you have any luggage, other than hand luggage?\nPAX: Yes, this suitcase.\nGS: On the scales, please. Mm, 23.4 kilos — that’s just over the permitted weight allowance.\nPAX: Oh dear. Can I move something into my hand luggage?\nGS: Yes, of course… That’s fine now. Did you pack your bag yourself?\nPAX: Yes, I did.\nGS: And have you left it unattended at any time?\nPAX: No, never.\nGS: Have you seen the list of prohibited items for hand luggage?\nPAX: Yes — I’ve got a small bottle of perfume, 90 millilitres. Oh, and scissors. Sorry, I forgot about them.\nGS: You’ll have to leave the scissors at the security check. Now, would you prefer a window seat or an aisle seat?\nPAX: An aisle seat, please, as near the front as possible.\nGS: There you are. There’s your boarding pass. Have a good flight.\nPAX: Thank you very much. Goodbye.'}
+];
+
+/* ============================================================
+   STATE + HELPERS
+   ============================================================ */
+const state = {errors:{}, counted:{}, correct:{}};
+const $ = s=>document.querySelector(s);
+
+function norm(s){
+  return (s||'').toLowerCase()
+    .replace(/[’‘`]/g,"'")
+    .replace(/[.,!?;:"()\-–—]/g,' ')
+    .replace(/\b(a|an|the)\b/g,' ')
+    .replace(/\s+/g,' ').trim();
+}
+function accepted(key){
+  const base = V[key].en;
+  const list = [base];
+  if(key==='sca') list.push('the scales','scale');
+  if(key==='lug') list.push('baggage');
+  if(key==='pwa') list.push('weight allowance','permitted weight');
+  if(key==='pi')  list.push('prohibited item');
+  return list.map(norm);
+}
+function toast(msg){
+  const t=$('#toast'); t.textContent=msg; t.classList.add('on');
+  clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('on'),2000);
+}
+function copyText(text){
+  const done=()=>toast('Скопировано ✓');
+  if(navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(text).then(done).catch(()=>fallback(text,done));
+  } else fallback(text,done);
+}
+function fallback(text,done){
+  const ta=document.createElement('textarea');
+  ta.value=text; ta.style.position='fixed'; ta.style.opacity='0';
+  document.body.appendChild(ta); ta.select();
+  try{document.execCommand('copy'); done();}catch(e){toast('Не получилось — выделите текст вручную');}
+  document.body.removeChild(ta);
+}
+
+/* ---------- speech ---------- */
+let voice=null;
+function pickVoice(){
+  const vs=window.speechSynthesis?speechSynthesis.getVoices():[];
+  voice = vs.find(v=>v.lang==='en-GB') || vs.find(v=>/^en[-_]/.test(v.lang)) || null;
+}
+if(window.speechSynthesis){ pickVoice(); speechSynthesis.onvoiceschanged=pickVoice; }
+function speak(text,btn){
+  if(!window.speechSynthesis){ toast('Озвучка недоступна в этом браузере'); return; }
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang='en-GB'; u.rate=.9; if(voice) u.voice=voice;
+  if(btn){ btn.classList.add('playing'); u.onend=u.onerror=()=>btn.classList.remove('playing'); }
+  speechSynthesis.speak(u);
+}
+function speakAll(){
+  if(!window.speechSynthesis){ toast('Озвучка недоступна в этом браузере'); return; }
+  speechSynthesis.cancel();
+  VOCAB.forEach(v=>{
+    const u=new SpeechSynthesisUtterance(v.en);
+    u.lang='en-GB'; u.rate=.85; if(voice) u.voice=voice;
+    speechSynthesis.speak(u);
+  });
+}
+
+/* ---------- problem words ---------- */
+function flagError(key,uid){
+  if(!key || state.counted[uid]) return;
+  state.counted[uid]=true;
+  state.errors[key]=(state.errors[key]||0)+1;
+  renderProblems();
+}
+function renderProblems(){
+  const ul=$('#problems');
+  const rows=Object.entries(state.errors).sort((a,b)=>b[1]-a[1]);
+  if(!rows.length){
+    ul.innerHTML='<li><span class="empty">Пока пусто. Нажмите «Проверить» в любом упражнении — слова с ошибками появятся здесь.</span></li>';
+    return;
+  }
+  ul.innerHTML = rows.map(([k,n])=>`
+    <li>
+      <span class="pw">${V[k].en}<small>${V[k].ipa}</small></span>
+      <span class="cnt">${n}</span>
+      <button class="spk" data-say="${V[k].en}" title="Прослушать">🔊</button>
+    </li>`).join('');
+}
+function setCorrect(uid,val){
+  state.correct[uid]=val;
+  const n=Object.values(state.correct).filter(Boolean).length;
+  $('#tally').textContent=n;
+}
+
+/* ============================================================
+   VOCAB TABLE
+   ============================================================ */
+$('#vocabBody').innerHTML = VOCAB.map(v=>`
+  <tr>
+    <td class="vword">${v.en}</td>
+    <td class="vipa">${v.ipa}</td>
+    <td class="vru">${v.ru}</td>
+    <td><button class="spk" data-say="${v.en}" title="Прослушать">🔊</button></td>
+  </tr>`).join('');
+
+$('#playAll').addEventListener('click',speakAll);
+$('#toggleRu').addEventListener('click',e=>{
+  document.body.classList.toggle('hide-ru');
+  e.target.textContent = document.body.classList.contains('hide-ru') ? 'Показать перевод' : 'Спрятать перевод';
+});
+document.addEventListener('click',e=>{
+  const b=e.target.closest('.spk'); if(b) speak(b.dataset.say,b);
+});
+
+/* ============================================================
+   BUILD EXERCISES
+   ============================================================ */
+const host=$('#exercises');
+const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+const gap=s=>esc(s).replace(/___/g,'<span class="blank">__________</span>');
+
+EX.forEach(ex=>{
+  const box=document.createElement('section');
+  box.className='ex'; box.id=ex.id;
+  box.innerHTML=`
+    <div class="ex-head">
+      <span class="ex-num">${ex.num}</span>
+      <h3>${ex.title}</h3>
+      <p>${ex.lead}</p>
+    </div>
+    <div class="ex-body">${bodyFor(ex)}</div>`;
+  host.appendChild(box);
+  wire(ex,box);
+});
+
+function bodyFor(ex){
+  if(ex.type==='text') return `
+    <ol class="items">${ex.items.map((it,i)=>`
+      <li data-i="${i}">
+        <div class="q">${gap(it.q)}</div>
+        <div class="ansrow">
+          <input class="in" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="напишите слово…">
+          <span class="mark"></span>
+        </div>
+        <div class="sol"></div>
+      </li>`).join('')}</ol>
+    <div class="btnrow">
+      <button class="btn" data-act="check">Проверить</button>
+      <button class="btn ghost" data-act="reveal">Показать ответы</button>
+      <button class="btn ghost" data-act="clear">Очистить</button>
+      <span class="score"></span>
+    </div>`;
+
+  if(ex.type==='tf') return `
+    <ol class="items">${ex.items.map((it,i)=>`
+      <li data-i="${i}">
+        <div class="q">${esc(it.q)}</div>
+        <div class="chips">
+          <button class="chip" data-v="true">True</button>
+          <button class="chip" data-v="false">False</button>
+        </div>
+        <div class="sol"></div>
+      </li>`).join('')}</ol>
+    <div class="btnrow">
+      <button class="btn" data-act="check">Проверить</button>
+      <button class="btn ghost" data-act="reveal">Показать ответы</button>
+      <button class="btn ghost" data-act="clear">Очистить</button>
+      <span class="score"></span>
+    </div>`;
+
+  if(ex.type==='mc') return `
+    <ol class="items">${ex.items.map((it,i)=>`
+      <li data-i="${i}">
+        <div class="q">${gap(it.q)}</div>
+        <div class="chips">${it.opts.map((o,j)=>`<button class="chip" data-v="${j}">${esc(o)}</button>`).join('')}</div>
+        <div class="sol"></div>
+      </li>`).join('')}</ol>
+    <div class="btnrow">
+      <button class="btn" data-act="check">Проверить</button>
+      <button class="btn ghost" data-act="reveal">Показать ответы</button>
+      <button class="btn ghost" data-act="clear">Очистить</button>
+      <span class="score"></span>
+    </div>`;
+
+  if(ex.type==='free') return `
+    <ol class="items">${ex.items.map((it,i)=>`
+      <li data-i="${i}">
+        <div class="q"><b>${esc(it.q)}</b></div>
+        <textarea rows="2" placeholder="…"></textarea>
+        <div class="model">Sample: ${esc(it.model)}</div>
+      </li>`).join('')}</ol>
+    <div class="btnrow">
+      <button class="btn amber" data-act="copy">${ex.copyLabel}</button>
+      <button class="btn ghost" data-act="reveal">Показать примерные ответы</button>
+      <button class="btn ghost" data-act="clear">Очистить</button>
+    </div>`;
+
+  if(ex.type==='dialogue') return `
+    <ol class="items">${ex.items.map((it,i)=>`
+      <li data-i="${i}">
+        <div class="turn">
+          <div class="said"><span class="who">${it.who}</span>${esc(it.said)}
+            <button class="spk" data-say="${esc(it.said).replace(/"/g,'&quot;')}" title="Прослушать">🔊</button></div>
+          <p class="hint">PAX: ${esc(it.hint)}</p>
+          <textarea rows="2" placeholder="ваша реплика…"></textarea>
+          <div class="model">Sample: ${esc(it.model)}</div>
+        </div>
+      </li>`).join('')}</ol>
+    <div class="btnrow">
+      <button class="btn amber" data-act="copy">${ex.copyLabel}</button>
+      <button class="btn ghost" data-act="reveal">Показать примерные ответы</button>
+      <button class="btn ghost" data-act="clear">Очистить</button>
+    </div>`;
+
+  if(ex.type==='order'){
+    const shuffled = shuffle(ex.lines.map((l,i)=>({...l,idx:i})));
+    return `
+      <div class="cols" style="grid-template-columns:1fr 1fr;gap:18px">
+        <div>
+          <p class="slot-head">Реплики вперемешку</p>
+          <div class="pool" data-pool>${shuffled.map(l=>`
+            <button class="line" data-idx="${l.idx}">
+              <span class="who ${l.w==='PAX'?'p':''}">${l.w}</span><span>${esc(l.t)}</span>
+            </button>`).join('')}</div>
+        </div>
+        <div>
+          <p class="slot-head">Ваш порядок — нажмите, чтобы убрать</p>
+          <div class="pool" data-slots></div>
+        </div>
+      </div>
+      <div class="btnrow">
+        <button class="btn" data-act="check">Проверить</button>
+        <button class="btn ghost" data-act="reveal">Показать ответ</button>
+        <button class="btn ghost" data-act="clear">Очистить</button>
+        <span class="score"></span>
+      </div>`;
+  }
+
+  if(ex.type==='own') return `
+    <p class="situation">${ex.situation}</p>
+    <p class="slot-head">Использовать в диалоге</p>
+    <ul class="checklist">${ex.checklist.map(c=>`<li><label><input type="checkbox"><span>${esc(c)}</span></label></li>`).join('')}</ul>
+    <textarea rows="12" placeholder="GS: Good morning, madam. May I see your passport, please?&#10;PAX: …"></textarea>
+    <div class="model">Sample dialogue:<br>${esc(ex.model).replace(/\n/g,'<br>')}</div>
+    <div class="btnrow">
+      <button class="btn amber" data-act="copy">${ex.copyLabel}</button>
+      <button class="btn ghost" data-act="reveal">Показать образец</button>
+      <button class="btn ghost" data-act="clear">Очистить</button>
+    </div>`;
+  return '';
+}
+
+function shuffle(a){
+  a=a.slice();
+  for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
+  return a;
+}
+
+/* ============================================================
+   WIRING
+   ============================================================ */
+function wire(ex,box){
+  const lis=[...box.querySelectorAll('ol.items>li')];
+  const scoreEl=box.querySelector('.score');
+
+  const setScore=n=>{
+    if(!scoreEl) return;
+    const tot = ex.type==='order'?ex.lines.length:ex.items.length;
+    scoreEl.textContent = n+' / '+tot;
+    scoreEl.classList.toggle('done', n===tot);
+  };
+
+  /* ---- chips select ---- */
+  if(ex.type==='tf'||ex.type==='mc'){
+    lis.forEach(li=>{
+      li.querySelectorAll('.chip').forEach(ch=>ch.addEventListener('click',()=>{
+        li.querySelectorAll('.chip').forEach(c=>c.classList.remove('sel','good','bad'));
+        ch.classList.add('sel');
+      }));
+    });
+  }
+
+  /* ---- ordering ---- */
+  if(ex.type==='order'){
+    const pool=box.querySelector('[data-pool]'), slots=box.querySelector('[data-slots]');
+    pool.addEventListener('click',e=>{
+      const b=e.target.closest('.line'); if(!b||b.classList.contains('used'))return;
+      b.classList.add('used');
+      const clone=b.cloneNode(true);
+      clone.classList.remove('used');
+      clone.insertAdjacentHTML('afterbegin','<span class="pos"></span>');
+      slots.appendChild(clone); renumber();
+    });
+    slots.addEventListener('click',e=>{
+      const b=e.target.closest('.line'); if(!b)return;
+      pool.querySelector('.line[data-idx="'+b.dataset.idx+'"]').classList.remove('used');
+      b.remove(); renumber();
+    });
+    function renumber(){
+      [...slots.children].forEach((c,i)=>{c.querySelector('.pos').textContent=String(i+1).padStart(2,'0');c.classList.remove('good','bad');});
+    }
+    box._order={pool,slots,renumber};
+  }
+
+  /* ---- buttons ---- */
+  box.querySelectorAll('.btnrow .btn').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const act=btn.dataset.act;
+
+      /* ---------- CHECK ---------- */
+      if(act==='check'){
+        let n=0;
+        if(ex.type==='text'){
+          lis.forEach((li,i)=>{
+            const it=ex.items[i], inp=li.querySelector('input');
+            const val=norm(inp.value), ok=val && accepted(it.key).includes(val);
+            li.classList.toggle('right',!!ok); li.classList.toggle('wrong',!ok);
+            li.querySelector('.mark').textContent = ok?'✓':'✗';
+            setCorrect(ex.id+'-'+i, !!ok);
+            if(ok) n++; else if(inp.value.trim()) flagError(it.key, ex.id+'-'+i);
+          });
+        }
+        if(ex.type==='tf'){
+          lis.forEach((li,i)=>{
+            const it=ex.items[i], sel=li.querySelector('.chip.sel');
+            if(!sel) return;
+            const ok = (sel.dataset.v==='true')===it.a;
+            sel.classList.add(ok?'good':'bad');
+            setCorrect(ex.id+'-'+i, ok);
+            if(ok) n++; else flagError(it.key, ex.id+'-'+i);
+          });
+        }
+        if(ex.type==='mc'){
+          lis.forEach((li,i)=>{
+            const it=ex.items[i], sel=li.querySelector('.chip.sel');
+            if(!sel) return;
+            const ok = Number(sel.dataset.v)===it.a;
+            sel.classList.add(ok?'good':'bad');
+            setCorrect(ex.id+'-'+i, ok);
+            if(ok) n++; else flagError(it.key, ex.id+'-'+i);
+          });
+        }
+        if(ex.type==='order'){
+          const {slots}=box._order;
+          [...slots.children].forEach((c,i)=>{
+            const ok = Number(c.dataset.idx)===i;
+            c.classList.toggle('good',ok); c.classList.toggle('bad',!ok);
+            setCorrect(ex.id+'-'+i, ok);
+            if(ok) n++;
+          });
+        }
+        setScore(n);
+        return;
+      }
+
+      /* ---------- REVEAL ---------- */
+      if(act==='reveal'){
+        if(ex.type==='text'){
+          lis.forEach((li,i)=>{
+            const s=li.querySelector('.sol');
+            s.innerHTML='Ответ: <b>'+V[ex.items[i].key].en+'</b>'; s.classList.add('on');
+          });
+        }
+        if(ex.type==='tf'){
+          lis.forEach((li,i)=>{
+            const s=li.querySelector('.sol');
+            s.innerHTML='Ответ: <b>'+(ex.items[i].a?'True':'False')+'</b>'; s.classList.add('on');
+          });
+        }
+        if(ex.type==='mc'){
+          lis.forEach((li,i)=>{
+            const s=li.querySelector('.sol');
+            s.innerHTML='Ответ: <b>'+ex.items[i].opts[ex.items[i].a]+'</b>'; s.classList.add('on');
+          });
+        }
+        if(ex.type==='order'){
+          const {pool,slots,renumber}=box._order;
+          slots.innerHTML=''; pool.querySelectorAll('.line').forEach(l=>l.classList.add('used'));
+          ex.lines.forEach((l,i)=>{
+            slots.insertAdjacentHTML('beforeend',
+              `<div class="line good" data-idx="${i}"><span class="pos"></span><span class="who ${l.w==='PAX'?'p':''}">${l.w}</span><span>${esc(l.t)}</span></div>`);
+          });
+          renumber();
+          [...slots.children].forEach(c=>c.classList.add('good'));
+        }
+        if(ex.type==='free'||ex.type==='dialogue'||ex.type==='own'){
+          box.querySelectorAll('.model').forEach(m=>m.classList.toggle('on'));
+          btn.textContent = box.querySelector('.model').classList.contains('on')
+            ? 'Спрятать образец' : (ex.type==='own'?'Показать образец':'Показать примерные ответы');
+        }
+        return;
+      }
+
+      /* ---------- CLEAR ---------- */
+      if(act==='clear'){
+        box.querySelectorAll('input.in').forEach(i=>i.value='');
+        box.querySelectorAll('textarea').forEach(t=>t.value='');
+        box.querySelectorAll('input[type=checkbox]').forEach(c=>c.checked=false);
+        lis.forEach(li=>{
+          li.classList.remove('right','wrong');
+          const m=li.querySelector('.mark'); if(m) m.textContent='';
+          const s=li.querySelector('.sol'); if(s){s.textContent='';s.classList.remove('on');}
+          li.querySelectorAll('.chip').forEach(c=>c.classList.remove('sel','good','bad'));
+        });
+        box.querySelectorAll('.model').forEach(m=>m.classList.remove('on'));
+        if(ex.type==='order'){
+          const {pool,slots}=box._order;
+          slots.innerHTML=''; pool.querySelectorAll('.line').forEach(l=>l.classList.remove('used','good','bad'));
+        }
+        if(scoreEl){scoreEl.textContent='';scoreEl.classList.remove('done');}
+        return;
+      }
+
+      /* ---------- COPY ---------- */
+      if(act==='copy') copyText(collect(ex,box));
+    });
+  });
+}
+
+/* ---------- collect written answers ---------- */
+function collect(ex,box){
+  const out=[ex.num+' — '+ex.title,''];
+  if(ex.type==='free'){
+    box.querySelectorAll('ol.items>li').forEach((li,i)=>{
+      out.push((i+1)+'. '+ex.items[i].q+' '+(li.querySelector('textarea').value.trim()||'…'));
+    });
+  }
+  if(ex.type==='dialogue'){
+    box.querySelectorAll('ol.items>li').forEach((li,i)=>{
+      out.push(ex.items[i].who+': '+ex.items[i].said);
+      out.push('PAX: '+(li.querySelector('textarea').value.trim()||'…'));
+      out.push('');
+    });
+  }
+  if(ex.type==='own'){
+    const used=[...box.querySelectorAll('.checklist input:checked')].map(c=>c.nextElementSibling.textContent);
+    out.push(box.querySelector('textarea').value.trim()||'…');
+    if(used.length){out.push('','Использованные фразы: '+used.join(', '));}
+  }
+  return out.join('\n');
+}
+
+/* ---------- global buttons ---------- */
+$('#copyEverything').addEventListener('click',()=>{
+  const parts=[];
+  ['ex4','ex7','ex8'].forEach(id=>{
+    const ex=EX.find(e=>e.id===id), box=document.getElementById(id);
+    parts.push(collect(ex,box));
+  });
+  const probs=Object.entries(state.errors).sort((a,b)=>b[1]-a[1]);
+  if(probs.length) parts.push('ПРОБЛЕМНЫЕ СЛОВА\n'+probs.map(([k,n])=>'· '+V[k].en+' — ошибок: '+n).join('\n'));
+  copyText(parts.join('\n\n———\n\n'));
+});
+$('#clearProblems').addEventListener('click',()=>{
+  state.errors={}; state.counted={}; renderProblems(); toast('Список очищен');
+});
+$('#resetAll').addEventListener('click',()=>{
+  document.querySelectorAll('.ex .btnrow .btn[data-act="clear"]').forEach(b=>b.click());
+  state.errors={}; state.counted={}; state.correct={};
+  renderProblems(); $('#tally').textContent='0';
+  window.scrollTo({top:0,behavior:'smooth'}); toast('Всё сброшено');
+});
+
+renderProblems();
+</script>
+</body>
+</html>
