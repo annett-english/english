@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Boarding: English — Airport &amp; Be Going To</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@400;500;600&display=swap');
+
+  :root{
+    --navy:#0B2545;
+    --navy-2:#123a63;
+    --sky:#3E7CB1;
+    --amber:#F4A100;
+    --cream:#FDF6E9;
+    --paper:#FFFFFF;
+    --ok:#2E7D32;
+    --bad:#C62828;
+    --muted:#7c8aa0;
+  }
+  *{box-sizing:border-box;}
+  @media (prefers-reduced-motion: reduce){ *{animation:none!important; transition:none!important;} }
+
+  body{
+    margin:0;
+    font-family:'Inter',sans-serif;
+    color:var(--navy);
+    background:
+      radial-gradient(ellipse at 20% -10%, rgba(255,255,255,.12), transparent 40%),
+      linear-gradient(160deg,#0B2545 0%, #123a63 45%, #2f6f9c 100%);
+    background-attachment:fixed;
+    min-height:100vh;
+    padding:28px 16px 80px;
+  }
+
+  .app{max-width:1180px; margin:0 auto;}
+
+  /* ===== Header: boarding pass stub ===== */
+  .ticket-header{
+    background:var(--cream);
+    border-radius:18px;
+    display:grid;
+    grid-template-columns:1fr auto;
+    overflow:hidden;
+    box-shadow:0 18px 40px rgba(0,0,0,.28);
+    position:relative;
+  }
+  .ticket-main{padding:26px 30px;}
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    letter-spacing:.14em;
+    font-size:11px;
+    color:var(--sky);
+    text-transform:uppercase;
+    margin:0 0 6px;
+  }
+  .ticket-main h1{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:clamp(26px,4vw,38px);
+    margin:0 0 10px;
+    line-height:1.05;
+  }
+  .ticket-main h1 span{color:var(--amber);}
+  .ticket-main p{margin:0; color:#2c3e58; max-width:52ch; font-size:14.5px;}
+  .fields{
+    font-family:'IBM Plex Mono',monospace;
+    display:flex; gap:22px; flex-wrap:wrap; margin-top:16px;
+  }
+  .fields div{font-size:11px; color:var(--muted);}
+  .fields b{display:block; font-size:14px; color:var(--navy); letter-spacing:.03em;}
+  .ticket-stub{
+    background:var(--navy);
+    color:var(--cream);
+    padding:26px 22px;
+    display:flex; flex-direction:column; justify-content:center; align-items:center; gap:8px;
+    border-left:2px dashed rgba(253,246,233,.35);
+    min-width:150px;
+    position:relative;
+  }
+  .ticket-stub .plane{font-size:34px;}
+  .ticket-stub small{font-family:'IBM Plex Mono',monospace; font-size:10px; opacity:.7; letter-spacing:.1em;}
+  .notch{position:absolute; width:22px; height:22px; background:var(--navy-2); border-radius:50%; left:-11px;}
+  .notch.top{top:-11px;} .notch.bottom{bottom:-11px;}
+
+  /* ===== Tabs ===== */
+  .tabs{display:flex; gap:10px; margin:22px 0 18px; flex-wrap:wrap;}
+  .tab-btn{
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:700; font-size:15px;
+    background:rgba(253,246,233,.14);
+    color:var(--cream);
+    border:1.5px solid rgba(253,246,233,.35);
+    padding:10px 20px; border-radius:999px; cursor:pointer;
+  }
+  .tab-btn.active{background:var(--amber); color:var(--navy); border-color:var(--amber);}
+  .tab-btn:focus-visible, .btn:focus-visible, .ans-input:focus-visible{outline:3px solid var(--amber); outline-offset:2px;}
+
+  /* ===== Layout ===== */
+  .layout{display:grid; grid-template-columns:1fr 260px; gap:22px; align-items:start;}
+  @media (max-width:900px){ .layout{grid-template-columns:1fr;} .sidebar{order:-1;} }
+
+  .tab-panel{display:none;}
+  .tab-panel.active{display:block;}
+
+  /* ===== Intro / reminder card ===== */
+  .intro-card{
+    background:var(--paper); border-radius:16px; padding:22px 24px; margin-bottom:24px;
+    box-shadow:0 10px 26px rgba(0,0,0,.12);
+  }
+  .intro-card h2{font-family:'Space Grotesk',sans-serif; margin:0 0 4px; font-size:20px;}
+  .intro-card .sub{color:var(--muted); font-size:13.5px; margin:0 0 16px;}
+  .word-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:10px;}
+  .word-chip{
+    border:1.5px solid #eadfc9; background:#FFFBF3; border-radius:12px; padding:10px 12px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .word-chip .play{
+    flex:0 0 auto; width:34px; height:34px; border-radius:50%; border:none; cursor:pointer;
+    background:var(--sky); color:#fff; font-size:15px;
+  }
+  .word-chip .txt{line-height:1.3;}
+  .word-chip .en{font-weight:600; font-size:14.5px;}
+  .word-chip .ipa{font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--sky);}
+  .word-chip .ru{font-size:12.5px; color:var(--muted);}
+  .listen-all{
+    margin-top:14px; font-family:'Space Grotesk',sans-serif; font-weight:700;
+    background:var(--navy); color:#fff; border:none; border-radius:10px; padding:9px 16px; cursor:pointer;
+  }
+
+  /* ===== Exercise card (boarding-pass stub look) ===== */
+  .exercise-card{
+    position:relative;
+    background:var(--cream);
+    border:2px solid var(--navy);
+    border-radius:14px;
+    padding:24px 28px 20px;
+    margin-bottom:28px;
+    box-shadow:0 6px 0 rgba(11,37,69,.10);
+  }
+  .exercise-card::before,.exercise-card::after{
+    content:""; position:absolute; width:24px; height:24px; border-radius:50%;
+    background:#123a63; top:58px; border:2px solid var(--navy);
+  }
+  .exercise-card::before{left:-14px;}
+  .exercise-card::after{right:-14px;}
+  .ex-head h3{font-family:'Space Grotesk',sans-serif; margin:0 0 4px; font-size:18px;}
+  .ex-head .instr{margin:0; color:#4a5872; font-size:13.5px;}
+  .perf{border-top:2px dashed rgba(11,37,69,.3); margin:16px -28px 18px;}
+
+  .item-row{
+    display:grid; grid-template-columns:28px 1fr 220px; gap:12px; align-items:start;
+    padding:10px 0; border-bottom:1px solid rgba(11,37,69,.08);
+  }
+  .item-row:last-child{border-bottom:none;}
+  .q-num{
+    font-family:'IBM Plex Mono',monospace; font-weight:600; color:var(--sky);
+    background:#fff; border-radius:50%; width:26px; height:26px; display:flex; align-items:center; justify-content:center; font-size:12px;
+    border:1px solid #dce6f0;
+  }
+  .q-prompt{font-size:14.5px; padding-top:3px;}
+  .q-prompt .ru-hint{color:var(--sky); font-style:italic; font-size:13px;}
+  .mini-play{
+    margin-left:8px; border:none; background:var(--amber); color:var(--navy); font-size:13px;
+    border-radius:50%; width:26px; height:26px; cursor:pointer; vertical-align:middle;
+  }
+  .ans-input{
+    width:100%; padding:8px 10px; border-radius:8px; border:1.5px solid #d7cba8;
+    font-family:'IBM Plex Mono',monospace; font-size:13.5px; background:#fff;
+  }
+  .ans-input.correct{border-color:var(--ok); background:#eefaf0;}
+  .ans-input.incorrect{border-color:var(--bad); background:#fdeeee;}
+  .triple{display:flex; flex-direction:column; gap:6px;}
+  .triple label{display:flex; align-items:center; gap:6px; font-size:12px; color:var(--muted);}
+  .triple input{flex:1;}
+  .feedback{grid-column:2 / span 2; font-size:12.5px; margin-top:4px; display:none; padding:6px 10px; border-radius:8px;}
+  .feedback.show{display:block;}
+  .feedback.show:not(.neutral){}
+  .item-row:has(.ans-input.correct) .feedback{background:#eefaf0; color:var(--ok);}
+  .item-row:has(.ans-input.incorrect) .feedback{background:#fdeeee; color:var(--bad);}
+  .feedback.neutral{background:#eef3fa; color:var(--sky);}
+
+  .picture-row{display:grid; grid-template-columns:28px 90px 1fr; gap:12px; align-items:center; padding:10px 0; border-bottom:1px solid rgba(11,37,69,.08);}
+  .picture-row .emoji{font-size:26px;}
+  .radio-row{display:flex; gap:14px; margin-top:6px; font-size:13px;}
+  .radio-row label{display:flex; align-items:center; gap:5px;}
+
+  .btn-row{display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:6px;}
+  .btn{
+    font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:13px; cursor:pointer;
+    border-radius:9px; padding:9px 15px; border:1.5px solid var(--navy); background:#fff; color:var(--navy);
+  }
+  .btn-check{background:var(--navy); color:#fff;}
+  .btn-show{background:#fff;}
+  .btn-copy{background:var(--amber); border-color:var(--amber); color:var(--navy);}
+  .score{font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--sky); margin-left:auto;}
+
+  .section-copy{
+    display:block; margin:6px auto 10px; background:var(--sky); color:#fff; border:none;
+    font-family:'Space Grotesk',sans-serif; font-weight:700; padding:12px 22px; border-radius:12px; cursor:pointer;
+  }
+
+  /* ===== Sidebar ===== */
+  .sidebar{position:sticky; top:16px;}
+  .side-card{
+    background:var(--paper); border-radius:16px; padding:16px 18px; box-shadow:0 10px 26px rgba(0,0,0,.12);
+  }
+  .side-card h4{font-family:'Space Grotesk',sans-serif; margin:0 0 3px; font-size:15px;}
+  .side-card .sub{margin:0 0 10px; font-size:11.5px; color:var(--muted);}
+  table.problems{width:100%; border-collapse:collapse; font-size:12px;}
+  table.problems th{text-align:left; font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.05em; padding-bottom:6px;}
+  table.problems td{padding:5px 4px; border-top:1px solid #f0ebdd;}
+  table.problems td:last-child{text-align:center; font-weight:700; color:var(--bad);}
+  table.problems .empty{color:var(--muted); text-align:center; padding:14px 0; font-style:italic;}
+  .reset-btn{margin-top:10px; width:100%; background:#f4f1ea; border:1px solid #e2dcc8; border-radius:8px; padding:7px; font-size:11.5px; cursor:pointer; color:var(--navy);}
+
+  .toast{
+    position:fixed; bottom:22px; left:50%; transform:translateX(-50%);
+    background:var(--navy); color:#fff; padding:10px 18px; border-radius:10px; font-size:13px;
+    opacity:0; pointer-events:none; transition:opacity .25s ease, transform .25s ease; z-index:50;
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(-4px);}
+
+  footer.note{text-align:center; color:rgba(253,246,233,.6); font-size:11.5px; margin-top:30px;}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="ticket-header">
+    <div class="ticket-main">
+      <p class="eyebrow">Boarding pass · lesson edition</p>
+      <h1>Boarding: <span>English</span></h1>
+      <p>Аэропорт и словарь путешествий + грамматика <b>be going to</b>. Впишите ответы от руки в каждое поле — как будто заполняете посадочный талон.</p>
+      <div class="fields">
+        <div>FROM<b>Russian</b></div>
+        <div>TO<b>English</b></div>
+        <div>GATE<b>B2</b></div>
+        <div>SEAT<b>7A</b></div>
+      </div>
+    </div>
+    <div class="ticket-stub">
+      <span class="notch top"></span>
+      <div class="plane">✈️</div>
+      <small>BOARDING · UNIT 04</small>
+      <span class="notch bottom"></span>
+    </div>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="vocab">✈️ Vocabulary: Airport &amp; Flying</button>
+    <button class="tab-btn" data-tab="grammar">🔜 Grammar: be going to</button>
+  </div>
+
+  <div class="layout">
+    <main>
+
+      <!-- ===== VOCAB TAB ===== -->
+      <section class="tab-panel active" id="tab-vocab">
+        <div class="intro-card">
+          <h2>Слова урока</h2>
+          <p class="sub">Прослушайте произношение (🔊), повторите вслух, посмотрите перевод и транскрипцию — потом переходите к упражнениям.</p>
+          <div class="word-grid" id="word-grid"></div>
+          <button class="listen-all" id="listen-all">▶ Прослушать все слова</button>
+        </div>
+
+        <div id="vocab-exercises"></div>
+        <button class="section-copy" id="copy-vocab-all">📋 Скопировать все ответы раздела «Vocabulary»</button>
+      </section>
+
+      <!-- ===== GRAMMAR TAB ===== -->
+      <section class="tab-panel" id="tab-grammar">
+        <div class="intro-card">
+          <h2>be going to</h2>
+          <p class="sub">Используется для <b>планов</b> (уже решено заранее) и <b>предсказаний</b> (есть доказательство сейчас).<br>
+          Формула: <b>подлежащее + am/is/are + (not) + going to + глагол</b>. В вопросе: <b>Am/Is/Are + подлежащее + going to + глагол?</b></p>
+        </div>
+        <div id="grammar-exercises"></div>
+        <button class="section-copy" id="copy-grammar-all">📋 Скопировать все ответы раздела «Grammar»</button>
+      </section>
+
+    </main>
+
+    <aside class="sidebar">
+      <div class="side-card">
+        <h4>🛠 Проблемные слова</h4>
+        <p class="sub">Автоматически пополняется, когда вы ошибаетесь</p>
+        <table class="problems">
+          <thead><tr><th>Слово</th><th>Перевод</th><th>Ошибок</th></tr></thead>
+          <tbody id="problems-body"><tr><td colspan="3" class="empty">Пока нет ошибок 🎉</td></tr></tbody>
+        </table>
+        <button class="reset-btn" id="reset-problems">Сбросить статистику</button>
+      </div>
+    </aside>
+  </div>
+
+  <footer class="note">Данные упражнений сохраняются только в этом браузере (localStorage). Ничего не отправляется никуда.</footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============ DATA ============ */
+const VOCAB = [
+  {en:"boarding pass", ru:"посадочный талон", ipa:"/ˈbɔːrdɪŋ pæs/",
+    def:"a document that you must show before you get on a plane",
+    fragment:"you / show / before the flight", sample:"You show your boarding pass before the flight.",
+    question:"What document do you show at the gate before boarding?", qsample:"You show your boarding pass at the gate before boarding."},
+  {en:"take off", ru:"взлетать", ipa:"/teɪk ɒf/",
+    def:"when a plane leaves the ground and starts flying",
+    fragment:"the plane / soon", sample:"The plane is going to take off soon.",
+    question:"What happens when a plane leaves the ground and starts flying?", qsample:"The plane takes off and starts flying."},
+  {en:"window seat", ru:"место у окна", ipa:"/ˈwɪndoʊ siːt/",
+    def:"a seat next to the plane's window",
+    fragment:"I / like / the view", sample:"I like a window seat because of the view.",
+    question:"Which seat lets you look outside during the flight?", qsample:"A window seat lets you look outside during the flight."},
+  {en:"land", ru:"приземляться", ipa:"/lænd/",
+    def:"when a plane comes down and touches the ground",
+    fragment:"the flight / at 6 pm", sample:"The flight is going to land at 6 pm.",
+    question:"What does a plane do when it arrives and touches the ground?", qsample:"The plane lands when it touches the ground."},
+  {en:"aisle seat", ru:"место у прохода", ipa:"/aɪl siːt/",
+    def:"a seat next to the passage between the rows of seats",
+    fragment:"he / want / easy access", sample:"He wants an aisle seat for easy access.",
+    question:"Which seat is best if you like moving around easily?", qsample:"An aisle seat is best for moving around easily."},
+  {en:"carry-on luggage", ru:"ручная кладь", ipa:"/ˈkæri ɒn ˈlʌɡɪdʒ/", alt:["hand baggage"],
+    def:"a small bag that you take with you into the plane cabin",
+    fragment:"put / in the bin", sample:"Put your carry-on luggage in the bin.",
+    question:"What do we call the small bag you take into the cabin?", qsample:"We call it carry-on luggage or hand baggage."},
+  {en:"luggage", ru:"багаж", ipa:"/ˈlʌɡɪdʒ/", alt:["baggage"],
+    def:"the bags and suitcases you take with you on a trip",
+    fragment:"we / collect / at the airport", sample:"We collect our luggage at the airport.",
+    question:"What word describes all your bags and suitcases together?", qsample:"We call it luggage or baggage."},
+  {en:"departure gate", ru:"выход на посадку", ipa:"/dɪˈpɑːrtʃər ɡeɪt/",
+    def:"the place at the airport where you get on your plane",
+    fragment:"the gate / soon", sample:"The departure gate closes soon.",
+    question:"Where do you go in the airport to get on your plane?", qsample:"You go to the departure gate to get on your plane."}
+];
+
+const VOCAB_EXERCISES = [
+  { key:"letters", title:"Упражнение 1 · Вставь пропущенные буквы",
+    instr:"Впиши слово целиком, ориентируясь на пропуски и перевод.",
+    order:[2,5,0,7,3,1,6,4],
+    prompt:it=>`${maskWord(it.en)} <span class="ru-hint">(${it.ru})</span>`,
+    accepted:it=>[it.en,...(it.alt||[])],
+    explain:it=>`${it.en} — ${it.ru} ${it.ipa}` },
+
+  { key:"translate", title:"Упражнение 2 · Переведи на английский",
+    instr:"Напиши английское слово или фразу по русскому переводу.",
+    order:[4,1,6,2,7,0,5,3],
+    prompt:it=>`${it.ru}`,
+    accepted:it=>[it.en,...(it.alt||[])],
+    explain:it=>`${it.ru} → ${it.en} ${it.ipa}` },
+
+  { key:"dictation", title:"Упражнение 3 · Запиши слово на слух",
+    instr:"Нажми 🔊, прослушай произношение и запиши слово по-английски.",
+    order:[7,3,1,5,0,6,2,4], audio:true,
+    prompt:it=>`Нажми и слушай →`,
+    accepted:it=>[it.en,...(it.alt||[])],
+    explain:it=>`${it.en} ${it.ipa} — ${it.ru}` },
+
+  { key:"definition", title:"Упражнение 4 · Угадай слово по определению",
+    instr:"Прочитай definition и напиши слово, которое оно описывает.",
+    order:[1,6,3,0,4,2,7,5],
+    prompt:it=>`${it.def}`,
+    accepted:it=>[it.en,...(it.alt||[])],
+    explain:it=>`"${it.def}" = ${it.en} (${it.ru})` },
+
+  { key:"expand", title:"Упражнение 5 · Expand the sentence",
+    instr:"Разверни заготовку в полное предложение, используя нужное слово.",
+    order:[5,2,7,4,1,3,0,6], lenient:true,
+    prompt:it=>`${it.fragment} <span class="ru-hint">[${it.ru}]</span>`,
+    accepted:it=>[it.en,...(it.alt||[])],
+    answerSample:it=>it.sample,
+    explain:it=>`Пример: "${it.sample}"` },
+
+  { key:"questions", title:"Упражнение 6 · Ответь на вопросы",
+    instr:"Ответь полным предложением, используя нужное слово.",
+    order:[3,0,5,2,6,1,4,7], lenient:true,
+    prompt:it=>`${it.question}`,
+    accepted:it=>[it.en,...(it.alt||[])],
+    answerSample:it=>it.qsample,
+    explain:it=>`Пример ответа: "${it.qsample}"` }
+];
+
+const GRAMMAR_FORMS = [
+  {subj:"I", verb:"study English tonight", pos:"I am going to study English tonight.", neg:"I am not going to study English tonight.", q:"Am I going to study English tonight?", note:"I → am"},
+  {subj:"She", verb:"visit her grandmother this weekend", pos:"She is going to visit her grandmother this weekend.", neg:"She is not going to visit her grandmother this weekend.", q:"Is she going to visit her grandmother this weekend?", note:"she/he/it → is"},
+  {subj:"They", verb:"travel by plane", pos:"They are going to travel by plane.", neg:"They are not going to travel by plane.", q:"Are they going to travel by plane?", note:"they → are"},
+  {subj:"We", verb:"watch a movie later", pos:"We are going to watch a movie later.", neg:"We are not going to watch a movie later.", q:"Are we going to watch a movie later?", note:"we → are"},
+  {subj:"He", verb:"give up meat", pos:"He is going to give up meat.", neg:"He is not going to give up meat.", q:"Is he going to give up meat?", note:"he → is"},
+  {subj:"You", verb:"call me tomorrow", pos:"You are going to call me tomorrow.", neg:"You are not going to call me tomorrow.", q:"Are you going to call me tomorrow?", note:"you → are"},
+  {subj:"The children", verb:"play football after school", pos:"The children are going to play football after school.", neg:"The children are not going to play football after school.", q:"Are the children going to play football after school?", note:"мн.ч. → are"},
+  {subj:"My parents", verb:"sell the house", pos:"My parents are going to sell the house.", neg:"My parents are not going to sell the house.", q:"Are my parents going to sell the house?", note:"мн.ч. → are"}
+];
+
+const GRAMMAR_TYPE = [
+  {sentence:"Look at those clouds! It's going to rain.", answer:"prediction", reason:"Видимое доказательство сейчас (тучи) → prediction."},
+  {sentence:"I've already booked the ticket — I'm going to fly to Rome next month.", answer:"plan", reason:"Решение принято заранее → plan."},
+  {sentence:"She's studied so hard, she's going to pass the exam.", answer:"prediction", reason:"Вывод на основе фактов → prediction."},
+  {sentence:"We're going to meet at the airport at 6 am.", answer:"plan", reason:"Заранее договорённая встреча → plan."},
+  {sentence:"He's driving too fast — he's going to have an accident.", answer:"prediction", reason:"Видимая причина сейчас → prediction."},
+  {sentence:"They are going to open a new café next year.", answer:"plan", reason:"Заранее принятое решение → plan."},
+  {sentence:"The sky is really dark, it's going to storm.", answer:"prediction", reason:"Признак в настоящем → prediction."},
+  {sentence:"I'm going to start my new job on Monday.", answer:"plan", reason:"Уже решено и организовано → plan."}
+];
+
+const GRAMMAR_MISTAKE = [
+  {wrong:"She going to visit Paris.", correct:"She is going to visit Paris.", reason:"Пропущен глагол be (is)."},
+  {wrong:"I is going to travel tomorrow.", correct:"I am going to travel tomorrow.", reason:"С I используется am, а не is."},
+  {wrong:"They is going to land soon.", correct:"They are going to land soon.", reason:"С they используется are, а не is."},
+  {wrong:"He going to buy carry-on luggage.", correct:"He is going to buy carry-on luggage.", reason:"Пропущен глагол be (is)."},
+  {wrong:"We not going to take off yet.", correct:"We are not going to take off yet.", reason:"Пропущен глагол be (are) перед not."},
+  {wrong:"Is you going to check your baggage?", correct:"Are you going to check your baggage?", reason:"С you используется Are, а не Is."},
+  {wrong:"She are going to sit in an aisle seat.", correct:"She is going to sit in an aisle seat.", reason:"С she используется is, а не are."},
+  {wrong:"The plane going to land at gate 5.", correct:"The plane is going to land at gate 5.", reason:"Пропущен глагол be (is)."}
+];
+
+const GRAMMAR_PICTURE = [
+  {emoji:"⛈️☁️", sample:"It is going to rain.", keyword:"rain"},
+  {emoji:"✈️🕕", sample:"The plane is going to take off at six o'clock.", keyword:"take off"},
+  {emoji:"🎂🎈", sample:"She is going to have a birthday party.", keyword:"birthday"},
+  {emoji:"📚🎓", sample:"He is going to study for his exam.", keyword:"study"},
+  {emoji:"🏖️☀️", sample:"They are going to go to the beach.", keyword:"beach"},
+  {emoji:"🧳✈️", sample:"We are going to check our luggage.", keyword:"luggage"},
+  {emoji:"🍽️👨‍🍳", sample:"I am going to cook dinner at eight.", keyword:"cook"},
+  {emoji:"🚪🏃", sample:"The passengers are going to miss the flight.", keyword:"miss"}
+];
+
+const GRAMMAR_QUESTIONS = [
+  {question:"What are you going to do this weekend?", sample:"I am going to visit my friends this weekend."},
+  {question:"Where are you going to travel next year?", sample:"I am going to travel to Spain next year."},
+  {question:"What is your best friend going to do after school today?", sample:"He is going to play football after school."},
+  {question:"Are you going to take a window seat or an aisle seat on your next flight?", sample:"I am going to take a window seat."},
+  {question:"What is the weather going to be like tomorrow?", sample:"It is going to be sunny tomorrow."},
+  {question:"What are your parents going to cook for dinner?", sample:"They are going to cook pasta for dinner."},
+  {question:"When is your plane going to land?", sample:"My plane is going to land at 9 p.m."},
+  {question:"What are you going to pack in your carry-on luggage?", sample:"I am going to pack my passport and phone."}
+];
+
+/* ============ HELPERS ============ */
+function maskWord(word){
+  return word.split(' ').map(part=>{
+    return part.split('').map((ch,i)=>{
+      if(ch==='-') return ch;
+      if(i===0) return ch;
+      return (i%2===0)?'_':ch;
+    }).join('');
+  }).join(' ');
+}
+function norm(s){
+  return (s||'').toLowerCase().trim()
+    .replace(/[.,!?;:"'’]/g,'')
+    .replace(/-/g,' ')
+    .replace(/\s+/g,' ');
+}
+function matchAny(input, accepted){ const ni=norm(input); return accepted.some(a=>norm(a)===ni); }
+function matchContains(input, keyword){ return norm(input).includes(norm(keyword)); }
+function speak(text){
+  if(!('speechSynthesis' in window)){ toast('Озвучка не поддерживается в этом браузере'); return; }
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang='en-US'; u.rate=0.85;
+  window.speechSynthesis.speak(u);
+}
+let toastTimer;
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),1800);
+}
+function copyText(text){
+  navigator.clipboard.writeText(text).then(()=>toast('Скопировано ✅')).catch(()=>toast('Не удалось скопировать'));
+}
+
+/* ============ PROBLEM WORDS ============ */
+let problems = {};
+try{ problems = JSON.parse(localStorage.getItem('bp_problems')||'{}'); }catch(e){ problems={}; }
+
+function addProblem(key, ru){
+  problems[key] = problems[key] || {ru: ru||'—', count:0};
+  problems[key].count++;
+  try{ localStorage.setItem('bp_problems', JSON.stringify(problems)); }catch(e){}
+  renderProblems();
+}
+function renderProblems(){
+  const body = document.getElementById('problems-body');
+  const rows = Object.entries(problems).sort((a,b)=>b[1].count-a[1].count).slice(0,10);
+  body.innerHTML = rows.length
+    ? rows.map(([w,d])=>`<tr><td>${w}</td><td>${d.ru}</td><td>${d.count}</td></tr>`).join('')
+    : `<tr><td colspan="3" class="empty">Пока нет ошибок 🎉</td></tr>`;
+}
+document.getElementById('reset-problems').addEventListener('click',()=>{
+  problems = {}; try{ localStorage.removeItem('bp_problems'); }catch(e){}
+  renderProblems(); toast('Статистика сброшена');
+});
+renderProblems();
+
+/* ============ INTRO WORD GRID ============ */
+const wordGrid = document.getElementById('word-grid');
+VOCAB.forEach(it=>{
+  const chip=document.createElement('div'); chip.className='word-chip';
+  chip.innerHTML = `<button class="play" type="button" aria-label="Слушать">🔊</button>
+    <div class="txt"><div class="en">${it.en}</div><div class="ipa">${it.ipa}</div><div class="ru">${it.ru}</div></div>`;
+  chip.querySelector('.play').addEventListener('click',()=>speak(it.en));
+  wordGrid.appendChild(chip);
+});
+document.getElementById('listen-all').addEventListener('click',()=>{
+  let i=0;
+  const next=()=>{ if(i>=VOCAB.length) return; speak(VOCAB[i].en); i++; setTimeout(next,1500); };
+  next();
+});
+
+/* ============ VOCAB EXERCISE BUILDER ============ */
+function buildVocabBlock(ex){
+  const wrap=document.createElement('div'); wrap.className='exercise-card';
+  wrap.innerHTML=`
+    <div class="ex-head"><h3>${ex.title}</h3><p class="instr">${ex.instr}</p></div>
+    <div class="perf"></div>
+    <div class="items"></div>
+    <div class="btn-row">
+      <button class="btn btn-check">✅ Проверить</button>
+      <button class="btn btn-show">👁 Показать ответы</button>
+      <button class="btn btn-copy">📋 Скопировать ответы</button>
+      <span class="score"></span>
+    </div>`;
+  const itemsBox = wrap.querySelector('.items');
+  ex.order.forEach((idx,pos)=>{
+    const it = VOCAB[idx];
+    const row=document.createElement('div'); row.className='item-row'; row.dataset.idx=idx;
+    row.innerHTML=`
+      <div class="q-num">${pos+1}</div>
+      <div class="q-prompt">${ex.prompt(it)}${ex.audio?` <button type="button" class="mini-play" data-word="${it.en}">🔊</button>`:''}</div>
+      <input type="text" class="ans-input" placeholder="Введите ответ...">
+      <div class="feedback"></div>`;
+    itemsBox.appendChild(row);
+  });
+  itemsBox.querySelectorAll('.mini-play').forEach(b=>b.addEventListener('click',()=>speak(b.dataset.word)));
+
+  wrap.querySelector('.btn-check').addEventListener('click',()=>{
+    let correct=0;
+    itemsBox.querySelectorAll('.item-row').forEach(row=>{
+      const it=VOCAB[row.dataset.idx];
+      const input=row.querySelector('.ans-input'); const fb=row.querySelector('.feedback');
+      const accepted=ex.accepted(it);
+      input.classList.remove('correct','incorrect');
+      let ok;
+      if(input.value.trim()===''){ ok=false; }
+      else if(ex.lenient){ ok = accepted.some(a=>matchContains(input.value,a)) && norm(input.value).split(' ').length>=3; }
+      else { ok = matchAny(input.value, accepted); }
+      if(ok){ input.classList.add('correct'); fb.textContent='✔ Верно! '+ex.explain(it); correct++; }
+      else { input.classList.add('incorrect'); fb.textContent=(input.value.trim()===''?'Нужно вписать ответ. ':'✘ ')+ex.explain(it); addProblem(it.en,it.ru); }
+      fb.className='feedback show';
+    });
+    wrap.querySelector('.score').textContent=`${correct}/8`;
+  });
+
+  wrap.querySelector('.btn-show').addEventListener('click',()=>{
+    itemsBox.querySelectorAll('.item-row').forEach(row=>{
+      const it=VOCAB[row.dataset.idx];
+      const input=row.querySelector('.ans-input'); const fb=row.querySelector('.feedback');
+      const sample = ex.answerSample? ex.answerSample(it): ex.accepted(it)[0];
+      input.placeholder=sample;
+      fb.textContent='Ответ: '+sample;
+      fb.className='feedback show neutral';
+    });
+  });
+
+  wrap.querySelector('.btn-copy').addEventListener('click',()=>{
+    const lines=[...itemsBox.querySelectorAll('.item-row')].map((row,i)=>{
+      const v=row.querySelector('.ans-input').value.trim();
+      return `${i+1}. ${v||'(нет ответа)'}`;
+    });
+    copyText(ex.title+'\n'+lines.join('\n'));
+  });
+
+  return wrap;
+}
+const vocabContainer=document.getElementById('vocab-exercises');
+VOCAB_EXERCISES.forEach(ex=>vocabContainer.appendChild(buildVocabBlock(ex)));
+
+document.getElementById('copy-vocab-all').addEventListener('click',()=>{
+  const blocks=[...vocabContainer.querySelectorAll('.exercise-card')];
+  const text=blocks.map(b=>{
+    const title=b.querySelector('h3').textContent;
+    const lines=[...b.querySelectorAll('.ans-input')].map((inp,i)=>`${i+1}. ${inp.value.trim()||'(нет ответа)'}`);
+    return title+'\n'+lines.join('\n');
+  }).join('\n\n');
+  copyText(text);
+});
+
+/* ============ GRAMMAR EXERCISE BUILDERS ============ */
+const grammarContainer=document.getElementById('grammar-exercises');
+
+function cardShell(title, instr){
+  const wrap=document.createElement('div'); wrap.className='exercise-card';
+  wrap.innerHTML=`
+    <div class="ex-head"><h3>${title}</h3><p class="instr">${instr}</p></div>
+    <div class="perf"></div>
+    <div class="items"></div>
+    <div class="btn-row">
+      <button class="btn btn-check">✅ Проверить</button>
+      <button class="btn btn-show">👁 Показать ответы</button>
+      <button class="btn btn-copy">📋 Скопировать ответы</button>
+      <span class="score"></span>
+    </div>`;
+  return wrap;
+}
+
+// 1. Forms + - ?
+function buildFormsBlock(){
+  const wrap=cardShell("Упражнение 1 · Positive / Negative / Question",
+    "Составь три формы предложения с be going to: утверждение (+), отрицание (−), вопрос (?).");
+  const box=wrap.querySelector('.items');
+  GRAMMAR_FORMS.forEach((it,i)=>{
+    const row=document.createElement('div'); row.className='item-row'; row.style.gridTemplateColumns='28px 1fr 260px';
+    row.innerHTML=`
+      <div class="q-num">${i+1}</div>
+      <div class="q-prompt"><b>${it.subj}</b> — ${it.verb}</div>
+      <div class="triple">
+        <label>+ <input class="ans-input fpos" placeholder="Positive"></label>
+        <label>− <input class="ans-input fneg" placeholder="Negative"></label>
+        <label>? <input class="ans-input fq" placeholder="Question"></label>
+      </div>
+      <div class="feedback"></div>`;
+    box.appendChild(row);
+  });
+  wrap.querySelector('.btn-check').addEventListener('click',()=>{
+    let correct=0;
+    box.querySelectorAll('.item-row').forEach((row,i)=>{
+      const it=GRAMMAR_FORMS[i];
+      const p=row.querySelector('.fpos'), n=row.querySelector('.fneg'), q=row.querySelector('.fq'), fb=row.querySelector('.feedback');
+      [p,n,q].forEach(inp=>inp.classList.remove('correct','incorrect'));
+      const okP=norm(p.value)===norm(it.pos), okN=norm(n.value)===norm(it.neg), okQ=norm(q.value)===norm(it.q);
+      p.classList.add(okP?'correct':'incorrect'); n.classList.add(okN?'correct':'incorrect'); q.classList.add(okQ?'correct':'incorrect');
+      if(okP&&okN&&okQ) correct++; else addProblem(`be going to — ${it.subj}`, it.note);
+      fb.textContent = `Правильно: + ${it.pos} | − ${it.neg} | ? ${it.q} (${it.note})`;
+      fb.className='feedback show';
+    });
+    wrap.querySelector('.score').textContent=`${correct}/8`;
+  });
+  wrap.querySelector('.btn-show').addEventListener('click',()=>{
+    box.querySelectorAll('.item-row').forEach((row,i)=>{
+      const it=GRAMMAR_FORMS[i];
+      row.querySelector('.fpos').placeholder=it.pos;
+      row.querySelector('.fneg').placeholder=it.neg;
+      row.querySelector('.fq').placeholder=it.q;
+      const fb=row.querySelector('.feedback');
+      fb.textContent = `+ ${it.pos} | − ${it.neg} | ? ${it.q} (${it.note})`;
+      fb.className='feedback show neutral';
+    });
+  });
+  wrap.querySelector('.btn-copy').addEventListener('click',()=>{
+    const lines=[...box.querySelectorAll('.item-row')].map((row,i)=>{
+      const p=row.querySelector('.fpos').value.trim()||'—', n=row.querySelector('.fneg').value.trim()||'—', q=row.querySelector('.fq').value.trim()||'—';
+      return `${i+1}. + ${p} | − ${n} | ? ${q}`;
+    });
+    copyText('Positive / Negative / Question\n'+lines.join('\n'));
+  });
+  return wrap;
+}
+
+// 2. Prediction vs Plan
+function buildTypeBlock(){
+  const wrap=cardShell("Упражнение 2 · Prediction или Plan?",
+    "Определи: это предсказание (есть доказательство сейчас) или заранее принятый план.");
+  const box=wrap.querySelector('.items');
+  GRAMMAR_TYPE.forEach((it,i)=>{
+    const row=document.createElement('div'); row.className='item-row'; row.style.gridTemplateColumns='28px 1fr 180px';
+    row.innerHTML=`
+      <div class="q-num">${i+1}</div>
+      <div class="q-prompt">${it.sentence}</div>
+      <div class="radio-row">
+        <label><input type="radio" name="type-${i}" value="prediction"> prediction</label>
+        <label><input type="radio" name="type-${i}" value="plan"> plan</label>
+      </div>
+      <div class="feedback"></div>`;
+    box.appendChild(row);
+  });
+  wrap.querySelector('.btn-check').addEventListener('click',()=>{
+    let correct=0;
+    box.querySelectorAll('.item-row').forEach((row,i)=>{
+      const it=GRAMMAR_TYPE[i];
+      const selected=row.querySelector('input[type=radio]:checked');
+      const fb=row.querySelector('.feedback');
+      const ok = selected && selected.value===it.answer;
+      if(ok) correct++; else addProblem(`be going to (prediction/plan) #${i+1}`, it.answer);
+      fb.textContent = (ok?'✔ Верно. ':'✘ Правильный ответ: '+it.answer+'. ')+it.reason;
+      fb.className='feedback show'+(ok?'':' neutral');
+    });
+    wrap.querySelector('.score').textContent=`${correct}/8`;
+  });
+  wrap.querySelector('.btn-show').addEventListener('click',()=>{
+    box.querySelectorAll('.item-row').forEach((row,i)=>{
+      const it=GRAMMAR_TYPE[i];
+      row.querySelector(`input[value="${it.answer}"]`).checked=true;
+      const fb=row.querySelector('.feedback');
+      fb.textContent = `Ответ: ${it.answer}. ${it.reason}`;
+      fb.className='feedback show neutral';
+    });
+  });
+  wrap.querySelector('.btn-copy').addEventListener('click',()=>{
+    const lines=[...box.querySelectorAll('.item-row')].map((row,i)=>{
+      const sel=row.querySelector('input[type=radio]:checked');
+      return `${i+1}. ${sel?sel.value:'(не выбрано)'}`;
+    });
+    copyText('Prediction / Plan\n'+lines.join('\n'));
+  });
+  return wrap;
+}
+
+// 3. Find the mistake
+function buildMistakeBlock(){
+  const wrap=cardShell("Упражнение 3 · Find the mistake",
+    "Найди ошибку в предложении и запиши исправленный вариант целиком.");
+  const box=wrap.querySelector('.items');
+  GRAMMAR_MISTAKE.forEach((it,i)=>{
+    const row=document.createElement('div'); row.className='item-row'; row.dataset.i=i;
+    row.innerHTML=`
+      <div class="q-num">${i+1}</div>
+      <div class="q-prompt">❌ ${it.wrong}</div>
+      <input type="text" class="ans-input" placeholder="Исправленный вариант...">
+      <div class="feedback"></div>`;
+    box.appendChild(row);
+  });
+  wrap.querySelector('.btn-check').addEventListener('click',()=>{
+    let correct=0;
+    box.querySelectorAll('.item-row').forEach(row=>{
+      const it=GRAMMAR_MISTAKE[row.dataset.i];
+      const input=row.querySelector('.ans-input'); const fb=row.querySelector('.feedback');
+      input.classList.remove('correct','incorrect');
+      const ok = norm(input.value)===norm(it.correct);
+      if(ok){ input.classList.add('correct'); correct++; } else { input.classList.add('incorrect'); addProblem(`find the mistake #${+row.dataset.i+1}`, it.reason); }
+      fb.textContent = (ok?'✔ Верно! ':'✘ Правильно: "'+it.correct+'". ')+it.reason;
+      fb.className='feedback show';
+    });
+    wrap.querySelector('.score').textContent=`${correct}/8`;
+  });
+  wrap.querySelector('.btn-show').addEventListener('click',()=>{
+    box.querySelectorAll('.item-row').forEach(row=>{
+      const it=GRAMMAR_MISTAKE[row.dataset.i];
+      row.querySelector('.ans-input').placeholder=it.correct;
+      const fb=row.querySelector('.feedback');
+      fb.textContent = `${it.correct} — ${it.reason}`;
+      fb.className='feedback show neutral';
+    });
+  });
+  wrap.querySelector('.btn-copy').addEventListener('click',()=>{
+    const lines=[...box.querySelectorAll('.item-row')].map((row,i)=>`${i+1}. ${row.querySelector('.ans-input').value.trim()||'(нет ответа)'}`);
+    copyText('Find the mistake\n'+lines.join('\n'));
+  });
+  return wrap;
+}
+
+// 4. Picture -> sentence
+function buildPictureBlock(){
+  const wrap=cardShell("Упражнение 4 · Составь предложение по картинке",
+    "Посмотри на эмодзи-сценку и составь предложение с be going to.");
+  const box=wrap.querySelector('.items');
+  GRAMMAR_PICTURE.forEach((it,i)=>{
+    const row=document.createElement('div'); row.className='item-row'; row.style.gridTemplateColumns='28px 70px 1fr';
+    row.innerHTML=`
+      <div class="q-num">${i+1}</div>
+      <div class="q-prompt" style="font-size:26px">${it.emoji}</div>
+      <input type="text" class="ans-input" placeholder="Напиши предложение...">
+      <div class="feedback"></div>`;
+    box.appendChild(row);
+  });
+  wrap.querySelector('.btn-check').addEventListener('click',()=>{
+    let correct=0;
+    box.querySelectorAll('.item-row').forEach((row,i)=>{
+      const it=GRAMMAR_PICTURE[i];
+      const input=row.querySelector('.ans-input'); const fb=row.querySelector('.feedback');
+      input.classList.remove('correct','incorrect');
+      const ok = matchContains(input.value, it.keyword) && norm(input.value).includes('going to') && norm(input.value).split(' ').length>=4;
+      if(ok){ input.classList.add('correct'); correct++; } else { input.classList.add('incorrect'); addProblem(`picture: ${it.keyword}`,''); }
+      fb.textContent = (ok?'✔ Подходит! ':'✘ ')+`Пример: "${it.sample}"`;
+      fb.className='feedback show';
+    });
+    wrap.querySelector('.score').textContent=`${correct}/8`;
+  });
+  wrap.querySelector('.btn-show').addEventListener('click',()=>{
+    box.querySelectorAll('.item-row').forEach((row,i)=>{
+      const it=GRAMMAR_PICTURE[i];
+      row.querySelector('.ans-input').placeholder=it.sample;
+      const fb=row.querySelector('.feedback');
+      fb.textContent = `Пример: "${it.sample}"`;
+      fb.className='feedback show neutral';
+    });
+  });
+  wrap.querySelector('.btn-copy').addEventListener('click',()=>{
+    const lines=[...box.querySelectorAll('.item-row')].map((row,i)=>`${i+1}. ${row.querySelector('.ans-input').value.trim()||'(нет ответа)'}`);
+    copyText('Sentences from pictures\n'+lines.join('\n'));
+  });
+  return wrap;
+}
+
+// 5. Questions
+function buildGQuestionsBlock(){
+  const wrap=cardShell("Упражнение 5 · Ответь на вопросы",
+    "Ответь полным предложением, используя be going to.");
+  const box=wrap.querySelector('.items');
+  GRAMMAR_QUESTIONS.forEach((it,i)=>{
+    const row=document.createElement('div'); row.className='item-row'; row.dataset.i=i;
+    row.innerHTML=`
+      <div class="q-num">${i+1}</div>
+      <div class="q-prompt">${it.question}</div>
+      <input type="text" class="ans-input" placeholder="Твой ответ...">
+      <div class="feedback"></div>`;
+    box.appendChild(row);
+  });
+  wrap.querySelector('.btn-check').addEventListener('click',()=>{
+    let correct=0;
+    box.querySelectorAll('.item-row').forEach(row=>{
+      const it=GRAMMAR_QUESTIONS[row.dataset.i];
+      const input=row.querySelector('.ans-input'); const fb=row.querySelector('.feedback');
+      input.classList.remove('correct','incorrect');
+      const ok = norm(input.value).includes('going to') && norm(input.value).length>10;
+      if(ok){ input.classList.add('correct'); correct++; } else { input.classList.add('incorrect'); addProblem(`answer questions #${+row.dataset.i+1}`,''); }
+      fb.textContent = (ok?'✔ Хороший ответ. ':'✘ Используй конструкцию be going to. ')+`Пример: "${it.sample}"`;
+      fb.className='feedback show';
+    });
+    wrap.querySelector('.score').textContent=`${correct}/8`;
+  });
+  wrap.querySelector('.btn-show').addEventListener('click',()=>{
+    box.querySelectorAll('.item-row').forEach(row=>{
+      const it=GRAMMAR_QUESTIONS[row.dataset.i];
+      row.querySelector('.ans-input').placeholder=it.sample;
+      const fb=row.querySelector('.feedback');
+      fb.textContent = `Пример: "${it.sample}"`;
+      fb.className='feedback show neutral';
+    });
+  });
+  wrap.querySelector('.btn-copy').addEventListener('click',()=>{
+    const lines=[...box.querySelectorAll('.item-row')].map((row,i)=>`${i+1}. ${row.querySelector('.ans-input').value.trim()||'(нет ответа)'}`);
+    copyText('Answer the questions\n'+lines.join('\n'));
+  });
+  return wrap;
+}
+
+[buildFormsBlock, buildTypeBlock, buildMistakeBlock, buildPictureBlock, buildGQuestionsBlock].forEach(fn=>grammarContainer.appendChild(fn()));
+
+document.getElementById('copy-grammar-all').addEventListener('click',()=>{
+  const blocks=[...grammarContainer.querySelectorAll('.exercise-card')];
+  const text=blocks.map(b=>{
+    const title=b.querySelector('h3').textContent;
+    const inputs=[...b.querySelectorAll('.ans-input')];
+    let lines;
+    if(title.includes('Positive')){
+      const rows=[...b.querySelectorAll('.item-row')];
+      lines=rows.map((row,i)=>{
+        const p=row.querySelector('.fpos').value.trim()||'—', n=row.querySelector('.fneg').value.trim()||'—', q=row.querySelector('.fq').value.trim()||'—';
+        return `${i+1}. + ${p} | − ${n} | ? ${q}`;
+      });
+    } else if(title.includes('Prediction')){
+      const rows=[...b.querySelectorAll('.item-row')];
+      lines=rows.map((row,i)=>{ const sel=row.querySelector('input[type=radio]:checked'); return `${i+1}. ${sel?sel.value:'(не выбрано)'}`; });
+    } else {
+      lines=inputs.map((inp,i)=>`${i+1}. ${inp.value.trim()||'(нет ответа)'}`);
+    }
+    return title+'\n'+lines.join('\n');
+  }).join('\n\n');
+  copyText(text);
+});
+
+/* ============ TABS ============ */
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-'+btn.dataset.tab).classList.add('active');
+  });
+});
+</script>
+</body>
+</html>
