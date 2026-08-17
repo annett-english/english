@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Numbers Workbook · Числительные</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FBF7EC;
+    --paper-line:#DDD3B8;
+    --ink:#2B3A67;
+    --ink-soft:#5B6690;
+    --red:#C1443C;
+    --green:#3F7A5B;
+    --gold:#C79A3D;
+    --card:#FFFDF7;
+    --shadow: 0 2px 0 rgba(43,58,103,0.06), 0 8px 20px rgba(43,58,103,0.06);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      repeating-linear-gradient(to bottom, transparent 0 35px, var(--paper-line) 35px 36px),
+      var(--paper);
+    font-family:'Inter',sans-serif;
+    color:var(--ink);
+    min-height:100vh;
+    padding-bottom:60px;
+  }
+  body::before{
+    content:"";
+    position:fixed; top:0; bottom:0; left:52px;
+    width:2px; background:rgba(193,68,60,0.35);
+    pointer-events:none; z-index:0;
+  }
+  .wrap{max-width:900px;margin:0 auto;padding:28px 28px 40px 68px;position:relative;z-index:1;}
+
+  header.top{
+    display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between;
+    gap:16px; margin-bottom:22px; padding-bottom:16px;
+    border-bottom:2px dashed var(--paper-line);
+  }
+  .title-block h1{
+    font-family:'Patrick Hand',cursive;
+    font-size:44px; margin:0; color:var(--ink); line-height:1;
+  }
+  .title-block p{margin:6px 0 0; color:var(--ink-soft); font-size:14.5px;}
+  .copy-all-btn{
+    background:var(--ink); color:#fff; border:none; border-radius:8px;
+    padding:12px 18px; font-size:14px; font-weight:600; cursor:pointer;
+    display:flex; align-items:center; gap:8px; box-shadow:var(--shadow);
+    transition:transform .15s ease, background .15s ease;
+    white-space:nowrap;
+  }
+  .copy-all-btn:hover{background:#3a4a80; transform:translateY(-1px);}
+  .copy-all-btn.copied{background:var(--green);}
+
+  nav.tabs{
+    display:flex; flex-wrap:wrap; gap:8px; margin-bottom:24px;
+  }
+  nav.tabs button{
+    font-family:'Patrick Hand',cursive;
+    font-size:18px;
+    background:var(--card); color:var(--ink-soft);
+    border:2px solid var(--paper-line); border-bottom:4px solid var(--paper-line);
+    border-radius:10px 10px 4px 4px;
+    padding:8px 16px 6px; cursor:pointer;
+    transition:.15s ease;
+  }
+  nav.tabs button:hover{color:var(--ink); border-color:var(--gold);}
+  nav.tabs button.active{
+    color:#fff; background:var(--ink); border-color:var(--ink);
+    box-shadow:var(--shadow);
+  }
+
+  section.ex{display:none;}
+  section.ex.active{display:block; animation:fadeIn .25s ease;}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);}}
+
+  .ex-card{
+    background:var(--card); border:1px solid var(--paper-line); border-radius:14px;
+    padding:22px 24px 24px; box-shadow:var(--shadow); margin-bottom:20px;
+  }
+  .ex-head{display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap;}
+  .ex-head h2{
+    font-family:'Patrick Hand',cursive; font-size:30px; margin:0 0 4px; color:var(--ink);
+  }
+  .ex-head .eyebrow{
+    font-size:11px; letter-spacing:.09em; text-transform:uppercase; color:var(--gold); font-weight:700;
+  }
+  .rule-note{
+    background:#F4EEDD; border-left:3px solid var(--gold); border-radius:6px;
+    padding:10px 14px; font-size:13.5px; color:var(--ink-soft); margin:14px 0 18px; line-height:1.5;
+  }
+  .rule-note b{color:var(--ink);}
+
+  .item{
+    display:grid; grid-template-columns:34px 1fr; gap:12px;
+    padding:12px 0; border-bottom:1px dashed var(--paper-line);
+    align-items:start;
+  }
+  .item:last-of-type{border-bottom:none;}
+  .item .num{
+    font-family:'JetBrains Mono',monospace; font-weight:700; color:var(--gold); font-size:15px; padding-top:6px;
+  }
+  .item .body{display:flex; flex-direction:column; gap:8px;}
+  .item .prompt{font-size:15px; color:var(--ink); line-height:1.5;}
+  .item .prompt .digit{
+    font-family:'JetBrains Mono',monospace; font-weight:700; color:var(--ink); background:#F0EBDA;
+    padding:2px 7px; border-radius:5px;
+  }
+  .item input[type="text"]{
+    font-family:'Patrick Hand',cursive; font-size:20px; color:var(--ink);
+    border:none; border-bottom:2px solid var(--paper-line); background:transparent;
+    padding:5px 4px; width:100%; max-width:420px; outline:none;
+  }
+  .item input[type="text"]:focus{border-bottom-color:var(--ink);}
+  .item input.correct{border-bottom-color:var(--green); color:var(--green);}
+  .item input.incorrect{border-bottom-color:var(--red); color:var(--red);}
+  .answer-reveal{
+    font-size:13px; color:var(--green); display:none; font-weight:600;
+  }
+  .answer-reveal.show{display:block;}
+
+  .mcq-options{display:flex; gap:10px; flex-wrap:wrap;}
+  .mcq-options label{
+    border:2px solid var(--paper-line); border-radius:8px; padding:6px 12px;
+    font-size:14.5px; cursor:pointer; transition:.15s ease; display:flex; align-items:center; gap:6px;
+  }
+  .mcq-options label:hover{border-color:var(--gold);}
+  .mcq-options input{accent-color:var(--ink);}
+  .mcq-options label.opt-correct{border-color:var(--green); background:#EAF5EE;}
+  .mcq-options label.opt-incorrect{border-color:var(--red); background:#FBEBEA;}
+
+  select.cat-select{
+    font-family:'Inter',sans-serif; font-size:14px; padding:6px 10px; border-radius:7px;
+    border:2px solid var(--paper-line); background:#fff; color:var(--ink); cursor:pointer;
+  }
+  select.cat-select.correct{border-color:var(--green); background:#EAF5EE;}
+  select.cat-select.incorrect{border-color:var(--red); background:#FBEBEA;}
+
+  .listen-row{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+  .listen-btn{
+    background:var(--ink); color:#fff; border:none; border-radius:50%;
+    width:34px; height:34px; font-size:15px; cursor:pointer; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center; transition:.15s ease;
+  }
+  .listen-btn:hover{background:var(--gold);}
+  .listen-hint{font-size:12px; color:var(--ink-soft); font-style:italic;}
+
+  .ex-actions{
+    display:flex; gap:10px; flex-wrap:wrap; margin-top:20px; padding-top:16px;
+    border-top:2px dashed var(--paper-line); align-items:center;
+  }
+  .btn{
+    font-family:'Inter',sans-serif; font-weight:600; font-size:14px; cursor:pointer;
+    border-radius:8px; padding:10px 16px; border:2px solid var(--ink); transition:.15s ease;
+  }
+  .btn-primary{background:var(--ink); color:#fff;}
+  .btn-primary:hover{background:#3a4a80;}
+  .btn-ghost{background:transparent; color:var(--ink);}
+  .btn-ghost:hover{background:#F0EBDA;}
+  .score-badge{
+    margin-left:auto; font-family:'JetBrains Mono',monospace; font-size:14px;
+    background:#F0EBDA; padding:8px 14px; border-radius:8px; color:var(--ink); font-weight:700;
+    min-width:70px; text-align:center;
+  }
+
+  footer.page-footer{
+    text-align:center; color:var(--ink-soft); font-size:12.5px; margin-top:30px;
+  }
+
+  @media (max-width:600px){
+    .wrap{padding:20px 14px 40px 34px;}
+    body::before{left:20px;}
+    .title-block h1{font-size:34px;}
+    header.top{flex-direction:column; align-items:stretch;}
+    .copy-all-btn{justify-content:center;}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important; transition:none !important;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="title-block">
+      <h1>Numbers Workbook</h1>
+      <p>Количественные и порядковые числительные · пишем от руки, проверяем, слушаем</p>
+    </div>
+    <button class="copy-all-btn" id="copyAllBtn" onclick="copyAllAnswers()">📋 Скопировать все ответы</button>
+  </header>
+
+  <nav class="tabs" id="tabs"></nav>
+
+  <main id="exercises"></main>
+
+  <footer class="page-footer">Нажимайте «Проверить», чтобы увидеть ошибки, и «Показать ответы», если хотите свериться сразу.</footer>
+</div>
+
+<script>
+/* ============ helpers ============ */
+function normWords(s){
+  return (s||'')
+    .toLowerCase()
+    .replace(/[-–—]/g,' ')
+    .replace(/,/g,'')
+    .replace(/\band\b/g,' ')
+    .replace(/\s+/g,' ')
+    .trim();
+}
+function normDigits(s){
+  return (s||'').toLowerCase().replace(/,/g,'').replace(/\s+/g,'').trim();
+}
+function normWord(s){
+  return (s||'').toLowerCase().replace(/[.,!?]/g,'').trim();
+}
+
+/* ============ voice (Google US English) ============ */
+let voicesReady = false;
+let chosenVoice = null;
+function loadVoices(){
+  const voices = speechSynthesis.getVoices();
+  if(!voices.length) return;
+  chosenVoice = voices.find(v=>v.name === 'Google US English')
+             || voices.find(v=>v.lang === 'en-US')
+             || voices.find(v=>v.lang && v.lang.startsWith('en'))
+             || voices[0];
+  voicesReady = true;
+}
+if('speechSynthesis' in window){
+  speechSynthesis.onvoiceschanged = loadVoices;
+  loadVoices();
+}
+function speak(text){
+  if(!('speechSynthesis' in window)){ alert('Синтез речи не поддерживается в этом браузере.'); return; }
+  if(!voicesReady) loadVoices();
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-US';
+  u.rate = 0.85;
+  if(chosenVoice) u.voice = chosenVoice;
+  speechSynthesis.speak(u);
+}
+
+/* ============ exercise data ============ */
+const EX = [
+  // ---- Exercise 1: cardinals in words ----
+  {
+    id:'ex1', tab:'Упр. 1', title:'Упражнение 1', subtitle:'Cardinal numbers — пропиши числа словами',
+    rule:'<b>Правило:</b> после конкретного числа hundred / thousand / million / billion остаются в <b>единственном</b> числе (без -s): <i>three hundred, ten thousand, two million</i>.',
+    type:'write',
+    items:[
+      {prompt:'<span class="digit">100</span>', answer:'one hundred'},
+      {prompt:'<span class="digit">350</span>', answer:'three hundred and fifty'},
+      {prompt:'<span class="digit">1,000</span>', answer:'one thousand'},
+      {prompt:'<span class="digit">4,600</span>', answer:'four thousand six hundred'},
+      {prompt:'<span class="digit">10,000</span>', answer:'ten thousand'},
+      {prompt:'<span class="digit">25,000</span>', answer:'twenty-five thousand'},
+      {prompt:'<span class="digit">100,000</span>', answer:'one hundred thousand'},
+      {prompt:'<span class="digit">1,000,000</span>', answer:'one million'}
+    ]
+  },
+  // ---- Exercise 2: find & correct mistake ----
+  {
+    id:'ex2', tab:'Упр. 2', title:'Упражнение 2', subtitle:'Найди и исправь ошибку — впиши правильное слово',
+    rule:'<b>Правило:</b> без конкретного числа используем -s + of: <i>hundreds of, thousands of, millions of</i>. С конкретным числом -s не нужно: <i>two hundred, five thousand</i>.',
+    type:'mistake',
+    items:[
+      {prompt:'Two <u>hundreds</u> people came to the concert.', answer:'hundred'},
+      {prompt:'Three <u>thousands</u> cars were parked outside the stadium.', answer:'thousand'},
+      {prompt:'Ten <u>millions</u> dollars were spent on the new bridge.', answer:'million'},
+      {prompt:'Six <u>billions</u> people live on Earth today.', answer:'billion'},
+      {prompt:'<u>Hundred</u> of fans waited for the singer outside the hotel.', answer:'hundreds'},
+      {prompt:'<u>Thousand</u> of refugees crossed the border last year.', answer:'thousands'},
+      {prompt:'<u>Million</u> of stars fill the night sky.', answer:'millions'},
+      {prompt:'<u>Billion</u> of bacteria live in the human body.', answer:'billions'}
+    ]
+  },
+  // ---- Exercise 3: choose correct variant ----
+  {
+    id:'ex3', tab:'Упр. 3', title:'Упражнение 3', subtitle:'Выбери правильный вариант',
+    rule:'Опирайся на то же правило: число + hundred/thousand/million (без -s), но hundreds/thousands/millions of ... без числа.',
+    type:'mcq',
+    items:[
+      {prompt:'There are ___ students in the hall.', options:['three hundred','three hundreds'], answer:'three hundred'},
+      {prompt:'___ of people attended the festival this weekend.', options:['Thousand','Thousands'], answer:'Thousands'},
+      {prompt:'She earns ___ dollars a year.', options:['two million','two millions'], answer:'two million'},
+      {prompt:'___ of birds flew over the lake at sunset.', options:['Hundred','Hundreds'], answer:'Hundreds'},
+      {prompt:'He has ___ books in his home library.', options:['five thousand','five thousands'], answer:'five thousand'},
+      {prompt:'___ of stars are visible on a clear night.', options:['Million','Millions'], answer:'Millions'},
+      {prompt:'The company lost ___ dollars last year.', options:['ten billion','ten billions'], answer:'ten billion'},
+      {prompt:'___ of bacteria live inside our bodies.', options:['Billion','Billions'], answer:'Billions'}
+    ]
+  },
+  // ---- Exercise 4: categorize cardinal / ordinal ----
+  {
+    id:'ex4', tab:'Упр. 4', title:'Упражнение 4', subtitle:'Категоризация — Cardinal или Ordinal? (повторение порядковых числительных)',
+    rule:'<b>Cardinal</b> — сколько? (one, twenty, a hundred). <b>Ordinal</b> — который по счёту? (first, twentieth, hundredth).',
+    type:'categorize',
+    items:[
+      {prompt:'twenty-one', answer:'cardinal'},
+      {prompt:'fifth', answer:'ordinal'},
+      {prompt:'one hundred', answer:'cardinal'},
+      {prompt:'twenty-first', answer:'ordinal'},
+      {prompt:'third', answer:'ordinal'},
+      {prompt:'one million', answer:'cardinal'},
+      {prompt:'ninetieth', answer:'ordinal'},
+      {prompt:'twelve', answer:'cardinal'}
+    ]
+  },
+  // ---- Exercise 5: listening dictation ----
+  {
+    id:'ex5', tab:'Упр. 5', title:'Упражнение 5', subtitle:'Слушай (🔊 Google US English) и запиши число цифрами',
+    rule:'Нажми на 🔊, прослушай число и запиши его <b>цифрами</b> (например: 150, 21st, 2,000,000).',
+    type:'listen',
+    items:[
+      {speak:'one hundred and fifty', answer:'150'},
+      {speak:'two thousand', answer:'2000'},
+      {speak:'the fifteenth', answer:'15th'},
+      {speak:'three hundred thousand', answer:'300000'},
+      {speak:'the twenty-first', answer:'21st'},
+      {speak:'seven million', answer:'7000000'},
+      {speak:'the hundredth', answer:'100th'},
+      {speak:'four thousand five hundred', answer:'4500'}
+    ]
+  },
+  // ---- Exercise 6: ordinals in words ----
+  {
+    id:'ex6', tab:'Упр. 6', title:'Упражнение 6', subtitle:'Ordinal numbers — пропиши порядковые числительные словами',
+    rule:'<b>Напоминание:</b> ordinal numbers показывают порядок / позицию и отвечают на вопрос «который?»: 1st → first, 2nd → second, 3rd → third, дальше + -th (fourth, fifth…), с исключениями (ninth, twelfth, twentieth).',
+    type:'write',
+    items:[
+      {prompt:'<span class="digit">1st</span>', answer:'first'},
+      {prompt:'<span class="digit">3rd</span>', answer:'third'},
+      {prompt:'<span class="digit">5th</span>', answer:'fifth'},
+      {prompt:'<span class="digit">9th</span>', answer:'ninth'},
+      {prompt:'<span class="digit">12th</span>', answer:'twelfth'},
+      {prompt:'<span class="digit">21st</span>', answer:'twenty-first'},
+      {prompt:'<span class="digit">100th</span>', answer:'hundredth'},
+      {prompt:'<span class="digit">1000th</span>', answer:'thousandth'}
+    ]
+  },
+  // ---- Exercise 7: answer the questions ----
+  {
+    id:'ex7', tab:'Упр. 7', title:'Упражнение 7', subtitle:'Ответь на вопросы',
+    rule:'Короткие ответы — можно писать по-английски или цифрами/словами, где нужно.',
+    type:'question',
+    items:[
+      {prompt:'Do we add -s to "hundred" after a specific number (e.g. two hundred)?', answer:'no', keywords:['no']},
+      {prompt:'Do we add -s to "hundred" when there is no specific number (e.g. ___ of people)?', answer:'yes', keywords:['yes']},
+      {prompt:'Does "hundreds of people" mean an exact number or an approximate large number?', answer:'approximate', keywords:['approx','not exact','large']},
+      {prompt:'What question do ordinal numbers answer — "how many?" or "which one / what position?"', answer:'which one / position', keywords:['which','position','order']},
+      {prompt:'What is the ordinal form of "two"?', answer:'second', keywords:['second']},
+      {prompt:'What is the ordinal form of "twelve"?', answer:'twelfth', keywords:['twelfth']},
+      {prompt:'Write 5,000,000 in words.', answer:'five million', keywords:['five million']},
+      {prompt:'Write 2000 in words.', answer:'two thousand', keywords:['two thousand']}
+    ]
+  }
+];
+
+/* ============ render ============ */
+const tabsEl = document.getElementById('tabs');
+const exWrap = document.getElementById('exercises');
+
+EX.forEach((ex, exIndex)=>{
+  // tab button
+  const tabBtn = document.createElement('button');
+  tabBtn.textContent = ex.tab;
+  tabBtn.onclick = ()=> showExercise(exIndex);
+  tabBtn.id = 'tabbtn-'+ex.id;
+  tabsEl.appendChild(tabBtn);
+
+  // section
+  const section = document.createElement('section');
+  section.className = 'ex';
+  section.id = ex.id;
+
+  let itemsHtml = '';
+  ex.items.forEach((it, i)=>{
+    const n = i+1;
+    if(ex.type === 'write'){
+      itemsHtml += `
+      <div class="item">
+        <div class="num">${n}.</div>
+        <div class="body">
+          <div class="prompt">${it.prompt}</div>
+          <input type="text" data-idx="${i}" placeholder="напиши словами по-английски...">
+          <div class="answer-reveal" data-idx="${i}">✓ ${it.answer}</div>
+        </div>
+      </div>`;
+    } else if(ex.type === 'mistake'){
+      itemsHtml += `
+      <div class="item">
+        <div class="num">${n}.</div>
+        <div class="body">
+          <div class="prompt">${it.prompt}</div>
+          <input type="text" data-idx="${i}" placeholder="правильное слово...">
+          <div class="answer-reveal" data-idx="${i}">✓ ${it.answer}</div>
+        </div>
+      </div>`;
+    } else if(ex.type === 'mcq'){
+      let opts = '';
+      it.options.forEach((opt, oi)=>{
+        opts += `<label data-idx="${i}" data-opt="${opt}">
+          <input type="radio" name="${ex.id}-q${i}" value="${opt}"> ${opt}
+        </label>`;
+      });
+      itemsHtml += `
+      <div class="item">
+        <div class="num">${n}.</div>
+        <div class="body">
+          <div class="prompt">${it.prompt}</div>
+          <div class="mcq-options" data-idx="${i}">${opts}</div>
+          <div class="answer-reveal" data-idx="${i}">✓ ${it.answer}</div>
+        </div>
+      </div>`;
+    } else if(ex.type === 'categorize'){
+      itemsHtml += `
+      <div class="item">
+        <div class="num">${n}.</div>
+        <div class="body">
+          <div class="prompt"><span class="digit">${it.prompt}</span></div>
+          <select class="cat-select" data-idx="${i}">
+            <option value="">— выбери —</option>
+            <option value="cardinal">Cardinal</option>
+            <option value="ordinal">Ordinal</option>
+          </select>
+          <div class="answer-reveal" data-idx="${i}">✓ ${it.answer}</div>
+        </div>
+      </div>`;
+    } else if(ex.type === 'listen'){
+      itemsHtml += `
+      <div class="item">
+        <div class="num">${n}.</div>
+        <div class="body">
+          <div class="listen-row">
+            <button type="button" class="listen-btn" onclick="speak('${it.speak.replace(/'/g,"\\'")}')">🔊</button>
+            <span class="listen-hint">нажми, чтобы услышать число</span>
+          </div>
+          <input type="text" data-idx="${i}" placeholder="запиши цифрами...">
+          <div class="answer-reveal" data-idx="${i}">✓ ${it.answer}</div>
+        </div>
+      </div>`;
+    } else if(ex.type === 'question'){
+      itemsHtml += `
+      <div class="item">
+        <div class="num">${n}.</div>
+        <div class="body">
+          <div class="prompt">${it.prompt}</div>
+          <input type="text" data-idx="${i}" placeholder="твой ответ...">
+          <div class="answer-reveal" data-idx="${i}">✓ ${it.answer}</div>
+        </div>
+      </div>`;
+    }
+  });
+
+  section.innerHTML = `
+    <div class="ex-card">
+      <div class="ex-head">
+        <div>
+          <div class="eyebrow">${ex.tab}</div>
+          <h2>${ex.subtitle}</h2>
+        </div>
+      </div>
+      <div class="rule-note">${ex.rule}</div>
+      ${itemsHtml}
+      <div class="ex-actions">
+        <button class="btn btn-primary" onclick="checkExercise('${ex.id}', ${exIndex})">✅ Проверить</button>
+        <button class="btn btn-ghost" onclick="showAnswers('${ex.id}', ${exIndex})">👁 Показать ответы</button>
+        <span class="score-badge" id="score-${ex.id}">–/${ex.items.length}</span>
+      </div>
+    </div>
+  `;
+  exWrap.appendChild(section);
+});
+
+function showExercise(idx){
+  document.querySelectorAll('section.ex').forEach((s,i)=> s.classList.toggle('active', i===idx));
+  document.querySelectorAll('nav.tabs button').forEach((b,i)=> b.classList.toggle('active', i===idx));
+}
+showExercise(0);
+
+/* ============ check / show / copy ============ */
+function checkExercise(exId, exIndex){
+  const ex = EX[exIndex];
+  const section = document.getElementById(exId);
+  let correctCount = 0;
+
+  ex.items.forEach((it, i)=>{
+    let isCorrect = false;
+
+    if(ex.type === 'write' || ex.type === 'mistake'){
+      const input = section.querySelector(`input[type="text"][data-idx="${i}"]`);
+      const userVal = input.value;
+      isCorrect = normWords(userVal) === normWords(it.answer);
+      input.classList.remove('correct','incorrect');
+      input.classList.add(isCorrect ? 'correct' : 'incorrect');
+    } else if(ex.type === 'listen'){
+      const input = section.querySelector(`input[type="text"][data-idx="${i}"]`);
+      const userVal = input.value;
+      isCorrect = normDigits(userVal) === normDigits(it.answer);
+      input.classList.remove('correct','incorrect');
+      input.classList.add(isCorrect ? 'correct' : 'incorrect');
+    } else if(ex.type === 'question'){
+      const input = section.querySelector(`input[type="text"][data-idx="${i}"]`);
+      const userVal = normWords(input.value);
+      isCorrect = it.keywords.some(k => userVal.includes(normWords(k)));
+      input.classList.remove('correct','incorrect');
+      input.classList.add(isCorrect ? 'correct' : 'incorrect');
+    } else if(ex.type === 'mcq'){
+      const checked = section.querySelector(`input[name="${ex.id}-q${i}"]:checked`);
+      const group = section.querySelector(`.mcq-options[data-idx="${i}"]`);
+      group.querySelectorAll('label').forEach(l=> l.classList.remove('opt-correct','opt-incorrect'));
+      if(checked){
+        isCorrect = checked.value === it.answer;
+        const chosenLabel = group.querySelector(`label[data-opt="${CSS.escape(checked.value)}"]`);
+        if(chosenLabel) chosenLabel.classList.add(isCorrect ? 'opt-correct' : 'opt-incorrect');
+        if(!isCorrect){
+          const correctLabel = group.querySelector(`label[data-opt="${CSS.escape(it.answer)}"]`);
+          if(correctLabel) correctLabel.classList.add('opt-correct');
+        }
+      }
+    } else if(ex.type === 'categorize'){
+      const sel = section.querySelector(`select[data-idx="${i}"]`);
+      isCorrect = sel.value === it.answer;
+      sel.classList.remove('correct','incorrect');
+      sel.classList.add(isCorrect ? 'correct' : 'incorrect');
+    }
+
+    if(isCorrect) correctCount++;
+  });
+
+  document.getElementById('score-'+exId).textContent = `${correctCount}/${ex.items.length}`;
+}
+
+function showAnswers(exId, exIndex){
+  const section = document.getElementById(exId);
+  section.querySelectorAll('.answer-reveal').forEach(el=> el.classList.add('show'));
+}
+
+function copyAllAnswers(){
+  let text = 'NUMBERS WORKBOOK — ОТВЕТЫ\n' + '='.repeat(30) + '\n\n';
+  EX.forEach(ex=>{
+    text += `${ex.tab}. ${ex.subtitle}\n`;
+    ex.items.forEach((it,i)=>{
+      let ans = it.answer;
+      text += `  ${i+1}. ${ans}\n`;
+    });
+    text += '\n';
+  });
+
+  navigator.clipboard.writeText(text).then(()=>{
+    const btn = document.getElementById('copyAllBtn');
+    const original = btn.textContent;
+    btn.textContent = '✓ Скопировано!';
+    btn.classList.add('copied');
+    setTimeout(()=>{ btn.textContent = original; btn.classList.remove('copied'); }, 1800);
+  }).catch(()=>{
+    alert('Не удалось скопировать автоматически. Вот ответы:\n\n' + text);
+  });
+}
+</script>
+</body>
+</html>
