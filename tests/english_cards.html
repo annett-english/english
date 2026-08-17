@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Картотека фраз</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#efe9dd;
+    --paper-line:#d8cfba;
+    --ink:#2b2a26;
+    --ink-soft:#5c5848;
+    --tab:#8a3324;
+    --tab-soft:#b3543f;
+    --accent:#3a5a52;
+    --accent-soft:#6f8f85;
+    --card:#faf7ee;
+    --shadow:0 1px 0 rgba(43,42,38,0.08), 0 10px 24px -14px rgba(43,42,38,0.35);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(ellipse at top left, rgba(138,51,36,0.05), transparent 55%),
+      var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    min-height:100vh;
+    padding:48px 20px 80px;
+  }
+
+  .wrap{max-width:960px;margin:0 auto;}
+
+  header{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:24px;
+    margin-bottom:38px;
+    padding-bottom:18px;
+    border-bottom:2px solid var(--ink);
+    flex-wrap:wrap;
+  }
+  .title-block .eyebrow{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--tab);
+    margin-bottom:6px;
+  }
+  h1{
+    font-family:'Lora',serif;
+    font-weight:600;
+    font-size:clamp(28px,4vw,40px);
+    margin:0;
+    letter-spacing:-0.01em;
+  }
+  .drawer-count{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    color:var(--ink-soft);
+    text-align:right;
+  }
+  .drawer-count b{color:var(--ink);font-size:20px;display:block;font-family:'Lora',serif;}
+
+  .voice-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:28px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    color:var(--ink-soft);
+  }
+  .voice-row select{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    background:var(--card);
+    border:1px solid var(--paper-line);
+    color:var(--ink);
+    padding:5px 8px;
+    border-radius:3px;
+    max-width:260px;
+  }
+
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:18px 20px;
+  }
+  @media (max-width:680px){
+    .grid{grid-template-columns:1fr;}
+    header{align-items:flex-start;}
+    .drawer-count{text-align:left;}
+  }
+
+  .card{
+    position:relative;
+    background:var(--card);
+    border:1px solid var(--paper-line);
+    border-radius:2px;
+    box-shadow:var(--shadow);
+    padding:20px 20px 18px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    transition:transform .18s ease, box-shadow .18s ease;
+  }
+  .card::before{
+    content:attr(data-num);
+    position:absolute;
+    top:-11px;
+    left:18px;
+    background:var(--tab);
+    color:#f6efe4;
+    font-family:'JetBrains Mono',monospace;
+    font-size:10px;
+    letter-spacing:0.06em;
+    padding:3px 8px 2px;
+    border-radius:2px;
+    box-shadow:0 3px 6px -2px rgba(138,51,36,0.5);
+  }
+  .card:hover{
+    transform:translateY(-2px);
+    box-shadow:0 2px 0 rgba(43,42,38,0.08), 0 16px 30px -14px rgba(43,42,38,0.4);
+  }
+
+  .headword-row{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+    padding-top:6px;
+  }
+  .headword{
+    font-family:'Lora',serif;
+    font-weight:600;
+    font-style:italic;
+    font-size:18px;
+    line-height:1.3;
+    color:var(--ink);
+  }
+
+  .say-btn{
+    flex:0 0 auto;
+    width:34px;
+    height:34px;
+    border-radius:50%;
+    border:1px solid var(--accent-soft);
+    background:transparent;
+    color:var(--accent);
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:15px;
+    transition:background .15s ease, color .15s ease, transform .1s ease;
+  }
+  .say-btn:hover{background:var(--accent);color:#f6efe4;}
+  .say-btn:active{transform:scale(0.92);}
+  .say-btn.playing{
+    background:var(--accent);
+    color:#f6efe4;
+    animation:pulse 0.9s ease-in-out infinite;
+  }
+  @keyframes pulse{
+    0%,100%{box-shadow:0 0 0 0 rgba(58,90,82,0.35);}
+    50%{box-shadow:0 0 0 6px rgba(58,90,82,0);}
+  }
+
+  .ipa{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12.5px;
+    color:var(--accent);
+    letter-spacing:0.01em;
+  }
+
+  .rule{
+    height:1px;
+    background:repeating-linear-gradient(to right, var(--paper-line) 0, var(--paper-line) 4px, transparent 4px, transparent 8px);
+    margin:2px 0 1px;
+  }
+
+  .translation{
+    font-size:13.5px;
+    line-height:1.5;
+    color:var(--ink-soft);
+  }
+  .translation em{
+    font-style:normal;
+    color:var(--tab-soft);
+  }
+
+  footer{
+    margin-top:40px;
+    text-align:center;
+    font-family:'JetBrains Mono',monospace;
+    font-size:10.5px;
+    color:var(--ink-soft);
+    letter-spacing:0.04em;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .card, .say-btn{transition:none;}
+    .say-btn.playing{animation:none;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="title-block">
+      <div class="eyebrow">Study Deck · English → Русский</div>
+      <h1>Картотека фраз</h1>
+    </div>
+    <div class="drawer-count"><b id="cardCount">10</b>карточек</div>
+  </header>
+
+  <div class="voice-row">
+    <span>🔊 Голос:</span>
+    <select id="voiceSelect"></select>
+  </div>
+
+  <div class="grid" id="grid"></div>
+
+  <footer>нажмите 🔊 на карточке, чтобы услышать произношение</footer>
+</div>
+
+<script>
+const cards = [
+  {
+    head: "wait for smb / sth",
+    speak: "wait for somebody or something",
+    ipa: "/weɪt fɔːr/",
+    ru: 'ждать <em>кого-то / что-то</em> (с предлогом <em>for</em>)'
+  },
+  {
+    head: "this / last / next + week/month/year",
+    speak: "this week, last month, next year",
+    ipa: "/ðɪs, lɑːst, nekst/",
+    ru: 'в этом / прошлом / следующем... — <em>без предлога!</em>'
+  },
+  {
+    head: "prefer",
+    speak: "prefer",
+    ipa: "/prɪˈfɜːr/",
+    ru: 'предпочитать — самостоятельный глагол (<em>без am/is/was</em> перед ним)'
+  },
+  {
+    head: "come back from vacation",
+    speak: "come back from vacation",
+    ipa: "/kʌm bæk frəm veɪˈkeɪʃn/",
+    ru: 'вернуться из отпуска (<em>не on vacation</em>)'
+  },
+  {
+    head: "ticket price",
+    speak: "ticket price",
+    ipa: "/ˈtɪkɪt praɪs/",
+    ru: 'цена билета (<em>не ticket cost</em>)'
+  },
+  {
+    head: "from ... to ...",
+    speak: "from morning to night",
+    ipa: "/frəm ... tuː/",
+    ru: 'от ... до ...'
+  },
+  {
+    head: "in the early morning",
+    speak: "in the early morning",
+    ipa: "/ɪn ði ˈɜːli ˈmɔːnɪŋ/",
+    ru: 'рано утром'
+  },
+  {
+    head: "What will the weather be like?",
+    speak: "What will the weather be like?",
+    ipa: "/wɒt wɪl ðə ˈweðər bi laɪk/",
+    ru: 'Какая будет погода? (<em>конструкция разрывается</em>)'
+  },
+  {
+    head: "it snows / rains",
+    speak: "it snows, it rains",
+    ipa: "/ɪt snəʊz, reɪnz/",
+    ru: 'идёт снег / дождь — <em>глагол меняется по временам</em>'
+  },
+  {
+    head: "dirty — clean",
+    speak: "dirty, clean",
+    ipa: "/ˈdɜːti — kliːn/",
+    ru: 'грязный — чистый'
+  }
+];
+
+const grid = document.getElementById('grid');
+document.getElementById('cardCount').textContent = cards.length;
+
+cards.forEach((c, i) => {
+  const el = document.createElement('div');
+  el.className = 'card';
+  el.setAttribute('data-num', String(i + 1).padStart(2, '0'));
+  el.innerHTML = `
+    <div class="headword-row">
+      <div class="headword">${c.head}</div>
+      <button class="say-btn" aria-label="Прослушать произношение" title="Прослушать">🔊</button>
+    </div>
+    <div class="ipa">${c.ipa}</div>
+    <div class="rule"></div>
+    <div class="translation">${c.ru}</div>
+  `;
+  const btn = el.querySelector('.say-btn');
+  btn.addEventListener('click', () => speak(c.speak, btn));
+  grid.appendChild(el);
+});
+
+// --- Speech synthesis ---
+let voices = [];
+const voiceSelect = document.getElementById('voiceSelect');
+
+function loadVoices() {
+  voices = speechSynthesis.getVoices().filter(v => v.lang.startsWith('en'));
+  voiceSelect.innerHTML = '';
+  if (voices.length === 0) {
+    const opt = document.createElement('option');
+    opt.textContent = 'Голоса не найдены (используется системный)';
+    voiceSelect.appendChild(opt);
+    return;
+  }
+  voices.forEach((v, idx) => {
+    const opt = document.createElement('option');
+    opt.value = idx;
+    opt.textContent = `${v.name} (${v.lang})`;
+    voiceSelect.appendChild(opt);
+  });
+  // prefer a natural US/UK voice by default
+  const preferredIdx = voices.findIndex(v => /en-(US|GB)/.test(v.lang) && /Google|Natural|Samantha|Daniel/i.test(v.name));
+  voiceSelect.value = preferredIdx >= 0 ? preferredIdx : 0;
+}
+
+speechSynthesis.onvoiceschanged = loadVoices;
+loadVoices();
+
+let currentBtn = null;
+
+function speak(text, btn) {
+  if (!('speechSynthesis' in window)) {
+    alert('Синтез речи не поддерживается в этом браузере.');
+    return;
+  }
+  speechSynthesis.cancel();
+  if (currentBtn) currentBtn.classList.remove('playing');
+
+  const utter = new SpeechSynthesisUtterance(text);
+  const chosen = voices[voiceSelect.value];
+  if (chosen) {
+    utter.voice = chosen;
+    utter.lang = chosen.lang;
+  } else {
+    utter.lang = 'en-US';
+  }
+  utter.rate = 0.92;
+
+  utter.onstart = () => { btn.classList.add('playing'); currentBtn = btn; };
+  utter.onend = () => { btn.classList.remove('playing'); currentBtn = null; };
+  utter.onerror = () => { btn.classList.remove('playing'); currentBtn = null; };
+
+  speechSynthesis.speak(utter);
+}
+</script>
+</body>
+</html>
