@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guests &amp; Rooms — A1 практика</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,900&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#eef2f2;
+    --paper-2:#e3ebe9;
+    --card:#ffffff;
+    --ink:#20303a;
+    --ink-soft:#5b6c74;
+    --teal:#3e7c78;
+    --teal-dark:#28524f;
+    --mustard:#d9a441;
+    --mustard-dark:#a97b25;
+    --plum:#9c4258;
+    --green:#3f8a5b;
+    --line:#d3ddda;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    background-image:
+      radial-gradient(circle at 1px 1px, rgba(62,124,120,0.08) 1px, transparent 0);
+    background-size:22px 22px;
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    line-height:1.5;
+    padding-bottom:80px;
+  }
+  h1,h2,h3{font-family:'Fraunces',serif;font-weight:700;margin:0;}
+  .ipa{font-family:'IBM Plex Mono',monospace;color:var(--teal-dark);}
+  .wrap{max-width:1180px;margin:0 auto;padding:28px 20px 0;}
+  /* HERO */
+  .hero{
+    display:grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap:28px;
+    align-items:center;
+    background:linear-gradient(135deg,#2c4b48,#1f3634);
+    border-radius:20px;
+    padding:34px 36px;
+    color:#f2f0e6;
+    margin-bottom:28px;
+    position:relative;
+    overflow:hidden;
+  }
+  .hero::after{
+    content:"";
+    position:absolute;inset:0;
+    background:radial-gradient(circle at 85% 20%, rgba(217,164,65,0.25), transparent 55%);
+  }
+  .hero h1{font-size:clamp(28px,4vw,40px);line-height:1.1;color:#fff;}
+  .hero p{color:#cfe0dc;max-width:46ch;margin-top:10px;font-size:15px;}
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:8px;
+    font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.08em;
+    text-transform:uppercase;color:var(--mustard);
+    background:rgba(217,164,65,0.12);
+    border:1px solid rgba(217,164,65,0.4);
+    padding:4px 10px;border-radius:100px;margin-bottom:14px;
+  }
+  .hero-actions{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap;position:relative;z-index:1;}
+  .hero-svg{position:relative;z-index:1;}
+  .hero-svg svg{width:100%;height:auto;display:block;}
+
+  button, .btn{
+    font-family:'Inter',sans-serif;
+    border:none;border-radius:10px;cursor:pointer;
+    font-weight:600;font-size:13.5px;
+    padding:9px 15px;
+    transition:transform .12s ease, box-shadow .12s ease, background .15s ease;
+  }
+  button:active{transform:scale(0.97);}
+  .btn-primary{background:var(--mustard);color:#2c2109;}
+  .btn-primary:hover{background:var(--mustard-dark);}
+  .btn-ghost{background:rgba(255,255,255,0.1);color:#fff;border:1px solid rgba(255,255,255,0.35);}
+  .btn-ghost:hover{background:rgba(255,255,255,0.2);}
+  .btn-teal{background:var(--teal);color:#fff;}
+  .btn-teal:hover{background:var(--teal-dark);}
+  .btn-outline{background:transparent;color:var(--teal-dark);border:1.5px solid var(--teal);}
+  .btn-outline:hover{background:var(--teal);color:#fff;}
+  .btn-small{padding:6px 11px;font-size:12.5px;border-radius:8px;}
+
+  /* LAYOUT */
+  .layout{display:grid;grid-template-columns: 1fr 270px; gap:28px; align-items:start;}
+  @media (max-width:920px){ .layout{grid-template-columns:1fr;} .hero{grid-template-columns:1fr;} .hero-svg{display:none;} }
+
+  section.block{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:24px 26px;
+    margin-bottom:22px;
+  }
+  .block-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;margin-bottom:14px;}
+  .block-head h2{font-size:21px;color:var(--teal-dark);}
+  .block-num{
+    font-family:'IBM Plex Mono',monospace;color:var(--mustard-dark);font-size:13px;
+    display:block;margin-bottom:2px;letter-spacing:.05em;
+  }
+  .instr{color:var(--ink-soft);font-size:13.5px;margin-bottom:16px;max-width:70ch;}
+
+  /* VOCAB CARDS */
+  .vocab-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;}
+  .vcard{
+    border:1px solid var(--line);border-radius:12px;padding:13px 14px;
+    background:var(--paper-2);position:relative;
+  }
+  .vcard .en{font-weight:700;font-size:15px;color:var(--teal-dark);}
+  .vcard .tr{font-size:12.5px;margin:2px 0 4px;}
+  .vcard .ru{font-size:13.5px;color:var(--ink);margin-bottom:6px;}
+  .vcard .ex{font-size:11.5px;color:var(--ink-soft);font-style:italic;line-height:1.35;}
+  .listen-btn{
+    position:absolute;top:10px;right:10px;
+    width:30px;height:30px;border-radius:50%;
+    background:#fff;border:1px solid var(--line);
+    display:flex;align-items:center;justify-content:center;font-size:14px;padding:0;
+  }
+  .listen-btn:hover{background:var(--teal);color:#fff;border-color:var(--teal);}
+
+  /* EXERCISE ITEMS */
+  .item{
+    padding:12px 0;border-top:1px dashed var(--line);
+  }
+  .item:first-of-type{border-top:none;}
+  .item-row{display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap;}
+  .item-num{
+    font-family:'IBM Plex Mono',monospace;color:var(--mustard-dark);font-weight:600;
+    min-width:22px;padding-top:9px;font-size:13px;
+  }
+  .item-body{flex:1;min-width:240px;}
+  .item-prompt{font-size:14.5px;margin-bottom:7px;}
+  .item-prompt b{color:var(--teal-dark);}
+  .mini-audio{
+    display:inline-flex;align-items:center;gap:6px;background:var(--paper-2);
+    border:1px solid var(--line);padding:3px 9px 3px 6px;border-radius:100px;font-size:12px;color:var(--ink-soft);cursor:pointer;
+  }
+  .mini-audio:hover{background:#fff;border-color:var(--teal);}
+  input.answer-input{
+    width:100%;max-width:520px;padding:9px 11px;border-radius:8px;
+    border:1.5px solid var(--line);font-size:14px;font-family:'Inter',sans-serif;
+    background:#fff;color:var(--ink);
+  }
+  input.answer-input:focus{outline:none;border-color:var(--teal);}
+  input.answer-input.ok{border-color:var(--green);background:#f1faf4;}
+  input.answer-input.bad{border-color:var(--plum);background:#fdf1f3;}
+  .feedback-line{font-size:12px;margin-top:5px;min-height:15px;}
+  .feedback-line.ok{color:var(--green);}
+  .feedback-line.bad{color:var(--plum);}
+  .feedback-line.rev{color:var(--mustard-dark);}
+  .scene{width:120px;flex-shrink:0;}
+  .scene svg{width:100%;display:block;}
+
+  .block-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:16px;padding-top:14px;border-top:1px solid var(--line);}
+  .score-tag{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--ink-soft);margin-left:auto;}
+
+  /* SIDEBAR */
+  .sidebar{position:sticky;top:18px;}
+  .side-card{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:18px 18px 16px;margin-bottom:16px;
+  }
+  .side-card h3{font-size:15px;color:var(--plum);margin-bottom:4px;}
+  .side-card .hint{font-size:12px;color:var(--ink-soft);margin-bottom:12px;}
+  table.problems{width:100%;border-collapse:collapse;font-size:13px;}
+  table.problems th{
+    text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.04em;
+    color:var(--ink-soft);border-bottom:1px solid var(--line);padding-bottom:6px;
+  }
+  table.problems td{padding:7px 0;border-bottom:1px dashed var(--line);}
+  table.problems td.cnt{
+    text-align:right;font-family:'IBM Plex Mono',monospace;color:var(--plum);font-weight:600;
+  }
+  .empty-note{font-size:12.5px;color:var(--ink-soft);padding:6px 0;}
+  .copy-card{background:var(--teal-dark);color:#fff;border-radius:var(--radius);padding:18px;}
+  .copy-card h3{color:#fff;font-size:15px;}
+  .copy-card p{font-size:12px;color:#cfe0dc;margin:6px 0 12px;}
+  .toast{
+    position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);
+    background:var(--ink);color:#fff;padding:10px 18px;border-radius:100px;font-size:13.5px;
+    opacity:0;pointer-events:none;transition:all .25s ease;z-index:50;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--ink-soft);margin-bottom:18px;}
+  .legend span{display:inline-flex;align-items:center;gap:5px;}
+  .dot{width:9px;height:9px;border-radius:50%;display:inline-block;}
+  footer{text-align:center;color:var(--ink-soft);font-size:12px;margin-top:30px;}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div>
+      <span class="eyebrow">✦ A1 · Guests &amp; Rooms</span>
+      <h1>Гости, комнаты и «где что находится»</h1>
+      <p>Повтори слова с озвучкой, потом пропиши руками 6 заданий: перевод, диктант на слух, картинка, найди ошибку, перефразируй и придумай конец предложения.</p>
+      <div class="hero-actions">
+        <button class="btn-primary" onclick="document.getElementById('vocab').scrollIntoView({behavior:'smooth'})">🔊 К словам</button>
+        <button class="btn-ghost" onclick="document.getElementById('ex1').scrollIntoView({behavior:'smooth'})">✍️ К заданиям</button>
+        <button class="btn-ghost" id="copyAllTop">📋 Скопировать все ответы</button>
+      </div>
+    </div>
+    <div class="hero-svg">
+      <svg viewBox="0 0 320 220" xmlns="http://www.w3.org/2000/svg">
+        <rect x="20" y="40" width="280" height="150" rx="6" fill="none" stroke="#e7e0c8" stroke-width="2"/>
+        <line x1="170" y1="40" x2="170" y2="190" stroke="#e7e0c8" stroke-width="2"/>
+        <rect x="40" y="120" width="90" height="45" rx="4" fill="#d9a441" opacity="0.85"/>
+        <text x="45" y="115" fill="#cfe0dc" font-size="10" font-family="IBM Plex Mono">guest room</text>
+        <circle cx="150" cy="115" r="10" fill="#f2f0e6"/>
+        <text x="120" y="100" fill="#cfe0dc" font-size="9" font-family="IBM Plex Mono">next to →</text>
+        <rect x="200" y="70" width="70" height="14" rx="3" fill="#3e7c78"/>
+        <text x="205" y="65" fill="#cfe0dc" font-size="9" font-family="IBM Plex Mono">above ↑ sofa</text>
+        <rect x="200" y="95" width="70" height="30" rx="3" fill="#7fa9a6" opacity="0.5"/>
+        <circle cx="235" cy="160" r="9" fill="#9c4258"/>
+        <text x="205" y="152" fill="#cfe0dc" font-size="9" font-family="IBM Plex Mono">under table</text>
+        <rect x="205" y="163" width="60" height="8" rx="2" fill="#f2f0e6" opacity="0.3"/>
+        <path d="M40 40 Q160 -10 300 40" stroke="#d9a441" stroke-width="2" fill="none" stroke-dasharray="4 4"/>
+        <text x="120" y="20" fill="#d9a441" font-size="9" font-family="IBM Plex Mono">plane flies OVER →</text>
+      </svg>
+    </div>
+  </div>
+
+  <div class="layout">
+    <div>
+
+      <!-- VOCAB -->
+      <section class="block" id="vocab">
+        <div class="block-head">
+          <div>
+            <span class="block-num">Повторение слов</span>
+            <h2>Words &amp; Prepositions</h2>
+          </div>
+          <button class="btn-outline btn-small" id="playAll">🔊 Прослушать всё подряд</button>
+        </div>
+        <p class="instr">Нажми на 🔊, чтобы услышать слово (голос Google US English). Прочитай транскрипцию и перевод перед тем, как начать задания.</p>
+        <div class="vocab-grid" id="vocabGrid"></div>
+      </section>
+
+      <!-- Exercises get injected here -->
+      <div id="exercisesRoot"></div>
+
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="side-card">
+        <h3>⚠ Проблемные слова</h3>
+        <p class="hint">Сюда попадают пункты, в которых была ошибка при проверке.</p>
+        <table class="problems" id="problemsTable">
+          <thead><tr><th>Пункт</th><th style="text-align:right">Ошибок</th></tr></thead>
+          <tbody id="problemsBody"></tbody>
+        </table>
+        <div class="empty-note" id="problemsEmpty">Пока всё чисто ✨</div>
+      </div>
+
+      <div class="copy-card">
+        <h3>📋 Все ответы</h3>
+        <p>Скопировать ключи ко всем 6 заданиям одной кнопкой — удобно для самопроверки.</p>
+        <button class="btn-primary" id="copyAllBottom" style="width:100%;">Скопировать всё</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>Guests &amp; Rooms · A1 · сделай задания вручную, потом проверь себя</footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================== VOCAB DATA ================== */
+const VOCAB = [
+  {en:"Next to", ipa:"/nekst tuː/", ru:"рядом (буквально следующий)", ex:"The chair is next to the table.", exRu:"Стул рядом со столом."},
+  {en:"Above", ipa:"/əˈbʌv/", ru:"над (статичное положение)", ex:"The picture is above the sofa.", exRu:"Картина висит над диваном."},
+  {en:"Over", ipa:"/ˈoʊvər/", ru:"над (в движении)", ex:"The plane flies over the city.", exRu:"Самолёт летит над городом."},
+  {en:"In front of", ipa:"/ɪn frʌnt əv/", ru:"перед, впереди", ex:"The car is in front of the house.", exRu:"Машина перед домом."},
+  {en:"Behind", ipa:"/bɪˈhaɪnd/", ru:"позади", ex:"The garden is behind the house.", exRu:"Сад находится позади дома."},
+  {en:"Under", ipa:"/ˈʌndər/", ru:"под", ex:"The cat is under the table.", exRu:"Кошка под столом."},
+  {en:"In", ipa:"/ɪn/", ru:"в, внутри", ex:"The keys are in the bag.", exRu:"Ключи в сумке."},
+  {en:"Between", ipa:"/bɪˈtwiːn/", ru:"между (двумя)", ex:"The lamp is between two chairs.", exRu:"Лампа между двумя стульями."},
+  {en:"guest", ipa:"/ɡest/", ru:"гость", ex:"We have a guest tonight.", exRu:"У нас сегодня гость."},
+  {en:"guest room", ipa:"/ɡest ruːm/", ru:"гостевая комната", ex:"The guest room is very cosy.", exRu:"Гостевая комната очень уютная."},
+  {en:"visit", ipa:"/ˈvɪzɪt/", ru:"навещать, посещать", ex:"I want to visit my parents.", exRu:"Я хочу навестить родителей."},
+  {en:"visitors", ipa:"/ˈvɪzɪtərz/", ru:"посетители, гости", ex:"We often have visitors on weekends.", exRu:"У нас часто бывают гости по выходным."},
+  {en:"stay in a hotel", ipa:"/steɪ ɪn ə hoʊˈtel/", ru:"останавливаться в отеле", ex:"We stayed in a hotel last summer.", exRu:"Мы останавливались в отеле прошлым летом."},
+  {en:"stay in an apartment", ipa:"/steɪ ɪn æn əˈpɑːrtmənt/", ru:"останавливаться в апартаментах", ex:"They stayed in an apartment near the beach.", exRu:"Они останавливались в апартаментах у пляжа."},
+  {en:"stay at a friend's home", ipa:"/steɪ æt ə frendz hoʊm/", ru:"останавливаться у друга дома", ex:"I stayed at my friend's home.", exRu:"Я останавливался у друга дома."},
+  {en:"I like ... more", ipa:"/aɪ laɪk ... mɔːr/", ru:"мне больше нравится ...", ex:"I like hotels more than hostels.", exRu:"Мне больше нравятся отели, чем хостелы."},
+  {en:"do you ever have ...?", ipa:"/duː juː ˈevər hæv/", ru:"у тебя когда-нибудь бывают ...?", ex:"Do you ever have guests at home?", exRu:"У тебя когда-нибудь бывают гости дома?"},
+  {en:"come to visit friends", ipa:"/kʌm tuː ˈvɪzɪt frendz/", ru:"приезжать в гости к друзьям", ex:"They come to visit friends every summer.", exRu:"Они приезжают в гости к друзьям каждое лето."},
+  {en:"we have a lot of space", ipa:"/wiː hæv ə lɒt əv speɪs/", ru:"у нас много места", ex:"We have a lot of space in our flat.", exRu:"В нашей квартире много места."},
+  {en:"space", ipa:"/speɪs/", ru:"место, пространство", ex:"There isn't much space here.", exRu:"Здесь не так много места."},
+  {en:"share", ipa:"/ʃer/", ru:"делить, разделять", ex:"I share a room with my sister.", exRu:"Я делю комнату с сестрой."},
+  {en:"don't have much space", ipa:"/doʊnt hæv mʌtʃ speɪs/", ru:"не иметь много места", ex:"We don't have much space at home.", exRu:"У нас дома не так много места."},
+  {en:"extra room", ipa:"/ˈekstrə ruːm/", ru:"дополнительная комната", ex:"We have an extra room for guests.", exRu:"У нас есть дополнительная комната для гостей."},
+  {en:"dirty / messy", ipa:"/ˈdɜːrti / ˈmesi/", ru:"грязный / неубранный", ex:"His room is dirty and messy.", exRu:"Его комната грязная и неубранная."},
+  {en:"tidy / clean", ipa:"/ˈtaɪdi / kliːn/", ru:"аккуратный / чистый", ex:"My room is tidy and clean.", exRu:"Моя комната аккуратная и чистая."}
+];
+
+/* ================== SPEECH ================== */
+let cachedVoice = null;
+function pickVoice(){
+  const voices = window.speechSynthesis.getVoices();
+  cachedVoice = voices.find(v => v.name === "Google US English")
+    || voices.find(v => v.name.includes("Google US English"))
+    || voices.find(v => v.lang === "en-US")
+    || voices.find(v => v.lang && v.lang.startsWith("en"))
+    || null;
+}
+window.speechSynthesis.onvoiceschanged = pickVoice;
+pickVoice();
+
+function speak(text){
+  if(!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  if(!cachedVoice) pickVoice();
+  if(cachedVoice) u.voice = cachedVoice;
+  u.lang = "en-US";
+  u.rate = 0.92;
+  window.speechSynthesis.speak(u);
+}
+
+/* ================== RENDER VOCAB ================== */
+const vocabGrid = document.getElementById('vocabGrid');
+VOCAB.forEach(v=>{
+  const card = document.createElement('div');
+  card.className = 'vcard';
+  card.innerHTML = `
+    <button class="listen-btn" title="Слушать">🔊</button>
+    <div class="en">${v.en}</div>
+    <div class="tr ipa">${v.ipa}</div>
+    <div class="ru">${v.ru}</div>
+    <div class="ex">${v.ex}<br>${v.exRu}</div>
+  `;
+  card.querySelector('.listen-btn').addEventListener('click', ()=> speak(v.ex));
+  vocabGrid.appendChild(card);
+});
+document.getElementById('playAll').addEventListener('click', ()=>{
+  let i = 0;
+  function next(){
+    if(i>=VOCAB.length) return;
+    const u = new SpeechSynthesisUtterance(VOCAB[i].ex);
+    if(cachedVoice) u.voice = cachedVoice;
+    u.lang = "en-US"; u.rate = 0.92;
+    u.onend = ()=>{ i++; next(); };
+    window.speechSynthesis.speak(u);
+  }
+  window.speechSynthesis.cancel();
+  next();
+});
+
+/* ================== PROBLEM WORDS TRACKING ================== */
+const problems = new Map(); // label -> count
+function reportProblem(label){
+  problems.set(label, (problems.get(label)||0)+1);
+  renderProblems();
+}
+function renderProblems(){
+  const body = document.getElementById('problemsBody');
+  const empty = document.getElementById('problemsEmpty');
+  body.innerHTML = '';
+  if(problems.size===0){ empty.style.display='block'; return; }
+  empty.style.display='none';
+  [...problems.entries()].sort((a,b)=>b[1]-a[1]).forEach(([label,count])=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${label}</td><td class="cnt">${count}</td>`;
+    body.appendChild(tr);
+  });
+}
+
+/* ================== CHECK HELPERS ================== */
+function normalize(s){
+  return (s||'')
+    .toLowerCase()
+    .replace(/’/g,"'")
+    .replace(/[.,!?;:"“”]/g,'')
+    .replace(/\s+/g,' ')
+    .trim();
+}
+function wordSet(s){ return new Set(normalize(s).split(' ').filter(Boolean)); }
+function overlapRatio(a,b){
+  const A = wordSet(a), B = wordSet(b);
+  if(A.size===0 || B.size===0) return 0;
+  let inter = 0;
+  A.forEach(w=>{ if(B.has(w)) inter++; });
+  return inter / Math.max(A.size,B.size);
+}
+function isCorrect(userInput, item){
+  const norm = normalize(userInput);
+  if(!norm) return false;
+  const answers = Array.isArray(item.answer) ? item.answer : [item.answer];
+  for(const a of answers){ if(normalize(a) === norm) return true; }
+  if(item.keywords){
+    return item.keywords.some(k => norm.includes(normalize(k)));
+  }
+  const best = Math.max(...answers.map(a=>overlapRatio(userInput,a)));
+  return best >= 0.72;
+}
+
+/* ================== SCENE SVGs (for "by picture" exercise) ================== */
+function scene(type){
+  const base = `viewBox="0 0 140 110" xmlns="http://www.w3.org/2000/svg"`;
+  const table = `<rect x="35" y="60" width="55" height="10" fill="#3e7c78"/><rect x="40" y="70" width="6" height="20" fill="#3e7c78"/><rect x="79" y="70" width="6" height="20" fill="#3e7c78"/>`;
+  const ball = (cx,cy,opacity=1)=>`<circle cx="${cx}" cy="${cy}" r="10" fill="#d9a441" opacity="${opacity}"/>`;
+  switch(type){
+    case 'nextto':
+      return `<svg ${base}>${table}${ball(105,60)}</svg>`;
+    case 'above':
+      return `<svg ${base}><rect x="20" y="70" width="90" height="18" fill="#7fa9a6"/>${ball(65,35)}</svg>`;
+    case 'over':
+      return `<svg ${base}><rect x="15" y="75" width="20" height="25" fill="#9c9c9c"/><rect x="45" y="65" width="20" height="35" fill="#9c9c9c"/><rect x="80" y="80" width="20" height="20" fill="#9c9c9c"/><path d="M10 30 Q70 5 130 30" stroke="#d9a441" stroke-width="2" fill="none" stroke-dasharray="4 3"/>${ball(100,22)}</svg>`;
+    case 'infrontof':
+      return `<svg ${base}><polygon points="30,20 100,20 100,90 30,90" fill="none" stroke="#3e7c78" stroke-width="3"/><rect x="58" y="60" width="14" height="30" fill="#3e7c78"/>${ball(65,100)}</svg>`;
+    case 'behind':
+      return `<svg ${base}><polygon points="30,20 100,20 100,90 30,90" fill="#e3ebe9" stroke="#3e7c78" stroke-width="3"/>${ball(115,50,0.9)}<polygon points="30,20 100,20 100,90 30,90" fill="#e3ebe9" stroke="#3e7c78" stroke-width="3"/></svg>`;
+    case 'under':
+      return `<svg ${base}>${ball(65,78,0.85)}${table}</svg>`;
+    case 'in':
+      return `<svg ${base}><polygon points="30,55 110,55 100,95 40,95" fill="none" stroke="#3e7c78" stroke-width="3"/>${ball(70,75)}<polygon points="30,55 70,65 110,55" fill="none" stroke="#3e7c78" stroke-width="3"/></svg>`;
+    case 'between':
+      return `<svg ${base}><rect x="15" y="55" width="25" height="30" fill="#7fa9a6"/><rect x="100" y="55" width="25" height="30" fill="#7fa9a6"/>${ball(70,68)}</svg>`;
+  }
+}
+
+/* ================== EXERCISES DATA ================== */
+const EX1 = { // Translate RU -> EN
+  id:'ex1', title:'1 · Переведи на английский', type:'translate',
+  instr:'Переведи предложение полностью на английский язык.',
+  items:[
+    {ru:"Сегодня вечером у нас гость.", answer:["We have a guest tonight."]},
+    {ru:"Гостевая комната очень уютная.", answer:["The guest room is very cosy.","The guest room is very cozy."]},
+    {ru:"Я хочу навестить родителей.", answer:["I want to visit my parents."]},
+    {ru:"У нас часто бывают посетители по выходным.", answer:["We often have visitors on weekends."]},
+    {ru:"Мы останавливались в отеле прошлым летом.", answer:["We stayed in a hotel last summer."]},
+    {ru:"Они останавливались в апартаментах у пляжа.", answer:["They stayed in an apartment near the beach."]},
+    {ru:"Я останавливался у друга дома.", answer:["I stayed at my friend's home."]},
+    {ru:"У нас дома не так много места.", answer:["We don't have much space at home."]}
+  ]
+};
+
+const EX2 = { // dictation by sound
+  id:'ex2', title:'2 · Пропиши предложение на слух', type:'dictation',
+  instr:'Нажми на 🔊, прослушай предложение и пропиши его целиком по-английски.',
+  items:[
+    {audio:"My room is tidy and clean.", answer:["My room is tidy and clean."]},
+    {audio:"We have an extra room for guests.", answer:["We have an extra room for guests."]},
+    {audio:"They come to visit friends every summer.", answer:["They come to visit friends every summer."]},
+    {audio:"Do you ever have guests at home?", answer:["Do you ever have guests at home?"]},
+    {audio:"I share a room with my sister.", answer:["I share a room with my sister."]},
+    {audio:"His room is dirty and messy.", answer:["His room is dirty and messy."]},
+    {audio:"There isn't much space here.", answer:["There isn't much space here."]},
+    {audio:"I like hotels more than hostels.", answer:["I like hotels more than hostels."]}
+  ]
+};
+
+const EX3 = { // by picture — 8 prepositions
+  id:'ex3', title:'3 · Опиши картинку', type:'picture',
+  instr:'Посмотри на схему и напиши предложение с нужным предлогом места.',
+  items:[
+    {scene:'behind', answer:["The ball is behind the box.","The circle is behind the box."]},
+    {scene:'above', answer:["The ball is above the sofa.","The circle is above the sofa."]},
+    {scene:'nextto', answer:["The ball is next to the table.","The circle is next to the table."]},
+    {scene:'between', answer:["The ball is between two boxes.","The circle is between two boxes."]},
+    {scene:'over', answer:["The plane flies over the city."]},
+    {scene:'in', answer:["The ball is in the box.","The circle is in the box."]},
+    {scene:'under', answer:["The ball is under the table.","The circle is under the table."]},
+    {scene:'infrontof', answer:["The ball is in front of the house.","The circle is in front of the house."]}
+  ]
+};
+
+const EX4 = { // find a mistake
+  id:'ex4', title:'4 · Find a mistake', type:'mistake',
+  instr:'В предложении есть ошибка. Впиши исправленный вариант целиком.',
+  items:[
+    {wrong:"We have guest tonight.", answer:["We have a guest tonight."]},
+    {wrong:"They stayed in a apartment near the beach.", answer:["They stayed in an apartment near the beach."]},
+    {wrong:"I want visit my parents.", answer:["I want to visit my parents."]},
+    {wrong:"The plane flies above the city.", answer:["The plane flies over the city."]},
+    {wrong:"We stayed on a hotel last summer.", answer:["We stayed in a hotel last summer."]},
+    {wrong:"The picture is over the sofa.", answer:["The picture is above the sofa."]},
+    {wrong:"We often have visitor on weekends.", answer:["We often have visitors on weekends."]},
+    {wrong:"The guest room are very cosy.", answer:["The guest room is very cosy."]}
+  ]
+};
+
+const EX5 = { // rephrase
+  id:'ex5', title:'5 · Rephrase', type:'rephrase',
+  instr:'Перестрой предложение так, как указано в задании, сохранив смысл.',
+  items:[
+    {base:"We have a guest tonight.", task:"сделай вопрос", answer:["Do we have a guest tonight?"]},
+    {base:"My room is tidy and clean.", task:"замени на противоположное по смыслу", answer:["My room is dirty and messy."]},
+    {base:"I want to visit my parents.", task:"сделай отрицательным", answer:["I don't want to visit my parents."]},
+    {base:"We stayed in a hotel last summer.", task:"сделай вопрос", answer:["Did we stay in a hotel last summer?"]},
+    {base:"His room is dirty and messy.", task:"замени на противоположное по смыслу", answer:["His room is tidy and clean."]},
+    {base:"We have an extra room for guests.", task:"сделай отрицательным", answer:["We don't have an extra room for guests."]},
+    {base:"They stayed in an apartment near the beach.", task:"сделай вопрос", answer:["Did they stay in an apartment near the beach?"]},
+    {base:"You share a room with your sister.", task:"сделай вопрос", answer:["Do you share a room with your sister?"]}
+  ]
+};
+
+const EX6 = { // predict the ending
+  id:'ex6', title:'6 · Predict the ending', type:'predict',
+  instr:'Придумай логичное окончание предложения по-английски (полным предложением или фразой).',
+  items:[
+    {start:"We have a lot of space, so...", keywords:["guest","room","space","friends"]},
+    {start:"His room is very messy, so...", keywords:["clean","tidy"]},
+    {start:"I want to visit my parents, but...", keywords:["time","busy","work"]},
+    {start:"We stayed at a friend's home because...", keywords:["hotel","expensive","cheap"]},
+    {start:"Do you ever have guests at home? Yes, ...", keywords:["visitor","weekend","often"]},
+    {start:"The guest room is very cosy, so...", keywords:["visitor","stay","like","comfortable"]},
+    {start:"I like hotels more than hostels because...", keywords:["comfortable","clean","quiet"]},
+    {start:"We don't have much space at home, so...", keywords:["extra","room","share","space"]}
+  ]
+};
+
+const EXERCISES = [EX1,EX2,EX3,EX4,EX5,EX6];
+
+/* ================== RENDER EXERCISES ================== */
+const root = document.getElementById('exercisesRoot');
+
+EXERCISES.forEach((ex, exIndex)=>{
+  const section = document.createElement('section');
+  section.className = 'block';
+  section.id = ex.id;
+
+  const head = document.createElement('div');
+  head.className = 'block-head';
+  head.innerHTML = `<div><span class="block-num">Задание ${exIndex+1} из ${EXERCISES.length}</span><h2>${ex.title}</h2></div>`;
+  section.appendChild(head);
+
+  const instr = document.createElement('p');
+  instr.className = 'instr';
+  instr.textContent = ex.instr;
+  section.appendChild(instr);
+
+  ex.items.forEach((item,i)=>{
+    const row = document.createElement('div');
+    row.className = 'item';
+    const promptHtml = buildPrompt(ex.type, item);
+    row.innerHTML = `
+      <div class="item-row">
+        <div class="item-num">${i+1}.</div>
+        <div class="item-body">
+          <div class="item-prompt">${promptHtml}</div>
+          <input type="text" class="answer-input" placeholder="Напиши ответ здесь...">
+          <div class="feedback-line"></div>
+        </div>
+      </div>
+    `;
+    section.appendChild(row);
+
+    if(ex.type==='dictation'){
+      const btn = document.createElement('button');
+      btn.className = 'mini-audio';
+      btn.innerHTML = '🔊 Слушать';
+      btn.addEventListener('click', ()=> speak(item.audio));
+      row.querySelector('.item-prompt').appendChild(document.createElement('br'));
+      row.querySelector('.item-prompt').appendChild(btn);
+    }
+  });
+
+  const actions = document.createElement('div');
+  actions.className = 'block-actions';
+  actions.innerHTML = `
+    <button class="btn-teal btn-small check-btn">✔ Проверить</button>
+    <button class="btn-outline btn-small show-btn">👁 Показать ответы</button>
+    <button class="btn-outline btn-small copy-btn">📋 Копировать ответы задания</button>
+    <span class="score-tag"></span>
+  `;
+  section.appendChild(actions);
+  root.appendChild(section);
+
+  const inputs = section.querySelectorAll('.answer-input');
+  const feedbacks = section.querySelectorAll('.feedback-line');
+  const scoreTag = section.querySelector('.score-tag');
+
+  section.querySelector('.check-btn').addEventListener('click', ()=>{
+    let correctCount = 0;
+    ex.items.forEach((item,i)=>{
+      const input = inputs[i];
+      const fb = feedbacks[i];
+      const ok = isCorrect(input.value, item);
+      input.classList.remove('ok','bad');
+      if(ok){
+        input.classList.add('ok');
+        fb.className = 'feedback-line ok';
+        fb.textContent = '✔ Верно';
+        correctCount++;
+      } else {
+        input.classList.add('bad');
+        fb.className = 'feedback-line bad';
+        fb.textContent = '✖ Неверно — сверься с ответом';
+        reportProblem(`Зад.${exIndex+1} №${i+1}`);
+      }
+    });
+    scoreTag.textContent = `Результат: ${correctCount} / ${ex.items.length}`;
+  });
+
+  section.querySelector('.show-btn').addEventListener('click', ()=>{
+    ex.items.forEach((item,i)=>{
+      const fb = feedbacks[i];
+      const answers = Array.isArray(item.answer) ? item.answer : (item.keywords ? [`ключевые слова: ${item.keywords.join(', ')}`] : []);
+      fb.className = 'feedback-line rev';
+      fb.textContent = '➤ ' + (answers.join('  /  ') || '—');
+    });
+  });
+
+  section.querySelector('.copy-btn').addEventListener('click', ()=>{
+    const text = ex.items.map((item,i)=>{
+      const ans = Array.isArray(item.answer) ? item.answer[0] : `(варианты: ${item.keywords.join(', ')})`;
+      return `${i+1}. ${ans}`;
+    }).join('\n');
+    copyToClipboard(`${ex.title}\n${text}`);
+  });
+});
+
+function buildPrompt(type, item){
+  switch(type){
+    case 'translate':
+      return `<b>RU:</b> ${item.ru}`;
+    case 'dictation':
+      return `Прослушай и запиши предложение:`;
+    case 'picture':
+      return `<div style="display:flex;gap:12px;align-items:center;">
+        <div class="scene">${scene(item.scene)}</div>
+        <span>Опиши, где находится предмет.</span>
+      </div>`;
+    case 'mistake':
+      return `<b>С ошибкой:</b> "${item.wrong}"`;
+    case 'rephrase':
+      return `<b>${item.base}</b><br><span style="color:var(--ink-soft);font-size:12.5px;">Задание: ${item.task}</span>`;
+    case 'predict':
+      return `<b>${item.start}</b>`;
+  }
+}
+
+/* ================== TOAST + COPY ALL ================== */
+function copyToClipboard(text){
+  navigator.clipboard.writeText(text).then(()=>{
+    showToast('Скопировано в буфер обмена ✓');
+  }).catch(()=>{
+    showToast('Не удалось скопировать — выделите текст вручную');
+  });
+}
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(()=> t.classList.remove('show'), 2200);
+}
+
+function buildAllAnswersText(){
+  let out = "GUESTS & ROOMS — A1 — Ключи ответов\n";
+  EXERCISES.forEach((ex,exIndex)=>{
+    out += `\n${ex.title}\n`;
+    ex.items.forEach((item,i)=>{
+      const ans = Array.isArray(item.answer) ? item.answer[0] : `(ключевые слова: ${item.keywords.join(', ')})`;
+      out += `${i+1}. ${ans}\n`;
+    });
+  });
+  return out;
+}
+document.getElementById('copyAllTop').addEventListener('click', ()=> copyToClipboard(buildAllAnswersText()));
+document.getElementById('copyAllBottom').addEventListener('click', ()=> copyToClipboard(buildAllAnswersText()));
+
+renderProblems();
+</script>
+</body>
+</html>
