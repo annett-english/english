@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Work &amp; Career — рабочая тетрадь</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@400;600;700&family=Work+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+  :root{
+    --paper:#F2EFE4;
+    --paper-line:#DFDAC7;
+    --ink:#20263A;
+    --ink-soft:#4A5164;
+    --margin-red:#B5533C;
+    --amber:#C9932E;
+    --sage:#6E8F63;
+    --sage-bg:#E7EEE1;
+    --brick:#A6503B;
+    --brick-bg:#F3E3DD;
+    --card:#FBF9F1;
+    --shadow: 0 2px 0 rgba(32,38,58,0.08);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      repeating-linear-gradient(
+        to bottom,
+        transparent 0px,
+        transparent 37px,
+        var(--paper-line) 38px
+      ),
+      var(--paper);
+    color:var(--ink);
+    font-family:'Work Sans', sans-serif;
+    line-height:1.5;
+    padding:0 0 80px 0;
+  }
+
+  h1,h2,h3{
+    font-family:'Zilla Slab', serif;
+    color:var(--ink);
+    margin:0 0 6px 0;
+  }
+
+  .transcript, .mono{
+    font-family:'IBM Plex Mono', monospace;
+  }
+
+  /* ===== layout shell ===== */
+  .shell{
+    max-width:1180px;
+    margin:0 auto;
+    padding:0 28px;
+    position:relative;
+  }
+  .margin-rule{
+    position:absolute;
+    top:0; bottom:0;
+    left:78px;
+    width:2px;
+    background:var(--margin-red);
+    opacity:0.55;
+  }
+  @media (max-width:760px){ .margin-rule{display:none;} }
+
+  header.top{
+    padding:40px 0 22px 0;
+  }
+  header.top .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12.5px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--margin-red);
+    margin-bottom:8px;
+  }
+  header.top h1{
+    font-size:38px;
+    font-weight:700;
+  }
+  header.top p.sub{
+    color:var(--ink-soft);
+    max-width:640px;
+    margin-top:6px;
+  }
+
+  /* ===== two-column body: main + sticky sidebar ===== */
+  .layout{
+    display:grid;
+    grid-template-columns: 1fr 250px;
+    gap:34px;
+    align-items:start;
+  }
+  @media (max-width:900px){
+    .layout{grid-template-columns:1fr;}
+  }
+
+  /* ===== vocab reminder ===== */
+  .vocab-panel{
+    background:var(--card);
+    border:1px solid var(--paper-line);
+    border-radius:4px;
+    padding:22px 24px;
+    box-shadow:var(--shadow);
+    margin-bottom:34px;
+  }
+  .vocab-panel h2{font-size:21px;}
+  .vocab-panel .hint{color:var(--ink-soft); font-size:14px; margin-bottom:16px;}
+  table.vocab{
+    width:100%;
+    border-collapse:collapse;
+    font-size:14.5px;
+  }
+  table.vocab th{
+    text-align:left;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    border-bottom:1px solid var(--paper-line);
+    padding:6px 8px;
+  }
+  table.vocab td{
+    padding:8px;
+    border-bottom:1px solid var(--paper-line);
+    vertical-align:middle;
+  }
+  table.vocab tr:last-child td{border-bottom:none;}
+  .word-cell{font-weight:600;}
+  .ipa{color:var(--margin-red); white-space:nowrap;}
+  .listen-btn{
+    background:var(--ink);
+    color:var(--paper);
+    border:none;
+    border-radius:20px;
+    padding:5px 12px;
+    font-size:12.5px;
+    cursor:pointer;
+    font-family:'Work Sans', sans-serif;
+    white-space:nowrap;
+  }
+  .listen-btn:hover{background:var(--margin-red);}
+  .listen-btn:active{transform:translateY(1px);}
+
+  /* ===== sidebar problem words ===== */
+  .sidebar{
+    position:sticky;
+    top:20px;
+  }
+  .sticky-note{
+    background:var(--brick-bg);
+    border:1px solid #E3C6BB;
+    border-radius:2px;
+    padding:16px 16px 14px 16px;
+    transform:rotate(-1.1deg);
+    box-shadow:0 4px 10px rgba(32,38,58,0.10);
+  }
+  .sticky-note h3{
+    font-size:15px;
+    color:var(--brick);
+    margin-bottom:2px;
+  }
+  .sticky-note .hint{
+    font-size:12px;
+    color:var(--ink-soft);
+    margin-bottom:10px;
+  }
+  #problemList{
+    list-style:none;
+    margin:0; padding:0;
+    font-size:13.5px;
+  }
+  #problemList li{
+    display:flex;
+    justify-content:space-between;
+    gap:8px;
+    padding:6px 0;
+    border-bottom:1px dashed #D9B9AC;
+  }
+  #problemList li:last-child{border-bottom:none;}
+  #problemList .count{
+    font-family:'IBM Plex Mono', monospace;
+    background:var(--brick);
+    color:#fff;
+    border-radius:10px;
+    padding:0 7px;
+    font-size:11.5px;
+    height:18px;
+    line-height:18px;
+  }
+  #emptyProblem{font-size:13px; color:var(--ink-soft); font-style:italic;}
+
+  .progress-box{
+    margin-top:16px;
+    background:var(--card);
+    border:1px solid var(--paper-line);
+    border-radius:4px;
+    padding:14px 16px;
+    font-size:13px;
+  }
+  .progress-box h3{font-size:14px; margin-bottom:8px;}
+  .progress-row{display:flex; justify-content:space-between; padding:3px 0; color:var(--ink-soft);}
+
+  /* ===== exercise cards ===== */
+  .ex-card{
+    background:var(--card);
+    border:1px solid var(--paper-line);
+    border-radius:4px;
+    padding:26px 26px 22px 26px;
+    margin-bottom:30px;
+    box-shadow:var(--shadow);
+    border-left:5px solid var(--margin-red);
+  }
+  .ex-head{
+    display:flex;
+    align-items:baseline;
+    gap:12px;
+    margin-bottom:4px;
+    flex-wrap:wrap;
+  }
+  .ex-num{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px;
+    color:var(--margin-red);
+    letter-spacing:.05em;
+  }
+  .ex-card h2{font-size:20px;}
+  .ex-instructions{
+    color:var(--ink-soft);
+    font-size:14px;
+    margin-bottom:18px;
+    max-width:760px;
+  }
+
+  .item{
+    padding:14px 0;
+    border-top:1px solid var(--paper-line);
+  }
+  .item:first-of-type{border-top:none;}
+  .item-row{
+    display:flex;
+    gap:12px;
+    align-items:flex-start;
+    flex-wrap:wrap;
+  }
+  .item-index{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px;
+    color:var(--ink-soft);
+    min-width:20px;
+    padding-top:8px;
+  }
+  .item-body{flex:1; min-width:240px;}
+  .item-prompt{font-size:14.5px; margin-bottom:8px;}
+  .item-prompt b{color:var(--ink);}
+
+  input[type="text"]{
+    width:100%;
+    max-width:520px;
+    font-family:'Work Sans', sans-serif;
+    font-size:14.5px;
+    padding:8px 10px;
+    border:1.5px solid var(--paper-line);
+    border-bottom:2px solid var(--ink-soft);
+    border-radius:3px;
+    background:#fff;
+  }
+  input[type="text"]:focus{outline:2px solid var(--amber); outline-offset:1px;}
+
+  select{
+    font-family:'Work Sans', sans-serif;
+    font-size:14px;
+    padding:6px 8px;
+    border:1.5px solid var(--paper-line);
+    border-radius:3px;
+    background:#fff;
+  }
+
+  .btn-row{
+    display:flex;
+    gap:8px;
+    margin-top:8px;
+    flex-wrap:wrap;
+  }
+  .btn{
+    border:1.5px solid var(--ink);
+    background:transparent;
+    color:var(--ink);
+    padding:6px 13px;
+    border-radius:20px;
+    font-size:12.5px;
+    cursor:pointer;
+    font-family:'Work Sans', sans-serif;
+  }
+  .btn:hover{background:var(--ink); color:var(--paper);}
+  .btn.mini{padding:4px 10px; font-size:11.5px;}
+  .btn.copy-all{
+    border-color:var(--amber);
+    color:var(--amber);
+    font-weight:600;
+  }
+  .btn.copy-all:hover{background:var(--amber); color:#fff;}
+
+  .feedback{
+    margin-top:8px;
+    font-size:13px;
+    font-weight:500;
+    min-height:18px;
+  }
+  .feedback.correct{color:var(--sage);}
+  .feedback.incorrect{color:var(--brick);}
+  .answer-reveal{
+    margin-top:8px;
+    font-size:13.5px;
+    background:var(--sage-bg);
+    border-left:3px solid var(--sage);
+    padding:8px 12px;
+    border-radius:3px;
+    display:none;
+  }
+  .answer-reveal.show{display:block;}
+  .answer-reveal.opinion{
+    background:#EFEAE0;
+    border-left-color:var(--amber);
+  }
+
+  .options{display:flex; flex-direction:column; gap:8px; max-width:520px;}
+  .opt-label{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:7px 10px;
+    border:1.5px solid var(--paper-line);
+    border-radius:4px;
+    cursor:pointer;
+    font-size:14px;
+    background:#fff;
+  }
+  .opt-label:hover{border-color:var(--amber);}
+  .opt-label.picked-right{border-color:var(--sage); background:var(--sage-bg);}
+  .opt-label.picked-wrong{border-color:var(--brick); background:var(--brick-bg);}
+
+  .dialogue-block{
+    background:#fff;
+    border:1px solid var(--paper-line);
+    border-radius:4px;
+    padding:16px 18px;
+    font-size:14.5px;
+    max-width:760px;
+    margin-bottom:14px;
+  }
+  .dialogue-block p{margin:0 0 12px 0;}
+  .dialogue-block .who{font-weight:700; color:var(--margin-red);}
+  .blank-input{
+    width:150px;
+    display:inline-block;
+    font-family:'Work Sans', sans-serif;
+    font-size:14px;
+    padding:3px 6px;
+    border:none;
+    border-bottom:2px solid var(--ink-soft);
+    background:transparent;
+    margin:0 2px;
+  }
+  .blank-input:focus{outline:none; border-bottom-color:var(--amber);}
+  .cue{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11.5px;
+    color:var(--ink-soft);
+  }
+
+  .cta-bar{
+    display:flex;
+    gap:10px;
+    margin-top:14px;
+    flex-wrap:wrap;
+  }
+
+  .listen-sentence{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    background:var(--ink);
+    color:var(--paper);
+    border:none;
+    border-radius:20px;
+    padding:6px 14px;
+    font-size:13px;
+    cursor:pointer;
+    margin-bottom:10px;
+  }
+  .listen-sentence:hover{background:var(--margin-red);}
+
+  footer{
+    text-align:center;
+    color:var(--ink-soft);
+    font-size:12.5px;
+    margin-top:20px;
+  }
+
+  .toast{
+    position:fixed;
+    bottom:24px;
+    left:50%;
+    transform:translateX(-50%) translateY(20px);
+    background:var(--ink);
+    color:var(--paper);
+    padding:10px 18px;
+    border-radius:20px;
+    font-size:13px;
+    opacity:0;
+    transition:opacity .25s, transform .25s;
+    pointer-events:none;
+    z-index:50;
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+
+<div class="margin-rule"></div>
+<div class="shell">
+
+  <header class="top">
+    <div class="eyebrow">Unit · Work &amp; Career</div>
+    <h1>Work &amp; Career — рабочая тетрадь</h1>
+    <p class="sub">Повторите слова, прослушайте произношение (голос Google US English), затем пропишите ответы от руки в полях ниже. 6 заданий · по 8 пунктов в каждом.</p>
+  </header>
+
+  <div class="layout">
+    <main>
+
+      <!-- ================= VOCAB REMINDER ================= -->
+      <section class="vocab-panel">
+        <h2>🔊 Повторение слов</h2>
+        <p class="hint">Нажмите на колонку с транскрипцией, чтобы прослушать слово / фразу.</p>
+        <table class="vocab" id="vocabTable">
+          <thead>
+            <tr><th>Word / phrase</th><th>Транскрипция</th><th>Перевод</th><th></th></tr>
+          </thead>
+          <tbody id="vocabBody"></tbody>
+        </table>
+      </section>
+
+      <!-- ================= EXERCISE 1 ================= -->
+      <section class="ex-card" id="ex1">
+        <div class="ex-head"><span class="ex-num">EX. 1</span><h2>Listen &amp; Write</h2></div>
+        <p class="ex-instructions">Нажмите «🔊 Прослушать», затем пропишите предложение целиком (в предложении до 8 слов). Проверьте себя или посмотрите ответ.</p>
+        <div id="ex1-items"></div>
+      </section>
+
+      <!-- ================= EXERCISE 2 ================= -->
+      <section class="ex-card" id="ex2">
+        <div class="ex-head"><span class="ex-num">EX. 2</span><h2>Categorise: Positive / Negative / Neutral</h2></div>
+        <p class="ex-instructions">Как вам кажется — эта фраза звучит скорее позитивно, негативно или нейтрально? Здесь нет единственно верного ответа — сравните своё мнение с примером.</p>
+        <div id="ex2-items"></div>
+      </section>
+
+      <!-- ================= EXERCISE 3 ================= -->
+      <section class="ex-card" id="ex3">
+        <div class="ex-head"><span class="ex-num">EX. 3</span><h2>Rephrase</h2></div>
+        <p class="ex-instructions">Перепишите предложение так, чтобы оно сохранило смысл, но использовало указанное слово / фразу.</p>
+        <div id="ex3-items"></div>
+      </section>
+
+      <!-- ================= EXERCISE 4 ================= -->
+      <section class="ex-card" id="ex4">
+        <div class="ex-head"><span class="ex-num">EX. 4</span><h2>Which Sentence Sounds Natural?</h2></div>
+        <p class="ex-instructions">Выберите вариант (a или b), который звучит естественно для носителя языка.</p>
+        <div id="ex4-items"></div>
+      </section>
+
+      <!-- ================= EXERCISE 5 ================= -->
+      <section class="ex-card" id="ex5">
+        <div class="ex-head"><span class="ex-num">EX. 5</span><h2>Finish the Dialogue</h2></div>
+        <p class="ex-instructions">В скобках дана базовая форма слова / фразы — измените её (время, окончание, часть речи), чтобы вписать в предложение правильно.</p>
+        <div class="dialogue-block" id="dialogueBlock"></div>
+        <div class="cta-bar">
+          <button class="btn" onclick="checkAll('ex5')">Проверить всё</button>
+          <button class="btn" onclick="revealAll('ex5')">Показать ответы</button>
+          <button class="btn copy-all" onclick="copyDialogueAnswers()">📋 Скопировать ответы</button>
+        </div>
+      </section>
+
+      <!-- ================= EXERCISE 6 ================= -->
+      <section class="ex-card" id="ex6">
+        <div class="ex-head"><span class="ex-num">EX. 6</span><h2>Drilling: Repeat &amp; Change</h2></div>
+        <p class="ex-instructions">По образцу придумайте собственное продолжение предложения. Строгой проверки нет — это тренировка речи.</p>
+        <div id="ex6-items"></div>
+        <div class="cta-bar">
+          <button class="btn copy-all" onclick="copyDrillAnswers()">📋 Скопировать все ответы</button>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- ================= SIDEBAR ================= -->
+    <aside class="sidebar">
+      <div class="sticky-note">
+        <h3>📌 Проблемные слова</h3>
+        <p class="hint">Слова, в которых были ошибки</p>
+        <ul id="problemList"></ul>
+        <div id="emptyProblem">Пока нет ошибок — отлично!</div>
+      </div>
+      <div class="progress-box">
+        <h3>Проверено</h3>
+        <div class="progress-row"><span>Ex. 3 — формы слов</span><span id="score-ex3">0/8</span></div>
+        <div class="progress-row"><span>Ex. 4 — natural?</span><span id="score-ex4">0/8</span></div>
+        <div class="progress-row"><span>Ex. 5 — диалог</span><span id="score-ex5">0/8</span></div>
+      </div>
+    </aside>
+  </div>
+
+  <footer>Work &amp; Career vocabulary workbook · озвучка: Google US English (en-US)</footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   VOCAB DATA
+   ============================================================ */
+const vocab = [
+  {word:"run (a business)", ipa:"/rʌn/", ru:"управлять (бизнесом)"},
+  {word:"apply for a job", ipa:"/əˈplaɪ fɔːr ə dʒɒb/", ru:"подавать заявление на работу"},
+  {word:"work shifts", ipa:"/wɜːrk ʃɪfts/", ru:"работать посменно"},
+  {word:"get promoted", ipa:"/ɡet prəˈmoʊtɪd/", ru:"получить повышение"},
+  {word:"resign", ipa:"/rɪˈzaɪn/", ru:"уволиться (по своему желанию)"},
+  {word:"be made redundant", ipa:"/biː meɪd rɪˈdʌndənt/", ru:"быть сокращённым"},
+  {word:"set up (a business)", ipa:"/set ʌp/", ru:"основать, открыть (дело)"},
+  {word:"be sacked", ipa:"/biː sækt/", ru:"быть уволенным (за проступок)"},
+  {word:"do overtime", ipa:"/duː ˈoʊvərtaɪm/", ru:"работать сверхурочно"},
+  {word:"colleague", ipa:"/ˈkɒliːɡ/", ru:"коллега"},
+  {word:"retire", ipa:"/rɪˈtaɪər/", ru:"выйти на пенсию"}
+];
+
+const vocabBody = document.getElementById('vocabBody');
+vocab.forEach(v=>{
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td class="word-cell">${v.word}</td>
+    <td class="ipa mono">${v.ipa}</td>
+    <td>${v.ru}</td>
+    <td><button class="listen-btn" onclick="speak('${v.word.replace(/'/g,"\\'")}')">🔊 Listen</button></td>
+  `;
+  vocabBody.appendChild(tr);
+});
+
+/* ============================================================
+   TEXT-TO-SPEECH — Google US English (en-US)
+   ============================================================ */
+let voices = [];
+function loadVoices(){ voices = speechSynthesis.getVoices(); }
+loadVoices();
+if (speechSynthesis.onvoiceschanged !== undefined) {
+  speechSynthesis.onvoiceschanged = loadVoices;
+}
+function pickVoice(){
+  let v = voices.find(v => v.name === "Google US English");
+  if (!v) v = voices.find(v => v.lang === "en-US");
+  return v || null;
+}
+function speak(text){
+  if (!('speechSynthesis' in window)) { showToast("Синтез речи не поддерживается в этом браузере"); return; }
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  const v = pickVoice();
+  if (v) u.voice = v;
+  u.lang = "en-US";
+  u.rate = 0.92;
+  speechSynthesis.speak(u);
+}
+
+/* ============================================================
+   TOAST
+   ============================================================ */
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+/* ============================================================
+   PROBLEM WORDS SIDEBAR
+   ============================================================ */
+const problemWords = {}; // word -> count
+function trackError(word){
+  problemWords[word] = (problemWords[word]||0) + 1;
+  renderProblemWords();
+}
+function renderProblemWords(){
+  const ul = document.getElementById('problemList');
+  const empty = document.getElementById('emptyProblem');
+  const entries = Object.entries(problemWords).sort((a,b)=>b[1]-a[1]);
+  ul.innerHTML = "";
+  if (entries.length === 0){ empty.style.display="block"; return; }
+  empty.style.display = "none";
+  entries.forEach(([w,c])=>{
+    const li = document.createElement('li');
+    li.innerHTML = `<span>${w}</span><span class="count">${c}</span>`;
+    ul.appendChild(li);
+  });
+}
+
+function normalize(s){
+  return s.toLowerCase().trim().replace(/[.,!?;:'"]/g,"").replace(/\s+/g," ");
+}
+
+/* ============================================================
+   EXERCISE 1 — Listen & Write (full sentence, ≤8 words)
+   ============================================================ */
+const ex1data = [
+  {sentence:"She decided to resign from her job.", word:"resign"},
+  {sentence:"My colleague helped me finish the report.", word:"colleague"},
+  {sentence:"He worked hard and got promoted fast.", word:"get promoted"},
+  {sentence:"They were sacked for stealing company money.", word:"be sacked"},
+  {sentence:"My grandfather will retire next spring.", word:"retire"},
+  {sentence:"She wants to set up her own business.", word:"set up"},
+  {sentence:"He often does overtime to earn extra.", word:"do overtime"},
+  {sentence:"I need to apply for a new job.", word:"apply for a job"}
+];
+
+const ex1Container = document.getElementById('ex1-items');
+ex1data.forEach((it, i)=>{
+  const id = `ex1-${i}`;
+  const div = document.createElement('div');
+  div.className = 'item';
+  div.innerHTML = `
+    <div class="item-row">
+      <div class="item-index">${i+1}.</div>
+      <div class="item-body">
+        <button class="listen-sentence" onclick="speak('${it.sentence.replace(/'/g,"\\'")}')">🔊 Прослушать предложение</button>
+        <div class="item-prompt">Прослушайте и пропишите услышанное предложение целиком:</div>
+        <input type="text" id="${id}-input" placeholder="Type the sentence you hear...">
+        <div class="btn-row">
+          <button class="btn mini" onclick="checkEx1('${id}', '${it.sentence.replace(/'/g,"\\'")}', '${it.word.replace(/'/g,"\\'")}')">Проверить</button>
+          <button class="btn mini" onclick="toggleReveal('${id}')">Показать ответ</button>
+        </div>
+        <div class="feedback" id="${id}-fb"></div>
+        <div class="answer-reveal" id="${id}-answer">${it.sentence} <span class="mono">— ${transcribeGuess(it.sentence)}</span></div>
+      </div>
+    </div>`;
+  ex1Container.appendChild(div);
+});
+function transcribeGuess(s){ return ""; } // reserved, sentence audio already covers pronunciation
+
+function checkEx1(id, correct, word){
+  const val = document.getElementById(id+'-input').value;
+  const fb = document.getElementById(id+'-fb');
+  if (normalize(val) === normalize(correct)){
+    fb.textContent = "✓ Верно!";
+    fb.className = "feedback correct";
+  } else {
+    fb.textContent = "✗ Не совсем — сверьте с ответом.";
+    fb.className = "feedback incorrect";
+    trackError(word);
+  }
+}
+function toggleReveal(id){
+  document.getElementById(id+'-answer').classList.toggle('show');
+}
+
+/* ============================================================
+   EXERCISE 2 — Categorise (opinion, example answers only)
+   ============================================================ */
+const ex2data = [
+  {phrase:"apply for a job", example:"Neutral / Positive — обычно связано с надеждой на новую работу"},
+  {phrase:"be made redundant", example:"Negative — потеря работы не по своей вине"},
+  {phrase:"run a business", example:"Positive — ассоциируется с самостоятельностью и успехом"},
+  {phrase:"resign", example:"Neutral — может быть как позитивным, так и негативным решением"},
+  {phrase:"colleague", example:"Neutral — просто человек, с которым вы работаете"},
+  {phrase:"retire", example:"Positive — заслуженный отдых после долгой карьеры"},
+  {phrase:"work shifts", example:"Neutral / Negative — зависит от графика и усталости"},
+  {phrase:"be sacked", example:"Negative — увольнение за проступок"}
+];
+const ex2Container = document.getElementById('ex2-items');
+ex2data.forEach((it,i)=>{
+  const id = `ex2-${i}`;
+  const div = document.createElement('div');
+  div.className = 'item';
+  div.innerHTML = `
+    <div class="item-row">
+      <div class="item-index">${i+1}.</div>
+      <div class="item-body">
+        <div class="item-prompt"><b>${it.phrase}</b> — как вам кажется, это...</div>
+        <select id="${id}-select">
+          <option value="">— выберите —</option>
+          <option>Positive</option>
+          <option>Negative</option>
+          <option>Neutral</option>
+        </select>
+        <div class="btn-row">
+          <button class="btn mini" onclick="toggleReveal('${id}')">Показать пример ответа</button>
+        </div>
+        <div class="answer-reveal opinion" id="${id}-answer">Пример: ${it.example}. <i>Ваш вариант тоже может быть верным — здесь нет единственно правильного ответа.</i></div>
+      </div>
+    </div>`;
+  ex2Container.appendChild(div);
+});
+
+/* ============================================================
+   EXERCISE 3 — Complete the Lexical Pattern
+   ============================================================ */
+const ex3data = [
+  {original:"The people I work with are very supportive.", word:"colleague", checkWords:["colleague"], model:"My colleagues are very supportive."},
+  {original:"She sent her CV to the company for the marketing position.", word:"apply for a job", checkWords:["apply for a job","applied for a job","applying for a job"], model:"She applied for a job in marketing."},
+  {original:"He lost his job because he broke company rules.", word:"be sacked", checkWords:["sacked"], model:"He was sacked because he broke company rules."},
+  {original:"She owns and manages a small bakery.", word:"run (a business)", checkWords:["run","runs","running"], model:"She runs a small bakery."},
+  {original:"He works different hours every week, sometimes at night.", word:"work shifts", checkWords:["work shifts","works shifts","working shifts"], model:"He works shifts, sometimes at night."},
+  {original:"My grandmother stopped working when she turned 65.", word:"retire", checkWords:["retire","retired"], model:"My grandmother retired when she turned 65."},
+  {original:"Many employees lost their jobs when the factory closed.", word:"be made redundant", checkWords:["made redundant"], model:"Many employees were made redundant when the factory closed."},
+  {original:"They started a new company last year.", word:"set up", checkWords:["set up"], model:"They set up a new company last year."}
+];
+const ex3Container = document.getElementById('ex3-items');
+ex3data.forEach((it,i)=>{
+  const id = `ex3-${i}`;
+  const div = document.createElement('div');
+  div.className = 'item';
+  div.innerHTML = `
+    <div class="item-row">
+      <div class="item-index">${i+1}.</div>
+      <div class="item-body">
+        <div class="item-prompt">${it.original} <span class="cue">(use: ${it.word})</span></div>
+        <input type="text" id="${id}-input" placeholder="Rewrite the sentence...">
+        <div class="btn-row">
+          <button class="btn mini" onclick="checkEx3('${id}', ${JSON.stringify(it.checkWords)}, '${it.word.replace(/'/g,"\\'")}')">Проверить</button>
+          <button class="btn mini" onclick="toggleReveal('${id}')">Показать ответ</button>
+        </div>
+        <div class="feedback" id="${id}-fb"></div>
+        <div class="answer-reveal" id="${id}-answer">Пример: ${it.model}</div>
+      </div>
+    </div>`;
+  ex3Container.appendChild(div);
+});
+const ex3Checked = new Set();
+function checkEx3(id, checkWords, word){
+  const val = normalize(document.getElementById(id+'-input').value);
+  const fb = document.getElementById(id+'-fb');
+  const ok = checkWords.some(w => val.includes(normalize(w)));
+  ex3Checked.add(id);
+  if (ok){
+    fb.textContent = "✓ Отлично, ключевое слово использовано! Сверьте формулировку с примером.";
+    fb.className = "feedback correct";
+  } else {
+    fb.textContent = "✗ Похоже, вы не использовали нужное слово — посмотрите пример.";
+    fb.className = "feedback incorrect";
+    trackError(word);
+  }
+  updateScore('ex3', ex3Checked.size);
+}
+
+/* ============================================================
+   EXERCISE 4 — Which Sentence Sounds Natural?
+   ============================================================ */
+const ex4data = [
+  {word:"be sacked", a:"He was sacked from his job.", b:"He was sacked in his job.", correct:"a"},
+  {word:"do overtime", a:"She does overtime three times a week.", b:"She makes overtime three times a week.", correct:"a"},
+  {word:"run (a business)", a:"He runs a small coffee shop.", b:"He runs on a small coffee shop.", correct:"a"},
+  {word:"get promoted", a:"I got promoted to team leader.", b:"I got promoted for team leader.", correct:"a"},
+  {word:"apply for a job", a:"I applied for a job at the bank.", b:"I applied to a job at the bank.", correct:"a"},
+  {word:"colleague", a:"My colleague is very helpful.", b:"My college is very helpful.", correct:"a"},
+  {word:"be made redundant", a:"Many workers were made redundant last year.", b:"Many workers were made redundancy last year.", correct:"a"},
+  {word:"set up", a:"They set up a new company in 2020.", b:"They set on a new company in 2020.", correct:"a"}
+];
+const ex4Container = document.getElementById('ex4-items');
+const ex4Checked = new Set();
+ex4data.forEach((it,i)=>{
+  const id = `ex4-${i}`;
+  const div = document.createElement('div');
+  div.className = 'item';
+  div.innerHTML = `
+    <div class="item-row">
+      <div class="item-index">${i+1}.</div>
+      <div class="item-body">
+        <div class="item-prompt">Выберите естественный вариант:</div>
+        <div class="options">
+          <label class="opt-label" id="${id}-a"><input type="radio" name="${id}" value="a" onchange="checkEx4('${id}', ${i}, 'a')"> ${it.a}</label>
+          <label class="opt-label" id="${id}-b"><input type="radio" name="${id}" value="b" onchange="checkEx4('${id}', ${i}, 'b')"> ${it.b}</label>
+        </div>
+        <div class="feedback" id="${id}-fb"></div>
+      </div>
+    </div>`;
+  ex4Container.appendChild(div);
+});
+function checkEx4(id, idx, chosen){
+  const it = ex4data[idx];
+  const fb = document.getElementById(id+'-fb');
+  const labelA = document.getElementById(id+'-a');
+  const labelB = document.getElementById(id+'-b');
+  labelA.classList.remove('picked-right','picked-wrong');
+  labelB.classList.remove('picked-right','picked-wrong');
+  ex4Checked.add(id);
+  if (chosen === it.correct){
+    fb.textContent = "✓ Верно, это звучит естественно!";
+    fb.className = "feedback correct";
+    (chosen==='a'?labelA:labelB).classList.add('picked-right');
+  } else {
+    fb.textContent = "✗ Носитель языка так не скажет.";
+    fb.className = "feedback incorrect";
+    (chosen==='a'?labelA:labelB).classList.add('picked-wrong');
+    trackError(it.word);
+  }
+  updateScore('ex4', ex4Checked.size);
+}
+
+/* ============================================================
+   EXERCISE 5 — Finish the Dialogue
+   ============================================================ */
+const ex5data = [
+  {cue:"retire", answers:["retiring"]},
+  {cue:"do overtime", answers:["does overtime"]},
+  {cue:"work shifts", answers:["worked shifts"]},
+  {cue:"be made redundant", answers:["was made redundant","were made redundant"]},
+  {cue:"resign", answers:["resigned"]},
+  {cue:"apply for a job", answers:["applying for a job"]},
+  {cue:"get promoted", answers:["got promoted"]},
+  {cue:"run", answers:["running"]}
+];
+const dialogueHTML = `
+<p><span class="who">A:</span> Did you hear? My uncle is <input class="blank-input" id="ex5-0-input"> <span class="cue">(retire)</span> next month after 40 years at the factory.</p>
+<p><span class="who">B:</span> Wow! He must be busy — he often <input class="blank-input" id="ex5-1-input"> <span class="cue">(do overtime)</span> on Fridays, right?</p>
+<p><span class="who">A:</span> Yes, and last year he <input class="blank-input" id="ex5-2-input"> <span class="cue">(work shifts)</span> at the factory too.</p>
+<p><span class="who">B:</span> Did you hear about Tom's department? Everyone there <input class="blank-input" id="ex5-3-input"> <span class="cue">(be made redundant)</span> last week.</p>
+<p><span class="who">A:</span> That's awful! I heard Sarah <input class="blank-input" id="ex5-4-input"> <span class="cue">(resign)</span> before that happened.</p>
+<p><span class="who">B:</span> Really? What's she doing now?</p>
+<p><span class="who">A:</span> She's <input class="blank-input" id="ex5-5-input"> <span class="cue">(apply for a job)</span> at a marketing agency.</p>
+<p><span class="who">B:</span> Good for her! And how's your job going?</p>
+<p><span class="who">A:</span> Great, actually — I just <input class="blank-input" id="ex5-6-input"> <span class="cue">(get promoted)</span> to team leader!</p>
+<p><span class="who">B:</span> Congratulations! She always dreamed of <input class="blank-input" id="ex5-7-input"> <span class="cue">(run)</span> her own company one day.</p>
+`;
+document.getElementById('dialogueBlock').innerHTML = dialogueHTML;
+
+function checkAll(prefix){
+  if (prefix === 'ex5'){
+    let correctCount = 0;
+    ex5data.forEach((it,i)=>{
+      const inp = document.getElementById(`ex5-${i}-input`);
+      const ok = it.answers.some(a => normalize(a) === normalize(inp.value));
+      inp.style.borderBottomColor = ok ? "#6E8F63" : "#A6503B";
+      if (ok) correctCount++; else trackError(it.cue);
+    });
+    updateScore('ex5', 8);
+    showToast(`Диалог: верно ${correctCount} из 8`);
+  }
+}
+function revealAll(prefix){
+  if (prefix === 'ex5'){
+    ex5data.forEach((it,i)=>{
+      const inp = document.getElementById(`ex5-${i}-input`);
+      inp.value = it.answers[0];
+      inp.style.borderBottomColor = "#C9932E";
+    });
+  }
+}
+function copyDialogueAnswers(){
+  const lines = ex5data.map((it,i)=>{
+    const inp = document.getElementById(`ex5-${i}-input`);
+    return `${i+1}. ${it.cue} → ${inp.value || it.answers[0]}`;
+  });
+  copyText(lines.join("\n"), "Ответы диалога скопированы!");
+}
+
+/* ============================================================
+   EXERCISE 6 — Drilling: Repeat & Change
+   ============================================================ */
+const ex6data = [
+  {model:"I used to work shifts, but now I have a 9-to-5 job.", prompt:"I used to ___, but now ___."},
+  {model:"If I were made redundant, I would look for a new job immediately.", prompt:"If I were made redundant, I would ___."},
+  {model:"I hope to get promoted within the next two years.", prompt:"I hope to get promoted ___."},
+  {model:"I would never resign without a backup plan.", prompt:"I would never resign ___."},
+  {model:"One day, I'd love to set up my own business selling handmade candles.", prompt:"One day, I'd love to set up my own business ___."},
+  {model:"I try to avoid doing overtime because I value my free time.", prompt:"I try to avoid doing overtime because ___."},
+  {model:"My best colleague is someone who always helps without being asked.", prompt:"My best colleague is someone who ___."},
+  {model:"When I retire, I plan to travel around the world.", prompt:"When I retire, I plan to ___."}
+];
+const ex6Container = document.getElementById('ex6-items');
+ex6data.forEach((it,i)=>{
+  const id = `ex6-${i}`;
+  const div = document.createElement('div');
+  div.className = 'item';
+  div.innerHTML = `
+    <div class="item-row">
+      <div class="item-index">${i+1}.</div>
+      <div class="item-body">
+        <div class="item-prompt">Model: <i>"${it.model}"</i></div>
+        <div class="item-prompt">Your turn: <b>${it.prompt}</b></div>
+        <input type="text" id="${id}-input" placeholder="Write your own sentence...">
+      </div>
+    </div>`;
+  ex6Container.appendChild(div);
+});
+function copyDrillAnswers(){
+  const lines = ex6data.map((it,i)=>{
+    const inp = document.getElementById(`ex6-${i}-input`);
+    return `${i+1}. ${inp.value || "(не заполнено)"}`;
+  });
+  copyText(lines.join("\n"), "Ответы дриллинга скопированы!");
+}
+
+/* ============================================================
+   HELPERS
+   ============================================================ */
+function copyText(text, msg){
+  navigator.clipboard.writeText(text).then(()=>showToast(msg))
+    .catch(()=>showToast("Не удалось скопировать — скопируйте вручную"));
+}
+function updateScore(ex, n){
+  const el = document.getElementById(`score-${ex}`);
+  if (el) el.textContent = `${n}/8`;
+}
+</script>
+</body>
+</html>
