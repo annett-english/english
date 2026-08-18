@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Travel Vocabulary Practice v2</title>
+<style>
+  :root{
+    --blue:#2563eb; --blue-dark:#1d4ed8; --green:#16a34a; --red:#dc2626;
+    --bg:#f4f6fb; --card:#ffffff; --border:#e2e8f0; --text:#1e293b; --muted:#64748b;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:'Segoe UI',Roboto,Arial,sans-serif; background:var(--bg); color:var(--text);
+    padding:24px;
+  }
+  h1{font-size:26px; margin-bottom:4px;}
+  .subtitle{color:var(--muted); margin-bottom:20px;}
+  .layout{display:flex; gap:20px; align-items:flex-start;}
+  .main{flex:1; min-width:0;}
+  .sidebar{
+    width:230px; position:sticky; top:20px; background:var(--card); border:1px solid var(--border);
+    border-radius:12px; padding:16px; flex-shrink:0;
+  }
+  .sidebar h3{margin-top:0; font-size:15px;}
+  .sidebar table{width:100%; border-collapse:collapse; font-size:13px;}
+  .sidebar td{padding:4px 2px; border-bottom:1px solid var(--border);}
+  .sidebar .empty{color:var(--muted); font-size:13px;}
+  .card{
+    background:var(--card); border:1px solid var(--border); border-radius:12px; padding:20px;
+    margin-bottom:22px;
+  }
+  .card h2{margin-top:0; font-size:19px; display:flex; align-items:center; gap:8px;}
+  .badge{
+    background:var(--blue); color:white; font-size:12px; padding:2px 8px; border-radius:20px;
+  }
+  .instructions{color:var(--muted); font-size:14px; margin-bottom:14px;}
+  table.vocab{width:100%; border-collapse:collapse; font-size:14px;}
+  table.vocab th, table.vocab td{padding:8px 6px; border-bottom:1px solid var(--border); text-align:left; vertical-align:top;}
+  table.vocab th{color:var(--muted); font-weight:600; font-size:12px; text-transform:uppercase;}
+  .play-btn{
+    background:var(--blue); color:white; border:none; border-radius:6px; width:30px; height:30px;
+    cursor:pointer; font-size:14px;
+  }
+  .play-btn:hover{background:var(--blue-dark);}
+  .q-row{
+    display:flex; gap:10px; align-items:center; padding:10px 0; border-bottom:1px dashed var(--border); flex-wrap:wrap;
+  }
+  .q-num{width:22px; color:var(--muted); font-weight:600;}
+  .q-prompt{flex:1; min-width:200px;}
+  .q-prompt small{display:block; color:var(--muted); font-size:12px; margin-top:2px;}
+  input[type=text]{
+    padding:8px 10px; border:1px solid var(--border); border-radius:8px; font-size:14px; width:260px; max-width:100%;
+  }
+  input.correct{border-color:var(--green); background:#f0fdf4;}
+  input.incorrect{border-color:var(--red); background:#fef2f2;}
+  select{padding:7px; border-radius:8px; border:1px solid var(--border); font-size:14px;}
+  select.correct{border-color:var(--green); background:#f0fdf4;}
+  select.incorrect{border-color:var(--red); background:#fef2f2;}
+  textarea{
+    width:100%; min-height:44px; padding:8px 10px; border:1px solid var(--border); border-radius:8px;
+    font-size:14px; font-family:inherit; resize:vertical;
+  }
+  .answer-hint{font-size:13px; color:var(--blue-dark); margin-top:4px; display:none;}
+  .answer-hint.show{display:block;}
+  .btn{
+    background:var(--blue); color:#fff; border:none; padding:9px 16px; border-radius:8px; cursor:pointer;
+    font-size:14px; margin-right:8px; margin-top:10px;
+  }
+  .btn:hover{background:var(--blue-dark);}
+  .btn.secondary{background:#64748b;}
+  .btn.secondary:hover{background:#475569;}
+  .btn.green{background:var(--green);}
+  .btn.green:hover{background:#15803d;}
+  .result-line{font-size:13px; font-weight:600; margin-top:10px;}
+  .cat-row{display:flex; align-items:center; justify-content:space-between; padding:8px 0; border-bottom:1px dashed var(--border);}
+  .cat-buttons button{
+    border:1px solid var(--border); background:#fff; padding:6px 12px; border-radius:20px; cursor:pointer; font-size:13px; margin-left:6px;
+  }
+  .cat-buttons button.active-yes{background:#dcfce7; border-color:var(--green); color:#166534;}
+  .cat-buttons button.active-no{background:#fee2e2; border-color:var(--red); color:#991b1b;}
+  .note{font-size:12px; color:var(--muted); font-style:italic; margin-top:8px;}
+  .dialogue-line{padding:8px 0; border-bottom:1px dashed var(--border);}
+  .speaker{font-weight:700; color:var(--blue-dark); margin-right:6px;}
+  .model{
+    background:#f1f5f9; border-left:3px solid var(--blue); padding:8px 12px; border-radius:6px;
+    font-size:13px; color:#334155; margin-bottom:8px; font-style:italic;
+  }
+  .drill-block{padding:14px 0; border-bottom:1px dashed var(--border);}
+  .verb-hint{color:var(--blue-dark); font-weight:600;}
+</style>
+</head>
+<body>
+
+<h1>✈️ Travel Vocabulary Practice — v2</h1>
+<p class="subtitle">Повторение слов + 11 письменных упражнений (новые предложения + диалог и дриллинг). Прописывайте слова руками — это лучше запоминается!</p>
+
+<div class="layout">
+  <div class="main">
+
+    <!-- WORD LIST -->
+    <div class="card">
+      <h2>📖 Слова для повторения <span class="badge">14 фраз</span></h2>
+      <p class="instructions">Нажмите 🔊, чтобы прослушать произношение (голос Google US English).</p>
+      <table class="vocab">
+        <thead><tr><th style="width:36px"></th><th>English</th><th>Transcription</th><th>Русский</th></tr></thead>
+        <tbody id="vocabTableBody"></tbody>
+      </table>
+    </div>
+
+    <!-- EXERCISES CONTAINER -->
+    <div id="exercisesContainer"></div>
+
+  </div>
+
+  <div class="sidebar">
+    <h3>⚠️ Проблемные слова</h3>
+    <div id="problemWords"><div class="empty">Пока ошибок нет 🙂</div></div>
+  </div>
+</div>
+
+<script>
+/* ===================== DATA ===================== */
+const VOCAB = [
+ {id:1, full:"book a flight / a train / accommodation", short:"book a flight", ru:"забронировать билет / поезд / жильё",
+  ipa:"/bʊk ə flaɪt/", def:"to reserve a place on a plane, train, etc. in advance",
+  blanked:"b__k a fl__ht", collocGap:"___ a flight", collocAnswer:"book",
+  firstHalf:"book", secondHalf:"a flight",
+  mistakeSentence:"We need to book a flights for our honeymoon next spring.", mistakeAnswer:"a flight",
+  starter:"If money wasn't a problem, I would book a flight to",
+  model:"I always book a flight at least two months before I travel."},
+
+ {id:2, full:"go by train / bus / plane", short:"go by train", ru:"ехать на поезде / автобусе / самолёте",
+  ipa:"/ɡəʊ baɪ treɪn/", def:"to travel using a particular form of transport",
+  blanked:"g_ b_ tr__n", collocGap:"___ by train", collocAnswer:"go",
+  firstHalf:"go", secondHalf:"by train",
+  mistakeSentence:"Next week we are going by trains to Edinburgh.", mistakeAnswer:"by train",
+  starter:"The best trip I ever took by train was",
+  model:"We decided to go by train because it's more relaxing than flying."},
+
+ {id:3, full:"rent a car / a flat", short:"rent a car", ru:"арендовать машину / квартиру",
+  ipa:"/rent ə kɑː/", def:"to pay money to use something, such as a car or flat, for a period of time",
+  blanked:"r_nt a c_r", collocGap:"___ a car", collocAnswer:"rent",
+  firstHalf:"rent", secondHalf:"a car",
+  mistakeSentence:"We forgot to rent car before arriving at the airport.", mistakeAnswer:"rent a car",
+  starter:"If I rented a car abroad, the first place I'd drive to is",
+  model:"They rented a car so they could explore the small villages."},
+
+ {id:4, full:"stay in a hotel / hostel", short:"stay in a hotel", ru:"остановиться в отеле / хостеле",
+  ipa:"/steɪ ɪn ə həʊˈtel/", def:"to live somewhere for a short time as a visitor",
+  blanked:"st_y _n a h_t_l", collocGap:"___ in a hotel", collocAnswer:"stay",
+  firstHalf:"stay", secondHalf:"in a hotel",
+  mistakeSentence:"We stayed on a hostel because it was cheaper than a hotel.", mistakeAnswer:"in a hostel",
+  starter:"My dream hotel to stay in would be",
+  model:"We stayed in a hotel right next to the beach."},
+
+ {id:5, full:"eat out (in local restaurants)", short:"eat out", ru:"есть вне дома (в местных ресторанах)",
+  ipa:"/iːt aʊt/", def:"to have a meal at a restaurant rather than at home",
+  blanked:"e_t _ut", collocGap:"___ out", collocAnswer:"eat",
+  firstHalf:"eat", secondHalf:"out",
+  mistakeSentence:"On holiday, we eating out almost every night.", mistakeAnswer:"eat out",
+  starter:"The best restaurant I've ever eaten out at was",
+  model:"We eat out almost every weekend when we're on holiday."},
+
+ {id:6, full:"visit museums and art galleries", short:"visit museums and art galleries", ru:"посещать музеи и художественные галереи",
+  ipa:"/ˈvɪzɪt mjuːˈziːəmz ənd ɑːt ˈɡælriz/", def:"to go to places where art and historical objects are shown to the public",
+  blanked:"v_s_t mus__ms _nd _rt g_ll_r__s", collocGap:"___ museums and art galleries", collocAnswer:"visit",
+  firstHalf:"visit", secondHalf:"museums and art galleries",
+  mistakeSentence:"We visits museum and art gallery on our first day there.", mistakeAnswer:"visit museums and art galleries",
+  starter:"The museum or art gallery I most want to visit is",
+  model:"On rainy days, I like to visit museums and art galleries."},
+
+ {id:7, full:"buy souvenirs", short:"buy souvenirs", ru:"покупать сувениры",
+  ipa:"/baɪ ˌsuːvəˈnɪəz/", def:"to purchase small items to remember a place you visited",
+  blanked:"b_y s_uven_rs", collocGap:"___ souvenirs", collocAnswer:"buy",
+  firstHalf:"buy", secondHalf:"souvenirs",
+  mistakeSentence:"Before leaving, don't forget to buy a souvenirs for your friends.", mistakeAnswer:"souvenirs",
+  starter:"The strangest souvenir I've ever bought was",
+  model:"I bought souvenirs for everyone in my family."},
+
+ {id:8, full:"have a good time", short:"have a good time", ru:"хорошо проводить время",
+  ipa:"/hæv ə ɡʊd taɪm/", def:"to enjoy yourself",
+  blanked:"h_ve a g__d t_me", collocGap:"___ a good time", collocAnswer:"have",
+  firstHalf:"have", secondHalf:"a good time",
+  mistakeSentence:"I really hope you had a good times in Prague.", mistakeAnswer:"a good time",
+  starter:"I always have a good time when",
+  model:"We had a good time even though the weather was bad."},
+
+ {id:9, full:"meet new people", short:"meet new people", ru:"знакомиться с новыми людьми",
+  ipa:"/miːt njuː ˈpiːpl/", def:"to get to know people you have never met before",
+  blanked:"m__t n_w pe_ple", collocGap:"___ new people", collocAnswer:"meet",
+  firstHalf:"meet", secondHalf:"new people",
+  mistakeSentence:"Travelling alone helped me met new people last year.", mistakeAnswer:"meet new people",
+  starter:"The most interesting new person I ever met was",
+  model:"Travelling alone is a great way to meet new people."},
+
+ {id:10, full:"leave a review of (the hotel)", short:"leave a review", ru:"оставить отзыв о (отеле)",
+  ipa:"/liːv ə rɪˈvjuː/", def:"to write your opinion about a place or service online after using it",
+  blanked:"le_ve a rev__w", collocGap:"___ a review", collocAnswer:"leave",
+  firstHalf:"leave", secondHalf:"a review",
+  mistakeSentence:"Please leave review for the hostel when you get home.", mistakeAnswer:"a review",
+  starter:"The last review I left was about",
+  model:"I always leave a review after staying somewhere new."},
+
+ {id:11, full:"have an adventure", short:"have an adventure", ru:"пережить приключение",
+  ipa:"/hæv ən ədˈventʃə/", def:"to experience something exciting, unusual or slightly dangerous",
+  blanked:"h_ve _n _dvent_re", collocGap:"___ an adventure", collocAnswer:"have",
+  firstHalf:"have", secondHalf:"an adventure",
+  mistakeSentence:"We decided to have adventure instead of relaxing on the beach.", mistakeAnswer:"an adventure",
+  starter:"My idea of a perfect adventure would be",
+  model:"Backpacking through Asia was a real adventure for me."},
+
+ {id:12, full:"make your dreams come true", short:"make your dreams come true", ru:"осуществить мечты",
+  ipa:"/meɪk jɔː driːmz kʌm truː/", def:"to make something you have always wanted actually happen",
+  blanked:"m_ke y__r dre_ms c_me tr_e", collocGap:"make your ___ come true", collocAnswer:"dreams",
+  firstHalf:"make", secondHalf:"your dreams come true",
+  mistakeSentence:"Working abroad for a year can make your dream come true.", mistakeAnswer:"dreams",
+  starter:"One thing that would make my dreams come true is",
+  model:"Saving money for years finally made her dreams come true."},
+
+ {id:13, full:"do courses", short:"do courses", ru:"проходить курсы",
+  ipa:"/duː ˈkɔːsɪz/", def:"to study or take classes in order to learn something",
+  blanked:"d_ c__rses", collocGap:"___ courses", collocAnswer:"do",
+  firstHalf:"do", secondHalf:"courses",
+  mistakeSentence:"This year she wants to doing courses in photography.", mistakeAnswer:"do courses",
+  starter:"If I had time, I would love to do a course in",
+  model:"While abroad, I did a course in local cooking."},
+
+ {id:14, full:"make sure", short:"make sure", ru:"убедиться",
+  ipa:"/meɪk ʃʊə/", def:"to check something so that you are certain it is true or has been done",
+  blanked:"m_ke s_re", collocGap:"___ sure", collocAnswer:"make",
+  firstHalf:"make", secondHalf:"sure",
+  mistakeSentence:"Before you leave, making sure you have your passport.", mistakeAnswer:"make sure",
+  starter:"Before a long trip, I always make sure that",
+  model:"Before flying, always make sure your passport hasn't expired."}
+];
+
+const VALID_COMBOS = VOCAB.map(v => norm(v.firstHalf + " " + v.secondHalf));
+
+/* dialogue data for exercise 10 (past simple tense) */
+const DIALOGUE = [
+  {type:'static', speaker:'A', text:"How was your trip to Portugal?"},
+  {type:'blank', speaker:'B', before:"Amazing! We ", verb:"book", answer:"booked", after:" our tickets really early.", id:1},
+  {type:'static', speaker:'A', text:"Nice! How did you get around the country?"},
+  {type:'blank', speaker:'B', before:"We ", verb:"go", answer:"went", after:" by train across three cities.", id:2},
+  {type:'static', speaker:'A', text:"Did you hire any transport of your own?"},
+  {type:'blank', speaker:'B', before:"Yes, in the Algarve we ", verb:"rent", answer:"rented", after:" a car for a week.", id:3},
+  {type:'static', speaker:'A', text:"Where did you sleep?"},
+  {type:'blank', speaker:'B', before:"We ", verb:"stay", answer:"stayed", after:" in a lovely little hostel near the old town.", id:4},
+  {type:'static', speaker:'A', text:"Did you cook much, or...?"},
+  {type:'blank', speaker:'B', before:"Not really — we ", verb:"eat", answer:"ate", after:" out at a different restaurant every night.", id:5},
+  {type:'static', speaker:'A', text:"Any culture along the way?"},
+  {type:'blank', speaker:'B', before:"Definitely, we ", verb:"visit", answer:"visited", after:" so many museums and art galleries.", id:6},
+  {type:'static', speaker:'A', text:"Did you bring anything back for people?"},
+  {type:'blank', speaker:'B', before:"Of course — we ", verb:"buy", answer:"bought", after:" lots of souvenirs for the whole family.", id:7},
+  {type:'static', speaker:'A', text:"Sounds like a brilliant holiday overall!"},
+  {type:'blank', speaker:'B', before:"Honestly, we ", verb:"have", answer:"had", after:" the best time of our lives.", id:8},
+  {type:'blank', speaker:'B', before:"We even ", verb:"meet", answer:"met", after:" some amazing local people.", id:9},
+  {type:'blank', speaker:'B', before:"And when we got home, we ", verb:"leave", answer:"left", after:" a five-star review for the hostel.", id:10}
+];
+
+/* ===================== HELPERS ===================== */
+function norm(s){
+  return (s||"").toString().trim().toLowerCase().replace(/[.,!?;:]/g,"").replace(/\s+/g," ");
+}
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+function pick10(){ return shuffle(VOCAB).slice(0,10); }
+
+/* problem words tracker */
+const mistakes = {}; // id -> count
+function registerMistake(id){
+  mistakes[id] = (mistakes[id]||0)+1;
+  renderProblemWords();
+}
+function renderProblemWords(){
+  const box = document.getElementById('problemWords');
+  const entries = Object.entries(mistakes).sort((a,b)=>b[1]-a[1]);
+  if(entries.length===0){
+    box.innerHTML = '<div class="empty">Пока ошибок нет 🙂</div>';
+    return;
+  }
+  let html = '<table>';
+  entries.slice(0,10).forEach(([id,count])=>{
+    const v = VOCAB.find(x=>x.id==id);
+    html += `<tr><td>${v.short}</td><td style="text-align:right;color:var(--red);font-weight:600;">${count}</td></tr>`;
+  });
+  html += '</table>';
+  box.innerHTML = html;
+}
+
+/* speech synthesis */
+let voices = [];
+function loadVoices(){ voices = window.speechSynthesis.getVoices(); }
+loadVoices();
+if(typeof window.speechSynthesis !== 'undefined'){
+  window.speechSynthesis.onvoiceschanged = loadVoices;
+}
+function speak(text){
+  if(!('speechSynthesis' in window)){ alert('Синтез речи не поддерживается в этом браузере'); return; }
+  const utter = new SpeechSynthesisUtterance(text);
+  const v = voices.find(v=>v.name.includes('Google US English')) || voices.find(v=>v.lang==='en-US') || voices[0];
+  if(v) utter.voice = v;
+  utter.lang = 'en-US';
+  utter.rate = 0.9;
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(utter);
+}
+
+/* ===================== RENDER VOCAB TABLE ===================== */
+const vocabBody = document.getElementById('vocabTableBody');
+VOCAB.forEach(v=>{
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td><button class="play-btn" onclick="speak('${v.short.replace(/'/g,"\\'")}')">🔊</button></td>
+    <td><strong>${v.full}</strong></td>
+    <td style="color:var(--muted)">${v.ipa}</td>
+    <td>${v.ru}</td>`;
+  vocabBody.appendChild(tr);
+});
+
+/* ===================== EXERCISE BUILDERS ===================== */
+const container = document.getElementById('exercisesContainer');
+
+function makeCard(title, instructions){
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.innerHTML = `<h2>${title}</h2><p class="instructions">${instructions}</p><div class="qs"></div>`;
+  container.appendChild(card);
+  return card.querySelector('.qs');
+}
+function addButtons(qsEl, checkFn, showFn){
+  const wrap = document.createElement('div');
+  wrap.innerHTML = `
+    <button class="btn" data-role="check">✅ Проверить</button>
+    <button class="btn secondary" data-role="show">👁 Показать ответы</button>
+    <div class="result-line"></div>`;
+  wrap.querySelector('[data-role="check"]').onclick = checkFn;
+  wrap.querySelector('[data-role="show"]').onclick = showFn;
+  qsEl.parentElement.appendChild(wrap);
+  return wrap.querySelector('.result-line');
+}
+
+/* ---------- Exercise 1: Fill in missing letters ---------- */
+(function ex1(){
+  const items = pick10();
+  const qs = makeCard('1️⃣ Вставьте пропущенные буквы', 'Впишите фразу целиком, восстановив пропущенные буквы.');
+  items.forEach((v,i)=>{
+    const row = document.createElement('div'); row.className='q-row';
+    row.innerHTML = `<div class="q-num">${i+1}.</div>
+      <div class="q-prompt"><strong>${v.blanked}</strong><small>${v.ru}</small></div>
+      <input type="text" data-id="${v.id}" placeholder="Введите слово...">
+      <div class="answer-hint">Ответ: ${v.short}</div>`;
+    qs.appendChild(row);
+  });
+  const result = addButtons(qs, ()=>{
+    let correct=0;
+    qs.querySelectorAll('input').forEach(inp=>{
+      const v = VOCAB.find(x=>x.id==inp.dataset.id);
+      const ok = norm(inp.value)===norm(v.short);
+      inp.classList.remove('correct','incorrect');
+      inp.classList.add(ok?'correct':'incorrect');
+      if(ok) correct++; else registerMistake(v.id);
+    });
+    result.textContent = `Правильно: ${correct}/10`;
+  }, ()=>{
+    qs.querySelectorAll('.answer-hint').forEach(h=>h.classList.toggle('show'));
+  });
+})();
+
+/* ---------- Exercise 2: Translate RU -> EN ---------- */
+(function ex2(){
+  const items = pick10();
+  const qs = makeCard('2️⃣ Переведите с русского на английский', 'Напишите фразу по-английски.');
+  items.forEach((v,i)=>{
+    const row = document.createElement('div'); row.className='q-row';
+    row.innerHTML = `<div class="q-num">${i+1}.</div>
+      <div class="q-prompt"><strong>${v.ru}</strong></div>
+      <input type="text" data-id="${v.id}" placeholder="in English...">
+      <div class="answer-hint">Ответ: ${v.short}</div>`;
+    qs.appendChild(row);
+  });
+  const result = addButtons(qs, ()=>{
+    let correct=0;
+    qs.querySelectorAll('input').forEach(inp=>{
+      const v = VOCAB.find(x=>x.id==inp.dataset.id);
+      const ok = norm(inp.value)===norm(v.short);
+      inp.classList.remove('correct','incorrect');
+      inp.classList.add(ok?'correct':'incorrect');
+      if(ok) correct++; else registerMistake(v.id);
+    });
+    result.textContent = `Правильно: ${correct}/10`;
+  }, ()=>{
+    qs.querySelectorAll('.answer-hint').forEach(h=>h.classList.toggle('show'));
+  });
+})();
+
+/* ---------- Exercise 3: Write the word by sound (dictation) ---------- */
+(function ex3(){
+  const items = pick10();
+  const qs = makeCard('3️⃣ Напишите слово на слух', 'Нажмите 🔊, прослушайте фразу и запишите её по буквам.');
+  items.forEach((v,i)=>{
+    const row = document.createElement('div'); row.className='q-row';
+    row.innerHTML = `<div class="q-num">${i+1}.</div>
+      <button class="play-btn" onclick="speak('${v.short.replace(/'/g,"\\'")}')">🔊</button>
+      <input type="text" data-id="${v.id}" placeholder="Что вы услышали?">
+      <div class="answer-hint">Ответ: ${v.short}</div>`;
+    qs.appendChild(row);
+  });
+  const result = addButtons(qs, ()=>{
+    let correct=0;
+    qs.querySelectorAll('input').forEach(inp=>{
+      const v = VOCAB.find(x=>x.id==inp.dataset.id);
+      const ok = norm(inp.value)===norm(v.short);
+      inp.classList.remove('correct','incorrect');
+      inp.classList.add(ok?'correct':'incorrect');
+      if(ok) correct++; else registerMistake(v.id);
+    });
+    result.textContent = `Правильно: ${correct}/10`;
+  }, ()=>{
+    qs.querySelectorAll('.answer-hint').forEach(h=>h.classList.toggle('show'));
+  });
+})();
+
+/* ---------- Exercise 4: Definitions ---------- */
+(function ex4(){
+  const items = pick10();
+  const qs = makeCard('4️⃣ Дефиниции', 'Прочитайте определение и напишите нужную фразу.');
+  items.forEach((v,i)=>{
+    const row = document.createElement('div'); row.className='q-row';
+    row.innerHTML = `<div class="q-num">${i+1}.</div>
+      <div class="q-prompt">${v.def}</div>
+      <input type="text" data-id="${v.id}" placeholder="Фраза...">
+      <div class="answer-hint">Ответ: ${v.short}</div>`;
+    qs.appendChild(row);
+  });
+  const result = addButtons(qs, ()=>{
+    let correct=0;
+    qs.querySelectorAll('input').forEach(inp=>{
+      const v = VOCAB.find(x=>x.id==inp.dataset.id);
+      const ok = norm(inp.value)===norm(v.short);
+      inp.classList.remove('correct','incorrect');
+      inp.classList.add(ok?'correct':'incorrect');
+      if(ok) correct++; else registerMistake(v.id);
+    });
+    result.textContent = `Правильно: ${correct}/10`;
+  }, ()=>{
+    qs.querySelectorAll('.answer-hint').forEach(h=>h.classList.toggle('show'));
+  });
+})();
+
+/* ---------- Exercise 5: Collocations ---------- */
+(function ex5(){
+  const items = pick10();
+  const qs = makeCard('5️⃣ Сочетаемость слов (collocations)', 'Впишите пропущенное слово, чтобы получилось верное словосочетание.');
+  items.forEach((v,i)=>{
+    const row = document.createElement('div'); row.className='q-row';
+    row.innerHTML = `<div class="q-num">${i+1}.</div>
+      <div class="q-prompt"><strong>${v.collocGap}</strong><small>${v.ru}</small></div>
+      <input type="text" data-id="${v.id}" placeholder="слово...">
+      <div class="answer-hint">Ответ: ${v.collocAnswer}</div>`;
+    qs.appendChild(row);
+  });
+  const result = addButtons(qs, ()=>{
+    let correct=0;
+    qs.querySelectorAll('input').forEach(inp=>{
+      const v = VOCAB.find(x=>x.id==inp.dataset.id);
+      const ok = norm(inp.value)===norm(v.collocAnswer);
+      inp.classList.remove('correct','incorrect');
+      inp.classList.add(ok?'correct':'incorrect');
+      if(ok) correct++; else registerMistake(v.id);
+    });
+    result.textContent = `Правильно: ${correct}/10`;
+  }, ()=>{
+    qs.querySelectorAll('.answer-hint').forEach(h=>h.classList.toggle('show'));
+  });
+})();
+
+/* ---------- Exercise 6: Match the halves ---------- */
+(function ex6(){
+  const items = pick10();
+  const rightOptions = shuffle(items.map(v=>v.secondHalf));
+  const qs = makeCard('6️⃣ Соедините половинки выражений', 'Выберите правильное окончание для каждого начала фразы.');
+  items.forEach((v,i)=>{
+    const row = document.createElement('div'); row.className='q-row';
+    const options = rightOptions.map(o=>`<option value="${o}">${o}</option>`).join('');
+    row.innerHTML = `<div class="q-num">${i+1}.</div>
+      <div class="q-prompt"><strong>${v.firstHalf}</strong> ...</div>
+      <select data-id="${v.id}"><option value="">— выберите —</option>${options}</select>
+      <div class="answer-hint">Ответ: ${v.firstHalf} ${v.secondHalf}</div>`;
+    qs.appendChild(row);
+  });
+  const result = addButtons(qs, ()=>{
+    let correct=0;
+    qs.querySelectorAll('select').forEach(sel=>{
+      const v = VOCAB.find(x=>x.id==sel.dataset.id);
+      const combo = norm(v.firstHalf + " " + sel.value);
+      const ok = VALID_COMBOS.includes(combo) && sel.value !== "";
+      sel.classList.remove('correct','incorrect');
+      sel.classList.add(ok?'correct':'incorrect');
+      if(ok) correct++; else registerMistake(v.id);
+    });
+    result.textContent = `Правильно: ${correct}/10`;
+  }, ()=>{
+    qs.querySelectorAll('.answer-hint').forEach(h=>h.classList.toggle('show'));
+  });
+})();
+
+/* ---------- Exercise 7: Find the mistake ---------- */
+(function ex7(){
+  const items = pick10();
+  const qs = makeCard('7️⃣ Найдите ошибку (Find the mistake)', 'В каждом предложении есть ошибка, связанная с изученной фразой. Напишите правильный вариант.');
+  items.forEach((v,i)=>{
+    const row = document.createElement('div'); row.className='q-row';
+    row.innerHTML = `<div class="q-num">${i+1}.</div>
+      <div class="q-prompt">${v.mistakeSentence}</div>
+      <input type="text" data-id="${v.id}" placeholder="Правильный вариант...">
+      <div class="answer-hint">Ответ: ${v.mistakeAnswer}</div>`;
+    qs.appendChild(row);
+  });
+  const result = addButtons(qs, ()=>{
+    let correct=0;
+    qs.querySelectorAll('input').forEach(inp=>{
+      const v = VOCAB.find(x=>x.id==inp.dataset.id);
+      const ok = norm(inp.value)===norm(v.mistakeAnswer);
+      inp.classList.remove('correct','incorrect');
+      inp.classList.add(ok?'correct':'incorrect');
+      if(ok) correct++; else registerMistake(v.id);
+    });
+    result.textContent = `Правильно: ${correct}/10`;
+  }, ()=>{
+    qs.querySelectorAll('.answer-hint').forEach(h=>h.classList.toggle('show'));
+  });
+})();
+
+/* ---------- Exercise 8: Categorise (opinion, no right answer) ---------- */
+(function ex8(){
+  const items = pick10();
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.innerHTML = `<h2>8️⃣ Categorise: интересно ли вам это? 🤔</h2>
+    <p class="instructions">Отметьте, интересно ли вам каждое занятие в путешествии. Здесь нет правильного или неправильного ответа — это ваше личное мнение.</p>
+    <div class="qs"></div>
+    <p class="note">Выбор сохраняется только визуально в этом окне, специальной проверки нет.</p>`;
+  container.appendChild(card);
+  const qs = card.querySelector('.qs');
+  items.forEach((v,i)=>{
+    const row = document.createElement('div'); row.className='cat-row';
+    row.innerHTML = `<div>${i+1}. <strong>${v.short}</strong> <span style="color:var(--muted)">— ${v.ru}</span></div>
+      <div class="cat-buttons">
+        <button data-val="yes">😊 Интересно</button>
+        <button data-val="no">😐 Не интересно</button>
+      </div>`;
+    const [yesBtn, noBtn] = row.querySelectorAll('button');
+    yesBtn.onclick = ()=>{ yesBtn.classList.toggle('active-yes'); noBtn.classList.remove('active-no'); };
+    noBtn.onclick = ()=>{ noBtn.classList.toggle('active-no'); yesBtn.classList.remove('active-yes'); };
+    qs.appendChild(row);
+  });
+})();
+
+/* ---------- Exercise 9: Complete the sentences (own ideas) ---------- */
+(function ex9(){
+  const items = pick10();
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.innerHTML = `<h2>9️⃣ Закончите предложения своими идеями ✍️</h2>
+    <p class="instructions">Допишите каждое предложение своими мыслями. Правильного ответа нет — важна практика письма.</p>
+    <div class="qs"></div>
+    <button class="btn green" id="copyAllBtn9">📋 Скопировать все ответы</button>
+    <span id="copyStatus9" style="font-size:13px;color:var(--green);margin-left:8px;"></span>`;
+  container.appendChild(card);
+  const qs = card.querySelector('.qs');
+  items.forEach((v,i)=>{
+    const row = document.createElement('div'); row.className='q-row';
+    row.innerHTML = `<div class="q-num">${i+1}.</div>
+      <div class="q-prompt" style="flex:0 0 100%;">
+        <strong>${v.starter} ...</strong>
+        <textarea data-num="${i+1}" data-starter="${v.starter.replace(/"/g,'&quot;')}" placeholder="Продолжите предложение..."></textarea>
+      </div>`;
+    qs.appendChild(row);
+  });
+  card.querySelector('#copyAllBtn9').onclick = ()=>{
+    let text = '';
+    qs.querySelectorAll('textarea').forEach(t=>{
+      const val = t.value.trim();
+      text += `${t.dataset.num}. ${t.dataset.starter} ${val}\n`;
+    });
+    navigator.clipboard.writeText(text).then(()=>{
+      document.getElementById('copyStatus9').textContent = 'Скопировано! ✅';
+      setTimeout(()=>{document.getElementById('copyStatus9').textContent='';}, 2500);
+    }).catch(()=>{
+      alert('Не удалось скопировать автоматически. Вот текст:\n\n'+text);
+    });
+  };
+})();
+
+/* ---------- Exercise 10: Finish the dialogue (change verb tense) ---------- */
+(function ex10(){
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.innerHTML = `<h2>🔟 Finish the dialogue — поставьте глагол в правильное время</h2>
+    <p class="instructions">B рассказывает A о своей поездке. Поставьте глагол в скобках в <strong>Past Simple</strong> (прошедшее простое время), чтобы закончить диалог.</p>
+    <div class="qs"></div>
+    <div style="margin-top:10px;">
+      <button class="btn" id="checkBtn10">✅ Проверить</button>
+      <button class="btn secondary" id="showBtn10">👁 Показать ответы</button>
+      <button class="btn green" id="copyAllBtn10">📋 Скопировать весь диалог</button>
+    </div>
+    <div class="result-line" id="result10"></div>
+    <span id="copyStatus10" style="font-size:13px;color:var(--green);margin-left:8px;"></span>`;
+  container.appendChild(card);
+  const qs = card.querySelector('.qs');
+
+  DIALOGUE.forEach(line=>{
+    const div = document.createElement('div'); div.className = 'dialogue-line';
+    if(line.type === 'static'){
+      div.innerHTML = `<span class="speaker">${line.speaker}:</span> ${line.text}`;
+    } else {
+      div.innerHTML = `<span class="speaker">${line.speaker}:</span> ${line.before}
+        <input type="text" style="width:120px" data-id="${line.id}" data-answer="${line.answer}" placeholder="...">
+        <span class="verb-hint">(${line.verb})</span>${line.after}
+        <span class="answer-hint" data-hint="${line.id}">Ответ: ${line.answer}</span>`;
+    }
+    qs.appendChild(div);
+  });
+
+  card.querySelector('#checkBtn10').onclick = ()=>{
+    let correct=0;
+    qs.querySelectorAll('input').forEach(inp=>{
+      const ok = norm(inp.value)===norm(inp.dataset.answer);
+      inp.classList.remove('correct','incorrect');
+      inp.classList.add(ok?'correct':'incorrect');
+      if(ok) correct++; else registerMistake(VOCAB[inp.dataset.id-1] ? VOCAB[inp.dataset.id-1].id : inp.dataset.id);
+    });
+    card.querySelector('#result10').textContent = `Правильно: ${correct}/10`;
+  };
+  card.querySelector('#showBtn10').onclick = ()=>{
+    qs.querySelectorAll('.answer-hint').forEach(h=>h.classList.toggle('show'));
+  };
+  card.querySelector('#copyAllBtn10').onclick = ()=>{
+    let text = '';
+    DIALOGUE.forEach(line=>{
+      if(line.type === 'static'){
+        text += `${line.speaker}: ${line.text}\n`;
+      } else {
+        const inp = qs.querySelector(`input[data-id="${line.id}"]`);
+        const val = inp.value.trim() || `___(${line.verb})___`;
+        text += `${line.speaker}: ${line.before}${val}${line.after}\n`;
+      }
+    });
+    navigator.clipboard.writeText(text).then(()=>{
+      document.getElementById('copyStatus10').textContent = 'Скопировано! ✅';
+      setTimeout(()=>{document.getElementById('copyStatus10').textContent='';}, 2500);
+    }).catch(()=>{
+      alert('Не удалось скопировать автоматически. Вот текст:\n\n'+text);
+    });
+  };
+})();
+
+/* ---------- Exercise 11: Repeat & Change (drilling) ---------- */
+(function ex11(){
+  const items = pick10();
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.innerHTML = `<h2>1️⃣1️⃣ Repeat & Change — дриллинг</h2>
+    <p class="instructions">Прочитайте пример-модель. Затем напишите своё собственное предложение с той же фразой, но со своими деталями (место, время, причина, человек и т.д.).</p>
+    <div class="qs"></div>
+    <button class="btn green" id="copyAllBtn11">📋 Скопировать все ответы</button>
+    <span id="copyStatus11" style="font-size:13px;color:var(--green);margin-left:8px;"></span>`;
+  container.appendChild(card);
+  const qs = card.querySelector('.qs');
+  items.forEach((v,i)=>{
+    const block = document.createElement('div'); block.className = 'drill-block';
+    block.innerHTML = `<div><strong>${i+1}. ${v.short}</strong> <span style="color:var(--muted)">— ${v.ru}</span></div>
+      <div class="model">Model: ${v.model}</div>
+      <textarea data-num="${i+1}" data-phrase="${v.short}" placeholder="Ваше предложение с фразой '${v.short}'..."></textarea>`;
+    qs.appendChild(block);
+  });
+  card.querySelector('#copyAllBtn11').onclick = ()=>{
+    let text = '';
+    qs.querySelectorAll('textarea').forEach(t=>{
+      const val = t.value.trim();
+      text += `${t.dataset.num}. (${t.dataset.phrase}) ${val}\n`;
+    });
+    navigator.clipboard.writeText(text).then(()=>{
+      document.getElementById('copyStatus11').textContent = 'Скопировано! ✅';
+      setTimeout(()=>{document.getElementById('copyStatus11').textContent='';}, 2500);
+    }).catch(()=>{
+      alert('Не удалось скопировать автоматически. Вот текст:\n\n'+text);
+    });
+  };
+})();
+
+renderProblemWords();
+</script>
+</body>
+</html>
