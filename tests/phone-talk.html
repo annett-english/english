@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phone Talk — телефонная лексика</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Work+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0f1e2b;
+    --panel:#16293b;
+    --panel2:#1d3549;
+    --panel3:#233f56;
+    --cream:#f1ead8;
+    --cream-dim:#c9c0aa;
+    --amber:#e3a53f;
+    --amber-dim:#a9793a;
+    --brass:#cfa96a;
+    --cord:#c1443d;
+    --ok:#5db07f;
+    --line: rgba(241,234,216,0.12);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(circle at 3px 3px, rgba(241,234,216,0.045) 1.4px, transparent 1.6px) 0 0/26px 26px,
+      linear-gradient(180deg, var(--navy), #0a1622 60%, #0a1420);
+    color:var(--cream);
+    font-family:'Work Sans', sans-serif;
+    line-height:1.5;
+    min-height:100vh;
+    padding-bottom:60px;
+  }
+  h1,h2,h3, .display{font-family:'Special Elite', monospace; letter-spacing:0.5px;}
+  .mono{font-family:'JetBrains Mono', monospace;}
+
+  /* ---------- layout ---------- */
+  .wrap{
+    max-width:1180px;
+    margin:0 auto;
+    padding:28px 20px 0;
+    display:grid;
+    grid-template-columns: 1fr 260px;
+    gap:28px;
+    align-items:start;
+  }
+  @media (max-width: 900px){
+    .wrap{grid-template-columns:1fr;}
+    .sidebar{order:-1; position:static !important;}
+  }
+  main{min-width:0;}
+
+  /* ---------- header ---------- */
+  header.top{
+    text-align:center;
+    padding:10px 0 22px;
+    border-bottom:1px dashed var(--line);
+    margin-bottom:22px;
+  }
+  header.top .tag{
+    display:inline-block;
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    letter-spacing:3px;
+    color:var(--amber);
+    border:1px solid var(--amber-dim);
+    padding:4px 10px;
+    border-radius:20px;
+    margin-bottom:14px;
+  }
+  header.top h1{
+    font-size:clamp(28px,4.2vw,44px);
+    margin:0 0 8px;
+    color:var(--cream);
+  }
+  header.top h1 span{color:var(--amber);}
+  header.top p{color:var(--cream-dim); font-size:14.5px; margin:0;}
+
+  /* switchboard nav */
+  .switchboard{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-wrap:wrap;
+    gap:0;
+    margin:22px auto 0;
+    max-width:980px;
+  }
+  .switchboard a{
+    width:30px;height:30px;
+    border-radius:50%;
+    background:var(--panel2);
+    border:2px solid var(--brass);
+    color:var(--cream);
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    display:flex;align-items:center;justify-content:center;
+    text-decoration:none;
+    flex:0 0 auto;
+    transition:.15s;
+  }
+  .switchboard a:hover{background:var(--amber); color:#1a1a1a;}
+  .switchboard .cord{
+    flex:1 1 8px; min-width:8px; max-width:26px; height:2px;
+    background:repeating-linear-gradient(90deg, var(--brass) 0 4px, transparent 4px 8px);
+    margin:0 2px;
+  }
+
+  /* ---------- word cards ---------- */
+  section{margin-bottom:44px;}
+  .section-head{
+    display:flex; align-items:baseline; gap:10px;
+    margin-bottom:6px;
+  }
+  .section-head .num{
+    font-family:'JetBrains Mono',monospace;
+    color:var(--amber-dim);
+    font-size:13px;
+  }
+  .section-head h2{font-size:20px; margin:0; color:var(--cream);}
+  .section-sub{color:var(--cream-dim); font-size:13.5px; margin:0 0 16px;}
+
+  .word-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(260px,1fr));
+    gap:12px;
+  }
+  .word-card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-left:3px solid var(--amber);
+    border-radius:8px;
+    padding:12px 14px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+  }
+  .word-card .info{min-width:0;}
+  .word-card .en{font-weight:600; color:var(--cream); font-size:15px;}
+  .word-card .ipa{font-family:'JetBrains Mono',monospace; color:var(--amber); font-size:12.5px; margin:2px 0;}
+  .word-card .ru{color:var(--cream-dim); font-size:13px;}
+  .play-btn{
+    flex:0 0 auto;
+    width:36px;height:36px;
+    border-radius:50%;
+    border:1px solid var(--brass);
+    background:var(--panel2);
+    color:var(--amber);
+    cursor:pointer;
+    font-size:15px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .play-btn:hover{background:var(--amber); color:#1a1a1a;}
+
+  /* ---------- exercise blocks ---------- */
+  .card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:20px 22px 22px;
+  }
+  .item{
+    display:grid;
+    grid-template-columns: 26px 1fr;
+    gap:10px;
+    align-items:start;
+    padding:10px 0;
+    border-bottom:1px dashed var(--line);
+  }
+  .item:last-child{border-bottom:none;}
+  .item .idx{
+    font-family:'JetBrains Mono',monospace;
+    color:var(--amber-dim);
+    font-size:13px;
+    padding-top:8px;
+  }
+  .item-body{min-width:0;}
+  .prompt{font-size:15px; margin-bottom:6px; color:var(--cream);}
+  .prompt b{color:var(--amber);}
+  .hint{color:var(--cream-dim); font-size:12.5px; margin-bottom:6px;}
+  .row-input{display:flex; gap:8px; align-items:center; flex-wrap:wrap;}
+  input[type=text], textarea, select{
+    background:#0e1c28;
+    border:1px solid var(--line);
+    color:var(--cream);
+    border-radius:6px;
+    padding:9px 11px;
+    font-family:'Work Sans',sans-serif;
+    font-size:14.5px;
+    flex:1 1 220px;
+    min-width:180px;
+  }
+  textarea{width:100%; min-height:56px; resize:vertical; font-size:14.5px;}
+  input[type=text]:focus, textarea:focus, select:focus{outline:2px solid var(--amber); outline-offset:1px;}
+  input.ok{border-color:var(--ok); box-shadow:0 0 0 1px var(--ok) inset;}
+  input.bad{border-color:var(--cord); box-shadow:0 0 0 1px var(--cord) inset;}
+  .fb{font-size:12.5px; font-family:'JetBrains Mono',monospace; min-height:16px;}
+  .fb.ok{color:var(--ok);}
+  .fb.bad{color:var(--cord);}
+  .tokens{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px;}
+  .token{
+    background:var(--panel3);
+    border:1px solid var(--brass);
+    color:var(--cream);
+    padding:4px 10px;
+    border-radius:14px;
+    font-size:13px;
+    font-family:'JetBrains Mono',monospace;
+  }
+
+  .toolbar{
+    display:flex; align-items:center; justify-content:space-between;
+    flex-wrap:wrap; gap:10px;
+    margin-top:16px;
+    padding-top:14px;
+    border-top:1px solid var(--line);
+  }
+  .btns{display:flex; gap:8px; flex-wrap:wrap;}
+  button.action{
+    background:var(--amber);
+    color:#1a1408;
+    border:none;
+    border-radius:6px;
+    padding:9px 16px;
+    font-weight:600;
+    font-size:13.5px;
+    cursor:pointer;
+  }
+  button.action.ghost{
+    background:transparent;
+    color:var(--cream);
+    border:1px solid var(--brass);
+  }
+  button.action:hover{opacity:0.88;}
+  .score{font-family:'JetBrains Mono',monospace; color:var(--cream-dim); font-size:13px;}
+  .score b{color:var(--amber);}
+
+  /* ---------- sidebar ---------- */
+  .sidebar{
+    position:sticky;
+    top:20px;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:16px;
+  }
+  .sidebar h3{margin:0 0 4px; font-size:15px; color:var(--amber);}
+  .sidebar .note{color:var(--cream-dim); font-size:12px; margin:0 0 12px;}
+  table.problem{width:100%; border-collapse:collapse; font-size:13px;}
+  table.problem th{
+    text-align:left; color:var(--cream-dim); font-weight:500;
+    font-size:11px; text-transform:uppercase; letter-spacing:1px;
+    padding-bottom:6px; border-bottom:1px solid var(--line);
+  }
+  table.problem td{padding:7px 4px; border-bottom:1px dashed var(--line); color:var(--cream);}
+  table.problem td:last-child{text-align:right; color:var(--cord); font-family:'JetBrains Mono',monospace;}
+  table.problem td.empty{color:var(--cream-dim); text-align:center; padding:14px 0;}
+
+  footer{text-align:center; color:var(--cream-dim); font-size:12px; margin-top:30px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+<main>
+
+  <header class="top">
+    <span class="tag">PHONE TALK · SWITCHBOARD PRACTICE</span>
+    <h1>Телефонная лексика: <span>10 фраз, 8 упражнений</span></h1>
+    <p>Прослушай, прочитай, впиши руками. Ошибки автоматически попадают в таблицу справа →</p>
+    <nav class="switchboard" id="switchboard"></nav>
+  </header>
+
+  <!-- WORD REMINDER -->
+  <section id="s0">
+    <div class="section-head"><span class="num">00</span><h2>Прежде чем начать</h2></div>
+    <p class="section-sub">Прослушай произношение (голос Google US English) и повтори вслух.</p>
+    <div class="word-grid" id="wordGrid"></div>
+  </section>
+
+  <!-- EX 1 fill letters -->
+  <section id="ex1">
+    <div class="section-head"><span class="num">01</span><h2>Вставь пропущенные буквы</h2></div>
+    <p class="section-sub">По переводу и части букв восстанови фразу целиком.</p>
+    <div class="card">
+      <div id="exFill-list"></div>
+      <div class="toolbar">
+        <div class="score">Результат: <b id="exFill-score">–</b></div>
+        <div class="btns">
+          <button class="action ghost" onclick="showAnswers('exFill', fillData, a=>translateAccepted[a.id][0])">Показать ответы</button>
+          <button class="action" onclick="checkExercise('exFill', fillData, a=>translateAccepted[a.id])">Проверить</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EX 2 translate -->
+  <section id="ex2">
+    <div class="section-head"><span class="num">02</span><h2>Перевод: RU → EN</h2></div>
+    <p class="section-sub">Переведи фразу с русского на английский.</p>
+    <div class="card">
+      <div id="exTranslate-list"></div>
+      <div class="toolbar">
+        <div class="score">Результат: <b id="exTranslate-score">–</b></div>
+        <div class="btns">
+          <button class="action ghost" onclick="showAnswers('exTranslate', translateData, a=>translateAccepted[a.id][0])">Показать ответы</button>
+          <button class="action" onclick="checkExercise('exTranslate', translateData, a=>translateAccepted[a.id])">Проверить</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EX 3 dictation -->
+  <section id="ex3">
+    <div class="section-head"><span class="num">03</span><h2>Прописать слово по звуку</h2></div>
+    <p class="section-sub">Нажми «🔊 Прослушать» и напиши фразу, которую услышал(а).</p>
+    <div class="card">
+      <div id="exDictation-list"></div>
+      <div class="toolbar">
+        <div class="score">Результат: <b id="exDictation-score">–</b></div>
+        <div class="btns">
+          <button class="action ghost" onclick="showAnswers('exDictation', dictData, a=>translateAccepted[a.id][0])">Показать ответы</button>
+          <button class="action" onclick="checkExercise('exDictation', dictData, a=>translateAccepted[a.id])">Проверить</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EX 4 definition -->
+  <section id="ex4">
+    <div class="section-head"><span class="num">04</span><h2>Дефиниция</h2></div>
+    <p class="section-sub">По определению на английском напиши нужную фразу.</p>
+    <div class="card">
+      <div id="exDefinition-list"></div>
+      <div class="toolbar">
+        <div class="score">Результат: <b id="exDefinition-score">–</b></div>
+        <div class="btns">
+          <button class="action ghost" onclick="showAnswers('exDefinition', defDataShuffled, a=>translateAccepted[a.id][0])">Показать ответы</button>
+          <button class="action" onclick="checkExercise('exDefinition', defDataShuffled, a=>translateAccepted[a.id])">Проверить</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EX 5 collocation -->
+  <section id="ex5">
+    <div class="section-head"><span class="num">05</span><h2>Сочетаемость фраз</h2></div>
+    <p class="section-sub">Впиши одно недостающее слово в устойчивое выражение.</p>
+    <div class="card">
+      <div id="exCollocation-list"></div>
+      <div class="toolbar">
+        <div class="score">Результат: <b id="exCollocation-score">–</b></div>
+        <div class="btns">
+          <button class="action ghost" onclick="showAnswers('exCollocation', collocationShuffled, a=>a.answer)">Показать ответы</button>
+          <button class="action" onclick="checkExercise('exCollocation', collocationShuffled, a=>[a.answer])">Проверить</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EX 6 context -->
+  <section id="ex6">
+    <div class="section-head"><span class="num">06</span><h2>Контекст</h2></div>
+    <p class="section-sub">Заполни пропуск в предложении подходящей фразой.</p>
+    <div class="card">
+      <div id="exContext-list"></div>
+      <div class="toolbar">
+        <div class="score">Результат: <b id="exContext-score">–</b></div>
+        <div class="btns">
+          <button class="action ghost" onclick="showAnswers('exContext', contextShuffled, a=>a.accepted[0])">Показать ответы</button>
+          <button class="action" onclick="checkExercise('exContext', contextShuffled, a=>a.accepted)">Проверить</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EX 7 match halves -->
+  <section id="ex7">
+    <div class="section-head"><span class="num">07</span><h2>Соедини половинки выражений</h2></div>
+    <p class="section-sub">Выбери вторую половину, которая продолжает начало фразы.</p>
+    <div class="card">
+      <div id="exMatch-list"></div>
+      <div class="toolbar">
+        <div class="score">Результат: <b id="exMatch-score">–</b></div>
+        <div class="btns">
+          <button class="action ghost" onclick="showMatchAnswers()">Показать ответы</button>
+          <button class="action" onclick="checkMatch()">Проверить</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CREATIVE 1: Finish the dialogue -->
+  <section id="ex10">
+    <div class="section-head"><span class="num">08</span><h2>Finish the Dialogue</h2></div>
+    <p class="section-sub">Заверши реплику B, используя подсказанную фразу. Собери все ответы одной кнопкой.</p>
+    <div class="card">
+      <div id="exDialogue-list"></div>
+      <div class="toolbar">
+        <div></div>
+        <div class="btns">
+          <button class="action" id="exDialogue-copybtn" onclick="copyAnswers('exDialogue', dialogueData.length)">📋 Скопировать все ответы</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CREATIVE 2: Finish sentences -->
+  <section id="ex11">
+    <div class="section-head"><span class="num">09</span><h2>Закончи предложение своей идеей</h2></div>
+    <p class="section-sub">Придумай свою концовку. Собери все ответы одной кнопкой.</p>
+    <div class="card">
+      <div id="exFinish-list"></div>
+      <div class="toolbar">
+        <div></div>
+        <div class="btns">
+          <button class="action" id="exFinish-copybtn" onclick="copyAnswers('exFinish', finishData.length)">📋 Скопировать все ответы</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>Phone Talk · практика телефонной лексики</footer>
+</main>
+
+<aside class="sidebar">
+  <h3>☎ Проблемные слова</h3>
+  <p class="note">Сюда попадают фразы, в которых была допущена ошибка.</p>
+  <table class="problem">
+    <thead><tr><th>Фраза</th><th>Ошибок</th></tr></thead>
+    <tbody id="problemList"><tr><td colspan="2" class="empty">Пока ошибок нет 🎉</td></tr></tbody>
+  </table>
+</aside>
+</div>
+
+<script>
+/* ================= DATA ================= */
+const wordsData = [
+  {id:'hangup',   en:'hang up',                       ru:'повесить трубку',                 ipa:'hæŋ ʌp'},
+  {id:'hold',     en:'put someone on hold',           ru:'поставить (кого-то) на удержание', ipa:'pʊt ˈsʌmwʌn ɒn hoʊld'},
+  {id:'goesoff',  en:'the phone goes off',            ru:'телефон внезапно звонит',          ipa:'ðə foʊn ɡoʊz ɔːf'},
+  {id:'dial',     en:'dial a number',                 ru:'набрать номер',                    ipa:'ˈdaɪəl ə ˈnʌmbər'},
+  {id:'ringtone', en:'choose a ringtone',             ru:'выбрать рингтон',                  ipa:'tʃuːz ə ˈrɪŋtoʊn'},
+  {id:'engaged',  en:'the line is engaged',           ru:'линия занята',                     ipa:'ðə laɪn ɪz ɪnˈɡeɪdʒd'},
+  {id:'cutoff',   en:'get cut off',                   ru:'прерваться (о связи)',             ipa:'ɡɛt kʌt ɔːf'},
+  {id:'voicemsg', en:'leave a voice message',         ru:'оставить голосовое сообщение',     ipa:'liːv ə vɔɪs ˈmɛsɪdʒ'},
+  {id:'speaker',  en:'put someone on speakerphone',   ru:'включить громкую связь',           ipa:'pʊt ˈsʌmwʌn ɒn ˈspiːkərˌfoʊn'},
+  {id:'scroll',   en:'scroll through photos',         ru:'пролистать фотографии',            ipa:'skroʊl θruː ˈfoʊtoʊz'}
+];
+
+const translateAccepted = {
+  hangup:['hang up'],
+  hold:['put someone on hold','put him on hold','put her on hold','put them on hold'],
+  goesoff:['the phone goes off','the phone went off'],
+  dial:['dial a number','dial the number'],
+  ringtone:['choose a ringtone','pick a ringtone'],
+  engaged:['the line is engaged','the line is busy'],
+  cutoff:['get cut off','be cut off','got cut off'],
+  voicemsg:['leave a voice message','leave him a voice message'],
+  speaker:['put someone on speakerphone','put him on speakerphone','put her on speakerphone'],
+  scroll:['scroll through photos','scroll through pictures']
+};
+
+const defData = [
+  {id:'hangup',   def:'to end a phone call by putting down the receiver or pressing "end call"'},
+  {id:'hold',     def:'to make a caller wait on the line, usually with music playing, without ending the call'},
+  {id:'goesoff',  def:'when a phone suddenly starts ringing or making a sound'},
+  {id:'dial',     def:'to press or enter the numbers needed to call someone'},
+  {id:'ringtone', def:'to pick the sound your phone makes when someone calls you'},
+  {id:'engaged',  def:"when the person you're calling is already talking on another call"},
+  {id:'cutoff',   def:'to have a phone call suddenly disconnected before you finish talking'},
+  {id:'voicemsg', def:"to record a spoken message for someone who didn't answer the phone"},
+  {id:'speaker',  def:'to turn on the loudspeaker so everyone nearby can hear the call'},
+  {id:'scroll',   def:'to swipe up or down to look through pictures on a screen'}
+];
+
+const collocationData = [
+  {id:'hangup',   prompt:'hang ___',                answer:'up'},
+  {id:'hold',     prompt:'put someone on ___',      answer:'hold'},
+  {id:'dial',     prompt:'___ a number',            answer:'dial'},
+  {id:'ringtone', prompt:'choose a ___',            answer:'ringtone'},
+  {id:'engaged',  prompt:'the line is ___',         answer:'engaged'},
+  {id:'cutoff',   prompt:'get cut ___',             answer:'off'},
+  {id:'voicemsg', prompt:'leave a voice ___',       answer:'message'},
+  {id:'speaker',  prompt:'put someone on speaker___', answer:'phone'},
+  {id:'scroll',   prompt:'___ through photos',      answer:'scroll'},
+  {id:'goesoff',  prompt:'the phone goes ___',      answer:'off'}
+];
+
+const contextData = [
+  {id:'hold',     sentence:"I'm on another line — could you ______ for a minute?", accepted:['put me on hold','put you on hold','hold on']},
+  {id:'cutoff',   sentence:"Sorry about that, we ______ — the signal was terrible in the tunnel.", accepted:['got cut off','were cut off']},
+  {id:'engaged',  sentence:"I tried calling him three times, but ______ every time.", accepted:['the line was engaged','the line was busy','it was engaged','it was busy']},
+  {id:'voicemsg', sentence:"He didn't answer, so I decided to ______.", accepted:['leave a voice message','leave him a voice message']},
+  {id:'speaker',  sentence:"Could you ______ so everyone in the meeting can hear?", accepted:['put it on speakerphone','put him on speakerphone','put her on speakerphone','put them on speakerphone']},
+  {id:'dial',     sentence:"I need to ______ before I forget it.", accepted:['dial the number','dial a number','dial it']},
+  {id:'goesoff',  sentence:"Suddenly ______ in the middle of the night and scared everyone.", accepted:['the phone went off','the phone goes off']},
+  {id:'ringtone', sentence:"I spent ten minutes trying to ______ for my new phone.", accepted:['choose a ringtone','pick a ringtone']},
+  {id:'hangup',   sentence:"It's rude to ______ on someone without saying goodbye.", accepted:['hang up']},
+  {id:'scroll',   sentence:"She was bored, so she started to ______ on her phone.", accepted:['scroll through photos','scroll through her photos']}
+];
+
+const matchLeft = {
+  hangup:'hang', hold:'put someone', goesoff:'the phone', dial:'dial',
+  ringtone:'choose', engaged:'the line is', cutoff:'get',
+  voicemsg:'leave', speaker:'put someone on', scroll:'scroll'
+};
+const matchRight = {
+  hangup:'up', hold:'on hold', goesoff:'goes off', dial:'a number',
+  ringtone:'a ringtone', engaged:'engaged', cutoff:'cut off',
+  voicemsg:'a voice message', speaker:'speakerphone', scroll:'through photos'
+};
+
+const dialogueData = [
+  {a:"Hi, is Tom there?", hint:"leave a voice message"},
+  {a:"Why are you calling from a different number?", hint:"get cut off"},
+  {a:"I tried to reach you all morning!", hint:"the line is engaged"},
+  {a:"Can everyone hear me okay?", hint:"put on speakerphone"},
+  {a:"What's that sound? Is that your phone?", hint:"the phone goes off"},
+  {a:"I love your new ringtone!", hint:"choose a ringtone"},
+  {a:"Hold on, someone's calling me.", hint:"put on hold"},
+  {a:"How do you remember all these numbers?", hint:"dial a number"},
+  {a:"You're so quiet — what are you looking at?", hint:"scroll through photos"},
+  {a:"That was quick, you didn't even say bye!", hint:"hang up"}
+];
+
+const finishData = [
+  "I usually hang up when…",
+  "The last time my phone went off at the worst possible moment was…",
+  "If a friend put me on hold for more than five minutes, I would…",
+  "I always choose a ringtone that…",
+  "It's really annoying when the line is engaged because…",
+  "Last week I got cut off during a call while…",
+  "Instead of texting, sometimes I prefer to leave a voice message because…",
+  "I only put people on speakerphone when…",
+  "When I'm bored, I scroll through photos of…",
+  "The strangest situation where I had to dial a number from memory was…"
+];
+
+/* ================= HELPERS ================= */
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+function norm(s){
+  return (s||'').toLowerCase().replace(/[.,!?;:'"«»_]/g,'').replace(/\s+/g,' ').trim();
+}
+function wordById(id){ return wordsData.find(w=>w.id===id); }
+
+/* mask a phrase, hiding ~45% of interior letters */
+function mask(str){
+  return str.split(' ').map(w=>{
+    if(w.length<=2) return w;
+    const chars = w.split('');
+    for(let i=1;i<chars.length-1;i++){
+      if(Math.random()<0.45) chars[i]='_';
+    }
+    return chars.join('');
+  }).join(' ');
+}
+
+/* ================= TTS ================= */
+let cachedVoices = [];
+function loadVoices(){ cachedVoices = window.speechSynthesis ? speechSynthesis.getVoices() : []; }
+if('speechSynthesis' in window){
+  loadVoices();
+  speechSynthesis.onvoiceschanged = loadVoices;
+}
+function pickVoice(){
+  if(!cachedVoices.length) loadVoices();
+  return cachedVoices.find(v=>v.name==='Google US English')
+      || cachedVoices.find(v=>v.lang==='en-US')
+      || cachedVoices[0];
+}
+function speak(text){
+  if(!('speechSynthesis' in window)){ alert('Ваш браузер не поддерживает озвучку.'); return; }
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-US';
+  u.rate = 0.9;
+  const v = pickVoice();
+  if(v) u.voice = v;
+  speechSynthesis.speak(u);
+}
+
+/* ================= PROBLEM WORDS ================= */
+let problemWords = {};
+function logMistake(id){
+  problemWords[id] = (problemWords[id]||0) + 1;
+  renderProblemWords();
+}
+function renderProblemWords(){
+  const el = document.getElementById('problemList');
+  const entries = Object.entries(problemWords).sort((a,b)=>b[1]-a[1]);
+  if(!entries.length){
+    el.innerHTML = '<tr><td colspan="2" class="empty">Пока ошибок нет 🎉</td></tr>';
+    return;
+  }
+  el.innerHTML = entries.map(([id,count])=>{
+    const w = wordById(id);
+    return `<tr><td>${w ? w.en : id}</td><td>${count}</td></tr>`;
+  }).join('');
+}
+
+/* ================= GENERIC CHECK / SHOW ================= */
+function checkExercise(prefix, items, correctFn){
+  let score = 0;
+  items.forEach((item, idx)=>{
+    const input = document.getElementById(prefix+idx);
+    const fb = document.getElementById(prefix+idx+'-fb');
+    const userVal = norm(input.value);
+    const correctList = correctFn(item);
+    const ok = correctList.some(c => norm(c) === userVal);
+    if(ok){
+      input.classList.add('ok'); input.classList.remove('bad');
+      fb.textContent = '✓ верно'; fb.className = 'fb ok';
+      score++;
+    } else {
+      input.classList.add('bad'); input.classList.remove('ok');
+      fb.textContent = '✗ ответ: ' + correctList[0]; fb.className = 'fb bad';
+      logMistake(item.id);
+    }
+  });
+  document.getElementById(prefix+'-score').textContent = score + ' / ' + items.length;
+}
+function showAnswers(prefix, items, correctFn){
+  items.forEach((item, idx)=>{
+    document.getElementById(prefix+idx).value = correctFn(item);
+  });
+}
+
+/* ================= RENDER: word reminder ================= */
+function renderWordGrid(){
+  const el = document.getElementById('wordGrid');
+  el.innerHTML = wordsData.map(w=>`
+    <div class="word-card">
+      <div class="info">
+        <div class="en">${w.en}</div>
+        <div class="ipa">/${w.ipa}/</div>
+        <div class="ru">${w.ru}</div>
+      </div>
+      <button class="play-btn" onclick="speak('${w.en.replace(/'/g,"\\'")}')" title="Прослушать">🔊</button>
+    </div>
+  `).join('');
+}
+
+/* ================= RENDER: EX1 fill letters ================= */
+let fillData = [];
+function renderFill(){
+  fillData = shuffle(wordsData);
+  document.getElementById('exFill-list').innerHTML = fillData.map((w, idx)=>`
+    <div class="item">
+      <div class="idx">${idx+1}</div>
+      <div class="item-body">
+        <div class="prompt">${mask(w.en)} <span style="color:var(--cream-dim)">— ${w.ru}</span></div>
+        <div class="row-input">
+          <input type="text" id="exFill${idx}" placeholder="впиши фразу целиком">
+        </div>
+        <div class="fb" id="exFill${idx}-fb"></div>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ================= RENDER: EX2 translate ================= */
+let translateData = [];
+function renderTranslate(){
+  translateData = shuffle(wordsData);
+  document.getElementById('exTranslate-list').innerHTML = translateData.map((w, idx)=>`
+    <div class="item">
+      <div class="idx">${idx+1}</div>
+      <div class="item-body">
+        <div class="prompt"><b>${w.ru}</b></div>
+        <div class="row-input">
+          <input type="text" id="exTranslate${idx}" placeholder="type in English">
+        </div>
+        <div class="fb" id="exTranslate${idx}-fb"></div>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ================= RENDER: EX3 dictation ================= */
+let dictData = [];
+function renderDictation(){
+  dictData = shuffle(wordsData);
+  document.getElementById('exDictation-list').innerHTML = dictData.map((w, idx)=>`
+    <div class="item">
+      <div class="idx">${idx+1}</div>
+      <div class="item-body">
+        <div class="row-input" style="margin-bottom:6px;">
+          <button class="play-btn" onclick="speak('${w.en.replace(/'/g,"\\'")}')" title="Прослушать">🔊</button>
+          <input type="text" id="exDictation${idx}" placeholder="напиши услышанную фразу">
+        </div>
+        <div class="fb" id="exDictation${idx}-fb"></div>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ================= RENDER: EX4 definition ================= */
+let defDataShuffled = [];
+function renderDefinition(){
+  defDataShuffled = shuffle(defData);
+  document.getElementById('exDefinition-list').innerHTML = defDataShuffled.map((d, idx)=>`
+    <div class="item">
+      <div class="idx">${idx+1}</div>
+      <div class="item-body">
+        <div class="prompt">${d.def}</div>
+        <div class="row-input">
+          <input type="text" id="exDefinition${idx}" placeholder="какая это фраза?">
+        </div>
+        <div class="fb" id="exDefinition${idx}-fb"></div>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ================= RENDER: EX5 collocation ================= */
+let collocationShuffled = [];
+function renderCollocation(){
+  collocationShuffled = shuffle(collocationData);
+  document.getElementById('exCollocation-list').innerHTML = collocationShuffled.map((c, idx)=>`
+    <div class="item">
+      <div class="idx">${idx+1}</div>
+      <div class="item-body">
+        <div class="prompt mono">${c.prompt}</div>
+        <div class="row-input">
+          <input type="text" id="exCollocation${idx}" placeholder="одно слово" style="max-width:200px;">
+        </div>
+        <div class="fb" id="exCollocation${idx}-fb"></div>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ================= RENDER: EX6 context ================= */
+let contextShuffled = [];
+function renderContext(){
+  contextShuffled = shuffle(contextData);
+  document.getElementById('exContext-list').innerHTML = contextShuffled.map((c, idx)=>`
+    <div class="item">
+      <div class="idx">${idx+1}</div>
+      <div class="item-body">
+        <div class="prompt">${c.sentence}</div>
+        <div class="row-input">
+          <input type="text" id="exContext${idx}" placeholder="заполни пропуск">
+        </div>
+        <div class="fb" id="exContext${idx}-fb"></div>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ================= RENDER: EX7 match halves ================= */
+let matchOrder = [];
+function renderMatch(){
+  matchOrder = shuffle(wordsData.map(w=>w.id));
+  const rightOptions = shuffle(matchOrder.map(id=>matchRight[id]));
+  document.getElementById('exMatch-list').innerHTML = matchOrder.map((id, idx)=>`
+    <div class="item">
+      <div class="idx">${idx+1}</div>
+      <div class="item-body">
+        <div class="row-input">
+          <span class="mono" style="min-width:170px; flex:0 0 auto;">${matchLeft[id]} …</span>
+          <select id="exMatch${idx}">
+            <option value="">— выбери окончание —</option>
+            ${rightOptions.map(r=>`<option value="${r}">${r}</option>`).join('')}
+          </select>
+        </div>
+        <div class="fb" id="exMatch${idx}-fb"></div>
+      </div>
+    </div>
+  `).join('');
+}
+function checkMatch(){
+  let score = 0;
+  matchOrder.forEach((id, idx)=>{
+    const sel = document.getElementById('exMatch'+idx);
+    const fb = document.getElementById('exMatch'+idx+'-fb');
+    const ok = norm(sel.value) === norm(matchRight[id]);
+    if(ok){
+      sel.classList.add('ok'); sel.classList.remove('bad');
+      fb.textContent = '✓ верно'; fb.className = 'fb ok';
+      score++;
+    } else {
+      sel.classList.add('bad'); sel.classList.remove('ok');
+      fb.textContent = '✗ верно: ' + matchRight[id]; fb.className = 'fb bad';
+      logMistake(id);
+    }
+  });
+  document.getElementById('exMatch-score').textContent = score + ' / ' + matchOrder.length;
+}
+function showMatchAnswers(){
+  matchOrder.forEach((id, idx)=>{
+    document.getElementById('exMatch'+idx).value = matchRight[id];
+  });
+}
+
+/* ================= RENDER: creative sections ================= */
+function renderDialogue(){
+  const order = shuffle(dialogueData.map((d,i)=>i));
+  document.getElementById('exDialogue-list').innerHTML = order.map((oi, idx)=>{
+    const d = dialogueData[oi];
+    return `
+    <div class="item">
+      <div class="idx">${idx+1}</div>
+      <div class="item-body">
+        <div class="prompt">A: "${d.a}"<br>B: …</div>
+        <textarea id="exDialogue${idx}" placeholder="ответ B…"></textarea>
+      </div>
+    </div>`;
+  }).join('');
+}
+function renderFinish(){
+  const order = shuffle(finishData.map((t,i)=>i));
+  document.getElementById('exFinish-list').innerHTML = order.map((oi, idx)=>`
+    <div class="item">
+      <div class="idx">${idx+1}</div>
+      <div class="item-body">
+        <div class="prompt">${finishData[oi]}</div>
+        <textarea id="exFinish${idx}" placeholder="закончи предложение…"></textarea>
+      </div>
+    </div>
+  `).join('');
+}
+function copyAnswers(prefix, count){
+  const lines = [];
+  for(let i=0;i<count;i++){
+    const val = document.getElementById(prefix+i).value.trim();
+    lines.push((i+1) + '. ' + (val || '—'));
+  }
+  const text = lines.join('\n');
+  navigator.clipboard.writeText(text).then(()=>{
+    const btn = document.getElementById(prefix+'-copybtn');
+    const old = btn.textContent;
+    btn.textContent = 'Скопировано ✓';
+    setTimeout(()=>{ btn.textContent = old; }, 1600);
+  }).catch(()=>{
+    alert('Не удалось скопировать автоматически. Текст:\n\n' + text);
+  });
+}
+
+/* ================= NAV ================= */
+function renderSwitchboard(){
+  const ids = ['s0','ex1','ex2','ex3','ex4','ex5','ex6','ex7','ex10','ex11'];
+  const labels = ['00','01','02','03','04','05','06','07','08','09'];
+  const nav = document.getElementById('switchboard');
+  nav.innerHTML = ids.map((id, i)=> (i>0?'<span class="cord"></span>':'') + `<a href="#${id}">${labels[i]}</a>`).join('');
+}
+
+/* ================= INIT ================= */
+function init(){
+  renderSwitchboard();
+  renderWordGrid();
+  renderFill();
+  renderTranslate();
+  renderDictation();
+  renderDefinition();
+  renderCollocation();
+  renderContext();
+  renderMatch();
+  renderDialogue();
+  renderFinish();
+  renderProblemWords();
+}
+init();
+</script>
+</body>
+</html>
