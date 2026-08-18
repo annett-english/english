@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Packing Vocabulary · Рабочая тетрадь</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧳</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F1E7D2;
+    --paper-dark:#E6D8B8;
+    --card:#FBF7EC;
+    --ink:#22302B;
+    --ink-soft:#4B5A52;
+    --teal:#1F4B44;
+    --teal-dark:#153833;
+    --mustard:#D79E2C;
+    --rust:#B24B2C;
+    --sage:#527A5D;
+    --line:#C9B48C;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(circle at 1px 1px, rgba(34,48,43,0.05) 1px, transparent 0) 0 0/22px 22px,
+      var(--paper);
+    color:var(--ink);
+    font-family:'IBM Plex Mono', ui-monospace, monospace;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{font-family:'Fraunces', Georgia, serif; margin:0; color:var(--teal-dark);}
+  a{color:var(--teal);}
+
+  /* ---------- header ---------- */
+  header.masthead{
+    background:
+      linear-gradient(180deg, var(--teal) 0%, var(--teal-dark) 100%);
+    color:var(--paper);
+    padding:36px 20px 30px;
+    position:relative;
+    overflow:hidden;
+    border-bottom:6px solid var(--mustard);
+  }
+  header.masthead::before{
+    content:'';
+    position:absolute; inset:0;
+    background-image:repeating-linear-gradient(45deg, rgba(255,255,255,0.03) 0 2px, transparent 2px 14px);
+    pointer-events:none;
+  }
+  .masthead-inner{max-width:1200px; margin:0 auto; position:relative;}
+  .tag-stamp{
+    display:inline-flex; align-items:center; gap:8px;
+    border:2px dashed var(--mustard);
+    border-radius:999px;
+    padding:6px 16px;
+    font-size:13px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--mustard);
+    margin-bottom:14px;
+    transform:rotate(-1.5deg);
+  }
+  header.masthead h1{
+    font-size:clamp(28px,4.5vw,44px);
+    color:var(--paper);
+    font-weight:700;
+    letter-spacing:-0.01em;
+  }
+  header.masthead p{
+    max-width:680px;
+    color:#D9E4DD;
+    margin-top:10px;
+    font-size:15px;
+  }
+  .voice-note{
+    display:inline-flex; align-items:center; gap:8px;
+    margin-top:16px;
+    font-size:13px;
+    color:var(--paper-dark);
+    background:rgba(0,0,0,0.18);
+    border:1px solid rgba(255,255,255,0.15);
+    padding:8px 14px;
+    border-radius:8px;
+  }
+
+  /* ---------- layout ---------- */
+  .page-wrap{
+    max-width:1200px;
+    margin:0 auto;
+    padding:28px 20px 80px;
+    display:flex;
+    gap:26px;
+    align-items:flex-start;
+  }
+  .main{flex:1; min-width:0;}
+  .sidebar{
+    width:270px;
+    flex-shrink:0;
+    position:sticky;
+    top:20px;
+  }
+  @media (max-width:900px){
+    .page-wrap{flex-direction:column;}
+    .sidebar{position:static; width:100%; order:-1;}
+  }
+
+  /* ---------- sidebar problem words ---------- */
+  .pw-box{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:4px 14px 14px 4px;
+    padding:16px 16px 14px;
+    box-shadow:3px 3px 0 var(--line);
+    position:relative;
+  }
+  .pw-box::before{
+    content:'';
+    position:absolute; left:-6px; top:22px;
+    width:12px;height:12px;border-radius:50%;
+    background:var(--paper); border:1px solid var(--line);
+  }
+  .pw-box h3{font-size:16px; display:flex; align-items:center; gap:8px;}
+  .pw-box h3 .ico{color:var(--rust);}
+  .pw-sub{font-size:11.5px; color:var(--ink-soft); margin:4px 0 12px;}
+  #problem-words-list{display:flex; flex-direction:column; gap:6px; max-height:360px; overflow-y:auto;}
+  .problem-row{
+    display:grid; grid-template-columns:1fr auto auto; gap:8px; align-items:baseline;
+    font-size:12.5px; border-bottom:1px dashed var(--line); padding-bottom:5px;
+  }
+  .pw-en{font-weight:600; color:var(--teal-dark);}
+  .pw-ru{color:var(--ink-soft); font-size:11px;}
+  .pw-count{color:var(--rust); font-weight:600; font-size:11px;}
+  .empty-note{font-size:12.5px; color:var(--sage); margin:0;}
+  .btn-mini{
+    margin-top:12px; width:100%;
+    background:none; border:1px solid var(--line); color:var(--ink-soft);
+    padding:7px 10px; border-radius:6px; font-family:inherit; font-size:11.5px;
+    cursor:pointer;
+  }
+  .btn-mini:hover{border-color:var(--rust); color:var(--rust);}
+
+  /* ---------- sections ---------- */
+  .section{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:26px 26px 22px;
+    margin-bottom:26px;
+    box-shadow:0 2px 0 var(--line);
+  }
+  .section-head{
+    display:flex; align-items:flex-start; gap:14px; margin-bottom:6px;
+  }
+  .ex-num-badge{
+    flex-shrink:0;
+    width:42px;height:42px;border-radius:50%;
+    border:2px dashed var(--rust);
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Fraunces',serif; font-weight:600; font-size:16px;
+    color:var(--rust);
+    transform:rotate(-6deg);
+  }
+  .section-head h2{font-size:21px;}
+  .section-instr{font-size:13px; color:var(--ink-soft); margin:2px 0 18px 56px;}
+  .section-toolbar{
+    display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+    margin:18px 0 6px 0;
+  }
+  .btn{
+    font-family:inherit; font-size:13px; font-weight:600;
+    padding:9px 16px; border-radius:7px; cursor:pointer;
+    border:1px solid transparent;
+  }
+  .btn-check{background:var(--teal); color:var(--paper); border-color:var(--teal-dark);}
+  .btn-check:hover{background:var(--teal-dark);}
+  .btn-show{background:none; border:1px solid var(--line); color:var(--ink-soft);}
+  .btn-show:hover{border-color:var(--ink-soft); color:var(--ink);}
+  .btn-copy{background:var(--mustard); color:#3A2A05; border-color:#B98317;}
+  .btn-copy:hover{filter:brightness(1.05);}
+  .score-pill{
+    margin-left:auto;
+    font-size:12.5px; color:var(--sage); font-weight:600;
+    background:rgba(82,122,93,0.1); padding:6px 12px; border-radius:999px;
+  }
+  .copy-toast{font-size:12px; color:var(--sage); font-weight:600; display:none;}
+
+  /* ---------- exercise rows ---------- */
+  .ex-list{margin-top:8px;}
+  .ex-row{
+    display:grid;
+    grid-template-columns:26px 1fr 190px 26px;
+    gap:12px; align-items:center;
+    padding:11px 0;
+    border-bottom:1px dashed var(--line);
+  }
+  .ex-row:last-child{border-bottom:none;}
+  .ex-row.correct{background:rgba(82,122,93,0.08); border-radius:6px;}
+  .ex-row.incorrect{background:rgba(178,75,44,0.08); border-radius:6px;}
+  .ex-num{color:var(--ink-soft); font-size:12px; text-align:right;}
+  .ex-prompt{font-size:14px; color:var(--ink);}
+  .masked-word{font-weight:600; letter-spacing:.03em; font-size:15px; color:var(--teal-dark);}
+  .ru-hint{color:var(--ink-soft); font-size:12.5px;}
+  .ru-text{font-weight:600; color:var(--teal-dark); font-size:15px;}
+  .def-text, .ctx-sentence{font-style:normal;}
+  .ctx-sentence b, .ctx-sentence strong{color:var(--rust);}
+  .emoji-big{font-size:30px;}
+  .ex-input{
+    font-family:'IBM Plex Mono',monospace; font-size:13.5px;
+    padding:8px 10px; border:1px solid var(--line); border-radius:6px;
+    background:var(--paper); color:var(--ink); width:100%;
+  }
+  .ex-input:focus{outline:2px solid var(--teal); outline-offset:1px;}
+  .ex-feedback{text-align:center; font-size:16px;}
+  .answer-reveal{color:var(--sage); font-weight:700; font-size:12.5px;}
+  .btn-listen{
+    font-family:inherit; font-size:12.5px; font-weight:600;
+    background:var(--paper-dark); border:1px solid var(--line); color:var(--teal-dark);
+    padding:8px 14px; border-radius:20px; cursor:pointer;
+  }
+  .btn-listen:hover{background:var(--mustard); border-color:#B98317; color:#3A2A05;}
+  .btn-listen.small{padding:3px 8px; font-size:11px; border-radius:14px;}
+
+  select.cat-select{
+    font-family:inherit; font-size:13px; padding:7px 8px;
+    border:1px solid var(--line); border-radius:6px; background:var(--paper); color:var(--ink);
+  }
+
+  @media (max-width:640px){
+    .ex-row{grid-template-columns:20px 1fr; grid-template-areas:"num prompt" "in fb"; row-gap:6px;}
+    .ex-num{grid-area:num;}
+    .ex-prompt{grid-area:prompt;}
+    .ex-input, select.cat-select{grid-area:in;}
+    .ex-feedback{grid-area:fb; text-align:left;}
+    .section-instr{margin-left:0;}
+    .section-head{flex-wrap:wrap;}
+  }
+
+  /* ---------- vocab review ---------- */
+  .cat-block{margin-bottom:22px;}
+  .cat-title{
+    display:flex; align-items:center; gap:8px;
+    font-size:14px; text-transform:uppercase; letter-spacing:.06em;
+    color:var(--ink-soft); margin-bottom:10px;
+  }
+  .cat-dot{width:9px;height:9px;border-radius:50%;}
+  .cat-dot.toiletries{background:var(--rust);}
+  .cat-dot.electronics{background:var(--teal);}
+  .cat-dot.clothes{background:var(--mustard);}
+  .vocab-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(200px,1fr));
+    gap:12px;
+  }
+  .tag-card{
+    position:relative;
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:6px 14px 14px 6px;
+    padding:12px 14px 12px 26px;
+    display:flex; flex-direction:column; gap:2px;
+  }
+  .tag-card::before{
+    content:'';
+    position:absolute; left:9px; top:50%; transform:translateY(-50%);
+    width:8px; height:8px; border-radius:50%;
+    background:var(--card); border:1px solid var(--line);
+  }
+  .tag-en{font-weight:600; color:var(--teal-dark); font-size:14.5px;}
+  .tag-ipa{color:var(--ink-soft); font-size:11.5px;}
+  .tag-ru{color:var(--ink); font-size:12.5px;}
+  .tag-card .btn-listen{align-self:flex-start; margin-top:6px;}
+
+  /* ---------- open-ended (would you rather / finish sentences) ---------- */
+  .open-item{margin-bottom:16px;}
+  .open-q{font-size:14px; margin-bottom:6px; color:var(--ink);}
+  .open-q .n{color:var(--rust); font-weight:700; margin-right:6px;}
+  textarea.open-input{
+    width:100%; min-height:56px; resize:vertical;
+    font-family:inherit; font-size:13px; padding:9px 10px;
+    border:1px solid var(--line); border-radius:6px; background:var(--paper); color:var(--ink);
+  }
+  textarea.open-input:focus{outline:2px solid var(--teal); outline-offset:1px;}
+
+  footer{
+    max-width:1200px; margin:0 auto; padding:0 20px 40px;
+    color:var(--ink-soft); font-size:12px; text-align:center;
+  }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <span class="tag-stamp">🧳 packing vocabulary</span>
+    <h1>Собери чемодан слов</h1>
+    <p>Рабочая тетрадь по лексике: туалетные принадлежности, электроника и одежда в дорогу. Слушайте, прописывайте руками, проверяйте себя — ошибки сами соберутся в табличку «Проблемные слова» сбоку.</p>
+    <div class="voice-note">🔊 Озвучка словами использует голос <strong>Google&nbsp;US&nbsp;English&nbsp;(en-US)</strong>, если он доступен в вашем браузере (лучше всего работает в Chrome).</div>
+  </div>
+</header>
+
+<div class="page-wrap">
+
+  <aside class="sidebar">
+    <div class="pw-box">
+      <h3><span class="ico">⚠</span> Проблемные слова</h3>
+      <p class="pw-sub">Слова, в которых были ошибки, во всех заданиях</p>
+      <div id="problem-words-list"><p class="empty-note">Пока нет ошибок — отлично!</p></div>
+      <button class="btn-mini" data-action="clear-problems">Очистить список</button>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <!-- ============ VOCAB REVIEW ============ -->
+    <section class="section" id="vocab-review">
+      <div class="section-head">
+        <div class="ex-num-badge">📖</div>
+        <h2>Повторение слов</h2>
+      </div>
+      <p class="section-instr">Нажимайте 🔊, чтобы прослушать произношение, и сверяйте перевод и транскрипцию.</p>
+      <div id="vocab-review-content"></div>
+    </section>
+
+    <!-- ============ EXERCISE 1 ============ -->
+    <section class="section" id="section-ex1">
+      <div class="section-head">
+        <div class="ex-num-badge">1</div>
+        <h2>Вставь пропущенные буквы</h2>
+      </div>
+      <p class="section-instr">Посмотри на слово с пропусками и перевод — впиши слово целиком.</p>
+      <div class="ex-list" id="ex1"></div>
+      <div class="section-toolbar">
+        <button class="btn btn-check" data-action="check" data-section="ex1">Проверить</button>
+        <button class="btn btn-show" data-action="show" data-section="ex1">Показать ответы</button>
+        <span class="score-pill" id="ex1-score">— / 20</span>
+      </div>
+    </section>
+
+    <!-- ============ EXERCISE 2 ============ -->
+    <section class="section" id="section-ex2">
+      <div class="section-head">
+        <div class="ex-num-badge">2</div>
+        <h2>Переведи с русского на английский</h2>
+      </div>
+      <p class="section-instr">Напиши английское слово, соответствующее переводу.</p>
+      <div class="ex-list" id="ex2"></div>
+      <div class="section-toolbar">
+        <button class="btn btn-check" data-action="check" data-section="ex2">Проверить</button>
+        <button class="btn btn-show" data-action="show" data-section="ex2">Показать ответы</button>
+        <span class="score-pill" id="ex2-score">— / 20</span>
+      </div>
+    </section>
+
+    <!-- ============ EXERCISE 3 ============ -->
+    <section class="section" id="section-ex3">
+      <div class="section-head">
+        <div class="ex-num-badge">3</div>
+        <h2>Прослушай и запиши слово</h2>
+      </div>
+      <p class="section-instr">Нажми «Слушать» и напиши услышанное слово по буквам.</p>
+      <div class="ex-list" id="ex3"></div>
+      <div class="section-toolbar">
+        <button class="btn btn-check" data-action="check" data-section="ex3">Проверить</button>
+        <button class="btn btn-show" data-action="show" data-section="ex3">Показать ответы</button>
+        <span class="score-pill" id="ex3-score">— / 20</span>
+      </div>
+    </section>
+
+    <!-- ============ EXERCISE 4 ============ -->
+    <section class="section" id="section-ex4">
+      <div class="section-head">
+        <div class="ex-num-badge">4</div>
+        <h2>Угадай слово по определению</h2>
+      </div>
+      <p class="section-instr">Прочитай определение на английском и напиши слово, которое оно описывает.</p>
+      <div class="ex-list" id="ex4"></div>
+      <div class="section-toolbar">
+        <button class="btn btn-check" data-action="check" data-section="ex4">Проверить</button>
+        <button class="btn btn-show" data-action="show" data-section="ex4">Показать ответы</button>
+        <span class="score-pill" id="ex4-score">— / 20</span>
+      </div>
+    </section>
+
+    <!-- ============ EXERCISE 5 ============ -->
+    <section class="section" id="section-ex5">
+      <div class="section-head">
+        <div class="ex-num-badge">5</div>
+        <h2>Назови слово по картинке</h2>
+      </div>
+      <p class="section-instr">Посмотри на эмодзи и напиши, что это за предмет по-английски.</p>
+      <div class="ex-list" id="ex5"></div>
+      <div class="section-toolbar">
+        <button class="btn btn-check" data-action="check" data-section="ex5">Проверить</button>
+        <button class="btn btn-show" data-action="show" data-section="ex5">Показать ответы</button>
+        <span class="score-pill" id="ex5-score">— / 15</span>
+      </div>
+    </section>
+
+    <!-- ============ EXERCISE 6 ============ -->
+    <section class="section" id="section-ex6">
+      <div class="section-head">
+        <div class="ex-num-badge">6</div>
+        <h2>Впиши слово по контексту</h2>
+      </div>
+      <p class="section-instr">Прочитай предложение и заполни пропуск подходящим словом.</p>
+      <div class="ex-list" id="ex6"></div>
+      <div class="section-toolbar">
+        <button class="btn btn-check" data-action="check" data-section="ex6">Проверить</button>
+        <button class="btn btn-show" data-action="show" data-section="ex6">Показать ответы</button>
+        <span class="score-pill" id="ex6-score">— / 15</span>
+      </div>
+    </section>
+
+    <!-- ============ EXERCISE 7 : CATEGORISE ============ -->
+    <section class="section" id="section-ex7">
+      <div class="section-head">
+        <div class="ex-num-badge">7</div>
+        <h2>Распредели слова по категориям</h2>
+      </div>
+      <p class="section-instr">Для каждого слова выбери категорию: туалетные принадлежности, электроника или одежда.</p>
+      <div class="ex-list" id="ex7"></div>
+      <div class="section-toolbar">
+        <button class="btn btn-check" data-action="check" data-section="ex7">Проверить</button>
+        <button class="btn btn-show" data-action="show" data-section="ex7">Показать ответы</button>
+        <span class="score-pill" id="ex7-score">— / 38</span>
+      </div>
+    </section>
+
+    <!-- ============ EXERCISE 8 : WOULD YOU RATHER ============ -->
+    <section class="section" id="section-ex8">
+      <div class="section-head">
+        <div class="ex-num-badge">8</div>
+        <h2>Would you rather…</h2>
+      </div>
+      <p class="section-instr">Выбери и объясни свой вариант на английском. Ответы можно скопировать одной кнопкой.</p>
+      <div id="ex8"></div>
+      <div class="section-toolbar">
+        <button class="btn btn-copy" data-action="copy" data-section="ex8">📋 Скопировать все ответы</button>
+        <span class="copy-toast" id="ex8-toast">Скопировано!</span>
+      </div>
+    </section>
+
+    <!-- ============ EXERCISE 9 : FINISH THE SENTENCES ============ -->
+    <section class="section" id="section-ex9">
+      <div class="section-head">
+        <div class="ex-num-badge">9</div>
+        <h2>Закончи предложения своими идеями</h2>
+      </div>
+      <p class="section-instr">Допиши предложение на английском своими словами. Ответы можно скопировать одной кнопкой.</p>
+      <div id="ex9"></div>
+      <div class="section-toolbar">
+        <button class="btn btn-copy" data-action="copy" data-section="ex9">📋 Скопировать все ответы</button>
+        <span class="copy-toast" id="ex9-toast">Скопировано!</span>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<footer>Packing Vocabulary Workbook · нажимай «Проверить», чтобы увидеть результат, и «Показать ответы», чтобы свериться</footer>
+
+<script>
+/* ================= DATA ================= */
+const WORDS = [
+  {en:"comb", ru:"расчёска", ipa:"/kəʊm/", cat:"toiletries", emoji:"🪮",
+   def:"A flat tool with narrow teeth that you pull through your hair to make it neat.",
+   ctx:"He ran a ___ through his hair before the interview."},
+  {en:"sunscreen", ru:"солнцезащитный крем", ipa:"", cat:"toiletries", emoji:"🧴",
+   def:"A cream you rub on your skin to stop it burning in the sun.",
+   ctx:"Put on some ___ before you lie on the beach."},
+  {en:"razor", ru:"бритва", ipa:"/ˈreɪzə/", cat:"toiletries", emoji:"🪒",
+   def:"A sharp tool used for removing hair from the skin.",
+   ctx:"He cut his chin while shaving with a blunt ___."},
+  {en:"make-up", ru:"макияж", ipa:"", cat:"toiletries", emoji:"💄",
+   def:"Coloured products, like lipstick or powder, used on the face.",
+   ctx:"She spent twenty minutes doing her ___ before the party."},
+  {en:"insect repellent", ru:"средство от насекомых", ipa:"/ɪnˈsekt rɪˌpelənt/", cat:"toiletries", emoji:"🦟",
+   def:"A spray or cream that stops insects like mosquitoes biting you.",
+   ctx:"Spray some ___ on your arms and legs before the hike."},
+  {en:"brush", ru:"щётка (для волос)", ipa:"", cat:"toiletries", emoji:"",
+   def:"A tool with a handle and bristles, used to make your hair smooth.",
+   ctx:"She packed a comb and a ___ for her hair."},
+  {en:"wet wipes", ru:"влажные салфетки", ipa:"", cat:"toiletries", emoji:"",
+   def:"Small pieces of damp cloth used for cleaning your hands or face quickly.",
+   ctx:"Use a ___ to clean your hands when there's no sink nearby."},
+  {en:"toothbrush", ru:"зубная щётка", ipa:"", cat:"toiletries", emoji:"🪥",
+   def:"A small brush with a long handle, used to clean your teeth.",
+   ctx:"Remember to pack your ___ and toothpaste."},
+  {en:"toothpaste", ru:"зубная паста", ipa:"", cat:"toiletries", emoji:"",
+   def:"A paste you squeeze onto a toothbrush to clean your teeth.",
+   ctx:"Squeeze a little ___ onto the brush."},
+  {en:"washbag", ru:"несессер", ipa:"", cat:"toiletries", emoji:"",
+   def:"A small waterproof bag for carrying soap, a toothbrush and other toiletries.",
+   ctx:"She packed her shampoo and razor into her ___."},
+  {en:"deodorant", ru:"дезодорант", ipa:"/diˈəʊdərənt/", cat:"toiletries", emoji:"🧴",
+   def:"A product you put under your arms to stop you smelling bad.",
+   ctx:"It's hot today — don't forget your ___!"},
+  {en:"cotton buds", ru:"ватные палочки", ipa:"", cat:"toiletries", emoji:"",
+   def:"Small sticks with soft cotton on each end, used for cleaning ears.",
+   ctx:"She used a ___ to clean out her ears."},
+  {en:"shampoo", ru:"шампунь", ipa:"", cat:"toiletries", emoji:"🧴",
+   def:"A liquid soap that you use to wash your hair.",
+   ctx:"This hotel doesn't provide ___, so bring your own."},
+  {en:"moisturiser", ru:"увлажняющий крем", ipa:"/ˈmɔɪstʃəraɪzə/", cat:"toiletries", emoji:"🧴",
+   def:"A cream that keeps your skin soft and stops it drying out.",
+   ctx:"My skin feels dry in winter, so I use a ___ every day."},
+  {en:"(nail) scissors", ru:"(маникюрные) ножницы", ipa:"", cat:"toiletries", emoji:"✂️",
+   def:"A small, sharp tool used for trimming your nails.",
+   ctx:"He trimmed his nails with a pair of ___."},
+  {en:"cotton pads", ru:"ватные диски", ipa:"", cat:"toiletries", emoji:"",
+   def:"Soft, round pads made of cotton, used to clean skin or remove make-up.",
+   ctx:"She used a ___ soaked in cleanser to remove her make-up."},
+
+  {en:"power bank", ru:"повербанк", ipa:"", cat:"electronics", emoji:"🔋",
+   def:"A portable battery used to charge your phone or other devices.",
+   ctx:"My phone died, so I charged it with a ___."},
+  {en:"USB cable", ru:"USB-кабель", ipa:"/keɪbl/", cat:"electronics", emoji:"🔌",
+   def:"A cord used to connect a device to a computer or charger.",
+   ctx:"I need a ___ to connect my phone to the laptop."},
+  {en:"adaptor", ru:"переходник", ipa:"", cat:"electronics", emoji:"🔌",
+   def:"A device that lets you plug something into a socket of a different shape.",
+   ctx:"You'll need a travel ___ to charge your laptop abroad."},
+  {en:"e-reader", ru:"электронная книга (ридер)", ipa:"", cat:"electronics", emoji:"📖",
+   def:"A small device used only for reading digital books.",
+   ctx:"I've loaded a hundred books onto my ___ for the flight."},
+  {en:"laptop", ru:"ноутбук", ipa:"", cat:"electronics", emoji:"💻",
+   def:"A portable computer that you can carry and use anywhere.",
+   ctx:"She works on her ___ every day at the coffee shop."},
+  {en:"(phone) charger", ru:"зарядное устройство", ipa:"", cat:"electronics", emoji:"🔌",
+   def:"A device used to fill a phone's battery with power.",
+   ctx:"Can I borrow your ___? My phone is almost dead."},
+  {en:"portable speaker", ru:"портативная колонка", ipa:"", cat:"electronics", emoji:"🔊",
+   def:"A small, carriable device used to play music out loud.",
+   ctx:"We took a ___ to the beach so we could listen to music."},
+  {en:"tablet", ru:"планшет", ipa:"", cat:"electronics", emoji:"📱",
+   def:"A flat touchscreen device, bigger than a phone but lighter than a laptop.",
+   ctx:"My daughter watches cartoons on her ___."},
+  {en:"smartwatch", ru:"смарт-часы", ipa:"", cat:"electronics", emoji:"⌚",
+   def:"A watch that connects to your phone and can track your fitness.",
+   ctx:"His ___ buzzed to tell him he had a new message."},
+  {en:"headphones", ru:"наушники (полноразмерные)", ipa:"", cat:"electronics", emoji:"🎧",
+   def:"Large devices worn over the ears for listening to music privately.",
+   ctx:"He put on his ___ to block out the noise on the train."},
+  {en:"earphones", ru:"наушники (вкладыши)", ipa:"", cat:"electronics", emoji:"",
+   def:"Small devices that fit inside your ears for listening to music.",
+   ctx:"She always keeps a pair of ___ in her bag."},
+  {en:"hairdryer", ru:"фен", ipa:"", cat:"electronics", emoji:"",
+   def:"An electrical device used to blow hot air and dry your hair.",
+   ctx:"After her shower, she dried her hair with a ___."},
+
+  {en:"a pair of slippers", ru:"тапочки", ipa:"", cat:"clothes", emoji:"🥿",
+   def:"Soft, comfortable shoes that you wear indoors.",
+   ctx:"He put on his ___ as soon as he got home."},
+  {en:"a sun hat", ru:"шляпа от солнца, панама", ipa:"", cat:"clothes", emoji:"👒",
+   def:"A wide hat worn to protect your head and face from the sun.",
+   ctx:"She wore a ___ to protect her face from the sun."},
+  {en:"a bathrobe / dressing gown", ru:"халат", ipa:"/ɡaʊn/", cat:"clothes", emoji:"🛁",
+   def:"A loose, comfortable piece of clothing worn after a bath or shower.",
+   ctx:"She wrapped herself in a ___ after her bath."},
+  {en:"a pair of swimming trunks", ru:"плавки", ipa:"", cat:"clothes", emoji:"🩳",
+   def:"Shorts worn by men or boys for swimming.",
+   ctx:"He packed a pair of ___ for the pool."},
+  {en:"a pair of flip-flops", ru:"шлёпанцы", ipa:"", cat:"clothes", emoji:"🩴",
+   def:"Simple, open sandals held on by a strap between the toes.",
+   ctx:"She wore ___ on the beach so sand wouldn't get in her shoes."},
+  {en:"a swimsuit", ru:"купальник", ipa:"", cat:"clothes", emoji:"👙",
+   def:"A piece of clothing worn for swimming, usually by women or girls.",
+   ctx:"She bought a new ___ for her beach holiday."},
+  {en:"a pair/set of underwear", ru:"нижнее бельё", ipa:"", cat:"clothes", emoji:"🩲",
+   def:"Clothes worn underneath your other clothes, next to the skin.",
+   ctx:"Don't forget to pack enough ___ for the whole trip."},
+  {en:"a rain jacket / raincoat", ru:"дождевик", ipa:"", cat:"clothes", emoji:"🌧️",
+   def:"A waterproof jacket that keeps you dry when it rains.",
+   ctx:"It started raining, so she put on her ___."},
+  {en:"a hoodie", ru:"худи", ipa:"", cat:"clothes", emoji:"👕",
+   def:"A soft sweatshirt with a hood that you pull over your head.",
+   ctx:"He wore a warm ___ on the cold evening."},
+  {en:"a pair of pyjamas", ru:"пижама", ipa:"/pɪˈdʒɑːməz/", cat:"clothes", emoji:"🌙",
+   def:"Comfortable clothes that you wear in bed.",
+   ctx:"She got into her ___ and went to bed."}
+];
+
+const CAT_LABELS = {toiletries:"Туалетные принадлежности", electronics:"Электроника", clothes:"Одежда и аксессуары"};
+
+const WOULD_YOU_RATHER = [
+  "Would you rather forget your charger or your toothbrush on a trip?",
+  "Would you rather travel with a washbag full of toiletries or a bag full of electronics?",
+  "Would you rather wear flip-flops or slippers around a hotel room all week?",
+  "Would you rather lose your headphones or your power bank on a long flight?",
+  "Would you rather pack a hoodie or a raincoat for an unpredictable climate?",
+  "Would you rather use a laptop or a tablet while travelling?",
+  "Would you rather forget your sunscreen or your insect repellent on a jungle trip?",
+  "Would you rather wear a swimsuit that's too big or one that's too small for a whole beach holiday?"
+];
+
+const FINISH_SENTENCES = [
+  "I always pack ______ in my washbag because ______.",
+  "If I forget my ______, I usually ______.",
+  "The most useful piece of electronics when I travel is ______ because ______.",
+  "On a rainy travel day I always wear ______.",
+  "Before I go to bed on holiday, I put on ______.",
+  "If my phone battery dies on a trip, I ______.",
+  "At the beach, I usually wear ______ and bring ______.",
+  "The one toiletry I can't travel without is ______ because ______.",
+  "If I could take only one electronic device on a trip, I would take ______ because ______.",
+  "When I get home from a long trip, the first thing I do is ______."
+];
+
+/* ================= HELPERS ================= */
+function escapeHtml(s){
+  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+function hashCode(str){
+  let h = 0;
+  for(let i=0;i<str.length;i++){ h = (Math.imul(31,h) + str.charCodeAt(i)) | 0; }
+  return h >>> 0;
+}
+function mulberry32(seed){
+  return function(){
+    seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+function seededShuffle(arr, rnd){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(rnd()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+function maskWord(str){
+  const chars = str.split("");
+  const letterIdx = [];
+  chars.forEach((c,i)=>{ if(/[A-Za-z]/.test(c)) letterIdx.push(i); });
+  if(letterIdx.length===0) return str;
+  const keepFirst = new Set();
+  let prevNonLetter = true;
+  chars.forEach((c,i)=>{
+    const isLetter = /[A-Za-z]/.test(c);
+    if(isLetter && prevNonLetter) keepFirst.add(i);
+    prevNonLetter = !isLetter;
+  });
+  const maskable = letterIdx.filter(i=>!keepFirst.has(i));
+  const rnd = mulberry32(hashCode(str));
+  const shuffled = seededShuffle(maskable, rnd);
+  const maskCount = Math.max(1, Math.round(shuffled.length*0.45));
+  const toMask = new Set(shuffled.slice(0,maskCount));
+  return chars.map((c,i)=> toMask.has(i) ? "_" : c).join("");
+}
+function normalizeAnswer(str){
+  return String(str).toLowerCase().trim().replace(/\s+/g," ").replace(/[.,!?]+$/,"");
+}
+function isCorrect(userInput, correctRaw){
+  const user = normalizeAnswer(userInput);
+  if(!user) return false;
+  const base = correctRaw.replace(/pair\/set/gi, "pair");
+  const variants = new Set();
+  base.split("/").map(p=>p.trim()).forEach(p=>{
+    const noParens1 = p.replace(/[()]/g,"");
+    const noParens2 = p.replace(/\([^)]*\)\s*/g,"").trim();
+    [p, noParens1, noParens2].forEach(v=>{
+      const norm = normalizeAnswer(v);
+      if(norm) variants.add(norm);
+      const strippedPair = normalizeAnswer(v.replace(/^a (pair|set) of\s+/i,""));
+      if(strippedPair) variants.add(strippedPair);
+      const strippedArticle = normalizeAnswer(v.replace(/^(a|an)\s+/i,""));
+      if(strippedArticle) variants.add(strippedArticle);
+    });
+  });
+  return variants.has(user);
+}
+
+/* ================= SPEECH ================= */
+let cachedVoices = [];
+function loadVoices(){ cachedVoices = window.speechSynthesis ? speechSynthesis.getVoices() : []; }
+if('speechSynthesis' in window){
+  loadVoices();
+  speechSynthesis.addEventListener('voiceschanged', loadVoices);
+}
+function pickVoice(){
+  if(!cachedVoices.length) loadVoices();
+  return cachedVoices.find(v=>v.name === "Google US English")
+      || cachedVoices.find(v=>v.lang === "en-US")
+      || cachedVoices.find(v=>v.lang && v.lang.startsWith("en"))
+      || cachedVoices[0];
+}
+function speak(text){
+  if(!('speechSynthesis' in window)){ alert('Озвучка не поддерживается в этом браузере.'); return; }
+  const clean = text.replace(/[()\/]/g, " ").replace(/\s+/g," ").trim();
+  const utter = new SpeechSynthesisUtterance(clean);
+  const v = pickVoice();
+  if(v) utter.voice = v;
+  utter.lang = "en-US";
+  utter.rate = 0.88;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(utter);
+}
+
+/* ================= PROBLEM WORDS ================= */
+let problemWords = {};
+function loadProblemWords(){
+  try{
+    const raw = localStorage.getItem('packingVocabProblems');
+    if(raw) problemWords = JSON.parse(raw);
+  }catch(e){ problemWords = {}; }
+}
+function saveProblemWords(){
+  try{ localStorage.setItem('packingVocabProblems', JSON.stringify(problemWords)); }catch(e){}
+}
+function addProblemWord(w){
+  if(!problemWords[w.en]) problemWords[w.en] = {ru:w.ru, count:0};
+  problemWords[w.en].count++;
+}
+function renderProblemWords(){
+  const el = document.getElementById('problem-words-list');
+  const entries = Object.entries(problemWords).sort((a,b)=> b[1].count - a[1].count);
+  if(entries.length===0){
+    el.innerHTML = '<p class="empty-note">Пока нет ошибок — отлично!</p>';
+    return;
+  }
+  el.innerHTML = entries.map(([en,data])=>
+    `<div class="problem-row"><span class="pw-en">${escapeHtml(en)}</span><span class="pw-ru">${escapeHtml(data.ru)}</span><span class="pw-count">×${data.count}</span></div>`
+  ).join("");
+}
+function clearProblemWords(){
+  problemWords = {};
+  saveProblemWords();
+  renderProblemWords();
+}
+
+/* ================= VOCAB REVIEW RENDER ================= */
+function renderVocabReview(){
+  const el = document.getElementById('vocab-review-content');
+  const cats = ["toiletries","electronics","clothes"];
+  el.innerHTML = cats.map(cat=>{
+    const items = WORDS.filter(w=>w.cat===cat);
+    const cards = items.map(w=>`
+      <div class="tag-card">
+        <div class="tag-en">${escapeHtml(w.en)}</div>
+        ${w.ipa ? `<div class="tag-ipa">${escapeHtml(w.ipa)}</div>` : ``}
+        <div class="tag-ru">${escapeHtml(w.ru)}</div>
+        <button class="btn-listen small" data-word="${escapeHtml(w.en)}">🔊 слушать</button>
+      </div>
+    `).join("");
+    return `
+      <div class="cat-block">
+        <div class="cat-title"><span class="cat-dot ${cat}"></span>${CAT_LABELS[cat]}</div>
+        <div class="vocab-grid">${cards}</div>
+      </div>
+    `;
+  }).join("");
+}
+
+/* ================= TYPING EXERCISES ================= */
+function buildExercise(sectionId, items, promptFn){
+  const container = document.getElementById(sectionId);
+  container.innerHTML = items.map((w,idx)=>`
+    <div class="ex-row" data-idx="${idx}">
+      <div class="ex-num">${idx+1}.</div>
+      <div class="ex-prompt">${promptFn(w)}</div>
+      <input type="text" class="ex-input" autocomplete="off" spellcheck="false" placeholder="напиши слово…">
+      <div class="ex-feedback"></div>
+    </div>
+  `).join("");
+}
+function updateScore(sectionId, count, total){
+  const el = document.getElementById(sectionId+'-score');
+  if(el) el.textContent = `${count} / ${total} правильно`;
+}
+function checkExercise(sectionId, items){
+  const container = document.getElementById(sectionId);
+  const rows = container.querySelectorAll('.ex-row');
+  let correctCount = 0;
+  let answeredCount = 0;
+  rows.forEach((row,idx)=>{
+    const w = items[idx];
+    const input = row.querySelector('.ex-input');
+    const fb = row.querySelector('.ex-feedback');
+    row.classList.remove('correct','incorrect');
+    if(!input.value.trim()){ fb.textContent=''; return; }
+    answeredCount++;
+    if(isCorrect(input.value, w.en)){
+      row.classList.add('correct');
+      fb.textContent = '✓';
+      correctCount++;
+    }else{
+      row.classList.add('incorrect');
+      fb.textContent = '✗';
+      addProblemWord(w);
+    }
+  });
+  updateScore(sectionId, correctCount, items.length);
+  saveProblemWords();
+  renderProblemWords();
+}
+function showAnswersExercise(sectionId, items){
+  const container = document.getElementById(sectionId);
+  const rows = container.querySelectorAll('.ex-row');
+  rows.forEach((row,idx)=>{
+    const w = items[idx];
+    const fb = row.querySelector('.ex-feedback');
+    fb.innerHTML = '';
+    fb.insertAdjacentHTML('afterend', `<div class="answer-reveal" style="grid-column:2/4;">→ ${escapeHtml(w.en)}</div>`);
+  });
+}
+
+/* ================= CATEGORISE EXERCISE ================= */
+function buildCategorise(sectionId, items){
+  const container = document.getElementById(sectionId);
+  container.innerHTML = items.map((w,idx)=>`
+    <div class="ex-row" data-idx="${idx}">
+      <div class="ex-num">${idx+1}.</div>
+      <div class="ex-prompt">${escapeHtml(w.en)}</div>
+      <select class="cat-select">
+        <option value="">— выбрать —</option>
+        <option value="toiletries">Туалетные принадлежности</option>
+        <option value="electronics">Электроника</option>
+        <option value="clothes">Одежда</option>
+      </select>
+      <div class="ex-feedback"></div>
+    </div>
+  `).join("");
+}
+function checkCategorise(sectionId, items){
+  const container = document.getElementById(sectionId);
+  const rows = container.querySelectorAll('.ex-row');
+  let correctCount = 0;
+  rows.forEach((row,idx)=>{
+    const w = items[idx];
+    const select = row.querySelector('.cat-select');
+    const fb = row.querySelector('.ex-feedback');
+    row.classList.remove('correct','incorrect');
+    if(!select.value){ fb.textContent=''; return; }
+    if(select.value === w.cat){
+      row.classList.add('correct');
+      fb.textContent = '✓';
+      correctCount++;
+    }else{
+      row.classList.add('incorrect');
+      fb.textContent = '✗';
+      addProblemWord(w);
+    }
+  });
+  updateScore(sectionId, correctCount, items.length);
+  saveProblemWords();
+  renderProblemWords();
+}
+function showAnswersCategorise(sectionId, items){
+  const container = document.getElementById(sectionId);
+  const rows = container.querySelectorAll('.ex-row');
+  rows.forEach((row,idx)=>{
+    const w = items[idx];
+    const fb = row.querySelector('.ex-feedback');
+    fb.innerHTML = '';
+    fb.insertAdjacentHTML('afterend', `<div class="answer-reveal" style="grid-column:2/4;">→ ${CAT_LABELS[w.cat]}</div>`);
+  });
+}
+
+/* ================= OPEN-ENDED EXERCISES ================= */
+function buildOpen(sectionId, questions){
+  const container = document.getElementById(sectionId);
+  container.innerHTML = questions.map((q,idx)=>`
+    <div class="open-item">
+      <div class="open-q"><span class="n">${idx+1}.</span>${escapeHtml(q)}</div>
+      <textarea class="open-input" placeholder="напиши свой ответ на английском…"></textarea>
+    </div>
+  `).join("");
+}
+function copyAnswers(sectionId, questions){
+  const container = document.getElementById(sectionId);
+  const textareas = container.querySelectorAll('textarea');
+  let out = '';
+  textareas.forEach((ta,idx)=>{
+    out += `${idx+1}. ${questions[idx]}\n${ta.value.trim() || '(нет ответа)'}\n\n`;
+  });
+  const toastId = sectionId+'-toast';
+  const finish = ()=>{
+    const toast = document.getElementById(toastId);
+    if(toast){ toast.style.display='inline'; setTimeout(()=>{ toast.style.display='none'; }, 2200); }
+  };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(out).then(finish).catch(()=>{ fallbackCopy(out); finish(); });
+  }else{
+    fallbackCopy(out); finish();
+  }
+}
+function fallbackCopy(text){
+  const temp = document.createElement('textarea');
+  temp.value = text;
+  temp.style.position = 'fixed'; temp.style.opacity = '0';
+  document.body.appendChild(temp);
+  temp.select();
+  try{ document.execCommand('copy'); }catch(e){}
+  document.body.removeChild(temp);
+}
+
+/* ================= INIT ================= */
+let exerciseData = {};
+
+function init(){
+  loadProblemWords();
+  renderProblemWords();
+  renderVocabReview();
+
+  const ex1Words = shuffle(WORDS).slice(0,20);
+  const ex2Words = shuffle(WORDS).slice(0,20);
+  const ex3Words = shuffle(WORDS).slice(0,20);
+  const ex4Words = shuffle(WORDS).slice(0,20);
+  const emojiWords = WORDS.filter(w=>w.emoji);
+  const ex5Words = shuffle(emojiWords).slice(0, Math.min(15, emojiWords.length));
+  const ex6Words = shuffle(WORDS).slice(0,15);
+  const ex7Words = shuffle(WORDS);
+
+  exerciseData = { ex1:ex1Words, ex2:ex2Words, ex3:ex3Words, ex4:ex4Words, ex5:ex5Words, ex6:ex6Words, ex7:ex7Words };
+
+  buildExercise('ex1', ex1Words, w=>`<span class="masked-word">${escapeHtml(maskWord(w.en))}</span> <span class="ru-hint">(${escapeHtml(w.ru)})</span>`);
+  buildExercise('ex2', ex2Words, w=>`<span class="ru-text">${escapeHtml(w.ru)}</span>`);
+  buildExercise('ex3', ex3Words, w=>`<button class="btn-listen" data-word="${escapeHtml(w.en)}">🔊 Слушать</button>`);
+  buildExercise('ex4', ex4Words, w=>`<span class="def-text">${escapeHtml(w.def)}</span>`);
+  buildExercise('ex5', ex5Words, w=>`<span class="emoji-big">${w.emoji}</span>`);
+  buildExercise('ex6', ex6Words, w=>`<span class="ctx-sentence">${escapeHtml(w.ctx)}</span> <span class="ru-hint">(${escapeHtml(w.ru)})</span>`);
+  buildCategorise('ex7', ex7Words);
+
+  document.getElementById('ex1-score').textContent = `— / ${ex1Words.length}`;
+  document.getElementById('ex2-score').textContent = `— / ${ex2Words.length}`;
+  document.getElementById('ex3-score').textContent = `— / ${ex3Words.length}`;
+  document.getElementById('ex4-score').textContent = `— / ${ex4Words.length}`;
+  document.getElementById('ex5-score').textContent = `— / ${ex5Words.length}`;
+  document.getElementById('ex6-score').textContent = `— / ${ex6Words.length}`;
+  document.getElementById('ex7-score').textContent = `— / ${ex7Words.length}`;
+
+  buildOpen('ex8', WOULD_YOU_RATHER);
+  buildOpen('ex9', FINISH_SENTENCES);
+}
+
+document.addEventListener('click', (e)=>{
+  const listenBtn = e.target.closest('.btn-listen');
+  if(listenBtn){ speak(listenBtn.dataset.word); return; }
+
+  const actionBtn = e.target.closest('[data-action]');
+  if(!actionBtn) return;
+  const action = actionBtn.dataset.action;
+  const section = actionBtn.dataset.section;
+
+  if(action === 'check'){
+    if(section === 'ex7') checkCategorise(section, exerciseData[section]);
+    else checkExercise(section, exerciseData[section]);
+  }else if(action === 'show'){
+    if(section === 'ex7') showAnswersCategorise(section, exerciseData[section]);
+    else showAnswersExercise(section, exerciseData[section]);
+  }else if(action === 'copy'){
+    copyAnswers(section, section === 'ex8' ? WOULD_YOU_RATHER : FINISH_SENTENCES);
+  }else if(action === 'clear-problems'){
+    clearProblemWords();
+  }
+});
+
+init();
+</script>
+</body>
+</html>
