@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vocabulary Workbook — практика слов</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F6F1E4;
+    --paper-line:#DCD2B8;
+    --ink:#232A3B;
+    --ink-soft:#5C6478;
+    --navy:#28324A;
+    --red:#B5432D;
+    --green:#3E7C59;
+    --gold:#B4883A;
+    --card:#FFFDF7;
+    --shadow: 0 2px 0 rgba(35,42,59,0.06);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:
+      repeating-linear-gradient(180deg, transparent, transparent 37px, var(--paper-line) 38px),
+      var(--paper);
+    color:var(--ink);
+    font-family:'Inter', sans-serif;
+    padding-bottom:80px;
+  }
+  .margin-line{
+    position:fixed;
+    top:0; bottom:0; left:64px;
+    width:1px;
+    background:rgba(181,67,45,0.25);
+    z-index:0;
+  }
+  header{
+    position:relative;
+    padding:48px 32px 28px 90px;
+    z-index:1;
+  }
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--red);
+    margin-bottom:10px;
+  }
+  h1{
+    font-family:'Caveat', cursive;
+    font-weight:700;
+    font-size:56px;
+    line-height:1;
+    margin:0 0 8px 0;
+    color:var(--navy);
+  }
+  .sub{
+    color:var(--ink-soft);
+    font-size:15px;
+    max-width:560px;
+  }
+
+  main{
+    position:relative;
+    z-index:1;
+    padding:0 32px 0 90px;
+    max-width:980px;
+  }
+
+  /* --- vocab reminder --- */
+  .vocab-section{margin-bottom:44px;}
+  .section-head{
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+    margin-bottom:16px;
+  }
+  .section-head .num{
+    font-family:'Caveat', cursive;
+    font-size:30px;
+    color:var(--red);
+  }
+  .section-head h2{
+    font-size:19px;
+    margin:0;
+    color:var(--navy);
+  }
+  .vocab-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(280px,1fr));
+    gap:12px;
+  }
+  .vocab-card{
+    background:var(--card);
+    border:1px solid var(--paper-line);
+    border-left:3px solid var(--gold);
+    border-radius:6px;
+    padding:12px 14px;
+    box-shadow:var(--shadow);
+  }
+  .vocab-card .en{
+    font-weight:600;
+    font-size:15px;
+    color:var(--navy);
+  }
+  .vocab-card .ipa{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    color:var(--ink-soft);
+    margin-top:2px;
+  }
+  .vocab-card .ru{
+    font-size:13.5px;
+    color:var(--ink);
+    margin-top:6px;
+  }
+  .vocab-card .note{
+    font-size:12px;
+    color:var(--red);
+    margin-top:6px;
+    line-height:1.4;
+    border-top:1px dashed var(--paper-line);
+    padding-top:6px;
+  }
+
+  /* --- tabs --- */
+  .tabs{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin:36px 0 20px 0;
+    padding-bottom:0;
+  }
+  .tab-btn{
+    font-family:'Caveat', cursive;
+    font-size:20px;
+    font-weight:700;
+    background:var(--card);
+    border:1px solid var(--paper-line);
+    border-bottom:none;
+    padding:9px 20px 12px 20px;
+    border-radius:8px 8px 0 0;
+    cursor:pointer;
+    color:var(--ink-soft);
+    position:relative;
+    top:1px;
+  }
+  .tab-btn.active{
+    color:var(--red);
+    background:var(--paper);
+    border-color:var(--red);
+    box-shadow:0 -2px 0 var(--red) inset;
+  }
+  .exercise{
+    display:none;
+    background:var(--card);
+    border:1px solid var(--paper-line);
+    border-radius:0 8px 8px 8px;
+    padding:22px 24px 28px 24px;
+  }
+  .exercise.active{display:block;}
+  .exercise-instruction{
+    font-size:14px;
+    color:var(--ink-soft);
+    margin-bottom:18px;
+    padding-bottom:14px;
+    border-bottom:1px dashed var(--paper-line);
+  }
+  .exercise-instruction b{color:var(--navy);}
+
+  .item{
+    padding:14px 0;
+    border-bottom:1px dashed var(--paper-line);
+  }
+  .item:last-of-type{border-bottom:none;}
+  .item-row{
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+  }
+  .item-num{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    color:var(--gold);
+    padding-top:9px;
+    min-width:20px;
+  }
+  .item-body{flex:1;}
+  .prompt{
+    font-size:14.5px;
+    color:var(--ink);
+    margin-bottom:8px;
+    line-height:1.5;
+  }
+  .prompt .word-chip{
+    font-weight:600;
+    color:var(--navy);
+    background:rgba(180,136,58,0.15);
+    padding:1px 6px;
+    border-radius:4px;
+  }
+  .speak-btn{
+    border:none;
+    background:none;
+    cursor:pointer;
+    font-size:16px;
+    vertical-align:middle;
+    margin-left:4px;
+    opacity:0.7;
+  }
+  .speak-btn:hover{opacity:1;}
+  .answer-row{
+    display:flex;
+    gap:8px;
+    align-items:center;
+    flex-wrap:wrap;
+  }
+  input.answer-input{
+    flex:1;
+    min-width:220px;
+    font-family:'Inter', sans-serif;
+    font-size:14px;
+    padding:8px 10px;
+    border:none;
+    border-bottom:2px solid var(--paper-line);
+    background:transparent;
+    color:var(--ink);
+    outline:none;
+  }
+  input.answer-input:focus{border-bottom-color:var(--navy);}
+  .mini-btn{
+    font-family:'Inter', sans-serif;
+    font-size:12.5px;
+    font-weight:600;
+    padding:7px 12px;
+    border-radius:5px;
+    border:1px solid var(--paper-line);
+    background:var(--paper);
+    cursor:pointer;
+    color:var(--ink-soft);
+    white-space:nowrap;
+  }
+  .mini-btn:hover{border-color:var(--navy); color:var(--navy);}
+  .feedback{
+    font-size:12.5px;
+    margin-top:6px;
+    min-height:16px;
+  }
+  .feedback.ok{color:var(--green); font-weight:600;}
+  .feedback.check{color:var(--red); font-weight:600;}
+  .sample{
+    display:none;
+    margin-top:8px;
+    font-size:13.5px;
+    background:rgba(62,124,89,0.08);
+    border-left:3px solid var(--green);
+    padding:8px 10px;
+    border-radius:4px;
+    color:var(--navy);
+  }
+  .sample.show{display:block;}
+  .sample b{color:var(--green);}
+
+  .exercise-actions{
+    display:flex;
+    gap:10px;
+    margin-top:20px;
+    padding-top:16px;
+    border-top:1px solid var(--paper-line);
+  }
+  .main-btn{
+    font-family:'Inter', sans-serif;
+    font-weight:600;
+    font-size:13.5px;
+    padding:10px 18px;
+    border-radius:6px;
+    border:none;
+    cursor:pointer;
+  }
+  .main-btn.check{background:var(--navy); color:#fff;}
+  .main-btn.check:hover{background:#1c2338;}
+  .main-btn.reveal{background:transparent; color:var(--red); border:1px solid var(--red);}
+  .main-btn.reveal:hover{background:rgba(181,67,45,0.08);}
+
+  @media (max-width:640px){
+    .margin-line{left:20px;}
+    header{padding-left:36px;}
+    main{padding-left:36px; padding-right:16px;}
+    h1{font-size:40px;}
+  }
+</style>
+</head>
+<body>
+<div class="margin-line"></div>
+
+<header>
+  <div class="eyebrow">Рабочая тетрадь · Unit vocabulary</div>
+  <h1>Practice sheet</h1>
+  <div class="sub">Повторение слов и 5 упражнений по 10 заданий. Пиши ответы вручную, проверяй себя и слушай произношение.</div>
+</header>
+
+<main>
+
+  <section class="vocab-section">
+    <div class="section-head"><span class="num">§1</span><h2>Повторение слов</h2></div>
+    <div class="vocab-grid" id="vocabGrid"></div>
+  </section>
+
+  <section class="vocab-section">
+    <div class="section-head"><span class="num">§2</span><h2>Упражнения</h2></div>
+    <div class="tabs" id="tabs"></div>
+    <div id="exercises"></div>
+  </section>
+
+</main>
+
+<script>
+/* ============ DATA ============ */
+
+const vocab = [
+  {en:"get on / get off the bus", ipa:"ɡet ɒn / ɒf ðə bʌs", ru:"садиться в автобус / выходить из автобуса", note:"«on/off» — для транспорта, в котором едешь стоя или по проходу: автобус, поезд, самолёт."},
+  {en:"get in / get out of the car", ipa:"ɡet ɪn / aʊt ɒv ðə kɑː", ru:"садиться в машину / выходить из машины", note:"«in/out of» — для машины и такси, куда садишься, наклоняясь."},
+  {en:"for the first time", ipa:"fɔː ðə ˈfɜːst taɪm", ru:"впервые", note:"обычно ставится в конце предложения."},
+  {en:"enclosed space", ipa:"ɪnˈkləʊzd speɪs", ru:"замкнутое пространство", note:"часто в контексте клаустрофобии: afraid of enclosed spaces."},
+  {en:"say something to somebody", ipa:"seɪ ˈsʌmθɪŋ tə ˈsʌmbədi", ru:"сказать что-то кому-то", note:"после say всегда нужен предлог to перед человеком: say (to me), НЕ say me."},
+  {en:"tell somebody something", ipa:"tel ˈsʌmbədi ˈsʌmθɪŋ", ru:"сказать / рассказать кому-то что-то", note:"после tell предлог to не нужен: tell me, НЕ tell to me."},
+  {en:"set phrase", ipa:"set freɪz", ru:"устойчивое выражение", note:"фраза, которая всегда используется в одном и том же виде."},
+  {en:"superstition", ipa:"ˌsuːpəˈstɪʃn", ru:"суеверие", note:"старое поверье без научного объяснения."},
+  {en:"smell a rat", ipa:"smel əræt", ru:"чуять неладное, подозревать обман", note:"идиома, не имеет отношения к настоящим крысам."},
+  {en:"marry somebody", ipa:"ˈmæri ˈsʌmbədi", ru:"жениться / выйти замуж за кого-то", note:"marry БЕЗ предлога: marry her. Но get married TO somebody — с предлогом to."},
+  {en:"senior citizen / elderly person / older person", ipa:"ˈsiːniə ˈsɪtɪzn / ˈeldəli ˈpɜːsn / ˈəʊldə ˈpɜːsn", ru:"пожилой человек", note:"вежливые варианты вместо old man/woman; senior citizen часто официальный термин."}
+];
+
+/* helper for normalizing text */
+function norm(s){
+  return s.toLowerCase()
+    .replace(/['’]/g,"'")
+    .replace(/[^a-z0-9' ]/g," ")
+    .replace(/\s+/g," ")
+    .trim();
+}
+function isCorrect(input, item){
+  const n = " " + norm(input) + " ";
+  if(item.exact){
+    return item.exact.some(a => n.includes(" "+norm(a)+" "));
+  }
+  let ok = true;
+  if(item.required){
+    ok = ok && item.required.every(r => n.includes(" "+norm(r)+" ") || n.includes(norm(r)));
+  }
+  if(item.requiredAnyOf){
+    ok = ok && item.requiredAnyOf.some(r => n.includes(norm(r)));
+  }
+  return ok;
+}
+
+/* ============ EXERCISES ============ */
+
+const exercises = [
+  {
+    id:"ex1",
+    tab:"1 · Предложение",
+    title:"Упражнение 1 — Составь предложение (на слух)",
+    instruction:"Письменно фраза <b>не показана</b> — только перевод. Нажми 🔊 и прослушай, как фраза звучит (голос Google US English), затем напиши своё полное предложение с ней. Английское написание появится только в ответе.",
+    type:"sentence",
+    items:[
+      {word:"superstition", ru:"суеверие", required:["superstition"], sample:"Breaking a mirror is an old superstition that brings bad luck."},
+      {word:"get in / get out of the car", ru:"садиться в машину / выходить из машины", required:["car"], requiredAnyOf:["got in","get in","got out","get out","in the car","out of the car"], sample:"He got out of the car and locked the door."},
+      {word:"tell somebody something", ru:"сказать / рассказать кому-то что-то", requiredAnyOf:["told","tell"], sample:"Can you tell me something about your trip?"},
+      {word:"marry somebody", ru:"жениться / выйти замуж за кого-то", requiredAnyOf:["married","marry","marries"], sample:"My sister married a pilot last summer."},
+      {word:"enclosed space", ru:"замкнутое пространство", required:["enclosed"], requiredAnyOf:["space","spaces"], sample:"I start to panic in enclosed spaces like lifts."},
+      {word:"senior citizen / elderly / older person", ru:"пожилой человек", requiredAnyOf:["senior citizen","senior citizens","elderly","older person","older people"], sample:"The bus has special seats for senior citizens."},
+      {word:"get on / get off the bus", ru:"садиться в автобус / выходить из автобуса", required:["bus"], requiredAnyOf:["got on","get on","got off","get off","on the bus","off the bus"], sample:"We got off the bus two stops early."},
+      {word:"smell a rat", ru:"чуять неладное", requiredAnyOf:["smell a rat","smelled a rat","smells a rat"], sample:"When he avoided my questions, I began to smell a rat."},
+      {word:"for the first time", ru:"впервые", required:["first time"], sample:"I tried sushi for the first time yesterday."},
+      {word:"set phrase", ru:"устойчивое выражение", required:["set phrase"], sample:"'How do you do?' is a set phrase used as a greeting."}
+    ]
+  },
+  {
+    id:"ex2",
+    tab:"2 · Сочетаемость",
+    title:"Упражнение 2 — Сочетаемость фраз",
+    instruction:"Впиши <b>пропущенное слово</b>, чтобы получилось правильное словосочетание.",
+    type:"blank",
+    items:[
+      {prompt:"Every morning I ___ the bus outside my house and ride to work.", exact:["get on","get on the bus"], sample:"get on"},
+      {prompt:"She said something strange ___ me.", exact:["to"], sample:"to"},
+      {prompt:"He ___ her in 2020.", exact:["married"], sample:"married"},
+      {prompt:"'How do you do?' is an example of a ___ phrase.", exact:["set"], sample:"set"},
+      {prompt:"We ___ the taxi and drove to the airport.", exact:["got in","get in","got into","get into"], sample:"got in"},
+      {prompt:"When he avoided my questions, I began to ___.", exact:["smell a rat"], sample:"smell a rat"},
+      {prompt:"Some people feel nervous in ___ spaces like lifts.", exact:["enclosed"], sample:"enclosed"},
+      {prompt:"This seat is reserved for ___ citizens.", exact:["senior"], sample:"senior"},
+      {prompt:"Can you ___ me the truth?", exact:["tell"], sample:"tell"},
+      {prompt:"I tried Thai food ___ the first time last week.", exact:["for"], sample:"for"}
+    ]
+  },
+  {
+    id:"ex3",
+    tab:"3 · Ошибки",
+    title:"Упражнение 3 — Найди и исправь ошибку",
+    instruction:"В каждом предложении есть ошибка. Перепиши предложение <b>правильно целиком</b>.",
+    type:"sentence",
+    items:[
+      {word:"She told to me the truth.", required:["told me the truth"], sample:"She told me the truth."},
+      {word:"I visited Italy the first time last year.", required:["for the first time"], sample:"I visited Italy for the first time last year."},
+      {word:"I smell the rat, something isn't right.", required:["smell a rat"], sample:"I smell a rat. Something isn't right."},
+      {word:"She get on the bus every morning at 8.", required:["gets on the bus"], sample:"She gets on the bus every morning at 8."},
+      {word:"He married with a teacher.", required:["married a teacher"], sample:"He married a teacher."},
+      {word:"Some people are afraid of enclosing spaces.", required:["enclosed spaces"], sample:"Some people are afraid of enclosed spaces."},
+      {word:"This is common set-phrase in English.", required:["a common set phrase"], sample:"This is a common set phrase in English."},
+      {word:"He got in of the car quickly.", required:["got in the car"], sample:"He got in the car quickly."},
+      {word:"This seat is for senior citizen.", required:["senior citizens"], sample:"This seat is for senior citizens."},
+      {word:"She said me something important.", required:["something important to me"], sample:"She said something important to me."}
+    ]
+  },
+  {
+    id:"ex4",
+    tab:"4 · Контекст",
+    title:"Упражнение 4 — Контекст",
+    instruction:"Впиши подходящее слово или фразу из списка выше, опираясь на контекст предложения.",
+    type:"blank",
+    items:[
+      {prompt:"'Break a leg' is a well-known ___ used to wish someone good luck.", exact:["set phrase"], sample:"set phrase"},
+      {prompt:"He avoided eye contact and changed the subject — I began to ___.", exact:["smell a rat"], sample:"smell a rat"},
+      {prompt:"My grandmother, who is now a ___, still goes swimming every day.", exact:["senior citizen","elderly person","older person"], sample:"senior citizen"},
+      {prompt:"We ___ the taxi and headed straight to the airport.", exact:["got in","get in","got into","get into"], sample:"got in"},
+      {prompt:"The lift got stuck and she felt anxious being in such an ___.", exact:["enclosed space"], sample:"enclosed space"},
+      {prompt:"Could you ___ me what happened at the meeting?", exact:["tell"], sample:"tell"},
+      {prompt:"Passengers must ___ the bus through the front doors only.", exact:["get on"], sample:"get on"},
+      {prompt:"I finally saw the Northern Lights ___ during my trip to Norway.", exact:["for the first time"], sample:"for the first time"},
+      {prompt:"He walked over and ___ something to the manager.", exact:["said"], sample:"said"},
+      {prompt:"They met at university and ___ five years later.", exact:["got married","married"], sample:"got married"}
+    ]
+  },
+  {
+    id:"ex5",
+    tab:"5 · Rephrase",
+    title:"Упражнение 5 — Rephrase (перефразируй)",
+    instruction:"Перепиши предложение так, чтобы <b>смысл не изменился</b>, используя слово/фразу из списка выше.",
+    type:"sentence",
+    items:[
+      {word:"Small, closed rooms make me nervous.", required:["enclosed space"], sample:"I feel anxious in enclosed spaces."},
+      {word:"She gave me some information about the project.", requiredAnyOf:["told me"], sample:"She told me something about the project."},
+      {word:"We left the bus at the wrong stop.", required:["bus"], requiredAnyOf:["got off","get off"], sample:"We got off the bus at the wrong stop."},
+      {word:"He became her husband in June.", requiredAnyOf:["married"], sample:"He married her in June."},
+      {word:"'Time flies' is a common English expression.", required:["set phrase"], sample:"'Time flies' is a common set phrase in English."},
+      {word:"This was my very first visit to Japan.", required:["for the first time"], sample:"I visited Japan for the first time."},
+      {word:"I have a bad feeling that he's lying.", requiredAnyOf:["smell a rat"], sample:"I smell a rat."},
+      {word:"We climbed into the taxi and drove away.", required:["taxi"], requiredAnyOf:["got in","get in"], sample:"We got in the taxi and drove away."},
+      {word:"He spoke a few words to the waiter.", requiredAnyOf:["said something"], sample:"He said something to the waiter."},
+      {word:"Many older people live in this neighbourhood.", requiredAnyOf:["senior citizens","elderly people","older people"], sample:"Many senior citizens live in this neighbourhood."}
+    ]
+  }
+];
+
+/* ============ RENDER VOCAB ============ */
+const vocabGrid = document.getElementById("vocabGrid");
+vocab.forEach(v=>{
+  const card = document.createElement("div");
+  card.className = "vocab-card";
+  card.innerHTML = `
+    <div class="en">${v.en}</div>
+    <div class="ipa">/${v.ipa}/</div>
+    <div class="ru">${v.ru}</div>
+    <div class="note">${v.note}</div>
+  `;
+  vocabGrid.appendChild(card);
+});
+
+/* ============ SPEECH ============ */
+let usVoice = null;
+function pickVoice(){
+  const voices = speechSynthesis.getVoices();
+  usVoice = voices.find(v => v.name === "Google US English")
+    || voices.find(v => v.lang === "en-US")
+    || voices[0] || null;
+}
+if('speechSynthesis' in window){
+  pickVoice();
+  speechSynthesis.onvoiceschanged = pickVoice;
+}
+function speak(text){
+  if(!('speechSynthesis' in window)) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = "en-US";
+  if(usVoice) u.voice = usVoice;
+  u.rate = 0.95;
+  speechSynthesis.speak(u);
+}
+
+/* ============ RENDER EXERCISES + TABS ============ */
+const tabsEl = document.getElementById("tabs");
+const exercisesEl = document.getElementById("exercises");
+
+exercises.forEach((ex, exIdx)=>{
+  // tab
+  const tabBtn = document.createElement("button");
+  tabBtn.className = "tab-btn" + (exIdx===0 ? " active" : "");
+  tabBtn.textContent = ex.tab;
+  tabBtn.onclick = ()=>{
+    document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
+    document.querySelectorAll(".exercise").forEach(e=>e.classList.remove("active"));
+    tabBtn.classList.add("active");
+    document.getElementById(ex.id).classList.add("active");
+  };
+  tabsEl.appendChild(tabBtn);
+
+  // exercise block
+  const block = document.createElement("div");
+  block.className = "exercise" + (exIdx===0 ? " active" : "");
+  block.id = ex.id;
+
+  let itemsHTML = "";
+  ex.items.forEach((it, i)=>{
+    const isEx1 = ex.id === "ex1";
+    const promptText = ex.type === "blank" ? it.prompt : (isEx1 ? it.ru : it.word);
+    const showSpeak = ex.id === "ex1";
+    itemsHTML += `
+      <div class="item">
+        <div class="item-row">
+          <div class="item-num">${String(i+1).padStart(2,"0")}</div>
+          <div class="item-body">
+            <div class="prompt">
+              ${ex.type==="blank" ? promptText : `<span class="word-chip">${promptText}</span>`}
+              ${showSpeak ? `<button class="speak-btn" title="Слушать произношение" data-speak="${it.word.replace(/"/g,'&quot;')}">🔊</button>` : ""}
+            </div>
+            <div class="answer-row">
+              <input type="text" class="answer-input" data-ex="${ex.id}" data-idx="${i}" placeholder="Впиши ответ здесь...">
+              <button class="mini-btn" data-action="check" data-ex="${ex.id}" data-idx="${i}">Проверить</button>
+              <button class="mini-btn" data-action="reveal" data-ex="${ex.id}" data-idx="${i}">Ответ</button>
+            </div>
+            <div class="feedback" id="fb-${ex.id}-${i}"></div>
+            <div class="sample" id="sample-${ex.id}-${i}"><b>Образец:</b> ${it.sample}</div>
+          </div>
+        </div>
+      </div>
+    `;
+  });
+
+  block.innerHTML = `
+    <div class="exercise-instruction">${ex.instruction}</div>
+    ${itemsHTML}
+    <div class="exercise-actions">
+      <button class="main-btn check" data-action="checkall" data-ex="${ex.id}">Проверить всё упражнение</button>
+      <button class="main-btn reveal" data-action="revealall" data-ex="${ex.id}">Показать все ответы</button>
+    </div>
+  `;
+  exercisesEl.appendChild(block);
+});
+
+/* ============ INTERACTIONS ============ */
+function checkOne(exId, idx){
+  const ex = exercises.find(e=>e.id===exId);
+  const item = ex.items[idx];
+  const input = document.querySelector(`.answer-input[data-ex="${exId}"][data-idx="${idx}"]`);
+  const fb = document.getElementById(`fb-${exId}-${idx}`);
+  if(!input.value.trim()){
+    fb.textContent = "Сначала впиши ответ.";
+    fb.className = "feedback check";
+    return;
+  }
+  const ok = isCorrect(input.value, item);
+  if(ok){
+    fb.textContent = "✓ Похоже верно!";
+    fb.className = "feedback ok";
+  } else {
+    fb.textContent = "Проверь себя по образцу ниже (нажми «Ответ»).";
+    fb.className = "feedback check";
+  }
+}
+function revealOne(exId, idx){
+  document.getElementById(`sample-${exId}-${idx}`).classList.add("show");
+}
+function checkAll(exId){
+  const ex = exercises.find(e=>e.id===exId);
+  ex.items.forEach((_, i)=>checkOne(exId, i));
+}
+function revealAll(exId){
+  const ex = exercises.find(e=>e.id===exId);
+  ex.items.forEach((_, i)=>revealOne(exId, i));
+}
+
+document.addEventListener("click", (e)=>{
+  const t = e.target;
+  if(t.dataset.action === "check") checkOne(t.dataset.ex, +t.dataset.idx);
+  if(t.dataset.action === "reveal") revealOne(t.dataset.ex, +t.dataset.idx);
+  if(t.dataset.action === "checkall") checkAll(t.dataset.ex);
+  if(t.dataset.action === "revealall") revealAll(t.dataset.ex);
+  if(t.dataset.speak) speak(t.dataset.speak);
+});
+
+document.addEventListener("keydown", (e)=>{
+  if(e.key === "Enter" && e.target.classList.contains("answer-input")){
+    checkOne(e.target.dataset.ex, +e.target.dataset.idx);
+  }
+});
+</script>
+</body>
+</html>
