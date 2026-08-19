@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Английский • Рабочая тетрадь</title>
+<style>
+  :root{
+    --paper:#F7F3E8;
+    --paper-line:#E4DBC4;
+    --ink:#1F3A5F;
+    --ink-soft:#3E5776;
+    --red:#B8412F;
+    --red-soft:#E7D3CC;
+    --green:#3F7D4F;
+    --green-soft:#DCEADD;
+    --note:#FFF3C4;
+    --note-border:#E8D77F;
+    --card:#FFFFFF;
+    --shadow: 0 1px 3px rgba(31,58,95,0.12), 0 4px 14px rgba(31,58,95,0.06);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      repeating-linear-gradient(
+        to bottom,
+        var(--paper) 0px,
+        var(--paper) 33px,
+        var(--paper-line) 34px
+      );
+    background-attachment:local;
+    color:var(--ink);
+    font-family: Verdana, Geneva, "Segoe UI", sans-serif;
+    font-size:15px;
+    line-height:1.5;
+    padding-left:64px;
+    position:relative;
+  }
+  body::before{
+    content:"";
+    position:fixed;
+    top:0; bottom:0; left:46px;
+    width:2px;
+    background:var(--red);
+    opacity:0.55;
+  }
+  .wrap{max-width:1180px; margin:0 auto; padding:28px 24px 90px;}
+  h1{
+    font-family: Georgia, "Times New Roman", serif;
+    font-style:italic;
+    font-size:34px;
+    color:var(--ink);
+    margin:6px 0 4px;
+  }
+  .subtitle{color:var(--ink-soft); margin-bottom:22px; font-size:14px;}
+  .top-controls{
+    display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+    margin-bottom:22px;
+  }
+  button{
+    font-family:inherit;
+    cursor:pointer;
+    border:1px solid var(--ink);
+    background:var(--card);
+    color:var(--ink);
+    padding:7px 14px;
+    border-radius:3px;
+    font-size:13.5px;
+    transition:transform .05s ease, background .15s ease;
+  }
+  button:hover{background:#EEF2F6;}
+  button:active{transform:scale(0.97);}
+  button.primary{background:var(--ink); color:#fff; border-color:var(--ink);}
+  button.primary:hover{background:var(--ink-soft);}
+  button.ghost{background:transparent;}
+  button.small{padding:4px 9px; font-size:12px;}
+  button.correct-btn{border-color:var(--green); color:var(--green);}
+  button.audio-btn{border-color:var(--ink-soft);}
+  #audio-status{font-size:12.5px; color:var(--ink-soft);}
+
+  .layout{display:flex; gap:26px; align-items:flex-start;}
+  .main{flex:1; min-width:0;}
+  .sidebar{
+    width:250px; flex-shrink:0;
+    position:sticky; top:20px;
+  }
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--paper-line);
+    border-radius:4px;
+    box-shadow:var(--shadow);
+    padding:20px 22px;
+    margin-bottom:26px;
+  }
+
+  .vocab-card table{width:100%; border-collapse:collapse;}
+  .vocab-card th{
+    text-align:left; font-size:12px; text-transform:uppercase;
+    letter-spacing:.04em; color:var(--ink-soft); font-weight:600;
+    border-bottom:1px solid var(--paper-line); padding:6px 8px;
+  }
+  .vocab-card td{padding:7px 8px; border-bottom:1px dashed var(--paper-line); vertical-align:middle;}
+  .vocab-word{font-weight:700; color:var(--ink);}
+  .ipa{font-family:"Cambria Math","Segoe UI",Georgia,serif; color:var(--ink-soft); font-style:italic;}
+  .ru{color:var(--ink-soft);}
+
+  .note-box{
+    background:var(--note);
+    border:1px solid var(--note-border);
+    border-radius:4px;
+    padding:14px 16px;
+    box-shadow:var(--shadow);
+  }
+  .note-box h3{margin:0 0 8px; font-size:14px; color:#6B5A16; font-family:Georgia,serif; font-style:italic;}
+  .note-box table{width:100%; border-collapse:collapse; font-size:12.5px;}
+  .note-box td{padding:4px 2px; border-bottom:1px solid #EEDD90;}
+  .note-empty{color:#8b7a2c; font-size:12.5px; font-style:italic;}
+  .note-box .clearbtn{margin-top:8px;}
+
+  .ex-title{
+    font-family:Georgia, serif; font-style:italic;
+    font-size:21px; color:var(--ink); margin:0 0 4px;
+  }
+  .ex-eyebrow{
+    font-size:11.5px; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--red); font-weight:700; margin-bottom:2px;
+  }
+  .ex-instructions{color:var(--ink-soft); font-size:13.5px; margin-bottom:16px;}
+  .ex-example{
+    background:#F1F5F9; border-left:3px solid var(--ink-soft);
+    padding:8px 12px; font-size:13px; margin-bottom:16px; color:var(--ink-soft);
+  }
+
+  .item{
+    display:flex; gap:12px; align-items:flex-start;
+    padding:11px 0; border-bottom:1px dashed var(--paper-line);
+  }
+  .item:last-of-type{border-bottom:none;}
+  .item-num{
+    width:22px; flex-shrink:0; font-weight:700; color:var(--red); padding-top:6px; font-size:13px;
+  }
+  .item-body{flex:1; min-width:0;}
+  .item-prompt{margin-bottom:6px; font-size:14px;}
+  .item-prompt .ru-hint{color:var(--ink-soft); font-size:12.5px; display:block; margin-bottom:3px;}
+  .item-row{display:flex; gap:8px; align-items:center; flex-wrap:wrap;}
+  input[type=text], textarea{
+    font-family:inherit; font-size:14px;
+    border:none; border-bottom:2px solid #C9BFA0;
+    background:transparent; padding:5px 2px;
+    color:var(--ink); flex:1; min-width:200px;
+    outline:none;
+  }
+  input[type=text]:focus, textarea:focus{border-bottom-color:var(--ink);}
+  textarea{width:100%; resize:vertical; min-height:38px; border:1px solid #C9BFA0; border-radius:3px; padding:8px;}
+  .feedback{font-size:12.5px; margin-top:5px; min-height:16px;}
+  .feedback.ok{color:var(--green);}
+  .feedback.bad{color:var(--red);}
+  .answer-reveal{
+    font-size:12.5px; margin-top:5px; color:var(--ink-soft);
+    display:none;
+  }
+  .answer-reveal.show{display:block;}
+  .item.state-ok input, .item.state-ok textarea{border-bottom-color:var(--green); background:var(--green-soft);}
+  .item.state-bad input, .item.state-bad textarea{border-bottom-color:var(--red); background:var(--red-soft);}
+
+  .tense-grid{display:grid; grid-template-columns:1fr; gap:6px; margin-top:6px;}
+  .tense-row{display:flex; gap:8px; align-items:center;}
+  .tense-tag{
+    font-size:11px; color:#fff; background:var(--ink-soft);
+    padding:2px 7px; border-radius:10px; flex-shrink:0; width:98px; text-align:center;
+  }
+
+  .ex-footer{display:flex; gap:10px; margin-top:16px; align-items:center; flex-wrap:wrap;}
+  .copy-status{font-size:12.5px; color:var(--green); opacity:0; transition:opacity .2s;}
+  .copy-status.show{opacity:1;}
+
+  .blank-display{
+    font-family:"Courier New",monospace; letter-spacing:1px; font-weight:700;
+    font-size:15px; background:#F1F5F9; padding:2px 8px; border-radius:3px;
+  }
+
+  footer{color:var(--ink-soft); font-size:12px; margin-top:30px; padding-top:14px; border-top:1px solid var(--paper-line);}
+
+  @media (max-width:880px){
+    .layout{flex-direction:column;}
+    .sidebar{width:100%; position:static;}
+    body{padding-left:20px;}
+    body::before{left:10px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="ex-eyebrow">Рабочая тетрадь · Home &amp; Travel</div>
+  <h1>Практика: слова, грамматика, вопросы</h1>
+  <div class="subtitle">9 упражнений по 8 заданий. Пишите ответы от руки в поля ввода — прогресс не сохраняется между сессиями, так что не забудьте сфотографировать результат при необходимости.</div>
+
+  <div class="top-controls">
+    <button class="primary" id="testAudioBtn">🔊 Проверить звук (Google US English)</button>
+    <span id="audio-status">Голос ещё не выбран…</span>
+  </div>
+
+  <div class="layout">
+    <div class="main">
+
+      <!-- VOCAB REMINDER -->
+      <div class="card vocab-card">
+        <div class="ex-eyebrow">Перед началом</div>
+        <div class="ex-title">Повторите слова</div>
+        <div class="ex-instructions">Нажмите 🔊, чтобы прослушать произношение (голос Google US English / en-US), затем закройте транскрипцию и попробуйте вспомнить перевод сами.</div>
+        <table>
+          <thead><tr><th>Слово</th><th>Транскрипция</th><th>Перевод</th><th>Аудио</th></tr></thead>
+          <tbody id="vocabTableBody"></tbody>
+        </table>
+      </div>
+
+      <!-- EX 1 -->
+      <div class="card" id="ex1">
+        <div class="ex-eyebrow">Упражнение 1 · Spelling</div>
+        <div class="ex-title">Вставьте пропущенные буквы</div>
+        <div class="ex-instructions">Впишите слово целиком (с пропущенными буквами) в поле ответа.</div>
+        <div id="ex1-items"></div>
+        <div class="ex-footer">
+          <button class="primary" onclick="checkExercise('ex1')">Проверить всё</button>
+          <button class="ghost" onclick="revealExercise('ex1')">Показать все ответы</button>
+        </div>
+      </div>
+
+      <!-- EX 2 -->
+      <div class="card" id="ex2">
+        <div class="ex-eyebrow">Упражнение 2 · Translation</div>
+        <div class="ex-title">Переведите с русского на английский</div>
+        <div class="ex-instructions">Пишите полным предложением, с точкой в конце.</div>
+        <div id="ex2-items"></div>
+        <div class="ex-footer">
+          <button class="primary" onclick="checkExercise('ex2')">Проверить всё</button>
+          <button class="ghost" onclick="revealExercise('ex2')">Показать все ответы</button>
+        </div>
+      </div>
+
+      <!-- EX 3 -->
+      <div class="card" id="ex3">
+        <div class="ex-eyebrow">Упражнение 3 · Dictation</div>
+        <div class="ex-title">Прослушайте и запишите предложение</div>
+        <div class="ex-instructions">Нажмите 🔊, прослушайте предложение целиком и запишите то, что услышали. Можно слушать несколько раз.</div>
+        <div id="ex3-items"></div>
+        <div class="ex-footer">
+          <button class="primary" onclick="checkExercise('ex3')">Проверить всё</button>
+          <button class="ghost" onclick="revealExercise('ex3')">Показать все ответы</button>
+        </div>
+      </div>
+
+      <!-- EX 4 -->
+      <div class="card" id="ex4">
+        <div class="ex-eyebrow">Упражнение 4 · Error correction</div>
+        <div class="ex-title">Найдите и исправьте ошибку</div>
+        <div class="ex-instructions">В каждом предложении одна грамматическая ошибка. Перепишите предложение полностью, но правильно.</div>
+        <div id="ex4-items"></div>
+        <div class="ex-footer">
+          <button class="primary" onclick="checkExercise('ex4')">Проверить всё</button>
+          <button class="ghost" onclick="revealExercise('ex4')">Показать все ответы</button>
+        </div>
+      </div>
+
+      <!-- EX 5 -->
+      <div class="card" id="ex5">
+        <div class="ex-eyebrow">Упражнение 5 · Statement → Question</div>
+        <div class="ex-title">Превратите утверждение в вопрос "How...?"</div>
+        <div class="ex-example">Пример: <em>the coffee is/was tasty</em> → <strong>How tasty was the coffee?</strong></div>
+        <div id="ex5-items"></div>
+        <div class="ex-footer">
+          <button class="primary" onclick="checkExercise('ex5')">Проверить всё</button>
+          <button class="ghost" onclick="revealExercise('ex5')">Показать все ответы</button>
+        </div>
+      </div>
+
+      <!-- EX 6 -->
+      <div class="card" id="ex6">
+        <div class="ex-eyebrow">Упражнение 6 · Translation drill</div>
+        <div class="ex-title">Переведите вопрос "What exactly...?"</div>
+        <div class="ex-example">Тренируем структуру: <strong>What exactly did you like about…?</strong> (меняется вспомогательный глагол и время)</div>
+        <div id="ex6-items"></div>
+        <div class="ex-footer">
+          <button class="primary" onclick="checkExercise('ex6')">Проверить всё</button>
+          <button class="ghost" onclick="revealExercise('ex6')">Показать все ответы</button>
+        </div>
+      </div>
+
+      <!-- EX 7 -->
+      <div class="card" id="ex7">
+        <div class="ex-eyebrow">Упражнение 7 · Tenses</div>
+        <div class="ex-title">Задайте один и тот же вопрос в трёх временах</div>
+        <div class="ex-example">
+          Пример: <strong>Where is she travelling?</strong> — прямо сейчас &nbsp;|&nbsp;
+          <strong>Where does she travel?</strong> — рутина &nbsp;|&nbsp;
+          <strong>Where did she travel?</strong> — прошлое
+        </div>
+        <div class="ex-instructions">Для каждого глагола составьте вопрос "Where…?" в трёх формах.</div>
+        <div id="ex7-items"></div>
+        <div class="ex-footer">
+          <button class="primary" onclick="checkExercise('ex7')">Проверить всё</button>
+          <button class="ghost" onclick="revealExercise('ex7')">Показать все ответы</button>
+        </div>
+      </div>
+
+      <!-- EX 8 -->
+      <div class="card" id="ex8">
+        <div class="ex-eyebrow">Упражнение 8 · Open practice</div>
+        <div class="ex-title">Закончите предложения своими идеями</div>
+        <div class="ex-instructions">Здесь нет единственно верного ответа — пишите то, что думаете сами. Внизу можно скопировать все свои ответы одной кнопкой.</div>
+        <div id="ex8-items"></div>
+        <div class="ex-footer">
+          <button class="primary" onclick="copyExercise('ex8')">📋 Скопировать все ответы</button>
+          <span class="copy-status" id="ex8-copy-status">Скопировано!</span>
+        </div>
+      </div>
+
+      <!-- EX 9 -->
+      <div class="card" id="ex9">
+        <div class="ex-eyebrow">Упражнение 9 · Repeat &amp; Change</div>
+        <div class="ex-title">Повторите структуру — но со своей идеей</div>
+        <div class="ex-instructions">Прочитайте модель, затем составьте своё предложение/вопрос по этой же структуре, но с другим содержанием. Внизу — кнопка "скопировать всё".</div>
+        <div id="ex9-items"></div>
+        <div class="ex-footer">
+          <button class="primary" onclick="copyExercise('ex9')">📋 Скопировать все ответы</button>
+          <span class="copy-status" id="ex9-copy-status">Скопировано!</span>
+        </div>
+      </div>
+
+      <footer>Голос озвучки: Google US English (en-US), если установлен в браузере, иначе — системный английский голос. Проверка ответов не учитывает регистр и лишние пробелы, для развёрнутых ответов допускаются небольшие вариации формулировок.</footer>
+    </div>
+
+    <div class="sidebar">
+      <div class="note-box" id="problemBox">
+        <h3>⚠ Проблемные слова</h3>
+        <div id="problemList"><div class="note-empty">Пока ошибок нет — отлично!</div></div>
+        <button class="small ghost clearbtn" onclick="clearProblems()">Очистить список</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ============ DATA ============ */
+
+const VOCAB = [
+  {word:"Fridge",     ipa:"/frɪdʒ/",        ru:"холодильник"},
+  {word:"Washbasin",  ipa:"/ˈwɒʃˌbeɪsn/",   ru:"раковина (умывальник)"},
+  {word:"Carpet",     ipa:"/ˈkɑːrpɪt/",     ru:"ковёр"},
+  {word:"Wardrobe",   ipa:"/ˈwɔːrdroʊb/",   ru:"шкаф (гардероб)"},
+  {word:"Shelf",      ipa:"/ʃelf/",          ru:"полка"},
+  {word:"Curtain",    ipa:"/ˈkɜːrtn/",      ru:"занавеска, штора"},
+  {word:"Mirror",     ipa:"/ˈmɪrər/",       ru:"зеркало"},
+  {word:"Blanket",    ipa:"/ˈblæŋkɪt/",     ru:"одеяло"},
+  {word:"Ceiling",    ipa:"/ˈsiːlɪŋ/",      ru:"потолок"},
+  {word:"Tasty",      ipa:"/ˈteɪsti/",      ru:"вкусный"},
+  {word:"Museum",     ipa:"/mjuˈziːəm/",    ru:"музей"},
+  {word:"Sink",       ipa:"/sɪŋk/",          ru:"раковина (кухонная)"},
+];
+
+// Exercise 1: fill in missing letters
+const EX1_DATA = [
+  {display:"FR_DGE",     answer:"fridge",    ru:"холодильник", tag:"fridge"},
+  {display:"WA_HBASIN",  answer:"washbasin", ru:"раковина (умывальник)", tag:"washbasin"},
+  {display:"C_RPET",     answer:"carpet",    ru:"ковёр", tag:"carpet"},
+  {display:"WARDRO_E",   answer:"wardrobe",  ru:"шкаф", tag:"wardrobe"},
+  {display:"SH_LF",      answer:"shelf",     ru:"полка", tag:"shelf"},
+  {display:"C_RTAIN",    answer:"curtain",   ru:"занавеска", tag:"curtain"},
+  {display:"MI_ROR",     answer:"mirror",    ru:"зеркало", tag:"mirror"},
+  {display:"BLA_KET",    answer:"blanket",   ru:"одеяло", tag:"blanket"},
+  {display:"CEILI_G",    answer:"ceiling",   ru:"потолок", tag:"ceiling"},
+  {display:"TAS_Y",      answer:"tasty",     ru:"вкусный", tag:"tasty"},
+  {display:"MUSE_M",     answer:"museum",    ru:"музей", tag:"museum"},
+  {display:"SI_K",       answer:"sink",      ru:"раковина (кухонная)", tag:"sink"},
+];
+
+// Exercise 2: RU -> EN translation
+const EX2_DATA = [
+  {ru:"В нашей кухне новый холодильник.", answers:["there is a new fridge in our kitchen","we have a new fridge in our kitchen"], tag:"fridge"},
+  {ru:"В ванной комнате чистая раковина.", answers:["there is a clean washbasin in the bathroom"], tag:"washbasin"},
+  {ru:"Ковёр в гостиной очень мягкий.", answers:["the carpet in the living room is very soft"], tag:"carpet"},
+  {ru:"Она повесила новые шторы на прошлой неделе.", answers:["she hung new curtains last week"], tag:"curtain"},
+  {ru:"На полке стоят книги.", answers:["there are books on the shelf"], tag:"shelf"},
+  {ru:"Сколько музеев в Италии?", answers:["how many museums are there in italy"], tag:"museum"},
+  {ru:"Кофе был очень вкусным вчера вечером.", answers:["the coffee was very tasty last night"], tag:"tasty"},
+  {ru:"Он купил новое одеяло для спальни.", answers:["he bought a new blanket for the bedroom"], tag:"blanket"},
+];
+
+// Exercise 3: dictation (listen & write). approxIpa is a simplified pronunciation guide.
+const EX3_DATA = [
+  {sentence:"The washbasin in the bathroom is broken.", ipa:"/ðə ˈwɒʃˌbeɪsn ɪn ðə ˈbæθruːm ɪz ˈbroʊkən/", tag:"washbasin"},
+  {sentence:"We are travelling to Italy next month.", ipa:"/wiː ɑːr ˈtrævəlɪŋ tuː ˈɪtəli nekst mʌnθ/", tag:"travel"},
+  {sentence:"She didn't like the tasty coffee at all.", ipa:"/ʃiː ˈdɪdnt laɪk ðə ˈteɪsti ˈkɒfi ət ɔːl/", tag:"tasty"},
+  {sentence:"How many museums are there in this city?", ipa:"/haʊ ˈmeni mjuˈziːəmz ɑːr ðeər ɪn ðɪs ˈsɪti/", tag:"museum"},
+  {sentence:"There is a soft carpet under the table.", ipa:"/ðeər ɪz ə sɒft ˈkɑːrpɪt ˈʌndər ðə ˈteɪbl/", tag:"carpet"},
+  {sentence:"He always keeps milk in the fridge.", ipa:"/hiː ˈɔːlweɪz kiːps mɪlk ɪn ðə frɪdʒ/", tag:"fridge"},
+  {sentence:"They bought a new mirror for the hallway.", ipa:"/ðeɪ bɔːt ə njuː ˈmɪrər fɔːr ðə ˈhɔːlweɪ/", tag:"mirror"},
+  {sentence:"What exactly did you like about the museum?", ipa:"/wɒt ɪɡˈzæktli dɪd juː laɪk əˈbaʊt ðə mjuˈziːəm/", tag:"what exactly"},
+];
+
+// Exercise 4: error correction
+const EX4_DATA = [
+  {wrong:"She have a new carpet in her room.", correct:["she has a new carpet in her room"], tag:"carpet / 3rd person -s"},
+  {wrong:"There is many museums in Rome.", correct:["there are many museums in rome"], tag:"there are / plural"},
+  {wrong:"He putted the blanket on the bed.", correct:["he put the blanket on the bed"], tag:"irregular verb put"},
+  {wrong:"I am liking this washbasin's design.", correct:["i like this washbasin's design"], tag:"stative verb like"},
+  {wrong:"Did she went to the museum yesterday?", correct:["did she go to the museum yesterday"], tag:"did + base form"},
+  {wrong:"The coffee were very tasty.", correct:["the coffee was very tasty"], tag:"was/were agreement"},
+  {wrong:"We didn't saw any curtains we liked.", correct:["we didn't see any curtains we liked"], tag:"didn't + base form"},
+  {wrong:"How much museums are there in London?", correct:["how many museums are there in london"], tag:"how many / countable"},
+];
+
+// Exercise 5: statement -> "How ... is/was ...?" question
+const EX5_DATA = [
+  {stmt:"The fridge is expensive.", answers:["how expensive is the fridge"], tag:"fridge"},
+  {stmt:"The museum was interesting.", answers:["how interesting was the museum"], tag:"museum"},
+  {stmt:"The carpet is soft.", answers:["how soft is the carpet"], tag:"carpet"},
+  {stmt:"The washbasin was dirty.", answers:["how dirty was the washbasin"], tag:"washbasin"},
+  {stmt:"The curtains are beautiful.", answers:["how beautiful are the curtains"], tag:"curtain"},
+  {stmt:"The coffee was tasty.", answers:["how tasty was the coffee"], tag:"tasty"},
+  {stmt:"The mirror is big.", answers:["how big is the mirror"], tag:"mirror"},
+  {stmt:"The blanket was warm.", answers:["how warm was the blanket"], tag:"blanket"},
+];
+
+// Exercise 6: "What exactly ...?" translation
+const EX6_DATA = [
+  {ru:"Что именно тебе понравилось в этом музее?", answers:["what exactly did you like about this museum"], tag:"what exactly"},
+  {ru:"Что именно тебе нравится в твоей новой квартире?", answers:["what exactly do you like about your new flat","what exactly do you like about your new apartment"], tag:"what exactly"},
+  {ru:"Что именно вам не понравилось в отеле?", answers:["what exactly didn't you like about the hotel","what exactly did not you like about the hotel"], tag:"what exactly"},
+  {ru:"Что именно она любит в этом городе?", answers:["what exactly does she like about this city"], tag:"what exactly"},
+  {ru:"Что именно тебе понравилось в кофе?", answers:["what exactly did you like about the coffee"], tag:"what exactly"},
+  {ru:"Что именно им нравится в их доме?", answers:["what exactly do they like about their house"], tag:"what exactly"},
+  {ru:"Что именно тебе не нравится в этом ковре?", answers:["what exactly don't you like about this carpet","what exactly do not you like about this carpet"], tag:"what exactly"},
+  {ru:"Что именно вам понравилось в Италии?", answers:["what exactly did you like about italy"], tag:"what exactly"},
+];
+
+// Exercise 7: three tenses of "Where ...?"
+const EX7_DATA = [
+  {subject:"he", verb:"work",  tag:"tense: work"},
+  {subject:"they", verb:"study", tag:"tense: study"},
+  {subject:"you", verb:"cook", tag:"tense: cook"},
+  {subject:"we", verb:"play", tag:"tense: play"},
+  {subject:"the children", verb:"read", tag:"tense: read"},
+  {subject:"Maria", verb:"dance", tag:"tense: dance"},
+  {subject:"your parents", verb:"shop", tag:"tense: shop"},
+  {subject:"she", verb:"travel", tag:"tense: travel"},
+];
+// helper builds correct forms for ex7 dynamically (see buildEx7Answers)
+
+// Exercise 8: open — finish the sentence (no strict grading, model shown on reveal)
+const EX8_DATA = [
+  "I would love to visit Italy because…",
+  "The best thing about my kitchen is…",
+  "If I could change one thing in my bedroom, it would be…",
+  "What I like most about travelling is…",
+  "In my opinion, a tasty breakfast should include…",
+  "The museum I most want to visit is… because…",
+  "My ideal living room would have…",
+  "One thing I always keep in my fridge is…",
+];
+
+// Exercise 9: Repeat & Change drilling
+const EX9_DATA = [
+  {model:"She is travelling to Spain right now.", task:"Составьте своё предложение (present continuous, куда-то едет прямо сейчас)."},
+  {model:"He works in a small office every day.", task:"Составьте своё предложение (present simple, рутина)."},
+  {model:"They visited three museums last year.", task:"Составьте своё предложение (past simple)."},
+  {model:"How tasty was the coffee this morning?", task:"Составьте свой вопрос по модели How + прилагательное + was/is."},
+  {model:"What exactly did you like about the trip?", task:"Составьте свой вопрос по модели What exactly...?"},
+  {model:"There is a soft carpet in my room.", task:"Составьте своё предложение (there is / there are)."},
+  {model:"She didn't like the museum because it was crowded.", task:"Составьте своё предложение (отрицание в прошедшем + because)."},
+  {model:"How many books are there on your shelf?", task:"Составьте свой вопрос по модели How many ... are there?"},
+];
+
+/* ============ STATE ============ */
+const problemWords = new Map(); // tag -> {ru, count}
+
+/* ============ UTIL ============ */
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+function normalize(s){
+  return s.toLowerCase()
+    .replace(/[.!?]+$/,'')
+    .replace(/[’']/g,"'")
+    .replace(/\s+/g,' ')
+    .trim();
+}
+function matches(userVal, accepted){
+  const u = normalize(userVal);
+  if(!u) return false;
+  return accepted.some(a => normalize(a) === u);
+}
+function el(tag, cls, html){
+  const e = document.createElement(tag);
+  if(cls) e.className = cls;
+  if(html !== undefined) e.innerHTML = html;
+  return e;
+}
+
+/* ============ SPEECH ============ */
+let chosenVoice = null;
+function pickVoice(){
+  const voices = window.speechSynthesis ? window.speechSynthesis.getVoices() : [];
+  if(!voices.length) return null;
+  let v = voices.find(v => v.name.includes('Google US English'));
+  if(!v) v = voices.find(v => v.lang === 'en-US');
+  if(!v) v = voices.find(v => v.lang && v.lang.startsWith('en'));
+  return v || voices[0];
+}
+function refreshVoice(){
+  chosenVoice = pickVoice();
+  const status = document.getElementById('audio-status');
+  if(chosenVoice){
+    status.textContent = 'Голос: ' + chosenVoice.name + ' (' + chosenVoice.lang + ')';
+  } else {
+    status.textContent = 'Голоса пока не загружены…';
+  }
+}
+if(window.speechSynthesis){
+  refreshVoice();
+  window.speechSynthesis.onvoiceschanged = refreshVoice;
+}
+function speak(text){
+  if(!window.speechSynthesis){
+    alert('Синтез речи не поддерживается в этом браузере.');
+    return;
+  }
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  if(!chosenVoice) chosenVoice = pickVoice();
+  if(chosenVoice){ u.voice = chosenVoice; u.lang = chosenVoice.lang; }
+  else { u.lang = 'en-US'; }
+  u.rate = 0.92;
+  window.speechSynthesis.speak(u);
+}
+document.getElementById('testAudioBtn').addEventListener('click', ()=>{
+  refreshVoice();
+  speak('This is an audio test. Fridge. Washbasin. Carpet.');
+});
+
+/* ============ PROBLEM WORDS SIDEBAR ============ */
+function markProblem(tag, ru){
+  if(!tag) return;
+  const cur = problemWords.get(tag) || {ru: ru || '', count:0};
+  cur.count += 1;
+  if(ru) cur.ru = ru;
+  problemWords.set(tag, cur);
+  renderProblems();
+}
+function clearProblems(){
+  problemWords.clear();
+  renderProblems();
+}
+function renderProblems(){
+  const box = document.getElementById('problemList');
+  if(problemWords.size === 0){
+    box.innerHTML = '<div class="note-empty">Пока ошибок нет — отлично!</div>';
+    return;
+  }
+  const rows = Array.from(problemWords.entries())
+    .sort((a,b)=> b[1].count - a[1].count)
+    .map(([tag,info]) => `<tr><td><strong>${tag}</strong>${info.ru ? ' — '+info.ru : ''}</td><td style="text-align:right;color:#8b7a2c;">×${info.count}</td></tr>`)
+    .join('');
+  box.innerHTML = `<table>${rows}</table>`;
+}
+
+/* ============ GENERIC ITEM BUILDER ============ */
+function buildItem(container, index, promptHTML, inputHTML, tag, ruHint){
+  const item = el('div','item');
+  item.dataset.tag = tag || '';
+  const num = el('div','item-num', (index+1)+'.');
+  const body = el('div','item-body');
+  const prompt = el('div','item-prompt');
+  if(ruHint) prompt.appendChild(el('span','ru-hint', ruHint));
+  prompt.insertAdjacentHTML('beforeend', promptHTML);
+  body.appendChild(prompt);
+  const row = el('div','item-row');
+  row.insertAdjacentHTML('beforeend', inputHTML);
+  body.appendChild(row);
+  const feedback = el('div','feedback');
+  body.appendChild(feedback);
+  const reveal = el('div','answer-reveal');
+  body.appendChild(reveal);
+  item.appendChild(num);
+  item.appendChild(body);
+  container.appendChild(item);
+  return item;
+}
+
+/* ============ RENDER: VOCAB ============ */
+function renderVocab(){
+  const tbody = document.getElementById('vocabTableBody');
+  VOCAB.forEach(v=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td class="vocab-word">${v.word}</td><td class="ipa">${v.ipa}</td><td class="ru">${v.ru}</td>
+      <td><button class="small audio-btn" onclick="speak('${v.word.replace(/'/g,"\\'")}')">🔊</button></td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+/* ============ RENDER: EX1 fill letters ============ */
+const ex1Order = shuffle(EX1_DATA).slice(0,8);
+function renderEx1(){
+  const c = document.getElementById('ex1-items');
+  ex1Order.forEach((d,i)=>{
+    const item = buildItem(c, i,
+      `Слово: <span class="blank-display">${d.display.toUpperCase()}</span> <span class="ru-hint" style="display:inline;">(${d.ru})</span>`,
+      `<input type="text" placeholder="впишите слово целиком">`,
+      d.tag, null);
+    item.dataset.answer = d.answer;
+  });
+}
+
+/* ============ RENDER: EX2 translation ============ */
+const ex2Order = shuffle(EX2_DATA);
+function renderEx2(){
+  const c = document.getElementById('ex2-items');
+  ex2Order.forEach((d,i)=>{
+    const item = buildItem(c, i,
+      `<span class="ru-hint" style="display:block;">${d.ru}</span>`,
+      `<input type="text" placeholder="type the English sentence…">`,
+      d.tag, null);
+    item.dataset.answers = JSON.stringify(d.answers);
+  });
+}
+
+/* ============ RENDER: EX3 dictation ============ */
+const ex3Order = shuffle(EX3_DATA);
+function renderEx3(){
+  const c = document.getElementById('ex3-items');
+  ex3Order.forEach((d,i)=>{
+    const item = buildItem(c, i,
+      `Прослушайте и запишите предложение.`,
+      `<button class="small audio-btn" data-role="listen">🔊 Слушать</button>
+       <input type="text" placeholder="что вы услышали?">`,
+      d.tag, null);
+    item.dataset.answers = JSON.stringify([d.sentence]);
+    item.querySelector('[data-role=listen]').addEventListener('click', ()=> speak(d.sentence));
+    const reveal = item.querySelector('.answer-reveal');
+    reveal.dataset.extra = d.ipa;
+  });
+}
+
+/* ============ RENDER: EX4 errors ============ */
+const ex4Order = shuffle(EX4_DATA);
+function renderEx4(){
+  const c = document.getElementById('ex4-items');
+  ex4Order.forEach((d,i)=>{
+    const item = buildItem(c, i,
+      `<em>"${d.wrong}"</em>`,
+      `<input type="text" placeholder="перепишите правильно…">`,
+      d.tag, null);
+    item.dataset.answers = JSON.stringify(d.correct);
+  });
+}
+
+/* ============ RENDER: EX5 statement -> question ============ */
+const ex5Order = shuffle(EX5_DATA);
+function renderEx5(){
+  const c = document.getElementById('ex5-items');
+  ex5Order.forEach((d,i)=>{
+    const item = buildItem(c, i,
+      `<em>"${d.stmt}"</em> → ?`,
+      `<input type="text" placeholder="How ... ?">`,
+      d.tag, null);
+    item.dataset.answers = JSON.stringify(d.answers);
+  });
+}
+
+/* ============ RENDER: EX6 "What exactly" translation ============ */
+const ex6Order = shuffle(EX6_DATA);
+function renderEx6(){
+  const c = document.getElementById('ex6-items');
+  ex6Order.forEach((d,i)=>{
+    const item = buildItem(c, i,
+      `<span class="ru-hint" style="display:block;">${d.ru}</span>`,
+      `<input type="text" placeholder="What exactly ... ?">`,
+      d.tag, null);
+    item.dataset.answers = JSON.stringify(d.answers);
+  });
+}
+
+/* ============ RENDER: EX7 tenses ============ */
+const ex7Order = shuffle(EX7_DATA);
+function buildEx7Answers(subject, verb){
+  const doAux = (subject==='he'||subject==='she'||subject==='Maria') ? 'does' : 'do';
+  // present continuous: be + verb-ing
+  const beMap = {he:'is', she:'is', Maria:'is', they:'are', we:'are', you:'are', 'the children':'are', 'your parents':'are'};
+  const be = beMap[subject] || 'is';
+  let ing = verb.endsWith('e') && verb!=='dance' ? verb.slice(0,-1)+'ing' : verb+'ing';
+  if(verb==='dance') ing = 'dancing';
+  if(verb==='shop') ing = 'shopping';
+  const cont = `where ${be} ${subject} ${ing}`;
+  const simple = `where ${doAux} ${subject} ${verb}`;
+  const past = `where did ${subject} ${verb}`;
+  return {cont, simple, past};
+}
+function renderEx7(){
+  const c = document.getElementById('ex7-items');
+  ex7Order.forEach((d,i)=>{
+    const ans = buildEx7Answers(d.subject, d.verb);
+    const item = el('div','item');
+    item.dataset.tag = d.tag;
+    const num = el('div','item-num', (i+1)+'.');
+    const body = el('div','item-body');
+    const prompt = el('div','item-prompt', `Subject: <strong>${d.subject}</strong> &nbsp; Verb: <strong>${d.verb}</strong>`);
+    body.appendChild(prompt);
+    const grid = el('div','tense-grid');
+    const rows = [
+      {label:'прямо сейчас', key:'cont', ph:'Where is/are ... -ing?'},
+      {label:'рутина', key:'simple', ph:'Where do/does ...?'},
+      {label:'прошлое', key:'past', ph:'Where did ...?'},
+    ];
+    rows.forEach(r=>{
+      const row = el('div','tense-row');
+      row.innerHTML = `<span class="tense-tag">${r.label}</span><input type="text" data-key="${r.key}" placeholder="${r.ph}">`;
+      grid.appendChild(row);
+    });
+    body.appendChild(grid);
+    const feedback = el('div','feedback');
+    body.appendChild(feedback);
+    const reveal = el('div','answer-reveal');
+    reveal.innerHTML = `cont: <strong>Where ${ans.cont.split(' ').slice(1).join(' ')}?</strong><br>simple: <strong>Where ${ans.simple.split(' ').slice(1).join(' ')}?</strong><br>past: <strong>Where ${ans.past.split(' ').slice(1).join(' ')}?</strong>`;
+    body.appendChild(reveal);
+    item.appendChild(num);
+    item.appendChild(body);
+    item.dataset.answers = JSON.stringify(ans);
+    c.appendChild(item);
+  });
+}
+
+/* ============ RENDER: EX8 open finish sentences ============ */
+const ex8Order = shuffle(EX8_DATA);
+function renderEx8(){
+  const c = document.getElementById('ex8-items');
+  ex8Order.forEach((prompt,i)=>{
+    const item = el('div','item');
+    const num = el('div','item-num', (i+1)+'.');
+    const body = el('div','item-body');
+    body.appendChild(el('div','item-prompt', prompt));
+    const ta = document.createElement('textarea');
+    ta.placeholder = 'ваш вариант…';
+    ta.dataset.prompt = prompt;
+    body.appendChild(ta);
+    item.appendChild(num); item.appendChild(body);
+    c.appendChild(item);
+  });
+}
+
+/* ============ RENDER: EX9 repeat & change ============ */
+const ex9Order = shuffle(EX9_DATA);
+function renderEx9(){
+  const c = document.getElementById('ex9-items');
+  ex9Order.forEach((d,i)=>{
+    const item = el('div','item');
+    const num = el('div','item-num', (i+1)+'.');
+    const body = el('div','item-body');
+    body.appendChild(el('div','item-prompt', `Модель: <em>"${d.model}"</em><br><span class="ru-hint" style="display:block;margin-top:3px;">${d.task}</span>`));
+    const ta = document.createElement('textarea');
+    ta.placeholder = 'ваше предложение…';
+    ta.dataset.prompt = d.model;
+    body.appendChild(ta);
+    item.appendChild(num); item.appendChild(body);
+    c.appendChild(item);
+  });
+}
+
+/* ============ CHECKING ============ */
+function checkExercise(exId){
+  const items = document.querySelectorAll('#'+exId+'-items > .item');
+  items.forEach(item=>{
+    if(exId === 'ex1'){
+      const input = item.querySelector('input');
+      const ok = normalize(input.value) === normalize(item.dataset.answer);
+      setState(item, ok);
+      if(!ok) markProblem(item.dataset.tag, item.dataset.answer);
+    } else if(exId === 'ex7'){
+      const ans = JSON.parse(item.dataset.answers);
+      const inputs = item.querySelectorAll('input');
+      let allOk = true;
+      inputs.forEach(inp=>{
+        const key = inp.dataset.key;
+        const target = 'where '+ans[key].split(' ').slice(1).join(' ');
+        const ok = normalize(inp.value) === normalize(target);
+        inp.style.background = inp.value.trim()==='' ? '' : (ok ? 'var(--green-soft)' : 'var(--red-soft)');
+        if(!ok) allOk = false;
+      });
+      const fb = item.querySelector('.feedback');
+      fb.textContent = allOk ? '✓ Все три формы верны' : '✗ Проверьте формы (см. подсказку ниже, если нужно)';
+      fb.className = 'feedback ' + (allOk ? 'ok' : 'bad');
+      if(!allOk) markProblem(item.dataset.tag, 'три времени');
+    } else {
+      const input = item.querySelector('input');
+      const accepted = JSON.parse(item.dataset.answers);
+      const ok = matches(input.value, accepted);
+      setState(item, ok);
+      if(!ok) markProblem(item.dataset.tag, accepted[0]);
+    }
+  });
+}
+function setState(item, ok){
+  item.classList.remove('state-ok','state-bad');
+  item.classList.add(ok ? 'state-ok' : 'state-bad');
+  const fb = item.querySelector('.feedback');
+  fb.textContent = ok ? '✓ верно' : '✗ попробуйте ещё раз или посмотрите ответ';
+  fb.className = 'feedback ' + (ok ? 'ok' : 'bad');
+}
+function revealExercise(exId){
+  const items = document.querySelectorAll('#'+exId+'-items > .item');
+  items.forEach(item=>{
+    const reveal = item.querySelector('.answer-reveal');
+    reveal.classList.add('show');
+    if(exId==='ex1'){
+      reveal.textContent = 'Ответ: ' + item.dataset.answer;
+    } else if(exId==='ex3'){
+      const ans = JSON.parse(item.dataset.answers)[0];
+      reveal.innerHTML = 'Ответ: <strong>'+ans+'</strong><br>Произношение: '+ (reveal.dataset.extra||'');
+    } else if(exId==='ex7'){
+      // already has html content set at render time
+    } else {
+      const ans = JSON.parse(item.dataset.answers);
+      reveal.textContent = 'Ответ: ' + ans.join(' / ');
+    }
+  });
+}
+
+/* ============ COPY ============ */
+function copyToClipboard(text){
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    return navigator.clipboard.writeText(text);
+  }
+  return new Promise((resolve,reject)=>{
+    try{
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position='fixed'; ta.style.left='-9999px';
+      document.body.appendChild(ta);
+      ta.focus(); ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      resolve();
+    }catch(e){ reject(e); }
+  });
+}
+function copyExercise(exId){
+  const items = document.querySelectorAll('#'+exId+'-items > .item');
+  let lines = [];
+  items.forEach((item,i)=>{
+    const field = item.querySelector('textarea');
+    const prompt = field.dataset.prompt || '';
+    const val = field.value.trim();
+    lines.push((i+1)+'. '+prompt+'\n   → '+(val || '(пусто)'));
+  });
+  const text = lines.join('\n\n');
+  copyToClipboard(text).then(()=>{
+    const status = document.getElementById(exId+'-copy-status');
+    status.classList.add('show');
+    setTimeout(()=> status.classList.remove('show'), 1800);
+  }).catch(()=>{
+    alert('Не удалось скопировать автоматически. Скопируйте ответы вручную:\n\n'+text);
+  });
+}
+
+/* ============ INIT ============ */
+renderVocab();
+renderEx1();
+renderEx2();
+renderEx3();
+renderEx4();
+renderEx5();
+renderEx6();
+renderEx7();
+renderEx8();
+renderEx9();
+renderProblems();
+</script>
+</body>
+</html>
