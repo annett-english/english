@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Care, Trust, Support —练习 практика</title>
+<style>
+  :root{
+    --bg:#f6f5f2;
+    --card:#ffffff;
+    --ink:#2b2b2b;
+    --muted:#6b6b6b;
+    --accent:#2f6f5e;
+    --accent-light:#e6f2ee;
+    --border:#e2ddd4;
+    --good:#2e7d32;
+    --good-bg:#e8f5e9;
+    --bad:#c62828;
+    --bad-bg:#fdecea;
+    --warn:#b8860b;
+    font-family: 'Georgia', 'Times New Roman', serif;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family: 'Segoe UI', system-ui, -apple-system, Arial, sans-serif;
+    line-height:1.5;
+  }
+  header{
+    background: linear-gradient(135deg,#2f6f5e,#245a4b);
+    color:#fff;
+    padding:28px 20px;
+    text-align:center;
+  }
+  header h1{
+    margin:0 0 6px;
+    font-family: Georgia, serif;
+    font-weight:700;
+    font-size:28px;
+    letter-spacing:.3px;
+  }
+  header p{margin:0;opacity:.9;font-size:14px;}
+
+  .layout{
+    display:grid;
+    grid-template-columns: 1fr 260px;
+    gap:22px;
+    max-width:1180px;
+    margin:24px auto;
+    padding:0 16px;
+    align-items:start;
+  }
+  @media (max-width: 900px){
+    .layout{grid-template-columns: 1fr;}
+    aside{position:static !important;}
+  }
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:20px 22px;
+    margin-bottom:22px;
+    box-shadow:0 1px 3px rgba(0,0,0,.04);
+  }
+
+  h2{
+    font-size:19px;
+    margin:0 0 4px;
+    color:var(--accent);
+  }
+  .sub{
+    color:var(--muted);
+    font-size:13.5px;
+    margin:0 0 16px;
+  }
+
+  /* Vocabulary reminder table */
+  table.vocab{
+    width:100%;
+    border-collapse:collapse;
+    font-size:14.5px;
+  }
+  table.vocab th{
+    text-align:left;
+    padding:8px 10px;
+    border-bottom:2px solid var(--border);
+    color:var(--muted);
+    font-size:12.5px;
+    text-transform:uppercase;
+    letter-spacing:.05em;
+  }
+  table.vocab td{
+    padding:9px 10px;
+    border-bottom:1px solid var(--border);
+    vertical-align:middle;
+  }
+  table.vocab tr:last-child td{border-bottom:none;}
+  .word-en{font-weight:600;}
+  .ipa{color:var(--accent);font-family:'Lucida Sans Unicode', 'DejaVu Sans', sans-serif;}
+  .btn-play{
+    border:none;
+    background:var(--accent-light);
+    color:var(--accent);
+    border-radius:20px;
+    padding:5px 12px;
+    cursor:pointer;
+    font-size:13px;
+    font-weight:600;
+    white-space:nowrap;
+  }
+  .btn-play:hover{background:#d3e9e2;}
+  .btn-play:active{transform:scale(0.97);}
+
+  /* Exercise items */
+  .item{
+    display:flex;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:10px;
+    padding:10px 0;
+    border-bottom:1px dashed var(--border);
+  }
+  .item:last-of-type{border-bottom:none;}
+  .item .num{
+    font-weight:700;
+    color:var(--accent);
+    min-width:22px;
+  }
+  .prompt{flex:1 1 320px;font-size:15px;}
+  .prompt .ru{color:var(--ink);}
+  .prompt .hint{color:var(--muted);font-size:13px;display:block;margin-top:2px;}
+  .masked{
+    font-family:'Courier New',monospace;
+    font-size:17px;
+    letter-spacing:2px;
+    font-weight:700;
+    color:var(--accent);
+  }
+  input[type=text]{
+    flex:1 1 220px;
+    padding:8px 10px;
+    border:1.5px solid var(--border);
+    border-radius:8px;
+    font-size:14.5px;
+    font-family:inherit;
+    transition:border-color .15s, background .15s;
+  }
+  input[type=text]:focus{
+    outline:none;
+    border-color:var(--accent);
+  }
+  input.correct{border-color:var(--good);background:var(--good-bg);}
+  input.incorrect{border-color:var(--bad);background:var(--bad-bg);}
+  textarea{
+    width:100%;
+    min-height:44px;
+    padding:8px 10px;
+    border:1.5px solid var(--border);
+    border-radius:8px;
+    font-family:inherit;
+    font-size:14.5px;
+    resize:vertical;
+  }
+  textarea:focus{outline:none;border-color:var(--accent);}
+  .feedback-icon{
+    min-width:22px;
+    font-size:16px;
+    text-align:center;
+  }
+  .answer-reveal{
+    flex-basis:100%;
+    font-size:13px;
+    color:var(--accent);
+    font-style:italic;
+    display:none;
+    padding-left:32px;
+  }
+  .answer-reveal.show{display:block;}
+
+  .btn-row{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-top:16px;
+    align-items:center;
+  }
+  button.action{
+    border:none;
+    padding:9px 16px;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:14px;
+    font-weight:600;
+    font-family:inherit;
+  }
+  .btn-check{background:var(--accent);color:#fff;}
+  .btn-check:hover{background:#255c4d;}
+  .btn-show{background:#efe8d8;color:#6b5b25;}
+  .btn-show:hover{background:#e5dabf;}
+  .btn-copy{background:#eef2f7;color:#33507a;}
+  .btn-copy:hover{background:#dfe6f0;}
+  .btn-reset{background:transparent;color:var(--muted);border:1px solid var(--border);}
+  .btn-reset:hover{background:#f0efeb;}
+
+  .score{
+    margin-left:auto;
+    font-weight:700;
+    font-size:14px;
+    color:var(--accent);
+  }
+
+  /* Sidebar */
+  aside{
+    position:sticky;
+    top:16px;
+  }
+  .problem-table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:13.5px;
+  }
+  .problem-table th{
+    text-align:left;
+    padding:6px 8px;
+    border-bottom:2px solid var(--border);
+    color:var(--muted);
+    font-size:11.5px;
+    text-transform:uppercase;
+  }
+  .problem-table td{
+    padding:7px 8px;
+    border-bottom:1px solid var(--border);
+  }
+  .count-badge{
+    background:var(--bad-bg);
+    color:var(--bad);
+    border-radius:10px;
+    padding:1px 8px;
+    font-weight:700;
+    font-size:12px;
+  }
+  .empty-msg{color:var(--muted);font-size:13px;font-style:italic;padding:8px 0;}
+
+  .toast{
+    position:fixed;
+    bottom:22px;
+    left:50%;
+    transform:translateX(-50%) translateY(20px);
+    background:#2b2b2b;
+    color:#fff;
+    padding:10px 20px;
+    border-radius:8px;
+    font-size:14px;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .25s, transform .25s;
+    z-index:999;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  .audio-warning{
+    display:none;
+    background:#fff4e5;
+    border:1px solid #f0c987;
+    color:#8a5a00;
+    padding:10px 14px;
+    border-radius:8px;
+    font-size:13.5px;
+    margin-bottom:16px;
+  }
+  .audio-warning.show{display:block;}
+
+  footer{
+    text-align:center;
+    color:var(--muted);
+    font-size:12.5px;
+    padding:24px 16px 40px;
+  }
+
+  .final-copy{
+    text-align:center;
+    margin:10px auto 30px;
+  }
+  .final-copy button{
+    padding:13px 26px;
+    font-size:15px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Care • Trust • Support</h1>
+  <p>Отношения и чувства: слова, произношение, 6 упражнений по 10 заданий</p>
+</header>
+
+<div class="layout">
+  <main>
+
+    <div class="card" id="audioCheckCard">
+      <div class="audio-warning" id="audioWarning">⚠️ Синтез речи не поддерживается или голос не найден. Попробуйте открыть страницу в Chrome (не в режиме предпросмотра, а как отдельный сохранённый файл).</div>
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+        <button class="btn-play" onclick="speak('Hello, can you hear me?')">🔊 Проверить звук</button>
+        <span id="voiceStatus" style="font-size:13px;color:var(--muted);"></span>
+      </div>
+    </div>
+
+    <!-- VOCAB REMINDER -->
+    <div class="card">
+      <h2>🔤 Повторим слова</h2>
+      <p class="sub">Нажми 🔊, чтобы прослушать произношение (голос Google US English).</p>
+      <table class="vocab">
+        <thead>
+          <tr><th>Слово / фраза</th><th>Транскрипция</th><th>Перевод</th><th></th></tr>
+        </thead>
+        <tbody id="vocabBody"></tbody>
+      </table>
+    </div>
+
+    <!-- EXERCISE 1 -->
+    <div class="card" id="ex1">
+      <h2>✏️ Упражнение 1. Вставь пропущенные буквы</h2>
+      <p class="sub">Восстанови слово по подсказке на русском.</p>
+      <div id="ex1_items"></div>
+      <div class="btn-row">
+        <button class="action btn-check" onclick="checkExercise('ex1')">Проверить</button>
+        <button class="action btn-show" onclick="showAnswers('ex1')">Показать ответы</button>
+        <button class="action btn-copy" onclick="copyExercise('ex1')">Скопировать ответы</button>
+        <span class="score" id="ex1_score"></span>
+      </div>
+    </div>
+
+    <!-- EXERCISE 2 -->
+    <div class="card" id="ex2">
+      <h2>🌍 Упражнение 2. Переведи с русского на английский</h2>
+      <p class="sub">Напиши полную фразу по-английски.</p>
+      <div id="ex2_items"></div>
+      <div class="btn-row">
+        <button class="action btn-check" onclick="checkExercise('ex2')">Проверить</button>
+        <button class="action btn-show" onclick="showAnswers('ex2')">Показать ответы</button>
+        <button class="action btn-copy" onclick="copyExercise('ex2')">Скопировать ответы</button>
+        <span class="score" id="ex2_score"></span>
+      </div>
+    </div>
+
+    <!-- EXERCISE 3 -->
+    <div class="card" id="ex3">
+      <h2>🎧 Упражнение 3. Прослушай и напиши фразу</h2>
+      <p class="sub">Нажми 🔊, послушай произношение и запиши фразу <b>целиком</b> — так, как услышал(а).</p>
+      <div id="ex3_items"></div>
+      <div class="btn-row">
+        <button class="action btn-check" onclick="checkExercise('ex3')">Проверить</button>
+        <button class="action btn-show" onclick="showAnswers('ex3')">Показать ответы</button>
+        <button class="action btn-copy" onclick="copyExercise('ex3')">Скопировать ответы</button>
+        <span class="score" id="ex3_score"></span>
+      </div>
+    </div>
+
+    <!-- EXERCISE 4 -->
+    <div class="card" id="ex4">
+      <h2>📖 Упражнение 4. Слово по определению</h2>
+      <p class="sub">Прочитай определение на английском и напиши нужное слово.</p>
+      <div id="ex4_items"></div>
+      <div class="btn-row">
+        <button class="action btn-check" onclick="checkExercise('ex4')">Проверить</button>
+        <button class="action btn-show" onclick="showAnswers('ex4')">Показать ответы</button>
+        <button class="action btn-copy" onclick="copyExercise('ex4')">Скопировать ответы</button>
+        <span class="score" id="ex4_score"></span>
+      </div>
+    </div>
+
+    <!-- EXERCISE 5 -->
+    <div class="card" id="ex5">
+      <h2>🔁 Упражнение 5. Rephrase — перефразируй</h2>
+      <p class="sub">Перепиши предложение, используя целевое слово/фразу из темы.</p>
+      <div id="ex5_items"></div>
+      <div class="btn-row">
+        <button class="action btn-check" onclick="checkExercise('ex5')">Проверить</button>
+        <button class="action btn-show" onclick="showAnswers('ex5')">Показать пример ответа</button>
+        <button class="action btn-copy" onclick="copyExercise('ex5')">Скопировать ответы</button>
+        <span class="score" id="ex5_score"></span>
+      </div>
+    </div>
+
+    <!-- EXERCISE 6 -->
+    <div class="card" id="ex6">
+      <h2>💭 Упражнение 6. Закончи предложения своими идеями</h2>
+      <p class="sub">Здесь нет "правильного" ответа — пиши, что думаешь. Можно посмотреть пример.</p>
+      <div id="ex6_items"></div>
+      <div class="btn-row">
+        <button class="action btn-show" onclick="showAnswers('ex6')">Показать пример</button>
+        <button class="action btn-copy" onclick="copyExercise('ex6')">Скопировать ответы</button>
+      </div>
+    </div>
+
+    <div class="final-copy">
+      <button class="action btn-check" onclick="copyAll()">📋 Скопировать ВСЕ ответы (все упражнения)</button>
+      <br><br>
+      <button class="action btn-reset" onclick="resetAll()">↺ Сбросить всё</button>
+    </div>
+
+  </main>
+
+  <aside>
+    <div class="card">
+      <h2 style="font-size:16px;">⚠️ Проблемные слова</h2>
+      <p class="sub" style="margin-bottom:10px;">Слова, в которых были ошибки</p>
+      <table class="problem-table">
+        <thead><tr><th>Слово</th><th>Ошибок</th></tr></thead>
+        <tbody id="problemBody"></tbody>
+      </table>
+      <div class="empty-msg" id="problemEmpty">Пока нет ошибок — так держать! 🎉</div>
+    </div>
+  </aside>
+</div>
+
+<footer>Практика по теме «Отношения и чувства» · озвучка через Web Speech API</footer>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============ DATA ============ */
+const vocab = [
+  {en:"care about sb", speak:"care about someone", ru:"заботиться о ком-то", ipa:"/keər əˈbaʊt/"},
+  {en:"trust sb", speak:"trust someone", ru:"доверять кому-то", ipa:"/trʌst/"},
+  {en:"support sb", speak:"support someone", ru:"поддерживать кого-то", ipa:"/səˈpɔːrt/"},
+  {en:"love sb unconditionally", speak:"love someone unconditionally", ru:"любить кого-то безусловно", ipa:"/lʌv ˌʌnkənˈdɪʃənəli/"},
+  {en:"feel safe with sb", speak:"feel safe with someone", ru:"чувствовать себя в безопасности с кем-то", ipa:"/fiːl seɪf wɪð/"},
+  {en:"respect sb's opinion", speak:"respect someone's opinion", ru:"уважать чьё-то мнение", ipa:"/rɪˈspekt əˈpɪnjən/"},
+  {en:"help sb with a problem", speak:"help someone with a problem", ru:"помогать кому-то с проблемой", ipa:"/help wɪð ə ˈprɒbləm/"},
+  {en:"trust sb completely", speak:"trust someone completely", ru:"доверять кому-то полностью", ipa:"/trʌst kəmˈpliːtli/"},
+  {en:"Love (n)", speak:"love", ru:"любовь", ipa:"/lʌv/"},
+  {en:"Support (n)", speak:"support", ru:"поддержка", ipa:"/səˈpɔːrt/"},
+  {en:"Care (n)", speak:"care", ru:"забота", ipa:"/keər/"},
+  {en:"Respect (n)", speak:"respect", ru:"уважение", ipa:"/rɪˈspekt/"},
+  {en:"Help (n)", speak:"help", ru:"помощь", ipa:"/help/"},
+  {en:"Trust (n)", speak:"trust", ru:"доверие", ipa:"/trʌst/"},
+  {en:"Safety / Safe", speak:"safety", ru:"безопасность", ipa:"/ˈseɪfti/"}
+];
+
+const exercises = {
+  ex1: {
+    type:"fill",
+    items:[
+      {masked:"tr_st", answer:["trust"], ru:"доверие", base:"trust"},
+      {masked:"he_p", answer:["help"], ru:"помощь", base:"help"},
+      {masked:"unc_nd_ti_n_lly", answer:["unconditionally"], ru:"безусловно", base:"unconditionally"},
+      {masked:"c_re", answer:["care"], ru:"забота", base:"care"},
+      {masked:"o_ini_n", answer:["opinion"], ru:"мнение", base:"opinion"},
+      {masked:"s_pp_rt", answer:["support"], ru:"поддержка", base:"support"},
+      {masked:"c_mpletely", answer:["completely"], ru:"полностью", base:"completely"},
+      {masked:"s_fe", answer:["safe"], ru:"безопасный", base:"safe"},
+      {masked:"re_p_ct", answer:["respect"], ru:"уважение", base:"respect"},
+      {masked:"l_ve", answer:["love"], ru:"любовь", base:"love"}
+    ]
+  },
+  ex2: {
+    type:"translate",
+    items:[
+      {ru:"любить кого-то безусловно", answer:["love someone unconditionally","love sb unconditionally"], base:"love unconditionally"},
+      {ru:"уважение", answer:["respect"], base:"respect"},
+      {ru:"доверять кому-то полностью", answer:["trust someone completely","trust sb completely"], base:"trust completely"},
+      {ru:"заботиться о ком-то", answer:["care about someone","care about sb","care about somebody"], base:"care about"},
+      {ru:"поддержка", answer:["support"], base:"support (noun)"},
+      {ru:"чувствовать себя в безопасности с кем-то", answer:["feel safe with someone","feel safe with sb"], base:"feel safe"},
+      {ru:"помогать кому-то с проблемой", answer:["help someone with a problem","help sb with a problem"], base:"help with a problem"},
+      {ru:"уважать чьё-то мнение", answer:["respect someone's opinion","respect sb's opinion","respect someones opinion"], base:"respect opinion"},
+      {ru:"доверять кому-то", answer:["trust someone","trust sb","trust somebody"], base:"trust sb"},
+      {ru:"поддерживать кого-то", answer:["support someone","support sb","support somebody"], base:"support sb"}
+    ]
+  },
+  ex3: {
+    type:"dictation",
+    items:[
+      {speak:"support someone", answer:["support someone","support sb","support somebody"], base:"support sb"},
+      {speak:"love someone unconditionally", answer:["love someone unconditionally","love sb unconditionally"], base:"love unconditionally"},
+      {speak:"trust someone", answer:["trust someone","trust sb","trust somebody"], base:"trust sb"},
+      {speak:"help someone with a problem", answer:["help someone with a problem","help sb with a problem"], base:"help with a problem"},
+      {speak:"respect someone's opinion", answer:["respect someone's opinion","respect sb's opinion","respect someones opinion"], base:"respect opinion"},
+      {speak:"care about someone", answer:["care about someone","care about sb","care about somebody"], base:"care about"},
+      {speak:"trust someone completely", answer:["trust someone completely","trust sb completely"], base:"trust completely"},
+      {speak:"feel safe with someone", answer:["feel safe with someone","feel safe with sb"], base:"feel safe"},
+      {speak:"give someone your support", answer:["give someone your support","give sb your support","give someone support"], base:"support (noun)"},
+      {speak:"show respect for someone", answer:["show respect for someone","show respect for sb"], base:"respect (noun)"}
+    ]
+  },
+  ex4: {
+    type:"definition",
+    items:[
+      {def:"To feel interest, concern, or affection for someone.", answer:["care about"], base:"care about"},
+      {def:"Without any limits, conditions, or exceptions.", answer:["unconditionally"], base:"unconditionally"},
+      {def:"To help someone emotionally or practically, to encourage them.", answer:["support"], base:"support"},
+      {def:"A strong feeling of admiration for someone's qualities or achievements.", answer:["respect"], base:"respect"},
+      {def:"To believe that someone is honest, reliable, and won't hurt you.", answer:["trust"], base:"trust"},
+      {def:"Free from danger or risk; protected.", answer:["safe"], base:"safe"},
+      {def:"To assist someone, especially when they are having difficulty.", answer:["help"], base:"help"},
+      {def:"A very strong feeling of affection for someone.", answer:["love"], base:"love"},
+      {def:"Fully, entirely, with nothing missing.", answer:["completely"], base:"completely"},
+      {def:"A person's view or judgment about something, not necessarily a fact.", answer:["opinion"], base:"opinion"}
+    ]
+  },
+  ex5: {
+    type:"rephrase",
+    items:[
+      {sentence:"I know he will never lie to me.", sample:"I trust him.", keyword:"trust", base:"trust"},
+      {sentence:"Everyone admires and values our teacher.", sample:"Everyone respects our teacher.", keyword:"respect", base:"respect"},
+      {sentence:"My mom always looks after me and worries about my well-being.", sample:"My mom cares about me.", keyword:"care", base:"care about"},
+      {sentence:"My family always gives me encouragement and help.", sample:"My family supports me.", keyword:"support", base:"support"},
+      {sentence:"She loves her children no matter what they do.", sample:"She loves her children unconditionally.", keyword:"unconditionally", base:"unconditionally"},
+      {sentence:"I believe in her 100%, without any doubt.", sample:"I trust her completely.", keyword:"trust", base:"trust completely"},
+      {sentence:"I never worry when I'm with my brother.", sample:"I feel safe with my brother.", keyword:"safe", base:"safe"},
+      {sentence:"My sister always assists me when I have difficulties.", sample:"My sister helps me with problems.", keyword:"help", base:"help"},
+      {sentence:"He always listens carefully to what I think, even if he disagrees.", sample:"He respects my opinion.", keyword:"respect", base:"respect opinion"},
+      {sentence:"My friends always help me when things are hard.", sample:"My friends support me.", keyword:"support", base:"support sb"}
+    ]
+  },
+  ex6: {
+    type:"open",
+    items:[
+      {prompt:"I trust ______ because ______.", sample:"I trust my best friend because she never judges me."},
+      {prompt:"I feel safe with ______ when ______.", sample:"I feel safe with my dad when I have problems at school."},
+      {prompt:"______ always supports me by ______.", sample:"My grandmother always supports me by listening to me."},
+      {prompt:"I respect ______'s opinion because ______.", sample:"I respect my teacher's opinion because she has a lot of experience."},
+      {prompt:"My parents love me unconditionally, for example ______.", sample:"My parents love me unconditionally, for example they support me even when I make mistakes."},
+      {prompt:"I care about ______ a lot because ______.", sample:"I care about my little brother a lot because he depends on me."},
+      {prompt:"______ helped me with a problem when ______.", sample:"My friend helped me with a problem when I lost my keys."},
+      {prompt:"True trust means ______.", sample:"True trust means being honest even when it's hard."},
+      {prompt:"For me, respect in a relationship is ______.", sample:"For me, respect in a relationship is listening without interrupting."},
+      {prompt:"The person I care about most is ______ because ______.", sample:"The person I care about most is my mom because she always believes in me."}
+    ]
+  }
+};
+
+/* ============ SPEECH ============ */
+let cachedVoices = [];
+let voicesReadyLogged = false;
+
+function loadVoices(){
+  cachedVoices = window.speechSynthesis ? window.speechSynthesis.getVoices() : [];
+  updateVoiceStatus();
+}
+if('speechSynthesis' in window){
+  loadVoices();
+  window.speechSynthesis.onvoiceschanged = loadVoices;
+  // some browsers (Safari) never fire onvoiceschanged and only populate voices
+  // a moment after page load — poll a few times just in case.
+  let tries = 0;
+  const poll = setInterval(() => {
+    tries++;
+    loadVoices();
+    if(cachedVoices.length > 0 || tries > 10) clearInterval(poll);
+  }, 300);
+} else {
+  document.getElementById('audioWarning').classList.add('show');
+  document.getElementById('audioWarning').textContent =
+    "⚠️ Ваш браузер не поддерживает синтез речи (Web Speech API). Откройте страницу в свежем Chrome, Edge или Safari.";
+}
+
+function updateVoiceStatus(){
+  const status = document.getElementById('voiceStatus');
+  if(!status) return;
+  if(cachedVoices.length === 0){
+    status.textContent = "Голоса ещё загружаются…";
+  } else {
+    const en = cachedVoices.filter(v => v.lang && v.lang.toLowerCase().startsWith('en'));
+    status.textContent = en.length > 0
+      ? `Доступно английских голосов: ${en.length}`
+      : "Английские голоса не найдены — будет использован голос по умолчанию.";
+  }
+}
+
+// Build a priority list of candidate voices: exact "Google US English" first,
+// then any en-US voice, then any English voice, then "no voice" (browser default).
+function getVoiceCandidates(){
+  const voices = window.speechSynthesis.getVoices();
+  cachedVoices = voices;
+  const list = [];
+  const google = voices.find(v => v.name === "Google US English");
+  if(google) list.push(google);
+  voices.filter(v => v.lang === "en-US" && v.name !== "Google US English").forEach(v => list.push(v));
+  voices.filter(v => v.lang && v.lang.startsWith("en") && !list.includes(v)).forEach(v => list.push(v));
+  list.push(null); // final fallback: let the browser pick its own default voice
+  return list;
+}
+
+function speak(text){
+  if(!('speechSynthesis' in window)){
+    document.getElementById('audioWarning').classList.add('show');
+    showToast("Синтез речи не поддерживается в этом браузере");
+    return;
+  }
+
+  window.speechSynthesis.cancel();
+
+  // If voices genuinely aren't loaded yet, wait briefly and retry once.
+  if(window.speechSynthesis.getVoices().length === 0){
+    setTimeout(() => {
+      if(window.speechSynthesis.getVoices().length === 0){
+        document.getElementById('audioWarning').classList.add('show');
+        document.getElementById('audioWarning').textContent =
+          "⚠️ В браузере не найдено ни одного голоса для синтеза речи. На Linux это частая ситуация — попробуйте открыть страницу в Chrome/Edge на Windows или Mac, либо в мобильном браузере.";
+        showToast("Голоса не найдены");
+      } else {
+        speak(text);
+      }
+    }, 500);
+    return;
+  }
+
+  const candidates = getVoiceCandidates();
+  attemptSpeak(text, candidates, 0);
+}
+
+function attemptSpeak(text, candidates, idx){
+  if(idx >= candidates.length){
+    document.getElementById('audioWarning').classList.add('show');
+    document.getElementById('audioWarning').textContent =
+      "⚠️ Не получилось воспроизвести звук. Проверьте, что звук в системе включён и вкладка не заглушена (значок 🔇 в адресной строке).";
+    showToast("Не удалось воспроизвести звук");
+    return;
+  }
+  const voice = candidates[idx];
+  const utter = new SpeechSynthesisUtterance(text);
+  if(voice) utter.voice = voice;
+  utter.lang = voice ? voice.lang : "en-US";
+  utter.rate = 0.88;
+
+  let settled = false;
+  utter.onstart = () => {
+    settled = true;
+    document.getElementById('audioWarning').classList.remove('show');
+  };
+  utter.onerror = () => {
+    if(!settled){
+      settled = true;
+      attemptSpeak(text, candidates, idx + 1);
+    }
+  };
+  window.speechSynthesis.speak(utter);
+
+  // Safety net: some browsers fail silently (no onstart, no onerror).
+  setTimeout(() => {
+    if(!settled){
+      settled = true;
+      window.speechSynthesis.cancel();
+      attemptSpeak(text, candidates, idx + 1);
+    }
+  }, 900);
+}
+
+/* ============ PROBLEM WORDS ============ */
+let problemWords = {};
+function addProblem(base){
+  problemWords[base] = (problemWords[base] || 0) + 1;
+  renderProblems();
+}
+function renderProblems(){
+  const body = document.getElementById('problemBody');
+  const empty = document.getElementById('problemEmpty');
+  const entries = Object.entries(problemWords).sort((a,b)=>b[1]-a[1]);
+  if(entries.length === 0){
+    body.innerHTML = "";
+    empty.style.display = "block";
+    return;
+  }
+  empty.style.display = "none";
+  body.innerHTML = entries.map(([word,count]) =>
+    `<tr><td>${escapeHtml(word)}</td><td><span class="count-badge">${count}</span></td></tr>`
+  ).join("");
+}
+
+/* ============ HELPERS ============ */
+function escapeHtml(str){
+  return str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+function normalize(str){
+  return str.toLowerCase()
+    .replace(/[.,!?;:]/g,'')
+    .replace(/\s+/g,' ')
+    .trim();
+}
+function matchesAny(input, answers){
+  const n = normalize(input);
+  return answers.some(a => normalize(a) === n);
+}
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 1800);
+}
+
+/* ============ RENDER VOCAB ============ */
+function renderVocab(){
+  const body = document.getElementById('vocabBody');
+  body.innerHTML = vocab.map(v => `
+    <tr>
+      <td class="word-en">${escapeHtml(v.en)}</td>
+      <td class="ipa">${escapeHtml(v.ipa)}</td>
+      <td>${escapeHtml(v.ru)}</td>
+      <td><button class="btn-play" onclick="speak('${v.speak.replace(/'/g,"\\'")}')">🔊 Слушать</button></td>
+    </tr>
+  `).join("");
+}
+
+/* ============ RENDER EXERCISES ============ */
+function renderExercise(exId){
+  const ex = exercises[exId];
+  const container = document.getElementById(exId + "_items");
+  container.innerHTML = ex.items.map((item, i) => {
+    const idx = i + 1;
+    let promptHtml = "";
+    let extra = "";
+    if(ex.type === "fill"){
+      promptHtml = `<span class="masked">${escapeHtml(item.masked)}</span> <span class="hint">(${escapeHtml(item.ru)})</span>`;
+    } else if(ex.type === "translate"){
+      promptHtml = `<span class="ru">${escapeHtml(item.ru)}</span>`;
+    } else if(ex.type === "dictation"){
+      promptHtml = `<button class="btn-play" onclick="speak('${item.speak.replace(/'/g,"\\'")}')">🔊 Слушать фразу</button><span class="hint">(напиши то, что услышал(а), полностью)</span>`;
+    } else if(ex.type === "definition"){
+      promptHtml = `<span>${escapeHtml(item.def)}</span>`;
+    } else if(ex.type === "rephrase"){
+      promptHtml = `<span>${escapeHtml(item.sentence)}</span>`;
+    } else if(ex.type === "open"){
+      promptHtml = `<span>${escapeHtml(item.prompt)}</span>`;
+    }
+
+    const inputField = ex.type === "open"
+      ? `<textarea id="${exId}_${i}" placeholder="Твой ответ..."></textarea>`
+      : `<input type="text" id="${exId}_${i}" placeholder="Твой ответ..." autocomplete="off">`;
+
+    const feedbackIcon = ex.type === "open" ? "" : `<span class="feedback-icon" id="${exId}_${i}_icon"></span>`;
+
+    let revealText = "";
+    if(ex.type === "rephrase") revealText = "Пример: " + item.sample;
+    else if(ex.type === "open") revealText = "Пример: " + item.sample;
+    else revealText = "Ответ: " + item.answer[0];
+
+    return `
+      <div class="item">
+        <span class="num">${idx}.</span>
+        <span class="prompt">${promptHtml}</span>
+        ${inputField}
+        ${feedbackIcon}
+        <span class="answer-reveal" id="${exId}_${i}_reveal">${escapeHtml(revealText)}</span>
+      </div>
+    `;
+  }).join("");
+}
+
+/* ============ CHECK ============ */
+function checkExercise(exId){
+  const ex = exercises[exId];
+  let correctCount = 0;
+  ex.items.forEach((item, i) => {
+    const input = document.getElementById(`${exId}_${i}`);
+    const icon = document.getElementById(`${exId}_${i}_icon`);
+    const val = input.value.trim();
+    let isCorrect = false;
+
+    if(val === ""){
+      input.classList.remove('correct','incorrect');
+      if(icon) icon.textContent = "";
+      return;
+    }
+
+    if(ex.type === "rephrase"){
+      isCorrect = normalize(val).includes(normalize(item.keyword));
+    } else {
+      isCorrect = matchesAny(val, item.answer);
+    }
+
+    input.classList.remove('correct','incorrect');
+    input.classList.add(isCorrect ? 'correct' : 'incorrect');
+    if(icon) icon.textContent = isCorrect ? "✅" : "❌";
+
+    if(isCorrect){
+      correctCount++;
+    } else {
+      addProblem(item.base);
+    }
+  });
+
+  const scoreEl = document.getElementById(exId + "_score");
+  if(scoreEl) scoreEl.textContent = `Результат: ${correctCount} / ${ex.items.length}`;
+}
+
+/* ============ SHOW ANSWERS ============ */
+function showAnswers(exId){
+  const ex = exercises[exId];
+  ex.items.forEach((item, i) => {
+    const reveal = document.getElementById(`${exId}_${i}_reveal`);
+    reveal.classList.toggle('show');
+  });
+}
+
+/* ============ COPY ============ */
+function collectExerciseText(exId){
+  const ex = exercises[exId];
+  const lines = ex.items.map((item, i) => {
+    const input = document.getElementById(`${exId}_${i}`);
+    const val = input.value.trim() || "(пусто)";
+    return `${i+1}. ${val}`;
+  });
+  return lines.join("\n");
+}
+
+function copyExercise(exId){
+  const text = collectExerciseText(exId);
+  copyToClipboard(text);
+}
+
+function copyAll(){
+  const titles = {
+    ex1:"Упражнение 1. Вставь пропущенные буквы",
+    ex2:"Упражнение 2. Переведи с русского на английский",
+    ex3:"Упражнение 3. Прослушай и напиши фразу",
+    ex4:"Упражнение 4. Слово по определению",
+    ex5:"Упражнение 5. Rephrase",
+    ex6:"Упражнение 6. Закончи предложения своими идеями"
+  };
+  let full = "";
+  Object.keys(exercises).forEach(exId => {
+    full += `— ${titles[exId]} —\n`;
+    full += collectExerciseText(exId);
+    full += "\n\n";
+  });
+  copyToClipboard(full.trim());
+}
+
+function copyToClipboard(text){
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(
+      () => showToast("Скопировано в буфер обмена ✅"),
+      () => fallbackCopy(text)
+    );
+  } else {
+    fallbackCopy(text);
+  }
+}
+function fallbackCopy(text){
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.left = '-9999px';
+  document.body.appendChild(ta);
+  ta.select();
+  try{
+    document.execCommand('copy');
+    showToast("Скопировано в буфер обмена ✅");
+  }catch(e){
+    showToast("Не удалось скопировать :(");
+  }
+  document.body.removeChild(ta);
+}
+
+/* ============ RESET ============ */
+function resetAll(){
+  if(!confirm("Сбросить все ответы и статистику ошибок?")) return;
+  problemWords = {};
+  renderProblems();
+  Object.keys(exercises).forEach(exId => {
+    exercises[exId].items.forEach((item, i) => {
+      const input = document.getElementById(`${exId}_${i}`);
+      if(input){
+        input.value = "";
+        input.classList.remove('correct','incorrect');
+      }
+      const icon = document.getElementById(`${exId}_${i}_icon`);
+      if(icon) icon.textContent = "";
+      const reveal = document.getElementById(`${exId}_${i}_reveal`);
+      if(reveal) reveal.classList.remove('show');
+    });
+    const scoreEl = document.getElementById(exId + "_score");
+    if(scoreEl) scoreEl.textContent = "";
+  });
+  showToast("Прогресс сброшен");
+}
+
+/* ============ INIT ============ */
+renderVocab();
+Object.keys(exercises).forEach(renderExercise);
+renderProblems();
+</script>
+</body>
+</html>
