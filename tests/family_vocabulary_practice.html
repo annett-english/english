@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Family &amp; Relatives — тренажёр слов</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EFEAE0;
+    --paper-card:#FBF9F4;
+    --ink:#21324D;
+    --ink-soft:#4B5A72;
+    --line:#D8D0BE;
+    --mustard:#C98A2C;
+    --mustard-deep:#A56C1B;
+    --teal:#3C6E68;
+    --good:#2F7A5E;
+    --good-bg:#E3F0E7;
+    --bad:#B4403A;
+    --bad-bg:#FBE7E4;
+    --shadow: 0 2px 0 rgba(33,50,77,0.08);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px);
+    background-size: 100% 38px;
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    line-height:1.5;
+    padding-bottom:60px;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:0 24px;}
+
+  /* HERO */
+  header.hero{
+    background:var(--ink);
+    background-image: radial-gradient(circle at 85% 0%, #2c4166 0%, var(--ink) 55%);
+    color:#F4F1E8;
+    padding:46px 0 34px;
+    border-bottom:6px solid var(--mustard);
+  }
+  header.hero .eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    text-transform:uppercase;
+    letter-spacing:.14em;
+    font-size:12.5px;
+    color:var(--mustard);
+    margin-bottom:10px;
+  }
+  header.hero h1{
+    font-family:'Fraunces',serif;
+    font-weight:700;
+    font-size:clamp(30px,4vw,44px);
+    margin:0 0 10px;
+  }
+  header.hero p{
+    max-width:640px;
+    color:#C9D0DE;
+    margin:0 0 18px;
+    font-size:15px;
+  }
+  #audioStatus{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12.5px;
+    background:rgba(255,255,255,0.08);
+    border:1px solid rgba(255,255,255,0.18);
+    padding:7px 12px;
+    border-radius:20px;
+  }
+  .dot{width:8px;height:8px;border-radius:50%;background:#889;flex:none;}
+  .dot.ok{background:#5BC48C;}
+  .dot.warn{background:#E0A94C;}
+
+  /* VOCAB PANEL */
+  section.vocab{margin-top:-18px;}
+  .vocab-card{
+    background:var(--paper-card);
+    border:1px solid var(--line);
+    box-shadow:var(--shadow);
+    border-radius:10px;
+    padding:22px 24px 12px;
+  }
+  .vocab-card h2{
+    font-family:'Fraunces',serif;
+    font-size:20px;
+    margin:0 0 4px;
+  }
+  .vocab-card .hint{color:var(--ink-soft);font-size:13.5px;margin:0 0 14px;}
+  .vocab-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(255px,1fr));
+    gap:10px 14px;
+    max-height:330px;
+    overflow-y:auto;
+    padding-bottom:14px;
+  }
+  .vcell{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:9px 10px;
+    background:#fff;
+  }
+  .vcell button.play{
+    flex:none;
+    width:30px;height:30px;
+    border-radius:50%;
+    border:1px solid var(--teal);
+    background:#fff;
+    color:var(--teal);
+    cursor:pointer;
+    font-size:13px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .vcell button.play:hover{background:var(--teal);color:#fff;}
+  .vcell .vtext{min-width:0;}
+  .vcell .en{font-weight:600;font-size:14.5px;}
+  .vcell .ipa{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--ink-soft);}
+  .vcell .ru{font-size:12.5px;color:var(--mustard-deep);}
+
+  /* LAYOUT */
+  .layout{display:grid;grid-template-columns:1fr 270px;gap:26px;margin-top:26px;align-items:start;}
+  @media (max-width:880px){ .layout{grid-template-columns:1fr;} aside{order:-1;} }
+
+  /* TABS */
+  .tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px;}
+  .tabs button{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    padding:9px 13px;
+    border-radius:7px;
+    border:1px solid var(--line);
+    background:#fff;
+    color:var(--ink-soft);
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  .tabs button.active{background:var(--ink);color:#fff;border-color:var(--ink);}
+  .tabs button:hover:not(.active){border-color:var(--teal);color:var(--teal);}
+
+  .panel{display:none;}
+  .panel.active{display:block;}
+  .ex-card{
+    background:var(--paper-card);
+    border:1px solid var(--line);
+    border-radius:10px;
+    box-shadow:var(--shadow);
+    padding:22px 24px 24px;
+  }
+  .ex-card h3{
+    font-family:'Fraunces',serif;
+    font-size:22px;
+    margin:0 0 4px;
+  }
+  .ex-card .instructions{color:var(--ink-soft);font-size:14px;margin:0 0 18px;}
+  .ex-toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;}
+  .btn{
+    font-family:'Inter',sans-serif;
+    font-size:13.5px;font-weight:600;
+    padding:9px 16px;
+    border-radius:7px;
+    border:1px solid var(--ink);
+    background:var(--ink);
+    color:#fff;
+    cursor:pointer;
+  }
+  .btn.secondary{background:#fff;color:var(--ink);}
+  .btn.ghost{background:transparent;color:var(--ink-soft);border-color:var(--line);}
+  .btn:hover{opacity:.88;}
+  .score-pill{
+    margin-left:auto;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:13px;
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:20px;
+    padding:8px 14px;
+  }
+
+  .item{
+    border-top:1px dashed var(--line);
+    padding:14px 0;
+    display:grid;
+    grid-template-columns:26px 1fr;
+    gap:10px;
+  }
+  .item:first-of-type{border-top:none;}
+  .num{
+    font-family:'IBM Plex Mono',monospace;
+    color:var(--mustard-deep);
+    font-weight:600;
+    font-size:13px;
+    padding-top:9px;
+  }
+  .prompt{font-size:15px;margin-bottom:8px;}
+  .prompt b{color:var(--ink);}
+  .masked{font-family:'IBM Plex Mono',monospace;font-size:16px;letter-spacing:1px;background:#fff;border:1px solid var(--line);padding:4px 10px;border-radius:6px;}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+  input[type=text], textarea{
+    font-family:'Inter',sans-serif;
+    font-size:14.5px;
+    padding:9px 11px;
+    border:1.5px solid var(--line);
+    border-radius:7px;
+    background:#fff;
+    color:var(--ink);
+    min-width:220px;
+  }
+  textarea{width:100%;min-height:56px;resize:vertical;font-size:14px;}
+  input[type=text]:focus, textarea:focus{outline:none;border-color:var(--teal);}
+  input.correct{border-color:var(--good);background:var(--good-bg);}
+  input.incorrect{border-color:var(--bad);background:var(--bad-bg);}
+  .play-mini{
+    flex:none;width:34px;height:34px;border-radius:50%;
+    border:1px solid var(--teal);background:#fff;color:var(--teal);
+    cursor:pointer;font-size:14px;
+  }
+  .play-mini:hover{background:var(--teal);color:#fff;}
+  .feedback{font-size:13px;margin-top:6px;}
+  .feedback.good{color:var(--good);}
+  .feedback.bad{color:var(--bad);}
+  .answer-reveal{
+    display:none;font-family:'IBM Plex Mono',monospace;font-size:13px;
+    color:var(--teal); margin-top:6px; background:#EFF6F4;border:1px dashed var(--teal);
+    padding:6px 10px;border-radius:6px;
+  }
+  .answer-reveal.show{display:block;}
+  .rank-group{margin-bottom:22px;}
+  .rank-group h4{font-family:'Fraunces',serif;font-size:16px;margin:0 0 6px;}
+  .rank-source{
+    font-size:13px;background:#fff;border:1px solid var(--line);
+    border-radius:7px;padding:8px 10px;margin-bottom:10px;color:var(--ink-soft);
+  }
+  .rank-blank{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
+  .rank-blank .num{padding-top:0;}
+
+  /* SIDEBAR */
+  aside{position:sticky;top:16px;display:flex;flex-direction:column;gap:16px;}
+  .side-card{
+    background:var(--paper-card);border:1px solid var(--line);border-radius:10px;
+    box-shadow:var(--shadow); padding:16px 16px 18px;
+  }
+  .side-card h3{font-family:'Fraunces',serif;font-size:16px;margin:0 0 4px;}
+  .side-card p.hint{font-size:12px;color:var(--ink-soft);margin:0 0 10px;}
+  #mistakeList{list-style:none;margin:0;padding:0;font-size:13.5px;}
+  #mistakeList li{
+    display:flex;justify-content:space-between;gap:6px;
+    border-bottom:1px solid var(--line);padding:6px 0;
+  }
+  #mistakeList li span.cnt{
+    font-family:'IBM Plex Mono',monospace;color:#fff;background:var(--bad);
+    border-radius:10px;padding:1px 8px;font-size:11.5px;flex:none;
+  }
+  #mistakeEmpty{font-size:13px;color:var(--ink-soft);}
+  .export-card .btn{width:100%;margin-bottom:8px;}
+
+  /* MODAL */
+  .modal-bg{
+    display:none;position:fixed;inset:0;background:rgba(20,26,38,.55);
+    align-items:center;justify-content:center;z-index:50;padding:20px;
+  }
+  .modal-bg.show{display:flex;}
+  .modal{
+    background:#fff;border-radius:10px;max-width:720px;width:100%;
+    max-height:82vh;display:flex;flex-direction:column;overflow:hidden;
+  }
+  .modal-head{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;}
+  .modal-head h3{font-family:'Fraunces',serif;margin:0;font-size:18px;}
+  .modal-body{padding:16px 20px;overflow:auto;}
+  .modal-body textarea{width:100%;height:340px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;}
+  .modal-foot{padding:12px 20px;border-top:1px solid var(--line);display:flex;gap:10px;justify-content:flex-end;}
+  .close-x{background:none;border:none;font-size:20px;cursor:pointer;color:var(--ink-soft);}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">Vocabulary practice · Family &amp; Relatives</div>
+    <h1>Family &amp; Relatives</h1>
+    <p>Ближайшая и расширенная семья, сводные и приёмные родственники. Прослушайте, повторите, впишите слова руками — 8 заданий, по 14 пунктов в каждом.</p>
+    <span id="audioStatus"><span class="dot" id="audioDot"></span><span id="audioText">проверяем голос…</span></span>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <section class="vocab">
+    <div class="vocab-card">
+      <h2>Слова урока</h2>
+      <p class="hint">Нажмите 🔊, чтобы услышать произношение (голос Google US English / en‑US).</p>
+      <div class="vocab-grid" id="vocabGrid"></div>
+    </div>
+  </section>
+
+  <div class="layout">
+    <main>
+      <div class="tabs" id="tabs"></div>
+      <div id="panels"></div>
+    </main>
+
+    <aside>
+      <div class="side-card">
+        <h3>⚠️ Проблемные слова</h3>
+        <p class="hint">Слова, в которых были ошибки</p>
+        <ul id="mistakeList"></ul>
+        <div id="mistakeEmpty">Пока ошибок нет — так держать!</div>
+      </div>
+      <div class="side-card export-card">
+        <h3>Экспорт ответов</h3>
+        <p class="hint">Собрать все ваши ответы для проверки преподавателем</p>
+        <button class="btn secondary" id="exportBtn">Показать / скопировать ответы</button>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Ваши ответы</h3>
+      <button class="close-x" id="modalClose">✕</button>
+    </div>
+    <div class="modal-body">
+      <textarea id="exportArea" readonly></textarea>
+    </div>
+    <div class="modal-foot">
+      <button class="btn ghost" id="downloadBtn">Скачать .txt</button>
+      <button class="btn secondary" id="copyBtn">Копировать</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============== DATA ============== */
+const VOCAB = [
+  {en:"aunt", ru:"тётя", ipa:"/ænt/"},
+  {en:"uncle", ru:"дядя", ipa:"/ˈʌŋkl/"},
+  {en:"great-grandmother", ru:"прабабушка", ipa:"/ˌɡreɪt ˈɡrænˌmʌðər/"},
+  {en:"great-grandfather", ru:"прадедушка", ipa:"/ˌɡreɪt ˈɡrænˌfɑːðər/"},
+  {en:"siblings", ru:"братья и сёстры", ipa:"/ˈsɪblɪŋz/"},
+  {en:"daughter", ru:"дочь", ipa:"/ˈdɔːtər/"},
+  {en:"cousin", ru:"двоюродный брат / сестра", ipa:"/ˈkʌzn/"},
+  {en:"cousin's wife", ru:"жена двоюродного брата", ipa:"/ˈkʌznz waɪf/"},
+  {en:"nephew", ru:"племянник", ipa:"/ˈnefjuː/"},
+  {en:"niece", ru:"племянница", ipa:"/niːs/"},
+  {en:"sister-in-law", ru:"невестка / золовка", ipa:"/ˈsɪstər ɪn lɔː/"},
+  {en:"father-in-law", ru:"тесть / свёкор", ipa:"/ˈfɑːðər ɪn lɔː/"},
+  {en:"mother-in-law", ru:"тёща / свекровь", ipa:"/ˈmʌðər ɪn lɔː/"},
+  {en:"ex-wife", ru:"бывшая жена", ipa:"/ˌeks ˈwaɪf/"},
+  {en:"stepfather", ru:"отчим", ipa:"/ˈstepˌfɑːðər/"},
+  {en:"stepsister", ru:"сводная сестра", ipa:"/ˈstepˌsɪstər/"},
+  {en:"stepbrother", ru:"сводный брат", ipa:"/ˈstepˌbrʌðər/"},
+  {en:"stepdaughter", ru:"падчерица", ipa:"/ˈstepˌdɔːtər/"},
+  {en:"stepson", ru:"пасынок", ipa:"/ˈstepˌsʌn/"},
+  {en:"ex-husband", ru:"бывший муж", ipa:"/ˌeks ˈhʌzbənd/"},
+  {en:"half-sister", ru:"неполнородная сестра", ipa:"/ˈhɑːf ˌsɪstər/"},
+  {en:"immediate family", ru:"ближайшая (нуклеарная) семья", ipa:"/ɪˈmiːdiət ˈfæməli/"},
+  {en:"extended family", ru:"расширенная семья", ipa:"/ɪkˈstendɪd ˈfæməli/"},
+  {en:"adopted child", ru:"приёмный ребёнок", ipa:"/əˈdɒptɪd tʃaɪld/"},
+  {en:"only child", ru:"единственный ребёнок", ipa:"/ˈəʊnli tʃaɪld/"}
+];
+
+const CLUES = {
+  "aunt":"Your mother's or father's sister.",
+  "uncle":"Your mother's or father's brother.",
+  "great-grandmother":"The mother of your grandmother or grandfather.",
+  "great-grandfather":"The father of your grandmother or grandfather.",
+  "siblings":"A general word for brothers and sisters together.",
+  "daughter":"A female child in relation to her parents.",
+  "cousin":"The child of your aunt or uncle.",
+  "cousin's wife":"The woman married to your cousin.",
+  "nephew":"The son of your brother or sister.",
+  "niece":"The daughter of your brother or sister.",
+  "sister-in-law":"Your husband's/wife's sister, or your brother's wife.",
+  "father-in-law":"The father of your husband or wife.",
+  "mother-in-law":"The mother of your husband or wife.",
+  "ex-wife":"A woman who used to be married to you but is now divorced from you.",
+  "stepfather":"The man your mother married after divorce or after your father died.",
+  "stepsister":"The daughter of your stepfather or stepmother from another marriage.",
+  "stepbrother":"The son of your stepfather or stepmother from another marriage.",
+  "stepdaughter":"The daughter of your husband or wife from a previous marriage.",
+  "stepson":"The son of your husband or wife from a previous marriage.",
+  "ex-husband":"A man who used to be married to you but is now divorced from you.",
+  "half-sister":"A sister who shares only one parent with you.",
+  "immediate family":"Your closest relatives — parents, siblings and children.",
+  "extended family":"Relatives beyond your closest family — grandparents, aunts, cousins, etc.",
+  "adopted child":"A child legally raised by parents who are not their biological parents.",
+  "only child":"A child who has no brothers or sisters."
+};
+
+const TF = [
+  {s:"A niece is the daughter of your brother or sister.", a:true},
+  {s:"An uncle is your father's or mother's sister.", a:false},
+  {s:"A stepbrother and a half-brother mean exactly the same thing.", a:false},
+  {s:"An only child has no siblings.", a:true},
+  {s:"A mother-in-law is the mother of your husband or wife.", a:true},
+  {s:"A cousin's wife is called your sister-in-law.", a:false},
+  {s:"Great-grandparents are the parents of your grandparents.", a:true},
+  {s:"An ex-husband is a man you are currently married to.", a:false},
+  {s:"Extended family includes only your parents and children.", a:false},
+  {s:"A stepdaughter is your husband's or wife's daughter from a previous marriage.", a:true},
+  {s:"Siblings means only brothers, never sisters.", a:false},
+  {s:"An adopted child is raised by parents who aren't their biological parents.", a:true},
+  {s:"A half-sister shares both parents with you.", a:false},
+  {s:"Immediate family usually means your parents, siblings, and children.", a:true},
+  {s:"A father-in-law is the father of your husband or wife.", a:true},
+  {s:"A nephew is the son of your aunt or uncle.", a:false},
+  {s:"Stepparents become part of your family through remarriage, not by birth.", a:true},
+  {s:"A sister-in-law can be your brother's wife.", a:true},
+  {s:"An ex-wife is a woman you are currently engaged to.", a:false},
+  {s:"A cousin is the child of your aunt or uncle.", a:true}
+];
+
+const DIFF_PAIRS = [
+  {a:"aunt", b:"uncle"},
+  {a:"niece", b:"nephew"},
+  {a:"stepsister", b:"half-sister"},
+  {a:"cousin", b:"siblings"},
+  {a:"ex-wife", b:"mother-in-law"},
+  {a:"stepson", b:"nephew"},
+  {a:"great-grandmother", b:"great-grandfather"},
+  {a:"immediate family", b:"extended family"},
+  {a:"adopted child", b:"stepdaughter"},
+  {a:"only child", b:"siblings"},
+  {a:"father-in-law", b:"stepfather"},
+  {a:"sister-in-law", b:"stepsister"},
+  {a:"cousin's wife", b:"sister-in-law"},
+  {a:"daughter", b:"stepdaughter"}
+];
+
+const EXPAND = [
+  {word:"aunt", seed:"I have an aunt."},
+  {word:"uncle", seed:"My uncle called me."},
+  {word:"cousin", seed:"She is my cousin."},
+  {word:"niece", seed:"He has a niece."},
+  {word:"nephew", seed:"They have a nephew."},
+  {word:"stepfather", seed:"My stepfather cooks dinner."},
+  {word:"stepson", seed:"He has a stepson."},
+  {word:"sister-in-law", seed:"This is my sister-in-law."},
+  {word:"mother-in-law", seed:"My mother-in-law visited."},
+  {word:"ex-husband", seed:"Her ex-husband called."},
+  {word:"half-sister", seed:"I met my half-sister."},
+  {word:"extended family", seed:"We have extended family."},
+  {word:"only child", seed:"She is an only child."},
+  {word:"adopted child", seed:"He is an adopted child."}
+];
+
+const RANK_GROUPS = [
+  {title:"Group A — alphabetical order", words:["aunt","cousin","daughter","nephew","niece","stepson","uncle"]},
+  {title:"Group B — alphabetical order", words:["ex-husband","ex-wife","father-in-law","mother-in-law","sister-in-law","stepbrother","stepdaughter"]}
+];
+
+/* ============== HELPERS ============== */
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+function pick(arr,n){ return shuffle(arr).slice(0,n); }
+function norm(s){ return (s||"").toLowerCase().trim().replace(/\s+/g," ").replace(/’/g,"'"); }
+
+function maskWord(word){
+  return word.split(/([ -])/).map(tok=>{
+    if(tok===" "||tok==="-") return tok;
+    if(tok.length<=2) return tok;
+    const chars = tok.split("");
+    for(let i=1;i<chars.length-1;i++){
+      if(Math.random()<0.55) chars[i]="_";
+    }
+    return chars.join("");
+  }).join("");
+}
+
+/* ============== MISTAKES ============== */
+const mistakes = {}; // word -> count
+function addMistake(word){
+  if(!word) return;
+  mistakes[word] = (mistakes[word]||0)+1;
+  renderMistakes();
+}
+function renderMistakes(){
+  const list = document.getElementById('mistakeList');
+  const empty = document.getElementById('mistakeEmpty');
+  const entries = Object.entries(mistakes).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  list.innerHTML = entries.map(([w,c])=>`<li><span>${w}</span><span class="cnt">${c}</span></li>`).join("");
+  empty.style.display = entries.length ? "none" : "block";
+}
+
+/* ============== AUDIO ============== */
+let chosenVoice = null;
+function setupVoice(){
+  const voices = window.speechSynthesis ? window.speechSynthesis.getVoices() : [];
+  if(!voices.length) return false;
+  chosenVoice = voices.find(v=>v.name.includes("Google US English"))
+             || voices.find(v=>v.lang==="en-US")
+             || voices.find(v=>v.lang && v.lang.startsWith("en"));
+  const dot = document.getElementById('audioDot');
+  const txt = document.getElementById('audioText');
+  if(chosenVoice){
+    dot.className = "dot ok";
+    txt.textContent = "голос готов: " + chosenVoice.name;
+  }else{
+    dot.className = "dot warn";
+    txt.textContent = "en-US голос не найден — попробуйте Chrome";
+  }
+  return true;
+}
+if('speechSynthesis' in window){
+  setupVoice();
+  window.speechSynthesis.onvoiceschanged = setupVoice;
+  setTimeout(()=>{ if(!chosenVoice) setupVoice(); }, 800);
+}else{
+  document.getElementById('audioText').textContent = "браузер не поддерживает озвучку";
+}
+function speak(text){
+  if(!('speechSynthesis' in window)){ alert("Ваш браузер не поддерживает синтез речи."); return; }
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = "en-US";
+  u.rate = 0.9;
+  if(chosenVoice) u.voice = chosenVoice;
+  window.speechSynthesis.speak(u);
+}
+
+/* ============== VOCAB PANEL ============== */
+const vocabGrid = document.getElementById('vocabGrid');
+vocabGrid.innerHTML = VOCAB.map(v=>`
+  <div class="vcell">
+    <button class="play" onclick="speak('${v.en.replace(/'/g,"\\'")}')" title="Слушать">🔊</button>
+    <div class="vtext">
+      <div class="en">${v.en}</div>
+      <div class="ipa">${v.ipa}</div>
+      <div class="ru">${v.ru}</div>
+    </div>
+  </div>
+`).join("");
+
+/* ============== EXERCISE BUILDERS ============== */
+const EXERCISES = [
+  {id:"ex1", tab:"1. Пропущенные буквы", build: buildFillLetters},
+  {id:"ex2", tab:"2. Перевод RU→EN", build: buildTranslation},
+  {id:"ex3", tab:"3. Пишем на слух", build: buildDictation},
+  {id:"ex4", tab:"4. Guess the word", build: buildGuess},
+  {id:"ex5", tab:"5. Rank them", build: buildRank},
+  {id:"ex6", tab:"6. True / False", build: buildTF},
+  {id:"ex7", tab:"7. Explain the difference", build: buildDiff},
+  {id:"ex8", tab:"8. Expand the sentence", build: buildExpand}
+];
+
+const tabsEl = document.getElementById('tabs');
+const panelsEl = document.getElementById('panels');
+
+EXERCISES.forEach((ex,i)=>{
+  const btn = document.createElement('button');
+  btn.textContent = ex.tab;
+  btn.dataset.target = ex.id;
+  if(i===0) btn.classList.add('active');
+  btn.onclick = ()=>{
+    document.querySelectorAll('.tabs button').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(ex.id).classList.add('active');
+  };
+  tabsEl.appendChild(btn);
+
+  const panel = document.createElement('div');
+  panel.className = 'panel' + (i===0 ? ' active':'');
+  panel.id = ex.id;
+  panelsEl.appendChild(panel);
+  ex.build(panel);
+});
+
+function exCardShell(panel, title, instructions){
+  panel.innerHTML = `
+    <div class="ex-card">
+      <h3>${title}</h3>
+      <p class="instructions">${instructions}</p>
+      <div class="ex-toolbar">
+        <button class="btn checkAllBtn">Проверить все</button>
+        <button class="btn secondary showAllBtn">Показать ответы</button>
+        <span class="score-pill">Результат: <span class="scoreVal">—</span></span>
+      </div>
+      <div class="items"></div>
+    </div>`;
+  return panel.querySelector('.items');
+}
+
+/* ---- 1. Fill in missing letters ---- */
+function buildFillLetters(panel){
+  const items = pick(VOCAB, 14).map(v=>({word:v.en, ru:v.ru, masked:maskWord(v.en)}));
+  const box = exCardShell(panel,"Вставьте пропущенные буквы","Допишите слово целиком в поле ввода. Перевод дан для подсказки.");
+  box.innerHTML = items.map((it,i)=>`
+    <div class="item" data-word="${it.word}">
+      <div class="num">${i+1}</div>
+      <div>
+        <div class="prompt"><span class="masked">${it.masked}</span> &nbsp;— <i>${it.ru}</i></div>
+        <div class="row">
+          <input type="text" class="ans" placeholder="напишите слово полностью">
+        </div>
+        <div class="feedback"></div>
+        <div class="answer-reveal">Ответ: <b>${it.word}</b></div>
+      </div>
+    </div>`).join("");
+  wireCheck(panel, it => it, "en");
+  wireData(panel, items);
+}
+
+/* ---- 2. Translation RU -> EN ---- */
+function buildTranslation(panel){
+  const items = pick(VOCAB, 14);
+  const box = exCardShell(panel,"Переведите на английский","Прочитайте русский перевод и напишите английское слово.");
+  box.innerHTML = items.map((v,i)=>`
+    <div class="item" data-word="${v.en}">
+      <div class="num">${i+1}</div>
+      <div>
+        <div class="prompt"><b>${v.ru}</b></div>
+        <div class="row"><input type="text" class="ans" placeholder="write in English"></div>
+        <div class="feedback"></div>
+        <div class="answer-reveal">Ответ: <b>${v.en}</b></div>
+      </div>
+    </div>`).join("");
+  wireData(panel, items);
+}
+
+/* ---- 3. Write the word you hear ---- */
+function buildDictation(panel){
+  const items = pick(VOCAB, 14);
+  const box = exCardShell(panel,"Прописать слово по звуку","Нажмите 🔊, прослушайте слово и напишите его по-английски.");
+  box.innerHTML = items.map((v,i)=>`
+    <div class="item" data-word="${v.en}">
+      <div class="num">${i+1}</div>
+      <div>
+        <div class="row" style="margin-bottom:8px;">
+          <button class="play-mini" onclick="speak('${v.en.replace(/'/g,"\\'")}')">🔊</button>
+          <input type="text" class="ans" placeholder="write what you hear">
+        </div>
+        <div class="feedback"></div>
+        <div class="answer-reveal">Ответ: <b>${v.en}</b> ${v.ipa}</div>
+      </div>
+    </div>`).join("");
+  wireData(panel, items);
+}
+
+/* ---- 4. Guess the word ---- */
+function buildGuess(panel){
+  const items = pick(VOCAB, 14);
+  const box = exCardShell(panel,"Guess the word","Прочитайте определение на английском и напишите слово, которое оно описывает.");
+  box.innerHTML = items.map((v,i)=>`
+    <div class="item" data-word="${v.en}">
+      <div class="num">${i+1}</div>
+      <div>
+        <div class="prompt">${CLUES[v.en]}</div>
+        <div class="row"><input type="text" class="ans" placeholder="write the word"></div>
+        <div class="feedback"></div>
+        <div class="answer-reveal">Ответ: <b>${v.en}</b></div>
+      </div>
+    </div>`).join("");
+  wireData(panel, items);
+}
+
+/* ---- 5. Rank them (alphabetical) ---- */
+function buildRank(panel){
+  panel.innerHTML = `
+    <div class="ex-card">
+      <h3>Rank them</h3>
+      <p class="instructions">Расставьте слова в алфавитном порядке (A→Z). Впишите слова в пустые поля по порядку.</p>
+      <div class="ex-toolbar">
+        <button class="btn checkAllBtn">Проверить все</button>
+        <button class="btn secondary showAllBtn">Показать ответы</button>
+        <span class="score-pill">Результат: <span class="scoreVal">—</span></span>
+      </div>
+      <div class="items"></div>
+    </div>`;
+  const box = panel.querySelector('.items');
+  let counter = 0;
+  const dataItems = [];
+  box.innerHTML = RANK_GROUPS.map(g=>{
+    const correct = g.words.slice().sort();
+    const shown = shuffle(g.words);
+    const blanks = correct.map((w)=>{
+      counter++;
+      dataItems.push({word:w, label:`Rank group: ${g.title}, position`});
+      return `<div class="rank-blank" data-word="${w}">
+        <span class="num">${counter}.</span>
+        <input type="text" class="ans" placeholder="слово по алфавиту">
+        <span class="feedback"></span>
+        <span class="answer-reveal">Ответ: <b>${w}</b></span>
+      </div>`;
+    }).join("");
+    return `<div class="rank-group">
+      <h4>${g.title}</h4>
+      <div class="rank-source">Слова: ${shown.join(", ")}</div>
+      ${blanks}
+    </div>`;
+  }).join("");
+  wireData(panel, dataItems, true);
+}
+
+/* ---- 6. True / False ---- */
+function buildTF(panel){
+  const items = pick(TF, 14);
+  const box = exCardShell(panel,"True or False","Прочитайте утверждение и напишите true или false.");
+  box.innerHTML = items.map((it,i)=>`
+    <div class="item" data-word="${it.a}">
+      <div class="num">${i+1}</div>
+      <div>
+        <div class="prompt">${it.s}</div>
+        <div class="row"><input type="text" class="ans" placeholder="true / false"></div>
+        <div class="feedback"></div>
+        <div class="answer-reveal">Ответ: <b>${it.a}</b></div>
+      </div>
+    </div>`).join("");
+  panel._tfAnswers = items.map(it=>String(it.a));
+  wireCheckTF(panel, items);
+}
+
+/* ---- 7. Explain the difference ---- */
+function buildDiff(panel){
+  const items = pick(DIFF_PAIRS, 14);
+  panel.innerHTML = `
+    <div class="ex-card">
+      <h3>Explain the difference</h3>
+      <p class="instructions">Своими словами объясните разницу между парой слов на английском (1–2 предложения). Строгой проверки нет — сравните с примером ответа.</p>
+      <div class="ex-toolbar">
+        <button class="btn secondary showAllBtn">Показать примеры ответов</button>
+        <span class="score-pill" id="diffCounter">Заполнено: 0/14</span>
+      </div>
+      <div class="items"></div>
+    </div>`;
+  const box = panel.querySelector('.items');
+  box.innerHTML = items.map((p,i)=>`
+    <div class="item">
+      <div class="num">${i+1}</div>
+      <div>
+        <div class="prompt"><b>${p.a}</b> vs <b>${p.b}</b></div>
+        <div class="row"><textarea class="ans" placeholder="Explain in English..."></textarea></div>
+        <div class="answer-reveal">Пример: ${p.a} — ${CLUES[p.a]} / ${p.b} — ${CLUES[p.b]}</div>
+      </div>
+    </div>`).join("");
+  panel.querySelector('.showAllBtn').onclick = ()=>{
+    panel.querySelectorAll('.answer-reveal').forEach(r=>r.classList.toggle('show'));
+  };
+  panel.querySelectorAll('textarea.ans').forEach(ta=>{
+    ta.addEventListener('input', ()=>{
+      const filled = [...panel.querySelectorAll('textarea.ans')].filter(t=>t.value.trim().length>0).length;
+      panel.querySelector('#diffCounter').textContent = `Заполнено: ${filled}/14`;
+    });
+  });
+}
+
+/* ---- 8. Expand the sentence ---- */
+function buildExpand(panel){
+  const items = pick(EXPAND, 14);
+  panel.innerHTML = `
+    <div class="ex-card">
+      <h3>Expand the sentence</h3>
+      <p class="instructions">Расширьте короткое предложение: добавьте детали (минимум +5 слов), используя нужное слово по теме.</p>
+      <div class="ex-toolbar">
+        <button class="btn checkAllBtn">Проверить все</button>
+        <button class="btn secondary showAllBtn">Показать пример</button>
+        <span class="score-pill">Результат: <span class="scoreVal">—</span></span>
+      </div>
+      <div class="items"></div>
+    </div>`;
+  const box = panel.querySelector('.items');
+  box.innerHTML = items.map((it,i)=>`
+    <div class="item" data-word="${it.word}">
+      <div class="num">${i+1}</div>
+      <div>
+        <div class="prompt">Base: <i>"${it.seed}"</i> &nbsp;(word: <b>${it.word}</b>)</div>
+        <div class="row"><textarea class="ans" placeholder="Write a fuller sentence..."></textarea></div>
+        <div class="feedback"></div>
+        <div class="answer-reveal">Пример: "${expandSample(it)}"</div>
+      </div>
+    </div>`).join("");
+  panel.querySelector('.checkAllBtn').onclick = ()=>{
+    let correctCount = 0;
+    panel.querySelectorAll('.item').forEach(itemEl=>{
+      const ta = itemEl.querySelector('textarea.ans');
+      const fb = itemEl.querySelector('.feedback');
+      const word = itemEl.dataset.word;
+      const val = ta.value.trim();
+      const wordCountOk = val.split(/\s+/).filter(Boolean).length >= 6;
+      const containsWord = norm(val).includes(norm(word.split(" ")[0])); // loose check
+      if(val && wordCountOk && containsWord){
+        fb.textContent = "✓ похоже на развёрнутое предложение"; fb.className="feedback good"; correctCount++;
+      }else{
+        fb.textContent = "✗ добавьте больше деталей и слово \""+word+"\""; fb.className="feedback bad";
+        addMistake(word);
+      }
+    });
+    panel.querySelector('.scoreVal').textContent = correctCount + "/14";
+  };
+  panel.querySelector('.showAllBtn').onclick = ()=>{
+    panel.querySelectorAll('.answer-reveal').forEach(r=>r.classList.toggle('show'));
+  };
+}
+function expandSample(it){
+  const samples = {
+    "aunt":"I have an aunt who lives in Manchester and visits us every Christmas.",
+    "uncle":"My uncle called me yesterday to invite me to his birthday party.",
+    "cousin":"She is my cousin, and we grew up together in the same town.",
+    "niece":"He has a niece who just started university this September.",
+    "nephew":"They have a nephew who loves playing football on weekends.",
+    "stepfather":"My stepfather cooks dinner for the whole family every Sunday evening.",
+    "stepson":"He has a stepson who recently moved in with them.",
+    "sister-in-law":"This is my sister-in-law, my brother's wife, who works as a doctor.",
+    "mother-in-law":"My mother-in-law visited us last weekend and brought homemade cookies.",
+    "ex-husband":"Her ex-husband called to arrange picking up the kids on Friday.",
+    "half-sister":"I met my half-sister for the first time last summer at a family reunion.",
+    "extended family":"We have extended family all over the country, including aunts, uncles, and cousins.",
+    "only child":"She is an only child, so she never had to share her toys.",
+    "adopted child":"He is an adopted child who joined the family when he was two years old."
+  };
+  return samples[it.word] || it.seed;
+}
+
+/* ============== GENERIC WIRING FOR SIMPLE WORD-INPUT EXERCISES ============== */
+function wireData(panel, items, isRank){
+  panel._items = items;
+  const box = panel.querySelector('.items');
+  const btnCheck = panel.querySelector('.checkAllBtn');
+  const btnShow = panel.querySelector('.showAllBtn');
+
+  btnCheck.onclick = ()=>{
+    let correct = 0;
+    const nodeList = isRank ? panel.querySelectorAll('.rank-blank') : panel.querySelectorAll('.item');
+    nodeList.forEach((el, idx)=>{
+      const input = el.querySelector('input.ans');
+      const fb = el.querySelector('.feedback');
+      const target = el.dataset.word;
+      const val = norm(input.value);
+      if(val && val === norm(target)){
+        input.classList.remove('incorrect'); input.classList.add('correct');
+        if(fb){ fb.textContent="✓ верно"; fb.className="feedback good"; }
+        correct++;
+      }else{
+        input.classList.remove('correct'); input.classList.add('incorrect');
+        if(fb){ fb.textContent="✗ неверно"; fb.className="feedback bad"; }
+        addMistake(target);
+      }
+    });
+    panel.querySelector('.scoreVal').textContent = correct + "/" + nodeList.length;
+  };
+
+  btnShow.onclick = ()=>{
+    panel.querySelectorAll('.answer-reveal').forEach(r=>r.classList.toggle('show'));
+  };
+}
+
+function wireCheck(){} // placeholder (unused, kept for structure clarity)
+
+/* ---- special wiring for True/False (accepts true/false/t/f) ---- */
+function wireCheckTF(panel, items){
+  panel._items = items.map(it=>({en:String(it.a), ru:it.s}));
+  const btnCheck = panel.querySelector('.checkAllBtn');
+  const btnShow = panel.querySelector('.showAllBtn');
+  btnCheck.onclick = ()=>{
+    let correct = 0;
+    const nodes = panel.querySelectorAll('.item');
+    nodes.forEach(el=>{
+      const input = el.querySelector('input.ans');
+      const fb = el.querySelector('.feedback');
+      const target = el.dataset.word; // "true" / "false"
+      let val = norm(input.value);
+      if(val==="t") val="true"; if(val==="f") val="false";
+      if(val === target){
+        input.classList.remove('incorrect'); input.classList.add('correct');
+        fb.textContent="✓ верно"; fb.className="feedback good"; correct++;
+      }else{
+        input.classList.remove('correct'); input.classList.add('incorrect');
+        fb.textContent="✗ неверно"; fb.className="feedback bad";
+        addMistake("T/F: " + el.querySelector('.prompt').textContent.slice(0,28)+"...");
+      }
+    });
+    panel.querySelector('.scoreVal').textContent = correct + "/" + nodes.length;
+  };
+  btnShow.onclick = ()=>{
+    panel.querySelectorAll('.answer-reveal').forEach(r=>r.classList.toggle('show'));
+  };
+}
+
+/* ============== EXPORT / COPY STUDENT ANSWERS ============== */
+document.getElementById('exportBtn').onclick = ()=>{
+  let out = "FAMILY & RELATIVES — ответы студента\n";
+  out += "Дата: " + new Date().toLocaleString() + "\n";
+  out += "=".repeat(50) + "\n\n";
+  EXERCISES.forEach(ex=>{
+    const panel = document.getElementById(ex.id);
+    out += "--- " + ex.tab + " ---\n";
+    const inputs = panel.querySelectorAll('input.ans, textarea.ans');
+    inputs.forEach((inp,i)=>{
+      out += (i+1) + ". " + (inp.value.trim() || "(пусто)") + "\n";
+    });
+    const scoreEl = panel.querySelector('.scoreVal');
+    if(scoreEl) out += "Результат: " + scoreEl.textContent + "\n";
+    out += "\n";
+  });
+  out += "=".repeat(50) + "\n";
+  out += "Проблемные слова:\n";
+  const entries = Object.entries(mistakes).sort((a,b)=>b[1]-a[1]);
+  out += entries.length ? entries.map(([w,c])=>`- ${w} (${c})`).join("\n") : "нет ошибок";
+
+  document.getElementById('exportArea').value = out;
+  document.getElementById('modalBg').classList.add('show');
+};
+document.getElementById('modalClose').onclick = ()=> document.getElementById('modalBg').classList.remove('show');
+document.getElementById('modalBg').addEventListener('click', (e)=>{
+  if(e.target.id==='modalBg') document.getElementById('modalBg').classList.remove('show');
+});
+document.getElementById('copyBtn').onclick = ()=>{
+  const ta = document.getElementById('exportArea');
+  ta.select();
+  navigator.clipboard && navigator.clipboard.writeText(ta.value).then(()=>{
+    document.getElementById('copyBtn').textContent = "Скопировано ✓";
+    setTimeout(()=>document.getElementById('copyBtn').textContent="Копировать",1500);
+  }).catch(()=>{ document.execCommand('copy'); });
+};
+document.getElementById('downloadBtn').onclick = ()=>{
+  const blob = new Blob([document.getElementById('exportArea').value], {type:"text/plain;charset=utf-8"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = "family_vocabulary_answers.txt";
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+};
+</script>
+</body>
+</html>
