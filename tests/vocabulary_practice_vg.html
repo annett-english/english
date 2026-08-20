@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vocabulary Practice: Clutter & Clean</title>
+<style>
+  :root{
+    --bg:#f5f7fb; --card:#ffffff; --accent:#3b5bdb; --accent-light:#e7ebff;
+    --good:#2f9e44; --bad:#e03131; --text:#22293a; --muted:#6b7280; --border:#dfe4ee;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:'Segoe UI',Roboto,Arial,sans-serif; background:var(--bg); color:var(--text);
+    display:flex; gap:24px; padding:24px; align-items:flex-start;
+  }
+  .main{flex:1; max-width:900px; margin:0 auto;}
+  h1{font-size:26px; margin-bottom:4px;}
+  .subtitle{color:var(--muted); margin-bottom:20px;}
+  .card{
+    background:var(--card); border:1px solid var(--border); border-radius:14px;
+    padding:20px 24px; margin-bottom:22px; box-shadow:0 2px 6px rgba(20,30,60,0.04);
+  }
+  h2{font-size:19px; margin-top:0; color:var(--accent);}
+  .instr{color:var(--muted); font-size:14px; margin-bottom:14px;}
+  table.vocab{width:100%; border-collapse:collapse; font-size:14.5px;}
+  table.vocab th, table.vocab td{padding:8px 10px; border-bottom:1px solid var(--border); text-align:left;}
+  table.vocab th{color:var(--muted); font-weight:600; font-size:13px;}
+  .speak-btn{
+    background:var(--accent-light); border:none; color:var(--accent); border-radius:8px;
+    width:34px; height:34px; cursor:pointer; font-size:16px;
+  }
+  .speak-btn:hover{background:#d3daff;}
+  ol{padding-left:20px;}
+  li{margin-bottom:14px; line-height:1.6;}
+  .context strong{letter-spacing:1px;}
+  input[type=text]{
+    border:1px solid var(--border); border-radius:8px; padding:7px 10px; font-size:14.5px;
+    min-width:170px; margin-left:6px; margin-top:4px;
+  }
+  input[type=text].correct{border-color:var(--good); background:#ebfbee;}
+  input[type=text].incorrect{border-color:var(--bad); background:#fff0f0;}
+  textarea{
+    width:100%; min-height:46px; border:1px solid var(--border); border-radius:8px;
+    padding:8px 10px; font-size:14.5px; font-family:inherit; margin-top:4px; resize:vertical;
+  }
+  .answer-key{display:none; color:var(--accent); font-weight:600; margin-left:8px; font-size:13.5px;}
+  .answer-key.show{display:inline;}
+  .btn-row{margin-top:14px; display:flex; gap:10px; flex-wrap:wrap; align-items:center;}
+  button.action{
+    background:var(--accent); color:#fff; border:none; border-radius:8px; padding:9px 16px;
+    font-size:14px; cursor:pointer;
+  }
+  button.action.secondary{background:#eef1fb; color:var(--accent);}
+  button.action:hover{opacity:0.9;}
+  .score{font-size:14px; color:var(--muted);}
+  .copied-msg{font-size:13px; color:var(--good); font-weight:600; display:none;}
+  .word-bank{color:var(--muted); font-style:italic; font-size:13.5px;}
+  .sidebar{
+    width:230px; position:sticky; top:24px; align-self:flex-start;
+  }
+  .sidebar .card{padding:16px 18px;}
+  #problemList{list-style:none; padding:0; margin:0; font-size:14px;}
+  #problemList li{
+    display:flex; justify-content:space-between; background:#fff5f5; border:1px solid #ffd6d6;
+    border-radius:8px; padding:6px 10px; margin-bottom:6px;
+  }
+  #problemList li span.count{color:var(--bad); font-weight:700;}
+  #problemEmpty{color:var(--muted); font-size:13.5px;}
+  .audio-test{display:flex; align-items:center; gap:10px; font-size:14px;}
+  #audioStatus{font-weight:600;}
+  .final-copy{background:#101a35;}
+  .final-copy:hover{background:#1b2a52;}
+  footer{color:var(--muted); font-size:12.5px; text-align:center; margin-top:10px;}
+</style>
+</head>
+<body>
+
+<div class="main">
+  <h1>Vocabulary Practice: Clutter, Cleaning & Tidying Up</h1>
+  <div class="subtitle">turn off · miss · put away · pick up · keep · clutter · declutter · clean · dirty</div>
+
+  <!-- AUDIO TEST -->
+  <div class="card">
+    <h2>🔊 Проверка звука</h2>
+    <div class="audio-test">
+      <button class="action secondary" onclick="testAudio()">Проверить, работает ли аудио</button>
+      <span id="audioStatus"></span>
+    </div>
+  </div>
+
+  <!-- VOCAB REMINDER -->
+  <div class="card">
+    <h2>📖 Повторим слова</h2>
+    <div class="instr">Нажмите 🔊, чтобы прослушать произношение (голос Google US English).</div>
+    <table class="vocab">
+      <tr><th></th><th>Word</th><th>Transcription</th><th>Перевод</th></tr>
+      <tbody id="vocabTableBody"></tbody>
+    </table>
+  </div>
+
+  <!-- EXERCISE 1: Fill in missing letters -->
+  <div class="card" id="ex1">
+    <h2>Упр. 1. Fill in the missing letters</h2>
+    <div class="instr">Впишите пропущенное слово / фразу полностью.</div>
+    <ol id="ex1list"></ol>
+    <div class="btn-row">
+      <button class="action" onclick="checkExercise('ex1')">Проверить</button>
+      <button class="action secondary" onclick="showAnswers('ex1')">Показать ответы</button>
+      <span class="score" id="ex1score"></span>
+    </div>
+  </div>
+
+  <!-- EXERCISE 2: Translate RU -> EN -->
+  <div class="card" id="ex2">
+    <h2>Упр. 2. Translate into English</h2>
+    <div class="instr">Переведите слово / словосочетание на английский.</div>
+    <ol id="ex2list"></ol>
+    <div class="btn-row">
+      <button class="action" onclick="checkExercise('ex2')">Проверить</button>
+      <button class="action secondary" onclick="showAnswers('ex2')">Показать ответы</button>
+      <span class="score" id="ex2score"></span>
+    </div>
+  </div>
+
+  <!-- EXERCISE 3: Listen and write -->
+  <div class="card" id="ex3">
+    <h2>Упр. 3. Listen & write</h2>
+    <div class="instr">Нажмите 🔊 и напишите слово, которое услышали.</div>
+    <ol id="ex3list"></ol>
+    <div class="btn-row">
+      <button class="action" onclick="checkExercise('ex3')">Проверить</button>
+      <button class="action secondary" onclick="showAnswers('ex3')">Показать ответы</button>
+      <span class="score" id="ex3score"></span>
+    </div>
+  </div>
+
+  <!-- EXERCISE 4: Definitions -->
+  <div class="card" id="ex4">
+    <h2>Упр. 4. Definitions</h2>
+    <div class="instr">Прочитайте определение и напишите слово.</div>
+    <ol id="ex4list"></ol>
+    <div class="btn-row">
+      <button class="action" onclick="checkExercise('ex4')">Проверить</button>
+      <button class="action secondary" onclick="showAnswers('ex4')">Показать ответы</button>
+      <span class="score" id="ex4score"></span>
+    </div>
+  </div>
+
+  <!-- EXERCISE 5: Verb forms -->
+  <div class="card" id="ex5">
+    <h2>Упр. 5. Verb forms: Past Simple & he/she/it</h2>
+    <div class="instr">Напишите форму Past Simple и форму 3-го лица ед. числа (he/she/it) в Present Simple.</div>
+    <ol id="ex5list"></ol>
+    <div class="btn-row">
+      <button class="action" onclick="checkExercise('ex5')">Проверить</button>
+      <button class="action secondary" onclick="showAnswers('ex5')">Показать ответы</button>
+      <span class="score" id="ex5score"></span>
+    </div>
+  </div>
+
+  <!-- EXERCISE 6: Which word fits -->
+  <div class="card" id="ex6">
+    <h2>Упр. 6. Which word fits?</h2>
+    <div class="instr">Выберите подходящее слово из скобок и впишите его.</div>
+    <ol id="ex6list"></ol>
+    <div class="btn-row">
+      <button class="action" onclick="checkExercise('ex6')">Проверить</button>
+      <button class="action secondary" onclick="showAnswers('ex6')">Показать ответы</button>
+      <span class="score" id="ex6score"></span>
+    </div>
+  </div>
+
+  <!-- EXERCISE 7: Rephrase -->
+  <div class="card" id="ex7">
+    <h2>Упр. 7. Rephrase</h2>
+    <div class="instr">Перепишите предложение, используя слово в скобках.</div>
+    <ol id="ex7list"></ol>
+    <div class="btn-row">
+      <button class="action" onclick="checkExercise('ex7')">Проверить</button>
+      <button class="action secondary" onclick="showAnswers('ex7')">Показать ответы</button>
+      <span class="score" id="ex7score"></span>
+    </div>
+  </div>
+
+  <!-- EXERCISE 8: Finish sentences -->
+  <div class="card" id="ex8">
+    <h2>Упр. 8. Finish the sentences with your own ideas</h2>
+    <div class="instr">Допишите предложения своими словами. Ответы не проверяются автоматически — эта работа творческая.</div>
+    <ol id="ex8list"></ol>
+    <div class="btn-row">
+      <button class="action" onclick="copyExercise('ex8')">Скопировать ответы</button>
+      <span class="copied-msg" id="ex8copied">Скопировано!</span>
+    </div>
+  </div>
+
+  <!-- EXERCISE 9: Drilling Repeat & Change -->
+  <div class="card" id="ex9">
+    <h2>Упр. 9. Drilling: Repeat & Change</h2>
+    <div class="instr">Повторите структуру модельного предложения, заменив пропуски своими идеями.</div>
+    <ol id="ex9list"></ol>
+    <div class="btn-row">
+      <button class="action" onclick="copyExercise('ex9')">Скопировать ответы</button>
+      <span class="copied-msg" id="ex9copied">Скопировано!</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>✅ Готово</h2>
+    <div class="instr">Скопировать все ответы студента со всей страницы одной кнопкой (для отправки преподавателю).</div>
+    <div class="btn-row">
+      <button class="action final-copy" onclick="copyAll()">Скопировать ВСЕ ответы</button>
+      <span class="copied-msg" id="allCopied">Скопировано в буфер обмена!</span>
+    </div>
+  </div>
+
+  <footer>Слова: turn off · miss · put away · pick up · keep · clutter · declutter · clean · dirty</footer>
+</div>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="card">
+    <h2 style="font-size:16px;">⚠️ Проблемные слова</h2>
+    <ul id="problemList"></ul>
+    <div id="problemEmpty">Пока ошибок нет 🙂</div>
+  </div>
+</div>
+
+<script>
+/* ---------------- VOCAB DATA ---------------- */
+const vocab = [
+  {w:"turn off", t:"/tɜːrn ɒf/", ru:"выключать"},
+  {w:"miss", t:"/mɪs/", ru:"скучать (по кому-то); пропускать"},
+  {w:"put away", t:"/pʊt əˈweɪ/", ru:"убирать (класть на место)"},
+  {w:"pick up", t:"/pɪk ʌp/", ru:"поднимать; забирать"},
+  {w:"keep", t:"/kiːp/", ru:"хранить, держать в порядке"},
+  {w:"clutter", t:"/ˈklʌtər/", ru:"беспорядок, хлам"},
+  {w:"declutter", t:"/diːˈklʌtər/", ru:"наводить порядок, избавляться от хлама"},
+  {w:"clean", t:"/kliːn/", ru:"чистый / убирать(ся)"},
+  {w:"dirty", t:"/ˈdɜːrti/", ru:"грязный"}
+];
+
+/* ---------------- SPEECH SYNTHESIS ---------------- */
+let chosenVoice = null;
+function pickVoice(){
+  const voices = speechSynthesis.getVoices();
+  chosenVoice = voices.find(v => v.name.includes("Google US English"))
+             || voices.find(v => v.lang === "en-US")
+             || voices.find(v => v.lang && v.lang.startsWith("en"))
+             || null;
+}
+if ('speechSynthesis' in window){
+  speechSynthesis.onvoiceschanged = pickVoice;
+  pickVoice();
+}
+function speak(text){
+  if (!('speechSynthesis' in window)){
+    alert("Ваш браузер не поддерживает синтез речи.");
+    return;
+  }
+  if (!chosenVoice) pickVoice();
+  const u = new SpeechSynthesisUtterance(text);
+  if (chosenVoice) u.voice = chosenVoice;
+  u.lang = "en-US";
+  u.rate = 0.9;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+}
+function testAudio(){
+  const status = document.getElementById('audioStatus');
+  if (!('speechSynthesis' in window)){
+    status.textContent = "❌ Speech Synthesis не поддерживается этим браузером";
+    status.style.color = "var(--bad)";
+    return;
+  }
+  status.textContent = "🔊 Проигрывается тестовое слово...";
+  status.style.color = "var(--accent)";
+  speak("This is an audio test.");
+  setTimeout(()=>{
+    status.textContent = "✅ Если вы услышали фразу — аудио работает";
+    status.style.color = "var(--good)";
+  }, 1200);
+}
+
+/* ---------------- BUILD VOCAB TABLE ---------------- */
+const vocabBody = document.getElementById('vocabTableBody');
+vocab.forEach(v=>{
+  const tr = document.createElement('tr');
+  tr.innerHTML = `<td><button class="speak-btn" onclick="speak('${v.w}')">🔊</button></td>
+    <td><strong>${v.w}</strong></td><td>${v.t}</td><td>${v.ru}</td>`;
+  vocabBody.appendChild(tr);
+});
+
+/* ---------------- PROBLEM WORDS TRACKING ---------------- */
+const problemWords = {}; // word -> count
+function registerMistake(word){
+  problemWords[word] = (problemWords[word]||0) + 1;
+  renderProblemWords();
+}
+function renderProblemWords(){
+  const list = document.getElementById('problemList');
+  const empty = document.getElementById('problemEmpty');
+  const words = Object.keys(problemWords);
+  list.innerHTML = "";
+  if (words.length === 0){
+    empty.style.display = "block";
+    return;
+  }
+  empty.style.display = "none";
+  words.sort((a,b)=>problemWords[b]-problemWords[a]).forEach(w=>{
+    const li = document.createElement('li');
+    li.innerHTML = `<span>${w}</span><span class="count">${problemWords[w]}</span>`;
+    list.appendChild(li);
+  });
+}
+
+/* ---------------- GENERIC CHECK / SHOW / COPY ---------------- */
+function normalize(s){
+  return s.trim().toLowerCase().replace(/\s+/g,' ').replace(/[.!?]+$/,'');
+}
+function checkExercise(exId){
+  const list = document.getElementById(exId+"list");
+  const inputs = list.querySelectorAll('input[type=text]');
+  let correct = 0, total = 0;
+  inputs.forEach(inp=>{
+    total++;
+    const answers = inp.dataset.answer.split('|').map(normalize);
+    const mode = inp.dataset.mode || "exact";
+    const val = normalize(inp.value);
+    let ok = false;
+    if (val.length === 0){ ok = false; }
+    else if (mode === "contains"){
+      ok = answers.some(a => val.includes(a));
+    } else {
+      ok = answers.includes(val);
+    }
+    inp.classList.remove('correct','incorrect');
+    if (ok){
+      inp.classList.add('correct');
+      correct++;
+    } else {
+      inp.classList.add('incorrect');
+      registerMistake(inp.dataset.word);
+    }
+  });
+  document.getElementById(exId+"score").textContent = `Результат: ${correct} / ${total}`;
+}
+function showAnswers(exId){
+  const list = document.getElementById(exId+"list");
+  list.querySelectorAll('.answer-key').forEach(el=>el.classList.add('show'));
+}
+function copyExercise(exId){
+  const list = document.getElementById(exId+"list");
+  const items = list.querySelectorAll('li');
+  let out = [];
+  items.forEach((li, i)=>{
+    const ta = li.querySelector('textarea');
+    const promptText = li.dataset.prompt || "";
+    out.push(`${i+1}. ${promptText}\n   Ответ: ${ta ? ta.value.trim() : ""}`);
+  });
+  copyToClipboard(out.join("\n\n"), document.getElementById(exId+"copied"));
+}
+function copyToClipboard(text, msgEl){
+  function done(){
+    if (msgEl){
+      msgEl.style.display = "inline";
+      setTimeout(()=>msgEl.style.display="none", 2000);
+    }
+  }
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(done).catch(()=>fallbackCopy(text, done));
+  } else {
+    fallbackCopy(text, done);
+  }
+}
+function fallbackCopy(text, cb){
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.left = '-9999px';
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); } catch(e){}
+  document.body.removeChild(ta);
+  if (cb) cb();
+}
+function copyAll(){
+  let out = ["=== VOCABULARY PRACTICE — STUDENT ANSWERS ===\n"];
+  for (let n=1; n<=9; n++){
+    const exId = "ex"+n;
+    const card = document.getElementById(exId);
+    if (!card) continue;
+    const title = card.querySelector('h2').textContent;
+    out.push(`\n--- ${title} ---`);
+    const list = document.getElementById(exId+"list");
+    const items = list.querySelectorAll('li');
+    items.forEach((li,i)=>{
+      const inputs = li.querySelectorAll('input[type=text]');
+      const ta = li.querySelector('textarea');
+      if (ta){
+        out.push(`${i+1}. ${(li.dataset.prompt||"").trim()} => ${ta.value.trim()}`);
+      } else if (inputs.length){
+        const vals = Array.from(inputs).map(inp=>inp.value.trim() || "___").join(" / ");
+        out.push(`${i+1}. ${(li.dataset.prompt||"").trim()} => ${vals}`);
+      }
+    });
+  }
+  copyToClipboard(out.join("\n"), document.getElementById('allCopied'));
+}
+
+/* ---------------- EXERCISE 1: Fill in missing letters ---------------- */
+const ex1data = [
+  {ctx:"Can you <strong>p_ck _p</strong> the toys from the floor?", word:"pick up"},
+  {ctx:"My hands are really <strong>d_rty</strong> after gardening.", word:"dirty"},
+  {ctx:"We need to <strong>decl_tt_r</strong> the garage this weekend.", word:"declutter"},
+  {ctx:"I really <strong>m_ss</strong> my old friends from school.", word:"miss"},
+  {ctx:"She likes to <strong>cl_an</strong> her room every Saturday.", word:"clean"},
+  {ctx:"Don't forget to <strong>t_rn _ff</strong> the lights.", word:"turn off"},
+  {ctx:"There is too much <strong>cl_tt_r</strong> on your desk.", word:"clutter"},
+  {ctx:"Please <strong>p_t</strong> your shoes <strong>_w_y</strong> after school.", word:"put away"}
+];
+buildSimpleList("ex1", ex1data, it => ({
+  prompt: it.ctx.replace(/<\/?strong>/g,'_'),
+  html: `<span class="context">${it.ctx}</span> <input type="text" data-answer="${it.word}" data-word="${it.word}" placeholder="слово"> <span class="answer-key">(${it.word})</span>`
+}));
+
+/* ---------------- EXERCISE 2: Translate RU -> EN ---------------- */
+const ex2data = [
+  {ru:"выключать", word:"turn off"},
+  {ru:"хранить, держать в порядке", word:"keep"},
+  {ru:"грязный", word:"dirty"},
+  {ru:"беспорядок, хлам", word:"clutter"},
+  {ru:"поднимать; забирать", word:"pick up"},
+  {ru:"скучать (по кому-то)", word:"miss"},
+  {ru:"убирать (класть на место)", word:"put away"},
+  {ru:"наводить порядок, избавляться от хлама", word:"declutter"}
+];
+buildSimpleList("ex2", ex2data, it => ({
+  prompt: it.ru,
+  html: `<span class="context">${it.ru}</span> — <input type="text" data-answer="${it.word}" data-word="${it.word}" placeholder="in English"> <span class="answer-key">(${it.word})</span>`
+}));
+
+/* ---------------- EXERCISE 3: Listen & write ---------------- */
+const ex3data = ["clean","dirty","turn off","miss","keep","clutter","declutter","pick up"];
+const ex3list = document.getElementById('ex3list');
+ex3data.forEach(word=>{
+  const li = document.createElement('li');
+  li.dataset.prompt = "[audio] " + word;
+  li.innerHTML = `<button class="speak-btn" onclick="speak('${word}')">🔊</button>
+    <input type="text" data-answer="${word}" data-word="${word}" placeholder="напишите слово">
+    <span class="answer-key">(${word})</span>`;
+  ex3list.appendChild(li);
+});
+
+/* ---------------- EXERCISE 4: Definitions ---------------- */
+const ex4data = [
+  {def:"To become free of dirt or mess.", word:"clean"},
+  {def:"Covered with dirt; not clean.", word:"dirty"},
+  {def:"To stop a light, TV, or machine from working.", word:"turn off"},
+  {def:"To feel sad because someone or something is not with you.", word:"miss"},
+  {def:"To have or keep something without losing or throwing it away.", word:"keep"},
+  {def:"A messy collection of things lying around.", word:"clutter"},
+  {def:"To remove unnecessary things and make a place tidy.", word:"declutter"},
+  {def:"To put something back in its usual place.", word:"put away"}
+];
+buildSimpleList("ex4", ex4data, it => ({
+  prompt: it.def,
+  html: `<span class="context">${it.def}</span> <input type="text" data-answer="${it.word}" data-word="${it.word}" placeholder="слово"> <span class="answer-key">(${it.word})</span>`
+}));
+
+/* ---------------- EXERCISE 5: Verb forms ---------------- */
+const ex5data = [
+  {base:"keep", past:"kept", s:"keeps"},
+  {base:"clean", past:"cleaned", s:"cleans"},
+  {base:"miss", past:"missed", s:"misses"},
+  {base:"pick up", past:"picked up", s:"picks up"},
+  {base:"turn off", past:"turned off", s:"turns off"},
+  {base:"declutter", past:"decluttered", s:"declutters"},
+  {base:"put away", past:"put away", s:"puts away"},
+  {base:"clutter", past:"cluttered", s:"clutters"}
+];
+const ex5list = document.getElementById('ex5list');
+ex5data.forEach(it=>{
+  const li = document.createElement('li');
+  li.dataset.prompt = it.base;
+  li.innerHTML = `<span class="context"><strong>${it.base}</strong></span><br>
+    Past Simple: <input type="text" data-answer="${it.past}" data-word="${it.base}" placeholder="past">
+    <span class="answer-key">(${it.past})</span>&nbsp;&nbsp;
+    He/She/It: <input type="text" data-answer="${it.s}" data-word="${it.base}" placeholder="he/she/it">
+    <span class="answer-key">(${it.s})</span>`;
+  ex5list.appendChild(li);
+});
+
+/* ---------------- EXERCISE 6: Which word fits ---------------- */
+const ex6data = [
+  {s:"My grandma passed away last year, and I really ___ her.", opts:"miss / keep / clean", word:"miss"},
+  {s:"There's so much ___ on the table, I can't work.", opts:"clutter / dirty / keep", word:"clutter"},
+  {s:"Let's ___ the house this weekend – it's a total mess.", opts:"declutter / turn off / miss", word:"declutter"},
+  {s:"Could you ___ the lights when you leave the room?", opts:"turn off / put away / pick up", word:"turn off"},
+  {s:"He always ___ his old photos in a box.", opts:"keep / clean / miss", word:"keep"},
+  {s:"Don't forget to ___ your bag before we leave.", opts:"pick up / dirty / clutter", word:"pick up"},
+  {s:"Your shoes are really ___ after the rain.", opts:"dirty / clean / declutter", word:"dirty"},
+  {s:"Please ___ your books after reading.", opts:"put away / turn off / miss", word:"put away"}
+];
+buildSimpleList("ex6", ex6data, it => ({
+  prompt: it.s,
+  html: `<span class="context">${it.s}</span> <span class="word-bank">(${it.opts})</span>
+    <input type="text" data-answer="${it.word}" data-word="${it.word}" placeholder="слово">
+    <span class="answer-key">(${it.word})</span>`
+}));
+
+/* ---------------- EXERCISE 7: Rephrase ---------------- */
+const ex7data = [
+  {s:"Switch off the lamp, please.", hint:"turn off", ans:"turn off the lamp"},
+  {s:"I need to remove the mess from my desk.", hint:"declutter", ans:"declutter"},
+  {s:"She feels sad because her friend moved away.", hint:"miss", ans:"misses"},
+  {s:"Put your toys back in the box.", hint:"put away", ans:"put away"},
+  {s:"Lift the bag and take it with you.", hint:"pick up", ans:"pick up"},
+  {s:"The room is full of unnecessary things.", hint:"clutter", ans:"clutter"},
+  {s:"His hands were covered in mud.", hint:"dirty", ans:"dirty"},
+  {s:"I never throw away my old letters; I always have them.", hint:"keep", ans:"keep"}
+];
+buildSimpleList("ex7", ex7data, it => ({
+  prompt: `${it.s} (${it.hint})`,
+  html: `<span class="context">${it.s}</span> <span class="word-bank">(use: ${it.hint})</span><br>
+    <input type="text" style="width:90%; min-width:260px;" data-answer="${it.ans}" data-mode="contains" data-word="${it.hint}" placeholder="перепишите предложение">
+    <span class="answer-key">(должно содержать: "${it.ans}")</span>`
+}), true);
+
+/* ---------------- EXERCISE 8: Finish the sentences ---------------- */
+const ex8data = [
+  "I always turn off ...",
+  "I really miss ...",
+  "Every evening I put away ...",
+  "When I get home, I pick up ...",
+  "I try to keep my room ...",
+  "My biggest clutter problem is ...",
+  "Last weekend I decluttered ...",
+  "My room is dirty when ..."
+];
+const ex8list = document.getElementById('ex8list');
+ex8data.forEach(s=>{
+  const li = document.createElement('li');
+  li.dataset.prompt = s;
+  li.innerHTML = `<span class="context">${s}</span><br><textarea placeholder="ваш ответ..."></textarea>`;
+  ex8list.appendChild(li);
+});
+
+/* ---------------- EXERCISE 9: Drilling Repeat & Change ---------------- */
+const ex9data = [
+  {model:"I always keep my keys in my bag.", pattern:"I always keep _______ in _______."},
+  {model:"Please turn off your phone in class.", pattern:"Please turn off _______ in _______."},
+  {model:"She missed her flight yesterday.", pattern:"_______ missed _______ yesterday."},
+  {model:"We picked up some litter in the park.", pattern:"We picked up _______ in _______."},
+  {model:"He put away his laptop after work.", pattern:"_______ put away _______ after _______."},
+  {model:"My desk is full of clutter.", pattern:"My _______ is full of clutter."},
+  {model:"I decluttered my wardrobe last month.", pattern:"I decluttered _______ last _______."},
+  {model:"Their kitchen was very dirty after the party.", pattern:"_______ was very dirty after _______."}
+];
+const ex9list = document.getElementById('ex9list');
+ex9data.forEach(it=>{
+  const li = document.createElement('li');
+  li.dataset.prompt = `Model: ${it.model} | Pattern: ${it.pattern}`;
+  li.innerHTML = `<button class="speak-btn" onclick="speak('${it.model.replace(/'/g,"\\'")}')">🔊</button>
+    <span class="context">Model: <em>${it.model}</em></span><br>
+    <span class="word-bank">${it.pattern}</span><br>
+    <textarea placeholder="ваше предложение по образцу..."></textarea>`;
+  ex9list.appendChild(li);
+});
+
+/* ---------------- HELPER TO BUILD SIMPLE (single-input) LISTS ---------------- */
+function buildSimpleList(exId, data, mapFn, withDataMode){
+  const list = document.getElementById(exId+"list");
+  data.forEach(it=>{
+    const li = document.createElement('li');
+    const built = mapFn(it);
+    li.dataset.prompt = built.prompt;
+    li.innerHTML = built.html;
+    list.appendChild(li);
+  });
+}
+</script>
+</body>
+</html>
