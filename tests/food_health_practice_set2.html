@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Food & Health Practice — Set 2</title>
+<style>
+  :root{
+    --bg:#f5f7fb; --card:#ffffff; --accent:#2f9e44; --accent-light:#e3f7e8;
+    --good:#2f9e44; --bad:#e03131; --text:#22293a; --muted:#6b7280; --border:#dcebe0;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:'Segoe UI',Roboto,Arial,sans-serif; background:var(--bg); color:var(--text);
+    display:flex; gap:24px; padding:24px; align-items:flex-start;
+  }
+  .main{flex:1; max-width:900px; margin:0 auto;}
+  h1{font-size:26px; margin-bottom:4px;}
+  .subtitle{color:var(--muted); margin-bottom:20px;}
+  .card{
+    background:var(--card); border:1px solid var(--border); border-radius:14px;
+    padding:20px 24px; margin-bottom:22px; box-shadow:0 2px 6px rgba(20,30,60,0.04);
+  }
+  h2{font-size:19px; margin-top:0; color:var(--accent);}
+  .instr{color:var(--muted); font-size:14px; margin-bottom:14px;}
+  .speak-btn{
+    background:var(--accent-light); border:none; color:var(--accent); border-radius:8px;
+    width:34px; height:34px; cursor:pointer; font-size:16px;
+  }
+  .speak-btn:hover{background:#c9f0d3;}
+  ol{padding-left:20px;}
+  li{margin-bottom:16px; line-height:1.6;}
+  .context strong{letter-spacing:1px;}
+  input[type=text]{
+    border:1px solid var(--border); border-radius:8px; padding:7px 10px; font-size:14.5px;
+    min-width:150px; margin-left:6px; margin-top:4px;
+  }
+  input[type=text].correct{border-color:var(--good); background:#ebfbee;}
+  input[type=text].incorrect{border-color:var(--bad); background:#fff0f0;}
+  textarea{
+    width:100%; min-height:46px; border:1px solid var(--border); border-radius:8px;
+    padding:8px 10px; font-size:14.5px; font-family:inherit; margin-top:4px; resize:vertical;
+  }
+  .answer-key{display:none; color:var(--accent); font-weight:600; margin-left:8px; font-size:13.5px;}
+  .answer-key.show{display:inline;}
+  .btn-row{margin-top:14px; display:flex; gap:10px; flex-wrap:wrap; align-items:center;}
+  button.action{
+    background:var(--accent); color:#fff; border:none; border-radius:8px; padding:9px 16px;
+    font-size:14px; cursor:pointer;
+  }
+  button.action.secondary{background:#e6f6ea; color:var(--accent);}
+  button.action:hover{opacity:0.9;}
+  .score{font-size:14px; color:var(--muted);}
+  .copied-msg{font-size:13px; color:var(--good); font-weight:600; display:none;}
+  .word-bank{color:var(--muted); font-style:italic; font-size:13.5px;}
+  .sidebar{width:230px; position:sticky; top:24px; align-self:flex-start;}
+  .sidebar .card{padding:16px 18px;}
+  #problemList{list-style:none; padding:0; margin:0; font-size:14px;}
+  #problemList li{
+    display:flex; justify-content:space-between; background:#fff5f5; border:1px solid #ffd6d6;
+    border-radius:8px; padding:6px 10px; margin-bottom:6px;
+  }
+  #problemList li span.count{color:var(--bad); font-weight:700;}
+  #problemEmpty{color:var(--muted); font-size:13.5px;}
+  .audio-test{display:flex; align-items:center; gap:10px; font-size:14px;}
+  #audioStatus{font-weight:600;}
+  .final-copy{background:#101a35;}
+  .final-copy:hover{background:#1b2a52;}
+  .mistake-inputs{margin-top:6px;}
+  .mistake-inputs label{font-size:13px; color:var(--muted); margin-right:4px;}
+  footer{color:var(--muted); font-size:12.5px; text-align:center; margin-top:10px;}
+</style>
+</head>
+<body>
+
+<div class="main">
+  <h1>Food, Cooking &amp; Health Practice — Set 2</h1>
+  <div class="subtitle">7 упражнений · по 10 заданий · другие предложения и примеры</div>
+
+  <!-- AUDIO TEST -->
+  <div class="card">
+    <h2>🔊 Проверка звука</h2>
+    <div class="audio-test">
+      <button class="action secondary" onclick="testAudio()">Проверить, работает ли аудио</button>
+      <span id="audioStatus"></span>
+    </div>
+  </div>
+
+  <!-- EXERCISE 1: Fill in missing letters -->
+  <div class="card" id="ex1">
+    <h2>Упр. 1. Fill in the missing letters</h2>
+    <div class="instr">Впишите пропущенное слово полностью.</div>
+    <ol id="ex1list"></ol>
+    <div class="btn-row">
+      <button class="action" onclick="checkExercise('ex1')">Проверить</button>
+      <button class="action secondary" onclick="showAnswers('ex1')">Показать ответы</button>
+      <span class="score" id="ex1score"></span>
+    </div>
+  </div>
+
+  <!-- EXERCISE 2: Translate RU -> EN -->
+  <div class="card" id="ex2">
+    <h2>Упр. 2. Translate into English (sauces & condiments)</h2>
+    <div class="instr">Переведите слово на английский.</div>
+    <ol id="ex2list"></ol>
+    <div class="btn-row">
+      <button class="action" onclick="checkExercise('ex2')">Проверить</button>
+      <button class="action secondary" onclick="showAnswers('ex2')">Показать ответы</button>
+      <span class="score" id="ex2score"></span>
+    </div>
+  </div>
+
+  <!-- EXERCISE 3: Listen and write -->
+  <div class="card" id="ex3">
+    <h2>Упр. 3. Listen & write (cooking methods)</h2>
+    <div class="instr">Нажмите 🔊 и напишите словосочетание, которое услышали (голос Google US English).</div>
+    <ol id="ex3list"></ol>
+    <div class="btn-row">
+      <button class="action" onclick="checkExercise('ex3')">Проверить</button>
+      <button class="action secondary" onclick="showAnswers('ex3')">Показать ответы</button>
+      <span class="score" id="ex3score"></span>
+    </div>
+  </div>
+
+  <!-- EXERCISE 4: Definitions -->
+  <div class="card" id="ex4">
+    <h2>Упр. 4. Definitions</h2>
+    <div class="instr">Прочитайте определение и напишите слово/фразу.</div>
+    <ol id="ex4list"></ol>
+    <div class="btn-row">
+      <button class="action" onclick="checkExercise('ex4')">Проверить</button>
+      <button class="action secondary" onclick="showAnswers('ex4')">Показать ответы</button>
+      <span class="score" id="ex4score"></span>
+    </div>
+  </div>
+
+  <!-- EXERCISE 5: Rephrase -->
+  <div class="card" id="ex5">
+    <h2>Упр. 5. Rephrase</h2>
+    <div class="instr">Перепишите предложение, используя слово/фразу в скобках.</div>
+    <ol id="ex5list"></ol>
+    <div class="btn-row">
+      <button class="action" onclick="checkExercise('ex5')">Проверить</button>
+      <button class="action secondary" onclick="showAnswers('ex5')">Показать ответы</button>
+      <span class="score" id="ex5score"></span>
+    </div>
+  </div>
+
+  <!-- EXERCISE 6: Find two mistakes -->
+  <div class="card" id="ex6">
+    <h2>Упр. 6. Find two mistakes (word combinations)</h2>
+    <div class="instr">В каждом предложении есть <strong>две ошибки</strong>. Найдите их и впишите исправленные слова.</div>
+    <ol id="ex6list"></ol>
+    <div class="btn-row">
+      <button class="action" onclick="checkExercise('ex6')">Проверить</button>
+      <button class="action secondary" onclick="showAnswers('ex6')">Показать ответы</button>
+      <span class="score" id="ex6score"></span>
+    </div>
+  </div>
+
+  <!-- EXERCISE 7: Discussion questions -->
+  <div class="card" id="ex7">
+    <h2>Упр. 7. Answer the questions</h2>
+    <div class="instr">Ответьте на вопросы по теме своими словами. Ответы не проверяются автоматически.</div>
+    <ol id="ex7list"></ol>
+    <div class="btn-row">
+      <button class="action" onclick="copyExercise('ex7')">Скопировать ответы</button>
+      <span class="copied-msg" id="ex7copied">Скопировано!</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>✅ Готово</h2>
+    <div class="instr">Скопировать все ответы студента со всей страницы одной кнопкой (для отправки преподавателю).</div>
+    <div class="btn-row">
+      <button class="action final-copy" onclick="copyAll()">Скопировать ВСЕ ответы</button>
+      <span class="copied-msg" id="allCopied">Скопировано в буфер обмена!</span>
+    </div>
+  </div>
+
+  <footer>Темы: fruit &amp; seafood &amp; meat · sauces · cooking methods · food &amp; health vocabulary</footer>
+</div>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="card">
+    <h2 style="font-size:16px;">⚠️ Проблемные слова</h2>
+    <ul id="problemList"></ul>
+    <div id="problemEmpty">Пока ошибок нет 🙂</div>
+  </div>
+</div>
+
+<script>
+/* ---------------- SPEECH SYNTHESIS ---------------- */
+let chosenVoice = null;
+function pickVoice(){
+  const voices = speechSynthesis.getVoices();
+  chosenVoice = voices.find(v => v.name.includes("Google US English"))
+             || voices.find(v => v.lang === "en-US")
+             || voices.find(v => v.lang && v.lang.startsWith("en"))
+             || null;
+}
+if ('speechSynthesis' in window){
+  speechSynthesis.onvoiceschanged = pickVoice;
+  pickVoice();
+}
+function speak(text){
+  if (!('speechSynthesis' in window)){
+    alert("Ваш браузер не поддерживает синтез речи.");
+    return;
+  }
+  if (!chosenVoice) pickVoice();
+  const u = new SpeechSynthesisUtterance(text);
+  if (chosenVoice) u.voice = chosenVoice;
+  u.lang = "en-US";
+  u.rate = 0.9;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+}
+function testAudio(){
+  const status = document.getElementById('audioStatus');
+  if (!('speechSynthesis' in window)){
+    status.textContent = "❌ Speech Synthesis не поддерживается этим браузером";
+    status.style.color = "var(--bad)";
+    return;
+  }
+  status.textContent = "🔊 Проигрывается тестовое слово...";
+  status.style.color = "var(--accent)";
+  speak("This is an audio test.");
+  setTimeout(()=>{
+    status.textContent = "✅ Если вы услышали фразу — аудио работает";
+    status.style.color = "var(--good)";
+  }, 1200);
+}
+
+/* ---------------- PROBLEM WORDS TRACKING ---------------- */
+const problemWords = {};
+function registerMistake(word){
+  problemWords[word] = (problemWords[word]||0) + 1;
+  renderProblemWords();
+}
+function renderProblemWords(){
+  const list = document.getElementById('problemList');
+  const empty = document.getElementById('problemEmpty');
+  const words = Object.keys(problemWords);
+  list.innerHTML = "";
+  if (words.length === 0){ empty.style.display = "block"; return; }
+  empty.style.display = "none";
+  words.sort((a,b)=>problemWords[b]-problemWords[a]).forEach(w=>{
+    const li = document.createElement('li');
+    li.innerHTML = `<span>${w}</span><span class="count">${problemWords[w]}</span>`;
+    list.appendChild(li);
+  });
+}
+
+/* ---------------- GENERIC CHECK / SHOW / COPY ---------------- */
+function normalize(s){
+  return s.trim().toLowerCase().replace(/\s+/g,' ').replace(/[.!?]+$/,'');
+}
+function checkExercise(exId){
+  const list = document.getElementById(exId+"list");
+  const inputs = list.querySelectorAll('input[type=text]');
+  let correct = 0, total = 0;
+  inputs.forEach(inp=>{
+    total++;
+    const answers = inp.dataset.answer.split('|').map(normalize);
+    const mode = inp.dataset.mode || "exact";
+    const val = normalize(inp.value);
+    let ok = false;
+    if (val.length === 0){ ok = false; }
+    else if (mode === "contains"){
+      ok = answers.some(a => val.includes(a));
+    } else {
+      ok = answers.includes(val);
+    }
+    inp.classList.remove('correct','incorrect');
+    if (ok){ inp.classList.add('correct'); correct++; }
+    else { inp.classList.add('incorrect'); registerMistake(inp.dataset.word); }
+  });
+  document.getElementById(exId+"score").textContent = `Результат: ${correct} / ${total}`;
+}
+function showAnswers(exId){
+  document.getElementById(exId+"list").querySelectorAll('.answer-key').forEach(el=>el.classList.add('show'));
+}
+function copyExercise(exId){
+  const list = document.getElementById(exId+"list");
+  const items = list.querySelectorAll('li');
+  let out = [];
+  items.forEach((li, i)=>{
+    const ta = li.querySelector('textarea');
+    out.push(`${i+1}. ${li.dataset.prompt || ""}\n   Ответ: ${ta ? ta.value.trim() : ""}`);
+  });
+  copyToClipboard(out.join("\n\n"), document.getElementById(exId+"copied"));
+}
+function copyToClipboard(text, msgEl){
+  function done(){
+    if (msgEl){ msgEl.style.display = "inline"; setTimeout(()=>msgEl.style.display="none", 2000); }
+  }
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(done).catch(()=>fallbackCopy(text, done));
+  } else { fallbackCopy(text, done); }
+}
+function fallbackCopy(text, cb){
+  const ta = document.createElement('textarea');
+  ta.value = text; ta.style.position = 'fixed'; ta.style.left = '-9999px';
+  document.body.appendChild(ta); ta.select();
+  try { document.execCommand('copy'); } catch(e){}
+  document.body.removeChild(ta);
+  if (cb) cb();
+}
+function copyAll(){
+  let out = ["=== FOOD & HEALTH PRACTICE (SET 2) — STUDENT ANSWERS ===\n"];
+  for (let n=1; n<=7; n++){
+    const exId = "ex"+n;
+    const card = document.getElementById(exId);
+    if (!card) continue;
+    const title = card.querySelector('h2').textContent;
+    out.push(`\n--- ${title} ---`);
+    const list = document.getElementById(exId+"list");
+    const items = list.querySelectorAll('li');
+    items.forEach((li,i)=>{
+      const inputs = li.querySelectorAll('input[type=text]');
+      const ta = li.querySelector('textarea');
+      if (ta){
+        out.push(`${i+1}. ${(li.dataset.prompt||"").trim()} => ${ta.value.trim()}`);
+      } else if (inputs.length){
+        const vals = Array.from(inputs).map(inp=>inp.value.trim() || "___").join(" / ");
+        out.push(`${i+1}. ${(li.dataset.prompt||"").trim()} => ${vals}`);
+      }
+    });
+  }
+  copyToClipboard(out.join("\n"), document.getElementById('allCopied'));
+}
+function buildSimpleList(exId, data, mapFn){
+  const list = document.getElementById(exId+"list");
+  data.forEach(it=>{
+    const li = document.createElement('li');
+    const built = mapFn(it);
+    li.dataset.prompt = built.prompt;
+    li.innerHTML = built.html;
+    list.appendChild(li);
+  });
+}
+
+/* ---------------- EXERCISE 1: Fill in missing letters (new sentences) ---------------- */
+const ex1data = [
+  {ctx:"The fishmonger sold fresh <strong>m_ss_ls</strong> straight from the boat this morning.", word:"mussels"},
+  {ctx:"In Greece, <strong>_ct_p_s</strong> is often served grilled with olive oil.", word:"octopus"},
+  {ctx:"The starter was calamari — deep-fried <strong>squ_d</strong> with lemon.", word:"squid"},
+  {ctx:"We bought a tin of <strong>t_na</strong> for tomorrow's sandwiches.", word:"tuna"},
+  {ctx:"My grandmother always soaks the <strong>b_ans</strong> overnight before cooking.", word:"beans"},
+  {ctx:"Fresh <strong>p_as</strong> from the garden taste much sweeter than frozen ones.", word:"peas"},
+  {ctx:"Shred the <strong>c_bb_ge</strong> finely for the coleslaw.", word:"cabbage"},
+  {ctx:"This <strong>p_ar</strong> is not ripe enough to eat yet.", word:"pear"},
+  {ctx:"The farm raises <strong>d_ck</strong>s for both eggs and meat.", word:"duck"},
+  {ctx:"Slice the <strong>z_cch_ni</strong> thinly before frying.", word:"zucchini"}
+];
+buildSimpleList("ex1", ex1data, it => ({
+  prompt: it.ctx.replace(/<\/?strong>/g,'_'),
+  html: `<span class="context">${it.ctx}</span> <input type="text" data-answer="${it.word}" data-word="${it.word}" placeholder="слово"> <span class="answer-key">(${it.word})</span>`
+}));
+
+/* ---------------- EXERCISE 2: Translate RU -> EN (new phrasing) ---------------- */
+const ex2data = [
+  {ru:"Полить хот-дог ___ (кетчупом)", word:"ketchup"},
+  {ru:"Намазать бутерброд ___ (майонезом)", word:"mayonnaise"},
+  {ru:"Замариновать курицу в соусе ___ (барбекю)", word:"barbecue|barbecue sauce"},
+  {ru:"Подать начос с ___ (гуакамоле)", word:"guacamole"},
+  {ru:"Добавить ложку ___ (горчицы) в заправку", word:"mustard"},
+  {ru:"Обжарить овощи в ___ (соевом) соусе", word:"soy|soy sauce"},
+  {ru:"Заказать курицу в ___ (кисло-сладком) соусе", word:"sweet and sour"},
+  {ru:"На столе стояла бутылка ___ (острого соуса)", word:"hot sauce"},
+  {ru:"Добавить немного ___ (уксуса) в салат", word:"vinegar"},
+  {ru:"Подать рыбные палочки с соусом ___ (тартар)", word:"tartar sauce"}
+];
+buildSimpleList("ex2", ex2data, it => ({
+  prompt: it.ru,
+  html: `<span class="context">${it.ru}</span> <input type="text" data-answer="${it.word}" data-word="${it.word.split('|')[0]}" placeholder="in English"> <span class="answer-key">(${it.word.split('|')[0]})</span>`
+}));
+
+/* ---------------- EXERCISE 3: Listen & write (new phrases) ---------------- */
+const ex3data = [
+  "baked beans","boiled rice","steamed fish","fried chicken","grilled vegetables",
+  "frozen fish","raw meat","tinned fruit","low-fat yogurt","fresh bread"
+];
+const ex3list = document.getElementById('ex3list');
+ex3data.forEach(phrase=>{
+  const li = document.createElement('li');
+  li.dataset.prompt = "[audio] " + phrase;
+  li.innerHTML = `<button class="speak-btn" onclick="speak('${phrase}')">🔊</button>
+    <input type="text" data-answer="${phrase}" data-word="${phrase}" placeholder="напишите фразу"
+    style="min-width:220px;">
+    <span class="answer-key">(${phrase})</span>`;
+  ex3list.appendChild(li);
+});
+
+/* ---------------- EXERCISE 4: Definitions (new wording) ---------------- */
+const ex4data = [
+  {def:"What you add on top of a dessert or pizza to make it look and taste better.", word:"topping"},
+  {def:"The part of a pie or cake that is hidden inside the pastry or sponge.", word:"filling"},
+  {def:"What people often do by treating themselves to comfort food after a bad day.", word:"cheer yourself up"},
+  {def:"A hot meal you order from a restaurant but eat at home.", word:"take away food|takeaway food|takeaway"},
+  {def:"A condition where eating a certain food triggers a dangerous immune response.", word:"be allergic to"},
+  {def:"A condition where the body struggles to digest a food but there's no immune danger.", word:"be intolerant to"},
+  {def:"A meal from the supermarket that only needs to be microwaved or heated.", word:"ready-made food|ready made food"},
+  {def:"Food with lots of sugar, salt or fat and very few vitamins.", word:"junk food"},
+  {def:"Eating a variety of foods in the right proportions to stay healthy.", word:"balanced diet"},
+  {def:"A quick bite eaten between lunch and dinner, for example.", word:"snack"}
+];
+buildSimpleList("ex4", ex4data, it => ({
+  prompt: it.def,
+  html: `<span class="context">${it.def}</span> <input type="text" data-answer="${it.word}" data-word="${it.word.split('|')[0]}" placeholder="слово / фраза"> <span class="answer-key">(${it.word.split('|')[0]})</span>`
+}));
+
+/* ---------------- EXERCISE 5: Rephrase (new sentences) ---------------- */
+const ex5data = [
+  {s:"Even a tiny bit of shellfish makes his throat swell up dangerously.", hint:"be allergic to", ans:"allergic to shellfish"},
+  {s:"Dairy products give my sister stomach pain, though it isn't dangerous for her.", hint:"be intolerant to / have an intolerance to", ans:"intolerant to dairy|an intolerance to dairy"},
+  {s:"The doctor told him to stop eating red meat completely.", hint:"cut out", ans:"cut out red meat"},
+  {s:"I'm not quitting coffee, I'm just having less of it.", hint:"cut down on", ans:"cutting down on coffee|cut down on coffee"},
+  {s:"Instead of cooking, we decided to have dinner at a restaurant.", hint:"eat out", ans:"eat out"},
+  {s:"My uncle stopped eating sugar completely five years ago.", hint:"give up", ans:"gave up sugar"},
+  {s:"He never touches spicy food because it upsets his stomach.", hint:"avoid", ans:"avoids spicy food"},
+  {s:"She never breaks her vegetarian eating plan, no matter what.", hint:"stick to", ans:"stick to her"},
+  {s:"Whenever my cousin eats eggs, she breaks out in hives.", hint:"have an allergy to", ans:"an allergy to eggs"},
+  {s:"Bread makes me bloated, but the doctor said it isn't an allergy.", hint:"be intolerant", ans:"intolerant to bread|intolerant"}
+];
+buildSimpleList("ex5", ex5data, it => ({
+  prompt: `${it.s} (${it.hint})`,
+  html: `<span class="context">${it.s}</span> <span class="word-bank">(use: ${it.hint})</span><br>
+    <input type="text" style="width:90%; min-width:260px;" data-answer="${it.ans}" data-mode="contains" data-word="${it.hint}" placeholder="перепишите предложение">
+    <span class="answer-key">(должно содержать: "${it.ans.split('|')[0]}")</span>`
+}));
+
+/* ---------------- EXERCISE 6: Find two mistakes (new sentences) ---------------- */
+const ex6data = [
+  {topic:"muscles", s:"Eating enough protein help your muscels recover after exercise.",
+   w1:"help", c1:"helps", w2:"muscels", c2:"muscles"},
+  {topic:"skip breakfast", s:"If you skips breakfast too often, you might feel tired on the afternoon.",
+   w1:"skips", c1:"skip", w2:"on the afternoon", c2:"in the afternoon"},
+  {topic:"blood sugar levels", s:"Sugary drinks makes your blood suger levels spike very fast.",
+   w1:"makes", c1:"make", w2:"suger", c2:"sugar"},
+  {topic:"lung capacity", s:"Regular swimming improve your lungs capacity a lot.",
+   w1:"improve", c1:"improves", w2:"lungs capacity", c2:"lung capacity"},
+  {topic:"liver", s:"Too much alcohol are very bad for your livers health.",
+   w1:"are", c1:"is", w2:"livers", c2:"liver's"},
+  {topic:"disrupt our body's", s:"Jet lag can disrupts our bodys sleep cycle for days.",
+   w1:"disrupts", c1:"disrupt", w2:"bodys", c2:"body's"},
+  {topic:"cause diabetes", s:"Obesity can causes diabetes and many other health problem.",
+   w1:"causes", c1:"cause", w2:"problem", c2:"problems"},
+  {topic:"make us mentally alert", s:"A short walk can makes us mentally alert for the rest of a morning.",
+   w1:"makes", c1:"make", w2:"for the rest of a morning", c2:"for the rest of the morning"},
+  {topic:"stomach produces acid", s:"When we're nervous, our stomach's produce extra acid and it hurts.",
+   w1:"stomach's", c1:"stomach", w2:"produce", c2:"produces"},
+  {topic:"produce the stress hormone", s:"During exams, students body produce the stress hormones constantly.",
+   w1:"students body", c1:"students' bodies", w2:"hormones", c2:"hormone"}
+];
+const ex6list = document.getElementById('ex6list');
+ex6data.forEach(it=>{
+  const li = document.createElement('li');
+  li.dataset.prompt = it.s;
+  li.innerHTML = `<span class="context">${it.s}</span>
+    <div class="mistake-inputs">
+      <label>Исправление 1:</label><input type="text" data-answer="${it.c1}" data-word="${it.topic}" placeholder="...">
+      <span class="answer-key">(${it.w1} → ${it.c1})</span><br>
+      <label>Исправление 2:</label><input type="text" data-answer="${it.c2}" data-word="${it.topic}" placeholder="...">
+      <span class="answer-key">(${it.w2} → ${it.c2})</span>
+    </div>`;
+  ex6list.appendChild(li);
+});
+
+/* ---------------- EXERCISE 7: Discussion questions (new) ---------------- */
+const ex7data = [
+  "Have you ever had a bad reaction to a food? What happened?",
+  "Do you prefer cooking at home or getting takeaway food? Why?",
+  "What's the strangest topping you've ever tried on a dish?",
+  "Do you know anyone who is intolerant to a certain food? How do they cope?",
+  "Should schools ban junk food from their canteens? Why or why not?",
+  "What do you usually eat to cheer yourself up after a stressful day?",
+  "How does skipping breakfast affect your mood or energy?",
+  "What's one habit you'd like to cut down on this year?",
+  "What does a balanced diet look like for you personally?",
+  "Do you trust ready-made or frozen food as much as fresh food? Why?"
+];
+const ex7list = document.getElementById('ex7list');
+ex7data.forEach(q=>{
+  const li = document.createElement('li');
+  li.dataset.prompt = q;
+  li.innerHTML = `<span class="context">${q}</span><br><textarea placeholder="ваш ответ..."></textarea>`;
+  ex7list.appendChild(li);
+});
+</script>
+</body>
+</html>
