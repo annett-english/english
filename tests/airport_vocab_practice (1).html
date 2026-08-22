@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Airport &amp; Airline Problems — B1+ Practice</title>
+<style>
+  :root{
+    --navy:#0b1f3a;
+    --navy-2:#132a4d;
+    --amber:#f5a623;
+    --amber-dim:#c98416;
+    --cream:#f5f3ee;
+    --card:#ffffff;
+    --ink:#16233a;
+    --muted:#5b6577;
+    --line:#e2e2dc;
+    --good:#1b7a4d;
+    --good-bg:#e6f4ec;
+    --bad:#b3261e;
+    --bad-bg:#fbe9e7;
+    --mono: 'Courier New', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--cream); color:var(--ink); font-family:var(--sans);
+    line-height:1.5; padding-bottom:60px;
+  }
+  a{color:inherit;}
+
+  /* ---------- Header : split-flap departure board ---------- */
+  header.board{
+    background:var(--navy);
+    color:var(--cream);
+    padding:28px 20px 34px;
+    position:relative;
+    overflow:hidden;
+  }
+  header.board::after{
+    content:"";
+    position:absolute; left:0; right:0; bottom:0; height:6px;
+    background:repeating-linear-gradient(90deg,var(--amber) 0 18px, transparent 18px 26px);
+    opacity:.8;
+  }
+  .board-inner{max-width:1100px;margin:0 auto;}
+  .board-eyebrow{
+    font-family:var(--mono); letter-spacing:.18em; text-transform:uppercase;
+    font-size:12px; color:var(--amber); margin-bottom:10px;
+  }
+  h1.board-title{
+    font-family:var(--mono); font-weight:700; font-size:clamp(24px,4.2vw,40px);
+    margin:0 0 8px; letter-spacing:.02em;
+  }
+  .board-sub{color:#c7d0e0; max-width:720px; font-size:15px;}
+  .board-tags{display:flex; gap:10px; flex-wrap:wrap; margin-top:16px;}
+  .flap{
+    font-family:var(--mono); background:var(--navy-2); border:1px solid #24406b;
+    color:var(--amber); padding:5px 10px; font-size:12px; letter-spacing:.06em;
+    border-radius:3px;
+  }
+
+  /* ---------- Audio test bar ---------- */
+  .audio-bar{
+    max-width:1100px; margin:-18px auto 0; background:var(--card); border:1px solid var(--line);
+    border-radius:10px; padding:14px 18px; display:flex; align-items:center; gap:14px;
+    flex-wrap:wrap; box-shadow:0 6px 18px rgba(11,31,58,.08); position:relative; z-index:2;
+  }
+  .audio-bar strong{font-size:14px;}
+  #audio-status{font-size:13px; color:var(--muted);}
+  .btn{
+    font-family:var(--sans); font-weight:600; font-size:13px; border:none; border-radius:7px;
+    padding:9px 16px; cursor:pointer; transition:transform .05s ease, opacity .15s ease;
+  }
+  .btn:active{transform:scale(.97);}
+  .btn-amber{background:var(--amber); color:var(--navy);}
+  .btn-amber:hover{background:var(--amber-dim);}
+  .btn-navy{background:var(--navy); color:#fff;}
+  .btn-navy:hover{background:var(--navy-2);}
+  .btn-ghost{background:transparent; color:var(--navy); border:1.5px solid var(--navy);}
+  .btn-ghost:hover{background:var(--navy); color:#fff;}
+  .btn-sm{padding:6px 12px; font-size:12px;}
+
+  /* ---------- Layout ---------- */
+  .layout{
+    max-width:1100px; margin:24px auto 0; padding:0 20px;
+    display:grid; grid-template-columns:1fr 250px; gap:24px; align-items:start;
+  }
+  @media (max-width:880px){
+    .layout{grid-template-columns:1fr;}
+    .sidebar{position:static; order:0;}
+  }
+  main{min-width:0;}
+
+  /* ---------- Sidebar : problem words ---------- */
+  .sidebar{position:sticky; top:16px;}
+  .sidebar-card{
+    background:var(--navy); color:#fff; border-radius:12px; padding:16px; margin-bottom:16px;
+  }
+  .sidebar-card h3{
+    font-family:var(--mono); font-size:13px; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--amber); margin:0 0 10px;
+  }
+  .sidebar-card table{width:100%; border-collapse:collapse; font-size:13px;}
+  .sidebar-card td{padding:6px 4px; border-bottom:1px solid rgba(255,255,255,.12);}
+  .sidebar-card td.empty{color:#9fb0cc; font-style:italic; border:none; padding-top:4px;}
+  .sidebar-card td:last-child{text-align:right; color:var(--amber); font-family:var(--mono); width:26px;}
+  .sidebar-note{font-size:12px; color:var(--muted); background:var(--card); border:1px solid var(--line); border-radius:10px; padding:12px;}
+
+  /* ---------- Intro vocab ---------- */
+  .intro{
+    background:var(--card); border:1px solid var(--line); border-radius:14px; padding:20px 22px; margin-bottom:26px;
+  }
+  .intro h2{margin-top:0; font-size:19px;}
+  .intro p.lead{color:var(--muted); font-size:14px; margin-top:-4px;}
+  table.vocab{width:100%; border-collapse:collapse; margin-top:12px;}
+  table.vocab th{
+    text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.06em;
+    color:var(--muted); padding:8px 8px; border-bottom:2px solid var(--navy);
+  }
+  table.vocab td{padding:10px 8px; border-bottom:1px solid var(--line); font-size:14px; vertical-align:middle;}
+  table.vocab td.word{font-weight:700;}
+  table.vocab td.ipa{font-family:var(--mono); color:var(--muted); font-size:13px;}
+  table.vocab tr:hover td{background:#faf9f5;}
+  .listen-btn{
+    background:var(--navy); color:var(--amber); border:none; border-radius:50%;
+    width:34px; height:34px; cursor:pointer; font-size:15px; line-height:1;
+  }
+  .listen-btn:hover{background:var(--navy-2);}
+
+  /* ---------- Exercise cards ---------- */
+  .exercise{
+    background:var(--card); border:1px solid var(--line); border-radius:14px; padding:22px;
+    margin-bottom:26px;
+  }
+  .exercise-head{display:flex; align-items:flex-start; gap:12px; margin-bottom:4px;}
+  .exercise-num{
+    font-family:var(--mono); background:var(--navy); color:var(--amber); font-weight:700;
+    font-size:13px; padding:4px 9px; border-radius:5px; flex-shrink:0; margin-top:2px;
+  }
+  .exercise-head h2{margin:0; font-size:18px;}
+  .exercise-instr{color:var(--muted); font-size:13.5px; margin:4px 0 16px 44px;}
+
+  .item{
+    display:grid; grid-template-columns:28px 1fr; gap:6px 10px; padding:12px 0;
+    border-top:1px solid var(--line); align-items:start;
+  }
+  .item:first-child{border-top:none;}
+  .item-num{font-family:var(--mono); color:var(--amber-dim); font-weight:700; font-size:14px; padding-top:8px;}
+  .item-body{display:flex; flex-direction:column; gap:8px;}
+  .item-prompt{font-size:14.5px;}
+  .item-prompt mark{background:#fde3b8; padding:0 3px; border-radius:3px;}
+  .item-prompt.pre{white-space:pre-line; font-size:14px; background:#faf9f5; border:1px dashed var(--line); border-radius:8px; padding:10px 12px;}
+  .row-input{display:flex; gap:8px; align-items:center; flex-wrap:wrap;}
+  .answer-input{
+    flex:1; min-width:200px; font-family:var(--sans); font-size:14px; padding:9px 11px;
+    border:1.5px solid var(--line); border-radius:8px; background:#fff; color:var(--ink);
+  }
+  .answer-input:focus{outline:none; border-color:var(--navy);}
+  .answer-input.right{border-color:var(--good); background:var(--good-bg);}
+  .answer-input.wrong{border-color:var(--bad); background:var(--bad-bg);}
+  .audio-btn{
+    background:var(--navy); color:var(--amber); border:none; border-radius:8px; width:38px; height:38px;
+    cursor:pointer; font-size:15px; flex-shrink:0;
+  }
+  .audio-btn:hover{background:var(--navy-2);}
+  .feedback{font-size:13px; font-weight:600; min-height:16px;}
+  .feedback.correct{color:var(--good);}
+  .feedback.incorrect{color:var(--bad);}
+  .reveal-answer{
+    display:none; font-size:13.5px; background:#fff7e9; border:1px dashed var(--amber-dim);
+    border-radius:8px; padding:8px 10px; color:#6b4a10;
+  }
+  .exercise-actions{display:flex; gap:10px; flex-wrap:wrap; margin-top:16px; align-items:center;}
+  .exercise-summary{font-size:13px; color:var(--muted); font-family:var(--mono);}
+  .toast{
+    position:fixed; bottom:20px; left:50%; transform:translateX(-50%);
+    background:var(--navy); color:var(--amber); padding:10px 18px; border-radius:8px;
+    font-size:13px; font-family:var(--mono); opacity:0; pointer-events:none; transition:opacity .25s ease;
+    z-index:50;
+  }
+  .toast.show{opacity:1;}
+
+  .phrase-bank{
+    margin-top:16px; background:#faf9f5; border:1px dashed var(--line); border-radius:10px;
+    padding:12px 16px; font-size:13.5px; color:var(--muted);
+  }
+  .phrase-bank strong{color:var(--ink); display:block; margin-bottom:6px; font-size:13px;}
+  .phrase-bank ol{margin:0; padding-left:20px; columns:2; column-gap:24px;}
+  .phrase-bank li{margin-bottom:4px; break-inside:avoid;}
+  @media (max-width:600px){ .phrase-bank ol{columns:1;} }
+
+  footer{max-width:1100px; margin:10px auto 0; padding:0 20px; color:var(--muted); font-size:12.5px;}
+  footer h3{color:var(--ink); font-size:14px;}
+  footer ul{padding-left:18px;}
+</style>
+</head>
+<body>
+
+<header class="board">
+  <div class="board-inner">
+    <div class="board-eyebrow">Departures / Vocabulary Practice</div>
+    <h1 class="board-title">AIRPORT &amp; AIRLINE PROBLEMS</h1>
+    <p class="board-sub">Практика лексики уровня B1+ по теме проблем в аэропорту: отменённые и задержанные рейсы, потерянный и повреждённый багаж, возврат денег. 9 упражнений по 10 заданий — печатайте ответы руками.</p>
+    <div class="board-tags">
+      <span class="flap">GATE: VOCAB</span>
+      <span class="flap">STATUS: 9 EXERCISES</span>
+      <span class="flap">LEVEL: B1+</span>
+    </div>
+  </div>
+</header>
+
+<div class="audio-bar">
+  <strong>🔊 Проверка звука:</strong>
+  <button class="btn btn-amber" onclick="testAudio()">Проверить звук</button>
+  <span id="audio-status">Нажмите кнопку, чтобы проверить, что синтез речи работает в вашем браузере.</span>
+</div>
+
+<div class="layout">
+  <main>
+
+    <section class="intro">
+      <h2>🧠 Повторим слова</h2>
+      <p class="lead">Прочитайте, послушайте произношение (голос Google US English / en-US) и вспомните перевод, прежде чем переходить к упражнениям.</p>
+      <table class="vocab">
+        <thead>
+          <tr><th></th><th>Word / phrase</th><th>Transcription</th><th>Перевод</th></tr>
+        </thead>
+        <tbody id="vocab-body"></tbody>
+      </table>
+    </section>
+
+    <!-- Exercise 1 -->
+    <section class="exercise">
+      <div class="exercise-head">
+        <span class="exercise-num">01</span>
+        <h2>Fill in the missing letters</h2>
+      </div>
+      <p class="exercise-instr">Вставьте пропущенные буквы и напишите слово/выражение целиком.</p>
+      <div id="ex1"></div>
+      <div class="exercise-actions">
+        <button class="btn btn-navy" onclick="checkExercise('ex1', EX1)">Проверить</button>
+        <button class="btn btn-ghost" onclick="showAnswersGraded('ex1', EX1)">Показать ответы</button>
+        <span class="exercise-summary" id="ex1-summary"></span>
+      </div>
+    </section>
+
+    <!-- Exercise 2 -->
+    <section class="exercise">
+      <div class="exercise-head">
+        <span class="exercise-num">02</span>
+        <h2>Listen and write</h2>
+      </div>
+      <p class="exercise-instr">Нажмите 🔊, прослушайте слово/выражение и напишите то, что услышали.</p>
+      <div id="ex2"></div>
+      <div class="exercise-actions">
+        <button class="btn btn-navy" onclick="checkExercise('ex2', EX2)">Проверить</button>
+        <button class="btn btn-ghost" onclick="showAnswersGraded('ex2', EX2)">Показать ответы</button>
+        <span class="exercise-summary" id="ex2-summary"></span>
+      </div>
+    </section>
+
+    <!-- Exercise 3 -->
+    <section class="exercise">
+      <div class="exercise-head">
+        <span class="exercise-num">03</span>
+        <h2>Definitions</h2>
+      </div>
+      <p class="exercise-instr">Прочитайте определение и напишите слово или выражение, которое оно описывает.</p>
+      <div id="ex3"></div>
+      <div class="exercise-actions">
+        <button class="btn btn-navy" onclick="checkExercise('ex3', EX3)">Проверить</button>
+        <button class="btn btn-ghost" onclick="showAnswersGraded('ex3', EX3)">Показать ответы</button>
+        <span class="exercise-summary" id="ex3-summary"></span>
+      </div>
+    </section>
+
+    <!-- Exercise 4 -->
+    <section class="exercise">
+      <div class="exercise-head">
+        <span class="exercise-num">04</span>
+        <h2>What was the question?</h2>
+      </div>
+      <p class="exercise-instr">Это ответ агента авиакомпании. Напишите вопрос пассажира, на который он мог отвечать — используйте фразы из списка ниже.</p>
+      <div id="ex4"></div>
+      <div class="exercise-actions">
+        <button class="btn btn-navy" onclick="checkExercise('ex4', EX4)">Проверить</button>
+        <button class="btn btn-ghost" onclick="showAnswersGraded('ex4', EX4)">Показать ответы</button>
+        <button class="btn btn-amber" onclick="copyAllAnswers('ex4')">Скопировать все ответы</button>
+        <span class="exercise-summary" id="ex4-summary"></span>
+      </div>
+      <div class="phrase-bank">
+        <strong>Phrase bank:</strong>
+        <ol>
+          <li>Can I get a full refund (for sth)?</li>
+          <li>Why was the flight cancelled?</li>
+          <li>Is there another flight available today?</li>
+          <li>What are my options?</li>
+          <li>Could you help me locate my bag?</li>
+          <li>Where can I report lost luggage?</li>
+          <li>When will I hear from you?</li>
+          <li>Can you rebook me on the next available flight?</li>
+          <li>I’d like to report the damage.</li>
+          <li>How long is the delay?</li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- Exercise 5 -->
+    <section class="exercise">
+      <div class="exercise-head">
+        <span class="exercise-num">05</span>
+        <h2>Replace the highlighted word</h2>
+      </div>
+      <p class="exercise-instr">Замените выделенное слово/фразу на более точное выражение по теме.</p>
+      <div id="ex5"></div>
+      <div class="exercise-actions">
+        <button class="btn btn-navy" onclick="checkExercise('ex5', EX5)">Проверить</button>
+        <button class="btn btn-ghost" onclick="showAnswersGraded('ex5', EX5)">Показать ответы</button>
+        <span class="exercise-summary" id="ex5-summary"></span>
+      </div>
+    </section>
+
+    <!-- Exercise 6 -->
+    <section class="exercise">
+      <div class="exercise-head">
+        <span class="exercise-num">06</span>
+        <h2>Build the chunk</h2>
+      </div>
+      <p class="exercise-instr">Слова перепутаны. Составьте из них правильное выражение или целое предложение/вопрос.</p>
+      <div id="ex6"></div>
+      <div class="exercise-actions">
+        <button class="btn btn-navy" onclick="checkExercise('ex6', EX6)">Проверить</button>
+        <button class="btn btn-ghost" onclick="showAnswersGraded('ex6', EX6)">Показать ответы</button>
+        <span class="exercise-summary" id="ex6-summary"></span>
+      </div>
+    </section>
+
+    <!-- Exercise 7 -->
+    <section class="exercise">
+      <div class="exercise-head">
+        <span class="exercise-num">07</span>
+        <h2>Finish the dialogues</h2>
+      </div>
+      <p class="exercise-instr">Допишите только реплику <strong>Passenger</strong>, используя, например, фразы из списка ниже. Готового единственно верного ответа нет — сравните свой вариант с примером.</p>
+      <div class="phrase-bank">
+        <strong>Phrase bank:</strong>
+        <ol>
+          <li>Can I get a full refund (for sth)?</li>
+          <li>Why was the flight cancelled?</li>
+          <li>Is there another flight available today?</li>
+          <li>What are my options?</li>
+          <li>Could you help me locate my bag?</li>
+          <li>Where can I report lost luggage?</li>
+          <li>When will I hear from you?</li>
+          <li>Can you rebook me on the next available flight?</li>
+          <li>I’d like to report the damage.</li>
+          <li>How long is the delay?</li>
+        </ol>
+      </div>
+      <div id="ex7"></div>
+      <div class="exercise-actions">
+        <button class="btn btn-ghost" onclick="revealAll('ex7')">Показать пример ответа</button>
+        <button class="btn btn-amber" onclick="copyAllAnswers('ex7')">Скопировать все ответы</button>
+      </div>
+    </section>
+
+    <!-- Exercise 8 -->
+    <section class="exercise">
+      <div class="exercise-head">
+        <span class="exercise-num">08</span>
+        <h2>Expand the sentence</h2>
+      </div>
+      <p class="exercise-instr">Расширьте короткое предложение, добавив причину, следствие или деталь по теме.</p>
+      <div id="ex8"></div>
+      <div class="exercise-actions">
+        <button class="btn btn-ghost" onclick="revealAll('ex8')">Показать пример ответа</button>
+        <button class="btn btn-amber" onclick="copyAllAnswers('ex8')">Скопировать все ответы</button>
+      </div>
+    </section>
+
+    <!-- Exercise 9 -->
+    <section class="exercise">
+      <div class="exercise-head">
+        <span class="exercise-num">09</span>
+        <h2>Finish with your own idea</h2>
+      </div>
+      <p class="exercise-instr">Закончите предложение своей идеей. Правильного ответа нет — пишите свободно.</p>
+      <div id="ex9"></div>
+      <div class="exercise-actions">
+        <button class="btn btn-ghost" onclick="revealAll('ex9')">Показать пример идеи</button>
+        <button class="btn btn-amber" onclick="copyAllAnswers('ex9')">Скопировать все ответы</button>
+      </div>
+    </section>
+
+  </main>
+
+  <aside class="sidebar">
+    <div class="sidebar-card">
+      <h3>⚠ Проблемные слова</h3>
+      <table>
+        <tbody id="problem-words-body">
+          <tr><td class="empty">Пока нет ошибок 🎉</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="sidebar-note">Здесь появляются слова, в которых были допущены ошибки при проверке (упражнения 1, 2, 3, 5, 6). Число справа — сколько раз была ошибка.</div>
+  </aside>
+</div>
+
+<footer>
+  <h3>Заметки для преподавателя</h3>
+  <ul>
+    <li><strong>Аудио:</strong> используется системный синтез речи браузера (Web Speech API). В Chrome на компьютере доступен голос «Google US English» — он выбирается автоматически, если есть. На телефонах и в других браузерах будет использован ближайший доступный голос en-US. Проверьте кнопкой «Проверить звук» вверху страницы.</li>
+    <li><strong>Копирование ответов:</strong> кнопки «Скопировать все ответы» собирают все введённые студентом варианты в один текст и копируют его в буфер обмена (можно вставить в чат/документ). Если браузер блокирует автоматическое копирование (например, при открытии файла напрямую), появится окно с текстом для ручного копирования.</li>
+    <li><strong>Проверка:</strong> упражнения 1, 2, 3, 5, 6 — с автоматической проверкой и подсветкой; упражнения 4, 7, 8, 9 — открытые (нет единственно верного ответа), доступен пример-ответ.</li>
+  </ul>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ========================= DATA ========================= */
+
+const VOCAB = [
+  {word:"a cancelled flight", ipa:"/ə ˈkæn.səld flaɪt/", ru:"отменённый рейс"},
+  {word:"a delayed flight", ipa:"/ə dɪˈleɪd flaɪt/", ru:"задержанный рейс"},
+  {word:"damaged luggage", ipa:"/ˈdæm.ɪdʒd ˈlʌg.ɪdʒ/", ru:"повреждённый багаж"},
+  {word:"get a refund", ipa:"/get ə ˈriː.fʌnd/", ru:"получить возврат денег"},
+  {word:"a missed flight", ipa:"/ə mɪst flaɪt/", ru:"пропущенный рейс"},
+  {word:"report lost luggage", ipa:"/rɪˈpɔːrt lɒst ˈlʌg.ɪdʒ/", ru:"заявить о потерянном багаже"},
+  {word:"rebook a flight", ipa:"/riːˈbʊk ə flaɪt/", ru:"перебронировать рейс"}
+];
+
+const EX1 = [
+  {masked:"g_t a r_f_nd", answer:"get a refund"},
+  {masked:"r_b__k a fl_ght", answer:"rebook a flight"},
+  {masked:"a c_nc_ll_d fl_ght", answer:"a cancelled flight"},
+  {masked:"p_rm_tt_d w__ght _ll_w_nce", answer:"permitted weight allowance"},
+  {masked:"d_m_g_d l_gg_ge", answer:"damaged luggage"},
+  {masked:"r_p_rt l_st l_gg_ge", answer:"report lost luggage"},
+  {masked:"a d_l_y_d fl_ght", answer:"a delayed flight"},
+  {masked:"a b__rd_ng p_ss", answer:"a boarding pass"},
+  {masked:"a m_ss_d fl_ght", answer:"a missed flight"},
+  {masked:"_n_tt_nd_d l_gg_ge", answer:"unattended luggage"}
+];
+
+const EX2 = [
+  {answer:"report lost luggage"},
+  {answer:"a delayed flight"},
+  {answer:"unattended luggage"},
+  {answer:"a missed flight"},
+  {answer:"a cancelled flight"},
+  {answer:"permitted weight allowance"},
+  {answer:"rebook a flight"},
+  {answer:"damaged luggage"},
+  {answer:"a boarding pass"},
+  {answer:"get a refund"}
+];
+
+const EX3 = [
+  {def:"a suitcase or bag that has been broken, torn or spoiled during the journey", answer:"damaged luggage"},
+  {def:"the maximum weight of luggage you are allowed to take on a flight", answer:"permitted weight allowance"},
+  {def:"to arrange a new flight ticket, usually after a problem with your original one", answer:"rebook a flight"},
+  {def:"a flight that has been officially stopped and will not take place", answer:"a cancelled flight"},
+  {def:"a flight that a passenger was unable to catch on time", answer:"a missed flight"},
+  {def:"a document that allows a passenger to get on the plane", answer:"a boarding pass"},
+  {def:"a flight that departs later than the time shown on the schedule", answer:"a delayed flight"},
+  {def:"to formally tell the airline staff that your bag hasn't arrived", answer:"report lost luggage"},
+  {def:"to receive your money back for a service you paid for but didn't get", answer:"get a refund"},
+  {def:"a bag or suitcase left alone by its owner in a public area", answer:"unattended luggage"}
+];
+
+const EX4 = [
+  {agent:"Of course, let me check our system for you right away.", answer:"Could you help me locate my bag?"},
+  {agent:"I'm sorry, sir, there was a technical problem with the aircraft.", answer:"Why was the flight cancelled?"},
+  {agent:"I understand. Please fill out this damage report form at the desk.", answer:"I'd like to report the damage."},
+  {agent:"You can report it at the baggage services desk just over there.", answer:"Where can I report lost luggage?"},
+  {agent:"Yes, since the flight was cancelled, you're entitled to a full refund.", answer:"Can I get a full refund (for sth)?"},
+  {agent:"Yes, I've rebooked you on tomorrow's 3 p.m. flight.", answer:"Can you rebook me on the next available flight?"},
+  {agent:"You can either wait for the next flight or request a refund.", answer:"What are my options?"},
+  {agent:"The flight is delayed by approximately two hours.", answer:"How long is the delay?"},
+  {agent:"Yes, we still have one seat left on the 6 p.m. flight.", answer:"Is there another flight available today?"},
+  {agent:"We'll contact you as soon as we have any news, usually within 24 hours.", answer:"When will I hear from you?"}
+];
+
+const EX5 = [
+  {sentence:"My suitcase was <mark>broken</mark> when I collected it at the airport.", answer:"damaged", alts:["damaged luggage"]},
+  {sentence:"Our flight was <mark>late</mark> by almost three hours.", answer:"delayed", alts:["a delayed flight"]},
+  {sentence:"Passengers need to <mark>get on</mark> the plane in ten minutes.", answer:"board", alts:["board the plane"]},
+  {sentence:"Please <mark>pick up</mark> your bags at carousel five.", answer:"collect", alts:["collect your baggage"]},
+  {sentence:"I <mark>left my bag alone</mark> for a minute near the gate.", answer:"unattended", alts:["unattended luggage","left it unattended"]},
+  {sentence:"The airline cancelled my ticket, so I want <mark>my money back</mark>.", answer:"a refund", alts:["get a refund"]},
+  {sentence:"I <mark>couldn't catch</mark> my connecting flight because of the delay.", answer:"missed", alts:["a missed flight"]},
+  {sentence:"An officer asked to <mark>check my documents</mark> before I entered the departure area.", answer:"show my passport", alts:["passport control","go through passport control","show your passport"]},
+  {sentence:"I need <mark>a new ticket</mark> for tomorrow, since mine was cancelled.", answer:"rebook a flight", alts:["rebook"]},
+  {sentence:"There's <mark>a limit on how much your luggage can weigh</mark>, so check before you pack.", answer:"permitted weight allowance", alts:[]}
+];
+
+const EX6 = [
+  {scrambled:"customs / through / go", answer:"go through customs"},
+  {scrambled:"flight / cancelled / why / the / was", answer:"Why was the flight cancelled?"},
+  {scrambled:"baggage / collect / your", answer:"collect your baggage"},
+  {scrambled:"delay / is / how / the / long", answer:"How long is the delay?"},
+  {scrambled:"trolley / a / take", answer:"take a trolley"},
+  {scrambled:"my / options / what / are", answer:"What are my options?"},
+  {scrambled:"bag / drop / your / off", answer:"drop off your bag"},
+  {scrambled:"today / flight / is / another / there / available", answer:"Is there another flight available today?"},
+  {scrambled:"check / go / security / through", answer:"go through security check"},
+  {scrambled:"refund / a / get / can / full / i", answer:"Can I get a full refund?"}
+];
+
+const EX7 = [
+  {prompt:"Passenger: Excuse me, I can't find my suitcase anywhere.\nAgent: I'm sorry to hear that.\nPassenger: ______________________________", example:"Could you help me locate my bag?"},
+  {prompt:"Agent: I'm afraid your flight won't be departing today.\nPassenger: ______________________________", example:"Why was the flight cancelled?"},
+  {prompt:"Agent: I noticed your suitcase has a broken handle.\nPassenger: ______________________________", example:"I'd like to report the damage."},
+  {prompt:"Passenger: My bag hasn't come out on the belt.\nAgent: I understand, let's sort this out.\nPassenger: ______________________________", example:"Where can I report lost luggage?"},
+  {prompt:"Agent: Unfortunately your flight has been cancelled.\nPassenger: ______________________________", example:"Can I get a full refund (for sth)?"},
+  {prompt:"Agent: I'm afraid you've missed your connection.\nPassenger: ______________________________", example:"Can you rebook me on the next available flight?"},
+  {prompt:"Agent: I'm sorry, there's nothing more we can offer right now.\nPassenger: ______________________________", example:"What are my options?"},
+  {prompt:"Agent: There's been a slight technical problem with the aircraft.\nPassenger: ______________________________", example:"How long is the delay?"},
+  {prompt:"Passenger: My flight has just been cancelled.\nAgent: I understand your frustration.\nPassenger: ______________________________", example:"Is there another flight available today?"},
+  {prompt:"Agent: We'll need to investigate your lost luggage report.\nPassenger: ______________________________", example:"When will I hear from you?"}
+];
+
+const EX8 = [
+  {base:"The flight was cancelled.", example:"The flight was cancelled due to a technical problem, so passengers were offered a full refund."},
+  {base:"My luggage is damaged.", example:"My luggage was damaged during the flight, and I'd like to report the damage at the desk."},
+  {base:"I missed my flight.", example:"I missed my connecting flight because my first flight was delayed by two hours."},
+  {base:"We went through security.", example:"We went through the security check quickly because there was no line at the airport."},
+  {base:"I need a refund.", example:"I need a full refund because my flight was cancelled and I wasn't rebooked."},
+  {base:"She showed her passport.", example:"She showed her passport at passport control before boarding the plane."},
+  {base:"He dropped off his bag.", example:"He dropped off his bag at the check-in counter and then went through customs."},
+  {base:"The bag was left alone.", example:"The bag was left unattended near the gate, so security had to check it."},
+  {base:"They rebooked the flight.", example:"They rebooked the flight for the next morning after the original one was cancelled."},
+  {base:"I took a trolley.", example:"I took a trolley to carry my heavy suitcase to the check-in desk."}
+];
+
+const EX9 = [
+  {starter:"If my flight is delayed for five hours, I...", example:"...would probably go to a cafe, charge my phone and try to get some sleep."},
+  {starter:"The last time I had a problem with an airline, ...", example:"...my luggage arrived a day late and the airline delivered it to my home."},
+  {starter:"If an airline lost my luggage, I would...", example:"...report it immediately and ask for compensation."},
+  {starter:"One thing I always do before I board the plane is...", example:"...check that I have my boarding pass and passport ready."},
+  {starter:"If I saw unattended luggage at the airport, I would...", example:"...tell airport security straight away."},
+  {starter:"I think airlines should always... when a flight is cancelled.", example:"...offer passengers a full refund or a free rebooking."},
+  {starter:"Before I go through customs, I usually...", example:"...make sure I have nothing prohibited in my bag."},
+  {starter:"If I were an airline agent, I would... for passengers with a missed flight.", example:"...try to rebook them on the next available flight for free."},
+  {starter:"The most stressful part of going through the airport is...", example:"...waiting in a long line at the security check."},
+  {starter:"If my bag arrived damaged, I would...", example:"...report the damage immediately and ask for compensation."}
+];
+
+/* ========================= AUDIO ========================= */
+
+function pickVoice(){
+  if(!('speechSynthesis' in window)) return null;
+  const voices = speechSynthesis.getVoices();
+  if(!voices || !voices.length) return null;
+  let v = voices.find(v => v.name === 'Google US English');
+  if(!v) v = voices.find(v => /google/i.test(v.name) && /en-US/i.test(v.lang));
+  if(!v) v = voices.find(v => /en-US/i.test(v.lang));
+  if(!v) v = voices.find(v => /^en/i.test(v.lang));
+  return v || null;
+}
+
+function speak(text){
+  if(!('speechSynthesis' in window)){
+    alert('Этот браузер не поддерживает синтез речи (Web Speech API). Попробуйте открыть страницу в Chrome.');
+    return;
+  }
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  const v = pickVoice();
+  if(v){ u.voice = v; u.lang = v.lang; } else { u.lang = 'en-US'; }
+  u.rate = 0.92;
+  speechSynthesis.speak(u);
+}
+
+function testAudio(){
+  const statusEl = document.getElementById('audio-status');
+  statusEl.textContent = 'Проверка…';
+  setTimeout(()=>{
+    const v = pickVoice();
+    speak('Testing audio. Can you hear this sentence?');
+    if(v){
+      statusEl.textContent = '✅ Аудио работает. Используется голос: ' + v.name + ' (' + v.lang + ').';
+    } else if('speechSynthesis' in window){
+      statusEl.textContent = '⚠️ Голос en-US не найден, но синтез речи должен работать с голосом по умолчанию. Проверьте звук.';
+    } else {
+      statusEl.textContent = '❌ Этот браузер не поддерживает синтез речи.';
+    }
+  }, 150);
+}
+
+if('speechSynthesis' in window){
+  speechSynthesis.onvoiceschanged = () => { /* voices ready */ };
+  // Chrome needs a nudge to populate voices on some systems
+  speechSynthesis.getVoices();
+}
+
+/* ========================= HELPERS ========================= */
+
+function normalize(s){
+  return (s || '').toLowerCase().trim()
+    .replace(/[.,!?"'’]/g,'')
+    .replace(/\(.*?\)/g,'')
+    .replace(/\s+/g,' ')
+    .trim();
+}
+
+function getAccepted(it){
+  let accepted = [it.answer];
+  if(it.alts) accepted = accepted.concat(it.alts);
+  let extra = [];
+  accepted.forEach(a=>{
+    if(/^(a|an|the)\s+/i.test(a)) extra.push(a.replace(/^(a|an|the)\s+/i,''));
+  });
+  return accepted.concat(extra).map(normalize);
+}
+
+function escapeHtml(s){
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=> t.classList.remove('show'), 2200);
+}
+
+function copyText(text){
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(
+      ()=> showToast('Скопировано в буфер обмена ✅'),
+      ()=> fallbackCopy(text)
+    );
+  } else {
+    fallbackCopy(text);
+  }
+}
+
+function fallbackCopy(text){
+  try{
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta);
+    ta.focus(); ta.select();
+    const ok = document.execCommand('copy');
+    document.body.removeChild(ta);
+    if(ok){ showToast('Скопировано в буфер обмена ✅'); return; }
+  }catch(e){ /* ignore */ }
+  window.prompt('Не удалось скопировать автоматически. Скопируйте вручную (Ctrl+C):', text);
+}
+
+/* ========================= PROBLEM WORDS ========================= */
+
+let problemWords = {};
+
+function addProblemWord(word){
+  problemWords[word] = (problemWords[word] || 0) + 1;
+  renderProblemWords();
+}
+
+function renderProblemWords(){
+  const tbody = document.getElementById('problem-words-body');
+  const entries = Object.entries(problemWords).sort((a,b)=> b[1]-a[1]);
+  if(entries.length === 0){
+    tbody.innerHTML = '<tr><td class="empty">Пока нет ошибок 🎉</td></tr>';
+    return;
+  }
+  tbody.innerHTML = entries.map(([w,c]) =>
+    '<tr><td>' + escapeHtml(w) + '</td><td>' + c + '</td></tr>'
+  ).join('');
+}
+
+/* ========================= RENDER: VOCAB INTRO ========================= */
+
+function renderVocab(){
+  const body = document.getElementById('vocab-body');
+  body.innerHTML = '';
+  VOCAB.forEach(v=>{
+    const tr = document.createElement('tr');
+
+    const tdBtn = document.createElement('td');
+    const btn = document.createElement('button');
+    btn.className = 'listen-btn';
+    btn.type = 'button';
+    btn.title = 'Прослушать';
+    btn.textContent = '🔊';
+    btn.addEventListener('click', ()=> speak(v.word));
+    tdBtn.appendChild(btn);
+
+    const tdWord = document.createElement('td');
+    tdWord.className = 'word';
+    tdWord.textContent = v.word;
+
+    const tdIpa = document.createElement('td');
+    tdIpa.className = 'ipa';
+    tdIpa.textContent = v.ipa;
+
+    const tdRu = document.createElement('td');
+    tdRu.textContent = v.ru;
+
+    tr.appendChild(tdBtn); tr.appendChild(tdWord); tr.appendChild(tdIpa); tr.appendChild(tdRu);
+    body.appendChild(tr);
+  });
+}
+
+/* ========================= RENDER: GRADED EXERCISES ========================= */
+
+function buildGraded(containerId, items, opts){
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+  items.forEach((it, i)=>{
+    const row = document.createElement('div');
+    row.className = 'item';
+
+    const num = document.createElement('div');
+    num.className = 'item-num';
+    num.textContent = (i+1) + '.';
+    row.appendChild(num);
+
+    const body = document.createElement('div');
+    body.className = 'item-body';
+
+    const prompt = document.createElement('div');
+    prompt.className = 'item-prompt';
+    prompt.innerHTML = opts.promptHTML(it);
+    body.appendChild(prompt);
+
+    const rowInput = document.createElement('div');
+    rowInput.className = 'row-input';
+
+    if(opts.audio){
+      const abtn = document.createElement('button');
+      abtn.type = 'button';
+      abtn.className = 'audio-btn';
+      abtn.textContent = '🔊';
+      abtn.title = 'Прослушать';
+      abtn.addEventListener('click', ()=> speak(it.answer));
+      rowInput.appendChild(abtn);
+    }
+
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'answer-input';
+    input.placeholder = opts.placeholder || 'Введите ответ…';
+    rowInput.appendChild(input);
+
+    body.appendChild(rowInput);
+
+    const fb = document.createElement('span');
+    fb.className = 'feedback';
+    body.appendChild(fb);
+
+    row.appendChild(body);
+    container.appendChild(row);
+  });
+}
+
+function checkExercise(containerId, items){
+  const container = document.getElementById(containerId);
+  const rows = container.querySelectorAll('.item');
+  let correctCount = 0;
+  rows.forEach((row, i)=>{
+    const it = items[i];
+    const input = row.querySelector('.answer-input');
+    const fb = row.querySelector('.feedback');
+    const val = input.value;
+    const accepted = getAccepted(it);
+    const isCorrect = val.trim() !== '' && accepted.includes(normalize(val));
+    if(isCorrect){
+      fb.textContent = '✅ Верно!';
+      fb.className = 'feedback correct';
+      input.classList.remove('wrong'); input.classList.add('right');
+      correctCount++;
+    } else {
+      fb.textContent = '❌ Правильный ответ: ' + it.answer;
+      fb.className = 'feedback incorrect';
+      input.classList.remove('right'); input.classList.add('wrong');
+      addProblemWord(it.answer);
+    }
+  });
+  const summary = document.getElementById(containerId + '-summary');
+  if(summary) summary.textContent = 'Результат: ' + correctCount + ' / ' + items.length;
+}
+
+function showAnswersGraded(containerId, items){
+  const container = document.getElementById(containerId);
+  const rows = container.querySelectorAll('.item');
+  rows.forEach((row, i)=>{
+    const input = row.querySelector('.answer-input');
+    const fb = row.querySelector('.feedback');
+    fb.textContent = 'Ответ: ' + items[i].answer;
+    fb.className = 'feedback';
+    fb.style.color = '#6b4a10';
+    input.classList.remove('right','wrong');
+  });
+}
+
+/* ========================= RENDER: OPEN / REVEAL EXERCISES ========================= */
+
+function buildReveal(containerId, items, opts){
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+  items.forEach((it, i)=>{
+    const row = document.createElement('div');
+    row.className = 'item';
+
+    const num = document.createElement('div');
+    num.className = 'item-num';
+    num.textContent = (i+1) + '.';
+    row.appendChild(num);
+
+    const body = document.createElement('div');
+    body.className = 'item-body';
+
+    const prompt = document.createElement('div');
+    prompt.className = 'item-prompt' + (opts.pre ? ' pre' : '');
+    prompt.textContent = opts.promptText(it);
+    body.appendChild(prompt);
+
+    const input = document.createElement('textarea');
+    input.rows = 2;
+    input.className = 'answer-input';
+    input.style.fontFamily = 'inherit';
+    input.style.resize = 'vertical';
+    input.placeholder = opts.placeholder || 'Ваш ответ…';
+    body.appendChild(input);
+
+    const ans = document.createElement('div');
+    ans.className = 'reveal-answer';
+    ans.textContent = 'Пример: ' + it.example;
+    body.appendChild(ans);
+
+    row.appendChild(body);
+    container.appendChild(row);
+  });
+}
+
+function revealAll(containerId){
+  const container = document.getElementById(containerId);
+  container.querySelectorAll('.reveal-answer').forEach(el=> el.style.display = 'block');
+}
+
+function copyAllAnswers(containerId){
+  const container = document.getElementById(containerId);
+  const inputs = container.querySelectorAll('.answer-input');
+  let lines = [];
+  inputs.forEach((inp, i)=>{
+    const val = inp.value.trim();
+    lines.push((i+1) + '. ' + (val || '(пусто)'));
+  });
+  copyText(lines.join('\n'));
+}
+
+/* ========================= INIT ========================= */
+
+renderVocab();
+
+buildGraded('ex1', EX1, {
+  promptHTML: it => escapeHtml(it.masked)
+});
+
+buildGraded('ex2', EX2, {
+  audio: true,
+  promptHTML: () => '<em style="color:#8a93a3;">Нажмите 🔊 и напишите то, что услышали</em>'
+});
+
+buildGraded('ex3', EX3, {
+  promptHTML: it => escapeHtml(it.def)
+});
+
+buildGraded('ex4', EX4, {
+  promptHTML: it => 'Agent: <em>"' + escapeHtml(it.agent) + '"</em>',
+  placeholder: 'Напишите вопрос пассажира…'
+});
+
+buildGraded('ex5', EX5, {
+  promptHTML: it => it.sentence,
+  placeholder: 'Замена для выделенного слова…'
+});
+
+buildGraded('ex6', EX6, {
+  promptHTML: it => escapeHtml(it.scrambled),
+  placeholder: 'Составьте выражение…'
+});
+
+buildReveal('ex7', EX7, {
+  pre: true,
+  promptText: it => it.prompt,
+  placeholder: 'Допишите пропущенную реплику…'
+});
+
+buildReveal('ex8', EX8, {
+  promptText: it => it.base,
+  placeholder: 'Расширьте предложение…'
+});
+
+buildReveal('ex9', EX9, {
+  promptText: it => it.starter,
+  placeholder: 'Закончите предложение своей идеей…'
+});
+</script>
+</body>
+</html>
