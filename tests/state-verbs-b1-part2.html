@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>State Verbs · B1 Practice · Часть 2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1b2620;
+    --paper:#f4f3ee;
+    --paper-line:#dedad0;
+    --state:#2f6f62;
+    --state-bg:#e4efe9;
+    --action:#c2732b;
+    --action-bg:#f7e9d8;
+    --card:#ffffff;
+    --border:#d8d3c6;
+    --ok:#2f6f4a;
+    --ok-bg:#e2f0e5;
+    --bad:#b5473a;
+    --bad-bg:#fbe6e2;
+    --shadow: 0 1px 0 rgba(27,38,32,0.06), 0 8px 24px -12px rgba(27,38,32,0.18);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      repeating-linear-gradient(to bottom, transparent 0 38px, var(--paper-line) 38px 39px),
+      var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    line-height:1.5;
+    padding-bottom:80px;
+  }
+  .wrap{max-width:880px;margin:0 auto;padding:32px 20px 20px;}
+
+  header.top{
+    padding:34px 26px 30px;
+    background:var(--ink);
+    color:var(--paper);
+    border-radius:18px;
+    position:relative;
+    overflow:hidden;
+    margin-bottom:28px;
+    box-shadow:var(--shadow);
+  }
+  header.top::before{
+    content:"";
+    position:absolute;inset:0;
+    background:
+      radial-gradient(circle at 85% -10%, rgba(194,115,43,0.5), transparent 55%),
+      radial-gradient(circle at -5% 120%, rgba(47,111,98,0.45), transparent 50%);
+    pointer-events:none;
+  }
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+    color:#c9d6cd;
+    display:flex;gap:10px;align-items:center;margin-bottom:14px;
+  }
+  .eyebrow .dot{width:7px;height:7px;border-radius:50%;background:var(--action);}
+  .eyebrow .dot.state{background:var(--state);}
+  h1{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:clamp(28px,4vw,40px);
+    margin:0 0 10px;
+    letter-spacing:-0.01em;
+    position:relative;
+  }
+  header.top p{max-width:620px;color:#d9dcd3;margin:0;position:relative;font-size:15px;}
+
+  .rule-box{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:18px 22px;
+    margin-bottom:28px;
+    box-shadow:var(--shadow);
+    font-size:14px;color:#3a3f38;
+  }
+  .rule-box b{color:var(--ink);}
+
+  nav.tabs{
+    display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px;
+    position:sticky;top:10px;z-index:5;
+  }
+  .tab{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12.5px;font-weight:600;
+    background:var(--card);border:1px solid var(--border);
+    padding:9px 14px;border-radius:10px;cursor:pointer;color:#555a4f;
+    transition:all .15s ease;
+    box-shadow:var(--shadow);
+  }
+  .tab:hover{color:var(--ink);}
+  .tab.active{background:var(--ink);color:var(--paper);border-color:var(--ink);}
+
+  .toolbar{
+    display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;
+    margin-bottom:28px;
+  }
+  .btn{
+    font-family:'Inter',sans-serif;font-weight:600;font-size:13.5px;
+    padding:10px 16px;border-radius:10px;border:1px solid var(--ink);
+    background:var(--ink);color:var(--paper);cursor:pointer;
+    transition:transform .1s ease, opacity .15s ease;
+  }
+  .btn:hover{opacity:.88;}
+  .btn:active{transform:scale(.98);}
+  .btn.secondary{background:transparent;color:var(--ink);}
+  .btn.small{padding:7px 12px;font-size:12.5px;border-radius:8px;}
+  .btn.ghost{background:transparent;border-color:var(--border);color:#555a4f;}
+
+  section.exercise{display:none;}
+  section.exercise.active{display:block;animation:fade .25s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+
+  .ex-head{
+    display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:10px;
+    margin-bottom:16px;
+  }
+  .ex-head h2{font-family:'Fraunces',serif;font-size:22px;margin:0 0 4px;font-weight:600;}
+  .ex-head .instr{font-size:13.5px;color:#5c6058;max-width:540px;}
+  .ex-actions{display:flex;gap:8px;flex-wrap:wrap;}
+
+  .item{
+    background:var(--card);border:1px solid var(--border);border-radius:12px;
+    padding:16px 18px;margin-bottom:12px;box-shadow:var(--shadow);
+  }
+  .item-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;}
+  .item-num{
+    font-family:'IBM Plex Mono',monospace;font-size:12px;color:#9a9c8f;font-weight:600;
+    margin-right:8px;
+  }
+  .item-text{font-size:15px;}
+  .item-text b{color:var(--ink);}
+  .item-text i{color:#5c6058;}
+  .answer-row{display:flex;gap:10px;align-items:center;margin-top:12px;flex-wrap:wrap;}
+  input.ans{
+    flex:1;min-width:180px;
+    font-family:'Inter',sans-serif;font-size:14px;
+    padding:9px 12px;border-radius:8px;border:1.5px solid var(--border);
+    background:#fbfaf7;color:var(--ink);
+  }
+  input.ans:focus{outline:none;border-color:var(--ink);}
+  .feedback{
+    font-size:12.5px;font-weight:600;padding:3px 10px;border-radius:20px;white-space:nowrap;
+    font-family:'IBM Plex Mono',monospace;
+  }
+  .feedback.ok{background:var(--ok-bg);color:var(--ok);}
+  .feedback.bad{background:var(--bad-bg);color:var(--bad);}
+  .explain{
+    margin-top:10px;padding:10px 12px;border-radius:8px;background:#f6f5f0;
+    border-left:3px solid var(--border);font-size:13px;color:#3c4038;display:none;
+  }
+  .explain.show{display:block;}
+  .explain b{color:var(--ink);}
+
+  .options-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;}
+  .opt-btn{
+    font-family:'Inter',sans-serif;font-size:13.5px;font-weight:500;
+    padding:9px 14px;border-radius:8px;border:1.5px solid var(--border);
+    background:#fbfaf7;color:var(--ink);cursor:pointer;text-align:left;
+    transition:all .12s ease;
+  }
+  .opt-btn:hover{border-color:var(--ink);}
+  .opt-btn.selected{border-color:var(--ink);background:var(--ink);color:var(--paper);}
+  .opt-btn.correct{border-color:var(--ok);background:var(--ok-bg);color:var(--ok);}
+  .opt-btn.incorrect{border-color:var(--bad);background:var(--bad-bg);color:var(--bad);}
+
+  .note{
+    font-size:12.5px;color:#7a7c72;background:#f6f5f0;border:1px dashed var(--border);
+    border-radius:10px;padding:10px 14px;margin-bottom:16px;
+  }
+
+  .toast{
+    position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);
+    background:var(--ink);color:var(--paper);padding:11px 20px;border-radius:10px;
+    font-family:'Inter',sans-serif;font-size:13.5px;font-weight:600;
+    opacity:0;transition:all .25s ease;pointer-events:none;box-shadow:var(--shadow);
+    z-index:50;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  .score{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;color:#5c6058;}
+
+  footer.credits{
+    text-align:center;color:#9a9c8f;font-size:12px;margin-top:36px;font-family:'IBM Plex Mono',monospace;
+  }
+
+  @media (max-width:600px){
+    .ex-head{flex-direction:column;align-items:flex-start;}
+    nav.tabs{position:static;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="eyebrow"><span class="dot"></span> STATE VERBS · ЧАСТЬ 2 <span class="dot state"></span></div>
+    <h1>State Verbs: 5 новых упражнений</h1>
+    <p>Другие форматы заданий на ту же тему: выбор варианта, поиск и исправление ошибки, прошедшее время, «лишнее слово» и диалоги. 5 упражнений по 10 заданий.</p>
+  </header>
+
+  <div class="rule-box">
+    Напоминание: state verbs (know, believe, understand, remember, want, love, seem, cost, own, belong, contain, consist of, matter, doubt, hope, agree, mean, deserve, resemble, envy, dislike, wish, hear, mind…) обычно <b>не употребляются в Continuous</b>, так как описывают состояние, а не процесс. Их дополнительные динамические значения (например, think = обдумывать, have = делать действие) — исключение, рассмотренное в первой части.
+  </div>
+
+  <nav class="tabs" id="tabs"></nav>
+
+  <div class="toolbar">
+    <div class="score" id="globalScore"></div>
+    <button class="btn" id="copyAllBtn">📋 Скопировать все ответы</button>
+  </div>
+
+  <div id="exercises"></div>
+
+  <footer class="credits">STATE VERBS · B1 PRACTICE · ЧАСТЬ 2 · 5 EXERCISES · 50 ITEMS</footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============ DATA ============ */
+const exercises = [
+  {
+    id:"ex1",
+    title:"1. Choose the correct sentence",
+    type:"mc",
+    instr:"Выберите правильный вариант (a или b).",
+    items:[
+      {text:"", options:["I'm not believing you.","I don't believe you."], answerIdx:1, explain:"<b>believe</b> = state (иметь мнение) → не используется в Continuous."},
+      {text:"", options:["She's remembering her childhood right now.","She remembers her childhood well."], answerIdx:1, explain:"<b>remember</b> = state → Present Simple."},
+      {text:"", options:["He's understanding the lesson.","He understands the lesson."], answerIdx:1, explain:"<b>understand</b> = state (понимание) → Present Simple."},
+      {text:"", options:["I'm wanting a coffee.","I want a coffee."], answerIdx:1, explain:"<b>want</b> = state (желание) → Present Simple."},
+      {text:"", options:["They're loving this movie.","They love this movie."], answerIdx:1, explain:"<b>love</b> = state (чувство) → Present Simple."},
+      {text:"", options:["This plan seems good.","This plan is seeming good."], answerIdx:0, explain:"<b>seem</b> = state (казаться) → Present Simple, не Continuous."},
+      {text:"", options:["The book costs $20.","The book is costing $20."], answerIdx:0, explain:"<b>cost</b> = state (иметь цену) → Present Simple."},
+      {text:"", options:["He's owning three houses.","He owns three houses."], answerIdx:1, explain:"<b>own</b> = state (владеть) → Present Simple."},
+      {text:"", options:["This car belongs to my uncle.","This car is belonging to my uncle."], answerIdx:0, explain:"<b>belong</b> = state (принадлежать) → Present Simple."},
+      {text:"", options:["I'm knowing the answer.","I know the answer."], answerIdx:1, explain:"<b>know</b> = state (знание) → Present Simple."}
+    ]
+  },
+  {
+    id:"ex2",
+    title:"2. Find and correct the mistake",
+    type:"correction",
+    instr:"В каждом предложении есть ошибка в употреблении state verb. Впишите исправленный вариант целиком.",
+    items:[
+      {text:"I'm not understanding this exercise.", answers:["i don't understand this exercise"], explain:"<b>understand</b> — state, не Continuous → <i>I don't understand this exercise.</i>"},
+      {text:"She's having three brothers.", answers:["she has three brothers"], explain:"<b>have</b> в значении «обладать» — state → <i>She has three brothers.</i>"},
+      {text:"Are you believing in ghosts?", answers:["do you believe in ghosts"], explain:"<b>believe</b> — state → <i>Do you believe in ghosts?</i>"},
+      {text:"This bag is weighing 5 kilos.", answers:["this bag weighs 5 kilos","this bag weighs five kilos"], explain:"<b>weigh</b> = «иметь вес» — state → <i>This bag weighs 5 kilos.</i>"},
+      {text:"He's not remembering where he put his keys.", answers:["he doesn't remember where he put his keys"], explain:"<b>remember</b> — state → <i>He doesn't remember where he put his keys.</i>"},
+      {text:"I'm needing your help right now.", answers:["i need your help right now"], explain:"<b>need</b> — state → <i>I need your help right now.</i>"},
+      {text:"This jacket isn't fitting me — it's too tight.", answers:["this jacket doesn't fit me — it's too tight","this jacket doesn't fit me - it's too tight","this jacket doesn't fit me it's too tight"], explain:"<b>fit</b> = «подходить по размеру» — state → <i>This jacket doesn't fit me.</i>"},
+      {text:"She's preferring tea to coffee.", answers:["she prefers tea to coffee"], explain:"<b>prefer</b> — state → <i>She prefers tea to coffee.</i>"},
+      {text:"We're owning a small flat in the city centre.", answers:["we own a small flat in the city centre"], explain:"<b>own</b> — state → <i>We own a small flat in the city centre.</i>"},
+      {text:"I'm not seeing why you're upset.", answers:["i don't see why you're upset","i don't see why you are upset"], explain:"<b>see</b> = «понимать» — state → <i>I don't see why you're upset.</i>"}
+    ]
+  },
+  {
+    id:"ex3",
+    title:"3. Fill in the gaps — Past Simple / Past Continuous",
+    type:"gap",
+    instr:"Раскройте скобки, поставив глагол в Past Simple или Past Continuous.",
+    items:[
+      {text:"I <b>___</b> (not/know) what to say when she told me the news.", answers:["didn't know","did not know"], explain:"<b>know</b> — state, даже в прошлом → Past Simple."},
+      {text:"While I <b>___</b> (think) about the problem, the phone rang.", answers:["was thinking"], explain:"<b>think about</b> = процесс (action) → Past Continuous."},
+      {text:"She <b>___</b> (not/believe) his excuse at all.", answers:["didn't believe","did not believe"], explain:"<b>believe</b> — state → Past Simple."},
+      {text:"The soup <b>___</b> (taste) delicious, so I asked for the recipe.", answers:["tasted"], explain:"<b>taste</b> = вкус (state) → Past Simple."},
+      {text:"We <b>___</b> (have) a great time at the party last night.", answers:["had"], explain:"<b>have a great time</b> = устойчивое действие/выражение → Past Simple (не state-значение «обладать»)."},
+      {text:"He <b>___</b> (look) exhausted after the match.", answers:["looked"], explain:"<b>look</b> = выглядеть (state) → Past Simple."},
+      {text:"At 8 pm yesterday, I <b>___</b> (have) dinner with my family.", answers:["was having"], explain:"<b>have dinner</b> = действие в процессе в конкретный момент → Past Continuous."},
+      {text:"This ring <b>___</b> (belong) to my grandmother.", answers:["belonged"], explain:"<b>belong</b> — state → Past Simple."},
+      {text:"She <b>___</b> (feel) the fabric to see if it was silk.", answers:["was feeling"], explain:"<b>feel</b> = трогать, действие → Past Continuous."},
+      {text:"He <b>___</b> (seem) very nervous during the interview.", answers:["seemed"], explain:"<b>seem</b> — state → Past Simple."}
+    ]
+  },
+  {
+    id:"ex4",
+    title:"4. Odd one out",
+    type:"mc4",
+    instr:"В каждой группе три глагола — типичные state verbs, а один обычно динамический (action). Найдите лишнее слово.",
+    items:[
+      {options:["know","believe","run","understand"], answerIdx:2, explain:"<b>run</b> — динамический глагол (действие); остальные — типичные state verbs."},
+      {options:["eat","love","want","need"], answerIdx:0, explain:"<b>eat</b> — динамический глагол; love/want/need — состояния (чувства, желания)."},
+      {options:["own","belong","walk","consist of"], answerIdx:2, explain:"<b>walk</b> — динамический глагол; остальные описывают владение/состав."},
+      {options:["seem","cost","write","matter"], answerIdx:2, explain:"<b>write</b> — динамический глагол; seem/cost/matter — состояния."},
+      {options:["remember","forget","paint","prefer"], answerIdx:2, explain:"<b>paint</b> — динамический глагол; remember/forget/prefer — состояния (память, предпочтение)."},
+      {options:["hear","read","see","understand"], answerIdx:1, explain:"<b>read</b> — динамический глагол (осознанное действие); hear/see/understand — состояния восприятия и понимания."},
+      {options:["contain","involve","play","deserve"], answerIdx:2, explain:"<b>play</b> — динамический глагол; contain/involve/deserve — состояния."},
+      {options:["wish","hope","cook","doubt"], answerIdx:2, explain:"<b>cook</b> — динамический глагол; wish/hope/doubt — состояния (желание, надежда, сомнение)."},
+      {options:["resemble","envy","dance","dislike"], answerIdx:2, explain:"<b>dance</b> — динамический глагол; resemble/envy/dislike — состояния (сходство, чувства)."},
+      {options:["appear","agree","build","mean"], answerIdx:2, explain:"<b>build</b> — динамический глагол; appear/agree/mean — состояния (в значении «казаться», «быть согласным», «означать»)."}
+    ]
+  },
+  {
+    id:"ex5",
+    title:"5. Complete the dialogues",
+    type:"gap",
+    instr:"Заполните пропуски правильной формой глагола (Present Simple, т.к. все глаголы — state verbs).",
+    items:[
+      {text:"A: Whose is this umbrella? B: It <b>___</b> (belong) to me.", answers:["belongs"], explain:"<b>belong</b> — state → Present Simple, 3-е лицо ед. ч. -s."},
+      {text:"A: Can you hear that noise? B: Yes, I <b>___</b> (hear) it too.", answers:["hear"], explain:"<b>hear</b> — state (непроизвольное восприятие) → Present Simple."},
+      {text:"A: Do you <b>___</b> (agree) with his plan? B: Not really.", answers:["agree"], explain:"<b>agree</b> — state → Present Simple."},
+      {text:"This box <b>___</b> (contain) old photographs.", answers:["contains"], explain:"<b>contain</b> — state → Present Simple."},
+      {text:"The team <b>___</b> (consist) of ten players.", answers:["consists"], explain:"<b>consist of</b> — state → Present Simple."},
+      {text:"It doesn't <b>___</b> (matter) what you wear to the party.", answers:["matter"], explain:"<b>matter</b> — state → Present Simple (после doesn't — базовая форма)."},
+      {text:"How much <b>___</b> this jacket <b>___</b> (cost)?", answers:["does ... cost","does cost","does this jacket cost"], explain:"<b>cost</b> — state → Present Simple, вопрос с does."},
+      {text:"She really <b>___</b> (deserve) a holiday after all this work.", answers:["deserves"], explain:"<b>deserve</b> — state → Present Simple."},
+      {text:"I <b>___</b> (doubt) that he'll come tonight.", answers:["doubt"], explain:"<b>doubt</b> — state → Present Simple."},
+      {text:"Would you <b>___</b> (mind) if I opened the window?", answers:["mind"], explain:"<b>mind</b> — state → базовая форма после would."}
+    ]
+  }
+];
+
+/* ============ RENDER ============ */
+const tabsEl = document.getElementById("tabs");
+const exercisesEl = document.getElementById("exercises");
+
+exercises.forEach((ex, exIdx) => {
+  const tabBtn = document.createElement("button");
+  tabBtn.className = "tab" + (exIdx===0 ? " active" : "");
+  tabBtn.textContent = "Упр. " + (exIdx+1);
+  tabBtn.onclick = () => showExercise(exIdx);
+  tabsEl.appendChild(tabBtn);
+
+  const section = document.createElement("section");
+  section.className = "exercise" + (exIdx===0 ? " active" : "");
+  section.id = ex.id;
+
+  let itemsHtml = "";
+
+  if(ex.type === "mc"){
+    ex.items.forEach((item, i) => {
+      let optsHtml = "<div class='options-row'>";
+      item.options.forEach((opt, oi) => {
+        optsHtml += `<button class="opt-btn" data-oi="${oi}" data-ex="${exIdx}" data-i="${i}">${String.fromCharCode(97+oi)}) ${opt}</button>`;
+      });
+      optsHtml += "</div>";
+      itemsHtml += `
+      <div class="item" data-ex="${exIdx}" data-i="${i}">
+        <div class="item-top"><div class="item-text"><span class="item-num">${i+1}.</span></div></div>
+        ${optsHtml}
+        <div class="explain"><b>Правильный ответ: ${String.fromCharCode(97+item.answerIdx)}.</b> ${item.explain}</div>
+      </div>`;
+    });
+  } else if(ex.type === "mc4"){
+    ex.items.forEach((item, i) => {
+      let optsHtml = "<div class='options-row'>";
+      item.options.forEach((opt, oi) => {
+        optsHtml += `<button class="opt-btn" data-oi="${oi}" data-ex="${exIdx}" data-i="${i}">${opt}</button>`;
+      });
+      optsHtml += "</div>";
+      itemsHtml += `
+      <div class="item" data-ex="${exIdx}" data-i="${i}">
+        <div class="item-top"><div class="item-text"><span class="item-num">${i+1}.</span> Найдите лишнее слово:</div></div>
+        ${optsHtml}
+        <div class="explain"><b>Лишнее слово: ${item.options[item.answerIdx]}.</b> ${item.explain}</div>
+      </div>`;
+    });
+  } else if(ex.type === "correction"){
+    ex.items.forEach((item, i) => {
+      itemsHtml += `
+      <div class="item" data-ex="${exIdx}" data-i="${i}">
+        <div class="item-top">
+          <div class="item-text"><span class="item-num">${i+1}.</span><i>${item.text}</i></div>
+        </div>
+        <div class="answer-row">
+          <input class="ans" type="text" placeholder="Исправленное предложение...">
+          <span class="feedback" style="display:none;"></span>
+        </div>
+        <div class="explain">${item.explain}</div>
+      </div>`;
+    });
+  } else {
+    ex.items.forEach((item, i) => {
+      itemsHtml += `
+      <div class="item" data-ex="${exIdx}" data-i="${i}">
+        <div class="item-top">
+          <div class="item-text"><span class="item-num">${i+1}.</span>${item.text}</div>
+        </div>
+        <div class="answer-row">
+          <input class="ans" type="text" placeholder="Впишите форму глагола...">
+          <span class="feedback" style="display:none;"></span>
+        </div>
+        <div class="explain"><b>Ответ: ${item.answers[0]}.</b> ${item.explain}</div>
+      </div>`;
+    });
+  }
+
+  section.innerHTML = `
+    <div class="ex-head">
+      <div>
+        <h2>${ex.title}</h2>
+        <div class="instr">${ex.instr}</div>
+      </div>
+      <div class="ex-actions">
+        ${ex.type === "gap" || ex.type === "correction" ? `<button class="btn small" data-action="check" data-ex="${exIdx}">Проверить</button>` : ""}
+        <button class="btn small secondary" data-action="reveal" data-ex="${exIdx}">Показать ответы</button>
+        <button class="btn small ghost" data-action="reset" data-ex="${exIdx}">Сбросить</button>
+      </div>
+    </div>
+    ${itemsHtml}
+  `;
+  exercisesEl.appendChild(section);
+});
+
+/* ============ TABS ============ */
+function showExercise(idx){
+  document.querySelectorAll("section.exercise").forEach((s,i) => s.classList.toggle("active", i===idx));
+  document.querySelectorAll(".tab").forEach((t,i) => t.classList.toggle("active", i===idx));
+}
+
+/* ============ NORMALIZE ============ */
+function normalize(str){
+  return str.toLowerCase()
+    .replace(/’/g,"'")
+    .replace(/[.,!?]/g,"")
+    .replace(/\s+/g," ")
+    .trim();
+}
+
+/* ============ OPTION CLICKS (mc / mc4) ============ */
+exercisesEl.addEventListener("click", (e) => {
+  const optBtn = e.target.closest(".opt-btn");
+  if(optBtn){
+    const exIdx = parseInt(optBtn.dataset.ex);
+    const i = parseInt(optBtn.dataset.i);
+    const ex = exercises[exIdx];
+    const item = ex.items[i];
+    const itemEl = optBtn.closest(".item");
+    itemEl.querySelectorAll(".opt-btn").forEach(b => b.classList.remove("selected"));
+    optBtn.classList.add("selected");
+    return;
+  }
+
+  const btn = e.target.closest("button[data-action]");
+  if(!btn) return;
+  const action = btn.dataset.action;
+  const exIdx = parseInt(btn.dataset.ex);
+  const ex = exercises[exIdx];
+  const section = document.getElementById(ex.id);
+
+  if(action === "check"){
+    let correctCount = 0;
+    section.querySelectorAll(".item").forEach((itemEl) => {
+      const i = parseInt(itemEl.dataset.i);
+      const item = ex.items[i];
+      const fb = itemEl.querySelector(".feedback");
+      const input = itemEl.querySelector("input.ans");
+      const val = normalize(input.value);
+      const answers = ex.type === "correction" ? item.answers : item.answers;
+      const isCorrect = answers.some(a => normalize(a) === val);
+      fb.style.display = "inline-block";
+      if(isCorrect){
+        fb.textContent = "✓ верно";
+        fb.className = "feedback ok";
+        correctCount++;
+      } else {
+        fb.textContent = "✗ неверно";
+        fb.className = "feedback bad";
+      }
+    });
+    showToast(`Упр. ${exIdx+1}: ${correctCount} из ${ex.items.length} верно`);
+  }
+
+  if(action === "reveal"){
+    section.querySelectorAll(".explain").forEach(el => el.classList.add("show"));
+    if(ex.type === "mc" || ex.type === "mc4"){
+      section.querySelectorAll(".item").forEach((itemEl) => {
+        const i = parseInt(itemEl.dataset.i);
+        const item = ex.items[i];
+        itemEl.querySelectorAll(".opt-btn").forEach((b) => {
+          const oi = parseInt(b.dataset.oi);
+          b.classList.remove("correct","incorrect");
+          if(oi === item.answerIdx) b.classList.add("correct");
+          else if(b.classList.contains("selected")) b.classList.add("incorrect");
+        });
+      });
+    } else if(ex.type === "gap"){
+      section.querySelectorAll(".item").forEach((itemEl) => {
+        const i = parseInt(itemEl.dataset.i);
+        const input = itemEl.querySelector("input.ans");
+        if(!input.value) input.value = ex.items[i].answers[0];
+      });
+    } else if(ex.type === "correction"){
+      section.querySelectorAll(".item").forEach((itemEl) => {
+        const i = parseInt(itemEl.dataset.i);
+        const input = itemEl.querySelector("input.ans");
+        if(!input.value) input.value = ex.items[i].answers[0];
+      });
+    }
+  }
+
+  if(action === "reset"){
+    section.querySelectorAll("input.ans").forEach(el => el.value = "");
+    section.querySelectorAll(".feedback").forEach(el => { el.style.display="none"; el.textContent=""; });
+    section.querySelectorAll(".explain").forEach(el => el.classList.remove("show"));
+    section.querySelectorAll(".opt-btn").forEach(el => el.classList.remove("selected","correct","incorrect"));
+  }
+});
+
+/* ============ COPY ALL ANSWERS ============ */
+document.getElementById("copyAllBtn").addEventListener("click", () => {
+  let text = "STATE VERBS — B1 PRACTICE — ЧАСТЬ 2 — ОТВЕТЫ\n";
+  exercises.forEach((ex, exIdx) => {
+    text += `\n== Упражнение ${exIdx+1}: ${ex.title.replace(/^\d+\.\s*/,"")} ==\n`;
+    ex.items.forEach((item, i) => {
+      const num = i+1;
+      if(ex.type === "mc"){
+        text += `${num}. ${String.fromCharCode(97+item.answerIdx)}) ${item.options[item.answerIdx]}\n`;
+      } else if(ex.type === "mc4"){
+        text += `${num}. ${item.options[item.answerIdx]}\n`;
+      } else {
+        text += `${num}. ${item.answers[0]}\n`;
+      }
+    });
+  });
+
+  const finish = () => showToast("Все ответы скопированы в буфер обмена ✓");
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(finish).catch(() => fallbackCopy(text, finish));
+  } else {
+    fallbackCopy(text, finish);
+  }
+});
+
+function fallbackCopy(text, cb){
+  const ta = document.createElement("textarea");
+  ta.value = text;
+  ta.style.position = "fixed";
+  ta.style.opacity = "0";
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand("copy"); } catch(e){}
+  document.body.removeChild(ta);
+  cb();
+}
+
+function showToast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(() => t.classList.remove("show"), 2600);
+}
+
+function updateGlobalScore(){
+  const total = exercises.reduce((sum,ex)=>sum+ex.items.length,0);
+  document.getElementById("globalScore").textContent = `Всего заданий: ${total} · 5 упражнений`;
+}
+updateGlobalScore();
+</script>
+</body>
+</html>
