@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>At the Restaurant: Complaints &amp; Problems</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --green-900:#1c3226;
+    --green-800:#25412f;
+    --green-700:#2f4d3a;
+    --green-600:#3c6249;
+    --gold-500:#c99a3d;
+    --gold-400:#dab35f;
+    --paper:#f6f0e2;
+    --paper-2:#fffdf7;
+    --ink:#26201a;
+    --ink-soft:#5b5142;
+    --line:#d9cfb8;
+    --good:#3f7a4e;
+    --good-bg:#e7f2e9;
+    --bad:#b5402d;
+    --bad-bg:#faeae6;
+    --radius:10px;
+    --shadow: 0 2px 0 rgba(28,50,38,0.06), 0 10px 24px -12px rgba(28,50,38,0.25);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(1200px 600px at 10% -10%, rgba(201,154,61,0.10), transparent 60%),
+      var(--paper);
+    color:var(--ink);
+    font-family:'Inter',system-ui,sans-serif;
+    line-height:1.5;
+    padding-bottom:80px;
+  }
+  a{color:inherit;}
+  ::selection{background:var(--gold-400); color:var(--green-900);}
+  :focus-visible{outline:3px solid var(--gold-500); outline-offset:2px;}
+
+  /* ---------- HERO ---------- */
+  header.hero{
+    background:
+      linear-gradient(180deg, var(--green-900), var(--green-800) 60%, var(--green-700));
+    color:var(--paper-2);
+    padding:48px 20px 64px;
+    position:relative;
+    overflow:hidden;
+    border-bottom:6px solid var(--gold-500);
+  }
+  header.hero::before{
+    content:"";
+    position:absolute; inset:0;
+    background-image: repeating-linear-gradient(135deg, rgba(255,255,255,0.03) 0 2px, transparent 2px 26px);
+    pointer-events:none;
+  }
+  .hero-inner{max-width:1040px; margin:0 auto; position:relative;}
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:12.5px; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--gold-400);
+    border:1px solid rgba(218,179,95,0.45);
+    padding:5px 12px; border-radius:999px;
+    margin-bottom:18px;
+  }
+  h1.title{
+    font-family:'Playfair Display',serif;
+    font-weight:900;
+    font-size:clamp(30px, 5vw, 52px);
+    margin:0 0 10px;
+    letter-spacing:-0.01em;
+  }
+  h1.title em{color:var(--gold-400); font-style:normal;}
+  .subtitle{max-width:640px; color:#e7e2d3; font-size:16.5px; margin:0 0 26px;}
+  .hero-note{
+    display:flex; gap:12px; align-items:flex-start;
+    background:rgba(255,255,255,0.06);
+    border:1px dashed rgba(218,179,95,0.4);
+    border-radius:var(--radius);
+    padding:14px 16px; max-width:640px; font-size:14.5px; color:#e7e2d3;
+  }
+
+  /* ---------- LAYOUT ---------- */
+  .page{max-width:1040px; margin:-30px auto 0; padding:0 20px; position:relative; z-index:2;}
+  .layout{display:grid; grid-template-columns: 1fr 260px; gap:26px; align-items:start;}
+  @media (max-width: 860px){ .layout{grid-template-columns:1fr;} }
+
+  main{min-width:0;}
+  aside.sidebar{ position:sticky; top:16px; }
+  @media (max-width:860px){ aside.sidebar{position:static;} }
+
+  .card{
+    background:var(--paper-2);
+    border:1px solid var(--line);
+    border-radius:14px;
+    box-shadow:var(--shadow);
+    padding:24px 22px;
+    margin-bottom:26px;
+  }
+  section.card h2{
+    font-family:'Playfair Display',serif;
+    font-size:23px; margin:0 0 4px; color:var(--green-900);
+  }
+  .section-kicker{
+    font-family:'JetBrains Mono',monospace; font-size:11.5px; letter-spacing:.12em;
+    text-transform:uppercase; color:var(--gold-500); font-weight:600; margin-bottom:6px; display:block;
+  }
+  .section-desc{color:var(--ink-soft); font-size:14.5px; margin:0 0 18px;}
+
+  /* ---------- VOCAB TICKETS ---------- */
+  #vocab-grid{
+    display:grid; grid-template-columns:repeat(auto-fill, minmax(240px,1fr));
+    gap:12px;
+  }
+  .ticket{
+    background:
+      repeating-linear-gradient(var(--paper-2) 0 27px, #f1ead9 27px 28px);
+    border:1px solid var(--line);
+    border-left:4px solid var(--gold-500);
+    border-radius:6px;
+    padding:12px 13px 13px;
+    position:relative;
+  }
+  .ticket-top{display:flex; align-items:flex-start; gap:8px; margin-bottom:6px;}
+  .ticket-en{font-weight:600; font-size:14.5px; color:var(--green-900);}
+  .ticket-ipa{font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--ink-soft); margin-bottom:4px;}
+  .ticket-ru{font-size:13.5px; color:var(--ink);}
+
+  /* ---------- BUTTONS ---------- */
+  button{font-family:inherit; cursor:pointer;}
+  .listen-btn{
+    flex:none;
+    background:var(--green-700); color:#fff; border:none;
+    padding:6px 11px; border-radius:999px; font-size:13px; font-weight:600;
+    display:inline-flex; align-items:center; gap:6px;
+    transition:transform .12s ease, background .15s ease;
+  }
+  .listen-btn:hover{background:var(--green-600);}
+  .listen-btn:active{transform:scale(0.96);}
+  .listen-btn.speaking{background:var(--gold-500); color:var(--green-900);}
+  .listen-btn.small{padding:5px 8px; font-size:12px;}
+
+  .btn{
+    border:none; border-radius:8px; padding:10px 16px; font-size:14px; font-weight:600;
+    display:inline-flex; align-items:center; gap:7px;
+  }
+  .btn-primary{background:var(--green-800); color:#fff;}
+  .btn-primary:hover{background:var(--green-700);}
+  .btn-ghost{background:transparent; color:var(--green-800); border:1px solid var(--line);}
+  .btn-ghost:hover{border-color:var(--green-700); background:rgba(47,77,58,0.06);}
+  .btn-gold{background:var(--gold-500); color:var(--green-900);}
+  .btn-gold:hover{background:var(--gold-400);}
+  .toolbar{display:flex; flex-wrap:wrap; gap:10px; margin:14px 0 6px;}
+  .score{font-family:'JetBrains Mono',monospace; font-size:13.5px; color:var(--ink-soft); align-self:center; margin-left:auto;}
+
+  /* ---------- EXERCISE ITEMS ---------- */
+  ol.item-list{list-style:none; margin:0; padding:0; display:grid; gap:14px;}
+  .item{
+    border:1px solid var(--line); border-radius:10px; padding:14px 15px;
+    background:var(--paper-2);
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .item.correct{border-color:var(--good); background:var(--good-bg);}
+  .item.incorrect{border-color:var(--bad); background:var(--bad-bg);}
+  .item-head{display:flex; align-items:center; gap:10px; margin-bottom:8px;}
+  .num{font-family:'JetBrains Mono',monospace; font-weight:700; color:var(--gold-500); font-size:14px;}
+  .ru-prompt{font-size:15.5px; margin:0 0 10px; font-weight:500;}
+  .ru-hint{font-size:13px; color:var(--ink-soft); margin:2px 0 10px;}
+  .gap-sentence{font-size:15.5px; margin:0 0 6px; font-family:'JetBrains Mono',monospace; letter-spacing:0.01em;}
+  .context-line{font-size:14px; color:var(--ink-soft); margin:0 0 8px;}
+  .waiter-line{display:flex; align-items:center; gap:8px; font-size:14.5px; margin:0 0 8px; font-style:italic;}
+  .you-label{font-size:12.5px; text-transform:uppercase; letter-spacing:.08em; color:var(--gold-500); font-weight:700; margin:0 0 4px;}
+  input.answer-input{
+    width:100%; padding:9px 11px; border-radius:7px; border:1.5px solid var(--line);
+    font-size:14.5px; font-family:'Inter',sans-serif; background:#fffefb;
+  }
+  input.answer-input:focus{border-color:var(--green-600);}
+  input.word-input{max-width:220px;}
+  .feedback{font-size:13.5px; margin-top:7px; min-height:18px; font-weight:600;}
+  .item.correct .feedback{color:var(--good);}
+  .item.incorrect .feedback{color:var(--bad);}
+
+  /* ---------- SIDEBAR ---------- */
+  .side-card{
+    background:var(--green-900); color:var(--paper-2);
+    border-radius:14px; padding:18px 18px 16px;
+    box-shadow:var(--shadow);
+    border:1px solid var(--green-800);
+  }
+  .side-card h3{
+    font-family:'Playfair Display',serif; margin:0 0 3px; font-size:18px; color:var(--gold-400);
+  }
+  .side-note{font-size:12.5px; color:#cfd9d2; margin:0 0 12px;}
+  #problemList{list-style:none; margin:0; padding:0; display:grid; gap:7px;}
+  #problemList li{
+    display:flex; justify-content:space-between; gap:8px;
+    background:rgba(255,255,255,0.06);
+    border-radius:6px; padding:7px 9px; font-size:13px;
+  }
+  #problemList li b{color:var(--gold-400); font-family:'JetBrains Mono',monospace;}
+  #problemList li.empty{color:#a9b6ae; justify-content:center; font-style:italic;}
+  .side-reset{margin-top:12px;}
+  .side-reset button{width:100%; justify-content:center;}
+
+  .diag-card{margin-top:16px; font-size:13px;}
+  .diag-card .btn{width:100%; justify-content:center; margin-bottom:6px;}
+  #diagStatus{font-size:12.5px; color:#cfd9d2; min-height:16px;}
+
+  /* ---------- OWN DIALOGUE ---------- */
+  textarea#own-dialogue{
+    width:100%; min-height:170px; border-radius:9px; border:1.5px solid var(--line);
+    padding:12px 13px; font-size:14.5px; font-family:'JetBrains Mono',monospace; resize:vertical; background:#fffefb;
+  }
+  .context-box{
+    background:#f1ead9; border-left:4px solid var(--gold-500); border-radius:6px;
+    padding:12px 14px; font-size:14.5px; margin-bottom:14px;
+  }
+  #own-analysis{font-size:13.5px; margin-top:10px;}
+  #own-analysis ul{margin:6px 0 0; padding-left:18px;}
+
+  /* ---------- TOAST ---------- */
+  #toast{
+    position:fixed; left:50%; bottom:22px; transform:translate(-50%,20px);
+    background:var(--green-900); color:#fff; padding:11px 20px; border-radius:999px;
+    font-size:14px; font-weight:600; box-shadow:0 10px 24px -8px rgba(0,0,0,0.4);
+    opacity:0; pointer-events:none; transition:opacity .2s ease, transform .2s ease; z-index:50;
+  }
+  #toast.show{opacity:1; transform:translate(-50%,0);}
+
+  footer.page-footer{max-width:1040px; margin:10px auto 0; padding:0 20px 40px; text-align:center; color:var(--ink-soft); font-size:13px;}
+
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto;}
+    *{transition:none !important;}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <span class="eyebrow">🍽 Restaurant English · Урок «Жалобы и проблемы»</span>
+    <h1 class="title">At the Restaurant:<br><em>Complaints &amp; Problems</em></h1>
+    <p class="subtitle">14 ключевых фраз, чтобы вежливо пожаловаться на счёт, заказ или блюдо в ресторане. Слушайте произношение (голос Google US English), вписывайте ответы от руки и проверяйте себя.</p>
+    <div class="hero-note">💡 Нажимайте 🔊, чтобы услышать фразу голосом носителя языка. Все упражнения можно проверить, посмотреть правильные ответы и скопировать одной кнопкой.</div>
+  </div>
+</header>
+
+<div class="page">
+  <div class="layout">
+    <main>
+
+      <!-- VOCAB REMINDER -->
+      <section class="card" id="vocab-section">
+        <span class="section-kicker">Напоминание</span>
+        <h2>Ключевые фразы</h2>
+        <p class="section-desc">Перевод, транскрипция и произношение. Прослушайте каждую фразу перед началом упражнений.</p>
+        <div id="vocab-grid"></div>
+      </section>
+
+      <!-- EXERCISE 1 -->
+      <section class="card" id="ex1">
+        <span class="section-kicker">Упражнение 1 · 10 пунктов</span>
+        <h2>Аудирование — запишите фразу целиком</h2>
+        <p class="section-desc">Нажмите 🔊, прослушайте фразу и впишите её полностью на английском (с пунктуацией по возможности).</p>
+        <ol class="item-list" id="ex1-list"></ol>
+        <div class="toolbar">
+          <button class="btn btn-primary" onclick="checkExercise(1)">✅ Проверить</button>
+          <button class="btn btn-ghost" onclick="revealExercise(1)">👁 Показать ответы</button>
+          <button class="btn btn-ghost" onclick="buildEx1()">🔀 Другой набор</button>
+          <button class="btn btn-gold" onclick="copyExerciseAnswers(1,'Упражнение 1')">📋 Копировать</button>
+          <span class="score" id="ex1-score"></span>
+        </div>
+      </section>
+
+      <!-- EXERCISE 2 -->
+      <section class="card" id="ex2">
+        <span class="section-kicker">Упражнение 2 · 10 пунктов</span>
+        <h2>Переведите с русского на английский</h2>
+        <p class="section-desc">Прочитайте фразу на русском и напишите её точный английский эквивалент из списка выше.</p>
+        <ol class="item-list" id="ex2-list"></ol>
+        <div class="toolbar">
+          <button class="btn btn-primary" onclick="checkExercise(2)">✅ Проверить</button>
+          <button class="btn btn-ghost" onclick="revealExercise(2)">👁 Показать ответы</button>
+          <button class="btn btn-ghost" onclick="buildEx2()">🔀 Другой набор</button>
+          <button class="btn btn-gold" onclick="copyExerciseAnswers(2,'Упражнение 2')">📋 Копировать</button>
+          <span class="score" id="ex2-score"></span>
+        </div>
+      </section>
+
+      <!-- EXERCISE 3 -->
+      <section class="card" id="ex3">
+        <span class="section-kicker">Упражнение 3 · 10 пунктов</span>
+        <h2>Впишите пропущенное слово (по контексту)</h2>
+        <p class="section-desc">Опираясь на перевод, впишите одно недостающее слово в предложение.</p>
+        <ol class="item-list" id="ex3-list"></ol>
+        <div class="toolbar">
+          <button class="btn btn-primary" onclick="checkExercise(3)">✅ Проверить</button>
+          <button class="btn btn-ghost" onclick="revealExercise(3)">👁 Показать ответы</button>
+          <button class="btn btn-ghost" onclick="buildEx3()">🔀 Другой набор</button>
+          <button class="btn btn-gold" onclick="copyExerciseAnswers(3,'Упражнение 3')">📋 Копировать</button>
+          <span class="score" id="ex3-score"></span>
+        </div>
+      </section>
+
+      <!-- EXERCISE 4 -->
+      <section class="card" id="ex4">
+        <span class="section-kicker">Упражнение 4 · 10 пунктов</span>
+        <h2>На слух: заполните пропуск в предложении</h2>
+        <p class="section-desc">Нажмите 🔊, прослушайте предложение целиком (произношение на английском) и впишите пропущенное слово.</p>
+        <ol class="item-list" id="ex4-list"></ol>
+        <div class="toolbar">
+          <button class="btn btn-primary" onclick="checkExercise(4)">✅ Проверить</button>
+          <button class="btn btn-ghost" onclick="revealExercise(4)">👁 Показать ответы</button>
+          <button class="btn btn-ghost" onclick="buildEx4()">🔀 Другой набор</button>
+          <button class="btn btn-gold" onclick="copyExerciseAnswers(4,'Упражнение 4')">📋 Копировать</button>
+          <span class="score" id="ex4-score"></span>
+        </div>
+      </section>
+
+      <!-- EXERCISE 5 -->
+      <section class="card" id="ex5">
+        <span class="section-kicker">Упражнение 5 · 10 пунктов</span>
+        <h2>Закончите диалог</h2>
+        <p class="section-desc">Прочитайте ситуацию и реплику официанта (можно прослушать 🔊), затем напишите подходящую реплику клиента, используя фразу из урока.</p>
+        <ol class="item-list" id="ex5-list"></ol>
+        <div class="toolbar">
+          <button class="btn btn-primary" onclick="checkExercise(5)">✅ Проверить</button>
+          <button class="btn btn-ghost" onclick="revealExercise(5)">👁 Показать ответы</button>
+          <button class="btn btn-ghost" onclick="buildEx5()">🔀 Другой набор</button>
+          <button class="btn btn-gold" onclick="copyExerciseAnswers(5,'Упражнение 5')">📋 Копировать</button>
+          <span class="score" id="ex5-score"></span>
+        </div>
+      </section>
+
+      <!-- EXERCISE 6 -->
+      <section class="card" id="ex6">
+        <span class="section-kicker">Упражнение 6 · творческое задание</span>
+        <h2>Составьте свой диалог</h2>
+        <div class="context-box">
+          🎭 <b>Контекст:</b> Вы обедаете в ресторане. Вам принесли пережаренный стейк, забыли картошку фри, а ждать пришлось очень долго. Когда приносят счёт, там ещё и ошибка в сумме. Напишите полный диалог между вами и официантом (не менее 4 реплик клиента), используя минимум 4 фразы из этого урока.
+        </div>
+        <textarea id="own-dialogue" placeholder="Waiter: Good evening! Here's your bill.&#10;You: Excuse me, I think there's a mistake on the bill...&#10;..."></textarea>
+        <div class="toolbar">
+          <button class="btn btn-primary" onclick="analyzeDialogue()">🔍 Проверить использованные фразы</button>
+          <button class="btn btn-gold" onclick="copyText(document.getElementById('own-dialogue').value || '(диалог пуст)', 'Диалог скопирован!')">📋 Копировать диалог</button>
+        </div>
+        <div id="own-analysis"></div>
+      </section>
+
+      <!-- GLOBAL COPY -->
+      <section class="card" style="text-align:center;">
+        <span class="section-kicker">Готово?</span>
+        <h2>Скопировать все ответы</h2>
+        <p class="section-desc">Соберёт ваши ответы из всех упражнений 1–6 в одном тексте и скопирует в буфер обмена.</p>
+        <button class="btn btn-gold" style="padding:13px 22px; font-size:15px;" onclick="copyAllAnswers()">📋 Скопировать все ответы одной кнопкой</button>
+      </section>
+
+    </main>
+
+    <aside class="sidebar">
+      <div class="side-card">
+        <h3>⚠️ Проблемные слова</h3>
+        <p class="side-note">Здесь появляются фразы, в которых вы чаще всего ошибаетесь.</p>
+        <ul id="problemList"></ul>
+        <div class="side-reset">
+          <button class="btn btn-ghost" onclick="resetProblems()" style="border-color:rgba(255,255,255,0.25); color:#e7e2d3;">Очистить список</button>
+        </div>
+
+        <div class="diag-card">
+          <h3 style="font-size:15px;">🔧 Диагностика</h3>
+          <button class="btn btn-ghost" style="border-color:rgba(255,255,255,0.25); color:#e7e2d3;" onclick="testAudio()">Проверить аудио</button>
+          <div id="diagStatus"></div>
+        </div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<footer class="page-footer">Restaurant Complaints · English lesson worksheet</footer>
+<div id="toast"></div>
+
+<script>
+/* ========================= DATA ========================= */
+const data = [
+  { id:1,  en:"Could you correct the amount, please?",
+    ru:"Не могли бы вы исправить сумму, пожалуйста?",
+    ipa:"kʊd juː kəˈrekt ðiː əˈmaʊnt pliːz",
+    gapWord:"amount", gapSentence:"Could you correct the ___, please?",
+    context:"Вы получили счёт, но итоговая сумма кажется неверной.",
+    waiterLine:"Here you are — that comes to $52 in total." },
+
+  { id:2,  en:"I'm sorry, but I didn't order this.",
+    ru:"Извините, но я это не заказывал(а).",
+    ipa:"aɪm ˈsɒri bʌt aɪ ˈdɪdnt ˈɔːdə ðɪs",
+    gapWord:"order", gapSentence:"I'm sorry, but I didn't ___ this.",
+    context:"Официант поставил перед вами блюдо, которое вы никогда не заказывали.",
+    waiterLine:"Here's your seafood pasta, enjoy!" },
+
+  { id:3,  en:"I think I've been overcharged.",
+    ru:"Кажется, с меня взяли больше, чем нужно.",
+    ipa:"aɪ θɪŋk aɪv biːn ˌəʊvəˈtʃɑːdʒd",
+    gapWord:"overcharged", gapSentence:"I think I've been ___.",
+    context:"Сумма в счёте намного больше, чем вы ожидали за свой заказ.",
+    waiterLine:"So the total is $89 for two mains and a bottle of wine." },
+
+  { id:4,  en:"I can't eat this because it contains…",
+    ru:"Я не могу это есть, потому что здесь содержится…",
+    ipa:"aɪ kɑːnt iːt ðɪs bɪˈkɒz ɪt kənˈteɪnz",
+    gapWord:"contains", gapSentence:"I can't eat this because it ___ nuts.",
+    context:"В блюде оказался ингредиент, который вам нельзя есть (аллергия).",
+    waiterLine:"Here's your salad — it has a walnut dressing." },
+
+  { id:5,  en:"Could you make it without…?",
+    ru:"Не могли бы вы приготовить это без…?",
+    ipa:"kʊd juː meɪk ɪt wɪˈðaʊt",
+    gapWord:"without", gapSentence:"Could you make it ___ onions, please?",
+    context:"Вы хотите заказать блюдо, но без одного из ингредиентов.",
+    waiterLine:"Would you like the classic burger with everything on it?" },
+
+  { id:6,  en:"I ordered this with chips, but they haven't arrived.",
+    ru:"Я заказывал(а) это с картошкой фри, но её не принесли.",
+    ipa:"aɪ ˈɔːdəd ðɪs wɪð tʃɪps bʌt ðeɪ hævnt əˈraɪvd",
+    gapWord:"arrived", gapSentence:"I ordered this with chips, but they haven't ___.",
+    context:"Вам принесли основное блюдо, но забыли гарнир, который вы заказывали.",
+    waiterLine:"Here's your grilled chicken, enjoy your meal!" },
+
+  { id:7,  en:"Excuse me, I think there's a mistake on the bill.",
+    ru:"Извините, кажется, в счёте ошибка.",
+    ipa:"ɪkˈskjuːz miː aɪ θɪŋk ðeəz ə mɪˈsteɪk ɒn ðə bɪl",
+    gapWord:"mistake", gapSentence:"Excuse me, I think there's a ___ on the bill.",
+    context:"В счёте указана позиция, которую вы точно не заказывали.",
+    waiterLine:"Here's your bill — it includes two desserts." },
+
+  { id:8,  en:"I'm afraid there's a problem with my steak.",
+    ru:"Боюсь, у меня проблема со стейком.",
+    ipa:"aɪm əˈfreɪd ðeəz ə ˈprɒbləm wɪð maɪ steɪk",
+    gapWord:"problem", gapSentence:"I'm afraid there's a ___ with my steak.",
+    context:"Со стейком что-то не так, и нужно вежливо привлечь внимание официанта.",
+    waiterLine:"How is everything with your steak tonight?" },
+
+  { id:9,  en:"Excuse me, we've been waiting for quite a while.",
+    ru:"Извините, мы уже долго ждём.",
+    ipa:"ɪkˈskjuːz miː wiːv biːn ˈweɪtɪŋ fə kwaɪt ə waɪl",
+    gapWord:"waiting", gapSentence:"Excuse me, we've been ___ for quite a while.",
+    context:"Прошло уже 40 минут, а еду до сих пор не принесли.",
+    waiterLine:"Sorry, the kitchen is a bit busy tonight." },
+
+  { id:10, en:"Could you remove this from the bill, please?",
+    ru:"Не могли бы вы убрать это из счёта, пожалуйста?",
+    ipa:"kʊd juː rɪˈmuːv ðɪs frəm ðə bɪl pliːz",
+    gapWord:"remove", gapSentence:"Could you ___ this from the bill, please?",
+    context:"Вас случайно заставили заплатить за блюдо, которое вам не приносили.",
+    waiterLine:"So that's $12 for the soup you didn't receive as well." },
+
+  { id:11, en:"It's overcooked.",
+    ru:"Это пережарено/переварено.",
+    ipa:"ɪts ˌəʊvəˈkʊkt",
+    gapWord:"overcooked", gapSentence:"It's ___.",
+    context:"Мясо, которое вы заказывали medium, оказалось полностью пережарено.",
+    waiterLine:"Is everything okay with your meat?" },
+
+  { id:12, en:"Could you check our order, please?",
+    ru:"Не могли бы вы проверить наш заказ, пожалуйста?",
+    ipa:"kʊd juː tʃek ˈaʊər ˈɔːdə pliːz",
+    gapWord:"check", gapSentence:"Could you ___ our order, please?",
+    context:"Вам кажется, что на стол принесли не всё, что вы заказывали.",
+    waiterLine:"Here are your two dishes, enjoy!" },
+
+  { id:13, en:"It's undercooked.",
+    ru:"Это недожарено/недоварено.",
+    ipa:"ɪts ˌʌndəˈkʊkt",
+    gapWord:"undercooked", gapSentence:"It's ___.",
+    context:"Курица внутри оказалась ещё сырой.",
+    waiterLine:"How's the chicken tonight?" },
+
+  { id:14, en:"I think you've brought me the wrong dish.",
+    ru:"Кажется, вы принесли мне не то блюдо.",
+    ipa:"aɪ θɪŋk juːv brɔːt miː ðə rɒŋ dɪʃ",
+    gapWord:"wrong", gapSentence:"I think you've brought me the ___ dish.",
+    context:"Вы заказывали курицу, а вам принесли рыбу.",
+    waiterLine:"Here's your salmon, enjoy your meal!" }
+];
+
+/* ========================= SPEECH ========================= */
+let voices = [];
+function loadVoices(){ voices = window.speechSynthesis ? window.speechSynthesis.getVoices() : []; }
+loadVoices();
+if('speechSynthesis' in window && 'onvoiceschanged' in window.speechSynthesis){
+  window.speechSynthesis.onvoiceschanged = loadVoices;
+}
+function pickVoice(){
+  if(!voices.length) loadVoices();
+  return voices.find(v=>v.name === "Google US English")
+    || voices.find(v=>v.lang === "en-US" && /Google/i.test(v.name))
+    || voices.find(v=>v.lang === "en-US")
+    || voices.find(v=>/^en/i.test(v.lang))
+    || null;
+}
+function speak(text, btn){
+  if(!('speechSynthesis' in window)){
+    toast('Ваш браузер не поддерживает синтез речи.');
+    return;
+  }
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  const v = pickVoice();
+  if(v) u.voice = v;
+  u.lang = 'en-US';
+  u.rate = 0.92;
+  if(btn){
+    btn.classList.add('speaking');
+    u.onend = ()=>btn.classList.remove('speaking');
+    u.onerror = ()=>btn.classList.remove('speaking');
+  }
+  window.speechSynthesis.speak(u);
+}
+function testAudio(){
+  const status = document.getElementById('diagStatus');
+  if(!('speechSynthesis' in window)){
+    status.textContent = '❌ Синтез речи не поддерживается в этом браузере.';
+    return;
+  }
+  status.textContent = '⏳ Воспроизведение…';
+  const u = new SpeechSynthesisUtterance("This is a test of the English voice.");
+  const v = pickVoice();
+  if(v) u.voice = v;
+  u.lang = 'en-US';
+  u.onend = ()=>{ status.textContent = '✅ Аудио работает (' + (v ? v.name : 'голос по умолчанию') + ')'; };
+  u.onerror = ()=>{ status.textContent = '❌ Ошибка воспроизведения аудио.'; };
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(u);
+}
+
+/* ========================= HELPERS ========================= */
+function escapeAttr(s){
+  return String(s)
+    .replace(/&/g,'&amp;')
+    .replace(/"/g,'&quot;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;');
+}
+function norm(s){
+  return String(s || '')
+    .toLowerCase()
+    .replace(/[.,!?;:'"’‘()…]/g,'')
+    .replace(/\s+/g,' ')
+    .trim();
+}
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+/* ========================= PROBLEM WORDS ========================= */
+let problemWords = {};
+function markProblem(key, label){
+  if(!problemWords[key]) problemWords[key] = { label: label, count: 0 };
+  problemWords[key].count++;
+  renderProblemPanel();
+}
+function renderProblemPanel(){
+  const list = Object.values(problemWords).sort((a,b)=>b.count - a.count).slice(0,10);
+  const el = document.getElementById('problemList');
+  if(list.length === 0){
+    el.innerHTML = '<li class="empty">Пока ошибок нет 🎉</li>';
+    return;
+  }
+  el.innerHTML = list.map(item =>
+    '<li><span>' + escapeAttr(item.label) + '</span><b>' + item.count + '</b></li>'
+  ).join('');
+}
+function resetProblems(){
+  problemWords = {};
+  renderProblemPanel();
+  toast('Список проблемных слов очищен.');
+}
+
+/* ========================= VOCAB GRID ========================= */
+function buildVocabGrid(){
+  document.getElementById('vocab-grid').innerHTML = data.map(it => `
+    <div class="ticket">
+      <div class="ticket-top">
+        <button type="button" class="listen-btn" data-speak="${escapeAttr(it.en)}">🔊</button>
+        <span class="ticket-en">${escapeAttr(it.en)}</span>
+      </div>
+      <div class="ticket-ipa">/${escapeAttr(it.ipa)}/</div>
+      <div class="ticket-ru">${escapeAttr(it.ru)}</div>
+    </div>`).join('');
+}
+
+/* ========================= EXERCISE BUILDERS ========================= */
+function itemShell(idx, id, answer, label, innerHtml){
+  return `<li class="item" data-id="${id}" data-answer="${escapeAttr(answer)}" data-label="${escapeAttr(label)}">
+    ${innerHtml}
+    <div class="feedback"></div>
+  </li>`;
+}
+
+function buildEx1(){
+  const items = shuffle(data).slice(0,10);
+  document.getElementById('ex1-list').innerHTML = items.map((it, i) => itemShell(
+    i+1, it.id, it.en, it.en,
+    `<div class="item-head">
+       <span class="num">${i+1}.</span>
+       <button type="button" class="listen-btn" data-speak="${escapeAttr(it.en)}">🔊 Слушать</button>
+     </div>
+     <input type="text" class="answer-input" autocomplete="off" placeholder="Напишите фразу целиком..." />`
+  )).join('');
+  clearScore(1);
+}
+
+function buildEx2(){
+  const items = shuffle(data).slice(0,10);
+  document.getElementById('ex2-list').innerHTML = items.map((it, i) => itemShell(
+    i+1, it.id, it.en, it.en,
+    `<div class="item-head"><span class="num">${i+1}.</span></div>
+     <p class="ru-prompt">${escapeAttr(it.ru)}</p>
+     <input type="text" class="answer-input" autocomplete="off" placeholder="Type in English..." />`
+  )).join('');
+  clearScore(2);
+}
+
+function buildEx3(){
+  const items = shuffle(data).slice(0,10);
+  document.getElementById('ex3-list').innerHTML = items.map((it, i) => itemShell(
+    i+1, it.id, it.gapWord, it.gapWord + ' — ' + it.en,
+    `<div class="item-head"><span class="num">${i+1}.</span></div>
+     <p class="gap-sentence">${escapeAttr(it.gapSentence)}</p>
+     <p class="ru-hint">${escapeAttr(it.ru)}</p>
+     <input type="text" class="answer-input word-input" autocomplete="off" placeholder="одно слово" />`
+  )).join('');
+  clearScore(3);
+}
+
+function buildEx4(){
+  const items = shuffle(data).slice(0,10);
+  document.getElementById('ex4-list').innerHTML = items.map((it, i) => itemShell(
+    i+1, it.id, it.gapWord, it.gapWord + ' — ' + it.en,
+    `<div class="item-head">
+       <span class="num">${i+1}.</span>
+       <button type="button" class="listen-btn" data-speak="${escapeAttr(it.en)}">🔊 Слушать предложение</button>
+     </div>
+     <p class="gap-sentence">${escapeAttr(it.gapSentence)}</p>
+     <input type="text" class="answer-input word-input" autocomplete="off" placeholder="одно слово" />`
+  )).join('');
+  clearScore(4);
+}
+
+function buildEx5(){
+  const items = shuffle(data).slice(0,10);
+  document.getElementById('ex5-list').innerHTML = items.map((it, i) => itemShell(
+    i+1, it.id, it.en, it.en,
+    `<div class="item-head"><span class="num">${i+1}.</span></div>
+     <p class="context-line">📋 ${escapeAttr(it.context)}</p>
+     <div class="waiter-line">
+       <button type="button" class="listen-btn small" data-speak="${escapeAttr(it.waiterLine)}">🔊</button>
+       <span>Waiter: "${escapeAttr(it.waiterLine)}"</span>
+     </div>
+     <p class="you-label">You:</p>
+     <input type="text" class="answer-input" autocomplete="off" placeholder="Напишите вашу реплику по-английски..." />`
+  )).join('');
+  clearScore(5);
+}
+
+function clearScore(n){
+  document.getElementById(`ex${n}-score`).textContent = '';
+}
+
+/* ========================= CHECK / REVEAL ========================= */
+function checkExercise(n){
+  const list = document.querySelectorAll(`#ex${n}-list .item`);
+  let correctCount = 0;
+  list.forEach(li => {
+    const input = li.querySelector('.answer-input');
+    const fb = li.querySelector('.feedback');
+    const ans = li.dataset.answer;
+    const label = li.dataset.label;
+    const val = input.value;
+    const ok = val.trim().length > 0 && norm(val) === norm(ans);
+    li.classList.remove('correct','incorrect');
+    if(ok){
+      li.classList.add('correct');
+      fb.textContent = '✓ Верно!';
+      correctCount++;
+    } else {
+      li.classList.add('incorrect');
+      fb.textContent = '✗ Правильный ответ: ' + ans;
+      markProblem(li.dataset.id + '-ex' + n, label);
+    }
+  });
+  document.getElementById(`ex${n}-score`).textContent = `Результат: ${correctCount} из ${list.length}`;
+}
+
+function revealExercise(n){
+  document.querySelectorAll(`#ex${n}-list .item`).forEach(li => {
+    li.querySelector('.feedback').textContent = 'Ответ: ' + li.dataset.answer;
+  });
+}
+
+/* ========================= OWN DIALOGUE ANALYSIS ========================= */
+function analyzeDialogue(){
+  const raw = document.getElementById('own-dialogue').value;
+  const n = norm(raw);
+  const box = document.getElementById('own-analysis');
+  if(!n){
+    box.innerHTML = '<p class="hint">Диалог пока пуст — напишите пару реплик.</p>';
+    return;
+  }
+  const used = data.filter(it => n.includes(norm(it.gapWord)));
+  if(used.length === 0){
+    box.innerHTML = '<p class="hint">Пока не найдено ни одной фразы из урока. Попробуйте использовать хотя бы 4.</p>';
+    return;
+  }
+  box.innerHTML = '<p>Похоже, использовано фраз из урока: <b>' + used.length + ' из 14</b></p><ul>' +
+    used.map(it => '<li>' + escapeAttr(it.en) + '</li>').join('') + '</ul>';
+}
+
+/* ========================= COPY TO CLIPBOARD ========================= */
+function copyText(text, okMsg){
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(
+      () => toast(okMsg),
+      () => fallbackCopy(text, okMsg)
+    );
+  } else {
+    fallbackCopy(text, okMsg);
+  }
+}
+function fallbackCopy(text, okMsg){
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  try{
+    document.execCommand('copy');
+    toast(okMsg);
+  }catch(e){
+    toast('Не удалось скопировать автоматически — выделите текст вручную.');
+  }
+  document.body.removeChild(ta);
+}
+
+function copyExerciseAnswers(n, title){
+  let out = title + '\n' + '-'.repeat(title.length) + '\n';
+  document.querySelectorAll(`#ex${n}-list .item`).forEach((li, i) => {
+    const val = li.querySelector('.answer-input').value.trim();
+    out += (i+1) + '. ' + (val || '(пусто)') + '\n';
+  });
+  copyText(out, 'Ответы упражнения ' + n + ' скопированы!');
+}
+
+function collectAllAnswers(){
+  let out = 'МОИ ОТВЕТЫ — At the Restaurant: Complaints & Problems\n' + '='.repeat(50) + '\n\n';
+  const sections = [
+    { n:1, title:'Упражнение 1. Аудирование (запишите фразу)' },
+    { n:2, title:'Упражнение 2. Перевод RU → EN' },
+    { n:3, title:'Упражнение 3. Пропущенное слово (по контексту)' },
+    { n:4, title:'Упражнение 4. Пропущенное слово (на слух)' },
+    { n:5, title:'Упражнение 5. Закончите диалог' }
+  ];
+  sections.forEach(sec => {
+    out += sec.title + '\n' + '-'.repeat(sec.title.length) + '\n';
+    document.querySelectorAll(`#ex${sec.n}-list .item`).forEach((li, i) => {
+      const val = li.querySelector('.answer-input').value.trim();
+      out += (i+1) + '. ' + (val || '(пусто)') + '\n';
+    });
+    out += '\n';
+  });
+  out += 'Упражнение 6. Свой диалог\n' + '-'.repeat(27) + '\n';
+  out += (document.getElementById('own-dialogue').value.trim() || '(пусто)') + '\n';
+  return out;
+}
+function copyAllAnswers(){
+  copyText(collectAllAnswers(), 'Все ответы скопированы в буфер обмена!');
+}
+
+/* ========================= TOAST ========================= */
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(window.__toastTimer);
+  window.__toastTimer = setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+/* ========================= INIT ========================= */
+document.addEventListener('click', (e) => {
+  const btn = e.target.closest('.listen-btn');
+  if(btn && btn.dataset.speak){
+    speak(btn.dataset.speak, btn);
+  }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  buildVocabGrid();
+  buildEx1();
+  buildEx2();
+  buildEx3();
+  buildEx4();
+  buildEx5();
+  renderProblemPanel();
+});
+</script>
+</body>
+</html>
