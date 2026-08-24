@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Bill Bistro — практика лексики</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#FAF6EC;
+  --paper-dark:#F0E9D8;
+  --ink:#2B2A28;
+  --ink-soft:#5B5850;
+  --stamp:#B5442E;
+  --stamp-light:#F3DCD5;
+  --ok:#4F7857;
+  --ok-light:#E1EBDD;
+  --tape:#E4D9BE;
+  --line:#C9BBA0;
+  --card:#FFFFFF;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  background:var(--paper-dark);
+  font-family:'Inter',sans-serif;
+  color:var(--ink);
+  line-height:1.5;
+}
+.wrap{
+  max-width:1180px;
+  margin:0 auto;
+  padding:28px 20px 80px;
+}
+.mono{font-family:'Space Mono',monospace;}
+/* ---------- HEADER (receipt) ---------- */
+.receipt-head{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:4px;
+  padding:28px 32px 24px;
+  position:relative;
+  box-shadow:0 2px 0 var(--line);
+}
+.receipt-head::after{
+  content:"";
+  position:absolute;
+  left:0;right:0;bottom:-9px;
+  height:14px;
+  background-image:
+    linear-gradient(-45deg, var(--paper-dark) 7px, transparent 7px),
+    linear-gradient(45deg, var(--paper-dark) 7px, transparent 7px);
+  background-size:14px 14px;
+  background-position:0 0;
+  background-repeat:repeat-x;
+}
+.eyebrow{
+  font-family:'Space Mono',monospace;
+  font-size:12px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--stamp);
+}
+h1{
+  font-family:'Space Mono',monospace;
+  font-size:30px;
+  margin:6px 0 4px;
+  letter-spacing:-0.01em;
+}
+.sub{color:var(--ink-soft);font-size:15px;margin:0 0 18px;max-width:640px;}
+.voice-check{
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  border-top:1px dashed var(--line);
+  padding-top:16px;
+  margin-top:16px;
+}
+.voice-status{font-family:'Space Mono',monospace;font-size:12.5px;color:var(--ink-soft);}
+/* ---------- BUTTONS ---------- */
+button{
+  font-family:'Inter',sans-serif;
+  cursor:pointer;
+  border-radius:3px;
+  border:1px solid var(--ink);
+  background:var(--ink);
+  color:var(--paper);
+  padding:9px 16px;
+  font-size:13.5px;
+  font-weight:600;
+  transition:transform .08s ease, opacity .15s ease;
+}
+button:hover{opacity:.85;}
+button:active{transform:scale(.97);}
+button.ghost{
+  background:transparent;
+  color:var(--ink);
+  border:1px solid var(--line);
+}
+button.stamp{
+  background:var(--stamp);
+  border-color:var(--stamp);
+}
+button.ok{
+  background:var(--ok);
+  border-color:var(--ok);
+}
+button.small{padding:6px 11px;font-size:12px;}
+button:disabled{opacity:.4;cursor:not-allowed;}
+/* ---------- LAYOUT ---------- */
+.layout{
+  display:flex;
+  gap:24px;
+  align-items:flex-start;
+  margin-top:24px;
+}
+.main-col{flex:1;min-width:0;}
+.side-col{
+  width:270px;
+  flex-shrink:0;
+  position:sticky;
+  top:20px;
+}
+@media (max-width:880px){
+  .layout{flex-direction:column;}
+  .side-col{width:100%;position:static;}
+}
+/* ---------- SIDEBAR ---------- */
+.side-panel{
+  background:var(--tape);
+  border:1px solid var(--line);
+  border-radius:4px;
+  padding:16px 16px 14px;
+}
+.side-panel h3{
+  font-family:'Space Mono',monospace;
+  font-size:14px;
+  margin:0 0 4px;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+}
+.side-panel p.hint{font-size:12.5px;color:var(--ink-soft);margin:0 0 12px;}
+table.problem-table{width:100%;border-collapse:collapse;font-size:13px;}
+table.problem-table th{
+  text-align:left;font-family:'Space Mono',monospace;font-size:11px;
+  text-transform:uppercase;color:var(--ink-soft);
+  border-bottom:1px solid var(--line);padding-bottom:6px;
+}
+table.problem-table td{padding:7px 0;border-bottom:1px dotted var(--line);}
+table.problem-table td.count{
+  text-align:right;font-family:'Space Mono',monospace;font-weight:700;color:var(--stamp);
+}
+.empty-row td{color:var(--ink-soft);font-style:italic;}
+.side-panel .reset{margin-top:12px;width:100%;}
+/* ---------- VOCAB CARDS ---------- */
+.vocab-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+  gap:10px;
+  margin-top:16px;
+}
+.vocab-card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:4px;
+  padding:12px 14px;
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+.vocab-word{font-weight:700;font-size:14.5px;}
+.vocab-ipa{font-family:'Space Mono',monospace;font-size:12.5px;color:var(--stamp);}
+.vocab-ru{font-size:13px;color:var(--ink-soft);}
+.vocab-ex{font-size:12.5px;color:var(--ink-soft);font-style:italic;}
+.vocab-play{
+  align-self:flex-start;margin-top:6px;
+  background:transparent;border:1px solid var(--line);color:var(--ink);
+  padding:5px 10px;font-size:12px;font-weight:600;
+}
+/* ---------- EXERCISE TICKETS ---------- */
+.ticket{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:4px;
+  margin-top:26px;
+  overflow:hidden;
+}
+.ticket-head{
+  padding:16px 22px 14px;
+  border-bottom:1px dashed var(--line);
+}
+.ticket-tag{
+  font-family:'Space Mono',monospace;
+  font-size:11.5px;
+  color:var(--stamp);
+  letter-spacing:.1em;
+  text-transform:uppercase;
+}
+.ticket-title{font-size:18px;font-weight:700;margin:4px 0 6px;}
+.ticket-instructions{font-size:13.5px;color:var(--ink-soft);}
+.ticket-body{padding:18px 22px 20px;}
+.exercise-item{
+  padding:12px 0;
+  border-bottom:1px solid var(--paper-dark);
+}
+.exercise-item:last-child{border-bottom:none;}
+.item-num{
+  font-family:'Space Mono',monospace;
+  font-size:12px;
+  color:var(--ink-soft);
+  margin-right:6px;
+}
+.item-prompt{font-size:14.5px;margin:0 0 8px;}
+.item-prompt .blank{
+  font-family:'Space Mono',monospace;
+  letter-spacing:.03em;
+  border-bottom:2px solid var(--stamp);
+  padding:0 2px;
+}
+.item-prompt .pattern{
+  font-family:'Space Mono',monospace;
+  background:var(--paper-dark);
+  padding:1px 6px;
+  border-radius:3px;
+}
+.item-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+.answer-input{
+  flex:1;
+  min-width:200px;
+  padding:8px 10px;
+  border:1px solid var(--line);
+  border-radius:3px;
+  font-size:14px;
+  font-family:'Inter',sans-serif;
+  background:var(--paper);
+}
+.answer-input:focus{outline:2px solid var(--ok);outline-offset:1px;}
+textarea.answer-input{min-height:44px;resize:vertical;font-family:'Inter',sans-serif;}
+.feedback{font-family:'Space Mono',monospace;font-size:12.5px;min-width:78px;}
+.reveal{
+  display:none;
+  margin-top:6px;
+  font-size:13px;
+  color:var(--ok);
+  font-family:'Space Mono',monospace;
+}
+.exercise-item.correct{background:var(--ok-light);}
+.exercise-item.incorrect{background:var(--stamp-light);}
+.exercise-item.correct .feedback{color:var(--ok);}
+.exercise-item.incorrect .feedback{color:var(--stamp);}
+.exercise-item.correct,.exercise-item.incorrect{
+  margin:0 -22px;
+  padding:12px 22px;
+}
+.ticket-foot{
+  display:flex;justify-content:space-between;align-items:center;
+  flex-wrap:wrap;gap:10px;
+  padding:14px 22px 18px;
+}
+.score{font-family:'Space Mono',monospace;font-size:13px;color:var(--ink-soft);}
+.toast{
+  position:fixed;bottom:22px;left:50%;transform:translateX(-50%);
+  background:var(--ink);color:var(--paper);
+  padding:10px 18px;border-radius:4px;font-size:13.5px;
+  opacity:0;pointer-events:none;transition:opacity .25s ease;
+  font-family:'Space Mono',monospace;z-index:99;
+}
+.toast.show{opacity:1;}
+.speaker-btn{
+  background:transparent;border:1px solid var(--line);color:var(--ink);
+  padding:6px 10px;font-size:12px;
+}
+footer.note{
+  text-align:center;color:var(--ink-soft);font-size:12.5px;margin-top:40px;
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <div class="receipt-head">
+    <div class="eyebrow">The Bill Bistro · практика лексики B1</div>
+    <h1>Charge, remove, contain &amp; co.</h1>
+    <p class="sub">Лексика про счёт в ресторане: <b>charge</b>, <b>overcharge</b>, <b>remove</b>, <b>contain</b>, <b>undercooked</b>, <b>overcooked</b>. Сначала прослушайте и повторите слова, затем пройдите 8 заданий — впишите ответы от руки.</p>
+    <div class="voice-check">
+      <button class="ghost small" id="testVoiceBtn" type="button">🔊 Проверить голос</button>
+      <span class="voice-status" id="voiceStatus">Голос ещё не проверен…</span>
+    </div>
+  </div>
+
+  <div class="layout">
+    <div class="main-col">
+
+      <div class="vocab-grid" id="vocabGrid"></div>
+
+      <!-- Exercises get injected here -->
+      <div id="exercisesRoot"></div>
+
+    </div>
+
+    <div class="side-col">
+      <div class="side-panel">
+        <h3>Проблемные слова</h3>
+        <p class="hint">Здесь копятся слова, в которых вы ошиблись, при проверке заданий 1–6.</p>
+        <table class="problem-table">
+          <thead><tr><th>Слово</th><th style="text-align:right">Ошибок</th></tr></thead>
+          <tbody id="problemTableBody">
+            <tr class="empty-row"><td colspan="2">Пока ошибок нет — отлично!</td></tr>
+          </tbody>
+        </table>
+        <button class="ghost reset" id="resetProblemsBtn" type="button">Очистить список</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="note">Голос по умолчанию — «Google US English» (en-US), если он доступен в вашем браузере. Ответы не сохраняются между перезагрузками страницы.</footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   VOCABULARY (intro)
+============================================================ */
+const vocabList = [
+  {word:"charge someone for something", ipa:"/tʃɑːrdʒ ˈsʌmwʌn fɔːr ˈsʌmθɪŋ/", ru:"взять с кого-то плату за что-то", ex:"They charged us €5 for the water."},
+  {word:"be charged for something", ipa:"/biː tʃɑːrdʒd fɔːr ˈsʌmθɪŋ/", ru:"с человека взяли плату за что-то", ex:"I was charged for a dish I didn't order."},
+  {word:"a (service) charge", ipa:"/ə tʃɑːrdʒ/", ru:"плата, начисление в счёте", ex:"There's a service charge on the bill."},
+  {word:"contain something", ipa:"/kənˈteɪn ˈsʌmθɪŋ/", ru:"содержать что-то", ex:"Does this sauce contain dairy?"},
+  {word:"remove something from the bill", ipa:"/rɪˈmuːv ˈsʌmθɪŋ frəm ðə bɪl/", ru:"убрать что-то из счёта", ex:"Could you remove this from the bill?"},
+  {word:"remove an ingredient", ipa:"/rɪˈmuːv ən ɪnˈɡriːdiənt/", ru:"убрать ингредиент из блюда", ex:"Could you remove the onions?"},
+  {word:"overcharge someone", ipa:"/ˌoʊvərˈtʃɑːrdʒ ˈsʌmwʌn/", ru:"обсчитать кого-то, взять лишнее", ex:"The restaurant overcharged us."},
+  {word:"be overcharged", ipa:"/biː ˌoʊvərˈtʃɑːrdʒd/", ru:"быть обсчитанным", ex:"I think I've been overcharged."},
+  {word:"undercooked", ipa:"/ˌʌndərˈkʊkt/", ru:"недоготовленный, сырой внутри", ex:"My steak was undercooked."},
+  {word:"overcooked", ipa:"/ˌoʊvərˈkʊkt/", ru:"переготовленный, разваренный", ex:"The vegetables were overcooked and mushy."}
+];
+
+function renderVocab(){
+  const grid = document.getElementById('vocabGrid');
+  grid.innerHTML = vocabList.map((v,i)=>`
+    <div class="vocab-card">
+      <div class="vocab-word">${v.word}</div>
+      <div class="vocab-ipa mono">${v.ipa}</div>
+      <div class="vocab-ru">${v.ru}</div>
+      <div class="vocab-ex">"${v.ex}"</div>
+      <button class="vocab-play" type="button" onclick="speak('${v.ex.replace(/'/g,"\\'")}')">🔊 Слушать</button>
+    </div>
+  `).join('');
+}
+
+/* ============================================================
+   AUDIO (speechSynthesis, prefers "Google US English")
+============================================================ */
+let cachedVoices = [];
+function refreshVoices(){
+  cachedVoices = window.speechSynthesis ? window.speechSynthesis.getVoices() : [];
+}
+if('speechSynthesis' in window){
+  refreshVoices();
+  window.speechSynthesis.onvoiceschanged = refreshVoices;
+}
+function pickVoice(){
+  refreshVoices();
+  let v = cachedVoices.find(v=>v.name === 'Google US English');
+  if(!v) v = cachedVoices.find(v=>v.lang === 'en-US');
+  if(!v) v = cachedVoices.find(v=>v.lang && v.lang.startsWith('en'));
+  return v || null;
+}
+function speak(text){
+  if(!('speechSynthesis' in window)){
+    showToast('Синтез речи не поддерживается этим браузером');
+    return;
+  }
+  window.speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  const v = pickVoice();
+  if(v) utter.voice = v;
+  utter.lang = 'en-US';
+  utter.rate = 0.92;
+  window.speechSynthesis.speak(utter);
+}
+document.getElementById('testVoiceBtn').addEventListener('click', ()=>{
+  const v = pickVoice();
+  const status = document.getElementById('voiceStatus');
+  if(v){
+    status.textContent = `Голос найден: ${v.name} (${v.lang}). Проверьте, слышен ли звук.`;
+  } else {
+    status.textContent = 'Голос Google US English не найден — используется голос по умолчанию en-US, если есть.';
+  }
+  speak("This is a test of the voice. Could you remove this charge from the bill?");
+});
+
+/* ============================================================
+   HELPERS
+============================================================ */
+function normalize(s){
+  return (s||'').toString().trim().toLowerCase()
+    .replace(/[.,!?;:"'’]/g,'')
+    .replace(/\s+/g,' ');
+}
+function matches(userVal, answer){
+  const u = normalize(userVal);
+  if(u.length===0) return false;
+  const answers = Array.isArray(answer) ? answer : [answer];
+  return answers.some(a=>normalize(a)===u);
+}
+const problemWords = {};
+const wordTranslations = {
+  charge:'charge — брать плату / плата',
+  remove:'remove — убрать',
+  contain:'contain — содержать',
+  overcharge:'overcharge — обсчитать',
+  undercooked:'undercooked — недоготовлено',
+  overcooked:'overcooked — переготовлено'
+};
+function registerMistake(word){
+  problemWords[word] = (problemWords[word]||0)+1;
+  renderProblemWords();
+}
+function renderProblemWords(){
+  const body = document.getElementById('problemTableBody');
+  const entries = Object.entries(problemWords).sort((a,b)=>b[1]-a[1]);
+  if(entries.length===0){
+    body.innerHTML = `<tr class="empty-row"><td colspan="2">Пока ошибок нет — отлично!</td></tr>`;
+    return;
+  }
+  body.innerHTML = entries.map(([w,c])=>`
+    <tr><td>${wordTranslations[w]||w}</td><td class="count">${c}</td></tr>
+  `).join('');
+}
+document.getElementById('resetProblemsBtn').addEventListener('click', ()=>{
+  Object.keys(problemWords).forEach(k=>delete problemWords[k]);
+  renderProblemWords();
+  showToast('Список очищен');
+});
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(showToast._tm);
+  showToast._tm = setTimeout(()=>t.classList.remove('show'), 2200);
+}
+function copyAllFrom(exId){
+  const items = document.querySelectorAll(`#${exId} .exercise-item`);
+  let text = '';
+  items.forEach((el,i)=>{
+    const input = el.querySelector('.answer-input');
+    text += `${i+1}. ${input ? input.value.trim() : ''}\n`;
+  });
+  navigator.clipboard.writeText(text).then(()=>{
+    showToast('Ответы скопированы в буфер обмена');
+  }).catch(()=>{
+    showToast('Не удалось скопировать — скопируйте вручную');
+  });
+}
+
+/* ============================================================
+   EXERCISE DATA
+============================================================ */
+// 1. Fill in the missing letters
+const ex1Data = [
+  {word:'remove', prompt:'Could you <span class="pattern">re_ _ve</span> the mushrooms from my salad?', answer:'remove'},
+  {word:'overcharge', prompt:"I think the taxi driver <span class=\"pattern\">_ver_harged</span> us.", answer:'overcharged'},
+  {word:'contain', prompt:'Does this cake <span class="pattern">c_nt_in</span> any nuts?', answer:'contain'},
+  {word:'undercooked', prompt:'Send it back — the chicken is <span class="pattern">_nder_ooked</span>!', answer:'undercooked'},
+  {word:'charge', prompt:'There\'s an extra service <span class="pattern">ch_ _ge</span> on the bill.', answer:'charge'},
+  {word:'overcooked', prompt:'The rice was <span class="pattern">_ver_ooked</span> and mushy.', answer:'overcooked'},
+  {word:'remove', prompt:'Please <span class="pattern">re_ove</span> the ice from my drink.', answer:'remove'},
+  {word:'charge', prompt:'We were <span class="pattern">ch_rged</span> twice for the same dessert.', answer:'charged'}
+];
+
+// 2. Dictation — listen and write the phrase (with pronunciation)
+const ex2Data = [
+  {word:'contain', sentence:"Does this soup contain shellfish?"},
+  {word:'charge', sentence:"They charged us five euros for the water."},
+  {word:'undercooked', sentence:"My burger was completely undercooked."},
+  {word:'remove', sentence:"Could you remove the onions, please?"},
+  {word:'overcooked', sentence:"The pasta was overcooked and stuck together."},
+  {word:'overcharge', sentence:"I'm sure we've been overcharged for the taxi."},
+  {word:'charge', sentence:"There's a service charge on the bill."},
+  {word:'remove', sentence:"The waiter removed the wrong dish from our table."}
+];
+
+// 3. Definitions
+const ex3Data = [
+  {word:'overcooked', prompt:'Приготовлено слишком долго, из-за чего еда стала невкусной или жёсткой.', answer:'overcooked'},
+  {word:'charge', prompt:'Сумма денег, которую нужно заплатить за услугу.', answer:['charge','a charge']},
+  {word:'remove', prompt:'Убрать что-то, чего там быть не должно (из счёта или блюда).', answer:'remove'},
+  {word:'undercooked', prompt:'Недостаточно приготовлено, всё ещё сырое внутри.', answer:'undercooked'},
+  {word:'contain', prompt:'Иметь что-то внутри себя (например, ингредиент).', answer:'contain'},
+  {word:'overcharge', prompt:'Взять с кого-то больше денег, чем следовало.', answer:'overcharge'},
+  {word:'charge', prompt:'Про человека: с него взяли плату за что-то.', answer:['be charged','charged']},
+  {word:'overcharge', prompt:'Про человека: с него взяли больше денег, чем нужно.', answer:['be overcharged','overcharged']}
+];
+
+// 4. Collocations
+const ex4Data = [
+  {word:'charge', prompt:'charge someone <span class="blank">___</span> something', answer:'for'},
+  {word:'remove', prompt:'remove something <span class="blank">___</span> the bill', answer:'from'},
+  {word:'charge', prompt:'a service <span class="blank">___</span>', answer:'charge'},
+  {word:'charge', prompt:'be charged <span class="blank">___</span> a dish you didn\'t order', answer:'for'},
+  {word:'contain', prompt:'This drink doesn\'t <span class="blank">___</span> any sugar.', answer:'contain'},
+  {word:'overcharge', prompt:'be overcharged <span class="blank">___</span> the drinks', answer:'for'},
+  {word:'remove', prompt:'remove an <span class="blank">___</span> from a recipe', answer:'ingredient'},
+  {word:'undercooked', prompt:'The steak was still red inside — it was <span class="blank">___</span>.', answer:'undercooked'}
+];
+
+// 5. Verb tenses
+const ex5Data = [
+  {word:'contain', prompt:'[Present Simple] This menu (contain) <span class="blank">___</span> a vegetarian section.', answer:'contains'},
+  {word:'charge', prompt:'[Past Simple] Yesterday the waiter (charge) <span class="blank">___</span> us for bread we never touched.', answer:'charged'},
+  {word:'remove', prompt:'[Present Continuous] Look — the chef (remove) <span class="blank">___</span> the bones from the fish right now.', answer:'is removing'},
+  {word:'overcharge', prompt:'[Present Perfect Passive] I think I (overcharge) <span class="blank">___</span> twice this month at that café.', answer:'have been overcharged'},
+  {word:'remove', prompt:'[Future Simple] Don\'t worry, I (remove) <span class="blank">___</span> the extra charge from your bill.', answer:'will remove'},
+  {word:'overcooked', prompt:'[Past Continuous] While we were eating, the kitchen (overcook) <span class="blank">___</span> our second course.', answer:'was overcooking'},
+  {word:'overcharge', prompt:'[Past Perfect] By the time we complained, they (already / overcharge) <span class="blank">___</span> three other tables.', answer:'had already overcharged'},
+  {word:'charge', prompt:'[Present Perfect Continuous] This restaurant (charge) <span class="blank">___</span> customers incorrectly all week.', answer:'has been charging'}
+];
+
+// 6. Find two mistakes (student writes the corrected sentence)
+const ex6Data = [
+  {word:'charge', wrong:"The waiter charge us the bread we didn't order.", answer:"The waiter charged us for the bread we didn't order."},
+  {word:'contain', wrong:"This cake don't contains nuts, so it's safe.", answer:"This cake doesn't contain nuts, so it's safe."},
+  {word:'remove', wrong:"Could you removed of the onions from my burger?", answer:"Could you remove the onions from my burger?"},
+  {word:'overcharge', wrong:"I think we was overcharge for the taxi ride.", answer:"I think we were overcharged for the taxi ride."},
+  {word:'undercooked', wrong:"The chicken were undercook, so I sent it back.", answer:"The chicken was undercooked, so I sent it back."},
+  {word:'overcooked', wrong:"My pasta are overcooked and it don't taste good.", answer:"My pasta is overcooked and it doesn't taste good."},
+  {word:'charge', wrong:"There is a extra charge for delivery you must to pay.", answer:"There is an extra charge for delivery you must pay."},
+  {word:'remove', wrong:"They was charging us twice, we asked for remove it.", answer:"They charged us twice, we asked to remove it."}
+];
+
+// 7. Complete the sentence with your own idea
+const ex7Data = [
+  {word:'charge', prompt:"I was really annoyed because the restaurant charged me for", sample:"...a drink I never ordered."},
+  {word:'remove', prompt:"Could you please remove", sample:"...the mayonnaise from my sandwich?"},
+  {word:'contain', prompt:"I'm not sure, but I don't think this dish contains", sample:"...any gluten."},
+  {word:'overcharge', prompt:"I'm pretty sure we were overcharged when", sample:"...they added a second service charge."},
+  {word:'undercooked', prompt:"The meat was so undercooked that", sample:"...I had to send it back to the kitchen."},
+  {word:'overcooked', prompt:"The vegetables were overcooked, so", sample:"...I asked the waiter to bring fresh ones."},
+  {word:'charge', prompt:"There was a strange extra charge on the bill for", sample:"...a bottle of water we never asked for."},
+  {word:'overcharge', prompt:"If I found out a restaurant had overcharged me, I would", sample:"...ask to speak to the manager immediately."}
+];
+
+// 8. Drilling — Repeat & Change
+const ex8Data = [
+  {word:'remove', model:"Could you remove the onions from my burger?", cue:"mushrooms → salad"},
+  {word:'charge', model:"They charged us extra for the delivery.", cue:"parking → at the hotel"},
+  {word:'contain', model:"Does this soup contain nuts?", cue:"cake → gluten"},
+  {word:'overcharge', model:"I think I've been overcharged for the taxi.", cue:"drinks → at the bar"},
+  {word:'undercooked', model:"My steak was undercooked, so I sent it back.", cue:"chicken → asked for a new one"},
+  {word:'overcooked', model:"The fries were overcooked and tasted burnt.", cue:"rice → dry"},
+  {word:'charge', model:"There's a service charge on the bill.", cue:"delivery charge → on the receipt"},
+  {word:'overcharge', model:"The restaurant overcharged the tourists for drinks.", cue:"shop → souvenirs"}
+];
+
+/* ============================================================
+   RENDERING
+============================================================ */
+function ticketShell(id, tag, title, instructions, bodyHtml, footHtml){
+  return `
+  <section class="ticket" id="${id}">
+    <div class="ticket-head">
+      <div class="ticket-tag mono">${tag}</div>
+      <div class="ticket-title">${title}</div>
+      <div class="ticket-instructions">${instructions}</div>
+    </div>
+    <div class="ticket-body">${bodyHtml}</div>
+    <div class="ticket-foot">${footHtml}</div>
+  </section>`;
+}
+
+function itemWrapper(idx, promptHtml, extraRowHtml, inputHtml){
+  return `
+  <div class="exercise-item">
+    <p class="item-prompt"><span class="item-num mono">${idx+1}.</span>${promptHtml}</p>
+    ${extraRowHtml||''}
+    <div class="item-row">
+      ${inputHtml}
+      <span class="feedback mono"></span>
+    </div>
+    <div class="reveal mono"></div>
+  </div>`;
+}
+
+function renderChecked(exId, data, promptFn, isTextarea){
+  const body = data.map((item,idx)=>{
+    const inputTag = isTextarea
+      ? `<textarea class="answer-input" placeholder="Впишите ответ..."></textarea>`
+      : `<input type="text" class="answer-input" placeholder="Впишите ответ...">`;
+    return itemWrapper(idx, promptFn(item), '', inputTag);
+  }).join('');
+  const foot = `
+    <button class="ok" onclick="checkExercise('${exId}')" type="button">Проверить</button>
+    <button class="ghost" onclick="revealAnswers('${exId}')" type="button">Показать ответы</button>
+    <span class="score mono"></span>`;
+  return {body, foot};
+}
+
+function checkExercise(exId){
+  const data = window.exerciseData[exId];
+  const items = document.querySelectorAll(`#${exId} .exercise-item`);
+  let correctCount = 0;
+  items.forEach((el, idx)=>{
+    const input = el.querySelector('.answer-input');
+    const feedback = el.querySelector('.feedback');
+    const ok = matches(input.value, data[idx].answer);
+    el.classList.remove('correct','incorrect');
+    if(ok){
+      el.classList.add('correct');
+      feedback.textContent = '✓ верно';
+      correctCount++;
+    } else {
+      el.classList.add('incorrect');
+      feedback.textContent = '✗ неверно';
+      registerMistake(data[idx].word);
+    }
+  });
+  document.querySelector(`#${exId} .score`).textContent = `Результат: ${correctCount} / ${data.length}`;
+}
+
+function revealAnswers(exId){
+  const data = window.exerciseData[exId];
+  const items = document.querySelectorAll(`#${exId} .exercise-item`);
+  items.forEach((el, idx)=>{
+    const reveal = el.querySelector('.reveal');
+    const ans = Array.isArray(data[idx].answer) ? data[idx].answer[0] : data[idx].answer;
+    reveal.textContent = `Ответ: ${ans}`;
+    reveal.style.display = 'block';
+  });
+}
+
+window.exerciseData = {ex1:ex1Data, ex2:ex2Data, ex3:ex3Data, ex4:ex4Data, ex5:ex5Data, ex6:ex6Data};
+
+function buildAll(){
+  const root = document.getElementById('exercisesRoot');
+  let html = '';
+
+  /* Exercise 1 — Fill in missing letters */
+  {
+    const {body, foot} = renderChecked('ex1', ex1Data, item=>item.prompt, false);
+    html += ticketShell('ex1', 'Задание 1 · Пропущенные буквы', 'Вставь пропущенные буквы',
+      'Прочитайте предложение и допишите слово целиком в поле ниже.', body, foot);
+  }
+
+  /* Exercise 2 — Dictation */
+  {
+    const body = ex2Data.map((item,idx)=>{
+      const promptHtml = `<button class="speaker-btn" type="button" onclick="speak('${item.sentence.replace(/'/g,"\\'")}')">🔊 Слушать фразу</button>`;
+      const inputTag = `<input type="text" class="answer-input" placeholder="Запишите то, что услышали...">`;
+      return itemWrapper(idx, promptHtml, '', inputTag);
+    }).join('');
+    window.exerciseData.ex2 = ex2Data.map(d=>({word:d.word, answer:d.sentence}));
+    const foot = `
+      <button class="ok" onclick="checkExercise('ex2')" type="button">Проверить</button>
+      <button class="ghost" onclick="revealAnswers('ex2')" type="button">Показать ответы</button>
+      <span class="score mono"></span>`;
+    html += ticketShell('ex2', 'Задание 2 · Диктант', 'Прослушай и запиши фразу',
+      'Нажмите на 🔊, чтобы услышать предложение (можно несколько раз), и напечатайте его полностью.', body, foot);
+  }
+
+  /* Exercise 3 — Definitions */
+  {
+    const {body, foot} = renderChecked('ex3', ex3Data, item=>item.prompt, false);
+    html += ticketShell('ex3', 'Задание 3 · Дефиниции', 'Угадай слово по определению',
+      'Прочитайте определение и впишите нужное слово или фразу на английском.', body, foot);
+  }
+
+  /* Exercise 4 — Collocations */
+  {
+    const {body, foot} = renderChecked('ex4', ex4Data, item=>item.prompt, false);
+    html += ticketShell('ex4', 'Задание 4 · Сочетаемость', 'Заполни пропуск в устойчивой фразе',
+      'Вставьте недостающее слово (предлог или существительное), чтобы сочетание было верным.', body, foot);
+  }
+
+  /* Exercise 5 — Verb tenses */
+  {
+    const {body, foot} = renderChecked('ex5', ex5Data, item=>item.prompt, false);
+    html += ticketShell('ex5', 'Задание 5 · Времена глагола', 'Поставь глагол в нужную форму',
+      'Раскройте скобки и поставьте глагол в указанном времени (подсказка времени — в квадратных скобках).', body, foot);
+  }
+
+  /* Exercise 6 — Find two mistakes */
+  {
+    const body = ex6Data.map((item,idx)=>{
+      const promptHtml = `Найдите <b>две</b> ошибки и перепишите предложение верно:<br><span class="pattern mono">"${item.wrong}"</span>`;
+      const inputTag = `<textarea class="answer-input" placeholder="Впишите исправленное предложение..."></textarea>`;
+      return itemWrapper(idx, promptHtml, '', inputTag);
+    }).join('');
+    window.exerciseData.ex6 = ex6Data.map(d=>({word:d.word, answer:d.answer}));
+    const foot = `
+      <button class="ok" onclick="checkExercise('ex6')" type="button">Проверить</button>
+      <button class="ghost" onclick="revealAnswers('ex6')" type="button">Показать ответы</button>
+      <span class="score mono"></span>`;
+    html += ticketShell('ex6', 'Задание 6 · Найди 2 ошибки', 'Find two mistakes',
+      'В каждом предложении две ошибки (грамматика или выбор слова). Перепишите предложение полностью и правильно.', body, foot);
+  }
+
+  /* Exercise 7 — Complete with your own idea (open, copy button) */
+  {
+    const body = ex7Data.map((item,idx)=>{
+      const promptHtml = `${item.prompt} <span class="blank">...</span>`;
+      const inputTag = `<input type="text" class="answer-input" placeholder="Допишите своей идеей...">`;
+      const extra = `<div class="reveal mono" style="display:none" data-sample="${item.sample.replace(/"/g,'&quot;')}"></div>`;
+      return itemWrapper(idx, promptHtml, '', inputTag) ;
+    }).join('');
+    const foot = `
+      <button class="ghost" onclick="revealSamples('ex7')" type="button">Пример ответа</button>
+      <button class="stamp" onclick="copyAllFrom('ex7')" type="button">Скопировать все ответы</button>`;
+    html += ticketShell('ex7', 'Задание 7 · Свои идеи', 'Закончи предложение',
+      'Допишите каждое предложение своей идеей. Единого правильного ответа нет — в конце скопируйте все ответы одной кнопкой.', body, foot);
+    window.exerciseData.ex7 = ex7Data;
+  }
+
+  /* Exercise 8 — Drilling Repeat & Change (open, copy button) */
+  {
+    const body = ex8Data.map((item,idx)=>{
+      const promptHtml = `Модель: <span class="pattern mono">"${item.model}"</span><br>Замените: <b>${item.cue}</b> — составьте свой вариант по этой модели.`;
+      const inputTag = `<textarea class="answer-input" placeholder="Напишите своё предложение по модели..."></textarea>`;
+      return itemWrapper(idx, promptHtml, '', inputTag);
+    }).join('');
+    const foot = `
+      <button class="stamp" onclick="copyAllFrom('ex8')" type="button">Скопировать все ответы</button>`;
+    html += ticketShell('ex8', 'Задание 8 · Дриллинг', 'Repeat &amp; Change',
+      'По образцу составьте своё предложение, заменив указанные слова своей идеей. В конце скопируйте все ответы одной кнопкой.', body, foot);
+    window.exerciseData.ex8 = ex8Data;
+  }
+
+  root.innerHTML = html;
+}
+
+function revealSamples(exId){
+  const data = window.exerciseData[exId];
+  const items = document.querySelectorAll(`#${exId} .exercise-item`);
+  items.forEach((el, idx)=>{
+    const reveal = el.querySelector('.reveal');
+    reveal.textContent = `Пример: ${data[idx].sample}`;
+    reveal.style.display = 'block';
+  });
+}
+
+renderVocab();
+buildAll();
+</script>
+</body>
+</html>
