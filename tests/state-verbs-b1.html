@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>State Verbs · B1 Practice</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1b2620;
+    --paper:#f4f3ee;
+    --paper-line:#dedad0;
+    --state:#2f6f62;
+    --state-bg:#e4efe9;
+    --action:#c2732b;
+    --action-bg:#f7e9d8;
+    --card:#ffffff;
+    --border:#d8d3c6;
+    --ok:#2f6f4a;
+    --ok-bg:#e2f0e5;
+    --bad:#b5473a;
+    --bad-bg:#fbe6e2;
+    --shadow: 0 1px 0 rgba(27,38,32,0.06), 0 8px 24px -12px rgba(27,38,32,0.18);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      repeating-linear-gradient(to bottom, transparent 0 38px, var(--paper-line) 38px 39px),
+      var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    line-height:1.5;
+    padding-bottom:80px;
+  }
+  .wrap{max-width:880px;margin:0 auto;padding:32px 20px 20px;}
+
+  header.top{
+    padding:34px 26px 30px;
+    background:var(--ink);
+    color:var(--paper);
+    border-radius:18px;
+    position:relative;
+    overflow:hidden;
+    margin-bottom:28px;
+    box-shadow:var(--shadow);
+  }
+  header.top::before{
+    content:"";
+    position:absolute;inset:0;
+    background:
+      radial-gradient(circle at 85% -10%, rgba(47,111,98,0.55), transparent 55%),
+      radial-gradient(circle at -5% 120%, rgba(194,115,43,0.4), transparent 50%);
+    pointer-events:none;
+  }
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+    color:#c9d6cd;
+    display:flex;gap:10px;align-items:center;margin-bottom:14px;
+  }
+  .eyebrow .dot{width:7px;height:7px;border-radius:50%;background:var(--state);}
+  .eyebrow .dot.action{background:var(--action);}
+  h1{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:clamp(28px,4vw,40px);
+    margin:0 0 10px;
+    letter-spacing:-0.01em;
+    position:relative;
+  }
+  header.top p{max-width:620px;color:#d9dcd3;margin:0;position:relative;font-size:15px;}
+
+  .rule-box{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:20px 22px;
+    margin-bottom:28px;
+    box-shadow:var(--shadow);
+  }
+  .rule-box h2{
+    font-family:'Fraunces',serif;font-size:19px;margin:0 0 10px;font-weight:600;
+  }
+  .rule-box p{margin:0 0 12px;font-size:14.5px;color:#3a3f38;}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:14px;}
+  .chip{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11.5px;font-weight:600;letter-spacing:.03em;
+    padding:3px 10px;border-radius:20px;display:inline-flex;align-items:center;gap:6px;
+  }
+  .chip.state{background:var(--state-bg);color:var(--state);}
+  .chip.action{background:var(--action-bg);color:var(--action);}
+  .chip::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;}
+
+  table.verbtable{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:6px;}
+  table.verbtable th{
+    text-align:left;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.05em;
+    text-transform:uppercase;color:#7a7c72;padding:6px 8px;border-bottom:1px solid var(--border);
+  }
+  table.verbtable td{padding:7px 8px;border-bottom:1px solid #ece9e0;vertical-align:top;}
+  table.verbtable tr:last-child td{border-bottom:none;}
+
+  nav.tabs{
+    display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px;
+    position:sticky;top:10px;z-index:5;
+  }
+  .tab{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12.5px;font-weight:600;
+    background:var(--card);border:1px solid var(--border);
+    padding:9px 14px;border-radius:10px;cursor:pointer;color:#555a4f;
+    transition:all .15s ease;
+    box-shadow:var(--shadow);
+  }
+  .tab:hover{color:var(--ink);}
+  .tab.active{background:var(--ink);color:var(--paper);border-color:var(--ink);}
+
+  .toolbar{
+    display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;
+    margin-bottom:28px;
+  }
+  .btn{
+    font-family:'Inter',sans-serif;font-weight:600;font-size:13.5px;
+    padding:10px 16px;border-radius:10px;border:1px solid var(--ink);
+    background:var(--ink);color:var(--paper);cursor:pointer;
+    transition:transform .1s ease, opacity .15s ease;
+  }
+  .btn:hover{opacity:.88;}
+  .btn:active{transform:scale(.98);}
+  .btn.secondary{background:transparent;color:var(--ink);}
+  .btn.small{padding:7px 12px;font-size:12.5px;border-radius:8px;}
+  .btn.ghost{background:transparent;border-color:var(--border);color:#555a4f;}
+
+  section.exercise{display:none;}
+  section.exercise.active{display:block;animation:fade .25s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+
+  .ex-head{
+    display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:10px;
+    margin-bottom:16px;
+  }
+  .ex-head h2{font-family:'Fraunces',serif;font-size:22px;margin:0 0 4px;font-weight:600;}
+  .ex-head .instr{font-size:13.5px;color:#5c6058;max-width:520px;}
+  .ex-actions{display:flex;gap:8px;flex-wrap:wrap;}
+
+  .item{
+    background:var(--card);border:1px solid var(--border);border-radius:12px;
+    padding:16px 18px;margin-bottom:12px;box-shadow:var(--shadow);
+  }
+  .item-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;}
+  .item-num{
+    font-family:'IBM Plex Mono',monospace;font-size:12px;color:#9a9c8f;font-weight:600;
+    margin-right:8px;
+  }
+  .item-text{font-size:15px;}
+  .item-text b{color:var(--ink);}
+  .answer-row{display:flex;gap:10px;align-items:center;margin-top:12px;flex-wrap:wrap;}
+  input.ans{
+    flex:1;min-width:180px;
+    font-family:'Inter',sans-serif;font-size:14px;
+    padding:9px 12px;border-radius:8px;border:1.5px solid var(--border);
+    background:#fbfaf7;color:var(--ink);
+  }
+  input.ans:focus{outline:none;border-color:var(--ink);}
+  select.ans{
+    flex:1;min-width:180px;font-family:'Inter',sans-serif;font-size:14px;
+    padding:9px 12px;border-radius:8px;border:1.5px solid var(--border);background:#fbfaf7;color:var(--ink);
+  }
+  .feedback{
+    font-size:12.5px;font-weight:600;padding:3px 10px;border-radius:20px;white-space:nowrap;
+    font-family:'IBM Plex Mono',monospace;
+  }
+  .feedback.ok{background:var(--ok-bg);color:var(--ok);}
+  .feedback.bad{background:var(--bad-bg);color:var(--bad);}
+  .explain{
+    margin-top:10px;padding:10px 12px;border-radius:8px;background:#f6f5f0;
+    border-left:3px solid var(--border);font-size:13px;color:#3c4038;display:none;
+  }
+  .explain.show{display:block;}
+  .explain b{color:var(--ink);}
+  .tagline{margin-top:10px;}
+
+  .meaning-list{
+    background:var(--card);border:1px solid var(--border);border-radius:12px;
+    padding:16px 20px;margin-bottom:18px;box-shadow:var(--shadow);font-size:13.5px;
+  }
+  .meaning-list div{padding:3px 0;}
+  .meaning-list b{font-family:'IBM Plex Mono',monospace;color:var(--state);margin-right:6px;}
+
+  .note{
+    font-size:12.5px;color:#7a7c72;background:#f6f5f0;border:1px dashed var(--border);
+    border-radius:10px;padding:10px 14px;margin-bottom:16px;
+  }
+
+  .toast{
+    position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);
+    background:var(--ink);color:var(--paper);padding:11px 20px;border-radius:10px;
+    font-family:'Inter',sans-serif;font-size:13.5px;font-weight:600;
+    opacity:0;transition:all .25s ease;pointer-events:none;box-shadow:var(--shadow);
+    z-index:50;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  .score{
+    font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;color:#5c6058;
+  }
+
+  footer.credits{
+    text-align:center;color:#9a9c8f;font-size:12px;margin-top:36px;font-family:'IBM Plex Mono',monospace;
+  }
+
+  @media (max-width:600px){
+    .ex-head{flex-direction:column;align-items:flex-start;}
+    nav.tabs{position:static;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="eyebrow"><span class="dot"></span> STATE <span class="dot action"></span> ACTION — B1 GRAMMAR</div>
+    <h1>State Verbs: state or action?</h1>
+    <p>Одни и те же глаголы (think, taste, see, smell, have, look, fit, be, feel, appear, weigh…) могут описывать и состояние, и действие — а форма меняется. 5 упражнений, по 10 заданий в каждом.</p>
+  </header>
+
+  <div class="rule-box">
+    <h2>Правило вкратце</h2>
+    <p>Стативные (state) значения глагола описывают состояние, мнение, восприятие, характеристику — они <b>не употребляются в Continuous</b> и стоят в Present Simple. Те же глаголы могут иметь динамическое (action) значение — конкретное действие/процесс — тогда возможен <b>Present Continuous</b>.</p>
+    <div class="legend">
+      <span class="chip state">state — состояние</span>
+      <span class="chip action">action — действие</span>
+    </div>
+    <table class="verbtable">
+      <tr><th>Глагол</th><th>State (Simple)</th><th>Action (Continuous)</th></tr>
+      <tr><td><b>think</b></td><td>иметь мнение — <i>I think it's true.</i></td><td>обдумывать — <i>I'm thinking about it.</i></td></tr>
+      <tr><td><b>taste</b></td><td>иметь вкус — <i>It tastes salty.</i></td><td>пробовать — <i>She's tasting the soup.</i></td></tr>
+      <tr><td><b>see</b></td><td>понимать / зрение — <i>I see your point.</i></td><td>встречаться — <i>I'm seeing my doctor.</i></td></tr>
+      <tr><td><b>smell</b></td><td>иметь запах — <i>It smells nice.</i></td><td>нюхать — <i>He's smelling the flowers.</i></td></tr>
+      <tr><td><b>have</b></td><td>обладать — <i>He has a car.</i></td><td>действие — <i>He's having lunch.</i></td></tr>
+      <tr><td><b>look</b></td><td>выглядеть — <i>You look tired.</i></td><td>смотреть — <i>She's looking at it.</i></td></tr>
+      <tr><td><b>fit</b></td><td>подходить по размеру — <i>It fits me.</i></td><td>устанавливать — <i>They're fitting windows.</i></td></tr>
+      <tr><td><b>be</b></td><td>постоянная черта — <i>He is polite.</i></td><td>временное поведение — <i>He's being rude.</i></td></tr>
+      <tr><td><b>feel</b></td><td>текстура на ощупь — <i>It feels soft.</i></td><td>трогать/ощупывать — <i>She's feeling the fabric.</i></td></tr>
+      <tr><td><b>appear</b></td><td>казаться — <i>He appears calm.</i></td><td>выступать — <i>She's appearing in a film.</i></td></tr>
+      <tr><td><b>weigh</b></td><td>иметь вес — <i>It weighs 2kg.</i></td><td>взвешивать — <i>He's weighing it.</i></td></tr>
+    </table>
+  </div>
+
+  <nav class="tabs" id="tabs"></nav>
+
+  <div class="toolbar">
+    <div class="score" id="globalScore"></div>
+    <button class="btn" id="copyAllBtn">📋 Скопировать все ответы</button>
+  </div>
+
+  <div id="exercises"></div>
+
+  <footer class="credits">STATE VERBS · B1 PRACTICE · 5 EXERCISES · 50 ITEMS</footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============ DATA ============ */
+const exercises = [
+  {
+    id:"ex1",
+    title:"1. Fill in the gaps — think / taste / see / smell / have",
+    type:"gap",
+    instr:"Раскройте скобки, поставив глагол в Present Simple или Present Continuous.",
+    items:[
+      {text:"I <b>___</b> (think) you're wrong about this.", answers:["think"], tag:"state", explain:"<b>think</b> = иметь мнение (state) → Present Simple."},
+      {text:"Be quiet, please — I <b>___</b> (think) about what to say next.", answers:["am thinking","'m thinking","m thinking"], tag:"action", explain:"<b>think</b> = обдумывать, процесс (action) → Present Continuous."},
+      {text:"This cake <b>___</b> (taste) amazing.", answers:["tastes"], tag:"state", explain:"<b>taste</b> = иметь вкус (state) → Present Simple."},
+      {text:"Look, the chef <b>___</b> (taste) the sauce right now.", answers:["is tasting"], tag:"action", explain:"<b>taste</b> = пробовать на вкус, действие → Present Continuous."},
+      {text:"I <b>___</b> (see) exactly what you mean.", answers:["see"], tag:"state", explain:"<b>see</b> = понимать (state) → Present Simple."},
+      {text:"I <b>___</b> (see) my dentist at 5 o'clock tomorrow.", answers:["am seeing","'m seeing","m seeing"], tag:"action", explain:"<b>see</b> = встречаться по договорённости (action, часто про будущее) → Present Continuous."},
+      {text:"This perfume <b>___</b> (smell) of roses.", answers:["smells"], tag:"state", explain:"<b>smell</b> = иметь запах (state) → Present Simple."},
+      {text:"Why <b>___</b> you <b>___</b> (smell) the milk? Is it off?", answers:["are you smelling","are ... smelling","are smelling"], tag:"action", explain:"<b>smell</b> = нюхать, действие → Present Continuous (are + smelling)."},
+      {text:"He <b>___</b> (have) a big house in the countryside.", answers:["has"], tag:"state", explain:"<b>have</b> = обладать (state) → Present Simple."},
+      {text:"We can't talk now — we <b>___</b> (have) dinner.", answers:["are having"], tag:"action", explain:"<b>have</b> = принимать пищу, действие → Present Continuous."}
+    ]
+  },
+  {
+    id:"ex2",
+    title:"2. Fill in the gaps — look / fit / be / feel / appear / weigh",
+    type:"gap",
+    instr:"Раскройте скобки, поставив глагол в Present Simple или Present Continuous.",
+    items:[
+      {text:"You <b>___</b> (look) great in that dress!", answers:["look"], tag:"state", explain:"<b>look</b> = выглядеть (state) → Present Simple."},
+      {text:"She <b>___</b> (look) at the photos from her holiday right now.", answers:["is looking"], tag:"action", explain:"<b>look at</b> = смотреть на что-то, действие → Present Continuous."},
+      {text:"These jeans <b>___</b> (fit) me perfectly.", answers:["fit"], tag:"state", explain:"<b>fit</b> = подходить по размеру (state) → Present Simple."},
+      {text:"The workers <b>___</b> (fit) new windows in our house this week.", answers:["are fitting"], tag:"action", explain:"<b>fit</b> = устанавливать, действие → Present Continuous."},
+      {text:"He <b>___</b> (be) usually very calm, but today he <b>___</b> (be) very anxious.", answers:["is / is being","is is being","is, is being"], tag:"action", explain:"Первое <b>is</b> — постоянная черта характера (state); второе <b>is being</b> — временное поведение сегодня (action)."},
+      {text:"My cat's fur <b>___</b> (feel) so soft.", answers:["feels"], tag:"state", explain:"<b>feel</b> = текстура на ощупь (state) → Present Simple."},
+      {text:"The vet <b>___</b> (feel) the dog's leg to check if it's broken.", answers:["is feeling"], tag:"action", explain:"<b>feel</b> = трогать, ощупывать, действие → Present Continuous."},
+      {text:"He <b>___</b> (appear) confident, though he's actually nervous.", answers:["appears"], tag:"state", explain:"<b>appear</b> = казаться (state) → Present Simple."},
+      {text:"She <b>___</b> (appear) in a new TV series this year.", answers:["is appearing"], tag:"action", explain:"<b>appear</b> = выступать/сниматься, действие → Present Continuous."},
+      {text:"This suitcase <b>___</b> (weigh) almost 20 kilos!", answers:["weighs"], tag:"state", explain:"<b>weigh</b> = иметь вес (state) → Present Simple."}
+    ]
+  },
+  {
+    id:"ex3",
+    title:"3. Rephrase",
+    type:"gap",
+    instr:"Перепишите предложение, используя слово в скобках, сохраняя смысл.",
+    items:[
+      {text:"In my opinion, we should wait. <i>(think)</i>", answers:["i think we should wait"], tag:"state", explain:"<b>think</b> в значении «считать» — state, Present Simple."},
+      {text:"He's meeting a client at 3 pm. <i>(seeing)</i>", answers:["he's seeing a client at 3 pm","he is seeing a client at 3 pm"], tag:"action", explain:"<b>seeing</b> = «встречаться по договорённости» — динамическое значение see."},
+      {text:"I believe she's right. <i>(think)</i>", answers:["i think she's right","i think she is right"], tag:"state", explain:"<b>think</b> = «полагать» — state, без Continuous."},
+      {text:"The bread has a wonderful smell. <i>(smells)</i>", answers:["the bread smells wonderful"], tag:"state", explain:"<b>smells</b> = «имеет запах» — state, Present Simple."},
+      {text:"She's checking the wine's flavour right now. <i>(tasting)</i>", answers:["she's tasting the wine","she is tasting the wine"], tag:"action", explain:"<b>tasting</b> = «пробует на вкус» — действие, Continuous."},
+      {text:"He possesses a huge collection of books. <i>(has)</i>", answers:["he has a huge collection of books"], tag:"state", explain:"<b>has</b> = «обладает» — state, Present Simple."},
+      {text:"The nurse is touching the patient's forehead to check his temperature. <i>(feeling)</i>", answers:["the nurse is feeling the patient's forehead","the nurse is feeling the patients forehead"], tag:"action", explain:"<b>feeling</b> = «ощупывает» — действие, Continuous."},
+      {text:"This shirt is the right size for me. <i>(fits)</i>", answers:["this shirt fits me"], tag:"state", explain:"<b>fits</b> = «подходит по размеру» — state, Present Simple."},
+      {text:"He usually behaves politely, but today he's behaving rudely. <i>(being)</i>", answers:["he's usually polite, but he's being rude today","he is usually polite, but he is being rude today","he's usually polite but he's being rude today"], tag:"action", explain:"<b>being rude</b> = временное поведение сегодня — Continuous, в отличие от постоянной черты (is polite)."},
+      {text:"The box has a weight of 5 kilos. <i>(weighs)</i>", answers:["the box weighs 5 kilos","the box weighs five kilos"], tag:"state", explain:"<b>weighs</b> = «весит» — state, Present Simple."}
+    ]
+  },
+  {
+    id:"ex4",
+    title:"4. Answer the questions",
+    type:"open",
+    instr:"Это открытые вопросы — свободного ответа. Впишите свой вариант, затем сравните его с примером ответа.",
+    items:[
+      {text:"What do you think about learning English online?", model:"I think it's very effective because you can study at any time.", tag:"state", explain:"<b>think</b> = мнение (state) → Present Simple."},
+      {text:"What are you thinking about right now?", model:"I'm thinking about my plans for the weekend.", tag:"action", explain:"<b>thinking about</b> = процесс обдумывания (action) → Present Continuous."},
+      {text:"What does your favourite dish taste like?", model:"It tastes spicy and a little sweet.", tag:"state", explain:"<b>tastes</b> = вкус (state) → Present Simple."},
+      {text:"Who usually tastes the food before it's served in your family?", model:"My mum usually tastes the food before serving it.", tag:"action", explain:"<b>tastes</b> здесь как обычное действие/привычка — тоже Simple, но глагол используется в значении действия «пробует»."},
+      {text:"Do you see what this grammar rule means?", model:"Yes, I see what it means now.", tag:"state", explain:"<b>see</b> = понимать (state) → Present Simple."},
+      {text:"Are you seeing any friends this weekend?", model:"Yes, I'm seeing my best friend on Saturday.", tag:"action", explain:"<b>seeing</b> = встречаться по договорённости (action) → Present Continuous."},
+      {text:"How much do you weigh (approximately)?", model:"I weigh about 65 kilos.", tag:"state", explain:"<b>weigh</b> = иметь вес (state) → Present Simple."},
+      {text:"What is your best friend like as a person?", model:"She's usually very kind and patient.", tag:"state", explain:"<b>is</b> описывает постоянную черту характера (state) → Present Simple."},
+      {text:"Have you ever been rude by accident? How were you being that day?", model:"I was being very impatient that day because I was tired.", tag:"action", explain:"<b>being impatient</b> = временное поведение в конкретный момент (action)."},
+      {text:"Do your favourite shoes fit you well?", model:"Yes, they fit me perfectly.", tag:"state", explain:"<b>fit</b> = подходить по размеру (state) → Present Simple."}
+    ]
+  },
+  {
+    id:"ex5",
+    title:"5. Match the meaning",
+    type:"match",
+    instr:"Выберите букву, которая правильно описывает значение выделенного глагола в предложении.",
+    options:[
+      ["A","have an opinion — иметь мнение"],
+      ["B","spend time thinking about sth — обдумывать"],
+      ["C","have a flavour — иметь вкус"],
+      ["D","test the flavour — пробовать на вкус"],
+      ["E","understand — понимать"],
+      ["F","meet by arrangement — встречаться"],
+      ["G","possess — обладать"],
+      ["H","do an activity — делать что-то"],
+      ["I","seem / have an appearance — выглядеть, казаться"],
+      ["J","direct your eyes at sth — смотреть на что-то"]
+    ],
+    items:[
+      {text:"I <b>think</b> he's lying.", answer:"A", explain:"A — «think» здесь выражает мнение/суждение (state)."},
+      {text:"I'm <b>thinking</b> about the problem.", answer:"B", explain:"B — «thinking about» — процесс обдумывания (action)."},
+      {text:"This soup <b>tastes</b> delicious.", answer:"C", explain:"C — «tastes» описывает вкус блюда (state)."},
+      {text:"The chef is <b>tasting</b> the soup.", answer:"D", explain:"D — «tasting» = пробует на вкус, действие."},
+      {text:"I <b>see</b> what you mean.", answer:"E", explain:"E — «see» = понимаю (state)."},
+      {text:"I'm <b>seeing</b> my doctor tomorrow.", answer:"F", explain:"F — «seeing» = встречаюсь по записи/договорённости (action)."},
+      {text:"Bob <b>has</b> a Porsche.", answer:"G", explain:"G — «has» = владеет (state)."},
+      {text:"He's <b>having</b> a shower.", answer:"H", explain:"H — «having» = совершает действие (action)."},
+      {text:"You <b>look</b> tired today.", answer:"I", explain:"I — «look» = выглядишь (state)."},
+      {text:"Sarah is <b>looking</b> at the picture.", answer:"J", explain:"J — «looking at» = направляет взгляд на что-то (action)."}
+    ]
+  }
+];
+
+/* ============ RENDER ============ */
+const tabsEl = document.getElementById("tabs");
+const exercisesEl = document.getElementById("exercises");
+
+exercises.forEach((ex, exIdx) => {
+  // tab
+  const tabBtn = document.createElement("button");
+  tabBtn.className = "tab" + (exIdx===0 ? " active" : "");
+  tabBtn.textContent = "Упр. " + (exIdx+1);
+  tabBtn.onclick = () => showExercise(exIdx);
+  tabsEl.appendChild(tabBtn);
+
+  // section
+  const section = document.createElement("section");
+  section.className = "exercise" + (exIdx===0 ? " active" : "");
+  section.id = ex.id;
+
+  let itemsHtml = "";
+
+  if(ex.type === "match"){
+    let optionsHtml = "<select class='ans'><option value=''>—</option>";
+    ex.options.forEach(([letter,label]) => {
+      optionsHtml += `<option value="${letter}">${letter}. ${label}</option>`;
+    });
+    optionsHtml += "</select>";
+
+    let meaningListHtml = "<div class='meaning-list'>";
+    ex.options.forEach(([letter,label]) => {
+      meaningListHtml += `<div><b>${letter}.</b> ${label}</div>`;
+    });
+    meaningListHtml += "</div>";
+
+    itemsHtml += meaningListHtml;
+
+    ex.items.forEach((item, i) => {
+      itemsHtml += `
+      <div class="item" data-ex="${exIdx}" data-i="${i}">
+        <div class="item-top">
+          <div class="item-text"><span class="item-num">${i+1}.</span>${item.text}</div>
+        </div>
+        <div class="answer-row">
+          ${optionsHtml}
+          <span class="feedback" style="display:none;"></span>
+        </div>
+        <div class="explain"><b>Ответ: ${item.answer}.</b> ${item.explain}</div>
+      </div>`;
+    });
+  } else if(ex.type === "open"){
+    ex.items.forEach((item, i) => {
+      itemsHtml += `
+      <div class="item" data-ex="${exIdx}" data-i="${i}">
+        <div class="item-top">
+          <div class="item-text"><span class="item-num">${i+1}.</span>${item.text}</div>
+          <span class="chip ${item.tag}">${item.tag}</span>
+        </div>
+        <div class="answer-row">
+          <input class="ans" type="text" placeholder="Ваш ответ...">
+        </div>
+        <div class="explain"><b>Пример ответа:</b> ${item.model}<br><span style="color:#7a7c72;">${item.explain}</span></div>
+      </div>`;
+    });
+  } else {
+    ex.items.forEach((item, i) => {
+      itemsHtml += `
+      <div class="item" data-ex="${exIdx}" data-i="${i}">
+        <div class="item-top">
+          <div class="item-text"><span class="item-num">${i+1}.</span>${item.text}</div>
+          <span class="chip ${item.tag}">${item.tag}</span>
+        </div>
+        <div class="answer-row">
+          <input class="ans" type="text" placeholder="Впишите форму глагола...">
+          <span class="feedback" style="display:none;"></span>
+        </div>
+        <div class="explain"><b>Ответ: ${item.answers[0]}.</b> ${item.explain}</div>
+      </div>`;
+    });
+  }
+
+  section.innerHTML = `
+    <div class="ex-head">
+      <div>
+        <h2>${ex.title}</h2>
+        <div class="instr">${ex.instr}</div>
+      </div>
+      <div class="ex-actions">
+        ${ex.type !== "open" ? `<button class="btn small" data-action="check" data-ex="${exIdx}">Проверить</button>` : ""}
+        <button class="btn small secondary" data-action="reveal" data-ex="${exIdx}">Показать ответы</button>
+        <button class="btn small ghost" data-action="reset" data-ex="${exIdx}">Сбросить</button>
+      </div>
+    </div>
+    ${itemsHtml}
+  `;
+  exercisesEl.appendChild(section);
+});
+
+/* ============ TABS ============ */
+function showExercise(idx){
+  document.querySelectorAll("section.exercise").forEach((s,i) => s.classList.toggle("active", i===idx));
+  document.querySelectorAll(".tab").forEach((t,i) => t.classList.toggle("active", i===idx));
+}
+
+/* ============ CHECK / REVEAL / RESET ============ */
+function normalize(str){
+  return str.toLowerCase()
+    .replace(/’/g,"'")
+    .replace(/[.,!?]/g,"")
+    .replace(/\s+/g," ")
+    .trim();
+}
+
+exercisesEl.addEventListener("click", (e) => {
+  const btn = e.target.closest("button[data-action]");
+  if(!btn) return;
+  const action = btn.dataset.action;
+  const exIdx = parseInt(btn.dataset.ex);
+  const ex = exercises[exIdx];
+  const section = document.getElementById(ex.id);
+
+  if(action === "check"){
+    let correctCount = 0;
+    section.querySelectorAll(".item").forEach((itemEl) => {
+      const i = parseInt(itemEl.dataset.i);
+      const item = ex.items[i];
+      const fb = itemEl.querySelector(".feedback");
+      let isCorrect = false;
+
+      if(ex.type === "match"){
+        const select = itemEl.querySelector("select.ans");
+        isCorrect = select.value === item.answer;
+      } else {
+        const input = itemEl.querySelector("input.ans");
+        const val = normalize(input.value);
+        isCorrect = item.answers.some(a => normalize(a) === val);
+      }
+
+      fb.style.display = "inline-block";
+      if(isCorrect){
+        fb.textContent = "✓ верно";
+        fb.className = "feedback ok";
+        correctCount++;
+      } else {
+        fb.textContent = "✗ неверно";
+        fb.className = "feedback bad";
+      }
+    });
+    showToast(`Упр. ${exIdx+1}: ${correctCount} из ${ex.items.length} верно`);
+  }
+
+  if(action === "reveal"){
+    section.querySelectorAll(".explain").forEach(el => el.classList.add("show"));
+    if(ex.type === "match"){
+      section.querySelectorAll(".item").forEach((itemEl) => {
+        const i = parseInt(itemEl.dataset.i);
+        const select = itemEl.querySelector("select.ans");
+        select.value = ex.items[i].answer;
+      });
+    } else if(ex.type === "gap"){
+      section.querySelectorAll(".item").forEach((itemEl) => {
+        const i = parseInt(itemEl.dataset.i);
+        const input = itemEl.querySelector("input.ans");
+        if(!input.value) input.value = ex.items[i].answers[0];
+      });
+    }
+  }
+
+  if(action === "reset"){
+    section.querySelectorAll("input.ans").forEach(el => el.value = "");
+    section.querySelectorAll("select.ans").forEach(el => el.value = "");
+    section.querySelectorAll(".feedback").forEach(el => { el.style.display="none"; el.textContent=""; });
+    section.querySelectorAll(".explain").forEach(el => el.classList.remove("show"));
+  }
+});
+
+/* ============ COPY ALL ANSWERS ============ */
+document.getElementById("copyAllBtn").addEventListener("click", () => {
+  let text = "STATE VERBS — B1 PRACTICE — ОТВЕТЫ\n";
+  exercises.forEach((ex, exIdx) => {
+    text += `\n== Упражнение ${exIdx+1}: ${ex.title.replace(/^\d+\.\s*/,"")} ==\n`;
+    ex.items.forEach((item, i) => {
+      const num = i+1;
+      if(ex.type === "match"){
+        text += `${num}. ${item.answer}\n`;
+      } else if(ex.type === "open"){
+        text += `${num}. ${item.model}\n`;
+      } else {
+        text += `${num}. ${item.answers[0]}\n`;
+      }
+    });
+  });
+
+  const finish = () => showToast("Все ответы скопированы в буфер обмена ✓");
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(finish).catch(() => fallbackCopy(text, finish));
+  } else {
+    fallbackCopy(text, finish);
+  }
+});
+
+function fallbackCopy(text, cb){
+  const ta = document.createElement("textarea");
+  ta.value = text;
+  ta.style.position = "fixed";
+  ta.style.opacity = "0";
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand("copy"); } catch(e){}
+  document.body.removeChild(ta);
+  cb();
+}
+
+function showToast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(() => t.classList.remove("show"), 2600);
+}
+
+/* global counter */
+function updateGlobalScore(){
+  const total = exercises.reduce((sum,ex)=>sum+ex.items.length,0);
+  document.getElementById("globalScore").textContent = `Всего заданий: ${total} · 5 упражнений`;
+}
+updateGlobalScore();
+</script>
+</body>
+</html>
