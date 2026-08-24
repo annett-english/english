@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nature Vocabulary — Interactive Exercises (A1-A2)</title>
+<style>
+  :root{
+    --main:#2f6f4f;
+    --main-dark:#204d37;
+    --accent:#e8a33d;
+    --bg:#f6f8f4;
+    --card:#ffffff;
+    --correct:#2e7d32;
+    --wrong:#c62828;
+    --border:#dbe4dc;
+    --text:#26332b;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Segoe UI',Tahoma,Arial,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    line-height:1.5;
+  }
+  header{
+    background:linear-gradient(120deg,var(--main),var(--main-dark));
+    color:#fff;
+    padding:28px 20px;
+    text-align:center;
+  }
+  header h1{margin:0 0 6px;font-size:1.6em;}
+  header p{margin:4px 0;opacity:.9;font-size:.95em;}
+  .layout{
+    max-width:1200px;
+    margin:0 auto;
+    padding:20px;
+    display:flex;
+    gap:20px;
+    align-items:flex-start;
+  }
+  main{flex:1;min-width:0;}
+  aside{
+    width:260px;
+    position:sticky;
+    top:20px;
+    flex-shrink:0;
+  }
+  @media(max-width:900px){
+    .layout{flex-direction:column;}
+    aside{width:100%;position:static;}
+  }
+  .card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:18px 20px;
+    margin-bottom:22px;
+    box-shadow:0 2px 6px rgba(0,0,0,.04);
+  }
+  .card h2{
+    margin-top:0;
+    color:var(--main-dark);
+    font-size:1.2em;
+    border-bottom:2px solid var(--border);
+    padding-bottom:8px;
+  }
+  .audio-test{
+    display:flex;
+    gap:10px;
+    align-items:center;
+    flex-wrap:wrap;
+  }
+  #audioStatus{font-size:.9em;color:#555;}
+  button{
+    cursor:pointer;
+    border:none;
+    border-radius:8px;
+    padding:8px 14px;
+    font-size:.9em;
+    font-weight:600;
+    transition:.15s;
+  }
+  .btn-main{background:var(--main);color:#fff;}
+  .btn-main:hover{background:var(--main-dark);}
+  .btn-secondary{background:#eef2ee;color:var(--main-dark);border:1px solid var(--border);}
+  .btn-secondary:hover{background:#e2ebe2;}
+  .btn-audio{background:var(--accent);color:#402d05;padding:6px 10px;font-size:.85em;}
+  .btn-audio:hover{filter:brightness(0.95);}
+  table.vocab{width:100%;border-collapse:collapse;font-size:.92em;}
+  table.vocab th, table.vocab td{padding:7px 8px;border-bottom:1px solid var(--border);text-align:left;}
+  table.vocab th{color:var(--main-dark);}
+  table.vocab td.ipa{color:#666;font-style:italic;font-size:.9em;}
+  .problem-table{width:100%;border-collapse:collapse;font-size:.88em;}
+  .problem-table th,.problem-table td{padding:6px 6px;border-bottom:1px solid var(--border);}
+  .problem-table th{color:var(--main-dark);text-align:left;}
+  .empty-note{color:#888;font-size:.85em;font-style:italic;}
+  .q{
+    padding:12px 0;
+    border-bottom:1px dashed var(--border);
+  }
+  .q:last-child{border-bottom:none;}
+  .q-num{font-weight:700;color:var(--main-dark);margin-right:6px;}
+  .prompt{margin-bottom:8px;}
+  .prompt .ru{color:#555;}
+  .row-input{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+  input[type="text"], textarea{
+    padding:8px 10px;
+    border:1px solid var(--border);
+    border-radius:8px;
+    font-size:.95em;
+    flex:1;
+    min-width:180px;
+    font-family:inherit;
+  }
+  textarea{width:100%;min-height:50px;resize:vertical;}
+  .feedback{font-weight:600;font-size:.9em;min-width:110px;}
+  .feedback.correct{color:var(--correct);}
+  .feedback.wrong{color:var(--wrong);}
+  .feedback.shown{color:#8a6d00;}
+  .emoji-clue{font-size:1.8em;margin-right:8px;}
+  .section-actions{margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+  .score{font-weight:700;color:var(--main-dark);}
+  .transcription-hint{color:#888;font-size:.85em;}
+  .finish-item{margin-bottom:14px;}
+  .finish-item .starter{font-weight:600;margin-bottom:6px;}
+  footer{text-align:center;padding:20px;color:#777;font-size:.85em;}
+  .tag{display:inline-block;background:var(--accent);color:#402d05;padding:2px 8px;border-radius:6px;font-size:.75em;font-weight:700;margin-left:6px;}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🌍 Nature Vocabulary — Interactive Exercises</h1>
+  <p>Уровень A1–A2 · 15 слов · 9 заданий · прописывание руками</p>
+</header>
+
+<div class="layout">
+  <main>
+
+    <!-- AUDIO TEST -->
+    <div class="card">
+      <h2>🔊 Проверка звука</h2>
+      <div class="audio-test">
+        <button class="btn-main" onclick="testAudio()">Проверить звук</button>
+        <span id="audioStatus">Нажмите, чтобы проверить, что аудио (Google US English / en-US) работает.</span>
+      </div>
+    </div>
+
+    <!-- VOCAB REMINDER -->
+    <div class="card">
+      <h2>📖 Повторим слова</h2>
+      <p>Прослушайте каждое слово (кнопка 🔊), обратите внимание на транскрипцию и перевод.</p>
+      <table class="vocab">
+        <thead><tr><th></th><th>Word</th><th>Transcription</th><th>Перевод</th></tr></thead>
+        <tbody id="vocabTable"></tbody>
+      </table>
+    </div>
+
+    <!-- EX 1: MISSING LETTERS -->
+    <div class="card">
+      <h2>1️⃣ Fill in the missing letters <span class="tag">10 слов</span></h2>
+      <p>Впишите слово целиком, восстановив пропущенные буквы.</p>
+      <div id="ex1"></div>
+      <div class="section-actions">
+        <button class="btn-main" onclick="checkExercise('ex1')">Проверить</button>
+        <button class="btn-secondary" onclick="showAnswers('ex1')">Показать ответы</button>
+        <span class="score" id="score-ex1"></span>
+      </div>
+    </div>
+
+    <!-- EX 2: TRANSLATION RU->EN -->
+    <div class="card">
+      <h2>2️⃣ Translate into English <span class="tag">10 слов</span></h2>
+      <p>Переведите слово с русского на английский (не забудьте про артикль).</p>
+      <div id="ex2"></div>
+      <div class="section-actions">
+        <button class="btn-main" onclick="checkExercise('ex2')">Проверить</button>
+        <button class="btn-secondary" onclick="showAnswers('ex2')">Показать ответы</button>
+        <span class="score" id="score-ex2"></span>
+      </div>
+    </div>
+
+    <!-- EX 3: LISTEN AND WRITE -->
+    <div class="card">
+      <h2>3️⃣ Listen and write (dictation) <span class="tag">10 слов</span></h2>
+      <p>Нажмите 🔊, прослушайте слово и запишите его.</p>
+      <div id="ex3"></div>
+      <div class="section-actions">
+        <button class="btn-main" onclick="checkExercise('ex3')">Проверить</button>
+        <button class="btn-secondary" onclick="showAnswers('ex3')">Показать ответы</button>
+        <span class="score" id="score-ex3"></span>
+      </div>
+    </div>
+
+    <!-- EX 4: DEFINITION -->
+    <div class="card">
+      <h2>4️⃣ Guess the word by its definition <span class="tag">10 слов</span></h2>
+      <p>Прочитайте определение и напишите слово.</p>
+      <div id="ex4"></div>
+      <div class="section-actions">
+        <button class="btn-main" onclick="checkExercise('ex4')">Проверить</button>
+        <button class="btn-secondary" onclick="showAnswers('ex4')">Показать ответы</button>
+        <span class="score" id="score-ex4"></span>
+      </div>
+    </div>
+
+    <!-- EX 5: PICTURE -->
+    <div class="card">
+      <h2>5️⃣ Guess the word by the picture <span class="tag">10 слов</span></h2>
+      <p>Посмотрите на картинку-эмодзи и напишите слово.</p>
+      <div id="ex5"></div>
+      <div class="section-actions">
+        <button class="btn-main" onclick="checkExercise('ex5')">Проверить</button>
+        <button class="btn-secondary" onclick="showAnswers('ex5')">Показать ответы</button>
+        <span class="score" id="score-ex5"></span>
+      </div>
+    </div>
+
+    <!-- EX 6: GUESS THE WORD (RIDDLE) -->
+    <div class="card">
+      <h2>6️⃣ Guess the word (riddle) <span class="tag">10 слов</span></h2>
+      <p>Прочитайте загадку и напишите слово.</p>
+      <div id="ex6"></div>
+      <div class="section-actions">
+        <button class="btn-main" onclick="checkExercise('ex6')">Проверить</button>
+        <button class="btn-secondary" onclick="showAnswers('ex6')">Показать ответы</button>
+        <span class="score" id="score-ex6"></span>
+      </div>
+    </div>
+
+    <!-- EX 8: EXPAND THE SENTENCE -->
+    <div class="card">
+      <h2>7️⃣ Expand the sentence <span class="tag">10 слов</span></h2>
+      <p>Впишите пропущенное слово (с артиклем), чтобы завершить предложение.</p>
+      <div id="ex8"></div>
+      <div class="section-actions">
+        <button class="btn-main" onclick="checkExercise('ex8')">Проверить</button>
+        <button class="btn-secondary" onclick="showAnswers('ex8')">Показать ответы</button>
+        <span class="score" id="score-ex8"></span>
+      </div>
+    </div>
+
+    <!-- EX 9: FINISH THE SENTENCE (OPEN) -->
+    <div class="card">
+      <h2>8️⃣ Finish the sentence with your own ideas <span class="tag">10 предложений</span></h2>
+      <p>Здесь нет "правильного" ответа — пишите свои идеи. Ответы можно скопировать одной кнопкой.</p>
+      <div id="ex9"></div>
+      <div class="section-actions">
+        <button class="btn-main" onclick="copySection9()">📋 Скопировать мои ответы (задание 9)</button>
+        <span id="copyStatus9" class="empty-note"></span>
+      </div>
+    </div>
+
+    <!-- GLOBAL COPY -->
+    <div class="card">
+      <h2>📋 Скопировать все ответы студента</h2>
+      <p>Собирает все введённые ответы из всех заданий (1–9) в одном тексте — удобно для отправки преподавателю.</p>
+      <button class="btn-main" onclick="copyAllAnswers()">Скопировать все ответы</button>
+      <span id="copyStatusAll" class="empty-note"></span>
+    </div>
+
+  </main>
+
+  <aside>
+    <div class="card">
+      <h2>⚠️ Проблемные слова</h2>
+      <table class="problem-table" id="problemTable">
+        <thead><tr><th>Слово</th><th>Ошибок</th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <p class="empty-note" id="problemEmptyNote">Пока ошибок нет 🎉</p>
+    </div>
+  </aside>
+</div>
+
+<footer>Nature Vocabulary Worksheet · A1–A2 · Generated for handwriting/typing practice</footer>
+
+<script>
+/* ================= DATA ================= */
+const words = [
+  {en:"mountains",   ru:"горы",     ipa:"/ˈmaʊntɪnz/"},
+  {en:"the sky",     ru:"небо",     ipa:"/ðə skaɪ/"},
+  {en:"a field",     ru:"поле",     ipa:"/ə fiːld/"},
+  {en:"a volcano",   ru:"вулкан",   ipa:"/ə vɒlˈkeɪnoʊ/"},
+  {en:"grass",       ru:"трава",    ipa:"/ɡræs/"},
+  {en:"a hill",      ru:"холм",     ipa:"/ə hɪl/"},
+  {en:"a river",     ru:"река",     ipa:"/ə ˈrɪvər/"},
+  {en:"a lake",      ru:"озеро",    ipa:"/ə leɪk/"},
+  {en:"a sea",       ru:"море",     ipa:"/ə siː/"},
+  {en:"a forest",    ru:"лес",      ipa:"/ə ˈfɒrɪst/"},
+  {en:"a waterfall", ru:"водопад",  ipa:"/ə ˈwɔːtərfɔːl/"},
+  {en:"an ocean",    ru:"океан",    ipa:"/ən ˈoʊʃən/"},
+  {en:"a cave",      ru:"пещера",   ipa:"/ə keɪv/"},
+  {en:"a tree",      ru:"дерево",   ipa:"/ə triː/"},
+  {en:"a desert",    ru:"пустыня",  ipa:"/ə ˈdezərt/"}
+];
+
+const emojis = {
+  "mountains":"🏔️🏔️",
+  "the sky":"🌤️☁️",
+  "a field":"🌾🚜",
+  "a volcano":"🌋",
+  "grass":"🍀🌱",
+  "a hill":"⛰️",
+  "a river":"🏞️〰️",
+  "a lake":"🏕️🌊",
+  "a sea":"🏖️🌊",
+  "a forest":"🌲🌲🌲",
+  "a waterfall":"🌊⬇️",
+  "an ocean":"🐋🌊",
+  "a cave":"🕳️⛰️",
+  "a tree":"🌳",
+  "a desert":"🏜️"
+};
+
+const definitions = {
+  "mountains":"Very high, rocky land, higher than a hill.",
+  "the sky":"The space above the earth where you see clouds, the sun and stars.",
+  "a field":"An open area of land, often used for crops or animals.",
+  "a volcano":"A mountain that can explode with fire and hot rock (lava).",
+  "grass":"Short, green plants that cover the ground.",
+  "a hill":"A small mountain, not very high.",
+  "a river":"A long line of water that flows to the sea.",
+  "a lake":"A big area of water with land all around it.",
+  "a sea":"A large area of salt water, smaller than an ocean.",
+  "a forest":"A big area of land covered with many trees.",
+  "a waterfall":"A place where a river falls from a high point down.",
+  "an ocean":"The biggest area of salt water on Earth.",
+  "a cave":"A big hole in the ground or inside a mountain.",
+  "a tree":"A tall plant with a trunk, branches and leaves.",
+  "a desert":"A very dry, hot area of land with a lot of sand."
+};
+
+const riddles = {
+  "mountains":"I am very tall, made of rock, and often have snow on top. I usually come in groups. What am I?",
+  "the sky":"You see me every day. I'm blue when it's sunny and grey when it rains. What am I?",
+  "a field":"Farmers grow crops on me, or animals eat grass here. I am flat and open. What am I?",
+  "a volcano":"I look like a mountain, but sometimes I explode with fire and smoke. What am I?",
+  "grass":"I am green, short and soft — you can walk on me in a park. What am I?",
+  "a hill":"I am like a small mountain — it's easy to walk up me. What am I?",
+  "a river":"I am water that never stops moving, flowing from the mountains to the sea. What am I?",
+  "a lake":"I am water with land all around me — you can swim or fish here. What am I?",
+  "a sea":"I am salty water, bigger than a lake but smaller than an ocean. What am I?",
+  "a forest":"I am full of trees, and many animals live inside me. What am I?",
+  "a waterfall":"Water falls down suddenly from a high place when it reaches me. What am I?",
+  "an ocean":"I am the biggest water in the world — ships cross me for weeks. What am I?",
+  "a cave":"I am dark, found inside mountains or underground — bats often live in me. What am I?",
+  "a tree":"I have a trunk, branches and leaves, and birds build nests in me. What am I?",
+  "a desert":"I am very hot and dry, mostly sand, and it almost never rains here. What am I?"
+};
+
+const sentences = {
+  "mountains":"In winter, the tops of the ___ are covered with snow.",
+  "the sky":"Look at ___ — it's full of stars tonight.",
+  "a field":"The farmer is walking across ___ to check the corn.",
+  "a volcano":"Scientists are watching ___ because it might erupt soon.",
+  "grass":"Please don't walk on ___ in the park.",
+  "a hill":"We climbed ___ to see the view of the town.",
+  "a river":"Fish are swimming in ___ near our house.",
+  "a lake":"We went swimming in ___ last summer.",
+  "a sea":"The ship sailed across ___ to reach the island.",
+  "a forest":"Many animals live in ___ near the mountains.",
+  "a waterfall":"Tourists take photos next to ___ in the national park.",
+  "an ocean":"It takes many days to cross ___ by boat.",
+  "a cave":"The explorers found old paintings inside ___.",
+  "a tree":"A bird built its nest in ___ outside our window.",
+  "a desert":"It almost never rains in ___."
+};
+
+const finishStarters = [
+  "My favourite place in nature is ... because ...",
+  "If I visited a forest, I would ...",
+  "I think mountains are ... because ...",
+  "When I see the sea, I feel ...",
+  "In the desert, it would be difficult to ...",
+  "I would like to swim in a lake / an ocean because ...",
+  "A waterfall looks like ...",
+  "If I found a cave, I would ...",
+  "My dream is to see a volcano because ...",
+  "The sky at night looks like ..."
+];
+
+/* ================= HELPERS ================= */
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+function pick10(){ return shuffle(words).slice(0,10); }
+function norm(s){ return (s||"").trim().toLowerCase().replace(/\s+/g," "); }
+
+function blankWord(word){
+  const chars = word.split("");
+  const letterIdx = [];
+  chars.forEach((c,i)=>{ if(/[a-zA-Z]/.test(c)) letterIdx.push(i); });
+  const hideCount = Math.max(2, Math.floor(letterIdx.length*0.45));
+  const toHide = shuffle(letterIdx).slice(0,hideCount);
+  toHide.forEach(i=> chars[i]="_");
+  return chars.join("");
+}
+
+function stripArticle(word){
+  return word.replace(/^(a|an|the)\s+/i,"");
+}
+
+/* ================= AUDIO ================= */
+let voices = [];
+function loadVoices(){ voices = speechSynthesis.getVoices(); }
+if('speechSynthesis' in window){
+  speechSynthesis.onvoiceschanged = loadVoices;
+  loadVoices();
+}
+function pickVoice(){
+  return voices.find(v=>v.name.includes("Google US English"))
+      || voices.find(v=>v.lang==="en-US")
+      || voices[0]
+      || null;
+}
+function speak(text){
+  if(!('speechSynthesis' in window)){
+    alert("Ваш браузер не поддерживает синтез речи. Попробуйте Google Chrome.");
+    return;
+  }
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  const v = pickVoice();
+  if(v) u.voice = v;
+  u.lang = "en-US";
+  u.rate = 0.9;
+  speechSynthesis.speak(u);
+}
+function testAudio(){
+  const status = document.getElementById('audioStatus');
+  if(!('speechSynthesis' in window)){
+    status.textContent = "❌ speechSynthesis не поддерживается этим браузером.";
+    return;
+  }
+  loadVoices();
+  const v = pickVoice();
+  speak("Hello! This is an audio test for the nature vocabulary lesson.");
+  status.textContent = v
+    ? `✅ Звук работает. Используется голос: "${v.name}" (${v.lang}).`
+    : "⚠️ Голоса ещё загружаются, попробуйте нажать ещё раз через секунду.";
+}
+
+/* ================= PROBLEM WORDS ================= */
+let problemWords = {};
+function markWrong(word){
+  problemWords[word] = (problemWords[word]||0)+1;
+  renderProblemWords();
+}
+function renderProblemWords(){
+  const tbody = document.querySelector('#problemTable tbody');
+  const note = document.getElementById('problemEmptyNote');
+  const entries = Object.entries(problemWords).sort((a,b)=>b[1]-a[1]);
+  tbody.innerHTML = entries.map(([w,c])=>`<tr><td>${w}</td><td>${c}</td></tr>`).join("");
+  note.style.display = entries.length ? "none" : "block";
+}
+
+/* ================= RENDER VOCAB TABLE ================= */
+function renderVocab(){
+  const tbody = document.getElementById('vocabTable');
+  tbody.innerHTML = words.map(w=>`
+    <tr>
+      <td><button class="btn-audio" onclick="speak('${w.en.replace(/'/g,"\\'")}')">🔊</button></td>
+      <td><strong>${w.en}</strong></td>
+      <td class="ipa">${w.ipa}</td>
+      <td>${w.ru}</td>
+    </tr>
+  `).join("");
+}
+
+/* ================= EXERCISE BUILDERS ================= */
+function makeQ(container, index, promptHTML, answer, opts={}){
+  const div = document.createElement('div');
+  div.className = 'q';
+  div.dataset.answer = norm(answer);
+  div.innerHTML = `
+    <div class="prompt"><span class="q-num">${index+1}.</span> ${promptHTML}</div>
+    <div class="row-input">
+      <input type="text" placeholder="Type your answer..." />
+      ${opts.audio ? `<button class="btn-audio" onclick="speak('${opts.audioText.replace(/'/g,"\\'")}')">🔊 Play</button>` : ""}
+      <span class="feedback"></span>
+    </div>
+  `;
+  container.appendChild(div);
+}
+
+function buildEx1(){ // missing letters
+  const set = pick10();
+  const c = document.getElementById('ex1'); c.innerHTML="";
+  set.forEach((w,i)=>{
+    const blanked = blankWord(w.en);
+    makeQ(c, i, `<strong style="letter-spacing:2px;font-size:1.1em;">${blanked}</strong> <span class="ru">— ${w.ru}</span>`, w.en);
+  });
+}
+function buildEx2(){ // translation ru->en
+  const set = pick10();
+  const c = document.getElementById('ex2'); c.innerHTML="";
+  set.forEach((w,i)=>{
+    makeQ(c, i, `Translate: <strong>${w.ru}</strong>`, w.en);
+  });
+}
+function buildEx3(){ // dictation
+  const set = pick10();
+  const c = document.getElementById('ex3'); c.innerHTML="";
+  set.forEach((w,i)=>{
+    makeQ(c, i, `Listen and write the word you hear:`, w.en, {audio:true, audioText:w.en});
+  });
+}
+function buildEx4(){ // definition
+  const set = pick10();
+  const c = document.getElementById('ex4'); c.innerHTML="";
+  set.forEach((w,i)=>{
+    makeQ(c, i, definitions[w.en], w.en);
+  });
+}
+function buildEx5(){ // picture
+  const set = pick10();
+  const c = document.getElementById('ex5'); c.innerHTML="";
+  set.forEach((w,i)=>{
+    makeQ(c, i, `<span class="emoji-clue">${emojis[w.en]}</span>What is this?`, w.en);
+  });
+}
+function buildEx6(){ // riddle
+  const set = pick10();
+  const c = document.getElementById('ex6'); c.innerHTML="";
+  set.forEach((w,i)=>{
+    makeQ(c, i, riddles[w.en], w.en);
+  });
+}
+function buildEx8(){ // expand sentence
+  const set = pick10();
+  const c = document.getElementById('ex8'); c.innerHTML="";
+  set.forEach((w,i)=>{
+    makeQ(c, i, sentences[w.en], w.en);
+  });
+}
+function buildEx9(){ // finish sentence — open
+  const c = document.getElementById('ex9'); c.innerHTML="";
+  const order = shuffle(finishStarters.map((s,idx)=>({s,idx})));
+  order.forEach((item,i)=>{
+    const div = document.createElement('div');
+    div.className = 'finish-item';
+    div.innerHTML = `
+      <div class="starter"><span class="q-num">${i+1}.</span> ${item.s}</div>
+      <textarea placeholder="Write your own sentence here..."></textarea>
+    `;
+    c.appendChild(div);
+  });
+}
+
+/* ================= CHECK / SHOW ================= */
+function checkExercise(id){
+  const container = document.getElementById(id);
+  const qs = container.querySelectorAll('.q');
+  let correctCount = 0;
+  qs.forEach(q=>{
+    const input = q.querySelector('input');
+    const fb = q.querySelector('.feedback');
+    const given = norm(input.value);
+    const answer = q.dataset.answer;
+    if(!given){
+      fb.textContent = "— empty —";
+      fb.className = "feedback";
+      return;
+    }
+    if(given === answer){
+      fb.textContent = "✅ Correct!";
+      fb.className = "feedback correct";
+      correctCount++;
+    } else {
+      fb.textContent = "❌ Try again";
+      fb.className = "feedback wrong";
+      markWrong(q.dataset.answer);
+    }
+  });
+  document.getElementById('score-'+id).textContent = `Score: ${correctCount}/${qs.length}`;
+}
+
+function showAnswers(id){
+  const container = document.getElementById(id);
+  const qs = container.querySelectorAll('.q');
+  qs.forEach(q=>{
+    const fb = q.querySelector('.feedback');
+    fb.textContent = "Answer: " + q.dataset.answer;
+    fb.className = "feedback shown";
+  });
+}
+
+/* ================= COPY ANSWERS ================= */
+function copySection9(){
+  const items = document.querySelectorAll('#ex9 .finish-item');
+  let text = "Finish the sentence — my answers:\n\n";
+  items.forEach((item,i)=>{
+    const starter = item.querySelector('.starter').textContent.trim();
+    const answer = item.querySelector('textarea').value.trim() || "(no answer)";
+    text += `${starter}\n→ ${answer}\n\n`;
+  });
+  navigator.clipboard.writeText(text).then(()=>{
+    document.getElementById('copyStatus9').textContent = "✅ Скопировано в буфер обмена!";
+  }).catch(()=>{
+    document.getElementById('copyStatus9').textContent = "⚠️ Не удалось скопировать автоматически, скопируйте текст вручную.";
+  });
+}
+
+function copyAllAnswers(){
+  const exIds = ['ex1','ex2','ex3','ex4','ex5','ex6','ex8'];
+  const titles = {
+    ex1:"1) Fill in the missing letters",
+    ex2:"2) Translate into English",
+    ex3:"3) Listen and write",
+    ex4:"4) Guess the word by definition",
+    ex5:"5) Guess the word by picture",
+    ex6:"6) Guess the word (riddle)",
+    ex8:"7) Expand the sentence"
+  };
+  let text = "STUDENT ANSWERS — Nature Vocabulary Worksheet\n" + "=".repeat(45) + "\n\n";
+  exIds.forEach(id=>{
+    text += titles[id] + "\n" + "-".repeat(titles[id].length) + "\n";
+    const qs = document.querySelectorAll('#'+id+' .q');
+    qs.forEach((q,i)=>{
+      const val = q.querySelector('input').value.trim() || "(no answer)";
+      text += `${i+1}. ${val}\n`;
+    });
+    text += "\n";
+  });
+  text += "8) Finish the sentence (own ideas)\n-----------------------------------\n";
+  document.querySelectorAll('#ex9 .finish-item').forEach((item,i)=>{
+    const starter = item.querySelector('.starter').textContent.trim();
+    const answer = item.querySelector('textarea').value.trim() || "(no answer)";
+    text += `${i+1}. ${starter}\n   → ${answer}\n`;
+  });
+
+  navigator.clipboard.writeText(text).then(()=>{
+    document.getElementById('copyStatusAll').textContent = "✅ Все ответы скопированы в буфер обмена!";
+  }).catch(()=>{
+    document.getElementById('copyStatusAll').textContent = "⚠️ Не удалось скопировать автоматически, скопируйте текст вручную.";
+  });
+}
+
+/* ================= INIT ================= */
+renderVocab();
+buildEx1(); buildEx2(); buildEx3(); buildEx4(); buildEx5();
+buildEx6(); buildEx8(); buildEx9();
+renderProblemWords();
+</script>
+</body>
+</html>
