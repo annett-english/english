@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Numbers Practice · Числа на английском</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Nunito:wght@400;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#fbf8f0;
+    --board:#1f3a34;
+    --board-line:#2c4d45;
+    --chalk-yellow:#f4c95d;
+    --chalk-white:#f2efe6;
+    --ink:#233129;
+    --ok:#3f8f5c;
+    --ok-bg:#e6f4ea;
+    --bad:#c0453a;
+    --bad-bg:#fbe9e6;
+    --muted:#7c8b83;
+    --card-border:#d9d0b8;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--board);
+    background-image:
+      repeating-linear-gradient(var(--board), var(--board) 38px, var(--board-line) 39px);
+    font-family:'Nunito',sans-serif;
+    color:var(--ink);
+    padding:28px 16px 80px;
+  }
+  .wrap{max-width:1180px;margin:0 auto;}
+
+  header.top{
+    text-align:center;
+    color:var(--chalk-white);
+    margin-bottom:26px;
+  }
+  header.top h1{
+    font-family:'Patrick Hand',cursive;
+    font-size:clamp(2.1rem,5vw,3.2rem);
+    margin:0 0 6px;
+    letter-spacing:.5px;
+  }
+  header.top p{margin:0;color:#c9d6cf;font-size:.98rem;}
+
+  .audio-status{
+    display:inline-flex;align-items:center;gap:8px;
+    background:rgba(255,255,255,.08);
+    border:1px dashed rgba(255,255,255,.35);
+    color:var(--chalk-white);
+    padding:8px 14px;border-radius:999px;
+    font-size:.85rem;margin-top:12px;
+  }
+  .dot{width:9px;height:9px;border-radius:50%;background:#999;display:inline-block;}
+  .dot.on{background:#5fd48a;box-shadow:0 0 8px #5fd48a;}
+  .dot.off{background:#e15d52;}
+  .audio-status button{
+    margin-left:6px;border:none;background:var(--chalk-yellow);color:#3a2a05;
+    padding:5px 10px;border-radius:8px;font-weight:700;cursor:pointer;font-family:'Nunito';font-size:.8rem;
+  }
+
+  .layout{
+    display:grid;
+    grid-template-columns:1fr 300px;
+    gap:22px;
+    align-items:start;
+  }
+  @media (max-width:920px){
+    .layout{grid-template-columns:1fr;}
+    aside{order:99;}
+  }
+
+  .card{
+    background:var(--paper);
+    border:1px solid var(--card-border);
+    border-radius:14px;
+    padding:22px 24px;
+    box-shadow:0 10px 26px rgba(0,0,0,.28);
+    margin-bottom:22px;
+    background-image:linear-gradient(var(--paper) 27px, rgba(31,58,52,.06) 28px);
+    background-size:100% 28px;
+  }
+  .card.plain{background-image:none;}
+
+  .section-title{
+    display:flex;align-items:baseline;gap:10px;
+    font-family:'Patrick Hand',cursive;
+    font-size:1.55rem;
+    margin:0 0 4px;
+    color:#20362f;
+  }
+  .section-title span.badge{
+    font-family:'Space Mono',monospace;
+    font-size:.7rem;background:#20362f;color:var(--chalk-yellow);
+    padding:3px 8px;border-radius:6px;letter-spacing:.5px;
+  }
+  .section-sub{color:var(--muted);margin:0 0 16px;font-size:.92rem;}
+
+  /* vocab intro */
+  .vocab-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+    gap:12px;
+  }
+  .vocab-item{
+    background:#fff;
+    border:1px solid var(--card-border);
+    border-radius:10px;
+    padding:12px 14px;
+    display:flex;flex-direction:column;gap:3px;
+  }
+  .vocab-word{font-weight:800;font-size:1.05rem;}
+  .vocab-trans{font-family:'Space Mono',monospace;color:#5c6d63;font-size:.85rem;}
+  .vocab-ru{color:#445048;font-size:.92rem;}
+  .listen-btn{
+    align-self:flex-start;
+    margin-top:6px;
+    border:none;background:var(--board);color:var(--chalk-white);
+    padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.82rem;font-weight:700;
+    display:inline-flex;align-items:center;gap:6px;
+    transition:transform .12s ease;
+  }
+  .listen-btn:hover{transform:translateY(-1px);}
+  .listen-btn:active{transform:translateY(0);}
+  .listen-btn.small{padding:5px 9px;font-size:.75rem;}
+
+  /* exercises */
+  .item{
+    display:grid;
+    grid-template-columns:34px 1fr auto;
+    gap:12px;
+    align-items:center;
+    padding:10px 0;
+    border-bottom:1px dashed #e2dcc6;
+  }
+  .item:last-child{border-bottom:none;}
+  .item .num{
+    font-family:'Space Mono',monospace;
+    font-weight:700;color:var(--muted);
+  }
+  .item .prompt{font-family:'Space Mono',monospace;font-size:1.05rem;font-weight:700;color:#20362f;}
+  .item input[type=text]{
+    grid-column:1/-1;
+    font-family:'Patrick Hand',cursive;
+    font-size:1.15rem;
+    padding:8px 10px;
+    border:none;
+    border-bottom:2px solid #b9b09228;
+    border-bottom-color:#20362f55;
+    background:transparent;
+    outline:none;
+    width:100%;
+  }
+  .item input[type=text]:focus{border-bottom-color:var(--chalk-yellow);background:#fffdf5;}
+  .item.correct input[type=text]{color:var(--ok);border-bottom-color:var(--ok);}
+  .item.incorrect input[type=text]{color:var(--bad);border-bottom-color:var(--bad);}
+  .feedback{grid-column:1/-1;font-size:.85rem;margin-top:-4px;}
+  .feedback.correct{color:var(--ok);}
+  .feedback.incorrect{color:var(--bad);}
+
+  .grid-2col{
+    display:grid;grid-template-columns:1fr 1fr;gap:0 26px;
+  }
+  @media(max-width:640px){.grid-2col{grid-template-columns:1fr;}}
+
+  .ex-actions{
+    display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;
+  }
+  .btn{
+    border:none;padding:10px 18px;border-radius:9px;
+    font-weight:800;cursor:pointer;font-family:'Nunito';font-size:.92rem;
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .btn:hover{transform:translateY(-1px);}
+  .btn-check{background:var(--board);color:var(--chalk-white);}
+  .btn-answers{background:var(--chalk-yellow);color:#3a2a05;}
+  .btn-reset{background:#e9e4d3;color:#5b5343;}
+  .score-pill{
+    margin-left:auto;
+    font-family:'Space Mono',monospace;
+    background:#20362f;color:var(--chalk-white);
+    padding:8px 14px;border-radius:999px;font-size:.85rem;
+    align-self:center;
+  }
+
+  .answer-key{
+    margin-top:14px;padding:12px 14px;background:#fff9e6;border:1px dashed #e3c975;
+    border-radius:10px;font-family:'Space Mono',monospace;font-size:.85rem;line-height:1.7;
+    display:none;
+    user-select:none;
+  }
+  .answer-key.show{display:block;}
+  .answer-key .k{color:var(--muted);}
+
+  /* sidebar */
+  aside .card{position:sticky;top:16px;}
+  #problemTable{width:100%;border-collapse:collapse;font-size:.85rem;}
+  #problemTable th{
+    text-align:left;font-family:'Space Mono',monospace;font-size:.72rem;
+    color:var(--muted);border-bottom:1px solid var(--card-border);padding-bottom:6px;
+  }
+  #problemTable td{padding:6px 4px;border-bottom:1px solid #efe9d5;vertical-align:top;}
+  #problemTable tr:last-child td{border-bottom:none;}
+  .empty-note{color:var(--muted);font-size:.85rem;font-style:italic;}
+  .miss-count{
+    display:inline-block;background:var(--bad-bg);color:var(--bad);
+    font-family:'Space Mono',monospace;font-weight:700;font-size:.72rem;
+    padding:1px 6px;border-radius:6px;
+  }
+  .clear-link{background:none;border:none;color:var(--muted);text-decoration:underline;cursor:pointer;font-size:.78rem;padding:0;margin-top:10px;}
+
+  footer.note{
+    color:#c9d6cf;text-align:center;font-size:.8rem;margin-top:26px;line-height:1.6;
+  }
+  footer.note a{color:var(--chalk-yellow);}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <h1>🔢 Numbers Practice · Числа на слух и письме</h1>
+    <p>Уровень A1–A2 · Пропиши числа руками, послушай и проверь себя</p>
+    <div class="audio-status" id="audioStatus">
+      <span class="dot off" id="audioDot"></span>
+      <span id="audioText">Проверяю голосовой движок…</span>
+      <button id="testAudioBtn" type="button">🔊 Тест звука</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <main>
+
+      <!-- INTRO VOCAB -->
+      <section class="card plain">
+        <h2 class="section-title">🧠 Вспомним слова <span class="badge">WARM-UP</span></h2>
+        <p class="section-sub">Нажми на колонку, чтобы услышать произношение (голос Google US English).</p>
+        <div class="vocab-grid" id="vocabGrid"></div>
+      </section>
+
+      <!-- EXERCISE 1 -->
+      <section class="card" id="ex1">
+        <h2 class="section-title">1️⃣ Напиши число словами <span class="badge">WRITING</span></h2>
+        <p class="section-sub">Посмотри на число и пропиши его <b>полными словами</b> по-английски (например: 456 → <i>four hundred and fifty-six</i>).</p>
+        <div id="ex1list"></div>
+        <div class="ex-actions">
+          <button class="btn btn-check" data-ex="1">✅ Проверить</button>
+          <button class="btn btn-answers" data-ex="1">👁 Показать ответы</button>
+          <button class="btn btn-reset" data-ex="1">↺ Сбросить</button>
+          <span class="score-pill" id="score1">0 / 10</span>
+        </div>
+        <div class="answer-key" id="answers1"></div>
+      </section>
+
+      <!-- EXERCISE 2 -->
+      <section class="card" id="ex2">
+        <h2 class="section-title">2️⃣ Послушай и напиши число цифрами <span class="badge">LISTENING</span></h2>
+        <p class="section-sub">Нажми 🔊, послушай большое число и запиши его <b>цифрами</b> (например, услышал «two thousand three hundred forty» → пиши <i>2340</i>).</p>
+        <div id="ex2list"></div>
+        <div class="ex-actions">
+          <button class="btn btn-check" data-ex="2">✅ Проверить</button>
+          <button class="btn btn-answers" data-ex="2">👁 Показать ответы</button>
+          <button class="btn btn-reset" data-ex="2">↺ Сбросить</button>
+          <span class="score-pill" id="score2">0 / 10</span>
+        </div>
+        <div class="answer-key" id="answers2"></div>
+      </section>
+
+      <!-- EXERCISE 3 -->
+      <section class="card" id="ex3">
+        <h2 class="section-title">3️⃣ Порядковые числа на слух <span class="badge">ORDINALS 1–100</span></h2>
+        <p class="section-sub">Нажми 🔊 и запиши услышанное порядковое число — цифрами с окончанием (<i>21st</i>) <b>или</b> словом (<i>twenty-first</i>) — оба варианта верны.</p>
+        <div id="ex3list"></div>
+        <div class="ex-actions">
+          <button class="btn btn-check" data-ex="3">✅ Проверить</button>
+          <button class="btn btn-answers" data-ex="3">👁 Показать ответы</button>
+          <button class="btn btn-reset" data-ex="3">↺ Сбросить</button>
+          <span class="score-pill" id="score3">0 / 10</span>
+        </div>
+        <div class="answer-key" id="answers3"></div>
+      </section>
+
+    </main>
+
+    <aside>
+      <div class="card plain">
+        <h2 class="section-title" style="font-size:1.25rem;">⚠️ Проблемные слова</h2>
+        <p class="section-sub" style="margin-bottom:10px;">Сюда попадают числа, в которых ты ошибся.</p>
+        <table id="problemTable">
+          <thead><tr><th>Число</th><th>Правильный ответ</th><th>×</th></tr></thead>
+          <tbody id="problemBody"></tbody>
+        </table>
+        <p class="empty-note" id="emptyNote">Пока ошибок нет — отлично! 🎉</p>
+        <button class="clear-link" id="clearProblems">очистить список</button>
+      </div>
+    </aside>
+  </div>
+
+  <footer class="note">
+    Голос озвучки: Google US English (en-US), если доступен в браузере — иначе используется системный английский голос.<br>
+    Вставка текста (copy-paste) в поля ответов отключена — числа нужно прописывать руками. Работает лучше всего в Chrome.
+  </footer>
+</div>
+
+<script>
+/* ================= SPEECH ================= */
+let chosenVoice = null;
+function pickVoice(){
+  const voices = speechSynthesis.getVoices();
+  chosenVoice = voices.find(v => v.name === 'Google US English') ||
+                voices.find(v => v.name.toLowerCase().includes('google') && v.lang === 'en-US') ||
+                voices.find(v => v.lang === 'en-US') ||
+                voices.find(v => v.lang && v.lang.startsWith('en')) || null;
+  updateAudioStatus();
+}
+function updateAudioStatus(){
+  const dot = document.getElementById('audioDot');
+  const txt = document.getElementById('audioText');
+  if(!('speechSynthesis' in window)){
+    dot.className = 'dot off';
+    txt.textContent = 'Синтез речи не поддерживается в этом браузере';
+    return;
+  }
+  if(chosenVoice){
+    dot.className = 'dot on';
+    txt.textContent = 'Голос готов: ' + chosenVoice.name + ' (' + chosenVoice.lang + ')';
+  } else {
+    dot.className = 'dot off';
+    txt.textContent = 'Английский голос не найден — попробуй нажать «Тест звука»';
+  }
+}
+function speak(text){
+  if(!('speechSynthesis' in window)){
+    alert('Твой браузер не поддерживает озвучку. Попробуй Chrome.');
+    return;
+  }
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  if(chosenVoice) u.voice = chosenVoice;
+  u.lang = 'en-US';
+  u.rate = 0.92;
+  u.onerror = () => {
+    document.getElementById('audioDot').className = 'dot off';
+    document.getElementById('audioText').textContent = 'Ошибка воспроизведения — проверь звук устройства';
+  };
+  speechSynthesis.speak(u);
+}
+if('speechSynthesis' in window){
+  pickVoice();
+  speechSynthesis.onvoiceschanged = pickVoice;
+} else {
+  updateAudioStatus();
+}
+document.getElementById('testAudioBtn').addEventListener('click', () => {
+  speak('Testing, one, two, three. Can you hear me?');
+});
+
+/* ================= NUMBER → WORDS HELPERS ================= */
+const ONES = ['','one','two','three','four','five','six','seven','eight','nine','ten',
+  'eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen'];
+const TENS = ['','','twenty','thirty','forty','fifty','sixty','seventy','eighty','ninety'];
+
+function threeDigitWords(n){
+  let str = '';
+  if(n >= 100){
+    str += ONES[Math.floor(n/100)] + ' hundred';
+    n %= 100;
+    if(n > 0) str += ' and ';
+  }
+  if(n >= 20){
+    str += TENS[Math.floor(n/10)];
+    if(n % 10 > 0) str += '-' + ONES[n % 10];
+  } else if(n > 0){
+    str += ONES[n];
+  }
+  return str;
+}
+
+function numberToWords(num){
+  if(num === 0) return 'zero';
+  let str = '';
+  const million = Math.floor(num / 1000000);
+  const thousand = Math.floor((num % 1000000) / 1000);
+  const rest = num % 1000;
+  if(million) str += threeDigitWords(million) + ' million ';
+  if(thousand) str += threeDigitWords(thousand) + ' thousand ';
+  if(rest) str += threeDigitWords(rest);
+  return str.trim();
+}
+
+const ORD_SMALL = {1:'first',2:'second',3:'third',4:'fourth',5:'fifth',6:'sixth',7:'seventh',
+  8:'eighth',9:'ninth',10:'tenth',11:'eleventh',12:'twelfth',13:'thirteenth',14:'fourteenth',
+  15:'fifteenth',16:'sixteenth',17:'seventeenth',18:'eighteenth',19:'nineteenth'};
+const ORD_TENS = {20:'twentieth',30:'thirtieth',40:'fortieth',50:'fiftieth',60:'sixtieth',
+  70:'seventieth',80:'eightieth',90:'ninetieth'};
+const CARD_TENS = {20:'twenty',30:'thirty',40:'forty',50:'fifty',60:'sixty',70:'seventy',80:'eighty',90:'ninety'};
+
+function ordinalWords(n){
+  if(n === 100) return 'one hundredth';
+  if(ORD_SMALL[n]) return ORD_SMALL[n];
+  const t = Math.floor(n/10)*10, r = n % 10;
+  if(r === 0) return ORD_TENS[t];
+  return CARD_TENS[t] + '-' + ORD_SMALL[r];
+}
+function ordinalSuffix(n){
+  if(n % 100 >= 11 && n % 100 <= 13) return 'th';
+  switch(n % 10){
+    case 1: return 'st';
+    case 2: return 'nd';
+    case 3: return 'rd';
+    default: return 'th';
+  }
+}
+function ordinalDigit(n){ return n + ordinalSuffix(n); }
+
+/* ================= NORMALIZATION FOR CHECKING ================= */
+function normalizeWords(str){
+  return str.toLowerCase()
+    .replace(/,/g,' ')
+    .replace(/-/g,' ')
+    .replace(/\band\b/g,' ')
+    .replace(/\s+/g,' ')
+    .trim();
+}
+function normalizeDigits(str){
+  return str.replace(/[,\s]/g,'').trim();
+}
+
+/* ================= SHUFFLE ================= */
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i+1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+/* ================= DATA ================= */
+
+// Vocab intro
+const VOCAB = [
+  {w:'hundred', t:'/ˈhʌndrəd/', ru:'сто'},
+  {w:'thousand', t:'/ˈθaʊzənd/', ru:'тысяча'},
+  {w:'million', t:'/ˈmɪljən/', ru:'миллион'},
+  {w:'zero / oh', t:'/ˈzɪəroʊ/ /oʊ/', ru:'ноль'},
+  {w:'point', t:'/pɔɪnt/', ru:'запятая/точка в числе'},
+  {w:'dozen', t:'/ˈdʌzn̩/', ru:'дюжина (12)'},
+  {w:'first', t:'/fɜːrst/', ru:'первый'},
+  {w:'ordinal number', t:'/ˈɔːrdɪnl ˈnʌmbər/', ru:'порядковое числительное'},
+];
+
+// Exercise 1 pool — write big numbers as full words (base order; will be shuffled)
+const EX1_POOL = [456, 1234, 15670, 100000, 234567, 1000000, 750, 89340, 999999, 2345678, 12045, 307];
+
+// Exercise 2 pool — listen to words, write digits
+const EX2_POOL = [3456, 780000, 92145, 500000, 1234567, 60700, 8901, 345000, 250, 999000, 40056, 176];
+
+// Exercise 3 pool — ordinals 1-100, listen, write ordinal
+const EX3_POOL = [1, 3, 5, 8, 11, 13, 15, 17, 19, 21, 23, 25, 30, 32, 34, 40, 45, 52, 58, 60, 63, 67, 71, 75, 79, 82, 88, 90, 96, 100];
+
+function pickTen(pool){
+  return shuffle(pool).slice(0, 10);
+}
+
+const state = {
+  ex1: pickTen(EX1_POOL).map(n => ({key: n.toString(), display: n.toLocaleString('en-US'), answers: [numberToWords(n)], raw:n})),
+  ex2: pickTen(EX2_POOL).map(n => ({key: n.toString(), spoken: numberToWords(n), answers: [n.toString()], raw:n})),
+  ex3: pickTen(EX3_POOL).map(n => ({key: 'ord'+n, spoken: ordinalWords(n), answers: [ordinalWords(n).replace(/-/g,' '), ordinalDigit(n)], display: ordinalDigit(n), raw:n})),
+};
+
+/* ================= PROBLEM WORDS TRACKER ================= */
+const problems = {}; // key -> {label, correct, count}
+function addProblem(label, correctAnswer){
+  const key = label;
+  if(!problems[key]) problems[key] = {label, correct: correctAnswer, count: 0};
+  problems[key].count++;
+  renderProblems();
+}
+function renderProblems(){
+  const body = document.getElementById('problemBody');
+  const empty = document.getElementById('emptyNote');
+  const entries = Object.values(problems).sort((a,b) => b.count - a.count);
+  body.innerHTML = '';
+  if(entries.length === 0){
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  entries.forEach(e => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${e.label}</td><td>${e.correct}</td><td><span class="miss-count">${e.count}</span></td>`;
+    body.appendChild(tr);
+  });
+}
+document.getElementById('clearProblems').addEventListener('click', () => {
+  Object.keys(problems).forEach(k => delete problems[k]);
+  renderProblems();
+});
+
+/* ================= RENDER VOCAB ================= */
+const vocabGrid = document.getElementById('vocabGrid');
+VOCAB.forEach(v => {
+  const div = document.createElement('div');
+  div.className = 'vocab-item';
+  div.innerHTML = `
+    <span class="vocab-word">${v.w}</span>
+    <span class="vocab-trans">${v.t}</span>
+    <span class="vocab-ru">${v.ru}</span>
+    <button class="listen-btn small" type="button">🔊 Слушать</button>
+  `;
+  div.querySelector('button').addEventListener('click', () => speak(v.w.replace(' / ', ' or ')));
+  vocabGrid.appendChild(div);
+});
+
+/* ================= RENDER EXERCISES ================= */
+function blockPaste(e){ e.preventDefault(); return false; }
+
+function renderEx1(){
+  const list = document.getElementById('ex1list');
+  list.innerHTML = '';
+  state.ex1.forEach((item, idx) => {
+    const row = document.createElement('div');
+    row.className = 'item';
+    row.dataset.idx = idx;
+    row.innerHTML = `
+      <div class="num">${idx+1}.</div>
+      <div class="prompt">${item.display}</div>
+      <button class="listen-btn small" type="button" title="Услышать число">🔊</button>
+      <input type="text" placeholder="напиши число словами..." autocomplete="off" spellcheck="false">
+      <div class="feedback"></div>
+    `;
+    row.querySelector('.listen-btn').addEventListener('click', () => speak(numberToWords(item.raw)));
+    const input = row.querySelector('input');
+    input.addEventListener('paste', blockPaste);
+    input.addEventListener('copy', blockPaste);
+    input.addEventListener('drop', blockPaste);
+    list.appendChild(row);
+  });
+}
+
+function renderEx2(){
+  const list = document.getElementById('ex2list');
+  list.innerHTML = '';
+  state.ex2.forEach((item, idx) => {
+    const row = document.createElement('div');
+    row.className = 'item';
+    row.dataset.idx = idx;
+    row.innerHTML = `
+      <div class="num">${idx+1}.</div>
+      <div class="prompt">🔊 Play</div>
+      <button class="listen-btn small" type="button" title="Слушать число">🔊 Слушать</button>
+      <input type="text" placeholder="напиши цифрами..." autocomplete="off" spellcheck="false" inputmode="numeric">
+      <div class="feedback"></div>
+    `;
+    row.querySelector('.listen-btn').addEventListener('click', () => speak(item.spoken));
+    const input = row.querySelector('input');
+    input.addEventListener('paste', blockPaste);
+    input.addEventListener('copy', blockPaste);
+    input.addEventListener('drop', blockPaste);
+    list.appendChild(row);
+  });
+}
+
+function renderEx3(){
+  const list = document.getElementById('ex3list');
+  list.innerHTML = '';
+  state.ex3.forEach((item, idx) => {
+    const row = document.createElement('div');
+    row.className = 'item';
+    row.dataset.idx = idx;
+    row.innerHTML = `
+      <div class="num">${idx+1}.</div>
+      <div class="prompt">🔊 Play</div>
+      <button class="listen-btn small" type="button" title="Слушать порядковое число">🔊 Слушать</button>
+      <input type="text" placeholder="напр. 21st или twenty-first" autocomplete="off" spellcheck="false">
+      <div class="feedback"></div>
+    `;
+    row.querySelector('.listen-btn').addEventListener('click', () => speak('the ' + item.spoken));
+    const input = row.querySelector('input');
+    input.addEventListener('paste', blockPaste);
+    input.addEventListener('copy', blockPaste);
+    input.addEventListener('drop', blockPaste);
+    list.appendChild(row);
+  });
+}
+
+renderEx1(); renderEx2(); renderEx3();
+
+/* ================= CHECK LOGIC ================= */
+function checkEx1(){
+  let correctCount = 0;
+  document.querySelectorAll('#ex1list .item').forEach(row => {
+    const idx = +row.dataset.idx;
+    const item = state.ex1[idx];
+    const input = row.querySelector('input');
+    const fb = row.querySelector('.feedback');
+    const userVal = normalizeWords(input.value || '');
+    const isCorrect = item.answers.some(a => normalizeWords(a) === userVal) && userVal.length > 0;
+    row.classList.toggle('correct', isCorrect);
+    row.classList.toggle('incorrect', !isCorrect);
+    if(isCorrect){
+      correctCount++;
+      fb.textContent = '✓ верно';
+      fb.className = 'feedback correct';
+    } else {
+      fb.textContent = '✗ верный ответ: ' + item.answers[0];
+      fb.className = 'feedback incorrect';
+      addProblem(item.display, item.answers[0]);
+    }
+  });
+  document.getElementById('score1').textContent = correctCount + ' / 10';
+}
+
+function checkEx2(){
+  let correctCount = 0;
+  document.querySelectorAll('#ex2list .item').forEach(row => {
+    const idx = +row.dataset.idx;
+    const item = state.ex2[idx];
+    const input = row.querySelector('input');
+    const fb = row.querySelector('.feedback');
+    const userVal = normalizeDigits(input.value || '');
+    const isCorrect = userVal === item.answers[0] && userVal.length > 0;
+    row.classList.toggle('correct', isCorrect);
+    row.classList.toggle('incorrect', !isCorrect);
+    if(isCorrect){
+      correctCount++;
+      fb.textContent = '✓ верно';
+      fb.className = 'feedback correct';
+    } else {
+      fb.textContent = '✗ верный ответ: ' + Number(item.answers[0]).toLocaleString('en-US');
+      fb.className = 'feedback incorrect';
+      addProblem(Number(item.answers[0]).toLocaleString('en-US'), item.spoken);
+    }
+  });
+  document.getElementById('score2').textContent = correctCount + ' / 10';
+}
+
+function checkEx3(){
+  let correctCount = 0;
+  document.querySelectorAll('#ex3list .item').forEach(row => {
+    const idx = +row.dataset.idx;
+    const item = state.ex3[idx];
+    const input = row.querySelector('input');
+    const fb = row.querySelector('.feedback');
+    const raw = (input.value || '').toLowerCase().trim();
+    const userWords = normalizeWords(raw);
+    const userDigits = raw.replace(/\s+/g,'');
+    const isCorrect = (userWords.length > 0 && userWords === normalizeWords(item.answers[0])) ||
+                       (userDigits === item.answers[1].toLowerCase());
+    row.classList.toggle('correct', isCorrect);
+    row.classList.toggle('incorrect', !isCorrect);
+    if(isCorrect){
+      correctCount++;
+      fb.textContent = '✓ верно';
+      fb.className = 'feedback correct';
+    } else {
+      fb.textContent = '✗ верный ответ: ' + item.display + ' (' + item.answers[0] + ')';
+      fb.className = 'feedback incorrect';
+      addProblem(item.display, item.answers[0]);
+    }
+  });
+  document.getElementById('score3').textContent = correctCount + ' / 10';
+}
+
+/* ================= SHOW ANSWERS ================= */
+function showAnswers(exNum){
+  const box = document.getElementById('answers' + exNum);
+  box.classList.toggle('show');
+  if(!box.classList.contains('show')) return;
+  let html = '';
+  const data = state['ex' + exNum];
+  data.forEach((item, i) => {
+    const label = item.display !== undefined ? item.display : (i+1);
+    const answer = exNum == 2 ? Number(item.answers[0]).toLocaleString('en-US') : item.answers[0];
+    html += `<div><span class="k">${i+1}. ${label} →</span> ${answer}</div>`;
+  });
+  box.innerHTML = html;
+}
+
+/* ================= RESET ================= */
+function resetEx(exNum){
+  document.querySelectorAll('#ex' + exNum + 'list .item').forEach(row => {
+    row.classList.remove('correct','incorrect');
+    row.querySelector('input').value = '';
+    row.querySelector('.feedback').textContent = '';
+  });
+  document.getElementById('score' + exNum).textContent = '0 / 10';
+  const box = document.getElementById('answers' + exNum);
+  box.classList.remove('show');
+}
+
+/* ================= WIRE BUTTONS ================= */
+document.querySelectorAll('.btn-check').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const ex = btn.dataset.ex;
+    if(ex === '1') checkEx1();
+    if(ex === '2') checkEx2();
+    if(ex === '3') checkEx3();
+  });
+});
+document.querySelectorAll('.btn-answers').forEach(btn => {
+  btn.addEventListener('click', () => showAnswers(btn.dataset.ex));
+});
+document.querySelectorAll('.btn-reset').forEach(btn => {
+  btn.addEventListener('click', () => resetEx(btn.dataset.ex));
+});
+
+renderProblems();
+</script>
+</body>
+</html>
