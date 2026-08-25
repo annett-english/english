@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A1 English Practice — drove/saw, has/have, family, desert/dessert</title>
+<style>
+  :root{
+    --bg:#f5f7fb;
+    --card:#ffffff;
+    --ink:#1f2937;
+    --muted:#6b7280;
+    --accent:#4f46e5;
+    --accent2:#0ea5e9;
+    --good:#16a34a;
+    --bad:#dc2626;
+    --warn:#f59e0b;
+    --border:#e5e7eb;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Segoe UI', Verdana, Arial, sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    line-height:1.5;
+  }
+  .app{max-width:1200px;margin:0 auto;padding:20px;}
+  header.top{
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    color:#fff;border-radius:var(--radius);padding:22px 26px;margin-bottom:20px;
+    box-shadow:0 6px 18px rgba(79,70,229,.25);
+  }
+  header.top h1{margin:0 0 6px;font-size:1.5rem;}
+  header.top p{margin:0;opacity:.92;font-size:.95rem;}
+
+  .audio-check{
+    display:flex;align-items:center;gap:10px;margin-top:12px;flex-wrap:wrap;
+    background:rgba(255,255,255,.15);padding:10px 14px;border-radius:10px;
+  }
+  .audio-check button{
+    background:#fff;color:var(--accent);border:none;padding:8px 14px;border-radius:8px;
+    cursor:pointer;font-weight:600;font-size:.9rem;
+  }
+  #audioStatus{font-size:.85rem;font-weight:600;}
+
+  section.card{
+    background:var(--card);border-radius:var(--radius);padding:18px 20px;margin-bottom:18px;
+    box-shadow:0 2px 10px rgba(0,0,0,.05);border:1px solid var(--border);
+  }
+  section.card h2{margin-top:0;font-size:1.15rem;color:var(--accent);}
+  section.card .sub{color:var(--muted);font-size:.9rem;margin-top:-6px;margin-bottom:14px;}
+
+  .vocab-grid{
+    display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;
+  }
+  .vocab-item{
+    border:1px solid var(--border);border-radius:10px;padding:10px 12px;background:#fafbff;
+    display:flex;flex-direction:column;gap:4px;
+  }
+  .vocab-item .en{font-weight:700;font-size:1.02rem;}
+  .vocab-item .ipa{color:var(--accent2);font-size:.85rem;}
+  .vocab-item .ru{color:var(--muted);font-size:.88rem;}
+  .listen-btn{
+    align-self:flex-start;margin-top:4px;background:var(--accent);color:#fff;border:none;
+    border-radius:20px;padding:5px 12px;font-size:.8rem;cursor:pointer;
+  }
+  .listen-btn:hover{background:var(--accent2);}
+  .listen-all{margin-bottom:14px;background:var(--accent2);color:#fff;border:none;border-radius:10px;
+    padding:9px 16px;cursor:pointer;font-weight:600;}
+
+  .layout{display:flex;gap:20px;align-items:flex-start;}
+  main{flex:1;min-width:0;}
+  aside.sidebar{
+    width:290px;flex-shrink:0;position:sticky;top:16px;
+  }
+  @media (max-width:880px){
+    .layout{flex-direction:column;}
+    aside.sidebar{width:100%;position:static;}
+  }
+
+  .item{
+    border-top:1px dashed var(--border);padding:12px 0;
+  }
+  .item:first-of-type{border-top:none;padding-top:0;}
+  .item .num{font-weight:700;color:var(--accent2);margin-right:6px;}
+  .item input[type=text]{
+    padding:8px 10px;border:2px solid var(--border);border-radius:8px;font-size:.95rem;
+    width:220px;max-width:60vw;
+  }
+  .item input[type=text]:focus{outline:none;border-color:var(--accent2);}
+  .item.correct input[type=text]{border-color:var(--good);background:#f0fdf4;}
+  .item.wrong input[type=text]{border-color:var(--bad);background:#fef2f2;}
+  .mark{font-weight:700;margin-left:8px;}
+  .mark.correct{color:var(--good);}
+  .mark.wrong{color:var(--bad);}
+  .answer-reveal{
+    display:none;margin-top:6px;font-size:.85rem;color:var(--accent);background:#eef2ff;
+    padding:4px 10px;border-radius:8px;width:fit-content;
+  }
+  .answer-reveal.show{display:block;}
+  .hint{color:var(--muted);font-size:.85rem;margin-left:8px;}
+  .chip{
+    display:inline-block;background:#eef2ff;color:var(--accent);border-radius:16px;
+    padding:3px 10px;margin:2px 4px 2px 0;font-size:.85rem;font-weight:600;
+  }
+  .mc-options label{
+    display:inline-flex;align-items:center;gap:5px;margin-right:14px;font-size:.92rem;
+    cursor:pointer;
+  }
+  .listen-mini{
+    background:none;border:1px solid var(--accent2);color:var(--accent2);border-radius:14px;
+    padding:3px 10px;font-size:.8rem;cursor:pointer;margin-left:6px;
+  }
+  .exercise-controls{margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+  .btn{
+    border:none;border-radius:10px;padding:9px 16px;font-weight:600;cursor:pointer;font-size:.9rem;
+  }
+  .btn-check{background:var(--accent);color:#fff;}
+  .btn-check:hover{background:#4338ca;}
+  .btn-show{background:#fff;color:var(--accent);border:2px solid var(--accent);}
+  .btn-show:hover{background:#eef2ff;}
+  .score-tag{font-weight:700;color:var(--accent);}
+
+  /* sidebar */
+  .side-card{
+    background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+    padding:14px 16px;margin-bottom:14px;box-shadow:0 2px 10px rgba(0,0,0,.05);
+  }
+  .side-card h3{margin:0 0 10px;font-size:1rem;color:var(--accent);}
+  #totalScore{font-size:1.3rem;font-weight:800;color:var(--accent);}
+  table#problemTable{width:100%;border-collapse:collapse;font-size:.87rem;}
+  table#problemTable th,table#problemTable td{
+    text-align:left;padding:5px 6px;border-bottom:1px solid var(--border);
+  }
+  table#problemTable th{color:var(--muted);font-weight:600;}
+  .empty-note{color:var(--muted);font-size:.85rem;}
+  .copy-btn{
+    width:100%;background:var(--good);color:#fff;border:none;border-radius:10px;
+    padding:10px;font-weight:700;cursor:pointer;margin-top:4px;
+  }
+  .copy-btn:hover{background:#15803d;}
+  #copyStatus{font-size:.82rem;color:var(--good);margin-top:6px;min-height:1em;}
+
+  textarea.repeat-input{
+    width:100%;min-height:44px;padding:8px 10px;border:2px solid var(--border);border-radius:8px;
+    font-size:.92rem;font-family:inherit;resize:vertical;
+  }
+  .model-line{color:var(--accent);font-weight:600;margin-bottom:4px;}
+  .task-line{color:var(--muted);font-size:.87rem;margin-bottom:6px;}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="top">
+    <h1>🇬🇧 A1 English Practice: drove / saw · plural fruits · has vs have · family · desert / dessert</h1>
+    <p>Повтори слова, прослушай произношение, а затем выполни 7 упражнений (по 10 заданий) + упражнение на дриллинг.</p>
+    <div class="audio-check">
+      <button id="testAudioBtn">🔊 Проверить звук</button>
+      <span id="audioStatus">Нажми, чтобы проверить, что аудио работает</span>
+    </div>
+  </header>
+
+  <section class="card">
+    <h2>📚 Слова для повторения</h2>
+    <div class="sub">Слово · транскрипция · перевод. Нажми 🔊, чтобы услышать произношение (голос Google US English / en-US).</div>
+    <button class="listen-all" id="listenAllBtn">🔊 Прослушать все слова по очереди</button>
+    <div class="vocab-grid" id="vocabGrid"></div>
+  </section>
+
+  <div class="layout">
+    <main id="exercisesContainer"></main>
+
+    <aside class="sidebar">
+      <div class="side-card">
+        <h3>🏆 Общий результат</h3>
+        <div id="totalScore">0 / 70</div>
+      </div>
+      <div class="side-card">
+        <h3>⚠️ Проблемные слова</h3>
+        <table id="problemTable">
+          <thead><tr><th>Слово</th><th>Ошибок</th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <div class="empty-note" id="problemEmpty">Пока ошибок нет 🎉</div>
+      </div>
+      <div class="side-card">
+        <h3>📋 Экспорт ответов</h3>
+        <button class="copy-btn" id="copyAllBtn">Скопировать все ответы ученика</button>
+        <div id="copyStatus"></div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script>
+/* ============ VOCAB ============ */
+const VOCAB = [
+  {en:"drive", ru:"водить машину", ipa:"/draɪv/"},
+  {en:"drove", ru:"вёл машину (прошедшее время)", ipa:"/droʊv/"},
+  {en:"see", ru:"видеть", ipa:"/siː/"},
+  {en:"saw", ru:"увидел (прошедшее время)", ipa:"/sɔː/"},
+  {en:"pancake", ru:"блинчик", ipa:"/ˈpænkeɪk/"},
+  {en:"cherries", ru:"вишни (мн.ч.)", ipa:"/ˈtʃɛriz/"},
+  {en:"strawberries", ru:"клубника (мн.ч.)", ipa:"/ˈstrɔːbəriz/"},
+  {en:"blueberries", ru:"черника (мн.ч.)", ipa:"/ˈbluːbəriz/"},
+  {en:"lemon", ru:"лимон", ipa:"/ˈlɛmən/"},
+  {en:"vitamins", ru:"витамины", ipa:"/ˈvaɪtəmɪnz/"},
+  {en:"aunt", ru:"тётя", ipa:"/ænt/"},
+  {en:"uncle", ru:"дядя", ipa:"/ˈʌŋkəl/"},
+  {en:"nephew", ru:"племянник", ipa:"/ˈnɛfjuː/"},
+  {en:"niece", ru:"племянница", ipa:"/niːs/"},
+  {en:"desert", ru:"пустыня", ipa:"/ˈdɛzərt/"},
+  {en:"dessert", ru:"десерт", ipa:"/dɪˈzɜːrt/"}
+];
+function vocabRu(word){
+  const v = VOCAB.find(v=>v.en===word.toLowerCase());
+  return v ? v.ru : "";
+}
+
+/* ============ AUDIO ============ */
+let chosenVoice = null;
+function loadVoices(){
+  const voices = speechSynthesis.getVoices();
+  if(!voices.length) return;
+  chosenVoice = voices.find(v=>v.name === "Google US English")
+             || voices.find(v=>v.lang === "en-US" && /Google/i.test(v.name))
+             || voices.find(v=>v.lang === "en-US")
+             || voices.find(v=>/en/i.test(v.lang))
+             || voices[0];
+}
+if('speechSynthesis' in window){
+  loadVoices();
+  speechSynthesis.onvoiceschanged = loadVoices;
+}
+function speak(text){
+  if(!('speechSynthesis' in window)){
+    alert("Ваш браузер не поддерживает озвучивание (Speech Synthesis). Попробуйте открыть страницу в Chrome.");
+    return;
+  }
+  if(!chosenVoice) loadVoices();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = "en-US";
+  u.rate = 0.92;
+  if(chosenVoice) u.voice = chosenVoice;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+}
+document.getElementById('testAudioBtn').addEventListener('click', ()=>{
+  loadVoices();
+  speak("Hello! This is an audio test. Can you hear me?");
+  const statusEl = document.getElementById('audioStatus');
+  setTimeout(()=>{
+    if(chosenVoice){
+      statusEl.textContent = "✅ Голос найден: " + chosenVoice.name + " (" + chosenVoice.lang + ")";
+    } else {
+      statusEl.textContent = "⚠️ Голос ещё не загружен — нажмите ещё раз через секунду.";
+    }
+  }, 300);
+});
+document.getElementById('listenAllBtn').addEventListener('click', ()=>{
+  VOCAB.forEach(v=>speak(v.en));
+});
+
+/* render vocab grid */
+const vocabGrid = document.getElementById('vocabGrid');
+VOCAB.forEach(v=>{
+  const div = document.createElement('div');
+  div.className = 'vocab-item';
+  div.innerHTML = `
+    <span class="en">${v.en}</span>
+    <span class="ipa">${v.ipa}</span>
+    <span class="ru">${v.ru}</span>
+    <button class="listen-btn">🔊 Слушать</button>
+  `;
+  div.querySelector('.listen-btn').addEventListener('click', ()=>speak(v.en));
+  vocabGrid.appendChild(div);
+});
+
+/* ============ HELPERS ============ */
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+function normalize(s){
+  return s.toLowerCase().trim()
+    .replace(/[.,!?;:'"]/g,'')
+    .replace(/\s+/g,' ');
+}
+function matches(value, answers){
+  const v = normalize(value);
+  return answers.some(a=>normalize(a)===v);
+}
+
+/* problem words tracking */
+const problemWords = new Map();
+function addProblem(tag){
+  if(!tag) return;
+  problemWords.set(tag, (problemWords.get(tag)||0)+1);
+  renderProblemTable();
+}
+function renderProblemTable(){
+  const tbody = document.querySelector('#problemTable tbody');
+  const emptyNote = document.getElementById('problemEmpty');
+  tbody.innerHTML = '';
+  if(problemWords.size === 0){
+    emptyNote.style.display = 'block';
+    return;
+  }
+  emptyNote.style.display = 'none';
+  const sorted = [...problemWords.entries()].sort((a,b)=>b[1]-a[1]);
+  sorted.forEach(([word,count])=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${word}</td><td>${count}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+/* total score */
+const exScores = {}; // exId -> correct count (max 10 each, ex1-ex7)
+function updateTotalScore(){
+  const total = Object.values(exScores).reduce((a,b)=>a+b,0);
+  const maxTotal = Object.keys(exScores).length ? 70 : 70;
+  document.getElementById('totalScore').textContent = total + " / 70";
+}
+
+/* ============ EXERCISE DATA ============ */
+
+const EX1 = shuffle([
+  {before:"I like to", after:"my new car.", hint:"dr_v_", answer:["drive"], tag:"drive"},
+  {before:"Yesterday she", after:"to Moscow.", hint:"dr_v_", answer:["drove"], tag:"drove"},
+  {before:"I can", after:"the mountains from here.", hint:"s__", answer:["see"], tag:"see"},
+  {before:"Last night we", after:"a great film.", hint:"s_w", answer:["saw"], tag:"saw"},
+  {before:"I love pancakes with", after:".", hint:"cherr___", answer:["cherries"], tag:"cherries"},
+  {before:"She put fresh", after:"on the cake.", hint:"straw____ies", answer:["strawberries"], tag:"strawberries"},
+  {before:"We picked", after:"in the forest.", hint:"blue____ies", answer:["blueberries"], tag:"blueberries"},
+  {before:"Oranges contain a lot of", after:".", hint:"vita____", answer:["vitamins"], tag:"vitamins"},
+  {before:"My sister's son is my", after:".", hint:"ne____", answer:["nephew"], tag:"nephew"},
+  {before:"Ice cream is my favourite", after:".", hint:"des_ert", answer:["dessert"], tag:"dessert"}
+]);
+
+const EX2 = shuffle([
+  {ru:"Он вёл машину вчера.", answer:["he drove yesterday","he drove the car yesterday","he drove a car yesterday"], tag:"drove"},
+  {ru:"Я увидел птицу в саду.", answer:["i saw a bird in the garden"], tag:"saw"},
+  {ru:"Блины с вишней.", answer:["pancakes with cherries"], tag:"cherries"},
+  {ru:"Блины с клубникой.", answer:["pancakes with strawberries"], tag:"strawberries"},
+  {ru:"Блины с черникой.", answer:["pancakes with blueberries"], tag:"blueberries"},
+  {ru:"У лимона много витаминов.", answer:["a lemon has a lot of vitamins","lemon has a lot of vitamins"], tag:"vitamins"},
+  {ru:"Моя тётя живёт в Лондоне.", answer:["my aunt lives in london"], tag:"aunt"},
+  {ru:"Мой племянник учится в школе.", answer:["my nephew studies at school"], tag:"nephew"},
+  {ru:"Моя племянница любит десерты.", answer:["my niece loves desserts"], tag:"dessert"},
+  {ru:"Пустыня очень большая.", answer:["the desert is very big","a desert is very big","desert is very big"], tag:"desert"}
+]);
+
+const EX3 = shuffle([
+  {word:"drive", tag:"drive"},
+  {word:"drove", tag:"drove"},
+  {word:"see", tag:"see"},
+  {word:"saw", tag:"saw"},
+  {word:"cherries", tag:"cherries"},
+  {word:"strawberries", tag:"strawberries"},
+  {word:"blueberries", tag:"blueberries"},
+  {word:"vitamins", tag:"vitamins"},
+  {word:"aunt", tag:"aunt"},
+  {word:"dessert", tag:"dessert"}
+]);
+
+const EX4 = shuffle([
+  {def:"The sister of your mother or father.", answer:["aunt"], tag:"aunt"},
+  {def:"The son of your sister or brother.", answer:["nephew"], tag:"nephew"},
+  {def:"The daughter of your sister or brother.", answer:["niece"], tag:"niece"},
+  {def:"A sweet food you eat after dinner.", answer:["dessert"], tag:"dessert"},
+  {def:"A hot, dry place with a lot of sand.", answer:["desert"], tag:"desert"},
+  {def:"The past tense of the verb \"drive\".", answer:["drove"], tag:"drove"},
+  {def:"The past tense of the verb \"see\".", answer:["saw"], tag:"saw"},
+  {def:"A yellow, sour fruit.", answer:["lemon"], tag:"lemon"},
+  {def:"Small red fruits, often on top of a cake.", answer:["cherries","cherry"], tag:"cherries"},
+  {def:"A flat, round food made from flour, milk and eggs, cooked in a pan.", answer:["pancake","pancakes"], tag:"pancake"}
+]);
+
+const EX5 = shuffle([
+  {sentence:"A lemon have a lot of vitamins.", answer:["has"], tag:"vitamins"},
+  {sentence:"I seed a movie yesterday.", answer:["saw"], tag:"saw"},
+  {sentence:"She drived to work.", answer:["drove"], tag:"drove"},
+  {sentence:"We had pancakes with cherry.", answer:["cherries"], tag:"cherries"},
+  {sentence:"He have an aunt in Paris.", answer:["has"], tag:"aunt"},
+  {sentence:"My nephew have a dog.", answer:["has"], tag:"nephew"},
+  {sentence:"Pancakes with strawberry are my favourite.", answer:["strawberries"], tag:"strawberries"},
+  {sentence:"I like eating desert after dinner.", answer:["dessert"], tag:"dessert"},
+  {sentence:"The camel lives in the dessert.", answer:["desert"], tag:"desert"},
+  {sentence:"Yesterday I see my niece.", answer:["saw"], tag:"niece"}
+]);
+
+const EX6 = shuffle([
+  {sentence:"A lemon ___ a lot of vitamins.", options:["has","have","contains"], impossible:"have", tag:"vitamins"},
+  {sentence:"Yesterday I ___ my grandmother.", options:["saw","see","visited"], impossible:"see", tag:"saw"},
+  {sentence:"Pancakes with ___ are delicious.", options:["cherries","cherry","blueberries"], impossible:"cherry", tag:"cherries"},
+  {sentence:"My mother's sister is my ___.", options:["aunt","uncle","relative"], impossible:"uncle", tag:"aunt"},
+  {sentence:"My brother's son is my ___.", options:["nephew","niece","relative"], impossible:"niece", tag:"nephew"},
+  {sentence:"He ___ to school every day.", options:["drives","drove","is driving"], impossible:"drove", tag:"drive"},
+  {sentence:"The Sahara is a huge ___.", options:["desert","dessert","place"], impossible:"dessert", tag:"desert"},
+  {sentence:"I usually eat ___ after lunch.", options:["dessert","desert","cake"], impossible:"desert", tag:"dessert"},
+  {sentence:"Oranges ___ vitamin C.", options:["has","have","contain"], impossible:"has", tag:"vitamins"},
+  {sentence:"She ___ a film last night.", options:["saw","see","watched"], impossible:"see", tag:"saw"}
+]);
+
+const EX7 = shuffle([
+  {words:["drove","school","He","to","yesterday"], answer:["he drove to school yesterday"], tag:"drove"},
+  {words:["saw","a","We","lion","zoo","the","in"], answer:["we saw a lion in the zoo"], tag:"saw"},
+  {words:["with","Pancakes","cherries","delicious","are"], answer:["pancakes with cherries are delicious"], tag:"cherries"},
+  {words:["a","has","lemon","A","vitamins","of","lot"], answer:["a lemon has a lot of vitamins"], tag:"vitamins"},
+  {words:["lives","aunt","My","London","in"], answer:["my aunt lives in london"], tag:"aunt"},
+  {words:["school","at","studies","nephew","My"], answer:["my nephew studies at school"], tag:"nephew"},
+  {words:["desserts","loves","niece","My"], answer:["my niece loves desserts"], tag:"dessert"},
+  {words:["big","desert","very","The","is"], answer:["the desert is very big"], tag:"desert"},
+  {words:["strawberries","with","like","pancakes","I"], answer:["i like pancakes with strawberries"], tag:"strawberries"},
+  {words:["blueberries","forest","picked","We","the","in"], answer:["we picked blueberries in the forest"], tag:"blueberries"}
+]);
+
+const EX8 = shuffle([
+  {model:"Pancakes with cherries are delicious.", task:"Напиши свой вариант с другой ягодой/фруктом."},
+  {model:"Yesterday I saw a bird in the garden.", task:"Напиши свой вариант — что ты видел вчера."},
+  {model:"A lemon has a lot of vitamins.", task:"Напиши свой вариант с другим фруктом."},
+  {model:"My aunt lives in London.", task:"Напиши свой вариант с другим родственником и городом."},
+  {model:"My nephew studies at school.", task:"Напиши свой вариант с другим родственником."},
+  {model:"My niece loves desserts.", task:"Напиши свой вариант с другим родственником и увлечением."},
+  {model:"The desert is very big.", task:"Напиши свой вариант с другим прилагательным."},
+  {model:"He drove to school yesterday.", task:"Напиши свой вариант — куда ты ездил вчера."},
+  {model:"We picked blueberries in the forest.", task:"Напиши свой вариант с другим действием и местом."},
+  {model:"I like eating dessert after dinner.", task:"Напиши свой вариант с другой едой."}
+]);
+
+/* ============ RENDER EXERCISES ============ */
+const container = document.getElementById('exercisesContainer');
+
+function makeSection(id, title, sub){
+  const sec = document.createElement('section');
+  sec.className = 'card';
+  sec.id = id;
+  sec.innerHTML = `<h2>${title}</h2><div class="sub">${sub}</div><div class="items"></div>`;
+  container.appendChild(sec);
+  return sec.querySelector('.items');
+}
+
+function addControls(sectionEl, exKey, checkFn, showFn){
+  const ctrl = document.createElement('div');
+  ctrl.className = 'exercise-controls';
+  ctrl.innerHTML = `
+    <button class="btn btn-check">✅ Проверить</button>
+    <button class="btn btn-show">👁 Показать ответы</button>
+    <span class="score-tag" id="score_${exKey}">Результат: —/10</span>
+  `;
+  sectionEl.appendChild(ctrl);
+  ctrl.querySelector('.btn-check').addEventListener('click', checkFn);
+  ctrl.querySelector('.btn-show').addEventListener('click', showFn);
+}
+
+/* ---- EX1: fill missing letters ---- */
+(function(){
+  const items = makeSection('ex1','1️⃣ Вставь пропущенные буквы','Впиши слово целиком (не только пропущенные буквы).').parentElement;
+  const wrap = document.createElement('div');
+  wrap.id='ex1items';
+  items.querySelector('.items').appendChild(wrap);
+  EX1.forEach((it,i)=>{
+    const div = document.createElement('div');
+    div.className='item';
+    div.innerHTML = `
+      <span class="num">${i+1}.</span> ${it.before} <input type="text" data-i="${i}" placeholder="${it.hint}"> ${it.after}
+      <span class="hint">подсказка: <em>${it.hint}</em></span>
+      <span class="mark"></span>
+      <div class="answer-reveal">Ответ: <b>${it.answer[0]}</b> (${vocabRu(it.answer[0])})</div>
+    `;
+    wrap.appendChild(div);
+  });
+  addControls(items, 'ex1', function(){
+    let correct=0;
+    wrap.querySelectorAll('.item').forEach((div,i)=>{
+      const input = div.querySelector('input');
+      const mark = div.querySelector('.mark');
+      const ok = matches(input.value, EX1[i].answer);
+      div.classList.toggle('correct', ok);
+      div.classList.toggle('wrong', !ok);
+      mark.textContent = ok ? '✓' : '✗';
+      mark.className = 'mark ' + (ok?'correct':'wrong');
+      if(ok) correct++; else addProblem(EX1[i].tag);
+    });
+    exScores.ex1 = correct;
+    document.getElementById('score_ex1').textContent = `Результат: ${correct}/10`;
+    updateTotalScore();
+  }, function(){
+    wrap.querySelectorAll('.answer-reveal').forEach(el=>el.classList.toggle('show'));
+  });
+})();
+
+/* ---- EX2: translate RU -> EN ---- */
+(function(){
+  const sec = makeSection('ex2','2️⃣ Переведи с русского на английский','Напиши предложение целиком по-английски.').parentElement;
+  const wrap = document.createElement('div');
+  sec.querySelector('.items').appendChild(wrap);
+  EX2.forEach((it,i)=>{
+    const div = document.createElement('div');
+    div.className='item';
+    div.innerHTML = `
+      <span class="num">${i+1}.</span> <b>${it.ru}</b><br>
+      <input type="text" style="width:340px;max-width:80vw;margin-top:6px;" placeholder="Type your answer in English...">
+      <span class="mark"></span>
+      <div class="answer-reveal">Ответ: <b>${it.answer[0].charAt(0).toUpperCase()+it.answer[0].slice(1)}.</b></div>
+    `;
+    wrap.appendChild(div);
+  });
+  addControls(sec, 'ex2', function(){
+    let correct=0;
+    wrap.querySelectorAll('.item').forEach((div,i)=>{
+      const input = div.querySelector('input');
+      const mark = div.querySelector('.mark');
+      const ok = matches(input.value, EX2[i].answer);
+      div.classList.toggle('correct', ok);
+      div.classList.toggle('wrong', !ok);
+      mark.textContent = ok ? '✓' : '✗';
+      mark.className = 'mark ' + (ok?'correct':'wrong');
+      if(ok) correct++; else addProblem(EX2[i].tag);
+    });
+    exScores.ex2 = correct;
+    document.getElementById('score_ex2').textContent = `Результат: ${correct}/10`;
+    updateTotalScore();
+  }, function(){
+    wrap.querySelectorAll('.answer-reveal').forEach(el=>el.classList.toggle('show'));
+  });
+})();
+
+/* ---- EX3: dictation (write the word you hear) ---- */
+(function(){
+  const sec = makeSection('ex3','3️⃣ Прослушай и напиши слово','Нажми 🔊, послушай произношение и впиши слово по звуку.').parentElement;
+  const wrap = document.createElement('div');
+  sec.querySelector('.items').appendChild(wrap);
+  EX3.forEach((it,i)=>{
+    const div = document.createElement('div');
+    div.className='item';
+    div.innerHTML = `
+      <span class="num">${i+1}.</span>
+      <button class="listen-mini">🔊 Слушать</button>
+      <input type="text" placeholder="Write the word...">
+      <span class="mark"></span>
+      <div class="answer-reveal">Ответ: <b>${it.word}</b> (${vocabRu(it.word)})</div>
+    `;
+    div.querySelector('.listen-mini').addEventListener('click', ()=>speak(it.word));
+    wrap.appendChild(div);
+  });
+  addControls(sec, 'ex3', function(){
+    let correct=0;
+    wrap.querySelectorAll('.item').forEach((div,i)=>{
+      const input = div.querySelector('input');
+      const mark = div.querySelector('.mark');
+      const ok = matches(input.value, [EX3[i].word]);
+      div.classList.toggle('correct', ok);
+      div.classList.toggle('wrong', !ok);
+      mark.textContent = ok ? '✓' : '✗';
+      mark.className = 'mark ' + (ok?'correct':'wrong');
+      if(ok) correct++; else addProblem(EX3[i].tag);
+    });
+    exScores.ex3 = correct;
+    document.getElementById('score_ex3').textContent = `Результат: ${correct}/10`;
+    updateTotalScore();
+  }, function(){
+    wrap.querySelectorAll('.answer-reveal').forEach(el=>el.classList.toggle('show'));
+  });
+})();
+
+/* ---- EX4: definitions ---- */
+(function(){
+  const sec = makeSection('ex4','4️⃣ Дефиниция — угадай слово','Прочитай определение и напиши нужное слово.').parentElement;
+  const wrap = document.createElement('div');
+  sec.querySelector('.items').appendChild(wrap);
+  EX4.forEach((it,i)=>{
+    const div = document.createElement('div');
+    div.className='item';
+    div.innerHTML = `
+      <span class="num">${i+1}.</span> <i>"${it.def}"</i><br>
+      <input type="text" style="margin-top:6px;" placeholder="word...">
+      <span class="mark"></span>
+      <div class="answer-reveal">Ответ: <b>${it.answer[0]}</b> (${vocabRu(it.answer[0])})</div>
+    `;
+    wrap.appendChild(div);
+  });
+  addControls(sec, 'ex4', function(){
+    let correct=0;
+    wrap.querySelectorAll('.item').forEach((div,i)=>{
+      const input = div.querySelector('input');
+      const mark = div.querySelector('.mark');
+      const ok = matches(input.value, EX4[i].answer);
+      div.classList.toggle('correct', ok);
+      div.classList.toggle('wrong', !ok);
+      mark.textContent = ok ? '✓' : '✗';
+      mark.className = 'mark ' + (ok?'correct':'wrong');
+      if(ok) correct++; else addProblem(EX4[i].tag);
+    });
+    exScores.ex4 = correct;
+    document.getElementById('score_ex4').textContent = `Результат: ${correct}/10`;
+    updateTotalScore();
+  }, function(){
+    wrap.querySelectorAll('.answer-reveal').forEach(el=>el.classList.toggle('show'));
+  });
+})();
+
+/* ---- EX5: find the mistake ---- */
+(function(){
+  const sec = makeSection('ex5','5️⃣ Find a mistake — найди и исправь ошибку','В каждом предложении одна ошибка. Напиши правильное слово.').parentElement;
+  const wrap = document.createElement('div');
+  sec.querySelector('.items').appendChild(wrap);
+  EX5.forEach((it,i)=>{
+    const div = document.createElement('div');
+    div.className='item';
+    div.innerHTML = `
+      <span class="num">${i+1}.</span> ${it.sentence}<br>
+      <input type="text" style="margin-top:6px;" placeholder="correct word...">
+      <span class="mark"></span>
+      <div class="answer-reveal">Правильно: <b>${it.answer[0]}</b></div>
+    `;
+    wrap.appendChild(div);
+  });
+  addControls(sec, 'ex5', function(){
+    let correct=0;
+    wrap.querySelectorAll('.item').forEach((div,i)=>{
+      const input = div.querySelector('input');
+      const mark = div.querySelector('.mark');
+      const ok = matches(input.value, EX5[i].answer);
+      div.classList.toggle('correct', ok);
+      div.classList.toggle('wrong', !ok);
+      mark.textContent = ok ? '✓' : '✗';
+      mark.className = 'mark ' + (ok?'correct':'wrong');
+      if(ok) correct++; else addProblem(EX5[i].tag);
+    });
+    exScores.ex5 = correct;
+    document.getElementById('score_ex5').textContent = `Результат: ${correct}/10`;
+    updateTotalScore();
+  }, function(){
+    wrap.querySelectorAll('.answer-reveal').forEach(el=>el.classList.toggle('show'));
+  });
+})();
+
+/* ---- EX6: which answer is impossible ---- */
+(function(){
+  const sec = makeSection('ex6','6️⃣ Which answer is impossible?','Выбери вариант, который НЕЛЬЗЯ вставить в предложение.').parentElement;
+  const wrap = document.createElement('div');
+  sec.querySelector('.items').appendChild(wrap);
+  EX6.forEach((it,i)=>{
+    const opts = shuffle(it.options);
+    const div = document.createElement('div');
+    div.className='item';
+    let optsHtml = '<div class="mc-options">';
+    opts.forEach((o,oi)=>{
+      optsHtml += `<label><input type="radio" name="ex6_${i}" value="${o}"> ${o}</label>`;
+    });
+    optsHtml += '</div>';
+    div.innerHTML = `
+      <span class="num">${i+1}.</span> ${it.sentence}
+      ${optsHtml}
+      <span class="mark"></span>
+      <div class="answer-reveal">Невозможный вариант: <b>${it.impossible}</b></div>
+    `;
+    wrap.appendChild(div);
+  });
+  addControls(sec, 'ex6', function(){
+    let correct=0;
+    wrap.querySelectorAll('.item').forEach((div,i)=>{
+      const checked = div.querySelector('input[type=radio]:checked');
+      const mark = div.querySelector('.mark');
+      const ok = checked && checked.value === EX6[i].impossible;
+      div.classList.toggle('correct', !!ok);
+      div.classList.toggle('wrong', !ok);
+      mark.textContent = ok ? '✓' : '✗';
+      mark.className = 'mark ' + (ok?'correct':'wrong');
+      if(ok) correct++; else addProblem(EX6[i].tag);
+    });
+    exScores.ex6 = correct;
+    document.getElementById('score_ex6').textContent = `Результат: ${correct}/10`;
+    updateTotalScore();
+  }, function(){
+    wrap.querySelectorAll('.answer-reveal').forEach(el=>el.classList.toggle('show'));
+  });
+})();
+
+/* ---- EX7: build the chunk / expand the sentence ---- */
+(function(){
+  const sec = makeSection('ex7','7️⃣ Build the chunk — собери предложение','Слова перемешаны. Напиши правильное предложение целиком.').parentElement;
+  const wrap = document.createElement('div');
+  sec.querySelector('.items').appendChild(wrap);
+  EX7.forEach((it,i)=>{
+    const scrambled = shuffle(it.words);
+    const chips = scrambled.map(w=>`<span class="chip">${w}</span>`).join(' ');
+    const div = document.createElement('div');
+    div.className='item';
+    div.innerHTML = `
+      <span class="num">${i+1}.</span> ${chips}<br>
+      <input type="text" style="width:360px;max-width:85vw;margin-top:6px;" placeholder="Write the full sentence...">
+      <span class="mark"></span>
+      <div class="answer-reveal">Ответ: <b>${it.answer[0].charAt(0).toUpperCase()+it.answer[0].slice(1)}.</b></div>
+    `;
+    wrap.appendChild(div);
+  });
+  addControls(sec, 'ex7', function(){
+    let correct=0;
+    wrap.querySelectorAll('.item').forEach((div,i)=>{
+      const input = div.querySelector('input');
+      const mark = div.querySelector('.mark');
+      const ok = matches(input.value, EX7[i].answer);
+      div.classList.toggle('correct', ok);
+      div.classList.toggle('wrong', !ok);
+      mark.textContent = ok ? '✓' : '✗';
+      mark.className = 'mark ' + (ok?'correct':'wrong');
+      if(ok) correct++; else addProblem(EX7[i].tag);
+    });
+    exScores.ex7 = correct;
+    document.getElementById('score_ex7').textContent = `Результат: ${correct}/10`;
+    updateTotalScore();
+  }, function(){
+    wrap.querySelectorAll('.answer-reveal').forEach(el=>el.classList.toggle('show'));
+  });
+})();
+
+/* ---- EX8: Repeat & Change drilling (free, not graded) ---- */
+(function(){
+  const sec = makeSection('ex8','🔁 Repeat & Change — дриллинг','Прочитай образец и напиши СВОЙ вариант предложения по этому же шаблону.').parentElement;
+  const wrap = document.createElement('div');
+  wrap.id = 'ex8items';
+  sec.querySelector('.items').appendChild(wrap);
+  EX8.forEach((it,i)=>{
+    const div = document.createElement('div');
+    div.className='item';
+    div.innerHTML = `
+      <span class="num">${i+1}.</span>
+      <div class="model-line">Model: "${it.model}" <button class="listen-mini">🔊</button></div>
+      <div class="task-line">${it.task}</div>
+      <textarea class="repeat-input" placeholder="Write your own sentence here..."></textarea>
+    `;
+    div.querySelector('.listen-mini').addEventListener('click', ()=>speak(it.model));
+    wrap.appendChild(div);
+  });
+  const note = document.createElement('div');
+  note.className = 'sub';
+  note.style.marginTop = '10px';
+  note.textContent = 'Это упражнение без автопроверки — учитель проверяет ответы вручную. Нажми "Скопировать все ответы" в боковой панели, чтобы собрать все ответы ученика (включая это упражнение) в один текст.';
+  sec.appendChild(note);
+})();
+
+/* ============ COPY ALL ANSWERS ============ */
+document.getElementById('copyAllBtn').addEventListener('click', ()=>{
+  let out = "=== ОТВЕТЫ УЧЕНИКА ===\n\n";
+
+  out += "-- 1. Fill in the missing letters --\n";
+  document.querySelectorAll('#ex1items .item input').forEach((inp,i)=>{
+    out += `${i+1}. ${inp.value || '(пусто)'}\n`;
+  });
+
+  out += "\n-- 2. Translate RU -> EN --\n";
+  document.querySelectorAll('#ex2 .items > div .item input').forEach((inp,i)=>{
+    out += `${i+1}. ${inp.value || '(пусто)'}\n`;
+  });
+
+  out += "\n-- 3. Write the word you hear --\n";
+  document.querySelectorAll('#ex3 .items > div .item input').forEach((inp,i)=>{
+    out += `${i+1}. ${inp.value || '(пусто)'}\n`;
+  });
+
+  out += "\n-- 4. Definitions --\n";
+  document.querySelectorAll('#ex4 .items > div .item input').forEach((inp,i)=>{
+    out += `${i+1}. ${inp.value || '(пусто)'}\n`;
+  });
+
+  out += "\n-- 5. Find a mistake --\n";
+  document.querySelectorAll('#ex5 .items > div .item input').forEach((inp,i)=>{
+    out += `${i+1}. ${inp.value || '(пусто)'}\n`;
+  });
+
+  out += "\n-- 6. Which answer is impossible --\n";
+  document.querySelectorAll('#ex6 .items > div .item').forEach((div,i)=>{
+    const checked = div.querySelector('input[type=radio]:checked');
+    out += `${i+1}. ${checked ? checked.value : '(не выбрано)'}\n`;
+  });
+
+  out += "\n-- 7. Build the chunk --\n";
+  document.querySelectorAll('#ex7 .items > div .item input').forEach((inp,i)=>{
+    out += `${i+1}. ${inp.value || '(пусто)'}\n`;
+  });
+
+  out += "\n-- Repeat & Change (free answers) --\n";
+  document.querySelectorAll('#ex8items .item textarea').forEach((ta,i)=>{
+    out += `${i+1}. ${ta.value || '(пусто)'}\n`;
+  });
+
+  out += "\n-- Итоговый счёт --\n";
+  out += document.getElementById('totalScore').textContent + "\n";
+
+  const statusEl = document.getElementById('copyStatus');
+  function showCopied(){
+    statusEl.textContent = "✅ Скопировано в буфер обмена!";
+    setTimeout(()=>statusEl.textContent = "", 3000);
+  }
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(out).then(showCopied).catch(()=>{
+      fallbackCopy(out, showCopied);
+    });
+  } else {
+    fallbackCopy(out, showCopied);
+  }
+  function fallbackCopy(text, cb){
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position='fixed';
+    ta.style.left='-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    try{ document.execCommand('copy'); cb(); }
+    catch(e){ statusEl.textContent = "⚠️ Не удалось скопировать автоматически."; }
+    document.body.removeChild(ta);
+  }
+});
+</script>
+</body>
+</html>
