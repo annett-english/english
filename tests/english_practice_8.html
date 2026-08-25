@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Practice: Life Events — A1/A2</title>
+<style>
+  :root{
+    --ink:#1e293b;
+    --paper:#f6f8fb;
+    --card:#ffffff;
+    --line:#dbe3ee;
+    --accent:#2f6f6f;
+    --accent-light:#e4f1ef;
+    --good:#2e7d4f;
+    --good-bg:#e7f6ec;
+    --bad:#b3452c;
+    --bad-bg:#fbeae5;
+    --muted:#64748b;
+    font-size:16px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    line-height:1.5;
+    padding-bottom:60px;
+  }
+  .wrap{
+    max-width:1180px;
+    margin:0 auto;
+    padding:28px 20px 80px;
+    display:grid;
+    grid-template-columns: 1fr 260px;
+    gap:24px;
+    align-items:start;
+  }
+  header.top{
+    grid-column:1/-1;
+    border-bottom:3px solid var(--accent);
+    padding-bottom:16px;
+    margin-bottom:6px;
+  }
+  header.top h1{
+    font-size:1.9rem;
+    margin:0 0 4px;
+    letter-spacing:0.2px;
+  }
+  header.top p{
+    margin:0;
+    color:var(--muted);
+    font-size:0.95rem;
+  }
+  main{ min-width:0; }
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:20px 22px;
+    margin-bottom:22px;
+  }
+  .card h2{
+    margin-top:0;
+    font-size:1.15rem;
+    color:var(--accent);
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .badge{
+    background:var(--accent);
+    color:#fff;
+    font-size:0.7rem;
+    padding:2px 8px;
+    border-radius:20px;
+    font-weight:600;
+    letter-spacing:0.3px;
+  }
+  .task-hint{
+    font-size:0.88rem;
+    color:var(--muted);
+    margin:-4px 0 14px;
+  }
+
+  /* Vocabulary table */
+  table.vocab{
+    width:100%;
+    border-collapse:collapse;
+    font-size:0.94rem;
+  }
+  table.vocab th, table.vocab td{
+    border-bottom:1px solid var(--line);
+    padding:8px 10px;
+    text-align:left;
+    vertical-align:middle;
+  }
+  table.vocab th{
+    color:var(--muted);
+    font-weight:600;
+    font-size:0.8rem;
+    text-transform:uppercase;
+    letter-spacing:0.4px;
+  }
+  .transcr{ color:var(--accent); font-style:italic; }
+  .listen-btn{
+    border:none;
+    background:var(--accent);
+    color:#fff;
+    padding:6px 12px;
+    border-radius:6px;
+    cursor:pointer;
+    font-size:0.85rem;
+  }
+  .listen-btn:hover{ opacity:0.88; }
+  .listen-btn.small{ padding:4px 8px; font-size:0.78rem; }
+
+  /* Exercise items */
+  .item{
+    display:grid;
+    grid-template-columns: 28px 1fr 200px;
+    gap:10px;
+    align-items:center;
+    padding:9px 0;
+    border-bottom:1px dashed var(--line);
+  }
+  .item:last-child{ border-bottom:none; }
+  .item .num{ color:var(--muted); font-weight:600; }
+  .item .prompt{ font-size:0.98rem; }
+  .item .prompt .ru{ color:#334155; }
+  .item .prompt small{ display:block; color:var(--muted); margin-top:2px; }
+  .item input[type=text]{
+    width:100%;
+    padding:8px 10px;
+    border:1px solid var(--line);
+    border-radius:6px;
+    font-size:0.95rem;
+    font-family:inherit;
+  }
+  .item.dictation{ grid-template-columns: 28px 90px 1fr 200px; }
+  .result-icon{ width:22px; text-align:center; font-weight:700; }
+  .result-icon.ok{ color:var(--good); }
+  .result-icon.no{ color:var(--bad); }
+  .answer-line{
+    font-size:0.85rem;
+    margin-top:3px;
+    color:var(--muted);
+  }
+  .answer-line b{ color:var(--accent); }
+
+  .open-item{ padding:10px 0; border-bottom:1px dashed var(--line); }
+  .open-item:last-child{ border-bottom:none; }
+  .open-item .prompt{ margin-bottom:6px; font-size:0.98rem; }
+  .open-item .prompt small{ display:block; color:var(--muted); margin-top:2px; }
+  .open-item textarea{
+    width:100%;
+    min-height:44px;
+    padding:8px 10px;
+    border:1px solid var(--line);
+    border-radius:6px;
+    font-family:inherit;
+    font-size:0.95rem;
+    resize:vertical;
+  }
+  .model-answer{
+    display:none;
+    margin-top:6px;
+    font-size:0.86rem;
+    background:var(--accent-light);
+    border-left:3px solid var(--accent);
+    padding:6px 10px;
+    border-radius:4px;
+    color:#134646;
+  }
+  .model-answer.shown{ display:block; }
+
+  .controls{
+    display:flex;
+    gap:10px;
+    margin-top:16px;
+    flex-wrap:wrap;
+  }
+  button.action{
+    border:none;
+    padding:9px 16px;
+    border-radius:7px;
+    font-size:0.9rem;
+    cursor:pointer;
+    font-weight:600;
+  }
+  button.check{ background:var(--accent); color:#fff; }
+  button.show{ background:#fff; color:var(--accent); border:1px solid var(--accent); }
+  button.copy{ background:#fff; color:var(--accent); border:1px solid var(--accent); }
+  button.reset{ background:#fff; color:var(--muted); border:1px solid var(--line); }
+  button.action:hover{ opacity:0.85; }
+  .score{
+    margin-left:auto;
+    font-size:0.9rem;
+    color:var(--muted);
+    align-self:center;
+  }
+  .copy-flash{ color:var(--good); font-size:0.85rem; margin-left:6px; }
+
+  /* sidebar */
+  aside{
+    position:sticky;
+    top:20px;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:16px 18px;
+  }
+  aside h3{
+    margin:0 0 10px;
+    font-size:0.95rem;
+    color:var(--accent);
+  }
+  #problemList{
+    list-style:none;
+    margin:0; padding:0;
+    font-size:0.88rem;
+  }
+  #problemList li{
+    display:flex;
+    justify-content:space-between;
+    padding:5px 0;
+    border-bottom:1px solid var(--line);
+  }
+  #problemList li span.cnt{
+    background:var(--bad-bg);
+    color:var(--bad);
+    border-radius:10px;
+    padding:0 8px;
+    font-size:0.78rem;
+    font-weight:700;
+  }
+  #problemEmpty{ color:var(--muted); font-size:0.85rem; }
+  .audio-note{
+    margin-top:14px;
+    font-size:0.78rem;
+    color:var(--muted);
+    border-top:1px dashed var(--line);
+    padding-top:10px;
+  }
+  #audioStatus{ font-weight:600; }
+  #audioStatus.ok{ color:var(--good); }
+  #audioStatus.no{ color:var(--bad); }
+
+  @media (max-width: 880px){
+    .wrap{ grid-template-columns: 1fr; }
+    aside{ position:static; }
+    .item{ grid-template-columns: 22px 1fr; }
+    .item .result-icon, .item input{ grid-column: 1/-1; }
+    .item.dictation{ grid-template-columns: 22px 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <h1>Life Events — Vocabulary Practice</h1>
+    <p>Уровень A1–A2 · 10 фраз · 7 упражнений на письмо + 3 упражнения на говорение/письмо своими словами</p>
+  </header>
+
+  <main>
+
+    <!-- VOCAB REMINDER -->
+    <section class="card" id="vocabCard">
+      <h2>📌 Напоминание слов <span class="badge">Listen &amp; repeat</span></h2>
+      <p class="task-hint">Нажмите 🔊, чтобы прослушать произношение (голос: Google US English). Повторите слово вслух, затем прочитайте перевод.</p>
+      <table class="vocab">
+        <thead>
+          <tr><th>Phrase</th><th>Transcription</th><th>Перевод</th><th>Audio</th></tr>
+        </thead>
+        <tbody id="vocabBody"></tbody>
+      </table>
+    </section>
+
+    <!-- EX 1: missing letters -->
+    <section class="card" id="ex1">
+      <h2>1. Вставь пропущенные буквы <span class="badge">10</span></h2>
+      <p class="task-hint">Восстанови слово целиком и впиши в поле полный вариант фразы.</p>
+      <div id="ex1list"></div>
+      <div class="controls">
+        <button class="action check" onclick="checkExercise('ex1')">Проверить</button>
+        <button class="action show" onclick="showAnswers('ex1')">Показать ответы</button>
+        <button class="action reset" onclick="resetExercise('ex1')">Сбросить</button>
+        <span class="score" id="ex1score"></span>
+      </div>
+    </section>
+
+    <!-- EX 2: RU -> EN translation -->
+    <section class="card" id="ex2">
+      <h2>2. Перевод с русского на английский <span class="badge">10</span></h2>
+      <p class="task-hint">Переведи фразу на английский язык.</p>
+      <div id="ex2list"></div>
+      <div class="controls">
+        <button class="action check" onclick="checkExercise('ex2')">Проверить</button>
+        <button class="action show" onclick="showAnswers('ex2')">Показать ответы</button>
+        <button class="action reset" onclick="resetExercise('ex2')">Сбросить</button>
+        <span class="score" id="ex2score"></span>
+      </div>
+    </section>
+
+    <!-- EX 3: dictation by sound -->
+    <section class="card" id="ex3">
+      <h2>3. Напиши слово на слух <span class="badge">10</span></h2>
+      <p class="task-hint">Нажми 🔊, прослушай фразу и запиши то, что услышал(а).</p>
+      <div id="ex3list"></div>
+      <div class="controls">
+        <button class="action check" onclick="checkExercise('ex3')">Проверить</button>
+        <button class="action show" onclick="showAnswers('ex3')">Показать ответы</button>
+        <button class="action reset" onclick="resetExercise('ex3')">Сбросить</button>
+        <span class="score" id="ex3score"></span>
+      </div>
+    </section>
+
+    <!-- EX 4: definitions -->
+    <section class="card" id="ex4">
+      <h2>4. Дефиниции <span class="badge">10</span></h2>
+      <p class="task-hint">Прочитай определение и напиши подходящую фразу.</p>
+      <div id="ex4list"></div>
+      <div class="controls">
+        <button class="action check" onclick="checkExercise('ex4')">Проверить</button>
+        <button class="action show" onclick="showAnswers('ex4')">Показать ответы</button>
+        <button class="action reset" onclick="resetExercise('ex4')">Сбросить</button>
+        <span class="score" id="ex4score"></span>
+      </div>
+    </section>
+
+    <!-- EX 5: collocations -->
+    <section class="card" id="ex5">
+      <h2>5. Сочетаемость слов <span class="badge">10</span></h2>
+      <p class="task-hint">Допиши недостающее слово так, чтобы получилось верное словосочетание.</p>
+      <div id="ex5list"></div>
+      <div class="controls">
+        <button class="action check" onclick="checkExercise('ex5')">Проверить</button>
+        <button class="action show" onclick="showAnswers('ex5')">Показать ответы</button>
+        <button class="action reset" onclick="resetExercise('ex5')">Сбросить</button>
+        <span class="score" id="ex5score"></span>
+      </div>
+    </section>
+
+    <!-- EX 6: verb tense change -->
+    <section class="card" id="ex6">
+      <h2>6. Измени время глагола <span class="badge">10</span></h2>
+      <p class="task-hint">Напиши фразу в указанном времени и лице.</p>
+      <div id="ex6list"></div>
+      <div class="controls">
+        <button class="action check" onclick="checkExercise('ex6')">Проверить</button>
+        <button class="action show" onclick="showAnswers('ex6')">Показать ответы</button>
+        <button class="action reset" onclick="resetExercise('ex6')">Сбросить</button>
+        <span class="score" id="ex6score"></span>
+      </div>
+    </section>
+
+    <!-- EX 7: rephrase -->
+    <section class="card" id="ex7">
+      <h2>7. Rephrase <span class="badge">10</span></h2>
+      <p class="task-hint">Перефразируй предложение, используя фразу из списка. Открытое задание — сравни с примером ответа.</p>
+      <div id="ex7list"></div>
+      <div class="controls">
+        <button class="action show" onclick="toggleModel('ex7')">Показать пример ответов</button>
+        <button class="action copy" onclick="copyOpenAnswers('ex7','Rephrase')">Скопировать все ответы</button>
+        <span class="copy-flash" id="ex7flash"></span>
+      </div>
+    </section>
+
+    <!-- EX 8: finish the dialogue -->
+    <section class="card" id="ex8">
+      <h2>8. Finish the Dialogue <span class="badge">10</span></h2>
+      <p class="task-hint">Заверши реплику в диалоге, используя фразы из темы.</p>
+      <div id="ex8list"></div>
+      <div class="controls">
+        <button class="action show" onclick="toggleModel('ex8')">Показать пример ответов</button>
+        <button class="action copy" onclick="copyOpenAnswers('ex8','Finish the Dialogue')">Скопировать все ответы</button>
+        <span class="copy-flash" id="ex8flash"></span>
+      </div>
+    </section>
+
+    <!-- EX 9: finish sentences with own ideas -->
+    <section class="card" id="ex9">
+      <h2>9. Finish the Sentences (your own ideas) <span class="badge">10</span></h2>
+      <p class="task-hint">Закончи предложение своей идеей.</p>
+      <div id="ex9list"></div>
+      <div class="controls">
+        <button class="action show" onclick="toggleModel('ex9')">Показать пример ответов</button>
+        <button class="action copy" onclick="copyOpenAnswers('ex9','Finish the Sentences')">Скопировать все ответы</button>
+        <span class="copy-flash" id="ex9flash"></span>
+      </div>
+    </section>
+
+    <!-- EX 10: drilling repeat & change -->
+    <section class="card" id="ex10">
+      <h2>10. Drilling: Repeat &amp; Change <span class="badge">10</span></h2>
+      <p class="task-hint">По примеру составь своё предложение, заменив подлежащее/детали.</p>
+      <div id="ex10list"></div>
+      <div class="controls">
+        <button class="action show" onclick="toggleModel('ex10')">Показать пример ответов</button>
+        <button class="action copy" onclick="copyOpenAnswers('ex10','Repeat & Change')">Скопировать все ответы</button>
+        <span class="copy-flash" id="ex10flash"></span>
+      </div>
+    </section>
+
+  </main>
+
+  <aside>
+    <h3>⚠️ Проблемные слова</h3>
+    <ul id="problemList"></ul>
+    <p id="problemEmpty">Пока нет ошибок. Отлично!</p>
+    <div class="audio-note">
+      Голос озвучки: <span id="audioStatus">проверка…</span><br>
+      Если звук не работает — проверьте разрешения браузера на воспроизведение звука.
+    </div>
+  </aside>
+</div>
+
+<script>
+/* =========================================================
+   DATA
+   ========================================================= */
+const PHRASES = [
+  {id:0, en:"become famous", ru:"стать знаменитым", ipa:"/bɪˈkʌm ˈfeɪməs/",
+   def:"to become known by a lot of people"},
+  {id:1, en:"get a lot of money", ru:"получить много денег", ipa:"/ɡet ə lɒt əv ˈmʌni/",
+   def:"to receive a large amount of money"},
+  {id:2, en:"get a new job", ru:"получить новую работу", ipa:"/ɡet ə njuː dʒɒb/",
+   def:"to start working in a different position"},
+  {id:3, en:"get married", ru:"пожениться / выйти замуж / жениться", ipa:"/ɡet ˈmærid/",
+   def:"to become someone's husband or wife"},
+  {id:4, en:"be lucky", ru:"быть удачливым", ipa:"/biː ˈlʌki/",
+   def:"to have good things happen to you by chance"},
+  {id:5, en:"meet somebody new", ru:"познакомиться с кем-то новым", ipa:"/miːt ˈsʌmbədi njuː/",
+   def:"to see and talk to a person for the first time"},
+  {id:6, en:"travel", ru:"путешествовать", ipa:"/ˈtrævl/",
+   def:"to go from one place to another, often to a different country"},
+  {id:7, en:"have a surprise", ru:"получить сюрприз", ipa:"/hæv ə səˈpraɪz/",
+   def:"to experience something you did not expect"},
+  {id:8, en:"fall in love", ru:"влюбиться", ipa:"/fɔːl ɪn lʌv/",
+   def:"to start having strong romantic feelings for someone"},
+  {id:9, en:"move house", ru:"переехать (жить в другой дом)", ipa:"/muːv haʊs/",
+   def:"to go and live in a different house"}
+];
+
+function norm(s){
+  return s.toLowerCase().trim().replace(/\s+/g," ").replace(/[.,!?]/g,"");
+}
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+/* =========================================================
+   PROBLEM WORDS TRACKER
+   ========================================================= */
+const problemWords = {}; // en -> count
+function markWrong(en){
+  problemWords[en] = (problemWords[en]||0)+1;
+  renderProblemWords();
+}
+function renderProblemWords(){
+  const ul = document.getElementById('problemList');
+  const empty = document.getElementById('problemEmpty');
+  const entries = Object.entries(problemWords).sort((a,b)=>b[1]-a[1]);
+  ul.innerHTML = "";
+  if(entries.length===0){ empty.style.display="block"; return; }
+  empty.style.display="none";
+  entries.forEach(([word,count])=>{
+    const li = document.createElement('li');
+    li.innerHTML = `<span>${word}</span><span class="cnt">${count}</span>`;
+    ul.appendChild(li);
+  });
+}
+
+/* =========================================================
+   AUDIO (Web Speech API)
+   ========================================================= */
+let chosenVoice = null;
+function pickVoice(){
+  const voices = window.speechSynthesis.getVoices();
+  chosenVoice = voices.find(v=>v.name.includes("Google US English"))
+             || voices.find(v=>v.lang==="en-US")
+             || voices.find(v=>v.lang && v.lang.startsWith("en"))
+             || null;
+  const statusEl = document.getElementById('audioStatus');
+  if(chosenVoice){
+    statusEl.textContent = chosenVoice.name + " (" + chosenVoice.lang + ")";
+    statusEl.className = "ok";
+  } else if(voices.length===0){
+    statusEl.textContent = "загрузка голосов...";
+  } else {
+    statusEl.textContent = "en-US голос не найден — используется голос по умолчанию";
+    statusEl.className = "no";
+  }
+}
+if('speechSynthesis' in window){
+  pickVoice();
+  window.speechSynthesis.onvoiceschanged = pickVoice;
+} else {
+  document.getElementById('audioStatus').textContent = "не поддерживается браузером";
+  document.getElementById('audioStatus').className = "no";
+}
+function speak(text){
+  if(!('speechSynthesis' in window)){
+    alert("Ваш браузер не поддерживает озвучку. Попробуйте Chrome.");
+    return;
+  }
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = "en-US";
+  u.rate = 0.9;
+  if(chosenVoice) u.voice = chosenVoice;
+  window.speechSynthesis.speak(u);
+}
+
+/* =========================================================
+   RENDER VOCAB TABLE
+   ========================================================= */
+const vocabBody = document.getElementById('vocabBody');
+PHRASES.forEach(p=>{
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td><b>${p.en}</b></td>
+    <td class="transcr">${p.ipa}</td>
+    <td>${p.ru}</td>
+    <td><button class="listen-btn small" onclick="speak('${p.en.replace(/'/g,"\\'")}')">🔊 Listen</button></td>
+  `;
+  vocabBody.appendChild(tr);
+});
+
+/* =========================================================
+   EXERCISE 1 — Missing letters
+   ========================================================= */
+function maskWord(word){
+  // mask ~40% of letters (not spaces), keep first and last letter of each word
+  return word.split(' ').map(w=>{
+    if(w.length<=2) return w;
+    let chars = w.split('');
+    let indices = [];
+    for(let i=1;i<chars.length-1;i++) indices.push(i);
+    indices = shuffle(indices).slice(0, Math.ceil(indices.length*0.45));
+    indices.forEach(i=> chars[i] = '_');
+    return chars.join('');
+  }).join(' ');
+}
+const order1 = shuffle(PHRASES.map(p=>p.id));
+const ex1list = document.getElementById('ex1list');
+order1.forEach((id,i)=>{
+  const p = PHRASES.find(x=>x.id===id);
+  const masked = maskWord(p.en);
+  const div = document.createElement('div');
+  div.className = 'item';
+  div.innerHTML = `
+    <div class="num">${i+1}.</div>
+    <div class="prompt">${masked} <small>${p.ru}</small></div>
+    <div>
+      <input type="text" data-answer="${p.en}" id="ex1_${i}" placeholder="полное слово/фраза">
+      <div class="answer-line" id="ex1_${i}_line"></div>
+    </div>
+  `;
+  ex1list.appendChild(div);
+});
+
+/* =========================================================
+   EXERCISE 2 — RU -> EN translation
+   ========================================================= */
+const order2 = shuffle(PHRASES.map(p=>p.id));
+const ex2list = document.getElementById('ex2list');
+order2.forEach((id,i)=>{
+  const p = PHRASES.find(x=>x.id===id);
+  const div = document.createElement('div');
+  div.className = 'item';
+  div.innerHTML = `
+    <div class="num">${i+1}.</div>
+    <div class="prompt"><span class="ru">${p.ru}</span></div>
+    <div>
+      <input type="text" data-answer="${p.en}" id="ex2_${i}" placeholder="translate...">
+      <div class="answer-line" id="ex2_${i}_line"></div>
+    </div>
+  `;
+  ex2list.appendChild(div);
+});
+
+/* =========================================================
+   EXERCISE 3 — Dictation by sound
+   ========================================================= */
+const order3 = shuffle(PHRASES.map(p=>p.id));
+const ex3list = document.getElementById('ex3list');
+order3.forEach((id,i)=>{
+  const p = PHRASES.find(x=>x.id===id);
+  const div = document.createElement('div');
+  div.className = 'item dictation';
+  div.innerHTML = `
+    <div class="num">${i+1}.</div>
+    <button class="listen-btn small" onclick="speak('${p.en.replace(/'/g,"\\'")}')">🔊</button>
+    <div class="prompt">
+      <input type="text" data-answer="${p.en}" id="ex3_${i}" placeholder="что услышал(а)?">
+      <div class="answer-line" id="ex3_${i}_line"></div>
+    </div>
+    <div></div>
+  `;
+  ex3list.appendChild(div);
+});
+
+/* =========================================================
+   EXERCISE 4 — Definitions
+   ========================================================= */
+const order4 = shuffle(PHRASES.map(p=>p.id));
+const ex4list = document.getElementById('ex4list');
+order4.forEach((id,i)=>{
+  const p = PHRASES.find(x=>x.id===id);
+  const div = document.createElement('div');
+  div.className = 'item';
+  div.innerHTML = `
+    <div class="num">${i+1}.</div>
+    <div class="prompt">${p.def}</div>
+    <div>
+      <input type="text" data-answer="${p.en}" id="ex4_${i}" placeholder="write the phrase">
+      <div class="answer-line" id="ex4_${i}_line"></div>
+    </div>
+  `;
+  ex4list.appendChild(div);
+});
+
+/* =========================================================
+   EXERCISE 5 — Collocations (fill missing part of phrase)
+   ========================================================= */
+const collocations = [
+  {gap:"become ______", answer:"famous", en:"become famous"},
+  {gap:"get a lot of ______", answer:"money", en:"get a lot of money"},
+  {gap:"get a new ______", answer:"job", en:"get a new job"},
+  {gap:"get ______", answer:"married", en:"get married"},
+  {gap:"be ______", answer:"lucky", en:"be lucky"},
+  {gap:"meet ______ new", answer:"somebody", en:"meet somebody new"},
+  {gap:"______ around the world", answer:"travel", en:"travel"},
+  {gap:"have a ______", answer:"surprise", en:"have a surprise"},
+  {gap:"fall in ______", answer:"love", en:"fall in love"},
+  {gap:"move ______", answer:"house", en:"move house"}
+];
+const order5 = shuffle(collocations.map((_,i)=>i));
+const ex5list = document.getElementById('ex5list');
+order5.forEach((idx,i)=>{
+  const c = collocations[idx];
+  const div = document.createElement('div');
+  div.className = 'item';
+  div.innerHTML = `
+    <div class="num">${i+1}.</div>
+    <div class="prompt">${c.gap} <small>(${c.en})</small></div>
+    <div>
+      <input type="text" data-answer="${c.answer}" id="ex5_${i}" placeholder="missing word">
+      <div class="answer-line" id="ex5_${i}_line"></div>
+    </div>
+  `;
+  ex5list.appendChild(div);
+});
+
+/* =========================================================
+   EXERCISE 6 — Verb tense change
+   ========================================================= */
+const tenseTasks = [
+  {base:"become famous", subj:"he", tense:"Present Simple", answer:"becomes famous"},
+  {base:"get a lot of money", subj:"he", tense:"Present Simple", answer:"gets a lot of money"},
+  {base:"get a new job", subj:"she", tense:"Present Continuous", answer:"is getting a new job"},
+  {base:"get married", subj:"they", tense:"Past Simple", answer:"got married"},
+  {base:"be lucky", subj:"I", tense:"Past Simple", answer:"was lucky"},
+  {base:"meet somebody new", subj:"she", tense:"Present Continuous", answer:"is meeting somebody new"},
+  {base:"travel", subj:"they", tense:"Past Simple", answer:"traveled / travelled"},
+  {base:"have a surprise", subj:"we", tense:"Present Simple", answer:"have a surprise"},
+  {base:"fall in love", subj:"I", tense:"Past Simple", answer:"fell in love"},
+  {base:"move house", subj:"they", tense:"Present Continuous", answer:"are moving house"}
+];
+const order6 = shuffle(tenseTasks.map((_,i)=>i));
+const ex6list = document.getElementById('ex6list');
+order6.forEach((idx,i)=>{
+  const t = tenseTasks[idx];
+  const div = document.createElement('div');
+  div.className = 'item';
+  div.innerHTML = `
+    <div class="num">${i+1}.</div>
+    <div class="prompt"><b>${t.base}</b> <small>${t.subj} — ${t.tense}</small></div>
+    <div>
+      <input type="text" data-answer="${t.answer}" id="ex6_${i}" placeholder="${t.subj} ...">
+      <div class="answer-line" id="ex6_${i}_line"></div>
+    </div>
+  `;
+  ex6list.appendChild(div);
+});
+
+/* =========================================================
+   EXERCISE 7 — Rephrase (open)
+   ========================================================= */
+const rephraseTasks = [
+  {q:"Tom won the lottery yesterday.", model:"Tom got a lot of money yesterday."},
+  {q:"Everybody knows her name now — she is on TV every day.", model:"She became famous."},
+  {q:"Anna and Max are going to be husband and wife next June.", model:"Anna and Max are going to get married next June."},
+  {q:"I won a free trip to Spain — I couldn't believe it!", model:"I had a surprise — I won a free trip to Spain!"},
+  {q:"I started working at a new company on Monday.", model:"I got a new job on Monday."},
+  {q:"Every time something good happens to him, it's just chance.", model:"He is lucky."},
+  {q:"We are going to visit five countries this summer.", model:"We are going to travel to five countries this summer."},
+  {q:"I saw an old friend at the party and made a new friend too.", model:"I met somebody new at the party."},
+  {q:"After the first date, he knew he had strong feelings for her.", model:"He fell in love after the first date."},
+  {q:"Next month our family is going to live in a different flat.", model:"Next month our family is going to move house."}
+];
+const order7 = shuffle(rephraseTasks.map((_,i)=>i));
+buildOpen('ex7', order7, rephraseTasks, (t)=>`Rephrase: <i>"${t.q}"</i>`, (t)=>t.model);
+
+/* =========================================================
+   EXERCISE 8 — Finish the dialogue (open)
+   ========================================================= */
+const dialogueTasks = [
+  {q:"A: Have you got any news? B: Yes! I ___________ (get a new job) last week.", model:"I got a new job last week."},
+  {q:"A: Why are you smiling? B: Guess what — I ___________ (fall in love)!", model:"I fell in love!"},
+  {q:"A: Where are you going this summer? B: We ___________ (travel) to Italy.", model:"We are travelling to Italy."},
+  {q:"A: I heard you moved. B: Yes, we ___________ (move house) two weeks ago.", model:"We moved house two weeks ago."},
+  {q:"A: Congratulations! I heard you and Alex... B: Yes, we ___________ (get married) in June!", model:"We are getting married in June!"},
+  {q:"A: You look surprised. B: I am! I ___________ (have a surprise) party today.", model:"I had a surprise party today."},
+  {q:"A: How was the party? B: Great, I ___________ (meet somebody new).", model:"I met somebody new."},
+  {q:"A: Did you win the competition? B: Yes! I ___________ (be lucky) this time.", model:"I was lucky this time."},
+  {q:"A: I saw your photo in a magazine! B: Yes, I ___________ (become famous) after the show.", model:"I became famous after the show."},
+  {q:"A: Did you buy a new car? B: No, but I ___________ (get a lot of money) from my job bonus.", model:"I got a lot of money from my job bonus."}
+];
+const order8 = shuffle(dialogueTasks.map((_,i)=>i));
+buildOpen('ex8', order8, dialogueTasks, (t)=>t.q, (t)=>t.model);
+
+/* =========================================================
+   EXERCISE 9 — Finish sentences with own ideas (open)
+   ========================================================= */
+const finishTasks = [
+  {q:"I would like to become famous because…", model:"(пример) I would like to become famous because I want people to know my music."},
+  {q:"If I get a lot of money, I will…", model:"(пример) If I get a lot of money, I will travel around the world."},
+  {q:"I want to get a new job because…", model:"(пример) I want to get a new job because I need a bigger salary."},
+  {q:"I think the best age to get married is… because…", model:"(пример) I think the best age to get married is 27 because you already know what you want."},
+  {q:"The last time I was lucky was when…", model:"(пример) The last time I was lucky was when I found money in my old jacket."},
+  {q:"I would like to meet somebody new who…", model:"(пример) I would like to meet somebody new who shares my hobbies."},
+  {q:"If I could travel anywhere, I would go to… because…", model:"(пример) If I could travel anywhere, I would go to Japan because I love the culture."},
+  {q:"The best surprise I ever had was…", model:"(пример) The best surprise I ever had was a birthday party from my friends."},
+  {q:"People usually fall in love when…", model:"(пример) People usually fall in love when they share the same interests."},
+  {q:"If I move house, I want to live in…", model:"(пример) If I move house, I want to live in a house near the sea."}
+];
+const order9 = shuffle(finishTasks.map((_,i)=>i));
+buildOpen('ex9', order9, finishTasks, (t)=>t.q, (t)=>t.model);
+
+/* =========================================================
+   EXERCISE 10 — Drilling: Repeat & Change (open)
+   ========================================================= */
+const drillTasks = [
+  {example:"Example: I want to become famous. → She wants to become famous.", task:"Change the subject to \"he\" and write your own idea."},
+  {example:"Example: We got a lot of money last year. → They got a lot of money last year.", task:"Change the subject to \"my parents\" and write your own idea."},
+  {example:"Example: He got a new job in June. → I got a new job in June.", task:"Change the time to \"last month\" and write your own idea."},
+  {example:"Example: They are getting married in Italy. → We are getting married in Italy.", task:"Change the place and write your own idea."},
+  {example:"Example: I am lucky today. → My brother is lucky today.", task:"Change the subject to \"my friend\" and write your own idea."},
+  {example:"Example: She met somebody new at university. → I met somebody new at university.", task:"Change the place to \"at work\" and write your own idea."},
+  {example:"Example: We travel every summer. → My family travels every summer.", task:"Change the frequency to \"once a year\" and write your own idea."},
+  {example:"Example: He had a surprise on his birthday. → She had a surprise on her birthday.", task:"Change the occasion and write your own idea."},
+  {example:"Example: I fell in love in Paris. → He fell in love in Paris.", task:"Change the place and write your own idea."},
+  {example:"Example: We moved house last year. → They moved house last year.", task:"Change the time and write your own idea."}
+];
+const order10 = shuffle(drillTasks.map((_,i)=>i));
+buildOpen('ex10', order10, drillTasks, (t)=>`${t.example}<br><small>${t.task}</small>`, (t)=>"(своя идея студента — без единого правильного ответа)");
+
+/* =========================================================
+   GENERIC OPEN EXERCISE BUILDER
+   ========================================================= */
+function buildOpen(prefix, order, tasksArr, promptFn, modelFn){
+  const list = document.getElementById(prefix+'list');
+  order.forEach((idx,i)=>{
+    const t = tasksArr[idx];
+    const div = document.createElement('div');
+    div.className = 'open-item';
+    div.innerHTML = `
+      <div class="prompt"><b>${i+1}.</b> ${promptFn(t)}</div>
+      <textarea id="${prefix}_${i}" data-num="${i+1}"></textarea>
+      <div class="model-answer" id="${prefix}_${i}_model"><b>Пример:</b> ${modelFn(t)}</div>
+    `;
+    list.appendChild(div);
+  });
+}
+
+/* =========================================================
+   CHECK / SHOW / RESET for closed exercises
+   ========================================================= */
+function checkExercise(prefix){
+  const inputs = document.querySelectorAll(`#${prefix}list input[type=text]`);
+  let correct = 0;
+  inputs.forEach(inp=>{
+    const line = document.getElementById(inp.id+'_line');
+    const userVal = inp.value;
+    const correctVal = inp.dataset.answer;
+    const acceptable = correctVal.split('/').map(s=>norm(s));
+    const isCorrect = acceptable.includes(norm(userVal)) && userVal.trim()!=="";
+    if(isCorrect){
+      correct++;
+      inp.style.borderColor = 'var(--good)';
+      inp.style.background = 'var(--good-bg)';
+      line.innerHTML = '✅ верно!';
+      line.style.color = 'var(--good)';
+    } else {
+      inp.style.borderColor = 'var(--bad)';
+      inp.style.background = 'var(--bad-bg)';
+      line.innerHTML = `❌ правильный ответ: <b>${correctVal}</b>`;
+      line.style.color = 'var(--bad)';
+      // mark problem word — find related phrase text for tracking
+      markWrong(correctVal.split('/')[0].trim());
+    }
+  });
+  document.getElementById(prefix+'score').textContent = `Результат: ${correct} / ${inputs.length}`;
+}
+
+function showAnswers(prefix){
+  const inputs = document.querySelectorAll(`#${prefix}list input[type=text]`);
+  inputs.forEach(inp=>{
+    const line = document.getElementById(inp.id+'_line');
+    line.innerHTML = `Ответ: <b>${inp.dataset.answer}</b>`;
+    line.style.color = 'var(--accent)';
+  });
+}
+
+function resetExercise(prefix){
+  const inputs = document.querySelectorAll(`#${prefix}list input[type=text]`);
+  inputs.forEach(inp=>{
+    inp.value = "";
+    inp.style.borderColor = 'var(--line)';
+    inp.style.background = '#fff';
+    document.getElementById(inp.id+'_line').innerHTML = "";
+  });
+  document.getElementById(prefix+'score').textContent = "";
+}
+
+/* =========================================================
+   OPEN EXERCISES: toggle model answers + copy all
+   ========================================================= */
+function toggleModel(prefix){
+  const models = document.querySelectorAll(`#${prefix}list .model-answer`);
+  models.forEach(m=> m.classList.toggle('shown'));
+}
+
+function copyOpenAnswers(prefix, title){
+  const textareas = document.querySelectorAll(`#${prefix}list textarea`);
+  let lines = [`--- ${title} ---`];
+  textareas.forEach(ta=>{
+    lines.push(`${ta.dataset.num}. ${ta.value.trim() || "(пусто)"}`);
+  });
+  const text = lines.join('\n');
+  navigator.clipboard.writeText(text).then(()=>{
+    const flash = document.getElementById(prefix+'flash');
+    flash.textContent = "Скопировано!";
+    setTimeout(()=> flash.textContent = "", 2000);
+  }).catch(()=>{
+    // fallback
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    const flash = document.getElementById(prefix+'flash');
+    flash.textContent = "Скопировано!";
+    setTimeout(()=> flash.textContent = "", 2000);
+  });
+}
+
+renderProblemWords();
+</script>
+</body>
+</html>
