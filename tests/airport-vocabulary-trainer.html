@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Airport English · Тренажёр лексики A1–A2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a1628;
+    --panel:#101f38;
+    --panel-2:#152641;
+    --board:#0c1a2e;
+    --border:#22385c;
+    --amber:#ffb020;
+    --amber-dim:#a97a1c;
+    --teal:#4fd1c5;
+    --red:#ff6b6b;
+    --text:#dfe7f2;
+    --text-dim:#8296b8;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(1200px 600px at 80% -10%, #14284a55, transparent),
+      var(--bg);
+    color:var(--text);
+    font-family:'Inter',sans-serif;
+    line-height:1.5;
+    padding-bottom:80px;
+  }
+  .wrap{max-width:1000px;margin:0 auto;padding:28px 20px 40px;}
+
+  /* ===== HEADER ===== */
+  header.top{
+    border-bottom:1px solid var(--border);
+    padding-bottom:20px;
+    margin-bottom:28px;
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    flex-wrap:wrap;
+    gap:14px;
+  }
+  .brand-eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    color:var(--amber);
+    letter-spacing:.14em;
+    font-size:12px;
+    text-transform:uppercase;
+    margin:0 0 6px;
+  }
+  h1{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:28px;
+    margin:0;
+    color:#fff;
+    letter-spacing:.01em;
+  }
+  .sub{color:var(--text-dim);font-size:14px;margin-top:6px;max-width:520px;}
+  #voice-status{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    color:var(--text-dim);
+    text-align:right;
+  }
+  #voice-status b{color:var(--teal);}
+
+  button{
+    font-family:'Inter',sans-serif;
+    cursor:pointer;
+    border-radius:8px;
+    border:1px solid var(--border);
+    background:var(--panel-2);
+    color:var(--text);
+    padding:9px 14px;
+    font-size:13.5px;
+    font-weight:600;
+    transition:.15s ease;
+  }
+  button:hover{border-color:var(--amber-dim);background:#1b3153;}
+  button:focus-visible, input:focus-visible, textarea:focus-visible{
+    outline:2px solid var(--amber);outline-offset:2px;
+  }
+  .btn-amber{background:var(--amber);color:#241a00;border-color:var(--amber);}
+  .btn-amber:hover{background:#ffc350;}
+  .btn-ghost{background:transparent;}
+  .btn-sm{padding:6px 10px;font-size:12.5px;border-radius:6px;}
+
+  /* ===== BOARD (vocab review) ===== */
+  .board-section{margin-bottom:34px;}
+  .board-title{
+    font-family:'IBM Plex Mono',monospace;
+    color:var(--amber);
+    font-size:13px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    margin:0 0 4px;
+  }
+  .board-instruction{color:var(--text-dim);font-size:13.5px;margin:0 0 16px;}
+  .board-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    gap:10px;
+  }
+  .tile{
+    background:var(--board);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:14px 16px;
+    position:relative;
+    overflow:hidden;
+    animation:flipIn .5s ease backwards;
+  }
+  .tile::before{
+    content:"";position:absolute;left:0;right:0;top:50%;height:1px;
+    background:rgba(255,255,255,.05);
+  }
+  @keyframes flipIn{
+    from{opacity:0;transform:rotateX(35deg) translateY(-6px);}
+    to{opacity:1;transform:none;}
+  }
+  .tile-en{
+    font-family:'IBM Plex Mono',monospace;
+    color:var(--amber);
+    font-size:15px;
+    font-weight:600;
+    text-transform:uppercase;
+    letter-spacing:.02em;
+  }
+  .tile-ipa{color:var(--teal);font-family:'IBM Plex Mono',monospace;font-size:12.5px;margin-top:3px;}
+  .tile-ru{color:var(--text-dim);font-size:13px;margin-top:6px;}
+  .tile-controls{margin-top:10px;display:flex;gap:8px;}
+
+  /* ===== LAYOUT with sidebar ===== */
+  .layout{display:flex;gap:24px;align-items:flex-start;}
+  main{flex:1;min-width:0;}
+  aside.sidebar{
+    width:220px;
+    flex-shrink:0;
+    position:sticky;
+    top:16px;
+  }
+  .sidebar-box{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:14px 14px 16px;
+  }
+  .sidebar-box h3{
+    margin:0 0 4px;font-size:13px;text-transform:uppercase;letter-spacing:.08em;
+    color:var(--red);font-family:'IBM Plex Mono',monospace;
+  }
+  .sidebar-box p.hint{color:var(--text-dim);font-size:12px;margin:0 0 10px;}
+  #problem-list{list-style:none;margin:0;padding:0;font-size:13px;}
+  #problem-list li{
+    display:flex;justify-content:space-between;gap:6px;
+    padding:6px 0;border-bottom:1px dashed var(--border);color:var(--text);
+  }
+  #problem-list li span.cnt{color:var(--red);font-family:'IBM Plex Mono',monospace;font-weight:700;}
+  #problem-empty{color:var(--text-dim);font-size:12.5px;}
+  .score-total{
+    margin-top:14px;background:var(--panel-2);border-radius:8px;padding:10px 12px;
+    font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--teal);
+  }
+
+  /* ===== EXERCISE SECTIONS ===== */
+  .exercise{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:20px 20px 18px;
+    margin-bottom:22px;
+  }
+  .exercise-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap;margin-bottom:4px;}
+  .exercise h2{font-size:16.5px;margin:0;color:#fff;}
+  .exercise .instruction{color:var(--text-dim);font-size:13px;margin:2px 0 14px;}
+  .exercise-actions{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 14px;}
+  .score-badge{
+    font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--teal);
+    align-self:center;
+  }
+  .row{
+    display:grid;
+    grid-template-columns:28px 1fr;
+    gap:10px;
+    padding:10px 0;
+    border-top:1px solid var(--border);
+    align-items:start;
+  }
+  .row:first-of-type{border-top:none;}
+  .qnum{
+    font-family:'IBM Plex Mono',monospace;color:var(--amber-dim);font-size:13px;padding-top:8px;
+  }
+  .row-content{min-width:0;}
+  .prompt-line{font-size:14px;margin-bottom:7px;}
+  .masked{
+    font-family:'IBM Plex Mono',monospace;
+    letter-spacing:.04em;
+    color:var(--amber);
+    font-size:15px;
+    text-transform:lowercase;
+  }
+  .hint-ru{color:var(--text-dim);font-size:12.5px;margin-top:2px;}
+  .sentence{font-size:14px;}
+  .sentence .blank{color:var(--amber);font-weight:700;font-family:'IBM Plex Mono',monospace;}
+  .sentence-ru{color:var(--text-dim);font-size:12.5px;margin-top:2px;}
+  .scrambled{
+    font-family:'IBM Plex Mono',monospace;color:var(--teal);font-size:14.5px;letter-spacing:.03em;
+  }
+  input.answer-input, textarea.answer-input{
+    width:100%;
+    background:var(--board);
+    border:1px solid var(--border);
+    border-radius:7px;
+    color:var(--text);
+    padding:9px 11px;
+    font-size:14px;
+    font-family:'Inter',sans-serif;
+  }
+  textarea.answer-input{min-height:56px;resize:vertical;}
+  input.answer-input.correct{border-color:var(--teal);box-shadow:0 0 0 1px var(--teal) inset;}
+  input.answer-input.incorrect{border-color:var(--red);box-shadow:0 0 0 1px var(--red) inset;}
+  .reveal{
+    display:none;font-size:12.5px;color:var(--teal);margin-top:6px;font-family:'IBM Plex Mono',monospace;
+  }
+  .reveal.show{display:block;}
+  .row-controls{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;}
+  .listen-btn{white-space:nowrap;}
+
+  /* ===== FOOTER TOOLS ===== */
+  .final-check{
+    background:var(--panel);
+    border:1px solid var(--amber-dim);
+    border-radius:12px;
+    padding:20px;
+    margin-top:8px;
+  }
+  .final-check h2{margin:0 0 6px;font-size:16.5px;color:var(--amber);}
+  .final-check p{color:var(--text-dim);font-size:13.5px;margin:0 0 14px;}
+  .final-actions{display:flex;gap:10px;flex-wrap:wrap;}
+  #copy-output-wrap{margin-top:14px;display:none;}
+  #copy-output-wrap.show{display:block;}
+  #copy-output{
+    width:100%;min-height:200px;
+    background:var(--board);border:1px solid var(--border);border-radius:8px;
+    color:var(--text-dim);font-family:'IBM Plex Mono',monospace;font-size:12px;padding:12px;
+  }
+  #toast{
+    position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);
+    background:var(--teal);color:#032420;padding:10px 18px;border-radius:8px;
+    font-weight:700;font-size:13.5px;opacity:0;pointer-events:none;transition:.25s ease;
+    font-family:'Inter',sans-serif;
+  }
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  @media (max-width:880px){
+    .layout{flex-direction:column;}
+    aside.sidebar{width:100%;position:static;order:-1;}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .tile{animation:none;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div>
+      <p class="brand-eyebrow">Gate A1–A2 · Vocabulary Trainer</p>
+      <h1>AIRPORT ENGLISH</h1>
+      <p class="sub">Аэропортовая лексика: изучи 7 выражений и пройди 7 упражнений по 10 заданий на закрепление.</p>
+    </div>
+    <div>
+      <div id="voice-status">Голос: проверяется…</div>
+      <div style="margin-top:8px;text-align:right;">
+        <button class="btn-amber" id="test-audio-btn">🔊 Проверить звук</button>
+      </div>
+    </div>
+  </header>
+
+  <section class="board-section">
+    <p class="board-title">Табло вылета · Новая лексика</p>
+    <p class="board-instruction">Нажми 🔊, чтобы прослушать произношение каждого выражения, прежде чем перейти к упражнениям.</p>
+    <div class="board-grid" id="vocab-board"></div>
+  </section>
+
+  <div class="layout">
+    <main id="exercises-container"></main>
+
+    <aside class="sidebar">
+      <div class="sidebar-box">
+        <h3>Проблемные слова</h3>
+        <p class="hint">Здесь появятся выражения, в которых были ошибки.</p>
+        <ul id="problem-list"></ul>
+        <p id="problem-empty">Пока ошибок нет — так держать!</p>
+        <div class="score-total" id="score-total">Общий счёт: 0 / 0</div>
+      </div>
+    </aside>
+  </div>
+
+  <div class="final-check">
+    <h2>Перед сдачей</h2>
+    <p>Убедись, что звук работает, и скопируй все свои ответы одной кнопкой — учитель сможет их проверить.</p>
+    <div class="final-actions">
+      <button class="btn-amber" id="final-audio-btn">🔊 Тест аудио</button>
+      <button id="copy-answers-btn">📋 Скопировать все ответы</button>
+      <button id="check-all-btn">✅ Проверить всё сразу</button>
+    </div>
+    <div id="copy-output-wrap">
+      <p class="hint" style="color:var(--text-dim);font-size:12px;margin:10px 0 6px;">Если автокопирование не сработало — выдели текст вручную (Ctrl+A → Ctrl+C):</p>
+      <textarea id="copy-output" readonly></textarea>
+    </div>
+  </div>
+
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* ============ DATA ============ */
+const vocab = [
+  { id:0, en:'pick up your luggage', ru:'забрать свой багаж', ipa:'/pɪk ʌp jɔːr ˈlʌɡɪdʒ/',
+    def:'to collect your bags from the baggage claim area after your flight',
+    example:'I picked up my luggage after the flight.', exampleRu:'Я забрал(а) свой багаж после полёта.',
+    conj:'picked up my luggage',
+    altBase:['pick up your luggage','pick up luggage','pick up my luggage','collect your luggage','collect your baggage'],
+    altConj:['picked up my luggage','picked up luggage','picked up my baggage','collected my luggage','collected my baggage'],
+    altExample:'My friend picked up his luggage at the carousel.' },
+  { id:1, en:'go through security check', ru:'пройти проверку безопасности', ipa:'/ɡoʊ θruː sɪˈkjʊrəti tʃɛk/',
+    def:'to be checked by airport staff and machines for dangerous items before boarding',
+    example:'You need to go through security check before boarding.', exampleRu:'Тебе нужно пройти проверку безопасности перед посадкой.',
+    conj:'go through security check',
+    altBase:['go through security check','go through the security check','go through security'],
+    altConj:['go through security check','go through the security check','go through security'],
+    altExample:'All passengers must go through security check at gate 5.' },
+  { id:2, en:'wait in the departure lounge', ru:'ждать в зале ожидания вылета', ipa:'/weɪt ɪn ðə dɪˈpɑːrtʃər laʊndʒ/',
+    def:'to stay in the area where passengers wait before boarding their plane',
+    example:'We waited in the departure lounge for an hour.', exampleRu:'Мы ждали в зале ожидания вылета час.',
+    conj:'waited in the departure lounge',
+    altBase:['wait in the departure lounge','wait in departure lounge'],
+    altConj:['waited in the departure lounge','waited in departure lounge'],
+    altExample:'They are waiting in the departure lounge right now.' },
+  { id:3, en:'drop off your baggage', ru:'сдать багаж', ipa:'/drɑːp ɔːf jɔːr ˈbæɡɪdʒ/',
+    def:'to give your suitcase to the airline staff at the check-in desk',
+    example:'I dropped off my baggage at the check-in desk.', exampleRu:'Я сдал(а) багаж на стойке регистрации.',
+    conj:'dropped off my baggage',
+    altBase:['drop off your baggage','drop off your bag','drop off baggage','drop off bag'],
+    altConj:['dropped off my baggage','dropped off my bag','dropped off baggage','dropped off bag'],
+    altExample:'She dropped off her bag at counter number three.' },
+  { id:4, en:'go through customs', ru:'пройти таможенный контроль', ipa:'/ɡoʊ θruː ˈkʌstəmz/',
+    def:'to show your documents and declare items when entering or leaving a country',
+    example:'We went through customs after landing.', exampleRu:'Мы прошли таможенный контроль после приземления.',
+    conj:'went through customs',
+    altBase:['go through customs'],
+    altConj:['went through customs'],
+    altExample:'He went through customs without any problems.' },
+  { id:5, en:'check in online', ru:'зарегистрироваться онлайн / в аэропорту', ipa:"/tʃɛk ɪn ˈɑːnˌlaɪn/",
+    def:'to confirm your flight and get your boarding pass before departure',
+    example:'I checked in online before my flight.', exampleRu:'Я зарегистрировался(ась) онлайн перед полётом.',
+    conj:'checked in online',
+    altBase:['check in online','check in at the airport','check in'],
+    altConj:['checked in online','checked in at the airport','checked in'],
+    altExample:'Did you check in online yesterday?' },
+  { id:6, en:'luggage', ru:'багаж', ipa:'/ˈlʌɡɪdʒ/',
+    def:'the bags and suitcases you take with you when you travel',
+    example:'My luggage was heavy.', exampleRu:'Мой багаж был тяжёлым.',
+    conj:'luggage',
+    altBase:['luggage','baggage'],
+    altConj:['luggage','baggage'],
+    altExample:'Where is your luggage now?' },
+];
+
+/* ============ AUDIO (Web Speech API) ============ */
+let voices = [];
+function loadVoices(){ voices = window.speechSynthesis ? window.speechSynthesis.getVoices() : []; updateVoiceStatus(); }
+if('speechSynthesis' in window){
+  loadVoices();
+  window.speechSynthesis.onvoiceschanged = loadVoices;
+}
+function pickVoice(){
+  let v = voices.find(v=>v.name === 'Google US English');
+  if(!v) v = voices.find(v=>v.lang === 'en-US');
+  if(!v && voices.length) v = voices[0];
+  return v;
+}
+function updateVoiceStatus(){
+  const el = document.getElementById('voice-status');
+  if(!('speechSynthesis' in window)){ el.innerHTML = 'Синтез речи не поддерживается браузером'; return; }
+  const v = pickVoice();
+  el.innerHTML = v ? `Голос: <b>${v.name}</b> (${v.lang})` : 'Голоса ещё загружаются…';
+}
+function speak(text){
+  if(!('speechSynthesis' in window)){ alert('Ваш браузер не поддерживает синтез речи (Web Speech API).'); return; }
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  const v = pickVoice();
+  if(v) u.voice = v;
+  u.lang = 'en-US';
+  u.rate = 0.88;
+  window.speechSynthesis.speak(u);
+}
+
+/* ============ HELPERS ============ */
+function normalize(s){
+  return (s||'').toLowerCase().trim()
+    .replace(/[.,!?;:'"()]/g,'')
+    .replace(/\s+/g,' ');
+}
+function isCorrect(value, accepted){
+  const n = normalize(value);
+  if(!n) return false;
+  return accepted.some(a => normalize(a) === n);
+}
+function maskPhrase(str, seed){
+  const chars = str.split('');
+  const alphaPositions = [];
+  chars.forEach((c,i)=>{ if(/[a-zA-Z]/.test(c)) alphaPositions.push(i); });
+  const first = alphaPositions[0], last = alphaPositions[alphaPositions.length-1];
+  let counter = 0;
+  return chars.map((c,i)=>{
+    if(/[a-zA-Z]/.test(c)){
+      counter++;
+      if(i===first || i===last) return c;
+      return ((counter+seed)%2===0) ? c : '_';
+    }
+    return c;
+  }).join('');
+}
+function scrambleWords(words, seed){
+  const n = words.length;
+  if(n<=1) return words.slice();
+  const r = seed % n;
+  return words.slice(r).concat(words.slice(0,r)).reverse();
+}
+function scrambleLetters(word, seed){
+  const arr = word.split('');
+  const n = arr.length;
+  const r = (seed % n) || 1;
+  return arr.slice(r).concat(arr.slice(0,r)).reverse().join('');
+}
+function esc(s){ return String(s).replace(/'/g,"\\'").replace(/"/g,'&quot;'); }
+
+/* ============ PROBLEM WORDS TRACKER ============ */
+const wrongCounts = {};
+function markWrong(enPhrase){
+  wrongCounts[enPhrase] = (wrongCounts[enPhrase]||0) + 1;
+  renderProblemList();
+}
+function renderProblemList(){
+  const list = document.getElementById('problem-list');
+  const empty = document.getElementById('problem-empty');
+  const entries = Object.entries(wrongCounts).sort((a,b)=>b[1]-a[1]);
+  if(entries.length===0){ list.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display='none';
+  list.innerHTML = entries.map(([word,count])=>
+    `<li><span>${word}</span><span class="cnt">×${count}</span></li>`
+  ).join('');
+}
+
+/* score tracking */
+const exerciseScores = {}; // key -> {correct, total}
+function updateTotalScore(){
+  let correct=0, total=0;
+  Object.values(exerciseScores).forEach(s=>{ correct+=s.correct; total+=s.total; });
+  document.getElementById('score-total').textContent = `Общий счёт: ${correct} / ${total}`;
+}
+
+/* ============ RENDER VOCAB BOARD ============ */
+const board = document.getElementById('vocab-board');
+board.innerHTML = vocab.map((v,i)=>`
+  <div class="tile" style="animation-delay:${i*0.06}s">
+    <div class="tile-en">${v.en}</div>
+    <div class="tile-ipa">${v.ipa}</div>
+    <div class="tile-ru">${v.ru}</div>
+    <div class="tile-controls">
+      <button class="btn-sm" onclick="speak('${esc(v.en)}')">🔊 Прослушать</button>
+    </div>
+  </div>
+`).join('');
+
+/* ============ EXERCISE CONFIG ============ */
+const exercisesConfig = [
+  { key:'ex1', title:'Упражнение 1 · Вставь пропущенные буквы',
+    instruction:'Впиши выражение целиком вместо пропусков. Перевод — подсказка.',
+    order:[3,0,5,2,6,1,4,2,0,6],
+    build:(v,i)=>{
+      const masked = maskPhrase(v.en, i%2);
+      return {
+        promptHtml:`<div class="masked">${masked}</div><div class="hint-ru">${v.ru}</div>`,
+        promptText:`Вставь буквы: ${masked}  (${v.ru})`,
+        accepted:v.altBase, showListen:false
+      };
+    }
+  },
+  { key:'ex2', title:'Упражнение 2 · Перевод с русского на английский',
+    instruction:'Переведи выражение на английский язык.',
+    order:[5,1,6,3,0,4,2,5,3,1],
+    build:(v)=>({
+      promptHtml:`<div class="prompt-line">${v.ru}</div>`,
+      promptText:`Переведи: ${v.ru}`,
+      accepted:v.altBase, showListen:false
+    })
+  },
+  { key:'ex3', title:'Упражнение 3 · Напиши выражение на слух',
+    instruction:'Нажми 🔊, прослушай выражение и напиши его по-английски.',
+    order:[2,4,0,6,1,5,3,4,6,0],
+    build:(v)=>({
+      promptHtml:`<div class="prompt-line">Что ты услышал(а)?</div>`,
+      promptText:`Прослушай и напиши: [аудио: ${v.en}]`,
+      accepted:v.altBase, showListen:true, listenText:v.en, ipa:v.ipa
+    })
+  },
+  { key:'ex4', title:'Упражнение 4 · Дефиниция → выражение',
+    instruction:'Прочитай определение на английском и напиши, какое это выражение.',
+    order:[0,3,1,5,2,6,4,1,5,3],
+    build:(v)=>({
+      promptHtml:`<div class="prompt-line">${v.def}</div>`,
+      promptText:`Определение: ${v.def}`,
+      accepted:v.altBase, showListen:false
+    })
+  },
+  { key:'ex5', title:'Упражнение 5 · Сочетаемость: заполни пропуск в предложении',
+    instruction:'Впиши нужную форму выражения в предложение (следи за временем глагола).',
+    order:[6,2,4,0,3,1,5,6,2,4],
+    build:(v)=>{
+      const re = new RegExp(v.conj.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'i');
+      const blanked = v.example.replace(re, '_____');
+      return {
+        promptHtml:`<div class="sentence">${blanked}</div><div class="sentence-ru">${v.exampleRu}</div>`,
+        promptText:`Заполни пропуск: ${blanked}  (${v.exampleRu})`,
+        accepted:v.altConj, showListen:false
+      };
+    }
+  },
+  { key:'ex6', title:'Упражнение 6 · Собери фразу из перепутанных слов/букв',
+    instruction:'Расставь слова (или буквы) в правильном порядке.',
+    order:[1,5,3,6,4,0,2,3,5,1],
+    build:(v,i)=>{
+      const words = v.en.split(' ');
+      let scrambledDisplay;
+      if(words.length>1){
+        scrambledDisplay = scrambleWords(words, i+1).join(' / ');
+      } else {
+        scrambledDisplay = scrambleLetters(v.en, i+1);
+      }
+      return {
+        promptHtml:`<div class="scrambled">${scrambledDisplay}</div><div class="hint-ru">${v.ru}</div>`,
+        promptText:`Собери фразу: ${scrambledDisplay}  (${v.ru})`,
+        accepted:v.altBase, showListen:false
+      };
+    }
+  },
+  { key:'ex7', title:'Упражнение 7 · Drilling: Repeat & Change',
+    instruction:'Прочитай образец и напиши своё собственное предложение с этим же выражением, изменив время, лицо или детали.',
+    order:[4,0,6,2,5,3,1,0,6,2],
+    creative:true,
+    build:(v)=>({
+      promptHtml:`<div class="prompt-line"><b>Образец:</b> ${v.example}<br><span class="hint-ru">${v.exampleRu}</span></div>`,
+      promptText:`Своё предложение с "${v.en}" (образец: ${v.example})`,
+      altExample:v.altExample
+    })
+  }
+];
+
+/* ============ RENDER EXERCISES ============ */
+const container = document.getElementById('exercises-container');
+
+exercisesConfig.forEach(cfg=>{
+  const section = document.createElement('section');
+  section.className = 'exercise';
+  section.id = cfg.key;
+
+  let rowsHtml = '';
+  cfg.order.forEach((vIdx,i)=>{
+    const v = vocab[vIdx];
+    const data = cfg.build(v,i);
+    const rowId = `${cfg.key}-q${i}`;
+
+    if(cfg.creative){
+      rowsHtml += `
+        <div class="row">
+          <div class="qnum">${i+1}</div>
+          <div class="row-content">
+            ${data.promptHtml}
+            <textarea class="answer-input" id="${rowId}" data-prompt="${esc(data.promptText)}" data-ex-title="${esc(cfg.title)}" placeholder="Напиши своё предложение…"></textarea>
+            <div class="row-controls">
+              <button class="btn-sm btn-ghost" onclick="toggleReveal('${rowId}-rev')">Показать пример</button>
+              <button class="btn-sm" onclick="speak('${esc(v.en)}')">🔊 ${v.en}</button>
+            </div>
+            <div class="reveal" id="${rowId}-rev">Другой пример: ${data.altExample}</div>
+          </div>
+        </div>`;
+    } else {
+      const listenBtn = data.showListen
+        ? `<button class="btn-sm listen-btn" onclick="speak('${esc(data.listenText)}')">🔊 Слушать</button>`
+        : '';
+      rowsHtml += `
+        <div class="row">
+          <div class="qnum">${i+1}</div>
+          <div class="row-content">
+            ${data.promptHtml}
+            <div class="row-controls" style="margin-top:0;margin-bottom:6px;">${listenBtn}</div>
+            <input type="text" class="answer-input" id="${rowId}"
+                   data-accepted='${JSON.stringify(data.accepted)}'
+                   data-vocab-en="${esc(v.en)}"
+                   data-prompt="${esc(data.promptText)}"
+                   data-ex-title="${esc(cfg.title)}"
+                   placeholder="Твой ответ…">
+            <div class="reveal" id="${rowId}-rev">Правильный ответ: <b>${v.en}</b>${data.ipa ? ' &nbsp;'+data.ipa : ''}</div>
+          </div>
+        </div>`;
+    }
+  });
+
+  section.innerHTML = `
+    <div class="exercise-head">
+      <div>
+        <h2>${cfg.title}</h2>
+        <p class="instruction">${cfg.instruction}</p>
+      </div>
+      <div class="score-badge" id="${cfg.key}-score"></div>
+    </div>
+    <div class="exercise-actions">
+      ${cfg.creative
+        ? `<button class="btn-amber" onclick="toggleAllReveals('${cfg.key}')">Показать/скрыть все примеры</button>`
+        : `<button class="btn-amber" onclick="checkExercise('${cfg.key}')">✅ Проверить</button>
+           <button class="btn-ghost" onclick="showAnswers('${cfg.key}')">👁 Показать ответы</button>`
+      }
+    </div>
+    <div class="rows">${rowsHtml}</div>
+  `;
+  container.appendChild(section);
+});
+
+/* ============ CHECK / REVEAL LOGIC ============ */
+function checkExercise(key){
+  const cfg = exercisesConfig.find(c=>c.key===key);
+  let correct = 0, total = 0;
+  cfg.order.forEach((vIdx,i)=>{
+    const input = document.getElementById(`${key}-q${i}`);
+    if(!input) return;
+    total++;
+    const accepted = JSON.parse(input.dataset.accepted);
+    const ok = isCorrect(input.value, accepted);
+    input.classList.remove('correct','incorrect');
+    input.classList.add(ok ? 'correct' : 'incorrect');
+    if(ok){ correct++; } else { markWrong(input.dataset.vocabEn); }
+  });
+  exerciseScores[key] = {correct, total};
+  document.getElementById(`${key}-score`).textContent = `Результат: ${correct} / ${total}`;
+  updateTotalScore();
+}
+function showAnswers(key){
+  const cfg = exercisesConfig.find(c=>c.key===key);
+  cfg.order.forEach((vIdx,i)=>{
+    const rev = document.getElementById(`${key}-q${i}-rev`);
+    if(rev) rev.classList.toggle('show');
+  });
+}
+function toggleReveal(id){
+  const el = document.getElementById(id);
+  if(el) el.classList.toggle('show');
+}
+function toggleAllReveals(key){
+  const cfg = exercisesConfig.find(c=>c.key===key);
+  cfg.order.forEach((vIdx,i)=>{
+    const rev = document.getElementById(`${key}-q${i}-rev`);
+    if(rev) rev.classList.toggle('show');
+  });
+}
+
+/* check-all button in footer */
+document.getElementById('check-all-btn').addEventListener('click', ()=>{
+  exercisesConfig.forEach(cfg=>{ if(!cfg.creative) checkExercise(cfg.key); });
+  showToast('Все упражнения проверены!');
+});
+
+/* ============ AUDIO TEST BUTTONS ============ */
+document.getElementById('test-audio-btn').addEventListener('click', ()=>{
+  speak('Testing audio. Pick up your luggage.');
+  setTimeout(updateVoiceStatus, 300);
+});
+document.getElementById('final-audio-btn').addEventListener('click', ()=>{
+  speak('Testing audio. Go through security check.');
+  setTimeout(updateVoiceStatus, 300);
+});
+
+/* ============ COPY ANSWERS ============ */
+function collectAnswersText(){
+  let text = 'ОТВЕТЫ СТУДЕНТА — Airport English Vocabulary Trainer\n' + new Date().toLocaleString() + '\n';
+  let currentTitle = '';
+  document.querySelectorAll('.answer-input').forEach(inp=>{
+    const title = inp.dataset.exTitle;
+    if(title !== currentTitle){
+      currentTitle = title;
+      text += `\n=== ${title} ===\n`;
+    }
+    text += `${inp.dataset.prompt}\n→ ${inp.value ? inp.value : '(пусто)'}\n\n`;
+  });
+  let scoreLine = '\n=== ИТОГО ===\n';
+  Object.entries(exerciseScores).forEach(([key,s])=>{
+    const cfg = exercisesConfig.find(c=>c.key===key);
+    scoreLine += `${cfg.title}: ${s.correct} / ${s.total}\n`;
+  });
+  return text + scoreLine;
+}
+document.getElementById('copy-answers-btn').addEventListener('click', ()=>{
+  const text = collectAnswersText();
+  const wrap = document.getElementById('copy-output-wrap');
+  const out = document.getElementById('copy-output');
+  out.value = text;
+  wrap.classList.add('show');
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(()=>{
+      showToast('Ответы скопированы в буфер обмена!');
+    }).catch(()=>{
+      out.select();
+      showToast('Автокопирование недоступно — текст ниже, выдели вручную');
+    });
+  } else {
+    out.select();
+    showToast('Текст готов ниже — выдели и скопируй вручную');
+  }
+});
+
+/* ============ TOAST ============ */
+let toastTimer;
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove('show'), 2600);
+}
+
+renderProblemList();
+updateTotalScore();
+</script>
+</body>
+</html>
