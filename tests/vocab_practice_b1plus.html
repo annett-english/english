@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vocabulary Practice B1+</title>
+<style>
+  :root{
+    --bg:#f4f6fb;
+    --card:#ffffff;
+    --accent:#4f6df5;
+    --accent-dark:#3b52c4;
+    --good:#2e9e5b;
+    --bad:#e0473f;
+    --border:#dfe3ee;
+    --text:#232637;
+    --muted:#6b7180;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Segoe UI', Roboto, Arial, sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    line-height:1.5;
+  }
+  header{
+    background:linear-gradient(135deg,var(--accent),#7b5cf0);
+    color:white;
+    padding:28px 24px;
+    text-align:center;
+  }
+  header h1{margin:0 0 6px 0; font-size:1.6em;}
+  header p{margin:0; opacity:.9; font-size:.95em;}
+  .wrap{
+    max-width:1200px;
+    margin:0 auto;
+    padding:24px;
+    display:grid;
+    grid-template-columns: 1fr 280px;
+    gap:24px;
+    align-items:start;
+  }
+  @media (max-width:900px){
+    .wrap{grid-template-columns:1fr;}
+    aside{order:-1;}
+  }
+  .card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:20px 22px;
+    margin-bottom:22px;
+    box-shadow:0 2px 8px rgba(30,40,80,.04);
+  }
+  .card h2{
+    margin-top:0;
+    font-size:1.25em;
+    color:var(--accent-dark);
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .badge{
+    display:inline-block;
+    background:var(--accent);
+    color:#fff;
+    font-size:.7em;
+    padding:2px 9px;
+    border-radius:20px;
+    font-weight:600;
+  }
+  table.word-table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:.95em;
+  }
+  table.word-table th{
+    text-align:left;
+    border-bottom:2px solid var(--border);
+    padding:8px 6px;
+    color:var(--muted);
+    font-size:.85em;
+    text-transform:uppercase;
+    letter-spacing:.03em;
+  }
+  table.word-table td{
+    padding:9px 6px;
+    border-bottom:1px solid var(--border);
+    vertical-align:middle;
+  }
+  .ipa{color:var(--muted); font-style:italic;}
+  .play-btn{
+    background:var(--accent);
+    color:white;
+    border:none;
+    border-radius:8px;
+    width:34px;
+    height:34px;
+    cursor:pointer;
+    font-size:1em;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    transition:.15s;
+  }
+  .play-btn:hover{background:var(--accent-dark);}
+  .q-block{
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:14px 16px;
+    margin-bottom:12px;
+    background:#fbfcff;
+  }
+  .q-num{
+    font-weight:700;
+    color:var(--accent-dark);
+    margin-right:6px;
+  }
+  .q-text{margin-bottom:8px; font-size:1.02em;}
+  .q-text .ru{color:#444; }
+  .q-input-row{display:flex; gap:8px; align-items:center; flex-wrap:wrap;}
+  input.answer-input{
+    flex:1;
+    min-width:220px;
+    padding:9px 12px;
+    border:1.5px solid var(--border);
+    border-radius:8px;
+    font-size:1em;
+  }
+  input.answer-input:focus{outline:none; border-color:var(--accent);}
+  input.answer-input.correct{border-color:var(--good); background:#eafbf1;}
+  input.answer-input.incorrect{border-color:var(--bad); background:#fdecea;}
+  .feedback{
+    font-size:.88em;
+    margin-top:5px;
+    font-weight:600;
+  }
+  .feedback.correct{color:var(--good);}
+  .feedback.incorrect{color:var(--bad);}
+  .btn{
+    background:var(--accent);
+    color:white;
+    border:none;
+    padding:11px 18px;
+    border-radius:9px;
+    font-size:.95em;
+    font-weight:600;
+    cursor:pointer;
+    transition:.15s;
+  }
+  .btn:hover{background:var(--accent-dark);}
+  .btn.secondary{
+    background:transparent;
+    color:var(--accent-dark);
+    border:1.5px solid var(--accent);
+  }
+  .btn.secondary:hover{background:#eef1ff;}
+  .btn-row{display:flex; gap:10px; margin-top:14px; flex-wrap:wrap;}
+  .score-line{
+    font-weight:700;
+    margin-top:10px;
+    font-size:.95em;
+  }
+  aside .card{position:sticky; top:16px;}
+  #problemList{list-style:none; padding:0; margin:0; font-size:.9em;}
+  #problemList li{
+    display:flex;
+    justify-content:space-between;
+    padding:7px 0;
+    border-bottom:1px solid var(--border);
+  }
+  #problemList li:last-child{border-bottom:none;}
+  .count-chip{
+    background:var(--bad);
+    color:white;
+    border-radius:20px;
+    padding:1px 8px;
+    font-size:.78em;
+    font-weight:700;
+  }
+  .empty-note{color:var(--muted); font-size:.88em;}
+  #reportTable{width:100%; border-collapse:collapse; font-size:.85em; margin-top:10px;}
+  #reportTable th, #reportTable td{border:1px solid var(--border); padding:6px 8px; text-align:left;}
+  #reportTable th{background:#eef1ff;}
+  .status-ok{color:var(--good); font-weight:700;}
+  .status-bad{color:var(--bad); font-weight:700;}
+  .instructions{font-size:.9em; color:var(--muted); margin-bottom:14px;}
+  .final-score{
+    font-size:1.3em;
+    font-weight:800;
+    color:var(--accent-dark);
+    text-align:center;
+    margin:10px 0;
+  }
+  footer{text-align:center; color:var(--muted); font-size:.8em; padding:20px;}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🗣️ Vocabulary Practice — B1+</h1>
+  <p>Слова и выражения: повторение, аудирование, письмо и сочетаемость</p>
+</header>
+
+<div class="wrap">
+  <main>
+
+    <!-- WORD LIST -->
+    <div class="card">
+      <h2>📖 Повторим слова <span class="badge">16 слов</span></h2>
+      <p class="instructions">Нажмите 🔊, чтобы прослушать произношение (голос Google US English, если доступен).</p>
+      <table class="word-table">
+        <thead>
+          <tr><th></th><th>Word / Phrase</th><th>Transcription</th><th>Перевод</th></tr>
+        </thead>
+        <tbody id="wordTableBody"></tbody>
+      </table>
+    </div>
+
+    <!-- EXERCISE 1 -->
+    <div class="card" id="ex1">
+      <h2>✏️ Упражнение 1. Вставьте пропущенные буквы <span class="badge">10 заданий</span></h2>
+      <p class="instructions">По переводу и подсказке восстановите слово/фразу целиком.</p>
+      <div id="ex1-questions"></div>
+      <div class="btn-row">
+        <button class="btn" onclick="checkExercise('ex1')">✅ Проверить</button>
+        <button class="btn secondary" onclick="showAnswers('ex1')">👁 Показать ответы</button>
+      </div>
+      <div class="score-line" id="ex1-score"></div>
+    </div>
+
+    <!-- EXERCISE 2 -->
+    <div class="card" id="ex2">
+      <h2>🌐 Упражнение 2. Переведите с русского на английский <span class="badge">10 заданий</span></h2>
+      <div id="ex2-questions"></div>
+      <div class="btn-row">
+        <button class="btn" onclick="checkExercise('ex2')">✅ Проверить</button>
+        <button class="btn secondary" onclick="showAnswers('ex2')">👁 Показать ответы</button>
+      </div>
+      <div class="score-line" id="ex2-score"></div>
+    </div>
+
+    <!-- EXERCISE 3 -->
+    <div class="card" id="ex3">
+      <h2>🎧 Упражнение 3. Напишите фразу на слух <span class="badge">10 заданий</span></h2>
+      <p class="instructions">Нажмите 🔊, прослушайте произношение и напишите фразу по-английски.</p>
+      <div id="ex3-questions"></div>
+      <div class="btn-row">
+        <button class="btn" onclick="checkExercise('ex3')">✅ Проверить</button>
+        <button class="btn secondary" onclick="showAnswers('ex3')">👁 Показать ответы</button>
+      </div>
+      <div class="score-line" id="ex3-score"></div>
+    </div>
+
+    <!-- EXERCISE 4 -->
+    <div class="card" id="ex4">
+      <h2>📘 Упражнение 4. Дефиниция → слово <span class="badge">10 заданий</span></h2>
+      <p class="instructions">Прочитайте определение на английском и напишите нужное слово/фразу.</p>
+      <div id="ex4-questions"></div>
+      <div class="btn-row">
+        <button class="btn" onclick="checkExercise('ex4')">✅ Проверить</button>
+        <button class="btn secondary" onclick="showAnswers('ex4')">👁 Показать ответы</button>
+      </div>
+      <div class="score-line" id="ex4-score"></div>
+    </div>
+
+    <!-- EXERCISE 5 -->
+    <div class="card" id="ex5">
+      <h2>🔗 Упражнение 5. Сочетаемость фраз <span class="badge">10 заданий</span></h2>
+      <p class="instructions">Заполните пропуск в предложении подходящим словом/фразой.</p>
+      <div id="ex5-questions"></div>
+      <div class="btn-row">
+        <button class="btn" onclick="checkExercise('ex5')">✅ Проверить</button>
+        <button class="btn secondary" onclick="showAnswers('ex5')">👁 Показать ответы</button>
+      </div>
+      <div class="score-line" id="ex5-score"></div>
+    </div>
+
+    <!-- FINAL REPORT -->
+    <div class="card">
+      <h2>📊 Итоговый отчёт</h2>
+      <p class="instructions">Здесь собираются все ответы студента для проверки преподавателем.</p>
+      <button class="btn" onclick="buildReport()">Сформировать отчёт</button>
+      <div class="final-score" id="finalScore"></div>
+      <div style="overflow-x:auto;">
+        <table id="reportTable"><thead><tr><th>Упр.</th><th>№</th><th>Задание</th><th>Ответ студента</th><th>Правильный ответ</th><th>Статус</th></tr></thead>
+        <tbody id="reportBody"></tbody></table>
+      </div>
+    </div>
+
+  </main>
+
+  <aside>
+    <div class="card">
+      <h2>⚠️ Проблемные слова</h2>
+      <ul id="problemList"></ul>
+      <p class="empty-note" id="problemEmpty">Пока ошибок нет — отлично!</p>
+    </div>
+  </aside>
+</div>
+
+<footer>Voice: Google US English (en-US) — via Web Speech API. Работает в Chrome.</footer>
+
+<script>
+/* ================= DATA ================= */
+const WORDS = [
+  {id:"go_to_sleep", en:"go to sleep", ru:"ложиться спать / засыпать", ipa:"/ɡoʊ tuː sliːp/",
+   def:"to begin sleeping after being awake"},
+  {id:"go_to_bed", en:"go to bed", ru:"идти спать, лечь в постель", ipa:"/ɡoʊ tuː bɛd/",
+   def:"to get into your bed at night in order to rest or sleep"},
+  {id:"pack", en:"pack", ru:"паковать(ся), собирать вещи", ipa:"/pæk/",
+   def:"to put your things into a bag or suitcase before a trip"},
+  {id:"deputy_director", en:"deputy director", ru:"заместитель директора", ipa:"/ˈdɛpjəti dəˈrɛktər/",
+   def:"the person who is second in command and helps run an organization"},
+  {id:"form_teacher", en:"form teacher / homeroom teacher", ru:"классный руководитель", ipa:"/fɔːrm ˈtiːtʃər/",
+   def:"the teacher responsible for a particular class and its daily register"},
+  {id:"lanyards", en:"lanyards", ru:"шнурки/ленты для бейджа", ipa:"/ˈlænjərdz/",
+   def:"a cord worn around the neck to hold an ID card or keys"},
+  {id:"boarding_pass", en:"boarding pass", ru:"посадочный талон", ipa:"/ˈbɔːrdɪŋ pæs/",
+   def:"a document that allows you to get on a plane"},
+  {id:"stand_in_line", en:"stand in line", ru:"стоять в очереди", ipa:"/stænd ɪn laɪn/",
+   def:"to wait behind other people for your turn"},
+  {id:"queue", en:"queue", ru:"очередь", ipa:"/kjuː/",
+   def:"a line of people waiting for something"},
+  {id:"stove", en:"stove / cooker", ru:"плита", ipa:"/stoʊv/ /ˈkʊkər/",
+   def:"a kitchen appliance used for cooking food"},
+  {id:"diving_excursion", en:"diving excursion", ru:"экскурсия с дайвингом", ipa:"/ˈdaɪvɪŋ ɪkˈskɜːrʒən/",
+   def:"a short organized trip where people go underwater to explore"},
+  {id:"recently_lately", en:"recently / lately", ru:"недавно / в последнее время", ipa:"/ˈriːsəntli/ /ˈleɪtli/",
+   def:"not long ago; during the period of time up to now"},
+  {id:"addiction", en:"addiction", ru:"зависимость", ipa:"/əˈdɪkʃən/",
+   def:"a strong, harmful need to keep doing something or using something"},
+  {id:"lead_to", en:"lead to", ru:"приводить к (результату)", ipa:"/liːd tuː/",
+   def:"to result in or cause something to happen"},
+  {id:"dopamine_crash", en:"dopamine crash / slump", ru:"дофаминовый спад", ipa:"/ˈdoʊpəmiːn kræʃ/",
+   def:"a sudden drop in mood or energy after a burst of excitement or pleasure"},
+  {id:"be_addicted_to", en:"be addicted to", ru:"быть зависимым от", ipa:"/biː əˈdɪktɪd tuː/",
+   def:"to be unable to stop doing or using something"}
+];
+
+const COLLOCATIONS = [
+  {id:"go_to_bed", sentence:"Every night, my little brother refuses to ______ before nine o'clock.", answer:"go to bed"},
+  {id:"go_to_sleep", sentence:"After a tiring day, I usually ______ almost immediately.", answer:"go to sleep"},
+  {id:"pack", sentence:"We need to ______ our suitcases tonight because the flight is early.", answer:"pack"},
+  {id:"deputy_director", sentence:"The ______ handles all discipline issues when the principal is away.", answer:"deputy director"},
+  {id:"form_teacher", sentence:"Our ______ checks attendance every morning before the first lesson.", answer:"form teacher"},
+  {id:"lanyards", sentence:"All the staff at the conference wore ______ with their names on them.", answer:"lanyards"},
+  {id:"boarding_pass", sentence:"Don't forget to print your ______ before heading to the airport.", answer:"boarding pass"},
+  {id:"stand_in_line", sentence:"We had to ______ for almost an hour to get through security.", answer:"stand in line"},
+  {id:"queue", sentence:"The ______ at the checkout stretched all the way to the door.", answer:"queue"},
+  {id:"stove", sentence:"Be careful, the ______ is still hot after cooking dinner.", answer:"stove"},
+  {id:"diving_excursion", sentence:"The hotel offers a ______ where you can see coral reefs.", answer:"diving excursion"},
+  {id:"recently_lately", sentence:"I've been feeling really tired ______, probably because of the heat.", answer:"lately"},
+  {id:"addiction", sentence:"Social media ______ is becoming a serious problem among teenagers.", answer:"addiction"},
+  {id:"lead_to", sentence:"Skipping breakfast can ______ poor concentration later in the day.", answer:"lead to"},
+  {id:"dopamine_crash", sentence:"After finishing the exciting game, he felt a real ______.", answer:"dopamine crash"},
+  {id:"be_addicted_to", sentence:"She's completely ______ her phone and checks it every few minutes.", answer:"addicted to"}
+];
+
+/* ================= HELPERS ================= */
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+function pickN(pool, n){
+  return shuffle(pool).slice(0, n);
+}
+function normalize(str){
+  return str.toLowerCase().trim().replace(/\s+/g," ").replace(/[.,!?;:]/g,"");
+}
+function blankWord(word){
+  // keep spaces, always reveal first letter of each part, blank ~50% of the rest
+  return word.split(" ").map(part=>{
+    if(part.length<=2) return part; // too short to blank meaningfully
+    let chars = part.split("");
+    for(let i=1;i<chars.length;i++){
+      if(Math.random()<0.55) chars[i]="_";
+    }
+    // guarantee at least one blank
+    if(!chars.slice(1).includes("_")){
+      const idx = 1 + Math.floor(Math.random()*(chars.length-1));
+      chars[idx]="_";
+    }
+    return chars.join("");
+  }).join(" ");
+}
+
+/* ================= TTS ================= */
+let voices = [];
+function loadVoices(){
+  voices = window.speechSynthesis ? window.speechSynthesis.getVoices() : [];
+}
+if(window.speechSynthesis){
+  loadVoices();
+  window.speechSynthesis.onvoiceschanged = loadVoices;
+}
+function speak(text){
+  if(!window.speechSynthesis){
+    alert("Ваш браузер не поддерживает синтез речи. Попробуйте Google Chrome.");
+    return;
+  }
+  window.speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  let voice = voices.find(v => v.name === "Google US English");
+  if(!voice) voice = voices.find(v => v.lang === "en-US");
+  if(voice) utter.voice = voice;
+  utter.lang = "en-US";
+  utter.rate = 0.92;
+  window.speechSynthesis.speak(utter);
+}
+
+/* ================= STATE ================= */
+const problemWords = {}; // id -> count
+const studentLog = {}; // exId -> array of {num, question, studentAnswer, correctAnswer, correct}
+
+function markProblem(id){
+  problemWords[id] = (problemWords[id] || 0) + 1;
+  renderProblemList();
+}
+function renderProblemList(){
+  const ul = document.getElementById("problemList");
+  const emptyNote = document.getElementById("problemEmpty");
+  const entries = Object.entries(problemWords).sort((a,b)=>b[1]-a[1]);
+  ul.innerHTML = "";
+  if(entries.length===0){
+    emptyNote.style.display="block";
+    return;
+  }
+  emptyNote.style.display="none";
+  entries.forEach(([id,count])=>{
+    const w = WORDS.find(x=>x.id===id);
+    const li = document.createElement("li");
+    li.innerHTML = `<span>${w ? w.en : id}</span><span class="count-chip">${count}</span>`;
+    ul.appendChild(li);
+  });
+}
+
+/* ================= BUILD WORD TABLE ================= */
+function buildWordTable(){
+  const tbody = document.getElementById("wordTableBody");
+  WORDS.forEach(w=>{
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><button class="play-btn" onclick="speak('${w.en.replace(/'/g,"\\'")}')">🔊</button></td>
+      <td><strong>${w.en}</strong></td>
+      <td class="ipa">${w.ipa}</td>
+      <td>${w.ru}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+/* ================= BUILD EXERCISES ================= */
+function buildExercise1(){
+  const items = pickN(WORDS, 10);
+  const container = document.getElementById("ex1-questions");
+  studentLog.ex1 = [];
+  items.forEach((w, idx)=>{
+    const blanked = blankWord(w.en);
+    const div = document.createElement("div");
+    div.className = "q-block";
+    div.dataset.id = w.id;
+    div.dataset.answer = w.en;
+    div.innerHTML = `
+      <div class="q-text"><span class="q-num">${idx+1}.</span>
+        <strong style="letter-spacing:2px;">${blanked}</strong>
+        — <span class="ru">${w.ru}</span></div>
+      <div class="q-input-row">
+        <input type="text" class="answer-input" placeholder="Впишите слово/фразу полностью">
+      </div>
+      <div class="feedback"></div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+function buildExercise2(){
+  const items = pickN(WORDS, 10);
+  const container = document.getElementById("ex2-questions");
+  items.forEach((w, idx)=>{
+    const div = document.createElement("div");
+    div.className = "q-block";
+    div.dataset.id = w.id;
+    div.dataset.answer = w.en;
+    div.innerHTML = `
+      <div class="q-text"><span class="q-num">${idx+1}.</span>
+        Переведите: <span class="ru"><strong>${w.ru}</strong></span></div>
+      <div class="q-input-row">
+        <input type="text" class="answer-input" placeholder="Type in English">
+      </div>
+      <div class="feedback"></div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+function buildExercise3(){
+  const items = pickN(WORDS, 10);
+  const container = document.getElementById("ex3-questions");
+  items.forEach((w, idx)=>{
+    const div = document.createElement("div");
+    div.className = "q-block";
+    div.dataset.id = w.id;
+    div.dataset.answer = w.en;
+    div.innerHTML = `
+      <div class="q-text"><span class="q-num">${idx+1}.</span>
+        <button class="play-btn" onclick="speak('${w.en.replace(/'/g,"\\'")}')">🔊</button>
+        <span style="color:var(--muted); margin-left:6px;">Прослушайте и напишите фразу</span></div>
+      <div class="q-input-row">
+        <input type="text" class="answer-input" placeholder="What did you hear?">
+      </div>
+      <div class="feedback"></div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+function buildExercise4(){
+  const items = pickN(WORDS, 10);
+  const container = document.getElementById("ex4-questions");
+  items.forEach((w, idx)=>{
+    const div = document.createElement("div");
+    div.className = "q-block";
+    div.dataset.id = w.id;
+    div.dataset.answer = w.en;
+    div.innerHTML = `
+      <div class="q-text"><span class="q-num">${idx+1}.</span>
+        <em>${w.def}</em></div>
+      <div class="q-input-row">
+        <input type="text" class="answer-input" placeholder="Какое это слово/фраза?">
+      </div>
+      <div class="feedback"></div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+function buildExercise5(){
+  const items = pickN(COLLOCATIONS, 10);
+  const container = document.getElementById("ex5-questions");
+  items.forEach((c, idx)=>{
+    const div = document.createElement("div");
+    div.className = "q-block";
+    div.dataset.id = c.id;
+    div.dataset.answer = c.answer;
+    div.innerHTML = `
+      <div class="q-text"><span class="q-num">${idx+1}.</span> ${c.sentence}</div>
+      <div class="q-input-row">
+        <input type="text" class="answer-input" placeholder="Впишите пропущенное слово/фразу">
+      </div>
+      <div class="feedback"></div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+/* ================= CHECK / SHOW ================= */
+function checkExercise(exId){
+  const container = document.getElementById(exId + "-questions");
+  const blocks = container.querySelectorAll(".q-block");
+  let correctCount = 0;
+  const log = [];
+  blocks.forEach((block, idx)=>{
+    const input = block.querySelector(".answer-input");
+    const feedback = block.querySelector(".feedback");
+    const correctAnswer = block.dataset.answer;
+    const studentAnswer = input.value;
+    const isCorrect = normalize(studentAnswer) === normalize(correctAnswer);
+    input.classList.remove("correct","incorrect");
+    if(isCorrect){
+      input.classList.add("correct");
+      feedback.textContent = "✔ Верно!";
+      feedback.className = "feedback correct";
+      correctCount++;
+    } else {
+      input.classList.add("incorrect");
+      feedback.textContent = "✘ Неверно. Правильный ответ: " + correctAnswer;
+      feedback.className = "feedback incorrect";
+      markProblem(block.dataset.id);
+    }
+    log.push({
+      num: idx+1,
+      question: block.querySelector(".q-text").innerText,
+      studentAnswer: studentAnswer || "(пусто)",
+      correctAnswer: correctAnswer,
+      correct: isCorrect
+    });
+  });
+  studentLog[exId] = log;
+  document.getElementById(exId + "-score").textContent =
+    `Результат: ${correctCount} из ${blocks.length}`;
+}
+
+function showAnswers(exId){
+  const container = document.getElementById(exId + "-questions");
+  const blocks = container.querySelectorAll(".q-block");
+  blocks.forEach(block=>{
+    const input = block.querySelector(".answer-input");
+    const feedback = block.querySelector(".feedback");
+    input.value = block.dataset.answer;
+    input.classList.remove("incorrect");
+    input.classList.add("correct");
+    feedback.textContent = "Ответ показан: " + block.dataset.answer;
+    feedback.className = "feedback correct";
+  });
+}
+
+/* ================= FINAL REPORT ================= */
+function buildReport(){
+  const body = document.getElementById("reportBody");
+  body.innerHTML = "";
+  let total = 0, correct = 0;
+  const exNames = {ex1:"1 (буквы)", ex2:"2 (перевод)", ex3:"3 (аудио)", ex4:"4 (дефиниция)", ex5:"5 (сочетаемость)"};
+  Object.keys(studentLog).forEach(exId=>{
+    (studentLog[exId] || []).forEach(entry=>{
+      total++;
+      if(entry.correct) correct++;
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${exNames[exId] || exId}</td>
+        <td>${entry.num}</td>
+        <td>${entry.question}</td>
+        <td>${entry.studentAnswer}</td>
+        <td>${entry.correctAnswer}</td>
+        <td class="${entry.correct ? 'status-ok':'status-bad'}">${entry.correct ? '✔ верно' : '✘ ошибка'}</td>
+      `;
+      body.appendChild(tr);
+    });
+  });
+  const finalScoreEl = document.getElementById("finalScore");
+  if(total===0){
+    finalScoreEl.textContent = "Сначала выполните и проверьте хотя бы одно упражнение.";
+  } else {
+    finalScoreEl.textContent = `Итого: ${correct} из ${total} (${Math.round(correct/total*100)}%)`;
+  }
+}
+
+/* ================= INIT ================= */
+buildWordTable();
+buildExercise1();
+buildExercise2();
+buildExercise3();
+buildExercise4();
+buildExercise5();
+renderProblemList();
+</script>
+</body>
+</html>
