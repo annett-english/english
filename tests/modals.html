@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ledger of Obligation — must / have to / should / mustn't</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#122A33;
+    --ink-2:#0D1F26;
+    --paper:#EAE0C4;
+    --paper-2:#E1D5B2;
+    --paper-line: rgba(18,42,51,0.14);
+    --gold:#A9791F;
+    --gold-2:#8C6417;
+    --red:#9B3B3B;
+    --red-bg:#F2E0DB;
+    --teal:#2C6E63;
+    --teal-bg:#DEE9E2;
+    --amber:#B06A22;
+    --amber-bg:#F1E3CE;
+    --green:#3E6B3A;
+    --green-bg:#DEE7D6;
+    --correct:#3E6B3A;
+    --wrong:#9B3B3B;
+    --shadow: 0 8px 24px rgba(13,31,38,0.25);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(circle at 20% -10%, rgba(255,255,255,0.05), transparent 40%),
+      var(--ink);
+    background-color:var(--ink);
+    font-family:'Source Serif 4', serif;
+    color:var(--ink);
+    min-height:100vh;
+    padding:28px 14px 80px;
+  }
+  .sheet{
+    max-width:920px;
+    margin:0 auto;
+    background:
+      repeating-linear-gradient(var(--paper), var(--paper) 34px, var(--paper-line) 35px);
+    background-color:var(--paper);
+    border:1px solid rgba(18,42,51,0.35);
+    border-radius:4px;
+    box-shadow:var(--shadow);
+    position:relative;
+    overflow:hidden;
+  }
+  .sheet::before{
+    content:"";
+    position:absolute; left:64px; top:0; bottom:0; width:2px;
+    background:rgba(155,59,59,0.25);
+  }
+  header.masthead{
+    padding:34px 40px 22px 84px;
+    border-bottom:2px solid var(--ink);
+    position:relative;
+  }
+  header.masthead .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    color:var(--gold-2);
+    margin:0 0 6px;
+  }
+  header.masthead h1{
+    font-family:'Special Elite', cursive;
+    font-size:clamp(26px,4vw,38px);
+    margin:0 0 8px;
+    color:var(--ink-2);
+    line-height:1.15;
+  }
+  header.masthead p.sub{
+    margin:0;
+    font-size:15.5px;
+    color:#3a4a4f;
+    max-width:640px;
+  }
+  .stamp{
+    position:absolute;
+    top:22px; right:34px;
+    width:96px; height:96px;
+    border:3px double var(--red);
+    border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    transform:rotate(-9deg);
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10.5px;
+    letter-spacing:.06em;
+    text-align:center;
+    color:var(--red);
+    opacity:.85;
+    padding:6px;
+    line-height:1.25;
+  }
+
+  nav.tabs{
+    display:flex;
+    flex-wrap:wrap;
+    gap:2px;
+    background:var(--ink-2);
+    padding:6px 84px 6px 84px;
+  }
+  nav.tabs button{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11.5px;
+    letter-spacing:.03em;
+    text-transform:uppercase;
+    background:var(--ink);
+    color:#cfd9dc;
+    border:none;
+    padding:10px 12px;
+    cursor:pointer;
+    border-top:2px solid transparent;
+    transition:.15s;
+  }
+  nav.tabs button:hover{ background:#1c3742; color:#fff; }
+  nav.tabs button.active{
+    background:var(--paper);
+    color:var(--ink-2);
+    border-top:2px solid var(--gold);
+    font-weight:600;
+  }
+
+  main{ padding:30px 40px 46px 84px; }
+  section.panel{ display:none; animation:fade .25s ease; }
+  section.panel.active{ display:block; }
+  @keyframes fade{ from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);} }
+
+  h2.panel-title{
+    font-family:'Special Elite', cursive;
+    font-size:22px;
+    color:var(--ink-2);
+    margin:0 0 4px;
+    display:flex; align-items:baseline; gap:10px;
+  }
+  h2.panel-title .num{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px;
+    color:var(--gold-2);
+  }
+  p.panel-desc{
+    margin:0 0 22px;
+    font-size:14.5px;
+    color:#3a4a4f;
+    max-width:680px;
+  }
+
+  /* RULES */
+  .rules-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+    gap:14px;
+    margin-bottom:26px;
+  }
+  .rule-card{
+    background:rgba(255,255,255,0.35);
+    border:1px solid rgba(18,42,51,0.18);
+    border-left:5px solid var(--c);
+    border-radius:3px;
+    padding:14px 16px;
+  }
+  .rule-card .badge{
+    display:inline-block;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:#fff;
+    background:var(--c);
+    padding:3px 8px;
+    border-radius:2px;
+    margin-bottom:8px;
+  }
+  .rule-card h3{ margin:0 0 6px; font-size:16px; font-family:'IBM Plex Mono', monospace; color:var(--ink-2);}
+  .rule-card p{ margin:0 0 8px; font-size:13.5px; line-height:1.5; color:#33454a;}
+  .rule-card .ex{ font-size:13.5px; font-style:italic; color:var(--ink-2); border-top:1px dashed rgba(18,42,51,0.3); padding-top:8px;}
+
+  .scenario-box{
+    background:rgba(255,255,255,0.35);
+    border:1px dashed rgba(18,42,51,0.35);
+    border-radius:4px;
+    padding:18px 20px;
+    margin-top:8px;
+  }
+  .scenario-box h3{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px; text-transform:uppercase; letter-spacing:.06em;
+    color:var(--gold-2); margin:0 0 12px;
+  }
+  .scenario-line{
+    display:grid;
+    grid-template-columns:150px 1fr;
+    gap:12px;
+    padding:8px 0;
+    border-bottom:1px solid var(--paper-line);
+    font-size:14px;
+    align-items:start;
+  }
+  .scenario-line:last-child{ border-bottom:none; }
+  .scenario-line .tag{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10.5px;
+    color:#fff;
+    background:var(--c);
+    padding:3px 7px;
+    border-radius:2px;
+    text-align:center;
+    align-self:start;
+    white-space:nowrap;
+  }
+  .scenario-line .txt b{ color:var(--ink-2); }
+  .scenario-line .txt .why{ display:block; font-size:12.5px; color:#4a5a5e; margin-top:3px;}
+
+  /* EXERCISE ITEM */
+  .item{
+    background:rgba(255,255,255,0.4);
+    border:1px solid rgba(18,42,51,0.15);
+    border-radius:3px;
+    padding:14px 16px;
+    margin-bottom:12px;
+  }
+  .item .qn{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    color:var(--gold-2);
+    margin-bottom:6px;
+    letter-spacing:.05em;
+  }
+  .item .stem{ font-size:15.5px; margin-bottom:10px; color:var(--ink-2); line-height:1.5;}
+  .item .stem .gap{ display:inline-block; min-width:70px; border-bottom:2px dotted var(--ink); }
+
+  .opts{ display:flex; flex-direction:column; gap:6px; }
+  .opts label{
+    display:flex; align-items:center; gap:8px;
+    font-size:14.5px; cursor:pointer;
+    padding:5px 8px; border-radius:3px;
+    border:1px solid transparent;
+  }
+  .opts label:hover{ background:rgba(169,121,31,0.1); }
+  .opts input{ accent-color:var(--gold-2); }
+
+  input[type=text].blank{
+    font-family:'Source Serif 4', serif;
+    font-size:14.5px;
+    padding:6px 10px;
+    border:1px solid rgba(18,42,51,0.4);
+    border-radius:3px;
+    background:#fbf7ec;
+    width:220px;
+    max-width:100%;
+  }
+  input[type=text].blank:focus{ outline:2px solid var(--gold); }
+
+  .feedback{
+    margin-top:10px;
+    font-size:13.5px;
+    line-height:1.5;
+    padding:9px 12px;
+    border-radius:3px;
+    display:none;
+  }
+  .feedback.show{ display:block; }
+  .feedback.correct{ background:var(--green-bg); color:var(--green); border-left:4px solid var(--green); }
+  .feedback.wrong{ background:var(--red-bg); color:var(--red); border-left:4px solid var(--red); }
+  .feedback.reveal{ background:var(--amber-bg); color:var(--amber); border-left:4px solid var(--amber); }
+  .feedback .expl{ color:#33454a; display:block; margin-top:4px; font-style:italic;}
+
+  .toolbar{
+    display:flex; gap:10px; flex-wrap:wrap;
+    margin:18px 0 22px;
+  }
+  button.action{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12.5px;
+    letter-spacing:.05em;
+    text-transform:uppercase;
+    background:var(--ink-2);
+    color:var(--paper);
+    border:none;
+    padding:10px 18px;
+    border-radius:3px;
+    cursor:pointer;
+    transition:.15s;
+  }
+  button.action:hover{ background:var(--gold-2); }
+  button.action.secondary{ background:transparent; border:1px solid var(--ink-2); color:var(--ink-2); }
+  button.action.secondary:hover{ background:rgba(18,42,51,0.08); }
+
+  .score{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px;
+    color:var(--ink-2);
+    background:rgba(255,255,255,0.5);
+    display:inline-block;
+    padding:6px 12px;
+    border-radius:3px;
+    border:1px solid rgba(18,42,51,0.2);
+    margin-bottom:16px;
+  }
+
+  /* DRAG & DROP */
+  .dd-wrap{ display:grid; grid-template-columns: 1fr; gap:20px; }
+  .dd-pool{
+    display:flex; flex-wrap:wrap; gap:8px;
+    padding:12px;
+    background:rgba(255,255,255,0.4);
+    border:1px dashed rgba(18,42,51,0.3);
+    border-radius:4px;
+    min-height:56px;
+  }
+  .dd-chip{
+    font-size:13.5px;
+    background:#fbf7ec;
+    border:1px solid rgba(18,42,51,0.35);
+    border-radius:3px;
+    padding:7px 10px;
+    cursor:grab;
+    user-select:none;
+  }
+  .dd-chip.placed{ opacity:.35; cursor:default; }
+  .dd-zones{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+    gap:12px;
+  }
+  .dd-zone{
+    border:2px dashed var(--c);
+    border-radius:4px;
+    padding:10px;
+    min-height:120px;
+    background:var(--bg);
+  }
+  .dd-zone h4{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px; text-transform:uppercase; letter-spacing:.05em;
+    color:var(--c); margin:0 0 8px;
+  }
+  .dd-zone.dragover{ background:rgba(0,0,0,0.06); }
+  .dd-zone .dd-item-in{
+    font-size:13px; background:#fff; border:1px solid rgba(18,42,51,0.2);
+    padding:5px 8px; border-radius:3px; margin-bottom:6px;
+  }
+  .dd-item-in.right{ border-left:4px solid var(--correct); }
+  .dd-item-in.wrong{ border-left:4px solid var(--wrong); }
+
+  /* FIND MISTAKE */
+  .tokens{ display:flex; flex-wrap:wrap; gap:5px; font-size:15px; }
+  .tok{
+    cursor:pointer;
+    padding:2px 4px;
+    border-radius:3px;
+    border:1px solid transparent;
+  }
+  .tok:hover{ background:rgba(169,121,31,0.18); }
+  .tok.picked{ background:var(--red-bg); border-color:var(--red); }
+  .tok.answer-right{ background:var(--green-bg); border-color:var(--green); text-decoration:underline; }
+
+  /* SENTENCE BUILDER */
+  .builder-bank{
+    display:flex; flex-wrap:wrap; gap:8px;
+    margin-bottom:10px;
+    min-height:20px;
+  }
+  .builder-bank .chip{
+    font-size:13.5px;
+    background:#fbf7ec;
+    border:1px solid rgba(18,42,51,0.35);
+    border-radius:14px;
+    padding:6px 12px;
+    cursor:pointer;
+  }
+  .builder-bank .chip.used{ opacity:.3; pointer-events:none; }
+  .builder-answer{
+    min-height:38px;
+    border-bottom:2px solid var(--ink-2);
+    padding:6px 2px;
+    font-size:15px;
+    display:flex; flex-wrap:wrap; gap:6px; align-items:center;
+    margin-bottom:10px;
+  }
+  .builder-answer .chip{
+    background:var(--teal-bg); border:1px solid var(--teal); border-radius:14px;
+    padding:5px 11px; font-size:13.5px; cursor:pointer;
+  }
+  .builder-answer .placeholder{ color:#8a8f75; font-style:italic; font-size:13px;}
+
+  /* VOCAB glossary */
+  .vocab-grid{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+    gap:8px; margin-bottom:24px;
+  }
+  .vocab-item{
+    background:rgba(255,255,255,0.4);
+    border:1px solid rgba(18,42,51,0.15);
+    border-radius:3px;
+    padding:8px 10px;
+    font-size:13px;
+  }
+  .vocab-item b{ color:var(--ink-2); font-size:13.5px;}
+  .vocab-item .ipa{ font-family:'IBM Plex Mono', monospace; color:var(--gold-2); font-size:12px;}
+
+  /* OPEN-ENDED */
+  .open-item{ margin-bottom:14px; }
+  .open-item .starter{ font-size:14.5px; margin-bottom:6px; color:var(--ink-2); }
+  .open-item textarea{
+    width:100%; min-height:44px;
+    font-family:'Source Serif 4', serif;
+    font-size:14.5px;
+    padding:8px 10px;
+    border:1px solid rgba(18,42,51,0.4);
+    border-radius:3px;
+    background:#fbf7ec;
+    resize:vertical;
+  }
+  .copy-note{
+    font-size:12.5px; color:var(--gold-2); margin-left:10px; font-family:'IBM Plex Mono', monospace;
+  }
+
+  footer.page-footer{
+    padding:16px 40px 26px 84px;
+    font-size:11.5px;
+    color:#5a6a6e;
+    font-family:'IBM Plex Mono', monospace;
+    border-top:1px solid var(--paper-line);
+  }
+
+  @media (max-width:640px){
+    header.masthead, main, footer.page-footer, nav.tabs{ padding-left:26px; padding-right:20px; }
+    .sheet::before{ left:16px; }
+    .stamp{ position:static; margin:14px 0 0; transform:rotate(-4deg);}
+    .scenario-line{ grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+  <header class="masthead">
+    <p class="eyebrow">B1 Grammar Ledger · Modal Verbs</p>
+    <h1>Must, Have To, Should &amp; Co.</h1>
+    <p class="sub">Правила запрета, совета и обязанности — на примерах о деньгах. Пройдите 6 упражнений, проверьте ответы и посмотрите разбор каждого пункта.</p>
+    <div class="stamp">B1<br>MODALS<br>&amp; MONEY</div>
+  </header>
+
+  <nav class="tabs" id="tabs">
+    <button data-tab="rules" class="active">Правило</button>
+    <button data-tab="ex1">1. Choose</button>
+    <button data-tab="ex2">2. Drag&amp;Drop</button>
+    <button data-tab="ex3">3. Gaps</button>
+    <button data-tab="ex4">4. Mistake</button>
+    <button data-tab="ex5">5. Stronger</button>
+    <button data-tab="ex6">6. Builder</button>
+    <button data-tab="open">Your ideas</button>
+  </nav>
+
+  <main>
+
+    <!-- RULES -->
+    <section class="panel active" id="panel-rules">
+      <h2 class="panel-title"><span class="num">§0</span> Правило: 5 способов сказать «нужно / нельзя»</h2>
+      <p class="panel-desc">Все эти формы говорят об обязанности, запрете или совете, но с разным оттенком: кто требует (я сам или внешние правила) и какая это категория — запрет, совет или необходимость.</p>
+
+      <div class="rules-grid" id="rulesGrid"></div>
+
+      <div class="scenario-box">
+        <h3>Правила на практике: «Твоя первая банковская карта»</h3>
+        <div id="scenarioLines"></div>
+      </div>
+    </section>
+
+    <!-- EX1 -->
+    <section class="panel" id="panel-ex1">
+      <h2 class="panel-title"><span class="num">§1</span> Choose the correct answer</h2>
+      <p class="panel-desc">Выберите правильный модальный глагол. После проверки появится объяснение, почему подходит именно этот вариант.</p>
+      <div class="toolbar">
+        <button class="action" onclick="checkExercise('ex1')">Проверить</button>
+        <button class="action secondary" onclick="revealExercise('ex1')">Показать ответы</button>
+      </div>
+      <div class="score" id="score-ex1"></div>
+      <div id="list-ex1"></div>
+    </section>
+
+    <!-- EX2 -->
+    <section class="panel" id="panel-ex2">
+      <h2 class="panel-title"><span class="num">§2</span> Drag &amp; Drop: распредели по функции</h2>
+      <p class="panel-desc">Перетащите (или нажмите, затем нажмите на категорию) каждую ситуацию в нужную колонку: Запрет, Совет, Обязанность (внешняя) или Обязанность (личная).</p>
+      <div class="toolbar">
+        <button class="action" onclick="checkExercise('ex2')">Проверить</button>
+        <button class="action secondary" onclick="revealExercise('ex2')">Показать ответы</button>
+        <button class="action secondary" onclick="resetEx2()">Сбросить</button>
+      </div>
+      <div class="score" id="score-ex2"></div>
+      <div class="dd-wrap">
+        <div class="dd-pool" id="ddPool"></div>
+        <div class="dd-zones" id="ddZones"></div>
+      </div>
+    </section>
+
+    <!-- EX3 -->
+    <section class="panel" id="panel-ex3">
+      <h2 class="panel-title"><span class="num">§3</span> Fill in the gaps</h2>
+      <p class="panel-desc">Впишите нужную форму модального глагола (в скобках указана функция, которую должно передавать предложение).</p>
+      <div class="toolbar">
+        <button class="action" onclick="checkExercise('ex3')">Проверить</button>
+        <button class="action secondary" onclick="revealExercise('ex3')">Показать ответы</button>
+      </div>
+      <div class="score" id="score-ex3"></div>
+      <div id="list-ex3"></div>
+    </section>
+
+    <!-- EX4 -->
+    <section class="panel" id="panel-ex4">
+      <h2 class="panel-title"><span class="num">§4</span> Find the mistake</h2>
+      <p class="panel-desc">В каждом предложении одна ошибка, связанная с модальными глаголами. Нажмите на неправильное слово.</p>
+      <div class="toolbar">
+        <button class="action" onclick="checkExercise('ex4')">Проверить</button>
+        <button class="action secondary" onclick="revealExercise('ex4')">Показать ответы</button>
+      </div>
+      <div class="score" id="score-ex4"></div>
+      <div id="list-ex4"></div>
+    </section>
+
+    <!-- EX5 -->
+    <section class="panel" id="panel-ex5">
+      <h2 class="panel-title"><span class="num">§5</span> Make the sentences stronger</h2>
+      <p class="panel-desc">Перепишите предложение так, чтобы функция изменилась (например, совет → строгий запрет), используя указанный модальный глагол.</p>
+      <div class="toolbar">
+        <button class="action" onclick="checkExercise('ex5')">Проверить</button>
+        <button class="action secondary" onclick="revealExercise('ex5')">Показать ответы</button>
+      </div>
+      <div class="score" id="score-ex5"></div>
+      <div id="list-ex5"></div>
+    </section>
+
+    <!-- EX6 -->
+    <section class="panel" id="panel-ex6">
+      <h2 class="panel-title"><span class="num">§6</span> Sentence Builder</h2>
+      <p class="panel-desc">Соберите предложение, нажимая на слова по порядку (в наборе есть лишние слова-дистракторы). Используем денежную лексику ниже.</p>
+      <div class="vocab-grid" id="vocabGrid"></div>
+      <div class="toolbar">
+        <button class="action" onclick="checkExercise('ex6')">Проверить</button>
+        <button class="action secondary" onclick="revealExercise('ex6')">Показать ответы</button>
+        <button class="action secondary" onclick="resetEx6()">Сбросить</button>
+      </div>
+      <div class="score" id="score-ex6"></div>
+      <div id="list-ex6"></div>
+    </section>
+
+    <!-- OPEN -->
+    <section class="panel" id="panel-open">
+      <h2 class="panel-title"><span class="num">§7</span> Finish the sentences — your ideas</h2>
+      <p class="panel-desc">Закончите предложения своими словами. Когда закончите, скопируйте все ответы одной кнопкой.</p>
+      <div class="toolbar">
+        <button class="action" onclick="copyOpenAnswers()">Скопировать все ответы</button>
+        <span class="copy-note" id="copyNote"></span>
+      </div>
+      <div id="list-open"></div>
+    </section>
+
+  </main>
+
+  <footer class="page-footer">must · mustn't · have to · don't have to · should · shouldn't · ought to · ought not to — B1 obligation &amp; advice</footer>
+</div>
+
+<script>
+/* ---------- TAB NAVIGATION ---------- */
+const tabs = document.querySelectorAll('#tabs button');
+tabs.forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    tabs.forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('section.panel').forEach(p=>p.classList.remove('active'));
+    document.getElementById('panel-'+btn.dataset.tab).classList.add('active');
+  });
+});
+
+/* ---------- DATA: RULES ---------- */
+const rules = [
+  {
+    color:'#9B3B3B', badge:'Запрет',
+    title:'mustn\'t / can\'t / (not) allowed to',
+    text:'Действие недопустимо. Mustn\'t — личный, категоричный запрет говорящего; can\'t — что-то невозможно или запрещено по факту; (not) allowed to — официальное разрешение/запрет (правила, закон). Не путайте с don\'t have to — там нет запрета, только нет необходимости!',
+    example:'You mustn\'t share your PIN code with anyone.'
+  },
+  {
+    color:'#2C6E63', badge:'Совет',
+    title:'should / shouldn\'t + infinitive',
+    text:'Личное мнение говорящего о том, что правильно или неправильно делать. Действие не обязательно — это рекомендация, а не требование.',
+    example:'You should keep a record of everything you spend.'
+  },
+  {
+    color:'#2C6E63', badge:'Совет (формально)',
+    title:'ought to / ought not (to)',
+    text:'То же значение, что и should, но более формальный, книжный вариант — часто используется, когда речь о принятых нормах или морали.',
+    example:'You ought to check your bank statement every month.'
+  },
+  {
+    color:'#B06A22', badge:'Обязанность (внешняя)',
+    title:'have to',
+    text:'Необходимость идёт извне — от правил, законов, обстоятельств, а не от мнения говорящего. Отрицания и вопросы строятся с do/does.',
+    example:'Tenants have to pay rent by the 1st of the month.'
+  },
+  {
+    color:'#3E6B3A', badge:'Обязанность (личная)',
+    title:'must',
+    text:'Сильная необходимость, которая исходит от самого говорящего — его решение, срочность или личное убеждение. Часто встречается в письменных правилах и инструкциях.',
+    example:'I must pay off this loan before the end of the year.'
+  },
+];
+
+function renderRules(){
+  const grid = document.getElementById('rulesGrid');
+  grid.innerHTML = rules.map(r=>`
+    <div class="rule-card" style="--c:${r.color}">
+      <span class="badge">${r.badge}</span>
+      <h3>${r.title}</h3>
+      <p>${r.text}</p>
+      <div class="ex">"${r.example}"</div>
+    </div>
+  `).join('');
+
+  const scenario = [
+    {c:'#9B3B3B', tag:'mustn\'t', txt:'You <b>mustn\'t</b> share your card PIN with anyone.', why:'Категоричный личный запрет — это правило безопасности, о котором говорящий предупреждает.'},
+    {c:'#2C6E63', tag:'should', txt:'You <b>should</b> pay off your full balance every month.', why:'Совет — так разумнее поступать, но это не строгое требование банка.'},
+    {c:'#2C6E63', tag:'ought to', txt:'You <b>ought to</b> check your statement regularly.', why:'То же значение, что и should, но более формально — как «принятая норма».'},
+    {c:'#B06A22', tag:'have to', txt:'You <b>have to</b> pay a minimum amount each month.', why:'Обязанность идёт от банка (внешнее правило договора), а не от мнения говорящего.'},
+    {c:'#3E6B3A', tag:'must', txt:'I <b>must</b> be more careful with my card this year.', why:'Личное решение и убеждение самого говорящего — внутренняя, а не внешняя обязанность.'},
+  ];
+  document.getElementById('scenarioLines').innerHTML = scenario.map(s=>`
+    <div class="scenario-line">
+      <span class="tag" style="--c:${s.c}">${s.tag}</span>
+      <span class="txt">${s.txt}<span class="why">${s.why}</span></span>
+    </div>
+  `).join('');
+}
+renderRules();
+
+/* ---------- EX1: Choose the correct answer ---------- */
+const ex1data = [
+  {stem:'You ___ waste money on things you don\'t really need.', opts:['shouldn\'t','don\'t have to','mustn\'t','isn\'t allowed to'], correct:0,
+   expl:'Это совет — говорящий делится мнением, а не запрещает и не говорит об отсутствии необходимости. Нужно should/shouldn\'t.'},
+  {stem:'In the UK, you ___ drive without a valid licence — it\'s against the law.', opts:['shouldn\'t','don\'t have to','aren\'t allowed to','ought not to'], correct:2,
+   expl:'Речь об официальном, законодательном запрете, поэтому лучший вариант — (not) allowed to (или mustn\'t).'},
+  {stem:'I ___ pay for the ticket — my friend already bought it for me.', opts:['mustn\'t','don\'t have to','shouldn\'t','can\'t'], correct:1,
+   expl:'Нет необходимости платить (не запрет!) — это классический контекст для don\'t have to.'},
+  {stem:'If you want to save money, you ___ create a monthly budget.', opts:['must','should','have to','mustn\'t'], correct:1,
+   expl:'Это рекомендация, совет, а не жёсткое требование — should подходит лучше всего.'},
+  {stem:'Students ___ use their phones during the exam.', opts:['don\'t have to','shouldn\'t','aren\'t allowed to','ought to'], correct:2,
+   expl:'Официальное правило учебного заведения — запрет, выраженный через aren\'t allowed to (или mustn\'t).'},
+  {stem:'You ___ borrow money from people you don\'t know online — it\'s risky.', opts:['shouldn\'t','don\'t have to','isn\'t allowed to','have to'], correct:0,
+   expl:'Это предупреждение/совет говорящего об опасности, а не официальный запрет — shouldn\'t.'},
+  {stem:'In this library, you ___ eat or drink.', opts:['don\'t have to','aren\'t allowed to','shouldn\'t','ought to'], correct:1,
+   expl:'Правило библиотеки — официальный запрет, поэтому aren\'t allowed to (или mustn\'t) точнее, чем совет shouldn\'t.'},
+  {stem:'He ___ get a part-time job — his parents already give him enough money.', opts:['mustn\'t','doesn\'t have to','shouldn\'t','isn\'t allowed to'], correct:1,
+   expl:'Нет внешней необходимости работать — doesn\'t have to, а не запрет.'},
+  {stem:'According to the contract, tenants ___ pay the rent by the 1st of each month.', opts:['must','have to','should','ought to'], correct:1,
+   expl:'Обязанность идёт из документа (договора) — это внешнее требование, поэтому have to точнее, чем личное must.'},
+  {stem:'You ___ tell anyone your online banking password. It\'s extremely important.', opts:['shouldn\'t','don\'t have to','mustn\'t','aren\'t allowed to'], correct:2,
+   expl:'Говорящий сам категорично запрещает это как крайне важное личное правило — mustn\'t.'},
+];
+
+/* ---------- EX2: Drag & Drop categorize ---------- */
+const ex2categories = [
+  {id:'prohibition', name:'Запрет', color:'#9B3B3B', bg:'#F2E0DB'},
+  {id:'advice', name:'Совет', color:'#2C6E63', bg:'#DEE9E2'},
+  {id:'obl-ext', name:'Обязанность (внешняя)', color:'#B06A22', bg:'#F1E3CE'},
+  {id:'obl-pers', name:'Обязанность (личная)', color:'#3E6B3A', bg:'#DEE7D6'},
+];
+const ex2data = [
+  {id:1, text:'Talking loudly during an exam.', cat:'prohibition'},
+  {id:2, text:'Saving a bit of money every month.', cat:'advice'},
+  {id:3, text:'Paying taxes — it\'s the law.', cat:'obl-ext'},
+  {id:4, text:'Believing it\'s important to always tell the truth about money.', cat:'obl-pers'},
+  {id:5, text:'Smoking on a plane.', cat:'prohibition'},
+  {id:6, text:'Making a monthly budget to control spending.', cat:'advice'},
+  {id:7, text:'Submitting an expense report every Friday — company policy.', cat:'obl-ext'},
+  {id:8, text:'Promising yourself never to waste money on gambling again.', cat:'obl-pers'},
+  {id:9, text:'Parking in a disabled space without a permit.', cat:'prohibition'},
+  {id:10, text:'Investing part of your salary for the future.', cat:'advice'},
+];
+let ex2state = {}; // id -> catId chosen
+let ex2selected = null; // for click-to-assign fallback
+
+/* ---------- EX3: Fill in the gaps ---------- */
+const ex3data = [
+  {stem:'You ___ spend all your salary in the first week. (совет)', answers:['shouldn\'t','shouldn`t','should not'],
+   expl:'Функция — совет, поэтому нужна форма should/shouldn\'t.'},
+  {stem:'Employees ___ wear a uniform at this company. (обязанность, внешнее правило)', answers:['have to'],
+   expl:'Требование идёт от компании (внешнее правило) — have to.'},
+  {stem:'I ___ call the bank today — I promised myself I would. (обязанность, личное решение)', answers:['must'],
+   expl:'Личное решение и убеждение говорящего — must.'},
+  {stem:'You ___ pay in cash, you can use a card instead. (нет необходимости)', answers:['don\'t have to','dont have to','do not have to'],
+   expl:'Нет необходимости, есть альтернатива — don\'t have to (не путать с запретом!).'},
+  {stem:'Passengers ___ bring more than 100ml of liquid on the plane. (запрет по правилам)', answers:['aren\'t allowed to','arent allowed to','are not allowed to','mustn\'t','mustnt','must not'],
+   expl:'Официальный запрет по правилам авиакомпании — aren\'t allowed to или mustn\'t.'},
+  {stem:'You ___ keep a record of every purchase you make. (формальный совет)', answers:['ought to'],
+   expl:'Формальный, книжный вариант совета — ought to.'},
+  {stem:'We ___ waste food — it\'s simply wrong. (личный категоричный запрет)', answers:['mustn\'t','mustnt','must not'],
+   expl:'Сильное личное убеждение говорящего, категоричный запрет — mustn\'t.'},
+  {stem:'He ___ ask his parents for money — he earns enough himself. (нет необходимости)', answers:['doesn\'t have to','doesnt have to','does not have to'],
+   expl:'Нет внешней необходимости — doesn\'t have to.'},
+  {stem:'You ___ borrow more money than you can repay. (формальный совет, отрицательный)', answers:['ought not to','ought not'],
+   expl:'Отрицательная форма формального совета — ought not (to).'},
+  {stem:'In this shop, customers ___ touch the items without permission. (запрет по правилам магазина)', answers:['aren\'t allowed to','arent allowed to','are not allowed to','can\'t','cant'],
+   expl:'Официальное правило магазина — запрет через aren\'t allowed to / can\'t.'},
+];
+
+/* ---------- EX4: Find the mistake ---------- */
+const ex4data = [
+  {tokens:['You','must','to','save','money','for','your','future.'], wrongIdx:2, correction:'save (без to)',
+   expl:'После must инфинитив идёт без to: must + V (must save), а не must to save.'},
+  {tokens:['She','don\'t','have','to','pay','for','parking','here.'], wrongIdx:1, correction:'doesn\'t',
+   expl:'С she/he/it нужен doesn\'t have to, а не don\'t.'},
+  {tokens:['We','ought','pay','the','bill','before','Friday.'], wrongIdx:1, correction:'ought to',
+   expl:'Ought всегда используется с частицей to: ought to + инфинитив.'},
+  {tokens:['He','mustn\'t','to','borrow','money','from','his','colleagues.'], wrongIdx:2, correction:'borrow (без to)',
+   expl:'После mustn\'t инфинитив без to: mustn\'t borrow, а не mustn\'t to borrow.'},
+  {tokens:['You','should','to','ask','the','bank','for','advice.'], wrongIdx:2, correction:'ask (без to)',
+   expl:'После should инфинитив идёт без to: should ask, а не should to ask.'},
+  {tokens:['They','can\'t','allowed','to','withdraw','more','than','$500','a','day.'], wrongIdx:1, correction:'aren\'t',
+   expl:'Правильная форма запрета по правилам — aren\'t allowed to, а не can\'t allowed to.'},
+  {tokens:['I','haven\'t','to','pay','the','fine,','it','was','cancelled.'], wrongIdx:1, correction:'don\'t have',
+   expl:'Отрицание отсутствия необходимости строится как don\'t have to, а не haven\'t to.'},
+  {tokens:['You','ought','not','tell','your','PIN','to','anyone.'], wrongIdx:2, correction:'not to',
+   expl:'Отрицательная форма — ought not to + инфинитив, частица to обязательна.'},
+  {tokens:['She','must','saves','every','month','to','reach','her','goal.'], wrongIdx:2, correction:'save',
+   expl:'После модального must глагол всегда в базовой форме без окончания -s: must save, а не must saves.'},
+  {tokens:['We','shouldn\'t','to','waste','money','on','things','we','don\'t','need.'], wrongIdx:2, correction:'waste (без to)',
+   expl:'После shouldn\'t инфинитив без to: shouldn\'t waste, а не shouldn\'t to waste.'},
+];
+
+/* ---------- EX5: Make the sentences stronger ---------- */
+const ex5data = [
+  {orig:'You shouldn\'t lend money to people you don\'t trust.', instr:'Сделай строгим личным запретом (mustn\'t):', answerKeywords:['mustn\'t','mustnt','must not'],
+   model:'You mustn\'t lend money to people you don\'t trust.'},
+  {orig:'You should save some money every month.', instr:'Сделай сильной личной обязанностью (must):', answerKeywords:['must'],
+   model:'You must save some money every month.'},
+  {orig:'Employees have to arrive on time.', instr:'Передай это как личное убеждение начальника (must):', answerKeywords:['must'],
+   model:'Employees must arrive on time.'},
+  {orig:'You shouldn\'t waste your salary on gambling.', instr:'Сделай строгим личным запретом (mustn\'t):', answerKeywords:['mustn\'t','mustnt','must not'],
+   model:'You mustn\'t waste your salary on gambling.'},
+  {orig:'You don\'t have to pay a deposit.', instr:'Измени на обязанность — правила изменились (must):', answerKeywords:['must'],
+   model:'You must pay a deposit now.'},
+  {orig:'You can\'t withdraw cash after 10pm.', instr:'Сделай официальным правилом банка (not allowed to):', answerKeywords:['allowed to','allowed'],
+   model:'You are not allowed to withdraw cash after 10pm.'},
+  {orig:'Tenants have to pay rent on time.', instr:'Передай как личное требование арендодателя (must):', answerKeywords:['must'],
+   model:'Tenants must pay rent on time.'},
+  {orig:'You should pay back the loan soon.', instr:'Сделай внешней обязанностью по договору (have to):', answerKeywords:['have to','has to'],
+   model:'You have to pay back the loan soon.'},
+  {orig:'You ought not to borrow more than you can afford.', instr:'Сделай категоричным личным запретом (mustn\'t):', answerKeywords:['mustn\'t','mustnt','must not'],
+   model:'You mustn\'t borrow more than you can afford.'},
+  {orig:'Students don\'t have to pay for the workshop.', instr:'Измени на обязанность — правила поменялись в этом году (have to):', answerKeywords:['have to','has to'],
+   model:'Students have to pay for the workshop this year.'},
+];
+
+/* ---------- EX6: Sentence Builder ---------- */
+const vocab = [
+  {w:'be worth', ipa:'/biː ˈwɜːθ/'},
+  {w:'borrow', ipa:'/ˈbɒrəʊ/'},
+  {w:"can't afford", ipa:'/kɑːnt əˈfɔːd/'},
+  {w:'charge', ipa:'/tʃɑːdʒ/'},
+  {w:'cost', ipa:'/kɒst/'},
+  {w:'earn', ipa:'/ɜːn/'},
+  {w:'inherit', ipa:'/ɪnˈherɪt/'},
+  {w:'invest', ipa:'/ɪnˈvest/'},
+  {w:'lend', ipa:'/lend/'},
+  {w:'owe', ipa:'/əʊ/'},
+  {w:'raise', ipa:'/reɪz/'},
+  {w:'save', ipa:'/seɪv/'},
+  {w:'waste', ipa:'/weɪst/'},
+];
+const ex6data = [
+  {words:['You','must','save','money','for','emergencies.'], distractors:['should','earn']},
+  {words:['She','doesn\'t','have','to','borrow','money','from','the','bank.'], distractors:['must','cost']},
+  {words:['Banks','lend','money','to','people','who','need','it.'], distractors:['owe','raise']},
+  {words:['We','shouldn\'t','waste','money','on','useless','things.'], distractors:['must','charge']},
+  {words:['He','can\'t','afford','a','new','car.'], distractors:['shouldn\'t','earn']},
+  {words:['You','ought','to','invest','your','savings','wisely.'], distractors:['must','cost']},
+  {words:['I','must','pay','back','the','money','I','owe.'], distractors:['earn','raise']},
+  {words:['This','shop','charges','too','much','for','coffee.'], distractors:['costs','worth']},
+  {words:['She','inherited','a','large','sum','of','money.'], distractors:['earned','saved']},
+  {words:['This','old','guitar','is','worth','a','lot','of','money.'], distractors:['cost','raise']},
+];
+let ex6state = {}; // idx -> array of chosen words in order
+
+/* ---------- OPEN-ENDED ---------- */
+const openData = [
+  'You must ______ if you want to save money.',
+  'In my family, we don\'t have to ______.',
+  'You shouldn\'t ______ when you get your salary.',
+  'According to the rules at my job, I have to ______.',
+  'I think everyone ought to ______.',
+  'You can\'t ______ without asking permission.',
+  'If I inherited a lot of money, I ______.',
+  'My parents always tell me I mustn\'t ______.',
+];
+
+/* ===================== RENDER FUNCTIONS ===================== */
+
+function renderEx1(){
+  const list = document.getElementById('list-ex1');
+  list.innerHTML = ex1data.map((it,i)=>`
+    <div class="item" data-idx="${i}">
+      <div class="qn">Вопрос ${i+1}/10</div>
+      <div class="stem">${it.stem.replace('___','<span class="gap">?</span>')}</div>
+      <div class="opts">
+        ${it.opts.map((o,oi)=>`
+          <label><input type="radio" name="ex1-${i}" value="${oi}"> ${o}</label>
+        `).join('')}
+      </div>
+      <div class="feedback" id="fb-ex1-${i}"></div>
+    </div>
+  `).join('');
+}
+
+function renderEx2(){
+  const pool = document.getElementById('ddPool');
+  pool.innerHTML = ex2data.map(it=>`
+    <div class="dd-chip" id="chip-${it.id}" draggable="true" data-id="${it.id}">${it.text}</div>
+  `).join('');
+
+  const zones = document.getElementById('ddZones');
+  zones.innerHTML = ex2categories.map(c=>`
+    <div class="dd-zone" id="zone-${c.id}" style="--c:${c.color};--bg:${c.bg}" data-cat="${c.id}">
+      <h4>${c.name}</h4>
+      <div class="zone-items" id="zoneitems-${c.id}"></div>
+    </div>
+  `).join('');
+
+  // drag events
+  pool.querySelectorAll('.dd-chip').forEach(chip=>{
+    chip.addEventListener('dragstart', e=>{
+      e.dataTransfer.setData('text/plain', chip.dataset.id);
+    });
+    chip.addEventListener('click', ()=>{
+      // click-to-select fallback
+      document.querySelectorAll('.dd-chip').forEach(c=>c.style.outline='');
+      ex2selected = chip.dataset.id;
+      chip.style.outline = '2px solid #A9791F';
+    });
+  });
+  zones.querySelectorAll('.dd-zone').forEach(zone=>{
+    zone.addEventListener('dragover', e=>{ e.preventDefault(); zone.classList.add('dragover'); });
+    zone.addEventListener('dragleave', ()=>zone.classList.remove('dragover'));
+    zone.addEventListener('drop', e=>{
+      e.preventDefault();
+      zone.classList.remove('dragover');
+      const id = e.dataTransfer.getData('text/plain');
+      assignEx2(id, zone.dataset.cat);
+    });
+    zone.addEventListener('click', ()=>{
+      if(ex2selected){
+        assignEx2(ex2selected, zone.dataset.cat);
+        ex2selected = null;
+      }
+    });
+  });
+}
+
+function assignEx2(id, catId){
+  id = parseInt(id);
+  ex2state[id] = catId;
+  const item = ex2data.find(d=>d.id===id);
+  const chip = document.getElementById('chip-'+id);
+  if(chip) chip.classList.add('placed');
+  const container = document.getElementById('zoneitems-'+catId);
+  // remove existing entry for this id in any zone
+  document.querySelectorAll('.zone-items .dd-item-in').forEach(el=>{
+    if(parseInt(el.dataset.id)===id) el.remove();
+  });
+  const div = document.createElement('div');
+  div.className = 'dd-item-in';
+  div.dataset.id = id;
+  div.textContent = item.text;
+  container.appendChild(div);
+}
+
+function resetEx2(){
+  ex2state = {};
+  ex2selected = null;
+  renderEx2();
+  document.getElementById('score-ex2').textContent='';
+}
+
+function renderEx3(){
+  const list = document.getElementById('list-ex3');
+  list.innerHTML = ex3data.map((it,i)=>`
+    <div class="item" data-idx="${i}">
+      <div class="qn">Вопрос ${i+1}/10</div>
+      <div class="stem">${it.stem.replace('___','<span class="gap"></span>')}</div>
+      <input type="text" class="blank" id="in-ex3-${i}" placeholder="введите форму глагола">
+      <div class="feedback" id="fb-ex3-${i}"></div>
+    </div>
+  `).join('');
+}
+
+function renderEx4(){
+  const list = document.getElementById('list-ex4');
+  list.innerHTML = ex4data.map((it,i)=>`
+    <div class="item" data-idx="${i}">
+      <div class="qn">Вопрос ${i+1}/10</div>
+      <div class="tokens" id="toks-ex4-${i}">
+        ${it.tokens.map((t,ti)=>`<span class="tok" data-ti="${ti}" onclick="pickToken(${i},${ti})">${t}</span>`).join('')}
+      </div>
+      <div class="feedback" id="fb-ex4-${i}"></div>
+    </div>
+  `).join('');
+}
+let ex4picks = {};
+function pickToken(i,ti){
+  ex4picks[i] = ti;
+  const toks = document.querySelectorAll('#toks-ex4-'+i+' .tok');
+  toks.forEach(t=>t.classList.remove('picked'));
+  toks[ti].classList.add('picked');
+}
+
+function renderEx5(){
+  const list = document.getElementById('list-ex5');
+  list.innerHTML = ex5data.map((it,i)=>`
+    <div class="item" data-idx="${i}">
+      <div class="qn">Вопрос ${i+1}/10 — ${it.instr}</div>
+      <div class="stem">Оригинал: <i>"${it.orig}"</i></div>
+      <input type="text" class="blank" style="width:100%" id="in-ex5-${i}" placeholder="напишите новое предложение">
+      <div class="feedback" id="fb-ex5-${i}"></div>
+    </div>
+  `).join('');
+}
+
+function renderEx6(){
+  const vg = document.getElementById('vocabGrid');
+  vg.innerHTML = vocab.map(v=>`<div class="vocab-item"><b>${v.w}</b> — <span class="ipa">${v.ipa}</span></div>`).join('');
+
+  const list = document.getElementById('list-ex6');
+  list.innerHTML = ex6data.map((it,i)=>{
+    const all = shuffleArr([...it.words, ...it.distractors]);
+    ex6state[i] = [];
+    return `
+    <div class="item" data-idx="${i}">
+      <div class="qn">Предложение ${i+1}/10</div>
+      <div class="builder-answer" id="ans-ex6-${i}"><span class="placeholder">нажимайте на слова снизу по порядку...</span></div>
+      <div class="builder-bank" id="bank-ex6-${i}">
+        ${all.map((w,wi)=>`<span class="chip" data-w="${w}" data-wi="${wi}" onclick="pickWord(${i},${wi},this)">${w}</span>`).join('')}
+      </div>
+      <div class="feedback" id="fb-ex6-${i}"></div>
+    </div>`;
+  }).join('');
+}
+function shuffleArr(a){
+  const arr=[...a];
+  for(let i=arr.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]];
+  }
+  return arr;
+}
+function pickWord(i,wi,el){
+  if(el.classList.contains('used')) return;
+  el.classList.add('used');
+  ex6state[i].push(el.dataset.w);
+  renderBuiltAnswer(i);
+}
+function renderBuiltAnswer(i){
+  const box = document.getElementById('ans-ex6-'+i);
+  if(ex6state[i].length===0){
+    box.innerHTML = '<span class="placeholder">нажимайте на слова снизу по порядку...</span>';
+    return;
+  }
+  box.innerHTML = ex6state[i].map((w,idx)=>`<span class="chip" onclick="removeWord(${i},${idx})">${w} ✕</span>`).join(' ');
+}
+function removeWord(i,idx){
+  const w = ex6state[i][idx];
+  ex6state[i].splice(idx,1);
+  renderBuiltAnswer(i);
+  // re-enable one matching chip in bank
+  const bank = document.querySelectorAll('#bank-ex6-'+i+' .chip.used');
+  for(const chip of bank){
+    if(chip.dataset.w===w){ chip.classList.remove('used'); break; }
+  }
+}
+function resetEx6(){
+  renderEx6();
+  document.getElementById('score-ex6').textContent='';
+}
+
+function renderOpen(){
+  const list = document.getElementById('list-open');
+  list.innerHTML = openData.map((s,i)=>`
+    <div class="open-item">
+      <div class="starter">${i+1}. ${s}</div>
+      <textarea id="open-${i}" placeholder="ваш ответ..."></textarea>
+    </div>
+  `).join('');
+}
+
+/* ===================== CHECK / REVEAL LOGIC ===================== */
+
+function norm(s){
+  return s.toLowerCase().replace(/[’`]/g,"'").replace(/[.,!?]/g,'').trim();
+}
+
+function checkExercise(name){
+  if(name==='ex1'){
+    let correct=0;
+    ex1data.forEach((it,i)=>{
+      const sel = document.querySelector(`input[name="ex1-${i}"]:checked`);
+      const fb = document.getElementById('fb-ex1-'+i);
+      fb.classList.add('show');
+      if(!sel){
+        fb.className='feedback show wrong';
+        fb.innerHTML = 'Выберите вариант ответа.';
+        return;
+      }
+      const val = parseInt(sel.value);
+      if(val===it.correct){
+        correct++;
+        fb.className='feedback show correct';
+        fb.innerHTML = 'Верно! <span class="expl">'+it.expl+'</span>';
+      } else {
+        fb.className='feedback show wrong';
+        fb.innerHTML = 'Неверно. Правильный ответ: <b>'+it.opts[it.correct]+'</b>. <span class="expl">'+it.expl+'</span>';
+      }
+    });
+    document.getElementById('score-ex1').textContent = 'Результат: '+correct+' / '+ex1data.length;
+  }
+  if(name==='ex2'){
+    let correct=0;
+    ex2data.forEach(it=>{
+      const chosen = ex2state[it.id];
+      const els = document.querySelectorAll('.zone-items .dd-item-in');
+      els.forEach(el=>{
+        if(parseInt(el.dataset.id)===it.id){
+          if(chosen===it.cat){ el.classList.add('right'); el.classList.remove('wrong'); correct++; }
+          else { el.classList.add('wrong'); el.classList.remove('right'); }
+        }
+      });
+    });
+    document.getElementById('score-ex2').textContent = 'Результат: '+correct+' / '+ex2data.length;
+  }
+  if(name==='ex3'){
+    let correct=0;
+    ex3data.forEach((it,i)=>{
+      const val = norm(document.getElementById('in-ex3-'+i).value);
+      const fb = document.getElementById('fb-ex3-'+i);
+      fb.classList.add('show');
+      const ok = it.answers.some(a=>norm(a)===val);
+      if(ok){
+        correct++;
+        fb.className='feedback show correct';
+        fb.innerHTML = 'Верно! <span class="expl">'+it.expl+'</span>';
+      } else {
+        fb.className='feedback show wrong';
+        fb.innerHTML = 'Неверно. Правильный ответ: <b>'+it.answers[0]+'</b>. <span class="expl">'+it.expl+'</span>';
+      }
+    });
+    document.getElementById('score-ex3').textContent = 'Результат: '+correct+' / '+ex3data.length;
+  }
+  if(name==='ex4'){
+    let correct=0;
+    ex4data.forEach((it,i)=>{
+      const fb = document.getElementById('fb-ex4-'+i);
+      fb.classList.add('show');
+      const picked = ex4picks[i];
+      const toks = document.querySelectorAll('#toks-ex4-'+i+' .tok');
+      if(picked===it.wrongIdx){
+        correct++;
+        fb.className='feedback show correct';
+        fb.innerHTML = 'Верно! Исправление: <b>'+it.correction+'</b>. <span class="expl">'+it.expl+'</span>';
+      } else {
+        fb.className='feedback show wrong';
+        toks[it.wrongIdx].classList.add('answer-right');
+        fb.innerHTML = 'Неверно. Ошибка была здесь: <b>'+it.tokens[it.wrongIdx]+'</b> → '+it.correction+'. <span class="expl">'+it.expl+'</span>';
+      }
+    });
+    document.getElementById('score-ex4').textContent = 'Результат: '+correct+' / '+ex4data.length;
+  }
+  if(name==='ex5'){
+    let correct=0;
+    ex5data.forEach((it,i)=>{
+      const val = norm(document.getElementById('in-ex5-'+i).value);
+      const fb = document.getElementById('fb-ex5-'+i);
+      fb.classList.add('show');
+      const ok = val.length>0 && it.answerKeywords.some(k=>val.includes(norm(k)));
+      if(ok){
+        correct++;
+        fb.className='feedback show correct';
+        fb.innerHTML = 'Похоже на правильный ответ! Пример: <i>"'+it.model+'"</i>';
+      } else {
+        fb.className='feedback show wrong';
+        fb.innerHTML = 'Проверьте ещё раз нужный модальный глагол. Пример ответа: <i>"'+it.model+'"</i>';
+      }
+    });
+    document.getElementById('score-ex5').textContent = 'Проверено (сверьте с образцом): '+correct+' / '+ex5data.length;
+  }
+  if(name==='ex6'){
+    let correct=0;
+    ex6data.forEach((it,i)=>{
+      const fb = document.getElementById('fb-ex6-'+i);
+      fb.classList.add('show');
+      const built = ex6state[i].join(' ');
+      const target = it.words.join(' ');
+      if(norm(built)===norm(target)){
+        correct++;
+        fb.className='feedback show correct';
+        fb.innerHTML = 'Отлично! Верное предложение.';
+      } else {
+        fb.className='feedback show wrong';
+        fb.innerHTML = 'Неверно. Правильное предложение: <b>'+target+'</b>';
+      }
+    });
+    document.getElementById('score-ex6').textContent = 'Результат: '+correct+' / '+ex6data.length;
+  }
+}
+
+function revealExercise(name){
+  if(name==='ex1'){
+    ex1data.forEach((it,i)=>{
+      document.querySelectorAll(`input[name="ex1-${i}"]`)[it.correct].checked = true;
+      const fb = document.getElementById('fb-ex1-'+i);
+      fb.className='feedback show reveal';
+      fb.innerHTML = 'Ответ: <b>'+it.opts[it.correct]+'</b>. <span class="expl">'+it.expl+'</span>';
+    });
+    document.getElementById('score-ex1').textContent = 'Ответы показаны.';
+  }
+  if(name==='ex2'){
+    ex2categories.forEach(c=>{ document.getElementById('zoneitems-'+c.id).innerHTML=''; });
+    ex2data.forEach(it=>{ assignEx2(it.id, it.cat); });
+    document.getElementById('score-ex2').textContent = 'Ответы показаны.';
+  }
+  if(name==='ex3'){
+    ex3data.forEach((it,i)=>{
+      document.getElementById('in-ex3-'+i).value = it.answers[0];
+      const fb = document.getElementById('fb-ex3-'+i);
+      fb.className='feedback show reveal';
+      fb.innerHTML = 'Ответ: <b>'+it.answers[0]+'</b>. <span class="expl">'+it.expl+'</span>';
+    });
+    document.getElementById('score-ex3').textContent = 'Ответы показаны.';
+  }
+  if(name==='ex4'){
+    ex4data.forEach((it,i)=>{
+      pickToken(i, it.wrongIdx);
+      const fb = document.getElementById('fb-ex4-'+i);
+      fb.className='feedback show reveal';
+      fb.innerHTML = 'Ошибка: <b>'+it.tokens[it.wrongIdx]+'</b> → '+it.correction+'. <span class="expl">'+it.expl+'</span>';
+    });
+    document.getElementById('score-ex4').textContent = 'Ответы показаны.';
+  }
+  if(name==='ex5'){
+    ex5data.forEach((it,i)=>{
+      document.getElementById('in-ex5-'+i).value = it.model;
+      const fb = document.getElementById('fb-ex5-'+i);
+      fb.className='feedback show reveal';
+      fb.innerHTML = 'Пример ответа: <i>"'+it.model+'"</i>';
+    });
+    document.getElementById('score-ex5').textContent = 'Ответы показаны.';
+  }
+  if(name==='ex6'){
+    ex6data.forEach((it,i)=>{
+      ex6state[i] = [...it.words];
+      renderBuiltAnswer(i);
+      document.querySelectorAll('#bank-ex6-'+i+' .chip').forEach(chip=>chip.classList.add('used'));
+      const fb = document.getElementById('fb-ex6-'+i);
+      fb.className='feedback show reveal';
+      fb.innerHTML = 'Ответ: <b>'+it.words.join(' ')+'</b>';
+    });
+    document.getElementById('score-ex6').textContent = 'Ответы показаны.';
+  }
+}
+
+/* ---------- COPY OPEN ANSWERS ---------- */
+function copyOpenAnswers(){
+  let text = '';
+  openData.forEach((s,i)=>{
+    const val = document.getElementById('open-'+i).value.trim();
+    text += (i+1)+'. '+s.replace('______', val || '______')+'\n';
+  });
+  navigator.clipboard.writeText(text).then(()=>{
+    document.getElementById('copyNote').textContent = 'Скопировано!';
+    setTimeout(()=>{ document.getElementById('copyNote').textContent=''; }, 2500);
+  }).catch(()=>{
+    document.getElementById('copyNote').textContent = 'Не удалось скопировать — скопируйте вручную.';
+  });
+}
+
+/* ---------- INIT ---------- */
+renderEx1();
+renderEx2();
+renderEx3();
+renderEx4();
+renderEx5();
+renderEx6();
+renderOpen();
+</script>
+</body>
+</html>
