@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Departures · Airport English B1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B1E33;
+    --bg-panel:#0F2540;
+    --bg-panel-2:#132D4E;
+    --line: rgba(255,177,0,0.18);
+    --amber:#FFB100;
+    --amber-dim:#B98200;
+    --teal:#2DD4BF;
+    --red:#FF6B5B;
+    --ink:#F4F1E8;
+    --muted:#90A4C0;
+    --mono: 'Space Mono', monospace;
+    --sans: 'Inter', sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background: radial-gradient(1200px 600px at 50% -10%, #123256 0%, var(--bg) 55%);
+    color:var(--ink);
+    font-family:var(--sans);
+    line-height:1.5;
+    padding-bottom:80px;
+  }
+  a{color:var(--amber);}
+
+  /* ===== HERO / DEPARTURE BOARD ===== */
+  .hero{
+    border-bottom:1px solid var(--line);
+    padding:28px 20px 22px;
+    background:
+      repeating-linear-gradient(180deg, rgba(255,177,0,0.03) 0px, rgba(255,177,0,0.03) 1px, transparent 1px, transparent 3px),
+      linear-gradient(180deg, #0D2340, #0B1E33);
+  }
+  .hero-inner{max-width:1180px;margin:0 auto;}
+  .eyebrow{
+    font-family:var(--mono);
+    letter-spacing:.35em;
+    font-size:11px;
+    color:var(--amber-dim);
+    text-transform:uppercase;
+    margin-bottom:10px;
+  }
+  h1{
+    font-family:var(--mono);
+    font-size:clamp(26px,4vw,42px);
+    letter-spacing:.02em;
+    margin:0 0 6px;
+    color:var(--ink);
+    text-shadow:0 0 18px rgba(255,177,0,0.15);
+  }
+  .hero p.sub{color:var(--muted);max-width:640px;margin:0 0 18px;font-size:15px;}
+
+  .board{
+    display:flex;flex-wrap:wrap;gap:8px;
+    margin-top:6px;
+  }
+  .flap{
+    font-family:var(--mono);
+    background:#081527;
+    border:1px solid var(--line);
+    color:var(--amber);
+    padding:8px 12px;
+    border-radius:4px;
+    font-size:13px;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    white-space:nowrap;
+  }
+
+  .status-row{
+    margin-top:20px;
+    display:flex;flex-wrap:wrap;gap:14px;align-items:center;
+    font-family:var(--mono);
+    font-size:13px;
+  }
+  .status-pill{
+    border:1px solid var(--line);
+    background:var(--bg-panel);
+    padding:8px 14px;border-radius:999px;
+    color:var(--muted);
+    display:flex;align-items:center;gap:8px;
+  }
+  .status-pill b{color:var(--amber);font-weight:400;}
+  .btn{
+    font-family:var(--sans);
+    font-weight:600;
+    border:1px solid var(--amber);
+    background:transparent;
+    color:var(--amber);
+    padding:9px 16px;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:14px;
+    transition:.15s ease;
+  }
+  .btn:hover{background:rgba(255,177,0,0.12);}
+  .btn.solid{background:var(--amber);color:#1a1100;border-color:var(--amber);}
+  .btn.solid:hover{background:#ffc433;}
+  .btn.small{padding:6px 11px;font-size:12.5px;border-radius:6px;}
+  .btn.ghost{border-color:var(--line);color:var(--muted);}
+  .btn.ghost:hover{border-color:var(--amber);color:var(--amber);background:transparent;}
+  select.voice-select{
+    font-family:var(--sans);
+    background:var(--bg-panel);
+    color:var(--ink);
+    border:1px solid var(--line);
+    padding:8px 10px;border-radius:8px;font-size:13px;
+  }
+
+  /* ===== LAYOUT ===== */
+  .layout{
+    max-width:1180px;margin:0 auto;padding:26px 20px 0;
+    display:grid;grid-template-columns:1fr 300px;gap:24px;
+    align-items:start;
+  }
+  @media (max-width:900px){
+    .layout{grid-template-columns:1fr;}
+    .sidebar{order:-1;position:static !important;}
+  }
+  main{min-width:0;}
+
+  .sidebar{
+    position:sticky;top:18px;
+    background:var(--bg-panel);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:16px;
+  }
+  .sidebar h3{
+    font-family:var(--mono);
+    font-size:13px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--amber);margin:0 0 4px;
+  }
+  .sidebar .hint{color:var(--muted);font-size:12.5px;margin:0 0 12px;}
+  #problemList{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;max-height:420px;overflow:auto;}
+  #problemList li{
+    background:var(--bg-panel-2);
+    border:1px solid rgba(255,107,91,0.35);
+    border-radius:8px;
+    padding:8px 10px;
+    font-size:13px;
+  }
+  #problemList li .w{font-family:var(--mono);color:var(--red);display:block;font-size:13px;}
+  #problemList li .c{color:var(--muted);font-size:11.5px;}
+  #problemList .empty{color:var(--muted);font-size:13px;font-style:italic;}
+
+  /* ===== SECTIONS ===== */
+  section.block{
+    background:var(--bg-panel);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:22px 22px 24px;
+    margin-bottom:22px;
+  }
+  .block-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:14px;}
+  .block-head h2{
+    font-family:var(--mono);
+    font-size:19px;margin:0 0 4px;color:var(--ink);
+  }
+  .block-head p{margin:0;color:var(--muted);font-size:13.5px;max-width:640px;}
+  .tag{
+    font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--bg);background:var(--amber);padding:4px 9px;border-radius:5px;white-space:nowrap;
+  }
+  .actions-row{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;}
+
+  /* vocab table */
+  .vocab-table{width:100%;border-collapse:collapse;font-size:13.5px;}
+  .vocab-table th{
+    text-align:left;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--amber-dim);border-bottom:1px solid var(--line);padding:8px 8px;
+  }
+  .vocab-table td{border-bottom:1px solid rgba(255,177,0,0.08);padding:10px 8px;vertical-align:top;}
+  .vocab-table tr:hover td{background:rgba(255,177,0,0.04);}
+  .word-cell{font-family:var(--mono);color:var(--ink);font-weight:700;white-space:nowrap;}
+  .ipa-cell{font-family:var(--mono);color:var(--teal);white-space:nowrap;}
+  .note-cell{color:var(--muted);font-size:12.5px;}
+  .listen-btn{
+    border:1px solid var(--teal);color:var(--teal);background:transparent;
+    border-radius:6px;padding:5px 9px;cursor:pointer;font-size:13px;
+  }
+  .listen-btn:hover{background:rgba(45,212,191,0.12);}
+
+  /* items */
+  .item{
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:14px 16px;
+    margin-bottom:12px;
+    background:var(--bg-panel-2);
+  }
+  .item-num{
+    font-family:var(--mono);color:var(--amber-dim);font-size:12px;margin-right:8px;
+  }
+  .item-prompt{font-size:15px;margin-bottom:10px;}
+  .item-prompt .blank{color:var(--amber);font-family:var(--mono);}
+  .item-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+  input[type=text]{
+    font-family:var(--sans);
+    background:#081527;color:var(--ink);
+    border:1px solid var(--line);border-radius:8px;
+    padding:9px 12px;font-size:14px;min-width:200px;flex:1;
+  }
+  input[type=text]:focus{outline:none;border-color:var(--amber);}
+  textarea{
+    font-family:var(--sans);
+    background:#081527;color:var(--ink);
+    border:1px solid var(--line);border-radius:8px;
+    padding:10px 12px;font-size:14px;width:100%;resize:vertical;min-height:56px;
+  }
+  textarea:focus{outline:none;border-color:var(--amber);}
+  .choice-btns{display:flex;gap:8px;flex-wrap:wrap;}
+  .choice-btn{
+    border:1px solid var(--line);background:transparent;color:var(--ink);
+    padding:8px 14px;border-radius:8px;cursor:pointer;font-size:13.5px;font-family:var(--sans);
+  }
+  .choice-btn:hover{border-color:var(--amber);}
+  .choice-btn.selected{border-color:var(--amber);background:rgba(255,177,0,0.15);}
+  .choice-btn.correct{border-color:var(--teal);background:rgba(45,212,191,0.15);color:var(--teal);}
+  .choice-btn.wrong{border-color:var(--red);background:rgba(255,107,91,0.15);color:var(--red);}
+
+  .feedback{margin-top:8px;font-size:13px;font-family:var(--mono);min-height:18px;}
+  .feedback.ok{color:var(--teal);}
+  .feedback.bad{color:var(--red);}
+  .feedback.info{color:var(--muted);}
+
+  .radio-row{display:flex;gap:16px;margin-top:4px;flex-wrap:wrap;}
+  .radio-opt{display:flex;align-items:center;gap:6px;font-size:14px;cursor:pointer;}
+  .radio-opt input{accent-color:var(--amber);}
+
+  .odd-options{display:flex;flex-direction:column;gap:8px;margin-top:4px;}
+  .odd-option{
+    display:flex;align-items:center;gap:10px;
+    border:1px solid var(--line);border-radius:8px;padding:9px 12px;cursor:pointer;font-size:14px;
+  }
+  .odd-option:hover{border-color:var(--amber-dim);}
+  .odd-option.selected{border-color:var(--amber);background:rgba(255,177,0,0.1);}
+  .odd-option.correct{border-color:var(--teal);background:rgba(45,212,191,0.12);}
+  .odd-option.wrong{border-color:var(--red);background:rgba(255,107,91,0.12);}
+  .odd-option span.letter{font-family:var(--mono);color:var(--amber-dim);}
+
+  .score-badge{
+    font-family:var(--mono);font-size:13px;color:var(--muted);
+  }
+  .score-badge b{color:var(--teal);}
+
+  footer{
+    max-width:1180px;margin:30px auto 0;padding:0 20px;
+    display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between;
+  }
+  .footer-note{color:var(--muted);font-size:12.5px;max-width:600px;}
+  #copyStatus{font-family:var(--mono);font-size:12.5px;color:var(--teal);margin-left:10px;}
+
+  @media (max-width:600px){
+    .layout{padding:20px 12px 0;}
+    section.block{padding:16px;}
+    .hero{padding:22px 14px 18px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow">Gate B1 · Vocabulary Departures</div>
+    <h1>AIRPORT ENGLISH — B1</h1>
+    <p class="sub">Повторите слова, прослушайте произношение (голос Google US English), затем пройдите 6 заданий по 10 пунктов. Ошибки автоматически попадают в панель «Проблемные слова» справа.</p>
+    <div class="board" id="flapBoard"></div>
+    <div class="status-row">
+      <button class="btn solid" id="testSoundBtn">🔊 Проверить звук</button>
+      <select id="voiceSelect" class="voice-select"><option>Загрузка голосов…</option></select>
+      <div class="status-pill" id="soundStatus">Статус звука: <b>не проверен</b></div>
+      <div class="status-pill" id="overallStatus">Прогресс: <b>0 / 60</b></div>
+    </div>
+  </div>
+</div>
+
+<div class="layout">
+  <main>
+
+    <!-- VOCAB REVIEW -->
+    <section class="block">
+      <div class="block-head">
+        <div>
+          <h2>0 · Повторение слов</h2>
+          <p>Транскрипция, перевод, нюансы и типичные ошибки. Нажмите 🔊, чтобы прослушать.</p>
+        </div>
+        <span class="tag">14 слов</span>
+      </div>
+      <table class="vocab-table">
+        <thead>
+          <tr><th></th><th>Слово / фраза</th><th>Транскрипция</th><th>Перевод</th><th>Нюансы и частые ошибки</th></tr>
+        </thead>
+        <tbody id="vocabBody"></tbody>
+      </table>
+    </section>
+
+    <!-- EXERCISE 1: DICTATION -->
+    <section class="block">
+      <div class="block-head">
+        <div>
+          <h2>1 · Прописать слово по звуку</h2>
+          <p>Нажмите 🔊, прослушайте произношение и впишите слово или фразу так, как услышали.</p>
+        </div>
+        <span class="tag" id="score-ex1">0 / 10</span>
+      </div>
+      <div id="ex1"></div>
+      <div class="actions-row">
+        <button class="btn solid" onclick="checkExercise('ex1')">Проверить</button>
+        <button class="btn ghost" onclick="revealExercise('ex1')">Показать ответы</button>
+      </div>
+    </section>
+
+    <!-- EXERCISE 2: COLLOCATIONS GAP FILL -->
+    <section class="block">
+      <div class="block-head">
+        <div>
+          <h2>2 · Сочетаемость: впишите нужное слово</h2>
+          <p>Заполните пропуск словом, которое образует правильное сочетание (collocation).</p>
+        </div>
+        <span class="tag" id="score-ex2">0 / 10</span>
+      </div>
+      <div id="ex2"></div>
+      <div class="actions-row">
+        <button class="btn solid" onclick="checkExercise('ex2')">Проверить</button>
+        <button class="btn ghost" onclick="revealExercise('ex2')">Показать ответы</button>
+      </div>
+    </section>
+
+    <!-- EXERCISE 3: VERB TENSES -->
+    <section class="block">
+      <div class="block-head">
+        <div>
+          <h2>3 · Глагол в нужном времени</h2>
+          <p>Поставьте глагол в скобках в правильную форму по смыслу и времени предложения.</p>
+        </div>
+        <span class="tag" id="score-ex3">0 / 10</span>
+      </div>
+      <div id="ex3"></div>
+      <div class="actions-row">
+        <button class="btn solid" onclick="checkExercise('ex3')">Проверить</button>
+        <button class="btn ghost" onclick="revealExercise('ex3')">Показать ответы</button>
+      </div>
+    </section>
+
+    <!-- EXERCISE 4: ODD ONE OUT -->
+    <section class="block">
+      <div class="block-head">
+        <div>
+          <h2>4 · Circle the odd collocation</h2>
+          <p>В каждом наборе три сочетания верные, а одно — ошибка. Отметьте лишнее (неправильное).</p>
+        </div>
+        <span class="tag" id="score-ex4">0 / 10</span>
+      </div>
+      <div id="ex4"></div>
+      <div class="actions-row">
+        <button class="btn solid" onclick="checkExercise('ex4')">Проверить</button>
+        <button class="btn ghost" onclick="revealExercise('ex4')">Показать ответы</button>
+      </div>
+    </section>
+
+    <!-- EXERCISE 5: ASK FOR vs ASK ABOUT -->
+    <section class="block">
+      <div class="block-head">
+        <div>
+          <h2>5 · ask for or ask about?</h2>
+          <p>Выберите правильный вариант: <b>for</b> (запросить конкретное) или <b>about</b> (спросить о теме).</p>
+        </div>
+        <span class="tag" id="score-ex5">0 / 10</span>
+      </div>
+      <div id="ex5"></div>
+      <div class="actions-row">
+        <button class="btn solid" onclick="checkExercise('ex5')">Проверить</button>
+        <button class="btn ghost" onclick="revealExercise('ex5')">Показать ответы</button>
+      </div>
+    </section>
+
+    <!-- EXERCISE 6: OPEN SENTENCES -->
+    <section class="block">
+      <div class="block-head">
+        <div>
+          <h2>6 · Закончите предложения своими идеями</h2>
+          <p>Здесь нет «правильного» ответа — пишите своими словами, используя изученную лексику.</p>
+        </div>
+        <span class="tag">открытое задание</span>
+      </div>
+      <div id="ex6"></div>
+      <div class="actions-row">
+        <button class="btn solid" onclick="copyExercise('ex6')">📋 Скопировать мои ответы (задание 6)</button>
+      </div>
+    </section>
+
+  </main>
+
+  <aside class="sidebar">
+    <h3>⚠ Проблемные слова</h3>
+    <p class="hint">Сюда попадают слова, в которых была допущена ошибка хотя бы раз. Обновляется автоматически.</p>
+    <ul id="problemList"><li class="empty">Пока нет ошибок — отлично!</li></ul>
+  </aside>
+</div>
+
+<footer>
+  <div class="footer-note">Кнопка ниже собирает все введённые ответы студента (задания 1–6) в один текст, который можно вставить преподавателю в чат или документ.</div>
+  <div>
+    <button class="btn solid" onclick="copyAllAnswers()">📋 Скопировать ВСЕ ответы</button>
+    <span id="copyStatus"></span>
+  </div>
+</footer>
+
+<script>
+/* ============================= DATA ============================= */
+const VOCAB = [
+  {word:"baggage reclaim", ipa:"/ˈbæɡɪdʒ rɪˈkleɪm/", ru:"зона выдачи багажа", note:"Место ПОСЛЕ прилёта, где забирают чемоданы с ленты. Не путайте с bag drop — это перед вылетом."},
+  {word:"bag drop", ipa:"/bæɡ drɒp/", ru:"стойка сдачи багажа", note:"Перед вылетом, часто после онлайн check-in. Противоположность baggage reclaim."},
+  {word:"a missed flight", ipa:"/ə ˌmɪst ˈflaɪt/", ru:"пропущенный рейс", note:"missed — прилагательное перед flight. Нельзя сказать 'a miss flight'."},
+  {word:"ask for", ipa:"/ɑːsk fɔːr/", ru:"попросить / запросить (конкретное)", note:"+ конкретный предмет или человек: ask for his booking reference."},
+  {word:"ask about", ipa:"/ɑːsk əˈbaʊt/", ru:"спросить о (в общем, тема)", note:"+ тема целиком: ask about my holiday. Частая ошибка — 'ask for my holiday'."},
+  {word:"unattended luggage", ipa:"/ˌʌnəˈtendɪd ˈlʌɡɪdʒ/", ru:"багаж без присмотра", note:"Классическое объявление в аэропорту: do not leave your luggage unattended."},
+  {word:"check in for your flight", ipa:"/ˌtʃek ˈɪn fɔːr jɔːr flaɪt/", ru:"зарегистрироваться на рейс", note:"check in — фразовый глагол + for + flight. check-in (сущ.) пишется через дефис."},
+  {word:"drop off your bag", ipa:"/ˌdrɒp ˈɒf jɔːr bæɡ/", ru:"сдать / оставить багаж", note:"Разделяемый фразовый глагол: drop your bag off — тоже верно."},
+  {word:"enjoy", ipa:"/ɪnˈdʒɔɪ/", ru:"получать удовольствие", note:"После enjoy всегда -ing: enjoy travelling. НЕ enjoy to travel."},
+  {word:"provide sb with sth", ipa:"/prəˈvaɪd wɪð/", ru:"обеспечить кого-то чем-то", note:"provide + человек + with + вещь: provide passengers with information."},
+  {word:"miss", ipa:"/mɪs/", ru:"1) опоздать / упустить  2) скучать", note:"miss the flight (не успеть на транспорт) vs miss my family (скучать по кому-то) — два разных значения."},
+  {word:"report (noun)", ipa:"/ˈriːpɔːt/", ru:"отчёт, доклад", note:"Ударение на ПЕРВЫЙ слог, когда это существительное: a written report."},
+  {word:"report (verb)", ipa:"/rɪˈpɔːt/", ru:"сообщать, докладывать", note:"Ударение на ВТОРОЙ слог, когда это глагол: to report an incident."},
+  {word:"due to", ipa:"/djuː tuː/", ru:"из-за, вследствие", note:"due to + существительное/фраза: due to my safety. Не путать с because (+ подлежащее + глагол)."},
+  {word:"get to know sb", ipa:"/ɡet tə nəʊ/", ru:"узнать кого-то поближе, познакомиться ближе", note:"Не просто 'познакомиться' (это meet), а именно постепенно узнать человека: it takes time to get to know someone. Часто путают с 'know' (уже знать) и 'meet' (встретить/познакомиться в первый раз)."},
+  {word:"person / people", ipa:"/ˈpɜːsən/ /ˈpiːpəl/", ru:"человек / люди", note:"people — обычное множественное число person (many people, NOT 'many persons'). 'Persons' используется только в официальном/юридическом языке (e.g. missing persons, this lift holds 8 persons)."}
+];
+
+/* Ex1: dictation */
+const EX1_ITEMS = [
+  {topic:"baggage reclaim", say:"baggage reclaim", accept:["baggage reclaim"]},
+  {topic:"bag drop", say:"bag drop", accept:["bag drop"]},
+  {topic:"unattended luggage", say:"unattended luggage", accept:["unattended luggage"]},
+  {topic:"check in for your flight", say:"check in for your flight", accept:["check in for your flight"]},
+  {topic:"drop off your bag", say:"drop off your bag", accept:["drop off your bag"]},
+  {topic:"enjoy", say:"enjoy", accept:["enjoy"]},
+  {topic:"ask for", say:"ask for", accept:["ask for"]},
+  {topic:"ask about", say:"ask about", accept:["ask about"]},
+  {topic:"due to", say:"due to", accept:["due to"]},
+  {topic:"miss", say:"miss", accept:["miss"]}
+];
+
+/* Ex2: collocation gap-fill (type the missing word) */
+const EX2_ITEMS = [
+  {topic:"unattended luggage", html:'Please don\'t leave your bags <span class="blank">______</span> near the gate.', accept:["unattended"]},
+  {topic:"check in for your flight", html:'You can <span class="blank">______</span> in for your flight online 24 hours before departure.', accept:["check"]},
+  {topic:"drop off your bag", html:'Don\'t forget to drop <span class="blank">______</span> your bag at the counter before security.', accept:["off"]},
+  {topic:"baggage reclaim", html:'After landing, go to baggage <span class="blank">______</span> to collect your suitcase.', accept:["reclaim"]},
+  {topic:"provide sb with sth", html:'The airline will <span class="blank">______</span> you with a boarding pass at check-in.', accept:["provide"]},
+  {topic:"ask for", html:'She had to <span class="blank">______</span> for her booking reference at the desk.', accept:["ask"]},
+  {topic:"ask about", html:'He wanted to <span class="blank">______</span> about the delay, so he went to the information desk.', accept:["ask"]},
+  {topic:"unattended luggage", html:'Passengers are asked to report any <span class="blank">______</span> luggage immediately.', accept:["unattended"]},
+  {topic:"due to", html:'The flight was cancelled <span class="blank">______</span> to bad weather.', accept:["due"]},
+  {topic:"a missed flight", html:'Unfortunately, we <span class="blank">______</span> our connecting flight because of the delay.', accept:["missed"]}
+];
+
+/* Ex3: verb tenses */
+const EX3_ITEMS = [
+  {topic:"miss", html:'Every day, hundreds of passengers <span class="blank">______</span> (miss) their flights because of long queues.', accept:["miss"]},
+  {topic:"miss", html:'Look! That man <span class="blank">______</span> (run) to the gate — he\'s going to miss his flight!', accept:["is running"]},
+  {topic:"miss", html:'Yesterday, my colleague <span class="blank">______</span> (miss) her flight because of traffic.', accept:["missed"]},
+  {topic:"report (verb)", html:'By 9 a.m., the staff <span class="blank">______</span> (already / report) the delay to all passengers.', accept:["had already reported","already had reported"]},
+  {topic:"provide sb with sth", html:'Right now, the ground crew <span class="blank">______</span> (provide) extra blankets for the stranded passengers.', accept:["are providing","is providing"]},
+  {topic:"baggage reclaim", html:'Next month, the airport <span class="blank">______</span> (open) a new baggage reclaim hall.', accept:["will open","is going to open","are going to open"]},
+  {topic:"enjoy", html:'I always <span class="blank">______</span> (enjoy) travelling by train rather than by plane.', accept:["enjoy"]},
+  {topic:"ask about", html:'When the announcement started, the passengers <span class="blank">______</span> (ask) about the delay.', accept:["were asking"]},
+  {topic:"unattended luggage", html:'If you lose your bag, you <span class="blank">______</span> (need) to report it at once.', accept:["need"]},
+  {topic:"check in for your flight", html:'He <span class="blank">______</span> already <span class="blank2">______</span> (check in) online when he arrived at the airport.', accept:["had already checked in"], mergeBlanks:true}
+];
+
+/* Ex4: odd one out (index of the INCORRECT collocation) */
+const EX4_ITEMS = [
+  {topic:"ask for", options:["ask for help","ask for information","ask about for a favour","ask for a refund"], odd:2},
+  {topic:"ask about", options:["ask about my day","ask about the news","ask about the weather","ask for my holiday"], odd:3},
+  {topic:"check in for your flight", options:["check in for your flight","check in online","check in early","check in your flight"], odd:3},
+  {topic:"drop off your bag", options:["drop off your bag","drop your bag off","leave your bag at bag drop","drop off with your bag"], odd:3},
+  {topic:"unattended luggage", options:["unattended luggage","leave luggage unattended","report unattended luggage","luggage unattended report"], odd:3},
+  {topic:"provide sb with sth", options:["provide passengers with information","provide sb with sth","provide information to passengers","provide with passengers information"], odd:3},
+  {topic:"enjoy", options:["enjoy travelling","enjoy flying","enjoy your trip","enjoy to travel"], odd:3},
+  {topic:"miss", options:["miss the flight","miss the train","miss my family","miss on the flight"], odd:3},
+  {topic:"report (noun)", options:["a written report","report an incident","report to security","a report incident"], odd:3},
+  {topic:"due to", options:["due to bad weather","due to the delay","because of the storm","due to because it was raining"], odd:3}
+];
+
+/* Ex5: ask for vs ask about */
+const EX5_ITEMS = [
+  {topic:"ask for", text:"Can I ask you ______ your name, please?", answer:"for"},
+  {topic:"ask about", text:"She asked ______ her holiday plans over dinner.", answer:"about"},
+  {topic:"ask for", text:"He asked ______ a discount at the hotel.", answer:"for"},
+  {topic:"ask about", text:"The journalist asked the minister ______ the new policy.", answer:"about"},
+  {topic:"ask for", text:"I asked the flight attendant ______ a blanket.", answer:"for"},
+  {topic:"ask about", text:"They asked us ______ our trip to Spain.", answer:"about"},
+  {topic:"ask for", text:"Could you ask the manager ______ his signature?", answer:"for"},
+  {topic:"ask about", text:"My friend always asks me ______ my family.", answer:"about"},
+  {topic:"ask for", text:"The passenger asked the staff ______ his booking reference.", answer:"for"},
+  {topic:"ask about", text:"We asked the guide ______ the history of the castle.", answer:"about"}
+];
+
+/* Ex6: open sentences */
+const EX6_ITEMS = [
+  "If I missed my flight, I would…",
+  "The thing I enjoy most about travelling is…",
+  "When I check in for a flight, I usually…",
+  "I would ask the airline staff about…",
+  "If I saw unattended luggage at the airport, I would…",
+  "Before a trip, I always ask my friends for…",
+  "Airlines should provide passengers with…",
+  "I once had to report…",
+  "Due to bad weather, once I…",
+  "At baggage reclaim, I always…"
+];
+
+/* ============================= UTIL ============================= */
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+function norm(s){
+  return (s||"").toLowerCase().trim().replace(/\s+/g," ").replace(/[.,!?;:]/g,"");
+}
+function escapeHtml(str){
+  return (str||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
+/* problem words tracking */
+const problemWords = new Map(); // topic -> count
+function markProblem(topic){
+  if(!topic) return;
+  problemWords.set(topic, (problemWords.get(topic)||0)+1);
+  renderProblemList();
+}
+function renderProblemList(){
+  const ul = document.getElementById('problemList');
+  if(problemWords.size===0){
+    ul.innerHTML = '<li class="empty">Пока нет ошибок — отлично!</li>';
+    return;
+  }
+  const sorted = [...problemWords.entries()].sort((a,b)=>b[1]-a[1]);
+  ul.innerHTML = sorted.map(([w,c])=>`<li><span class="w">${escapeHtml(w)}</span><span class="c">ошибок: ${c}</span></li>`).join("");
+}
+
+let totalCorrect = 0;
+const exState = {}; // exId -> {items, correctFlags:[]}
+function updateOverall(){
+  let done=0;
+  ['ex1','ex2','ex3','ex4','ex5'].forEach(id=>{
+    const st = exState[id];
+    if(st) done += st.correctFlags.filter(f=>f===true).length;
+  });
+  document.getElementById('overallStatus').innerHTML = `Прогресс: <b>${done} / 50</b>`;
+}
+
+/* ============================= VOICES ============================= */
+let voices = [];
+let selectedVoice = null;
+function loadVoices(){
+  voices = window.speechSynthesis ? speechSynthesis.getVoices() : [];
+  const sel = document.getElementById('voiceSelect');
+  const enVoices = voices.filter(v=>v.lang && v.lang.toLowerCase().startsWith('en'));
+  const list = enVoices.length ? enVoices : voices;
+  if(list.length===0){
+    sel.innerHTML = '<option>Голоса не найдены</option>';
+    return;
+  }
+  sel.innerHTML = list.map((v,i)=>`<option value="${i}">${v.name} (${v.lang})</option>`).join("");
+  let preferredIndex = list.findIndex(v=>/google us english/i.test(v.name));
+  if(preferredIndex===-1) preferredIndex = list.findIndex(v=>v.lang==='en-US' && /google/i.test(v.name));
+  if(preferredIndex===-1) preferredIndex = list.findIndex(v=>v.lang==='en-US');
+  if(preferredIndex===-1) preferredIndex = 0;
+  sel.selectedIndex = preferredIndex;
+  selectedVoice = list[preferredIndex];
+  sel.onchange = ()=>{ selectedVoice = list[sel.selectedIndex]; };
+}
+if('speechSynthesis' in window){
+  loadVoices();
+  speechSynthesis.onvoiceschanged = loadVoices;
+} else {
+  document.getElementById('voiceSelect').innerHTML = '<option>Синтез речи не поддерживается</option>';
+}
+
+function speak(text){
+  const statusEl = document.getElementById('soundStatus');
+  if(!('speechSynthesis' in window)){
+    statusEl.innerHTML = 'Статус звука: <b style="color:var(--red)">не поддерживается браузером</b>';
+    return;
+  }
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  if(selectedVoice) u.voice = selectedVoice;
+  u.lang = 'en-US';
+  u.rate = 0.88;
+  u.onstart = ()=>{ statusEl.innerHTML = 'Статус звука: <b style="color:var(--teal)">воспроизводится ✓</b>'; };
+  u.onerror = ()=>{ statusEl.innerHTML = 'Статус звука: <b style="color:var(--red)">ошибка воспроизведения</b>'; };
+  speechSynthesis.speak(u);
+}
+document.getElementById('testSoundBtn').addEventListener('click', ()=>{
+  speak("This is a sound check. Can you hear this clearly?");
+});
+
+/* ============================= RENDER: FLAP BOARD ============================= */
+(function renderBoard(){
+  const board = document.getElementById('flapBoard');
+  const words = shuffle(VOCAB).slice(0,7).map(v=>v.word.toUpperCase());
+  board.innerHTML = words.map(w=>`<span class="flap">${escapeHtml(w)}</span>`).join("");
+})();
+
+/* ============================= RENDER: VOCAB TABLE ============================= */
+(function renderVocab(){
+  const body = document.getElementById('vocabBody');
+  body.innerHTML = VOCAB.map((v,i)=>`
+    <tr>
+      <td><button class="listen-btn" onclick="speak('${v.word.replace(/'/g,"\\'")}')">🔊</button></td>
+      <td class="word-cell">${escapeHtml(v.word)}</td>
+      <td class="ipa-cell">${escapeHtml(v.ipa)}</td>
+      <td>${escapeHtml(v.ru)}</td>
+      <td class="note-cell">${escapeHtml(v.note)}</td>
+    </tr>
+  `).join("");
+})();
+
+/* ============================= RENDER: EXERCISE 1 (dictation) ============================= */
+(function(){
+  const items = shuffle(EX1_ITEMS);
+  exState.ex1 = {items, correctFlags:new Array(items.length).fill(null)};
+  const container = document.getElementById('ex1');
+  container.innerHTML = items.map((it,i)=>`
+    <div class="item" data-idx="${i}">
+      <div class="item-prompt"><span class="item-num">${i+1}.</span>
+        <button class="listen-btn" onclick="speak('${it.say.replace(/'/g,"\\'")}')">🔊 Прослушать</button>
+      </div>
+      <div class="item-row">
+        <input type="text" placeholder="Впишите слово/фразу..." data-answer-ex1="${i}">
+      </div>
+      <div class="feedback" id="fb-ex1-${i}"></div>
+    </div>
+  `).join("");
+})();
+
+/* ============================= RENDER: EXERCISE 2 (collocation gap fill) ============================= */
+(function(){
+  const items = shuffle(EX2_ITEMS);
+  exState.ex2 = {items, correctFlags:new Array(items.length).fill(null)};
+  const container = document.getElementById('ex2');
+  container.innerHTML = items.map((it,i)=>`
+    <div class="item" data-idx="${i}">
+      <div class="item-prompt"><span class="item-num">${i+1}.</span>${it.html}</div>
+      <div class="item-row">
+        <input type="text" placeholder="Впишите слово..." data-answer-ex2="${i}">
+      </div>
+      <div class="feedback" id="fb-ex2-${i}"></div>
+    </div>
+  `).join("");
+})();
+
+/* ============================= RENDER: EXERCISE 3 (verb tenses) ============================= */
+(function(){
+  const items = shuffle(EX3_ITEMS);
+  exState.ex3 = {items, correctFlags:new Array(items.length).fill(null)};
+  const container = document.getElementById('ex3');
+  container.innerHTML = items.map((it,i)=>`
+    <div class="item" data-idx="${i}">
+      <div class="item-prompt"><span class="item-num">${i+1}.</span>${it.html}</div>
+      <div class="item-row">
+        <input type="text" placeholder="Впишите форму глагола..." data-answer-ex3="${i}">
+      </div>
+      <div class="feedback" id="fb-ex3-${i}"></div>
+    </div>
+  `).join("");
+})();
+
+/* ============================= RENDER: EXERCISE 4 (odd one out) ============================= */
+(function(){
+  const items = shuffle(EX4_ITEMS).map(it=>{
+    // shuffle option order, tracking the odd one
+    const withFlag = it.options.map((opt,idx)=>({text:opt, isOdd: idx===it.odd}));
+    const shuffled = shuffle(withFlag);
+    return {topic:it.topic, options:shuffled};
+  });
+  exState.ex4 = {items, correctFlags:new Array(items.length).fill(null), selected:new Array(items.length).fill(null)};
+  const container = document.getElementById('ex4');
+  const letters = ['A','B','C','D'];
+  container.innerHTML = items.map((it,i)=>`
+    <div class="item" data-idx="${i}">
+      <div class="item-prompt"><span class="item-num">${i+1}.</span>Найдите неправильное сочетание:</div>
+      <div class="odd-options" id="odd-ex4-${i}">
+        ${it.options.map((opt,j)=>`
+          <div class="odd-option" data-j="${j}" onclick="selectOdd(${i},${j})">
+            <span class="letter">${letters[j]}</span> ${escapeHtml(opt.text)}
+          </div>
+        `).join("")}
+      </div>
+      <div class="feedback" id="fb-ex4-${i}"></div>
+    </div>
+  `).join("");
+})();
+function selectOdd(itemIdx, optIdx){
+  const st = exState.ex4;
+  st.selected[itemIdx] = optIdx;
+  const wrapper = document.getElementById(`odd-ex4-${itemIdx}`);
+  [...wrapper.children].forEach((el,j)=>{
+    el.classList.toggle('selected', j===optIdx);
+    el.classList.remove('correct','wrong');
+  });
+  document.getElementById(`fb-ex4-${itemIdx}`).textContent = '';
+}
+
+/* ============================= RENDER: EXERCISE 5 (ask for / about) ============================= */
+(function(){
+  const items = shuffle(EX5_ITEMS);
+  exState.ex5 = {items, correctFlags:new Array(items.length).fill(null), selected:new Array(items.length).fill(null)};
+  const container = document.getElementById('ex5');
+  container.innerHTML = items.map((it,i)=>{
+    // randomize button order for/about
+    const opts = shuffle(['for','about']);
+    return `
+    <div class="item" data-idx="${i}">
+      <div class="item-prompt"><span class="item-num">${i+1}.</span>${escapeHtml(it.text)}</div>
+      <div class="choice-btns" id="choice-ex5-${i}">
+        ${opts.map(o=>`<button type="button" class="choice-btn" data-val="${o}" onclick="selectChoice5(${i},'${o}')">${o}</button>`).join("")}
+      </div>
+      <div class="feedback" id="fb-ex5-${i}"></div>
+    </div>`;
+  }).join("");
+})();
+function selectChoice5(itemIdx, val){
+  const st = exState.ex5;
+  st.selected[itemIdx] = val;
+  const wrapper = document.getElementById(`choice-ex5-${itemIdx}`);
+  [...wrapper.children].forEach(btn=>{
+    btn.classList.toggle('selected', btn.dataset.val===val);
+    btn.classList.remove('correct','wrong');
+  });
+  document.getElementById(`fb-ex5-${itemIdx}`).textContent = '';
+}
+
+/* ============================= RENDER: EXERCISE 6 (open sentences) ============================= */
+(function(){
+  const items = shuffle(EX6_ITEMS);
+  exState.ex6 = {items};
+  const container = document.getElementById('ex6');
+  container.innerHTML = items.map((prompt,i)=>`
+    <div class="item" data-idx="${i}">
+      <div class="item-prompt"><span class="item-num">${i+1}.</span>${escapeHtml(prompt)}</div>
+      <textarea placeholder="Ваш ответ..." data-answer-ex6="${i}"></textarea>
+    </div>
+  `).join("");
+})();
+
+/* ============================= CHECKING LOGIC ============================= */
+function checkExercise(exId){
+  const st = exState[exId];
+  if(!st) return;
+  let correctCount = 0;
+
+  if(exId==='ex1'){
+    st.items.forEach((it,i)=>{
+      const input = document.querySelector(`[data-answer-ex1="${i}"]`);
+      const val = norm(input.value);
+      const ok = it.accept.some(a=>norm(a)===val) && val.length>0;
+      st.correctFlags[i] = ok;
+      const fb = document.getElementById(`fb-ex1-${i}`);
+      input.style.borderColor = ok? 'var(--teal)' : 'var(--red)';
+      if(ok){ fb.textContent = '✓ Верно'; fb.className='feedback ok'; correctCount++; }
+      else { fb.textContent = `✗ Неверно. Правильный ответ: ${it.accept[0]}`; fb.className='feedback bad'; markProblem(it.topic); }
+    });
+  }
+
+  if(exId==='ex2'){
+    st.items.forEach((it,i)=>{
+      const input = document.querySelector(`[data-answer-ex2="${i}"]`);
+      const val = norm(input.value);
+      const ok = it.accept.some(a=>norm(a)===val) && val.length>0;
+      st.correctFlags[i] = ok;
+      const fb = document.getElementById(`fb-ex2-${i}`);
+      input.style.borderColor = ok? 'var(--teal)' : 'var(--red)';
+      if(ok){ fb.textContent = '✓ Верно'; fb.className='feedback ok'; correctCount++; }
+      else { fb.textContent = `✗ Неверно. Правильный ответ: ${it.accept[0]}`; fb.className='feedback bad'; markProblem(it.topic); }
+    });
+  }
+
+  if(exId==='ex3'){
+    st.items.forEach((it,i)=>{
+      const input = document.querySelector(`[data-answer-ex3="${i}"]`);
+      const val = norm(input.value);
+      const ok = it.accept.some(a=>norm(a)===val) && val.length>0;
+      st.correctFlags[i] = ok;
+      const fb = document.getElementById(`fb-ex3-${i}`);
+      input.style.borderColor = ok? 'var(--teal)' : 'var(--red)';
+      if(ok){ fb.textContent = '✓ Верно'; fb.className='feedback ok'; correctCount++; }
+      else { fb.textContent = `✗ Неверно. Правильный ответ: ${it.accept[0]}`; fb.className='feedback bad'; markProblem(it.topic); }
+    });
+  }
+
+  if(exId==='ex4'){
+    st.items.forEach((it,i)=>{
+      const sel = st.selected[i];
+      const wrapper = document.getElementById(`odd-ex4-${i}`);
+      const correctIdx = it.options.findIndex(o=>o.isOdd);
+      const ok = sel===correctIdx;
+      st.correctFlags[i] = ok;
+      [...wrapper.children].forEach((el,j)=>{
+        el.classList.remove('correct','wrong');
+        if(j===correctIdx) el.classList.add('correct');
+        else if(j===sel) el.classList.add('wrong');
+      });
+      const fb = document.getElementById(`fb-ex4-${i}`);
+      if(ok){ fb.textContent='✓ Верно'; fb.className='feedback ok'; correctCount++; }
+      else { fb.textContent = sel===null? '✗ Вы не выбрали вариант' : '✗ Неверно, правильный вариант выделен'; fb.className='feedback bad'; markProblem(it.topic); }
+    });
+  }
+
+  if(exId==='ex5'){
+    st.items.forEach((it,i)=>{
+      const sel = st.selected[i];
+      const wrapper = document.getElementById(`choice-ex5-${i}`);
+      const ok = sel===it.answer;
+      st.correctFlags[i] = ok;
+      [...wrapper.children].forEach(btn=>{
+        btn.classList.remove('correct','wrong');
+        if(btn.dataset.val===it.answer) btn.classList.add('correct');
+        else if(btn.dataset.val===sel) btn.classList.add('wrong');
+      });
+      const fb = document.getElementById(`fb-ex5-${i}`);
+      if(ok){ fb.textContent='✓ Верно'; fb.className='feedback ok'; correctCount++; }
+      else { fb.textContent = `✗ Правильный ответ: ${it.answer}`; fb.className='feedback bad'; markProblem(it.topic); }
+    });
+  }
+
+  document.getElementById(`score-${exId}`).textContent = `${correctCount} / ${st.items.length}`;
+  updateOverall();
+}
+
+function revealExercise(exId){
+  const st = exState[exId];
+  if(!st) return;
+  if(exId==='ex1'){
+    st.items.forEach((it,i)=>{ document.querySelector(`[data-answer-ex1="${i}"]`).value = it.accept[0]; });
+  }
+  if(exId==='ex2'){
+    st.items.forEach((it,i)=>{ document.querySelector(`[data-answer-ex2="${i}"]`).value = it.accept[0]; });
+  }
+  if(exId==='ex3'){
+    st.items.forEach((it,i)=>{ document.querySelector(`[data-answer-ex3="${i}"]`).value = it.accept[0]; });
+  }
+  if(exId==='ex4'){
+    st.items.forEach((it,i)=>{
+      const correctIdx = it.options.findIndex(o=>o.isOdd);
+      selectOdd(i, correctIdx);
+    });
+  }
+  if(exId==='ex5'){
+    st.items.forEach((it,i)=>{ selectChoice5(i, it.answer); });
+  }
+  checkExercise(exId);
+}
+
+/* ============================= COPY ANSWERS ============================= */
+function copyToClipboard(text){
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    return navigator.clipboard.writeText(text);
+  }
+  const ta = document.createElement('textarea');
+  ta.value = text; document.body.appendChild(ta); ta.select();
+  document.execCommand('copy'); document.body.removeChild(ta);
+  return Promise.resolve();
+}
+
+function copyExercise(exId){
+  const st = exState[exId];
+  let text = `Задание ${exId.replace('ex','')}\n`;
+  if(exId==='ex6'){
+    st.items.forEach((prompt,i)=>{
+      const val = document.querySelector(`[data-answer-ex6="${i}"]`).value.trim();
+      text += `${i+1}. ${prompt}\n   → ${val || '(нет ответа)'}\n`;
+    });
+  }
+  copyToClipboard(text).then(()=>{
+    const el = document.getElementById('copyStatus');
+    el.textContent = '✓ Скопировано в буфер обмена';
+    setTimeout(()=>el.textContent='', 2500);
+  });
+}
+
+function copyAllAnswers(){
+  let text = "=== ОТВЕТЫ СТУДЕНТА: Airport English B1 ===\n\n";
+
+  text += "--- Задание 1: Диктант по звуку ---\n";
+  exState.ex1.items.forEach((it,i)=>{
+    text += `${i+1}. ${document.querySelector(`[data-answer-ex1="${i}"]`).value || '(пусто)'}\n`;
+  });
+
+  text += "\n--- Задание 2: Сочетаемость (gap-fill) ---\n";
+  exState.ex2.items.forEach((it,i)=>{
+    text += `${i+1}. ${document.querySelector(`[data-answer-ex2="${i}"]`).value || '(пусто)'}\n`;
+  });
+
+  text += "\n--- Задание 3: Времена глагола ---\n";
+  exState.ex3.items.forEach((it,i)=>{
+    text += `${i+1}. ${document.querySelector(`[data-answer-ex3="${i}"]`).value || '(пусто)'}\n`;
+  });
+
+  text += "\n--- Задание 4: Odd collocation (выбранный вариант) ---\n";
+  exState.ex4.items.forEach((it,i)=>{
+    const sel = exState.ex4.selected[i];
+    const letters=['A','B','C','D'];
+    text += `${i+1}. ${sel!==null && sel!==undefined ? letters[sel]+' — '+it.options[sel].text : '(не выбрано)'}\n`;
+  });
+
+  text += "\n--- Задание 5: ask for / ask about ---\n";
+  exState.ex5.items.forEach((it,i)=>{
+    text += `${i+1}. ${exState.ex5.selected[i] || '(не выбрано)'}\n`;
+  });
+
+  text += "\n--- Задание 6: Свои идеи ---\n";
+  exState.ex6.items.forEach((prompt,i)=>{
+    const val = document.querySelector(`[data-answer-ex6="${i}"]`).value.trim();
+    text += `${i+1}. ${prompt}\n   → ${val || '(нет ответа)'}\n`;
+  });
+
+  text += "\n--- Проблемные слова (по итогам сессии) ---\n";
+  if(problemWords.size===0){ text += "нет ошибок\n"; }
+  else { [...problemWords.entries()].sort((a,b)=>b[1]-a[1]).forEach(([w,c])=>{ text += `${w} — ${c}\n`; }); }
+
+  copyToClipboard(text).then(()=>{
+    const el = document.getElementById('copyStatus');
+    el.textContent = '✓ Все ответы скопированы в буфер обмена';
+    setTimeout(()=>el.textContent='', 3000);
+  }).catch(()=>{
+    const el = document.getElementById('copyStatus');
+    el.textContent = '✗ Не удалось скопировать (разрешите доступ к буферу обмена)';
+  });
+}
+</script>
+</body>
+</html>
