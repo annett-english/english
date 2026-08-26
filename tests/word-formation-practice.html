@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Verb ⇄ Noun · Тренажёр словообразования (B1)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F6F2E8;
+    --paper-2:#EFE9DA;
+    --ink:#232520;
+    --ink-soft:#5B5A50;
+    --line:#D9D1BC;
+    --accent:#2B5F63;      /* deep teal ink */
+    --accent-soft:#DCE9E7;
+    --rust:#C4622D;        /* warm rust accent */
+    --rust-soft:#F5DFCF;
+    --good:#2F7A4F;
+    --good-soft:#DEEEE2;
+    --bad:#B4423A;
+    --bad-soft:#F6DEDB;
+    --card:#FFFFFF;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    font-size:16px;
+    line-height:1.5;
+    padding-bottom:80px;
+  }
+  ::selection{background:var(--rust-soft);}
+
+  /* ---------- Layout ---------- */
+  .wrap{
+    max-width:1180px;
+    margin:0 auto;
+    padding:0 20px;
+    display:grid;
+    grid-template-columns:1fr 268px;
+    gap:32px;
+    align-items:start;
+  }
+  main{min-width:0;}
+  aside{
+    position:sticky;
+    top:16px;
+    align-self:start;
+  }
+  @media (max-width:920px){
+    .wrap{grid-template-columns:1fr;}
+    aside{position:static;order:-1;}
+  }
+
+  header.top{
+    background:var(--ink);
+    color:var(--paper);
+    padding:36px 20px 30px;
+    margin-bottom:28px;
+  }
+  header.top .inner{max-width:1180px;margin:0 auto;}
+  header.top .eyebrow{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12.5px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--rust-soft);
+    opacity:.85;
+    margin-bottom:10px;
+  }
+  header.top h1{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:clamp(28px,4vw,42px);
+    margin:0 0 10px;
+    letter-spacing:-.01em;
+  }
+  header.top p{
+    margin:0;
+    max-width:640px;
+    color:#D8D4C6;
+    font-size:15px;
+  }
+
+  nav.jump{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin:22px 0 30px;
+  }
+  nav.jump a{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    text-decoration:none;
+    color:var(--accent);
+    background:var(--accent-soft);
+    border:1px solid transparent;
+    padding:6px 10px;
+    border-radius:999px;
+    white-space:nowrap;
+  }
+  nav.jump a:hover{border-color:var(--accent);}
+
+  section{margin-bottom:44px;}
+  .section-head{
+    display:flex;
+    align-items:baseline;
+    gap:12px;
+    margin-bottom:6px;
+    flex-wrap:wrap;
+  }
+  .section-num{
+    font-family:'JetBrains Mono',monospace;
+    color:var(--rust);
+    font-size:13px;
+    font-weight:600;
+  }
+  h2{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:24px;
+    margin:0;
+  }
+  .instructions{
+    color:var(--ink-soft);
+    font-size:14.5px;
+    margin:2px 0 16px;
+    max-width:760px;
+  }
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:20px 22px;
+  }
+
+  /* ---------- Reminder table ---------- */
+  table.reminder{
+    width:100%;
+    border-collapse:collapse;
+    font-size:14.5px;
+  }
+  table.reminder th{
+    text-align:left;
+    font-family:'JetBrains Mono',monospace;
+    font-size:11.5px;
+    text-transform:uppercase;
+    letter-spacing:.05em;
+    color:var(--ink-soft);
+    padding:0 8px 8px;
+    border-bottom:1px solid var(--line);
+  }
+  table.reminder td{
+    padding:9px 8px;
+    border-bottom:1px solid var(--paper-2);
+    vertical-align:middle;
+  }
+  table.reminder tr:last-child td{border-bottom:none;}
+  .word-en{font-weight:600;}
+  .ipa{
+    font-family:'JetBrains Mono',monospace;
+    color:var(--accent);
+    font-size:13px;
+  }
+  .ru{color:var(--ink-soft);}
+  .spk{
+    border:1px solid var(--line);
+    background:var(--paper-2);
+    border-radius:7px;
+    width:30px;height:30px;
+    cursor:pointer;
+    font-size:14px;
+    line-height:1;
+    display:inline-flex;align-items:center;justify-content:center;
+    transition:transform .1s ease, background .15s ease;
+  }
+  .spk:hover{background:var(--accent-soft);}
+  .spk:active{transform:scale(.92);}
+
+  /* ---------- Generic exercise rows ---------- */
+  .item-row{
+    display:grid;
+    grid-template-columns:28px 1fr 190px;
+    gap:12px;
+    align-items:center;
+    padding:10px 0;
+    border-bottom:1px dashed var(--line);
+  }
+  .item-row:last-child{border-bottom:none;}
+  .item-idx{
+    font-family:'JetBrains Mono',monospace;
+    color:var(--ink-soft);
+    font-size:13px;
+  }
+  .item-prompt{font-size:15px;}
+  .item-prompt .gap{
+    font-family:'JetBrains Mono',monospace;
+    letter-spacing:.03em;
+    color:var(--rust);
+    font-weight:600;
+  }
+  .item-prompt .hint{
+    display:block;
+    color:var(--ink-soft);
+    font-size:12.5px;
+    margin-top:2px;
+  }
+  input.answer{
+    width:100%;
+    padding:8px 10px;
+    border:1.5px solid var(--line);
+    border-radius:7px;
+    font-size:14.5px;
+    font-family:'Inter',sans-serif;
+    background:#FCFBF7;
+    color:var(--ink);
+  }
+  input.answer:focus{outline:none;border-color:var(--accent);background:#fff;}
+  input.answer.correct{border-color:var(--good);background:var(--good-soft);}
+  input.answer.incorrect{border-color:var(--bad);background:var(--bad-soft);}
+  input.answer.review{border-color:var(--rust);background:var(--rust-soft);}
+
+  textarea.answer{
+    width:100%;
+    min-height:44px;
+    padding:8px 10px;
+    border:1.5px solid var(--line);
+    border-radius:7px;
+    font-size:14.5px;
+    font-family:'Inter',sans-serif;
+    background:#FCFBF7;
+    resize:vertical;
+  }
+  textarea.answer:focus{outline:none;border-color:var(--accent);background:#fff;}
+  textarea.answer.correct{border-color:var(--good);background:var(--good-soft);}
+  textarea.answer.incorrect{border-color:var(--bad);background:var(--bad-soft);}
+  textarea.answer.review{border-color:var(--rust);background:var(--rust-soft);}
+
+  .tf-buttons{display:flex;gap:8px;justify-content:flex-end;}
+  .tf-btn{
+    border:1.5px solid var(--line);
+    background:#FCFBF7;
+    border-radius:7px;
+    padding:7px 12px;
+    font-size:13px;
+    font-family:'Inter',sans-serif;
+    cursor:pointer;
+  }
+  .tf-btn.selected{background:var(--accent);color:#fff;border-color:var(--accent);}
+  .item-row.correct .tf-btn.selected{background:var(--good);border-color:var(--good);}
+  .item-row.incorrect .tf-btn.selected{background:var(--bad);border-color:var(--bad);}
+
+  /* ---------- Toolbar under each exercise ---------- */
+  .toolbar{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-top:16px;
+    padding-top:14px;
+    border-top:1px solid var(--line);
+  }
+  .btn{
+    font-family:'Inter',sans-serif;
+    font-size:13.5px;
+    font-weight:600;
+    padding:9px 16px;
+    border-radius:7px;
+    border:1.5px solid transparent;
+    cursor:pointer;
+  }
+  .btn-primary{background:var(--accent);color:#fff;}
+  .btn-primary:hover{background:#234b4f;}
+  .btn-ghost{background:transparent;border-color:var(--line);color:var(--ink);}
+  .btn-ghost:hover{border-color:var(--accent);color:var(--accent);}
+  .btn-rust{background:var(--rust);color:#fff;}
+  .btn-rust:hover{background:#a84f22;}
+  .result-badge{
+    margin-left:auto;
+    font-family:'JetBrains Mono',monospace;
+    font-size:13px;
+    color:var(--ink-soft);
+  }
+  .result-badge.show{color:var(--accent);font-weight:600;}
+  .copy-flash{color:var(--good);font-size:13px;font-family:'JetBrains Mono',monospace;}
+
+  /* ---------- Sidebar ---------- */
+  .side-card{
+    background:var(--ink);
+    color:var(--paper);
+    border-radius:var(--radius);
+    padding:18px 18px 16px;
+  }
+  .side-card h3{
+    font-family:'Fraunces',serif;
+    font-size:16px;
+    margin:0 0 4px;
+    color:#fff;
+  }
+  .side-card p.sub{
+    margin:0 0 12px;
+    font-size:12px;
+    color:#B8B6AA;
+  }
+  .problem-list{list-style:none;margin:0;padding:0;}
+  .problem-list li{
+    display:flex;
+    justify-content:space-between;
+    gap:8px;
+    padding:8px 0;
+    border-bottom:1px solid #3A3D36;
+    font-size:13px;
+  }
+  .problem-list li:last-child{border-bottom:none;}
+  .pl-word{font-weight:600;color:#fff;}
+  .pl-ru{color:#A9A79B;font-size:11.5px;}
+  .pl-count{
+    font-family:'JetBrains Mono',monospace;
+    background:var(--rust);
+    color:#fff;
+    font-size:11px;
+    border-radius:999px;
+    padding:2px 7px;
+    height:fit-content;
+  }
+  .empty-note{color:#8B8A7D;font-size:12.5px;font-style:italic;}
+  .side-reset{
+    margin-top:12px;
+    width:100%;
+    background:transparent;
+    border:1px solid #4A4D44;
+    color:#D8D4C6;
+    border-radius:7px;
+    padding:7px;
+    font-size:12px;
+    cursor:pointer;
+  }
+  .side-reset:hover{border-color:var(--rust);color:#fff;}
+
+  .voice-note{
+    margin-top:14px;
+    font-size:11.5px;
+    color:#8B8A7D;
+    line-height:1.4;
+  }
+
+  /* ---------- Drill section ---------- */
+  .drill-item{
+    padding:14px 0;
+    border-bottom:1px dashed var(--line);
+  }
+  .drill-item:last-child{border-bottom:none;}
+  .drill-model{
+    font-size:13.5px;
+    color:var(--ink-soft);
+    margin-bottom:6px;
+  }
+  .drill-model b{color:var(--accent);font-family:'JetBrains Mono',monospace;}
+
+  footer{
+    max-width:1180px;
+    margin:0 auto;
+    padding:20px;
+    color:var(--ink-soft);
+    font-size:12.5px;
+    text-align:center;
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="inner">
+    <div class="eyebrow">B1 · Word formation · Verb ⇄ Noun</div>
+    <h1>Develop → Development</h1>
+    <p>13 пар «глагол — существительное». Сначала прослушай и повтори слова, затем пройди 8 упражнений по 10 заданий и потренируйся в свободной части. Ошибки автоматически попадают в список справа — вернись и повтори их в конце.</p>
+  </div>
+</header>
+
+<div class="wrap">
+<main>
+
+  <nav class="jump">
+    <a href="#reminder">Слова</a>
+    <a href="#ex1">1. Пропущенные буквы</a>
+    <a href="#ex2">2. Глагол/сущ.</a>
+    <a href="#ex3">3. Таблица форм</a>
+    <a href="#ex4">4. Диктант</a>
+    <a href="#ex5">5. Guess the word</a>
+    <a href="#ex6">6. True/False</a>
+    <a href="#ex7">7. Which word fits</a>
+    <a href="#ex8">8. Rephrase</a>
+    <a href="#drill">Repeat &amp; Change</a>
+  </nav>
+
+  <!-- ================= REMINDER ================= -->
+  <section id="reminder">
+    <div class="section-head"><span class="section-num">Слова</span><h2>Повторение перед упражнениями</h2></div>
+    <p class="instructions">Нажми 🔊, чтобы услышать произношение (голос Google US English). Прочитай транскрипцию и перевод, прежде чем переходить к заданиям.</p>
+    <div class="card">
+      <table class="reminder" id="reminderTable"></table>
+    </div>
+  </section>
+
+  <!-- ================= EX 1 ================= -->
+  <section id="ex1">
+    <div class="section-head"><span class="section-num">01</span><h2>Вставь пропущенные буквы</h2></div>
+    <p class="instructions">Пропуски отмечены «_». Впиши слово целиком, с правильными буквами.</p>
+    <div class="card"><div id="ex1-items"></div>
+      <div class="toolbar">
+        <button class="btn btn-primary" onclick="checkEx1()">Проверить</button>
+        <button class="btn btn-ghost" onclick="showEx1()">Показать ответы</button>
+        <button class="btn btn-ghost" onclick="copyAnswers('ex1', ex1Items.length, 'input')">Скопировать ответы</button>
+        <span class="result-badge" id="ex1-result"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= EX 2 ================= -->
+  <section id="ex2">
+    <div class="section-head"><span class="section-num">02</span><h2>Глагол или существительное?</h2></div>
+    <p class="instructions">Напиши <b>verb</b> или <b>noun</b> (можно короче: v / n, или по-русски: глагол / сущ).</p>
+    <div class="card"><div id="ex2-items"></div>
+      <div class="toolbar">
+        <button class="btn btn-primary" onclick="checkEx2()">Проверить</button>
+        <button class="btn btn-ghost" onclick="showEx2()">Показать ответы</button>
+        <button class="btn btn-ghost" onclick="copyAnswers('ex2', ex2Items.length, 'input')">Скопировать ответы</button>
+        <span class="result-badge" id="ex2-result"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= EX 3 ================= -->
+  <section id="ex3">
+    <div class="section-head"><span class="section-num">03</span><h2>Заполни таблицу: напиши парную форму слова</h2></div>
+    <p class="instructions">Дано слово и его часть речи — впиши однокоренное слово другой части речи.</p>
+    <div class="card"><div id="ex3-items"></div>
+      <div class="toolbar">
+        <button class="btn btn-primary" onclick="checkEx3()">Проверить</button>
+        <button class="btn btn-ghost" onclick="showEx3()">Показать ответы</button>
+        <button class="btn btn-ghost" onclick="copyAnswers('ex3', ex3Items.length, 'input')">Скопировать ответы</button>
+        <span class="result-badge" id="ex3-result"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= EX 4 ================= -->
+  <section id="ex4">
+    <div class="section-head"><span class="section-num">04</span><h2>Прописать слово по звуку (диктант)</h2></div>
+    <p class="instructions">Нажми 🔊, послушай слово и напиши его правильно.</p>
+    <div class="card"><div id="ex4-items"></div>
+      <div class="toolbar">
+        <button class="btn btn-primary" onclick="checkEx4()">Проверить</button>
+        <button class="btn btn-ghost" onclick="showEx4()">Показать ответы</button>
+        <button class="btn btn-ghost" onclick="copyAnswers('ex4', ex4Items.length, 'input')">Скопировать ответы</button>
+        <span class="result-badge" id="ex4-result"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= EX 5 ================= -->
+  <section id="ex5">
+    <div class="section-head"><span class="section-num">05</span><h2>Guess the word</h2></div>
+    <p class="instructions">Прочитай определение на английском и напиши слово, которое подходит.</p>
+    <div class="card"><div id="ex5-items"></div>
+      <div class="toolbar">
+        <button class="btn btn-primary" onclick="checkEx5()">Проверить</button>
+        <button class="btn btn-ghost" onclick="showEx5()">Показать ответы</button>
+        <button class="btn btn-ghost" onclick="copyAnswers('ex5', ex5Items.length, 'input')">Скопировать ответы</button>
+        <span class="result-badge" id="ex5-result"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= EX 6 ================= -->
+  <section id="ex6">
+    <div class="section-head"><span class="section-num">06</span><h2>True or False</h2></div>
+    <p class="instructions">Прочитай утверждение и отметь, верно оно (True) или нет (False).</p>
+    <div class="card"><div id="ex6-items"></div>
+      <div class="toolbar">
+        <button class="btn btn-primary" onclick="checkEx6()">Проверить</button>
+        <button class="btn btn-ghost" onclick="showEx6()">Показать ответы</button>
+        <span class="result-badge" id="ex6-result"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= EX 7 ================= -->
+  <section id="ex7">
+    <div class="section-head"><span class="section-num">07</span><h2>Which word fits?</h2></div>
+    <p class="instructions">Выбери и впиши подходящую форму слова из скобок.</p>
+    <div class="card"><div id="ex7-items"></div>
+      <div class="toolbar">
+        <button class="btn btn-primary" onclick="checkEx7()">Проверить</button>
+        <button class="btn btn-ghost" onclick="showEx7()">Показать ответы</button>
+        <button class="btn btn-ghost" onclick="copyAnswers('ex7', ex7Items.length, 'input')">Скопировать ответы</button>
+        <span class="result-badge" id="ex7-result"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= EX 8 ================= -->
+  <section id="ex8">
+    <div class="section-head"><span class="section-num">08</span><h2>Rephrase</h2></div>
+    <p class="instructions">Перепиши предложение, используя указанное слово. Смысл должен остаться тем же (проверка гибкая: если нужного слова нет в ответе — поле подсветится оранжевым для ручной проверки).</p>
+    <div class="card"><div id="ex8-items"></div>
+      <div class="toolbar">
+        <button class="btn btn-primary" onclick="checkEx8()">Проверить</button>
+        <button class="btn btn-ghost" onclick="showEx8()">Показать пример ответа</button>
+        <button class="btn btn-ghost" onclick="copyAnswers('ex8', ex8Items.length, 'textarea')">Скопировать ответы</button>
+        <span class="result-badge" id="ex8-result"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= DRILL ================= -->
+  <section id="drill">
+    <div class="section-head"><span class="section-num">Bonus</span><h2>Repeat &amp; Change — устная/письменная отработка</h2></div>
+    <p class="instructions">Прочитай (и произнеси вслух) образец, затем напиши своё предложение с тем же словом, но со своей идеей. Это открытое задание — автопроверки нет, но все ответы можно скопировать одной кнопкой и отправить преподавателю.</p>
+    <div class="card"><div id="drill-items"></div>
+      <div class="toolbar">
+        <button class="btn btn-rust" onclick="copyAnswers('drill', drillItems.length, 'textarea', true)">Скопировать все предложения</button>
+        <span class="copy-flash" id="drill-flash"></span>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ================= SIDEBAR ================= -->
+<aside>
+  <div class="side-card">
+    <h3>Проблемные слова</h3>
+    <p class="sub">Сюда попадают слова из заданий, где был неверный или пропущенный ответ.</p>
+    <ul class="problem-list" id="problemList">
+      <li class="empty-note">Пока всё чисто — начни выполнять упражнения.</li>
+    </ul>
+    <button class="side-reset" onclick="resetProblems()">Сбросить список</button>
+    <p class="voice-note">Аудио использует голос браузера «Google US English» (en-US), если он доступен, иначе — любой доступный английский голос. Работает в Chrome при включённом звуке.</p>
+  </div>
+</aside>
+</div>
+
+<footer>Verb ⇄ Noun · тренажёр словообразования · B1</footer>
+
+<script>
+/* ===================== DATA ===================== */
+const pairs = [
+  {verb:"develop", noun:"development", ru:"развивать, разрабатывать / развитие, разработка", vIPA:"/dɪˈveləp/", nIPA:"/dɪˈveləpmənt/"},
+  {verb:"improve", noun:"improvement", ru:"улучшать / улучшение", vIPA:"/ɪmˈpruːv/", nIPA:"/ɪmˈpruːvmənt/"},
+  {verb:"discuss", noun:"discussion", ru:"обсуждать / обсуждение", vIPA:"/dɪˈskʌs/", nIPA:"/dɪˈskʌʃn/"},
+  {verb:"advertise", noun:"advertisement", ru:"рекламировать / реклама, рекламное объявление", vIPA:"/ˈædvətaɪz/", nIPA:"/ədˈvɜːtɪsmənt/"},
+  {verb:"employ", noun:"employment", ru:"нанимать на работу / трудоустройство, занятость", vIPA:"/ɪmˈplɔɪ/", nIPA:"/ɪmˈplɔɪmənt/"},
+  {verb:"organise", noun:"organisation", ru:"организовывать / организация", vIPA:"/ˈɔːgənaɪz/", nIPA:"/ˌɔːgənaɪˈzeɪʃn/"},
+  {verb:"educate", noun:"education", ru:"обучать, давать образование / образование", vIPA:"/ˈedʒukeɪt/", nIPA:"/ˌedʒuˈkeɪʃn/"},
+  {verb:"invite", noun:"invitation", ru:"приглашать / приглашение", vIPA:"/ɪnˈvaɪt/", nIPA:"/ˌɪnvɪˈteɪʃn/"},
+  {verb:"promote", noun:"promotion", ru:"повышать в должности, продвигать / повышение, продвижение", vIPA:"/prəˈməʊt/", nIPA:"/prəˈməʊʃn/"},
+  {verb:"apply", noun:"application", ru:"подавать заявление/заявку / заявление, заявка", vIPA:"/əˈplaɪ/", nIPA:"/ˌæplɪˈkeɪʃn/"},
+  {verb:"retire", noun:"retirement", ru:"выходить на пенсию / выход на пенсию", vIPA:"/rɪˈtaɪə/", nIPA:"/rɪˈtaɪəmənt/"},
+  {verb:"qualify", noun:"qualification", ru:"получать квалификацию / квалификация", vIPA:"/ˈkwɒlɪfaɪ/", nIPA:"/ˌkwɒlɪfɪˈkeɪʃn/"},
+  {verb:"resign", noun:"resignation", ru:"увольняться по собственному желанию / увольнение, отставка", vIPA:"/rɪˈzaɪn/", nIPA:"/ˌrezɪgˈneɪʃn/"}
+];
+
+const ex1Items = [
+  {gapped:"dev_l_pment", answer:"development", pair:0},
+  {gapped:"impr_ve", answer:"improve", pair:1},
+  {gapped:"disc_ss_on", answer:"discussion", pair:2},
+  {gapped:"adver_ise", answer:"advertise", pair:3},
+  {gapped:"empl_yment", answer:"employment", pair:4},
+  {gapped:"org_n_se", answer:"organise", pair:5},
+  {gapped:"educ_tion", answer:"education", pair:6},
+  {gapped:"inv_tation", answer:"invitation", pair:7},
+  {gapped:"prom_te", answer:"promote", pair:8},
+  {gapped:"appl_cation", answer:"application", pair:9}
+];
+
+const verbAliases = ["verb","v","глагол","гл"];
+const nounAliases = ["noun","n","существительное","сущ","сущ."];
+const ex2Items = [
+  {word:"resign", type:"verb", pair:12},
+  {word:"qualification", type:"noun", pair:11},
+  {word:"retire", type:"verb", pair:10},
+  {word:"employment", type:"noun", pair:4},
+  {word:"promotion", type:"noun", pair:8},
+  {word:"discuss", type:"verb", pair:2},
+  {word:"advertisement", type:"noun", pair:3},
+  {word:"organisation", type:"noun", pair:5},
+  {word:"invite", type:"verb", pair:7},
+  {word:"education", type:"noun", pair:6}
+].map(it=>({...it, answers: it.type==="verb"?verbAliases:nounAliases}));
+
+const ex3Items = [
+  {given:"develop", givenType:"глагол", targetType:"существительное", answer:"development", pair:0},
+  {given:"improvement", givenType:"существительное", targetType:"глагол", answer:"improve", pair:1},
+  {given:"discuss", givenType:"глагол", targetType:"существительное", answer:"discussion", pair:2},
+  {given:"advertisement", givenType:"существительное", targetType:"глагол", answer:"advertise", pair:3},
+  {given:"employ", givenType:"глагол", targetType:"существительное", answer:"employment", pair:4},
+  {given:"organisation", givenType:"существительное", targetType:"глагол", answer:"organise", pair:5},
+  {given:"educate", givenType:"глагол", targetType:"существительное", answer:"education", pair:6},
+  {given:"invitation", givenType:"существительное", targetType:"глагол", answer:"invite", pair:7},
+  {given:"promote", givenType:"глагол", targetType:"существительное", answer:"promotion", pair:8},
+  {given:"application", givenType:"существительное", targetType:"глагол", answer:"apply", pair:9}
+];
+
+const ex4Items = [
+  {word:"qualification", pair:11},
+  {word:"resign", pair:12},
+  {word:"retirement", pair:10},
+  {word:"apply", pair:9},
+  {word:"promotion", pair:8},
+  {word:"organise", pair:5},
+  {word:"invitation", pair:7},
+  {word:"educate", pair:6},
+  {word:"advertisement", pair:3},
+  {word:"employment", pair:4}
+];
+
+const ex5Items = [
+  {clue:"To stop working permanently, usually because of old age.", answers:["retire"], pair:10},
+  {clue:"A document you complete in order to apply for a job or course.", answers:["application"], pair:9},
+  {clue:"To pay someone regularly to do work for you.", answers:["employ"], pair:4},
+  {clue:"The act of leaving a job voluntarily, or the letter that announces it.", answers:["resignation"], pair:12},
+  {clue:"To make something better than it was before.", answers:["improve"], pair:1},
+  {clue:"A formal, usually written request asking someone to come to an event.", answers:["invitation"], pair:7},
+  {clue:"Skills, knowledge or a certificate needed to do a particular job.", answers:["qualification","qualifications"], pair:11},
+  {clue:"To grow, change and become more advanced over time.", answers:["develop"], pair:0},
+  {clue:"A move to a higher, more responsible position at work.", answers:["promotion"], pair:8},
+  {clue:"To talk about something with other people in order to decide something.", answers:["discuss"], pair:2}
+];
+
+const ex6Items = [
+  {statement:"«Employment» means the state of having a paid job.", answer:true, pair:4},
+  {statement:"«Resign» means to be forced to leave your job.", answer:false, pair:12},
+  {statement:"«Qualification» can mean a certificate or degree needed for a job.", answer:true, pair:11},
+  {statement:"«Retirement» means starting an exciting new career.", answer:false, pair:10},
+  {statement:"«Advertisement» is the noun form of «advertise».", answer:true, pair:3},
+  {statement:"«Invitation» is the verb form of «invite».", answer:false, pair:7},
+  {statement:"A «promotion» is always only about getting more money.", answer:false, pair:8},
+  {statement:"«Application» can mean both a job application and a computer program.", answer:true, pair:9},
+  {statement:"«Organisation» and «organization» are just two spellings of the same word.", answer:true, pair:5},
+  {statement:"«Development» is related in meaning to the verb «develop».", answer:true, pair:0}
+];
+
+const ex7Items = [
+  {sentence:"She wants to ___ for the marketing position.", options:"apply / application", answer:"apply", pair:9},
+  {sentence:"His job ___ was rejected by the company.", options:"apply / application", answer:"application", pair:9},
+  {sentence:"The company plans to ___ fifty new workers.", options:"employ / employment", answer:"employ", pair:4},
+  {sentence:"___ rates have risen sharply this year.", options:"Employ / Employment", answer:"Employment", pair:4},
+  {sentence:"They decided to ___ the budget at the meeting.", options:"discuss / discussion", answer:"discuss", pair:2},
+  {sentence:"The ___ lasted almost two hours.", options:"discuss / discussion", answer:"discussion", pair:2},
+  {sentence:"He hopes to get a ___ next year.", options:"promote / promotion", answer:"promotion", pair:8},
+  {sentence:"Good managers ___ their best employees.", options:"promote / promotion", answer:"promote", pair:8},
+  {sentence:"My grandmother will ___ next month.", options:"retire / retirement", answer:"retire", pair:10},
+  {sentence:"She is really looking forward to her ___.", options:"retire / retirement", answer:"retirement", pair:10}
+];
+
+const ex8Items = [
+  {source:"He stopped working at the age of 65.", useWord:"retire", checkContains:["retir"], sample:"He retired at the age of 65.", pair:10},
+  {source:"The company will hire more staff soon.", useWord:"employ", checkContains:["employ"], sample:"The company will employ more staff soon.", pair:4},
+  {source:"We need to talk about this problem.", useWord:"discuss", checkContains:["discuss"], sample:"We need to discuss this problem.", pair:2},
+  {source:"She got a better position at work.", useWord:"promotion", checkContains:["promot"], sample:"She got a promotion at work.", pair:8},
+  {source:"They sent me a formal request to come to the wedding.", useWord:"invitation", checkContains:["invit"], sample:"They sent me an invitation to the wedding.", pair:7},
+  {source:"He left his job by his own choice.", useWord:"resign", checkContains:["resign"], sample:"He resigned from his job.", pair:12},
+  {source:"The city is becoming more modern every year.", useWord:"develop", checkContains:["develop"], sample:"The city is developing every year.", pair:0},
+  {source:"This new version made the app better.", useWord:"improvement", checkContains:["improv"], sample:"This new version is an improvement to the app.", pair:1},
+  {source:"She sent her documents to the university.", useWord:"apply", checkContains:["appl"], sample:"She applied to the university.", pair:9},
+  {source:"He needs new skills and certificates for this job.", useWord:"qualifications", checkContains:["qualif"], sample:"He needs new qualifications for this job.", pair:11}
+];
+
+const drillItems = [
+  {word:"develop", model:"I want to develop my English skills every day."},
+  {word:"improve", model:"I try to improve my pronunciation every week."},
+  {word:"discuss", model:"We discussed the project during the meeting."},
+  {word:"advertise", model:"Companies advertise their products on social media."},
+  {word:"employ", model:"The factory employs two hundred workers."},
+  {word:"organise", model:"She organised a surprise party for her friend."},
+  {word:"educate", model:"Schools educate children about healthy habits."},
+  {word:"invite", model:"I invited my colleagues to the celebration."},
+  {word:"promote", model:"The company promoted her after one year."},
+  {word:"apply", model:"He applied for a scholarship last month."}
+];
+
+/* ===================== SPEECH ===================== */
+let cachedVoice = null;
+function pickVoice(){
+  const voices = speechSynthesis.getVoices();
+  if(!voices.length) return null;
+  return voices.find(v=>v.name==="Google US English")
+      || voices.find(v=>v.lang==="en-US" && /Google/i.test(v.name))
+      || voices.find(v=>v.lang==="en-US")
+      || voices.find(v=>v.lang && v.lang.startsWith("en"))
+      || voices[0];
+}
+if('speechSynthesis' in window){
+  speechSynthesis.onvoiceschanged = ()=>{ cachedVoice = pickVoice(); };
+  cachedVoice = pickVoice();
+}
+function speak(text){
+  if(!('speechSynthesis' in window)){
+    alert("Голосовой синтез не поддерживается в этом браузере.");
+    return;
+  }
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  const v = cachedVoice || pickVoice();
+  if(v){ u.voice = v; u.lang = v.lang; } else { u.lang = "en-US"; }
+  u.rate = 0.92;
+  speechSynthesis.speak(u);
+}
+
+/* ===================== PROBLEM WORDS ===================== */
+let problemWords = new Map(); // pairIndex -> count
+
+function addProblemWord(pairIndex){
+  if(pairIndex === undefined || pairIndex === null) return;
+  problemWords.set(pairIndex, (problemWords.get(pairIndex)||0)+1);
+  renderProblemWords();
+}
+function resetProblems(){
+  problemWords = new Map();
+  renderProblemWords();
+}
+function renderProblemWords(){
+  const list = document.getElementById('problemList');
+  if(problemWords.size === 0){
+    list.innerHTML = '<li class="empty-note">Пока всё чисто — начни выполнять упражнения.</li>';
+    return;
+  }
+  const sorted = [...problemWords.entries()].sort((a,b)=>b[1]-a[1]);
+  list.innerHTML = sorted.map(([idx,count])=>{
+    const p = pairs[idx];
+    return `<li>
+      <span>
+        <span class="pl-word">${p.verb} / ${p.noun}</span>
+        <span class="pl-ru">${p.ru.split(' / ')[0]}</span>
+      </span>
+      <span class="pl-count">${count}</span>
+    </li>`;
+  }).join('');
+}
+
+/* ===================== HELPERS ===================== */
+function normalize(str){
+  return (str||"").trim().toLowerCase().replace(/\s+/g,' ').replace(/[.,!?;:]+$/,'');
+}
+function copyAnswers(prefix, count, tag, includeModel){
+  let lines = [];
+  for(let i=0;i<count;i++){
+    const el = document.getElementById(prefix+'-input-'+i);
+    if(!el) continue;
+    const label = includeModel ? drillItems[i].word : (i+1);
+    lines.push(`${label}. ${el.value.trim()}`);
+  }
+  const text = lines.join('\n');
+  const flashId = prefix+'-flash';
+  const done = ()=>{
+    let flash = document.getElementById(flashId);
+    if(flash){ flash.textContent = 'Скопировано!'; setTimeout(()=>flash.textContent='',1800); }
+  };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(done).catch(()=>fallbackCopy(text, done));
+  } else {
+    fallbackCopy(text, done);
+  }
+}
+function fallbackCopy(text, cb){
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position='fixed'; ta.style.opacity='0';
+  document.body.appendChild(ta);
+  ta.select();
+  try{ document.execCommand('copy'); }catch(e){}
+  document.body.removeChild(ta);
+  if(cb) cb();
+}
+
+/* ===================== RENDER: REMINDER ===================== */
+function renderReminder(){
+  const rows = pairs.map((p,i)=>`
+    <tr>
+      <td><span class="spk" onclick="speak('${p.verb}')" title="Слушать: ${p.verb}">🔊</span></td>
+      <td><span class="word-en">${p.verb}</span><br><span class="ipa">${p.vIPA}</span></td>
+      <td><span class="spk" onclick="speak('${p.noun}')" title="Слушать: ${p.noun}">🔊</span></td>
+      <td><span class="word-en">${p.noun}</span><br><span class="ipa">${p.nIPA}</span></td>
+      <td class="ru">${p.ru}</td>
+    </tr>
+  `).join('');
+  document.getElementById('reminderTable').innerHTML = `
+    <tr><th></th><th>Verb</th><th></th><th>Noun</th><th>Перевод</th></tr>
+    ${rows}
+  `;
+}
+
+/* ===================== RENDER + CHECK: EX1 ===================== */
+function renderEx1(){
+  document.getElementById('ex1-items').innerHTML = ex1Items.map((it,i)=>`
+    <div class="item-row">
+      <span class="item-idx">${i+1}.</span>
+      <span class="item-prompt"><span class="gap">${it.gapped}</span>
+        <span class="hint">${pairs[it.pair].ru.split(' / ')[it.answer===pairs[it.pair].verb?0:1]||''}</span>
+      </span>
+      <input class="answer" id="ex1-input-${i}" placeholder="напиши слово" autocomplete="off">
+    </div>
+  `).join('');
+}
+function checkEx1(){
+  let correct=0;
+  ex1Items.forEach((it,i)=>{
+    const el = document.getElementById('ex1-input-'+i);
+    const ok = normalize(el.value) === normalize(it.answer);
+    el.classList.remove('correct','incorrect');
+    el.classList.add(ok?'correct':'incorrect');
+    if(ok) correct++; else addProblemWord(it.pair);
+  });
+  const r = document.getElementById('ex1-result');
+  r.textContent = `Результат: ${correct} / ${ex1Items.length}`;
+  r.classList.add('show');
+}
+function showEx1(){
+  ex1Items.forEach((it,i)=>{
+    const el = document.getElementById('ex1-input-'+i);
+    el.value = it.answer;
+    el.classList.remove('incorrect'); el.classList.add('correct');
+  });
+}
+
+/* ===================== RENDER + CHECK: EX2 ===================== */
+function renderEx2(){
+  document.getElementById('ex2-items').innerHTML = ex2Items.map((it,i)=>`
+    <div class="item-row">
+      <span class="item-idx">${i+1}.</span>
+      <span class="item-prompt">${it.word}</span>
+      <input class="answer" id="ex2-input-${i}" placeholder="verb / noun" autocomplete="off">
+    </div>
+  `).join('');
+}
+function checkEx2(){
+  let correct=0;
+  ex2Items.forEach((it,i)=>{
+    const el = document.getElementById('ex2-input-'+i);
+    const ok = it.answers.includes(normalize(el.value));
+    el.classList.remove('correct','incorrect');
+    el.classList.add(ok?'correct':'incorrect');
+    if(ok) correct++; else addProblemWord(it.pair);
+  });
+  const r = document.getElementById('ex2-result');
+  r.textContent = `Результат: ${correct} / ${ex2Items.length}`;
+  r.classList.add('show');
+}
+function showEx2(){
+  ex2Items.forEach((it,i)=>{
+    const el = document.getElementById('ex2-input-'+i);
+    el.value = it.type;
+    el.classList.remove('incorrect'); el.classList.add('correct');
+  });
+}
+
+/* ===================== RENDER + CHECK: EX3 ===================== */
+function renderEx3(){
+  document.getElementById('ex3-items').innerHTML = ex3Items.map((it,i)=>`
+    <div class="item-row">
+      <span class="item-idx">${i+1}.</span>
+      <span class="item-prompt"><b>${it.given}</b> <span class="hint">(${it.givenType}) → напиши ${it.targetType}</span></span>
+      <input class="answer" id="ex3-input-${i}" placeholder="напиши форму" autocomplete="off">
+    </div>
+  `).join('');
+}
+function checkEx3(){
+  let correct=0;
+  ex3Items.forEach((it,i)=>{
+    const el = document.getElementById('ex3-input-'+i);
+    const ok = normalize(el.value) === normalize(it.answer);
+    el.classList.remove('correct','incorrect');
+    el.classList.add(ok?'correct':'incorrect');
+    if(ok) correct++; else addProblemWord(it.pair);
+  });
+  const r = document.getElementById('ex3-result');
+  r.textContent = `Результат: ${correct} / ${ex3Items.length}`;
+  r.classList.add('show');
+}
+function showEx3(){
+  ex3Items.forEach((it,i)=>{
+    const el = document.getElementById('ex3-input-'+i);
+    el.value = it.answer;
+    el.classList.remove('incorrect'); el.classList.add('correct');
+  });
+}
+
+/* ===================== RENDER + CHECK: EX4 (dictation) ===================== */
+function renderEx4(){
+  document.getElementById('ex4-items').innerHTML = ex4Items.map((it,i)=>`
+    <div class="item-row">
+      <span class="item-idx">${i+1}.</span>
+      <span class="item-prompt"><span class="spk" onclick="speak('${it.word}')" title="Слушать">🔊</span> <span class="hint" style="display:inline">нажми и слушай</span></span>
+      <input class="answer" id="ex4-input-${i}" placeholder="напиши услышанное слово" autocomplete="off">
+    </div>
+  `).join('');
+}
+function checkEx4(){
+  let correct=0;
+  ex4Items.forEach((it,i)=>{
+    const el = document.getElementById('ex4-input-'+i);
+    const ok = normalize(el.value) === normalize(it.word);
+    el.classList.remove('correct','incorrect');
+    el.classList.add(ok?'correct':'incorrect');
+    if(ok) correct++; else addProblemWord(it.pair);
+  });
+  const r = document.getElementById('ex4-result');
+  r.textContent = `Результат: ${correct} / ${ex4Items.length}`;
+  r.classList.add('show');
+}
+function showEx4(){
+  ex4Items.forEach((it,i)=>{
+    const el = document.getElementById('ex4-input-'+i);
+    el.value = it.word;
+    el.classList.remove('incorrect'); el.classList.add('correct');
+  });
+}
+
+/* ===================== RENDER + CHECK: EX5 (guess the word) ===================== */
+function renderEx5(){
+  document.getElementById('ex5-items').innerHTML = ex5Items.map((it,i)=>`
+    <div class="item-row">
+      <span class="item-idx">${i+1}.</span>
+      <span class="item-prompt">${it.clue}</span>
+      <input class="answer" id="ex5-input-${i}" placeholder="твой ответ" autocomplete="off">
+    </div>
+  `).join('');
+}
+function checkEx5(){
+  let correct=0;
+  ex5Items.forEach((it,i)=>{
+    const el = document.getElementById('ex5-input-'+i);
+    const ok = it.answers.map(normalize).includes(normalize(el.value));
+    el.classList.remove('correct','incorrect');
+    el.classList.add(ok?'correct':'incorrect');
+    if(ok) correct++; else addProblemWord(it.pair);
+  });
+  const r = document.getElementById('ex5-result');
+  r.textContent = `Результат: ${correct} / ${ex5Items.length}`;
+  r.classList.add('show');
+}
+function showEx5(){
+  ex5Items.forEach((it,i)=>{
+    const el = document.getElementById('ex5-input-'+i);
+    el.value = it.answers[0];
+    el.classList.remove('incorrect'); el.classList.add('correct');
+  });
+}
+
+/* ===================== RENDER + CHECK: EX6 (true/false) ===================== */
+let tfState = {};
+function renderEx6(){
+  tfState = {};
+  document.getElementById('ex6-items').innerHTML = ex6Items.map((it,i)=>`
+    <div class="item-row" id="ex6-row-${i}">
+      <span class="item-idx">${i+1}.</span>
+      <span class="item-prompt">${it.statement}</span>
+      <span class="tf-buttons">
+        <button class="tf-btn" id="ex6-true-${i}" onclick="setTF(${i}, true)">True</button>
+        <button class="tf-btn" id="ex6-false-${i}" onclick="setTF(${i}, false)">False</button>
+      </span>
+    </div>
+  `).join('');
+}
+function setTF(i, val){
+  tfState[i] = val;
+  document.getElementById('ex6-true-'+i).classList.toggle('selected', val===true);
+  document.getElementById('ex6-false-'+i).classList.toggle('selected', val===false);
+  document.getElementById('ex6-row-'+i).classList.remove('correct','incorrect');
+}
+function checkEx6(){
+  let correct=0;
+  ex6Items.forEach((it,i)=>{
+    const row = document.getElementById('ex6-row-'+i);
+    row.classList.remove('correct','incorrect');
+    const ok = tfState[i] === it.answer;
+    row.classList.add(ok?'correct':'incorrect');
+    if(ok) correct++; else addProblemWord(it.pair);
+  });
+  const r = document.getElementById('ex6-result');
+  r.textContent = `Результат: ${correct} / ${ex6Items.length}`;
+  r.classList.add('show');
+}
+function showEx6(){
+  ex6Items.forEach((it,i)=>{
+    setTF(i, it.answer);
+    document.getElementById('ex6-row-'+i).classList.add('correct');
+  });
+}
+
+/* ===================== RENDER + CHECK: EX7 (which word fits) ===================== */
+function renderEx7(){
+  document.getElementById('ex7-items').innerHTML = ex7Items.map((it,i)=>`
+    <div class="item-row">
+      <span class="item-idx">${i+1}.</span>
+      <span class="item-prompt">${it.sentence}<span class="hint">(${it.options})</span></span>
+      <input class="answer" id="ex7-input-${i}" placeholder="твой ответ" autocomplete="off">
+    </div>
+  `).join('');
+}
+function checkEx7(){
+  let correct=0;
+  ex7Items.forEach((it,i)=>{
+    const el = document.getElementById('ex7-input-'+i);
+    const ok = normalize(el.value) === normalize(it.answer);
+    el.classList.remove('correct','incorrect');
+    el.classList.add(ok?'correct':'incorrect');
+    if(ok) correct++; else addProblemWord(it.pair);
+  });
+  const r = document.getElementById('ex7-result');
+  r.textContent = `Результат: ${correct} / ${ex7Items.length}`;
+  r.classList.add('show');
+}
+function showEx7(){
+  ex7Items.forEach((it,i)=>{
+    const el = document.getElementById('ex7-input-'+i);
+    el.value = it.answer;
+    el.classList.remove('incorrect'); el.classList.add('correct');
+  });
+}
+
+/* ===================== RENDER + CHECK: EX8 (rephrase) ===================== */
+function renderEx8(){
+  document.getElementById('ex8-items').innerHTML = ex8Items.map((it,i)=>`
+    <div class="item-row" style="grid-template-columns:28px 1fr 220px;">
+      <span class="item-idx">${i+1}.</span>
+      <span class="item-prompt">${it.source}<span class="hint">используй слово: <b>${it.useWord}</b></span></span>
+      <textarea class="answer" id="ex8-input-${i}" placeholder="перепиши предложение"></textarea>
+    </div>
+  `).join('');
+}
+function checkEx8(){
+  let correct=0;
+  ex8Items.forEach((it,i)=>{
+    const el = document.getElementById('ex8-input-'+i);
+    const val = el.value.toLowerCase();
+    el.classList.remove('correct','incorrect','review');
+    if(val.trim()===''){
+      el.classList.add('incorrect');
+      addProblemWord(it.pair);
+    } else if(it.checkContains.some(k=>val.includes(k))){
+      el.classList.add('correct');
+      correct++;
+    } else {
+      el.classList.add('review');
+      addProblemWord(it.pair);
+    }
+  });
+  const r = document.getElementById('ex8-result');
+  r.textContent = `Содержат нужное слово: ${correct} / ${ex8Items.length}`;
+  r.classList.add('show');
+}
+function showEx8(){
+  ex8Items.forEach((it,i)=>{
+    const el = document.getElementById('ex8-input-'+i);
+    el.value = it.sample;
+    el.classList.remove('incorrect','review'); el.classList.add('correct');
+  });
+}
+
+/* ===================== RENDER: DRILL ===================== */
+function renderDrill(){
+  document.getElementById('drill-items').innerHTML = drillItems.map((it,i)=>`
+    <div class="drill-item">
+      <div class="drill-model"><span class="spk" onclick="speak('${it.model.replace(/'/g,"\\'")}')" title="Слушать образец">🔊</span> Пример с <b>${it.word}</b>: «${it.model}»</div>
+      <textarea class="answer" id="drill-input-${i}" placeholder="Напиши своё предложение со словом «${it.word}»..."></textarea>
+    </div>
+  `).join('');
+}
+
+/* ===================== INIT ===================== */
+renderReminder();
+renderEx1(); renderEx2(); renderEx3(); renderEx4(); renderEx5();
+renderEx6(); renderEx7(); renderEx8(); renderDrill();
+renderProblemWords();
+</script>
+</body>
+</html>
