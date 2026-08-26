@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAY vs TELL vs SPEAK vs TALK — Practice</title>
+<style>
+  :root{
+    --bg:#f5f7fb; --card:#ffffff; --ink:#1f2937; --muted:#6b7280;
+    --accent:#7c3aed; --accent2:#0ea5e9; --good:#16a34a; --bad:#dc2626;
+    --border:#e5e7eb; --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:'Segoe UI', Verdana, Arial, sans-serif;background:var(--bg);color:var(--ink);line-height:1.5;}
+  .app{max-width:1200px;margin:0 auto;padding:20px;}
+  header.top{
+    background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-radius:var(--radius);
+    padding:22px 26px;margin-bottom:20px;box-shadow:0 6px 18px rgba(124,58,237,.25);
+  }
+  header.top h1{margin:0 0 6px;font-size:1.4rem;}
+  header.top p{margin:0;opacity:.92;font-size:.95rem;}
+  .audio-check{display:flex;align-items:center;gap:10px;margin-top:12px;flex-wrap:wrap;background:rgba(255,255,255,.15);padding:10px 14px;border-radius:10px;}
+  .audio-check button{background:#fff;color:var(--accent);border:none;padding:8px 14px;border-radius:8px;cursor:pointer;font-weight:600;font-size:.9rem;}
+  #audioStatus{font-size:.85rem;font-weight:600;}
+
+  section.card{background:var(--card);border-radius:var(--radius);padding:18px 20px;margin-bottom:18px;box-shadow:0 2px 10px rgba(0,0,0,.05);border:1px solid var(--border);}
+  section.card h2{margin-top:0;font-size:1.15rem;color:var(--accent);}
+  section.card .sub{color:var(--muted);font-size:.9rem;margin-top:-6px;margin-bottom:14px;}
+
+  /* rule block */
+  .rule-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;}
+  .rule-box{border:1px solid var(--border);border-radius:12px;padding:14px 16px;background:#faf7ff;}
+  .rule-box h3{margin:0 0 8px;color:var(--accent);font-size:1.02rem;}
+  .rule-box .ex{color:var(--muted);font-size:.88rem;}
+  .rule-box ul{margin:6px 0 8px 18px;padding:0;font-size:.92rem;}
+  .rule-box .phr-title{font-weight:600;font-size:.9rem;margin-top:8px;color:var(--ink);}
+  .rule-note{margin-top:14px;background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:10px 14px;font-size:.92rem;}
+  .rule-note .no{color:var(--bad);font-weight:700;}
+  .rule-note .yes{color:var(--good);font-weight:700;}
+  .summary-line{margin-top:12px;background:#eef2ff;border-radius:10px;padding:10px 14px;font-size:.92rem;}
+
+  .vocab-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;}
+  .vocab-item{border:1px solid var(--border);border-radius:10px;padding:10px 12px;background:#fafbff;display:flex;flex-direction:column;gap:4px;}
+  .vocab-item .en{font-weight:700;font-size:1.02rem;}
+  .vocab-item .ipa{color:var(--accent2);font-size:.85rem;}
+  .vocab-item .ru{color:var(--muted);font-size:.88rem;}
+  .listen-btn{align-self:flex-start;margin-top:4px;background:var(--accent);color:#fff;border:none;border-radius:20px;padding:5px 12px;font-size:.8rem;cursor:pointer;}
+  .listen-btn:hover{background:var(--accent2);}
+  .listen-all{margin-bottom:14px;background:var(--accent2);color:#fff;border:none;border-radius:10px;padding:9px 16px;cursor:pointer;font-weight:600;}
+
+  .layout{display:flex;gap:20px;align-items:flex-start;}
+  main{flex:1;min-width:0;}
+  aside.sidebar{width:290px;flex-shrink:0;position:sticky;top:16px;}
+  @media (max-width:880px){ .layout{flex-direction:column;} aside.sidebar{width:100%;position:static;} }
+
+  .item{border-top:1px dashed var(--border);padding:12px 0;}
+  .item:first-of-type{border-top:none;padding-top:0;}
+  .item .num{font-weight:700;color:var(--accent2);margin-right:6px;}
+  .item input[type=text]{padding:8px 10px;border:2px solid var(--border);border-radius:8px;font-size:.95rem;width:220px;max-width:60vw;}
+  .item input[type=text]:focus{outline:none;border-color:var(--accent2);}
+  .item.correct input[type=text]{border-color:var(--good);background:#f0fdf4;}
+  .item.wrong input[type=text]{border-color:var(--bad);background:#fef2f2;}
+  .mark{font-weight:700;margin-left:8px;}
+  .mark.correct{color:var(--good);}
+  .mark.wrong{color:var(--bad);}
+  .answer-reveal{display:none;margin-top:6px;font-size:.85rem;color:var(--accent);background:#eef2ff;padding:4px 10px;border-radius:8px;width:fit-content;}
+  .answer-reveal.show{display:block;}
+  .listen-mini{background:none;border:1px solid var(--accent2);color:var(--accent2);border-radius:14px;padding:3px 10px;font-size:.8rem;cursor:pointer;margin-left:6px;}
+  .exercise-controls{margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+  .btn{border:none;border-radius:10px;padding:9px 16px;font-weight:600;cursor:pointer;font-size:.9rem;}
+  .btn-check{background:var(--accent);color:#fff;}
+  .btn-check:hover{background:#6d28d9;}
+  .btn-show{background:#fff;color:var(--accent);border:2px solid var(--accent);}
+  .btn-show:hover{background:#f5f3ff;}
+  .score-tag{font-weight:700;color:var(--accent);}
+
+  .side-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:14px;box-shadow:0 2px 10px rgba(0,0,0,.05);}
+  .side-card h3{margin:0 0 10px;font-size:1rem;color:var(--accent);}
+  #totalScore{font-size:1.3rem;font-weight:800;color:var(--accent);}
+  table#problemTable{width:100%;border-collapse:collapse;font-size:.87rem;}
+  table#problemTable th,table#problemTable td{text-align:left;padding:5px 6px;border-bottom:1px solid var(--border);}
+  table#problemTable th{color:var(--muted);font-weight:600;}
+  .empty-note{color:var(--muted);font-size:.85rem;}
+  .copy-btn{width:100%;background:var(--good);color:#fff;border:none;border-radius:10px;padding:10px;font-weight:700;cursor:pointer;margin-top:4px;}
+  .copy-btn:hover{background:#15803d;}
+  #copyStatus{font-size:.82rem;color:var(--good);margin-top:6px;min-height:1em;}
+
+  textarea.free-input{width:100%;min-height:44px;padding:8px 10px;border:2px solid var(--border);border-radius:8px;font-size:.92rem;font-family:inherit;resize:vertical;}
+  .prompt-line{color:var(--accent);font-weight:600;margin-bottom:4px;}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="top">
+    <h1>🗣️ SAY vs TELL vs SPEAK vs TALK</h1>
+    <p>Изучи правило, повтори слова и выполни 4 упражнения (по 8 заданий). Пиши слова руками.</p>
+    <div class="audio-check">
+      <button id="testAudioBtn">🔊 Проверить звук</button>
+      <span id="audioStatus">Нажми, чтобы проверить, что аудио работает</span>
+    </div>
+  </header>
+
+  <section class="card">
+    <h2>📖 Правило</h2>
+    <div class="rule-grid">
+      <div class="rule-box">
+        <h3>SAY — сказать</h3>
+        <div class="ex">I say /aɪ seɪ/ — я говорю / скажу</div>
+        <div class="ex">I said /aɪ sed/ — я сказал(а)</div>
+        <div class="phr-title">Частые выражения:</div>
+        <ul>
+          <li>say hello — поздороваться</li>
+          <li>say goodbye — попрощаться</li>
+          <li>say a word — сказать слово</li>
+          <li>say sorry — извиниться</li>
+          <li>say something — сказать что-то</li>
+        </ul>
+      </div>
+      <div class="rule-box">
+        <h3>TELL — сказать / сообщить / рассказать кому-то</h3>
+        <div class="ex">После tell обычно сразу идёт человек:</div>
+        <div class="ex">I tell you. /aɪ tel juː/</div>
+        <div class="ex">I told you. /aɪ təʊld juː/</div>
+        <div class="ex">Tell me! — Скажи мне! · She told me the truth.</div>
+        <div class="phr-title">Устойчивые выражения:</div>
+        <ul>
+          <li>tell the truth — сказать правду</li>
+          <li>tell a lie — солгать / сказать ложь</li>
+          <li>tell a secret — рассказать секрет</li>
+          <li>tell a joke — рассказать анекдот/шутку</li>
+          <li>tell a story — рассказать историю</li>
+        </ul>
+      </div>
+      <div class="rule-box">
+        <h3>SPEAK — говорить</h3>
+        <div class="ex">Более формальный вариант, особенно «поговорить с кем-то по делу»:</div>
+        <ul>
+          <li>speak to someone — поговорить с кем-то</li>
+          <li>speak with someone — поговорить с кем-то</li>
+          <li>speak to someone about something — поговорить с кем-то о чём-то</li>
+        </ul>
+        <div class="ex">I need to speak to my manager. — Мне нужно поговорить с менеджером.</div>
+        <div class="ex">Также про языки: She speaks English fluently.</div>
+      </div>
+      <div class="rule-box">
+        <h3>TALK — разговаривать / беседовать</h3>
+        <div class="ex">Более разговорное, чем speak:</div>
+        <ul>
+          <li>talk to someone</li>
+          <li>talk with someone</li>
+          <li>talk about something</li>
+        </ul>
+        <div class="ex">We talked about our holidays.</div>
+        <div class="ex">I need to talk to you. — Мне нужно с тобой поговорить.</div>
+      </div>
+    </div>
+
+    <div class="rule-note">
+      <span class="no">❌ say me</span> &nbsp; <span class="yes">✅ say something to me</span>
+    </div>
+
+    <div class="summary-line">
+      📌 <b>say something</b> → сказать что-то &nbsp;·&nbsp; <b>tell someone something</b> → сказать кому-то что-то<br>
+      ⭐ <b>tell a story</b> /tel ə ˈstɔːri/ — рассказывать историю &nbsp;·&nbsp; <b>talk about something</b> /tɔːk əˈbaʊt/ — рассказывать/говорить о чём-то<br>
+      Например: <i>She told me a story about her childhood.</i> (Она рассказала мне историю о своём детстве) — но <i>She talked about her childhood.</i> (Она рассказывала о своём детстве).
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>📚 Слова для повторения</h2>
+    <div class="sub">Слово/фраза · транскрипция · перевод. Нажми 🔊, чтобы услышать произношение (голос Google US English / en-US).</div>
+    <button class="listen-all" id="listenAllBtn">🔊 Прослушать все слова по очереди</button>
+    <div class="vocab-grid" id="vocabGrid"></div>
+  </section>
+
+  <div class="layout">
+    <main id="exercisesContainer"></main>
+
+    <aside class="sidebar">
+      <div class="side-card">
+        <h3>🏆 Общий результат</h3>
+        <div id="totalScore">0 / 24</div>
+      </div>
+      <div class="side-card">
+        <h3>⚠️ Проблемные слова</h3>
+        <table id="problemTable">
+          <thead><tr><th>Слово</th><th>Ошибок</th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <div class="empty-note" id="problemEmpty">Пока ошибок нет 🎉</div>
+      </div>
+      <div class="side-card">
+        <h3>📋 Экспорт ответов</h3>
+        <button class="copy-btn" id="copyAllBtn">Скопировать все ответы ученика</button>
+        <div id="copyStatus"></div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script>
+/* ============ VOCAB ============ */
+const VOCAB = [
+  {en:"say", ru:"говорить / сказать", ipa:"/seɪ/"},
+  {en:"said", ru:"сказал(а) — прошедшее время say", ipa:"/sed/"},
+  {en:"tell", ru:"сказать / рассказать кому-то", ipa:"/tel/"},
+  {en:"told", ru:"сказал(а) кому-то — прошедшее время tell", ipa:"/toʊld/"},
+  {en:"speak", ru:"говорить (формально / про язык)", ipa:"/spiːk/"},
+  {en:"spoke", ru:"говорил(а) — прошедшее время speak", ipa:"/spoʊk/"},
+  {en:"talk", ru:"разговаривать / беседовать", ipa:"/tɔːk/"},
+  {en:"talked", ru:"разговаривал(а) — прошедшее время talk", ipa:"/tɔːkt/"},
+  {en:"say hello", ru:"поздороваться", ipa:"/seɪ həˈloʊ/"},
+  {en:"say sorry", ru:"извиниться", ipa:"/seɪ ˈsɒri/"},
+  {en:"tell the truth", ru:"сказать правду", ipa:"/tel ðə truːθ/"},
+  {en:"tell a lie", ru:"солгать", ipa:"/tel ə laɪ/"},
+  {en:"tell a story", ru:"рассказать историю", ipa:"/tel ə ˈstɔːri/"},
+  {en:"speak to someone", ru:"поговорить с кем-то", ipa:"/spiːk tuː ˈsʌmwʌn/"},
+  {en:"talk about something", ru:"говорить / рассказывать о чём-то", ipa:"/tɔːk əˈbaʊt ˈsʌmθɪŋ/"}
+];
+
+/* ============ AUDIO ============ */
+let chosenVoice = null;
+function loadVoices(){
+  const voices = speechSynthesis.getVoices();
+  if(!voices.length) return;
+  chosenVoice = voices.find(v=>v.name === "Google US English")
+             || voices.find(v=>v.lang === "en-US" && /Google/i.test(v.name))
+             || voices.find(v=>v.lang === "en-US")
+             || voices.find(v=>/en/i.test(v.lang))
+             || voices[0];
+}
+if('speechSynthesis' in window){
+  loadVoices();
+  speechSynthesis.onvoiceschanged = loadVoices;
+}
+function speak(text){
+  if(!('speechSynthesis' in window)){
+    alert("Ваш браузер не поддерживает озвучивание (Speech Synthesis). Попробуйте открыть страницу в Chrome.");
+    return;
+  }
+  if(!chosenVoice) loadVoices();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = "en-US";
+  u.rate = 0.92;
+  if(chosenVoice) u.voice = chosenVoice;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+}
+document.getElementById('testAudioBtn').addEventListener('click', ()=>{
+  loadVoices();
+  speak("Hello! This is an audio test. Can you hear me?");
+  const statusEl = document.getElementById('audioStatus');
+  setTimeout(()=>{
+    if(chosenVoice){
+      statusEl.textContent = "✅ Голос найден: " + chosenVoice.name + " (" + chosenVoice.lang + ")";
+    } else {
+      statusEl.textContent = "⚠️ Голос ещё не загружен — нажмите ещё раз через секунду.";
+    }
+  }, 300);
+});
+document.getElementById('listenAllBtn').addEventListener('click', ()=>{
+  VOCAB.forEach(v=>speak(v.en));
+});
+
+const vocabGrid = document.getElementById('vocabGrid');
+VOCAB.forEach(v=>{
+  const div = document.createElement('div');
+  div.className = 'vocab-item';
+  div.innerHTML = `
+    <span class="en">${v.en}</span>
+    <span class="ipa">${v.ipa}</span>
+    <span class="ru">${v.ru}</span>
+    <button class="listen-btn">🔊 Слушать</button>
+  `;
+  div.querySelector('.listen-btn').addEventListener('click', ()=>speak(v.en));
+  vocabGrid.appendChild(div);
+});
+
+/* ============ HELPERS ============ */
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+function normalize(s){
+  return s.toLowerCase().trim().replace(/[.,!?;:'"]/g,'').replace(/\s+/g,' ');
+}
+function matches(value, answers){
+  const v = normalize(value);
+  return answers.some(a=>normalize(a)===v);
+}
+
+const problemWords = new Map();
+function addProblem(tag){
+  if(!tag) return;
+  problemWords.set(tag, (problemWords.get(tag)||0)+1);
+  renderProblemTable();
+}
+function renderProblemTable(){
+  const tbody = document.querySelector('#problemTable tbody');
+  const emptyNote = document.getElementById('problemEmpty');
+  tbody.innerHTML = '';
+  if(problemWords.size === 0){ emptyNote.style.display = 'block'; return; }
+  emptyNote.style.display = 'none';
+  const sorted = [...problemWords.entries()].sort((a,b)=>b[1]-a[1]);
+  sorted.forEach(([word,count])=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${word}</td><td>${count}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+const exScores = {};
+function updateTotalScore(){
+  const total = Object.values(exScores).reduce((a,b)=>a+b,0);
+  document.getElementById('totalScore').textContent = total + " / 24";
+}
+
+/* ============ EXERCISE DATA (8 items each) ============ */
+
+const EX1 = shuffle([
+  {before:"Please", after:"hello to your parents.", answer:["say"], tag:"say"},
+  {before:"She always", after:"the truth.", answer:["tells"], tag:"tell"},
+  {before:"I need to", after:"to my manager about the project.", answer:["speak"], tag:"speak"},
+  {before:"We", after:"about our holiday plans yesterday.", answer:["talked"], tag:"talk"},
+  {before:"Can you", after:"me a story before bed?", answer:["tell"], tag:"tell"},
+  {before:"He", after:"sorry after the argument.", answer:["said"], tag:"say"},
+  {before:"Do you", after:"English?", answer:["speak"], tag:"speak"},
+  {before:"Let's", after:"about your idea after lunch.", answer:["talk"], tag:"talk"}
+]);
+
+const EX2 = shuffle([
+  {before:"I", after:"something important yesterday.", hint:"(say)", answer:["said"], tag:"say"},
+  {before:"She", after:"me a secret last night.", hint:"(tell)", answer:["told"], tag:"tell"},
+  {before:"He needs to", after:"his teacher about the exam.", hint:"(speak + preposition)", answer:["speak to"], tag:"speak to"},
+  {before:"We", after:"our childhood for hours.", hint:"(talk + preposition)", answer:["talked about"], tag:"talk about"},
+  {before:"Don't", after:"a lie!", hint:"(tell)", answer:["tell"], tag:"tell a lie"},
+  {before:"I want to", after:"sorry to her.", hint:"(say)", answer:["say"], tag:"say sorry"},
+  {before:"They", after:"the new project all morning.", hint:"(talk + preposition)", answer:["talked about"], tag:"talk about"},
+  {before:"Can I", after:"you for a minute?", hint:"(speak + preposition)", answer:["speak to"], tag:"speak to"}
+]);
+
+const EX3 = shuffle([
+  {sentence:"She said me the truth.", answer:["told"], tag:"tell"},
+  {sentence:"Please tell hello to your friend.", answer:["say"], tag:"say hello"},
+  {sentence:"He always says the truth.", answer:["tells"], tag:"tell the truth"},
+  {sentence:"Can you speak me a story?", answer:["tell"], tag:"tell a story"},
+  {sentence:"I want to tell sorry for being late.", answer:["say"], tag:"say sorry"},
+  {sentence:"Let's tell about our plans for tomorrow.", answer:["talk"], tag:"talk about"},
+  {sentence:"She speaks a lie sometimes.", answer:["tells"], tag:"tell a lie"},
+  {sentence:"Do you talk English at work?", answer:["speak"], tag:"speak"}
+]);
+
+const EX4 = shuffle([
+  {prompt:"I usually say..."},
+  {prompt:"Yesterday I told my friend..."},
+  {prompt:"I need to speak to... about..."},
+  {prompt:"My friends and I often talk about..."},
+  {prompt:"Please tell me..."},
+  {prompt:"I never say..."},
+  {prompt:"I can speak..."},
+  {prompt:"Let's talk about..."}
+]);
+
+/* ============ RENDER ============ */
+const container = document.getElementById('exercisesContainer');
+function makeSection(id, title, sub){
+  const sec = document.createElement('section');
+  sec.className = 'card';
+  sec.id = id;
+  sec.innerHTML = `<h2>${title}</h2><div class="sub">${sub}</div><div class="items"></div>`;
+  container.appendChild(sec);
+  return sec;
+}
+function addControls(sectionEl, exKey, checkFn, showFn){
+  const ctrl = document.createElement('div');
+  ctrl.className = 'exercise-controls';
+  ctrl.innerHTML = `
+    <button class="btn btn-check">✅ Проверить</button>
+    <button class="btn btn-show">👁 Показать ответы</button>
+    <span class="score-tag" id="score_${exKey}">Результат: —/8</span>
+  `;
+  sectionEl.appendChild(ctrl);
+  ctrl.querySelector('.btn-check').addEventListener('click', checkFn);
+  ctrl.querySelector('.btn-show').addEventListener('click', showFn);
+}
+
+/* ---- EX1: Context ---- */
+(function(){
+  const sec = makeSection('ex1','1️⃣ Context — вставь нужный глагол','По контексту предложения впиши правильную форму: say / said / tell / told / speak / talk...');
+  const wrap = sec.querySelector('.items');
+  wrap.id = 'ex1items';
+  EX1.forEach((it,i)=>{
+    const div = document.createElement('div');
+    div.className='item';
+    div.innerHTML = `
+      <span class="num">${i+1}.</span> ${it.before} <input type="text" placeholder="..."> ${it.after}
+      <span class="mark"></span>
+      <div class="answer-reveal">Ответ: <b>${it.answer[0]}</b></div>
+    `;
+    wrap.appendChild(div);
+  });
+  addControls(sec, 'ex1', function(){
+    let correct=0;
+    wrap.querySelectorAll('.item').forEach((div,i)=>{
+      const input = div.querySelector('input');
+      const mark = div.querySelector('.mark');
+      const ok = matches(input.value, EX1[i].answer);
+      div.classList.toggle('correct', ok);
+      div.classList.toggle('wrong', !ok);
+      mark.textContent = ok ? '✓' : '✗';
+      mark.className = 'mark ' + (ok?'correct':'wrong');
+      if(ok) correct++; else addProblem(EX1[i].tag);
+    });
+    exScores.ex1 = correct;
+    document.getElementById('score_ex1').textContent = `Результат: ${correct}/8`;
+    updateTotalScore();
+  }, function(){
+    wrap.querySelectorAll('.answer-reveal').forEach(el=>el.classList.toggle('show'));
+  });
+})();
+
+/* ---- EX2: Fill in the gaps ---- */
+(function(){
+  const sec = makeSection('ex2','2️⃣ Fill in the gaps','Впиши правильную форму глагола (и предлог, если нужен).');
+  const wrap = sec.querySelector('.items');
+  wrap.id = 'ex2items';
+  EX2.forEach((it,i)=>{
+    const div = document.createElement('div');
+    div.className='item';
+    div.innerHTML = `
+      <span class="num">${i+1}.</span> ${it.before} <input type="text" placeholder="..."> ${it.after} <span style="color:var(--muted);font-size:.85rem;">${it.hint}</span>
+      <span class="mark"></span>
+      <div class="answer-reveal">Ответ: <b>${it.answer[0]}</b></div>
+    `;
+    wrap.appendChild(div);
+  });
+  addControls(sec, 'ex2', function(){
+    let correct=0;
+    wrap.querySelectorAll('.item').forEach((div,i)=>{
+      const input = div.querySelector('input');
+      const mark = div.querySelector('.mark');
+      const ok = matches(input.value, EX2[i].answer);
+      div.classList.toggle('correct', ok);
+      div.classList.toggle('wrong', !ok);
+      mark.textContent = ok ? '✓' : '✗';
+      mark.className = 'mark ' + (ok?'correct':'wrong');
+      if(ok) correct++; else addProblem(EX2[i].tag);
+    });
+    exScores.ex2 = correct;
+    document.getElementById('score_ex2').textContent = `Результат: ${correct}/8`;
+    updateTotalScore();
+  }, function(){
+    wrap.querySelectorAll('.answer-reveal').forEach(el=>el.classList.toggle('show'));
+  });
+})();
+
+/* ---- EX3: Find a mistake ---- */
+(function(){
+  const sec = makeSection('ex3','3️⃣ Find a mistake','В каждом предложении неправильно выбран глагол (say/tell/speak/talk). Напиши правильное слово.');
+  const wrap = sec.querySelector('.items');
+  wrap.id = 'ex3items';
+  EX3.forEach((it,i)=>{
+    const div = document.createElement('div');
+    div.className='item';
+    div.innerHTML = `
+      <span class="num">${i+1}.</span> ${it.sentence}<br>
+      <input type="text" style="margin-top:6px;" placeholder="correct word...">
+      <span class="mark"></span>
+      <div class="answer-reveal">Правильно: <b>${it.answer[0]}</b></div>
+    `;
+    wrap.appendChild(div);
+  });
+  addControls(sec, 'ex3', function(){
+    let correct=0;
+    wrap.querySelectorAll('.item').forEach((div,i)=>{
+      const input = div.querySelector('input');
+      const mark = div.querySelector('.mark');
+      const ok = matches(input.value, EX3[i].answer);
+      div.classList.toggle('correct', ok);
+      div.classList.toggle('wrong', !ok);
+      mark.textContent = ok ? '✓' : '✗';
+      mark.className = 'mark ' + (ok?'correct':'wrong');
+      if(ok) correct++; else addProblem(EX3[i].tag);
+    });
+    exScores.ex3 = correct;
+    document.getElementById('score_ex3').textContent = `Результат: ${correct}/8`;
+    updateTotalScore();
+  }, function(){
+    wrap.querySelectorAll('.answer-reveal').forEach(el=>el.classList.toggle('show'));
+  });
+})();
+
+/* ---- EX4: Finish the sentence with your own idea (free, not graded) ---- */
+(function(){
+  const sec = makeSection('ex4','4️⃣ Закончи предложение своей идеей','Допиши предложение своими словами, используя say / tell / speak / talk.');
+  const wrap = sec.querySelector('.items');
+  wrap.id = 'ex4items';
+  EX4.forEach((it,i)=>{
+    const div = document.createElement('div');
+    div.className='item';
+    div.innerHTML = `
+      <span class="num">${i+1}.</span>
+      <div class="prompt-line">${it.prompt} <button class="listen-mini">🔊</button></div>
+      <textarea class="free-input" placeholder="Write your own ending..."></textarea>
+    `;
+    div.querySelector('.listen-mini').addEventListener('click', ()=>speak(it.prompt.replace('...','')));
+    wrap.appendChild(div);
+  });
+  const note = document.createElement('div');
+  note.className = 'sub';
+  note.style.marginTop = '10px';
+  note.textContent = 'Это упражнение без автопроверки — учитель проверяет вручную. Нажми "Скопировать все ответы" в боковой панели.';
+  sec.appendChild(note);
+})();
+
+/* ============ COPY ALL ANSWERS ============ */
+document.getElementById('copyAllBtn').addEventListener('click', ()=>{
+  let out = "=== ОТВЕТЫ УЧЕНИКА: SAY vs TELL vs SPEAK vs TALK ===\n\n";
+
+  out += "-- 1. Context --\n";
+  document.querySelectorAll('#ex1items .item input').forEach((inp,i)=>{ out += `${i+1}. ${inp.value || '(пусто)'}\n`; });
+
+  out += "\n-- 2. Fill in the gaps --\n";
+  document.querySelectorAll('#ex2items .item input').forEach((inp,i)=>{ out += `${i+1}. ${inp.value || '(пусто)'}\n`; });
+
+  out += "\n-- 3. Find a mistake --\n";
+  document.querySelectorAll('#ex3items .item input').forEach((inp,i)=>{ out += `${i+1}. ${inp.value || '(пусто)'}\n`; });
+
+  out += "\n-- 4. Finish the sentence (free answers) --\n";
+  document.querySelectorAll('#ex4items .item textarea').forEach((ta,i)=>{ out += `${i+1}. ${ta.value || '(пусто)'}\n`; });
+
+  out += "\n-- Итоговый счёт --\n";
+  out += document.getElementById('totalScore').textContent + "\n";
+
+  const statusEl = document.getElementById('copyStatus');
+  function showCopied(){
+    statusEl.textContent = "✅ Скопировано в буфер обмена!";
+    setTimeout(()=>statusEl.textContent = "", 3000);
+  }
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(out).then(showCopied).catch(()=>{ fallbackCopy(out, showCopied); });
+  } else {
+    fallbackCopy(out, showCopied);
+  }
+  function fallbackCopy(text, cb){
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position='fixed'; ta.style.left='-9999px';
+    document.body.appendChild(ta); ta.select();
+    try{ document.execCommand('copy'); cb(); }
+    catch(e){ statusEl.textContent = "⚠️ Не удалось скопировать автоматически."; }
+    document.body.removeChild(ta);
+  }
+});
+</script>
+</body>
+</html>
