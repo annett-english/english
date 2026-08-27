@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vocabulary Lab — Food · Money · Personality</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EEF0E6;
+    --paper-2:#E4E7DA;
+    --ink:#212a1f;
+    --ink-soft:#4b5745;
+    --line:#c9cdb9;
+    --accent:#B5651D;
+    --accent-2:#7a8a5c;
+    --ok:#4C7A5E;
+    --ok-bg:#e2ede4;
+    --bad:#B3423A;
+    --bad-bg:#f6e2e0;
+    --card:#f7f8f2;
+    --shadow: 0 1px 0 rgba(33,42,31,0.06);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',system-ui,sans-serif;
+    line-height:1.5;
+    padding-bottom:80px;
+  }
+  ::selection{background:#d9c9a3;}
+
+  .wrap{
+    max-width:1180px;
+    margin:0 auto;
+    padding:36px 24px 60px;
+    display:grid;
+    grid-template-columns: 1fr 280px;
+    gap:32px;
+    align-items:start;
+  }
+  @media (max-width:900px){
+    .wrap{grid-template-columns:1fr; padding:20px 14px 50px;}
+    aside{order:-1;}
+  }
+
+  header.hero{
+    grid-column:1/-1;
+    padding:8px 0 20px;
+    border-bottom:2px solid var(--ink);
+    margin-bottom:6px;
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    flex-wrap:wrap;
+    gap:14px;
+  }
+  header.hero .eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--accent-2);
+    margin-bottom:6px;
+  }
+  header.hero h1{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:clamp(28px,4vw,42px);
+    margin:0;
+    letter-spacing:-0.01em;
+  }
+  header.hero .sub{
+    font-size:14px;
+    color:var(--ink-soft);
+    max-width:520px;
+  }
+  .score-pill{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:13px;
+    background:var(--ink);
+    color:var(--paper);
+    padding:10px 16px;
+    border-radius:100px;
+    white-space:nowrap;
+  }
+  .score-pill b{color:#ffd9a0;}
+
+  main{min-width:0;}
+
+  section.block{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:24px 26px 28px;
+    margin-bottom:28px;
+    box-shadow:var(--shadow);
+  }
+
+  h2.section-title{
+    font-family:'Fraunces',serif;
+    font-size:22px;
+    font-weight:600;
+    margin:0 0 4px;
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+  }
+  h2.section-title .num{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:13px;
+    color:var(--accent);
+    border:1px solid var(--accent);
+    border-radius:3px;
+    padding:1px 7px;
+  }
+  .section-hint{
+    font-size:13.5px;
+    color:var(--ink-soft);
+    margin:0 0 18px;
+  }
+
+  /* --- reminder / glossary --- */
+  .glossary-cats{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+    gap:18px;
+  }
+  .cat-card h3{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--accent-2);
+    margin:0 0 8px;
+    border-bottom:1px dashed var(--line);
+    padding-bottom:6px;
+  }
+  .word-row{
+    display:grid;
+    grid-template-columns:22px 1fr;
+    gap:10px;
+    align-items:start;
+    padding:7px 4px;
+    border-radius:4px;
+  }
+  .word-row:hover{background:var(--paper-2);}
+  .speak-btn{
+    width:22px;height:22px;
+    border-radius:50%;
+    border:1px solid var(--accent-2);
+    background:transparent;
+    color:var(--accent-2);
+    cursor:pointer;
+    font-size:11px;
+    display:flex;align-items:center;justify-content:center;
+    padding:0;
+    margin-top:2px;
+    flex-shrink:0;
+    transition:transform .12s ease, background .12s ease;
+  }
+  .speak-btn:hover{background:var(--accent-2); color:#fff;}
+  .speak-btn:active{transform:scale(.9);}
+  .word-en{font-weight:600; font-size:14.5px;}
+  .word-ipa{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    color:var(--accent);
+    margin-left:6px;
+  }
+  .word-ru{font-size:13px; color:var(--ink-soft); margin-top:1px;}
+
+  .sound-check{
+    margin-top:16px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+    font-size:13px;
+    color:var(--ink-soft);
+  }
+  .btn{
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:13.5px;
+    border:1px solid var(--ink);
+    background:var(--ink);
+    color:var(--paper);
+    padding:9px 16px;
+    border-radius:3px;
+    cursor:pointer;
+    transition:opacity .12s ease;
+  }
+  .btn:hover{opacity:.82;}
+  .btn.secondary{
+    background:transparent;
+    color:var(--ink);
+  }
+  .btn.small{padding:5px 10px; font-size:12px;}
+  #voice-status{font-family:'IBM Plex Mono',monospace; font-size:12px;}
+  #voice-status.ok{color:var(--ok);}
+  #voice-status.bad{color:var(--bad);}
+
+  /* --- exercises --- */
+  .item{
+    display:grid;
+    grid-template-columns:28px 1fr;
+    gap:12px;
+    padding:12px 0;
+    border-bottom:1px solid var(--line);
+  }
+  .item:last-child{border-bottom:none;}
+  .item .idx{
+    font-family:'IBM Plex Mono',monospace;
+    color:var(--accent-2);
+    font-size:13px;
+    padding-top:9px;
+  }
+  .item .prompt{
+    font-size:15px;
+    margin-bottom:8px;
+  }
+  .item .prompt .mask{
+    font-family:'IBM Plex Mono',monospace;
+    letter-spacing:.03em;
+    background:var(--paper-2);
+    padding:2px 6px;
+    border-radius:3px;
+  }
+  .item .ru-hint{color:var(--ink-soft); font-style:italic;}
+  .item input[type=text]{
+    width:100%;
+    max-width:420px;
+    font-family:'Inter',sans-serif;
+    font-size:14.5px;
+    padding:8px 11px;
+    border:1.5px solid var(--line);
+    border-radius:3px;
+    background:#fff;
+    color:var(--ink);
+  }
+  .item input[type=text]:focus{
+    outline:none;
+    border-color:var(--accent);
+  }
+  .item input.correct{border-color:var(--ok); background:var(--ok-bg);}
+  .item input.wrong{border-color:var(--bad); background:var(--bad-bg);}
+  .feedback{
+    font-size:12.5px;
+    margin-top:5px;
+    font-family:'IBM Plex Mono',monospace;
+  }
+  .feedback.ok{color:var(--ok);}
+  .feedback.bad{color:var(--bad);}
+  .mini-speak{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    margin-bottom:8px;
+  }
+
+  .block-controls{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-top:18px;
+    padding-top:14px;
+    border-top:2px solid var(--ink);
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  .block-score{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:13px;
+  }
+  .btn-group{display:flex; gap:8px;}
+
+  /* --- sidebar --- */
+  aside{
+    position:sticky;
+    top:20px;
+  }
+  .side-card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:18px;
+  }
+  .side-card h3{
+    font-family:'Fraunces',serif;
+    font-size:17px;
+    margin:0 0 4px;
+  }
+  .side-card .side-hint{
+    font-size:12px;
+    color:var(--ink-soft);
+    margin-bottom:12px;
+  }
+  table.problem-table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:12.5px;
+  }
+  table.problem-table th{
+    text-align:left;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10.5px;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    color:var(--ink-soft);
+    border-bottom:1px solid var(--ink);
+    padding:4px 4px 6px;
+  }
+  table.problem-table td{
+    padding:6px 4px;
+    border-bottom:1px dashed var(--line);
+    vertical-align:top;
+  }
+  table.problem-table .cnt{
+    font-family:'IBM Plex Mono',monospace;
+    color:var(--bad);
+    font-weight:600;
+    text-align:right;
+  }
+  .empty-note{
+    font-size:12.5px;
+    color:var(--ink-soft);
+    padding:14px 0;
+    text-align:center;
+    border:1px dashed var(--line);
+    border-radius:4px;
+  }
+  .side-total{
+    margin-top:16px;
+    padding-top:14px;
+    border-top:1px solid var(--line);
+    font-family:'IBM Plex Mono',monospace;
+    font-size:13px;
+  }
+  .side-total b{color:var(--accent);}
+
+  footer.final{
+    grid-column:1/-1;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:14px;
+    padding-top:10px;
+  }
+  #copy-status{font-size:12.5px; color:var(--ink-soft); font-family:'IBM Plex Mono',monospace;}
+
+  @media (prefers-reduced-motion: reduce){
+    *{transition:none !important;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div>
+      <div class="eyebrow">Vocabulary Lab · Food / Money / Personality</div>
+      <h1>Практика лексики</h1>
+      <p class="sub">Сначала прослушайте и повторите слова, затем впишите ответы вручную в пяти упражнениях. Ошибки автоматически попадают в таблицу «Проблемные слова» справа.</p>
+    </div>
+    <div class="score-pill">Общий счёт: <b><span id="total-score">0</span> / <span id="total-max">50</span></b></div>
+  </header>
+
+  <main>
+
+    <!-- REMINDER -->
+    <section class="block" id="glossary">
+      <h2 class="section-title"><span class="num">0</span>Повторение слов</h2>
+      <p class="section-hint">Нажмите на 🔊, чтобы прослушать произношение (голос Google US English). Затем повторите слово вслух.</p>
+      <div class="glossary-cats" id="glossary-root"></div>
+      <div class="sound-check">
+        <button class="btn secondary small" id="test-audio">🔊 Проверить звук</button>
+        <span id="voice-status">проверка голосов…</span>
+      </div>
+    </section>
+
+    <!-- EX 1 -->
+    <section class="block" data-exercise="ex1">
+      <h2 class="section-title"><span class="num">1</span>Вставьте пропущенные буквы</h2>
+      <p class="section-hint">Впишите слово или фразу полностью — пропуски обозначены "_".</p>
+      <div class="items" id="ex1-items"></div>
+      <div class="block-controls">
+        <div class="block-score">Результат: <span class="cur">0</span>/<span class="max">10</span></div>
+        <div class="btn-group">
+          <button class="btn secondary small" data-action="reveal" data-target="ex1">Показать ответы</button>
+          <button class="btn small" data-action="check" data-target="ex1">Проверить</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- EX 2 -->
+    <section class="block" data-exercise="ex2">
+      <h2 class="section-title"><span class="num">2</span>Переведите с русского на английский</h2>
+      <p class="section-hint">Впишите английский эквивалент фразы.</p>
+      <div class="items" id="ex2-items"></div>
+      <div class="block-controls">
+        <div class="block-score">Результат: <span class="cur">0</span>/<span class="max">10</span></div>
+        <div class="btn-group">
+          <button class="btn secondary small" data-action="reveal" data-target="ex2">Показать ответы</button>
+          <button class="btn small" data-action="check" data-target="ex2">Проверить</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- EX 3 -->
+    <section class="block" data-exercise="ex3">
+      <h2 class="section-title"><span class="num">3</span>Запишите слово на слух</h2>
+      <p class="section-hint">Нажмите 🔊, прослушайте фразу и запишите её на английском.</p>
+      <div class="items" id="ex3-items"></div>
+      <div class="block-controls">
+        <div class="block-score">Результат: <span class="cur">0</span>/<span class="max">10</span></div>
+        <div class="btn-group">
+          <button class="btn secondary small" data-action="reveal" data-target="ex3">Показать ответы</button>
+          <button class="btn small" data-action="check" data-target="ex3">Проверить</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- EX 4 -->
+    <section class="block" data-exercise="ex4">
+      <h2 class="section-title"><span class="num">4</span>Сочетаемость: впишите нужное слово</h2>
+      <p class="section-hint">Впишите пропущенный предлог/частицу, чтобы фраза была верной.</p>
+      <div class="items" id="ex4-items"></div>
+      <div class="block-controls">
+        <div class="block-score">Результат: <span class="cur">0</span>/<span class="max">10</span></div>
+        <div class="btn-group">
+          <button class="btn secondary small" data-action="reveal" data-target="ex4">Показать ответы</button>
+          <button class="btn small" data-action="check" data-target="ex4">Проверить</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- EX 5 -->
+    <section class="block" data-exercise="ex5">
+      <h2 class="section-title"><span class="num">5</span>Fill in the gaps</h2>
+      <p class="section-hint">Заполните пропуск в предложении подходящим словом/фразой.</p>
+      <div class="items" id="ex5-items"></div>
+      <div class="block-controls">
+        <div class="block-score">Результат: <span class="cur">0</span>/<span class="max">10</span></div>
+        <div class="btn-group">
+          <button class="btn secondary small" data-action="reveal" data-target="ex5">Показать ответы</button>
+          <button class="btn small" data-action="check" data-target="ex5">Проверить</button>
+        </div>
+      </div>
+    </section>
+
+    <footer class="final">
+      <button class="btn" id="copy-answers">Скопировать все мои ответы</button>
+      <span id="copy-status"></span>
+    </footer>
+
+  </main>
+
+  <aside>
+    <div class="side-card">
+      <h3>Проблемные слова</h3>
+      <p class="side-hint">Слова, в которых была допущена ошибка хотя бы раз.</p>
+      <div id="problem-wrap">
+        <div class="empty-note">Пока ошибок нет — отлично!</div>
+      </div>
+      <div class="side-total">Ошибок всего: <b id="mistake-total">0</b></div>
+    </div>
+  </aside>
+
+</div>
+
+<script>
+/* ============ DATA ============ */
+const VOCAB = [
+  {key:"make sb mentally alert", en:"make sb mentally alert", ru:"делать кого-л. умственно бодрым", ipa:"/meɪk ˈsʌmbədi ˈmentəli əˈlɜːrt/", cat:"FOOD"},
+  {key:"skip breakfast", en:"skip breakfast", ru:"пропускать завтрак", ipa:"/skɪp ˈbrekfəst/", cat:"FOOD"},
+  {key:"except for", en:"except for", ru:"за исключением", ipa:"/ɪkˈsept fɔːr/", cat:"FOOD"},
+  {key:"cut down on", en:"cut down on", ru:"сократить употребление (чего-л.)", ipa:"/kʌt daʊn ɒn/", cat:"FOOD"},
+  {key:"cheer yourself up", en:"cheer yourself up", ru:"поднять себе настроение", ipa:"/tʃɪər jɔːˈself ʌp/", cat:"FOOD"},
+  {key:"cut out", en:"cut out", ru:"исключить (из рациона)", ipa:"/kʌt aʊt/", cat:"FOOD"},
+  {key:"cause diabetes", en:"cause diabetes", ru:"вызывать диабет", ipa:"/kɔːz ˌdaɪəˈbiːtiːz/", cat:"FOOD"},
+  {key:"be allergic to", en:"be allergic to / have an allergy to", ru:"иметь аллергию на", ipa:"/biː əˈlɜːrdʒɪk tuː/", cat:"FOOD"},
+  {key:"have an intolerance to", en:"have an intolerance to / be intolerant to", ru:"иметь непереносимость", ipa:"/hæv ən ɪnˈtɒlərəns tuː/", cat:"FOOD"},
+  {key:"disrupt your body's natural cycle", en:"disrupt sth (your body's natural cycle)", ru:"нарушать (естественный цикл организма)", ipa:"/dɪsˈrʌpt jɔːr ˈbɒdiz ˈnætʃrəl ˈsaɪkl/", cat:"FOOD"},
+
+  {key:"live on", en:"live on", ru:"жить на (доход)", ipa:"/lɪv ɒn/", cat:"MONEY"},
+  {key:"take out money", en:"take out money from sth", ru:"снимать деньги (со счёта)", ipa:"/teɪk aʊt ˈmʌni frəm/", cat:"MONEY"},
+  {key:"be worth", en:"be worth", ru:"стоить", ipa:"/biː wɜːrθ/", cat:"MONEY"},
+  {key:"can't afford to buy", en:"can't afford to buy", ru:"не может позволить себе купить", ipa:"/kɑːnt əˈfɔːrd tuː baɪ/", cat:"MONEY"},
+  {key:"inherit money", en:"inherit money from sb", ru:"унаследовать деньги от кого-л.", ipa:"/ɪnˈherɪt ˈmʌni frəm/", cat:"MONEY"},
+  {key:"charge sb for sth", en:"charge sb for sth", ru:"взимать плату с кого-л. за что-л.", ipa:"/tʃɑːrdʒ fɔːr/", cat:"MONEY"},
+  {key:"lend money to sb", en:"lend money to sb", ru:"одалживать деньги кому-л.", ipa:"/lend ˈmʌni tuː/", cat:"MONEY"},
+  {key:"invest in sth", en:"invest in sth", ru:"инвестировать во что-л.", ipa:"/ɪnˈvest ɪn/", cat:"MONEY"},
+  {key:"live off", en:"live off", ru:"жить за счёт", ipa:"/lɪv ɒf/", cat:"MONEY"},
+
+  {key:"affectionate", en:"affectionate", ru:"ласковый, любящий", ipa:"/əˈfekʃənət/", cat:"PERSONALITY"},
+  {key:"stubborn", en:"stubborn", ru:"упрямый", ipa:"/ˈstʌbərn/", cat:"PERSONALITY"},
+  {key:"spoilt", en:"spoilt", ru:"избалованный", ipa:"/spɔɪlt/", cat:"PERSONALITY"},
+  {key:"sensible", en:"sensible", ru:"благоразумный", ipa:"/ˈsensəbl/", cat:"PERSONALITY"},
+  {key:"anxious", en:"anxious", ru:"тревожный", ipa:"/ˈæŋkʃəs/", cat:"PERSONALITY"},
+  {key:"rebellious", en:"rebellious", ru:"бунтарский", ipa:"/rɪˈbeljəs/", cat:"PERSONALITY"},
+  {key:"competitive", en:"competitive", ru:"соревновательный", ipa:"/kəmˈpetətɪv/", cat:"PERSONALITY"},
+  {key:"imaginative", en:"imaginative", ru:"с богатым воображением", ipa:"/ɪˈmædʒɪnətɪv/", cat:"PERSONALITY"},
+  {key:"insecure", en:"insecure", ru:"неуверенный в себе", ipa:"/ˌɪnsɪˈkjʊr/", cat:"PERSONALITY"}
+];
+
+function findWord(key){ return VOCAB.find(v => v.key === key); }
+
+/* ============ EXERCISES ============ */
+// Each item: { key (link to VOCAB for problem tracking), prompt-building info, answers[] }
+
+const EX1 = [ // fill in missing letters
+  {key:"skip breakfast", mask:"sk_p", answers:["skip"]},
+  {key:"cut down on", mask:"c_t d_wn _n", answers:["cut down on"]},
+  {key:"cheer yourself up", mask:"ch_er y_urs_lf _p", answers:["cheer yourself up"]},
+  {key:"cause diabetes", mask:"di_bet_s", answers:["diabetes"]},
+  {key:"be allergic to", mask:"all_rg_c", answers:["allergic"]},
+  {key:"have an intolerance to", mask:"int_ler_nce", answers:["intolerance"]},
+  {key:"inherit money", mask:"inh_r_t", answers:["inherit"]},
+  {key:"can't afford to buy", mask:"aff_rd", answers:["afford"]},
+  {key:"stubborn", mask:"st_bb_rn", answers:["stubborn"]},
+  {key:"rebellious", mask:"reb_lli_us", answers:["rebellious"]}
+];
+
+const EX2 = [ // RU -> EN
+  {key:"make sb mentally alert", ru:"делать кого-то умственно бодрым", answers:["make sb mentally alert","make you mentally alert","make us mentally alert"]},
+  {key:"except for", ru:"за исключением", answers:["except for"]},
+  {key:"cut out", ru:"исключить (из рациона)", answers:["cut out"]},
+  {key:"disrupt your body's natural cycle", ru:"нарушать естественный цикл организма", answers:["disrupt your body's natural cycle","disrupt sth","disrupt"]},
+  {key:"can't afford to buy", ru:"не может позволить себе купить", answers:["can't afford to buy","cant afford to buy"]},
+  {key:"be worth", ru:"стоить", answers:["be worth"]},
+  {key:"charge sb for sth", ru:"взимать плату с кого-то за что-то", answers:["charge sb for sth","charge someone for something","charge for"]},
+  {key:"live off", ru:"жить за счёт", answers:["live off"]},
+  {key:"spoilt", ru:"избалованный", answers:["spoilt","spoiled"]},
+  {key:"imaginative", ru:"с богатым воображением", answers:["imaginative"]}
+];
+
+const EX3 = [ // dictation
+  {key:"except for", say:"except for", answers:["except for"]},
+  {key:"cause diabetes", say:"cause diabetes", answers:["cause diabetes"]},
+  {key:"have an intolerance to", say:"have an intolerance to", answers:["have an intolerance to"]},
+  {key:"take out money", say:"take out money", answers:["take out money"]},
+  {key:"be worth", say:"be worth", answers:["be worth"]},
+  {key:"lend money to sb", say:"lend money to someone", answers:["lend money to someone","lend money to sb"]},
+  {key:"invest in sth", say:"invest in something", answers:["invest in something","invest in sth"]},
+  {key:"affectionate", say:"affectionate", answers:["affectionate"]},
+  {key:"sensible", say:"sensible", answers:["sensible"]},
+  {key:"insecure", say:"insecure", answers:["insecure"]}
+];
+
+const EX4 = [ // collocation particle/preposition
+  {key:"cut down on", prompt:"cut ____ on sugar", answers:["down"]},
+  {key:"cut out", prompt:"cut it ____", answers:["out"]},
+  {key:"be allergic to", prompt:"be allergic ____ nuts", answers:["to"]},
+  {key:"have an intolerance to", prompt:"have an intolerance ____ lactose", answers:["to"]},
+  {key:"lend money to sb", prompt:"lend money ____ someone", answers:["to"]},
+  {key:"invest in sth", prompt:"invest ____ stocks", answers:["in"]},
+  {key:"live on", prompt:"live ____ a small salary", answers:["on"]},
+  {key:"live off", prompt:"live ____ your parents' money", answers:["off"]},
+  {key:"take out money", prompt:"take ____ money from the bank", answers:["out"]},
+  {key:"charge sb for sth", prompt:"charge someone ____ a service", answers:["for"]}
+];
+
+const EX5 = [ // fill in the gaps, full sentence
+  {key:"skip breakfast", sentence:"I always ______ breakfast when I'm in a hurry.", answers:["skip"]},
+  {key:"cause diabetes", sentence:"Eating too much sugar can ______ diabetes.", answers:["cause"]},
+  {key:"be allergic to", sentence:"She is ______ nuts, so she never eats peanut butter.", answers:["allergic to"]},
+  {key:"disrupt your body's natural cycle", sentence:"Loud noise at night can ______ your sleep cycle.", answers:["disrupt"]},
+  {key:"live on", sentence:"It's hard to ______ on such a small salary.", answers:["live"]},
+  {key:"inherit money", sentence:"He ______ a fortune from his grandmother.", answers:["inherited"]},
+  {key:"charge sb for sth", sentence:"The hotel ______ us $50 for breakfast.", answers:["charged"]},
+  {key:"invest in sth", sentence:"They decided to ______ in a new business.", answers:["invest"]},
+  {key:"stubborn", sentence:"My little sister is very ______ — she always wants her own way.", answers:["stubborn"]},
+  {key:"insecure", sentence:"She feels ______ about her new job.", answers:["insecure"]}
+];
+
+/* ============ STATE ============ */
+const problemWords = {}; // key -> count
+let totalCorrectSoFar = 0; // running counted score across "checked" exercises (recomputed on each check)
+const exerciseState = {}; // exId -> {items:[], answersEls:[]}
+
+/* ============ SPEECH ============ */
+let chosenVoice = null;
+function pickVoice(){
+  const voices = window.speechSynthesis.getVoices();
+  if(!voices || !voices.length) return null;
+  let v = voices.find(v => v.name === "Google US English");
+  if(!v) v = voices.find(v => v.lang === "en-US" && /Google/i.test(v.name));
+  if(!v) v = voices.find(v => v.lang === "en-US");
+  if(!v) v = voices.find(v => v.lang && v.lang.startsWith("en"));
+  return v || null;
+}
+function refreshVoiceStatus(){
+  chosenVoice = pickVoice();
+  const el = document.getElementById("voice-status");
+  if(chosenVoice){
+    el.textContent = "Голос: " + chosenVoice.name + " (" + chosenVoice.lang + ") — готов";
+    el.className = "ok";
+  } else {
+    el.textContent = "Голос не найден — попробуйте открыть страницу в Chrome и подождать пару секунд";
+    el.className = "bad";
+  }
+}
+if("speechSynthesis" in window){
+  refreshVoiceStatus();
+  window.speechSynthesis.onvoiceschanged = refreshVoiceStatus;
+} else {
+  document.getElementById("voice-status").textContent = "Ваш браузер не поддерживает озвучивание";
+  document.getElementById("voice-status").className = "bad";
+}
+
+function speak(text){
+  if(!("speechSynthesis" in window)){
+    alert("Синтез речи не поддерживается в этом браузере. Попробуйте Chrome.");
+    return;
+  }
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = "en-US";
+  if(chosenVoice) u.voice = chosenVoice;
+  u.rate = 0.92;
+  window.speechSynthesis.speak(u);
+}
+
+document.getElementById("test-audio").addEventListener("click", ()=>{
+  speak("This is a sound test. Can you hear me clearly?");
+});
+
+/* ============ NORMALIZATION & CHECKING ============ */
+function normalize(str){
+  return str
+    .toLowerCase()
+    .trim()
+    .replace(/['’]/g,"")
+    .replace(/[.,!?]/g,"")
+    .replace(/\s+/g," ");
+}
+function isCorrect(userInput, answers){
+  const n = normalize(userInput);
+  if(!n) return false;
+  return answers.some(a => normalize(a) === n);
+}
+
+/* ============ RENDER GLOSSARY ============ */
+const catLabels = {FOOD:"Food", MONEY:"Money", PERSONALITY:"Personality traits"};
+const catOrder = ["FOOD","MONEY","PERSONALITY"];
+const glossaryRoot = document.getElementById("glossary-root");
+catOrder.forEach(cat => {
+  const card = document.createElement("div");
+  card.className = "cat-card";
+  const h3 = document.createElement("h3");
+  h3.textContent = catLabels[cat];
+  card.appendChild(h3);
+  VOCAB.filter(v=>v.cat===cat).forEach(v=>{
+    const row = document.createElement("div");
+    row.className = "word-row";
+    row.innerHTML = `
+      <button class="speak-btn" aria-label="Прослушать ${v.en}">🔊</button>
+      <div>
+        <span class="word-en">${v.en}</span><span class="word-ipa">${v.ipa}</span>
+        <div class="word-ru">${v.ru}</div>
+      </div>`;
+    row.querySelector(".speak-btn").addEventListener("click", ()=> speak(v.en.replace(/sb|sth/g,"someone").replace(/\(.*?\)/g,"")));
+    card.appendChild(row);
+  });
+  glossaryRoot.appendChild(card);
+});
+
+/* ============ RENDER EXERCISES ============ */
+function buildItemShell(containerId, index, promptHTML, exId, dataAnswers, extraClass){
+  const wrap = document.createElement("div");
+  wrap.className = "item";
+  wrap.innerHTML = `
+    <div class="idx">${index+1}.</div>
+    <div>
+      <div class="prompt">${promptHTML}</div>
+      <input type="text" placeholder="Введите ответ..." data-answers='${JSON.stringify(dataAnswers).replace(/'/g,"&#39;")}' />
+      <div class="feedback"></div>
+    </div>`;
+  document.getElementById(containerId).appendChild(wrap);
+}
+
+// EX1 — fill in missing letters
+EX1.forEach((it, i)=>{
+  buildItemShell("ex1-items", i, `<span class="mask">${it.mask}</span> <span class="ru-hint">— ${findWord(it.key).ru}</span>`, "ex1", it.answers);
+});
+
+// EX2 — translation RU -> EN
+EX2.forEach((it, i)=>{
+  buildItemShell("ex2-items", i, `«${it.ru}»`, "ex2", it.answers);
+});
+
+// EX3 — dictation
+EX3.forEach((it, i)=>{
+  const wrap = document.createElement("div");
+  wrap.className = "item";
+  wrap.innerHTML = `
+    <div class="idx">${i+1}.</div>
+    <div>
+      <div class="mini-speak">
+        <button class="speak-btn" style="width:30px;height:30px;font-size:14px;">🔊</button>
+        <span class="ru-hint">Прослушайте и запишите фразу</span>
+      </div>
+      <input type="text" placeholder="Введите то, что услышали..." data-answers='${JSON.stringify(it.answers).replace(/'/g,"&#39;")}' />
+      <div class="feedback"></div>
+    </div>`;
+  wrap.querySelector(".speak-btn").addEventListener("click", ()=> speak(it.say));
+  document.getElementById("ex3-items").appendChild(wrap);
+});
+
+// EX4 — collocations
+EX4.forEach((it, i)=>{
+  buildItemShell("ex4-items", i, `${it.prompt}`, "ex4", it.answers);
+});
+
+// EX5 — fill in the gaps sentences
+EX5.forEach((it, i)=>{
+  buildItemShell("ex5-items", i, `${it.sentence}`, "ex5", it.answers);
+});
+
+/* ============ CHECK / REVEAL LOGIC ============ */
+const exDataMap = { ex1: EX1, ex2: EX2, ex3: EX3, ex4: EX4, ex5: EX5 };
+const exContainerMap = { ex1:"ex1-items", ex2:"ex2-items", ex3:"ex3-items", ex4:"ex4-items", ex5:"ex5-items" };
+
+function updateProblemTable(){
+  const wrap = document.getElementById("problem-wrap");
+  const entries = Object.entries(problemWords).sort((a,b)=> b[1]-a[1]);
+  if(!entries.length){
+    wrap.innerHTML = `<div class="empty-note">Пока ошибок нет — отлично!</div>`;
+    document.getElementById("mistake-total").textContent = "0";
+    return;
+  }
+  let total = 0;
+  let rows = entries.map(([key,count])=>{
+    total += count;
+    const w = findWord(key);
+    const label = w ? w.en : key;
+    const ru = w ? w.ru : "";
+    return `<tr><td><b>${label}</b><br><span style="color:var(--ink-soft)">${ru}</span></td><td class="cnt">${count}</td></tr>`;
+  }).join("");
+  wrap.innerHTML = `<table class="problem-table"><thead><tr><th>Слово</th><th>Ошибок</th></tr></thead><tbody>${rows}</tbody></table>`;
+  document.getElementById("mistake-total").textContent = total;
+}
+
+function recalcTotalScore(){
+  let sum = 0;
+  document.querySelectorAll("[data-exercise]").forEach(sec=>{
+    const cur = sec.querySelector(".block-score .cur");
+    if(cur) sum += parseInt(cur.textContent || "0", 10);
+  });
+  document.getElementById("total-score").textContent = sum;
+}
+
+function checkExercise(exId){
+  const data = exDataMap[exId];
+  const container = document.getElementById(exContainerMap[exId]);
+  const inputs = container.querySelectorAll("input[type=text]");
+  let correctCount = 0;
+  inputs.forEach((input, i)=>{
+    const it = data[i];
+    const feedback = input.parentElement.querySelector(".feedback");
+    const ok = isCorrect(input.value, it.answers);
+    input.classList.remove("correct","wrong");
+    if(ok){
+      input.classList.add("correct");
+      feedback.textContent = "✓ верно";
+      feedback.className = "feedback ok";
+      correctCount++;
+    } else {
+      input.classList.add("wrong");
+      feedback.textContent = "✗ правильный ответ: " + it.answers[0];
+      feedback.className = "feedback bad";
+      problemWords[it.key] = (problemWords[it.key] || 0) + 1;
+    }
+  });
+  const scoreEl = document.querySelector(`[data-exercise="${exId}"] .block-score .cur`);
+  scoreEl.textContent = correctCount;
+  updateProblemTable();
+  recalcTotalScore();
+}
+
+function revealExercise(exId){
+  const data = exDataMap[exId];
+  const container = document.getElementById(exContainerMap[exId]);
+  const inputs = container.querySelectorAll("input[type=text]");
+  inputs.forEach((input, i)=>{
+    const it = data[i];
+    const feedback = input.parentElement.querySelector(".feedback");
+    input.value = it.answers[0];
+    input.classList.remove("wrong");
+    input.classList.add("correct");
+    feedback.textContent = "показано: " + it.answers[0];
+    feedback.className = "feedback ok";
+  });
+  const scoreEl = document.querySelector(`[data-exercise="${exId}"] .block-score .cur`);
+  scoreEl.textContent = data.length;
+  recalcTotalScore();
+}
+
+document.querySelectorAll("[data-action]").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    const target = btn.getAttribute("data-target");
+    if(btn.getAttribute("data-action") === "check") checkExercise(target);
+    else revealExercise(target);
+  });
+});
+
+/* allow Enter key to move focus to next input within an exercise */
+document.querySelectorAll(".items").forEach(list=>{
+  list.addEventListener("keydown", (e)=>{
+    if(e.key === "Enter"){
+      e.preventDefault();
+      const inputs = Array.from(list.querySelectorAll("input[type=text]"));
+      const idx = inputs.indexOf(e.target);
+      if(idx > -1 && idx < inputs.length-1) inputs[idx+1].focus();
+    }
+  });
+});
+
+/* ============ COPY ANSWERS ============ */
+document.getElementById("copy-answers").addEventListener("click", async ()=>{
+  const titles = {
+    ex1:"1. Вставьте пропущенные буквы",
+    ex2:"2. Перевод RU→EN",
+    ex3:"3. Диктант (на слух)",
+    ex4:"4. Сочетаемость",
+    ex5:"5. Fill in the gaps"
+  };
+  let out = "Мои ответы — Vocabulary Lab\n" + "=".repeat(30) + "\n\n";
+  Object.keys(exContainerMap).forEach(exId=>{
+    out += titles[exId] + "\n";
+    const inputs = document.querySelectorAll(`#${exContainerMap[exId]} input[type=text]`);
+    inputs.forEach((inp,i)=>{
+      out += `  ${i+1}. ${inp.value || "(пусто)"}\n`;
+    });
+    out += "\n";
+  });
+  out += "Итоговый счёт: " + document.getElementById("total-score").textContent + " / " + document.getElementById("total-max").textContent + "\n";
+  const status = document.getElementById("copy-status");
+  try{
+    await navigator.clipboard.writeText(out);
+    status.textContent = "Скопировано в буфер обмена ✓";
+  } catch(e){
+    status.textContent = "Не удалось скопировать автоматически — выделите текст вручную.";
+    console.error(e);
+  }
+  setTimeout(()=> status.textContent = "", 4000);
+});
+
+/* initial score */
+recalcTotalScore();
+</script>
+</body>
+</html>
