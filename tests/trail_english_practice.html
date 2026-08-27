@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Тропа слов: Climb / Cross / Explore / Walk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-dark:#152621;
+    --bg-darker:#0f1d19;
+    --panel-light:#e8ece0;
+    --panel-white:#f6f4ea;
+    --ink:#152621;
+    --ink-soft:#3c4a44;
+    --accent-amber:#e0973a;
+    --accent-amber-dark:#c17c28;
+    --accent-moss:#4f7a53;
+    --accent-clay:#b5533f;
+    --line:#c8d0bf;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg-dark);
+    color:var(--panel-white);
+    font-family:'Work Sans',sans-serif;
+    line-height:1.5;
+  }
+  h1,h2,h3{font-family:'Fraunces',serif; font-weight:700; margin:0 0 8px;}
+  .app{max-width:1180px;margin:0 auto;padding:0 20px 80px;}
+
+  /* HERO */
+  .hero{padding:56px 0 40px; border-bottom:1px solid rgba(255,255,255,.12); margin-bottom:36px;}
+  .hero .eyebrow{
+    display:inline-block; font-size:.78rem; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--accent-amber); font-weight:600; margin-bottom:10px;
+  }
+  .hero h1{font-size:2.4rem; color:#fff; max-width:760px;}
+  .hero p{color:#cdd8ce; max-width:640px; font-size:1.02rem;}
+  .verb-tags{display:flex; gap:10px; flex-wrap:wrap; margin-top:18px;}
+  .verb-tags span{
+    border:1px solid rgba(224,151,58,.5); color:var(--accent-amber);
+    padding:5px 14px; border-radius:999px; font-size:.85rem; font-weight:600;
+  }
+
+  /* LAYOUT */
+  .layout{display:flex; gap:36px; align-items:flex-start;}
+  main.trail{flex:1; min-width:0;}
+  aside.sidebar{width:300px; flex-shrink:0; position:sticky; top:20px; display:flex; flex-direction:column; gap:20px;}
+
+  /* WAYPOINT / TRAIL SIGNATURE */
+  .waypoint{display:flex; gap:18px; margin-bottom:34px;}
+  .marker-col{display:flex; flex-direction:column; align-items:center; width:40px; flex-shrink:0;}
+  .marker{
+    width:40px;height:40px;border-radius:50%;
+    background:var(--accent-amber); color:var(--bg-darker);
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Fraunces',serif; font-weight:700; font-size:1.05rem;
+    box-shadow:0 0 0 4px var(--bg-dark);
+  }
+  .marker-line{
+    flex:1; width:2px; margin-top:6px;
+    background-image:repeating-linear-gradient(to bottom, rgba(224,151,58,.55) 0 7px, transparent 7px 15px);
+  }
+  .waypoint:last-child .marker-line{display:none;}
+
+  .card-body{
+    flex:1; min-width:0;
+    background:var(--panel-light); color:var(--ink);
+    border-radius:var(--radius); padding:26px 28px;
+  }
+  .card-body h2{font-size:1.3rem; color:var(--ink);}
+  .card-body .kicker{
+    font-size:.75rem; text-transform:uppercase; letter-spacing:.1em; font-weight:700;
+    color:var(--accent-amber-dark); margin-bottom:4px; display:block;
+  }
+  .card-body .instructions{color:var(--ink-soft); font-size:.92rem; margin-bottom:16px;}
+
+  /* WARMUP TABLE */
+  .warmup-list{display:flex; flex-direction:column; gap:0; border-top:1px solid var(--line);}
+  .warmup-row{
+    display:grid; grid-template-columns: 34px 1fr 1fr 1.3fr; gap:12px; align-items:center;
+    padding:10px 4px; border-bottom:1px solid var(--line); font-size:.95rem;
+  }
+  .warmup-row .wnum{color:var(--accent-amber-dark); font-weight:700;}
+  .warmup-row .wen{font-weight:600;}
+  .warmup-row .wipa{color:var(--ink-soft); font-style:italic; font-size:.88rem;}
+  .warmup-row .wru{color:var(--ink-soft);}
+  .btn-listen{
+    background:var(--bg-dark); color:#fff; border:none; border-radius:8px;
+    width:32px;height:32px; cursor:pointer; font-size:1rem; flex-shrink:0;
+  }
+  .btn-listen:hover{background:var(--accent-amber-dark);}
+
+  /* Q ROWS */
+  .qrow{
+    display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+    padding:9px 0; border-bottom:1px dashed var(--line); font-size:.95rem;
+  }
+  .qrow:last-child{border-bottom:none;}
+  .qnum{color:var(--accent-amber-dark); font-weight:700; width:22px; flex-shrink:0;}
+  .qprompt{min-width:140px; flex:1 1 200px;}
+  .qinput, .qselect{
+    flex:1 1 220px; min-width:160px; padding:8px 10px; border-radius:8px;
+    border:1px solid var(--line); font-family:'Work Sans',sans-serif; font-size:.95rem;
+    background:#fff; color:var(--ink);
+  }
+  .qtextarea{
+    width:100%; min-height:44px; padding:8px 10px; border-radius:8px;
+    border:1px solid var(--line); font-family:'Work Sans',sans-serif; font-size:.95rem;
+    background:#fff; color:var(--ink); resize:vertical;
+  }
+  .qfeedback{font-size:.85rem; flex-basis:100%; margin-top:2px;}
+  .qrow.correct{background:rgba(79,122,83,.08); border-radius:8px;}
+  .qrow.correct .qfeedback{color:var(--accent-moss); font-weight:600;}
+  .qrow.wrong{background:rgba(181,83,63,.08); border-radius:8px;}
+  .qrow.wrong .qfeedback{color:var(--accent-clay); font-weight:600;}
+  .qrow.shown .qinput{background:#fff7e6;}
+
+  .drill-row{margin-bottom:14px;}
+  .drill-row .base{font-weight:600; display:block; margin-bottom:6px;}
+
+  /* ACTIONS */
+  .actions{display:flex; align-items:center; gap:12px; margin-top:16px; flex-wrap:wrap;}
+  button.btn{
+    border:none; border-radius:10px; padding:10px 18px; font-weight:600;
+    cursor:pointer; font-family:'Work Sans',sans-serif; font-size:.92rem;
+  }
+  .btn-primary{background:var(--accent-amber); color:var(--bg-darker);}
+  .btn-primary:hover{background:var(--accent-amber-dark);}
+  .btn-ghost{background:transparent; color:var(--ink); border:1px solid var(--ink-soft) !important;}
+  .btn-ghost:hover{background:rgba(0,0,0,.05);}
+  .summary{font-weight:600; color:var(--ink-soft);}
+
+  /* SIDEBAR PANELS */
+  .panel{background:var(--panel-light); color:var(--ink); border-radius:var(--radius); padding:20px;}
+  .panel h3{font-size:1.05rem;}
+  #problemTable{width:100%; border-collapse:collapse; font-size:.85rem; margin-top:10px;}
+  #problemTable td{padding:5px 4px; border-bottom:1px solid var(--line); vertical-align:top;}
+  #problemTable td:last-child{text-align:center; font-weight:700; color:var(--accent-clay); width:22px;}
+  #problemEmpty{color:var(--ink-soft); font-size:.88rem; margin-top:8px;}
+  .audio-status p{font-size:.88rem; color:var(--ink-soft); margin-top:10px;}
+
+  .example-box{
+    background:#fff7e6; border:1px dashed var(--accent-amber-dark); border-radius:10px;
+    padding:12px 14px; margin-bottom:16px; font-size:.92rem;
+  }
+  .example-box b{color:var(--accent-amber-dark);}
+
+  footer.note{color:#a9b6ab; font-size:.85rem; margin-top:40px; text-align:center;}
+
+  @media (max-width:880px){
+    .layout{flex-direction:column;}
+    aside.sidebar{width:100%; position:static;}
+    .warmup-row{grid-template-columns: 24px 1fr; grid-template-areas:"n en" ". ipa" ". ru";}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="hero">
+    <span class="eyebrow">Тропа природы · практика глаголов движения</span>
+    <h1>Climb, Cross, Explore, Walk along / around</h1>
+    <p>8 заданий по 10 пунктов: перевод, диктант слов и предложений, сочетаемость, соединение половинок,
+      категоризация, rephrase, свои идеи и дриллинг. Все ответы вписываются вручную.</p>
+    <div class="verb-tags">
+      <span>climb</span><span>cross</span><span>walk along</span><span>walk around</span><span>explore</span>
+    </div>
+  </div>
+
+  <div class="layout">
+    <main class="trail">
+
+      <!-- WARM UP -->
+      <div class="waypoint">
+        <div class="marker-col"><div class="marker">★</div><div class="marker-line"></div></div>
+        <div class="card-body">
+          <span class="kicker">Разминка</span>
+          <h2>Вспомним слова</h2>
+          <p class="instructions">Нажми 🔊, чтобы услышать произношение (голос Google US English), или кнопку ниже, чтобы прослушать всё подряд.</p>
+          <div class="warmup-list" id="warmupList"></div>
+          <div class="actions">
+            <button class="btn btn-primary" id="playAllBtn">🔊 Прослушать все слова</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- EX 1 -->
+      <div class="waypoint">
+        <div class="marker-col"><div class="marker">1</div><div class="marker-line"></div></div>
+        <div class="card-body">
+          <span class="kicker">Задание 1 · Перевод</span>
+          <h2>Переведи с русского на английский</h2>
+          <p class="instructions">Напиши словосочетание целиком (глагол + существительное).</p>
+          <div class="qcontainer" id="ex1"></div>
+          <div class="actions">
+            <button class="btn btn-primary" onclick="checkEx1()">Проверить</button>
+            <button class="btn btn-ghost" onclick="showEx1()">Показать ответы</button>
+            <span class="summary" id="ex1summary"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- EX 2 -->
+      <div class="waypoint">
+        <div class="marker-col"><div class="marker">2</div><div class="marker-line"></div></div>
+        <div class="card-body">
+          <span class="kicker">Задание 2 · Диктант (словосочетание)</span>
+          <h2>Прослушай и напиши выражение</h2>
+          <p class="instructions">Нажми 🔊 у каждого пункта и напиши то, что услышал(а).</p>
+          <div class="qcontainer" id="ex2"></div>
+          <div class="actions">
+            <button class="btn btn-primary" onclick="checkEx2()">Проверить</button>
+            <button class="btn btn-ghost" onclick="showEx2()">Показать ответы</button>
+            <span class="summary" id="ex2summary"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- EX 3 -->
+      <div class="waypoint">
+        <div class="marker-col"><div class="marker">3</div><div class="marker-line"></div></div>
+        <div class="card-body">
+          <span class="kicker">Задание 3 · Диктант (предложение)</span>
+          <h2>Прослушай и напиши предложение целиком</h2>
+          <p class="instructions">Нажми 🔊 и напиши всё предложение с нужным словосочетанием.</p>
+          <div class="qcontainer" id="ex3"></div>
+          <div class="actions">
+            <button class="btn btn-primary" onclick="checkEx3()">Проверить</button>
+            <button class="btn btn-ghost" onclick="showEx3()">Показать ответы</button>
+            <span class="summary" id="ex3summary"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- EX 4 -->
+      <div class="waypoint">
+        <div class="marker-col"><div class="marker">4</div><div class="marker-line"></div></div>
+        <div class="card-body">
+          <span class="kicker">Задание 4 · Сочетаемость / соедини половинки</span>
+          <h2>Выбери верное продолжение</h2>
+          <p class="instructions">К каждому глаголу выбери существительное, с которым он естественно сочетается.</p>
+          <div class="qcontainer" id="ex4"></div>
+          <div class="actions">
+            <button class="btn btn-primary" onclick="checkEx4()">Проверить</button>
+            <button class="btn btn-ghost" onclick="showEx4()">Показать ответы</button>
+            <span class="summary" id="ex4summary"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- EX 5 -->
+      <div class="waypoint">
+        <div class="marker-col"><div class="marker">5</div><div class="marker-line"></div></div>
+        <div class="card-body">
+          <span class="kicker">Задание 5 · Categorise</span>
+          <h2>Распредели существительные по глаголам</h2>
+          <p class="instructions">Выбери, с каким глаголом обычно используется слово.</p>
+          <div class="qcontainer" id="ex5"></div>
+          <div class="actions">
+            <button class="btn btn-primary" onclick="checkEx5()">Проверить</button>
+            <button class="btn btn-ghost" onclick="showEx5()">Показать ответы</button>
+            <span class="summary" id="ex5summary"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- EX 6 -->
+      <div class="waypoint">
+        <div class="marker-col"><div class="marker">6</div><div class="marker-line"></div></div>
+        <div class="card-body">
+          <span class="kicker">Задание 6 · Rephrase</span>
+          <h2>Перефразируй, используя нужный глагол</h2>
+          <p class="instructions">Перепиши предложение, заменив описательную конструкцию на глагол из списка (climb / cross / explore / walk along).</p>
+          <div class="qcontainer" id="ex6"></div>
+          <div class="actions">
+            <button class="btn btn-primary" onclick="checkEx6()">Проверить</button>
+            <button class="btn btn-ghost" onclick="showEx6()">Показать ответы</button>
+            <span class="summary" id="ex6summary"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- EX 7 -->
+      <div class="waypoint">
+        <div class="marker-col"><div class="marker">7</div><div class="marker-line"></div></div>
+        <div class="card-body">
+          <span class="kicker">Задание 7 · Твои идеи</span>
+          <h2>Закончи предложения своими идеями</h2>
+          <p class="instructions">Здесь нет единственно верного ответа — пиши свои мысли. В конце можно скопировать все ответы одной кнопкой.</p>
+          <div class="qcontainer" id="ex7"></div>
+          <div class="actions">
+            <button class="btn btn-primary" onclick="copyEx7(event)">📋 Скопировать все ответы</button>
+            <span class="summary" id="ex7summary"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- EX 8 -->
+      <div class="waypoint">
+        <div class="marker-col"><div class="marker">8</div></div>
+        <div class="card-body">
+          <span class="kicker">Задание 8 · Drilling: Repeat &amp; Change</span>
+          <h2>Повтори модель и измени сам(а)</h2>
+          <div class="example-box">
+            <b>Модель:</b> climb a mountain → climb a <u>snowy</u> mountain → climb a snowy mountain <u>alone</u>
+          </div>
+          <p class="instructions">Для каждого словосочетания добавь сначала прилагательное, потом ещё деталь — по образцу. Пиши свою версию целиком.</p>
+          <div class="qcontainer" id="ex8"></div>
+          <div class="actions">
+            <button class="btn btn-primary" onclick="copyEx8(event)">📋 Скопировать все ответы</button>
+            <span class="summary" id="ex8summary"></span>
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+    <aside class="sidebar">
+      <div class="panel">
+        <h3>⚠️ Проблемные слова</h3>
+        <table id="problemTable"><tbody></tbody></table>
+        <p id="problemEmpty">Пока нет ошибок 🎉</p>
+      </div>
+      <div class="panel audio-status">
+        <h3>🔊 Проверка звука</h3>
+        <button class="btn btn-primary" id="testAudioBtn" style="width:100%;">Проверить аудио</button>
+        <p id="audioStatus">Статус: не проверено</p>
+      </div>
+    </aside>
+  </div>
+
+  <footer class="note">Сделано для практики письма: печатайте руками, слушайте вслух, проверяйте себя. 🌲</footer>
+</div>
+
+<script>
+/* ---------- DATA ---------- */
+const vocab = [
+  {verb:"climb", noun:"a mountain", ru:"подниматься на гору", ipa:"/klaɪm ə ˈmaʊntən/"},
+  {verb:"climb", noun:"a volcano", ru:"подниматься на вулкан", ipa:"/klaɪm ə vɒlˈkeɪnoʊ/"},
+  {verb:"climb", noun:"a tree", ru:"залезать на дерево", ipa:"/klaɪm ə triː/"},
+  {verb:"climb", noun:"a hill", ru:"подниматься на холм", ipa:"/klaɪm ə hɪl/"},
+  {verb:"cross", noun:"an ocean", ru:"пересекать океан", ipa:"/krɒs ən ˈoʊʃən/"},
+  {verb:"cross", noun:"a desert", ru:"пересекать пустыню", ipa:"/krɒs ə ˈdezərt/"},
+  {verb:"cross", noun:"a sea", ru:"пересекать море", ipa:"/krɒs ə siː/"},
+  {verb:"cross", noun:"a field", ru:"пересекать поле", ipa:"/krɒs ə fiːld/"},
+  {verb:"walk along", noun:"a river", ru:"идти вдоль реки", ipa:"/wɔːk əˈlɒŋ ə ˈrɪvər/"},
+  {verb:"walk around", noun:"a lake", ru:"обходить озеро", ipa:"/wɔːk əˈraʊnd ə leɪk/"},
+  {verb:"walk around", noun:"the grass", ru:"обходить траву", ipa:"/wɔːk əˈraʊnd ðə ɡræs/"},
+  {verb:"explore", noun:"a waterfall", ru:"исследовать водопад", ipa:"/ɪkˈsplɔːr ə ˈwɔːtərfɔːl/"},
+  {verb:"explore", noun:"the sky", ru:"исследовать небо", ipa:"/ɪkˈsplɔːr ðə skaɪ/"},
+  {verb:"explore", noun:"a forest", ru:"исследовать лес", ipa:"/ɪkˈsplɔːr ə ˈfɒrɪst/"},
+  {verb:"explore", noun:"a cave", ru:"исследовать пещеру", ipa:"/ɪkˈsplɔːr ə keɪv/"}
+];
+const sentenceBank = [
+  "Next summer we plan to climb a mountain in the Alps.",
+  "Only experienced guides can climb a volcano safely.",
+  "The boy loves to climb a tree in his garden.",
+  "We decided to climb a hill before sunset.",
+  "It took the sailors three months to cross an ocean.",
+  "The caravan had to cross a desert without water.",
+  "They used an old ship to cross a sea.",
+  "The shortest way home is to cross a field.",
+  "I like to walk along a river in the evening.",
+  "We spent the morning walking around a lake.",
+  "Please walk around the grass, not across it.",
+  "The tourists wanted to explore a waterfall nearby.",
+  "Pilots explore the sky every single day.",
+  "Children love to explore a forest full of secrets.",
+  "Scientists explore a cave to find ancient paintings."
+];
+const combined = vocab.map((v,i)=>({...v, sentence: sentenceBank[i]}));
+
+const rephraseData = [
+  {prompt:"We went up the mountain slowly.", keywords:["climb","mountain"], answer:"We climbed the mountain slowly."},
+  {prompt:"They got across the desert on foot.", keywords:["cross","desert"], answer:"They crossed the desert on foot."},
+  {prompt:"He went up the tree to get the cat.", keywords:["climb","tree"], answer:"He climbed the tree to get the cat."},
+  {prompt:"We travelled through the field to reach the farm.", keywords:["cross","field"], answer:"We crossed the field to reach the farm."},
+  {prompt:"The ship travelled over the ocean for weeks.", keywords:["cross","ocean"], answer:"The ship crossed the ocean for weeks."},
+  {prompt:"We went for a walk beside the river.", keywords:["walk","along","river"], answer:"We walked along the river."},
+  {prompt:"They had a look around the cave with torches.", keywords:["explore","cave"], answer:"They explored the cave with torches."},
+  {prompt:"We went up the hill to see the view.", keywords:["climb","hill"], answer:"We climbed the hill to see the view."},
+  {prompt:"Tourists like to have a look around the forest.", keywords:["explore","forest"], answer:"Tourists like to explore the forest."},
+  {prompt:"The boat went over the sea at night.", keywords:["cross","sea"], answer:"The boat crossed the sea at night."}
+];
+
+const ex7Prompts = [
+  "I would really love to climb ______ one day because ______.",
+  "If I had to cross ______, I would feel ______.",
+  "The most interesting place to explore is ______ because ______.",
+  "Walking along ______ always makes me think of ______.",
+  "I once tried to walk around ______ and ______.",
+  "My dream is to explore ______ before I turn ______.",
+  "Crossing ______ would be scary because ______.",
+  "I think climbing ______ is harder than climbing ______ because ______.",
+  "If I explored ______, I would bring ______ with me.",
+  "The best way to cross ______ is ______."
+];
+
+const ex8Base = ["cross a desert","explore a cave","walk along a river","climb a hill","walk around a lake",
+  "cross a sea","explore a forest","climb a tree","cross a field","explore a waterfall"];
+
+/* ---------- HELPERS ---------- */
+function shuffle(arr){ const a=[...arr]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a; }
+function pick(arr,n){ return shuffle(arr).slice(0,n); }
+function normalize(s){ return (s||"").toLowerCase().trim().replace(/[.,!?;:'"]/g,"").replace(/\s+/g," "); }
+function cap(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
+
+/* ---------- PROBLEM WORDS ---------- */
+let problemWords = {};
+function addProblem(en, ru){
+  if(!en) return;
+  if(!problemWords[en]) problemWords[en] = {ru: ru || "", count:0};
+  problemWords[en].count++;
+  renderProblemWords();
+}
+function renderProblemWords(){
+  const tbody = document.querySelector('#problemTable tbody');
+  const emptyMsg = document.getElementById('problemEmpty');
+  const entries = Object.entries(problemWords).sort((a,b)=>b[1].count-a[1].count);
+  if(entries.length===0){ tbody.innerHTML=''; emptyMsg.style.display='block'; return; }
+  emptyMsg.style.display='none';
+  tbody.innerHTML = entries.map(([en,data])=>
+    `<tr><td>${en}${data.ru? '<br><span style="color:var(--ink-soft);font-size:.8em;">'+data.ru+'</span>':''}</td><td>${data.count}</td></tr>`
+  ).join('');
+}
+
+/* ---------- AUDIO ---------- */
+let chosenVoice = null;
+function loadVoices(){
+  if(!('speechSynthesis' in window)) return;
+  const voices = speechSynthesis.getVoices();
+  if(voices.length){
+    chosenVoice = voices.find(v=>v.name==='Google US English')
+      || voices.find(v=>v.lang==='en-US' && /Google/i.test(v.name))
+      || voices.find(v=>v.lang==='en-US')
+      || voices[0];
+  }
+}
+if('speechSynthesis' in window){
+  loadVoices();
+  speechSynthesis.onvoiceschanged = loadVoices;
+}
+function speak(text){
+  if(!('speechSynthesis' in window)){ alert('Ваш браузер не поддерживает озвучивание речи.'); return; }
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang='en-US'; u.rate=0.95;
+  if(chosenVoice) u.voice=chosenVoice;
+  speechSynthesis.speak(u);
+}
+function speakSeq(list, idx=0){
+  if(idx>=list.length) return;
+  const u = new SpeechSynthesisUtterance(list[idx]);
+  u.lang='en-US'; u.rate=0.95;
+  if(chosenVoice) u.voice=chosenVoice;
+  u.onend = ()=>speakSeq(list, idx+1);
+  speechSynthesis.speak(u);
+}
+document.getElementById('playAllBtn').addEventListener('click', ()=>{
+  if(!('speechSynthesis' in window)){ alert('Ваш браузер не поддерживает озвучивание речи.'); return; }
+  speechSynthesis.cancel();
+  speakSeq(vocab.map(v=>v.verb+' '+v.noun));
+});
+document.getElementById('testAudioBtn').addEventListener('click', ()=>{
+  const status = document.getElementById('audioStatus');
+  if(!('speechSynthesis' in window)){ status.textContent='Статус: ❌ speechSynthesis не поддерживается'; return; }
+  status.textContent='Статус: воспроизведение…';
+  const u = new SpeechSynthesisUtterance('Audio is working correctly.');
+  u.lang='en-US';
+  if(chosenVoice) u.voice=chosenVoice;
+  u.onend = ()=>{ status.textContent='Статус: ✅ звук работает ('+(chosenVoice?chosenVoice.name:'голос по умолчанию')+')'; };
+  u.onerror = ()=>{ status.textContent='Статус: ❌ ошибка воспроизведения'; };
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+});
+
+/* ---------- COPY ---------- */
+function fallbackCopy(text, cb){
+  const ta=document.createElement('textarea');
+  ta.value=text; ta.style.position='fixed'; ta.style.left='-9999px';
+  document.body.appendChild(ta); ta.focus(); ta.select();
+  try{ document.execCommand('copy'); cb(); }
+  catch(e){ alert('Не удалось скопировать автоматически. Выделите текст вручную.'); }
+  document.body.removeChild(ta);
+}
+function copyText(text, btn){
+  const old = btn.textContent;
+  function done(){ btn.textContent='Скопировано ✓'; setTimeout(()=>btn.textContent=old,1600); }
+  if(navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(text).then(done).catch(()=>fallbackCopy(text,done));
+  } else {
+    fallbackCopy(text,done);
+  }
+}
+
+/* ---------- GENERIC RENDERERS (fill-in) ---------- */
+function renderFillExercise(containerId, data, opts){
+  const container = document.getElementById(containerId);
+  container.innerHTML = data.map((item,i)=>{
+    const prompt = opts.promptFn(item,i);
+    const listenBtn = opts.showListenBtn
+      ? `<button class="btn-listen" type="button" data-i="${i}">🔊</button>` : '';
+    return `<div class="qrow" data-idx="${i}">
+      <span class="qnum">${i+1}.</span>
+      <span class="qprompt">${prompt}</span>${listenBtn}
+      <input type="text" class="qinput" autocomplete="off" placeholder="напиши ответ...">
+      <span class="qfeedback"></span>
+    </div>`;
+  }).join('');
+  if(opts.showListenBtn){
+    container.querySelectorAll('.btn-listen').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const i = +btn.dataset.i;
+        speak(opts.listenTextFn(data[i], i));
+      });
+    });
+  }
+}
+function checkFillExercise(containerId, data, answerFn, ruFn, summaryId){
+  const container = document.getElementById(containerId);
+  const rows = container.querySelectorAll('.qrow');
+  let correctCount = 0;
+  rows.forEach((row,i)=>{
+    const input = row.querySelector('.qinput');
+    const feedback = row.querySelector('.qfeedback');
+    const correctAns = answerFn(data[i], i);
+    if(normalize(input.value) === normalize(correctAns)){
+      row.classList.remove('wrong'); row.classList.add('correct');
+      feedback.textContent = '✓ верно';
+      correctCount++;
+    } else {
+      row.classList.remove('correct'); row.classList.add('wrong');
+      feedback.textContent = '✗ правильный ответ: ' + correctAns;
+      const phraseKey = data[i].verb ? (data[i].verb+' '+data[i].noun) : correctAns;
+      addProblem(phraseKey, ruFn ? ruFn(data[i]) : '');
+    }
+  });
+  document.getElementById(summaryId).textContent = `Результат: ${correctCount} из ${rows.length}`;
+}
+function showFillAnswers(containerId, data, answerFn){
+  const container = document.getElementById(containerId);
+  const rows = container.querySelectorAll('.qrow');
+  rows.forEach((row,i)=>{
+    const input = row.querySelector('.qinput');
+    input.value = answerFn(data[i], i);
+    row.classList.remove('wrong','correct'); row.classList.add('shown');
+    row.querySelector('.qfeedback').textContent = '(ответ показан)';
+  });
+}
+
+/* ---------- GENERIC RENDERERS (select) ---------- */
+function renderSelectExercise(containerId, data, promptFn, optionsList){
+  const container = document.getElementById(containerId);
+  container.innerHTML = data.map((item,i)=>{
+    const opts = optionsList.map(o=>`<option value="${o}">${o}</option>`).join('');
+    return `<div class="qrow" data-idx="${i}">
+      <span class="qnum">${i+1}.</span>
+      <span class="qprompt">${promptFn(item,i)}</span>
+      <select class="qselect"><option value="">— выбери —</option>${opts}</select>
+      <span class="qfeedback"></span>
+    </div>`;
+  }).join('');
+}
+function checkSelectExercise(containerId, data, correctFn, ruFn, summaryId){
+  const container = document.getElementById(containerId);
+  const rows = container.querySelectorAll('.qrow');
+  let correctCount = 0;
+  rows.forEach((row,i)=>{
+    const select = row.querySelector('.qselect');
+    const feedback = row.querySelector('.qfeedback');
+    const correctAns = correctFn(data[i], i);
+    if(normalize(select.value) === normalize(correctAns)){
+      row.classList.remove('wrong'); row.classList.add('correct');
+      feedback.textContent = '✓ верно';
+      correctCount++;
+    } else {
+      row.classList.remove('correct'); row.classList.add('wrong');
+      feedback.textContent = '✗ правильный ответ: ' + correctAns;
+      addProblem(data[i].verb+' '+data[i].noun, ruFn ? ruFn(data[i]) : '');
+    }
+  });
+  document.getElementById(summaryId).textContent = `Результат: ${correctCount} из ${rows.length}`;
+}
+function showSelectAnswers(containerId, data, correctFn){
+  const container = document.getElementById(containerId);
+  const rows = container.querySelectorAll('.qrow');
+  rows.forEach((row,i)=>{
+    row.querySelector('.qselect').value = correctFn(data[i], i);
+    row.classList.remove('wrong','correct'); row.classList.add('shown');
+    row.querySelector('.qfeedback').textContent = '(ответ показан)';
+  });
+}
+
+/* ---------- REPHRASE (keyword check) ---------- */
+function renderRephrase(containerId, data){
+  const container = document.getElementById(containerId);
+  container.innerHTML = data.map((item,i)=>`
+    <div class="qrow" data-idx="${i}">
+      <span class="qnum">${i+1}.</span>
+      <span class="qprompt">${item.prompt}</span>
+      <input type="text" class="qinput" autocomplete="off" placeholder="перефразируй...">
+      <span class="qfeedback"></span>
+    </div>`).join('');
+}
+function checkRephrase(containerId, data, summaryId){
+  const container = document.getElementById(containerId);
+  const rows = container.querySelectorAll('.qrow');
+  let correctCount = 0;
+  rows.forEach((row,i)=>{
+    const input = row.querySelector('.qinput');
+    const feedback = row.querySelector('.qfeedback');
+    const userNorm = normalize(input.value);
+    const ok = userNorm.length>0 && data[i].keywords.every(k=>userNorm.includes(k));
+    if(ok){
+      row.classList.remove('wrong'); row.classList.add('correct');
+      feedback.textContent = '✓ верно';
+      correctCount++;
+    } else {
+      row.classList.remove('correct'); row.classList.add('wrong');
+      feedback.textContent = '✗ пример ответа: ' + data[i].answer;
+      addProblem(data[i].keywords.join(' '), '');
+    }
+  });
+  document.getElementById(summaryId).textContent = `Результат: ${correctCount} из ${rows.length}`;
+}
+function showRephraseAnswers(containerId, data){
+  const container = document.getElementById(containerId);
+  const rows = container.querySelectorAll('.qrow');
+  rows.forEach((row,i)=>{
+    row.querySelector('.qinput').value = data[i].answer;
+    row.classList.remove('wrong','correct'); row.classList.add('shown');
+    row.querySelector('.qfeedback').textContent = '(ответ показан)';
+  });
+}
+
+/* ---------- OPEN-ENDED (textarea + copy) ---------- */
+function renderOpenExercise(containerId, prompts){
+  const container = document.getElementById(containerId);
+  container.innerHTML = prompts.map((p,i)=>`
+    <div class="qrow" data-idx="${i}" style="align-items:flex-start;">
+      <span class="qnum">${i+1}.</span>
+      <span class="qprompt" style="flex-basis:100%;">${p}</span>
+      <textarea class="qtextarea" placeholder="напиши свой вариант..."></textarea>
+    </div>`).join('');
+}
+function copyOpenExercise(containerId, prompts, btnEvent){
+  const container = document.getElementById(containerId);
+  const areas = container.querySelectorAll('.qtextarea');
+  const lines = prompts.map((p,i)=>`${i+1}. ${p}\n→ ${areas[i].value.trim()}`);
+  copyText(lines.join('\n\n'), btnEvent.target);
+}
+function renderDrillExercise(containerId, baseList){
+  const container = document.getElementById(containerId);
+  container.innerHTML = baseList.map((b,i)=>`
+    <div class="qrow drill-row" data-idx="${i}" style="align-items:flex-start;">
+      <span class="qnum">${i+1}.</span>
+      <div style="flex:1;">
+        <span class="base">${b}</span>
+        <textarea class="qtextarea" placeholder="climb a snowy mountain alone ..."></textarea>
+      </div>
+    </div>`).join('');
+}
+function copyDrillExercise(containerId, baseList, btnEvent){
+  const container = document.getElementById(containerId);
+  const areas = container.querySelectorAll('.qtextarea');
+  const lines = baseList.map((b,i)=>`${i+1}. ${b} → ${areas[i].value.trim()}`);
+  copyText(lines.join('\n'), btnEvent.target);
+}
+
+/* ---------- INIT DATA PER EXERCISE ---------- */
+let ex1Data, ex2Data, ex3Data, ex4Data, ex5Data, ex6Data, ex7Data;
+
+function init(){
+  // warm-up list (fixed order)
+  const warmupList = document.getElementById('warmupList');
+  warmupList.innerHTML = vocab.map((v,i)=>`
+    <div class="warmup-row">
+      <span class="wnum">${i+1}.</span>
+      <span class="wen"><button class="btn-listen" type="button" data-w="${i}">🔊</button> ${cap(v.verb)} ${v.noun}</span>
+      <span class="wipa">${v.ipa}</span>
+      <span class="wru">${v.ru}</span>
+    </div>`).join('');
+  warmupList.querySelectorAll('.btn-listen').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const v = vocab[+btn.dataset.w];
+      speak(v.verb+' '+v.noun);
+    });
+  });
+
+  // Ex1: translate RU -> EN
+  ex1Data = pick(vocab, 10);
+  renderFillExercise('ex1', ex1Data, { promptFn:(item)=>item.ru, showListenBtn:false });
+
+  // Ex2: dictation of phrase
+  ex2Data = pick(vocab, 10);
+  renderFillExercise('ex2', ex2Data, {
+    promptFn: ()=> '🎧 напиши то, что услышишь',
+    showListenBtn: true,
+    listenTextFn: (item)=> item.verb+' '+item.noun
+  });
+
+  // Ex3: dictation of full sentence
+  ex3Data = pick(combined, 10);
+  renderFillExercise('ex3', ex3Data, {
+    promptFn: ()=> '🎧 напиши предложение',
+    showListenBtn: true,
+    listenTextFn: (item)=> item.sentence
+  });
+
+  // Ex4: collocation / match halves (select noun for a verb)
+  ex4Data = pick(vocab, 10);
+  const ex4Nouns = shuffle(ex4Data.map(d=>d.noun));
+  renderSelectExercise('ex4', ex4Data, (item)=> cap(item.verb) + ' ...', ex4Nouns);
+
+  // Ex5: categorise by verb
+  ex5Data = pick(vocab, 10);
+  const verbOptions = ['climb','cross','walk along','walk around','explore'];
+  renderSelectExercise('ex5', ex5Data, (item)=> cap(item.noun), verbOptions);
+
+  // Ex6: rephrase
+  ex6Data = shuffle(rephraseData);
+  renderRephrase('ex6', ex6Data);
+
+  // Ex7: open ended
+  ex7Data = shuffle(ex7Prompts);
+  renderOpenExercise('ex7', ex7Data);
+
+  // Ex8: drilling
+  const ex8List = shuffle(ex8Base);
+  renderDrillExercise('ex8', ex8List);
+  window.__ex8List = ex8List;
+}
+
+/* ---------- CHECK / SHOW FUNCTIONS ---------- */
+function checkEx1(){ checkFillExercise('ex1', ex1Data, (item)=>item.verb+' '+item.noun, (item)=>item.ru, 'ex1summary'); }
+function showEx1(){ showFillAnswers('ex1', ex1Data, (item)=>item.verb+' '+item.noun); }
+
+function checkEx2(){ checkFillExercise('ex2', ex2Data, (item)=>item.verb+' '+item.noun, (item)=>item.ru, 'ex2summary'); }
+function showEx2(){ showFillAnswers('ex2', ex2Data, (item)=>item.verb+' '+item.noun); }
+
+function checkEx3(){ checkFillExercise('ex3', ex3Data, (item)=>item.sentence, (item)=>item.ru, 'ex3summary'); }
+function showEx3(){ showFillAnswers('ex3', ex3Data, (item)=>item.sentence); }
+
+function checkEx4(){ checkSelectExercise('ex4', ex4Data, (item)=>item.noun, (item)=>item.ru, 'ex4summary'); }
+function showEx4(){ showSelectAnswers('ex4', ex4Data, (item)=>item.noun); }
+
+function checkEx5(){ checkSelectExercise('ex5', ex5Data, (item)=>item.verb, (item)=>item.ru, 'ex5summary'); }
+function showEx5(){ showSelectAnswers('ex5', ex5Data, (item)=>item.verb); }
+
+function checkEx6(){ checkRephrase('ex6', ex6Data, 'ex6summary'); }
+function showEx6(){ showRephraseAnswers('ex6', ex6Data); }
+
+function copyEx7(e){ copyOpenExercise('ex7', ex7Data, e); }
+function copyEx8(e){ copyDrillExercise('ex8', window.__ex8List, e); }
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
