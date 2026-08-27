@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Суеверия и приметы — практика лексики</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#12142B;
+    --bg2:#0D0E20;
+    --panel:#1B1E3D;
+    --panel2:#232752;
+    --gold:#E8B84B;
+    --gold-dim: rgba(232,184,74,0.25);
+    --green:#5FA777;
+    --red:#E1626B;
+    --text:#F1F0FA;
+    --muted:#A7A9D0;
+    --mono: 'IBM Plex Mono', monospace;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(1px 1px at 10% 15%, rgba(255,255,255,0.5) 50%, transparent 51%),
+      radial-gradient(1px 1px at 80% 8%, rgba(255,255,255,0.4) 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 60% 25%, rgba(255,255,255,0.5) 50%, transparent 51%),
+      radial-gradient(1px 1px at 30% 40%, rgba(255,255,255,0.35) 50%, transparent 51%),
+      radial-gradient(1px 1px at 90% 60%, rgba(255,255,255,0.3) 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 15% 70%, rgba(255,255,255,0.4) 50%, transparent 51%),
+      radial-gradient(1px 1px at 45% 85%, rgba(255,255,255,0.3) 50%, transparent 51%),
+      linear-gradient(160deg, var(--bg) 0%, var(--bg2) 100%);
+    background-attachment: fixed;
+    color:var(--text);
+    font-family:'Inter', sans-serif;
+    line-height:1.5;
+    min-height:100vh;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:32px 20px 80px;}
+  header.top{text-align:center;margin-bottom:36px;}
+  header.top .eyebrow{
+    font-family:var(--mono);
+    letter-spacing:.2em;
+    text-transform:uppercase;
+    color:var(--gold);
+    font-size:12px;
+    margin-bottom:10px;
+  }
+  header.top h1{
+    font-family:'Playfair Display', serif;
+    font-style:italic;
+    font-weight:700;
+    font-size:clamp(28px,4vw,44px);
+    margin:0 0 10px;
+    background:linear-gradient(90deg,#fff,var(--gold));
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+  header.top p{color:var(--muted);max-width:640px;margin:0 auto;font-size:15px;}
+
+  .vocab-card{
+    background:var(--panel);
+    border:1px solid var(--gold-dim);
+    border-radius:16px;
+    padding:24px 24px 20px;
+    margin-bottom:28px;
+  }
+  .vocab-card h2{
+    font-family:'Playfair Display', serif;
+    font-size:20px;
+    margin:0 0 4px;
+    color:var(--gold);
+  }
+  .vocab-card .hint{color:var(--muted);font-size:13px;margin:0 0 16px;}
+  .vocab-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(270px,1fr));
+    gap:10px;
+  }
+  .vocab-item{
+    background:var(--panel2);
+    border-radius:10px;
+    padding:10px 12px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    border:1px solid transparent;
+    transition:border-color .15s;
+  }
+  .vocab-item:hover{border-color:var(--gold-dim);}
+  .btn-speak{
+    flex:0 0 auto;
+    width:34px;height:34px;
+    border-radius:50%;
+    border:1px solid var(--gold-dim);
+    background:rgba(232,184,74,0.1);
+    color:var(--gold);
+    font-size:14px;
+    cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .btn-speak:hover{background:rgba(232,184,74,0.25);}
+  .vocab-text{min-width:0;}
+  .vocab-text .en{font-weight:600;font-size:14px;}
+  .vocab-text .ipa{font-family:var(--mono);font-size:11.5px;color:var(--gold);opacity:.85;}
+  .vocab-text .ru{font-size:12.5px;color:var(--muted);}
+
+  .layout{display:grid;grid-template-columns:1fr 260px;gap:28px;align-items:start;}
+  @media (max-width:880px){ .layout{grid-template-columns:1fr;} .sidebar{position:static !important;} }
+
+  .sidebar{
+    position:sticky;top:20px;
+    background:var(--panel);
+    border:1px solid rgba(225,98,107,0.3);
+    border-radius:16px;
+    padding:18px;
+  }
+  .sidebar h3{
+    font-family:'Playfair Display', serif;
+    color:var(--red);
+    font-size:16px;margin:0 0 4px;
+  }
+  .sidebar .sub{color:var(--muted);font-size:12px;margin:0 0 12px;}
+  #problemList{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;max-height:60vh;overflow:auto;}
+  #problemList li{
+    display:flex;justify-content:space-between;gap:8px;
+    background:var(--panel2);
+    border-radius:8px;
+    padding:7px 10px;
+    font-size:12.5px;
+  }
+  #problemList li .count{color:var(--red);font-weight:700;font-family:var(--mono);}
+  #problemList li.empty{justify-content:center;color:var(--muted);font-style:italic;}
+
+  section.exercise{
+    background:var(--panel);
+    border:1px solid rgba(255,255,255,0.06);
+    border-radius:16px;
+    padding:24px;
+    margin-bottom:26px;
+  }
+  section.exercise .exhead{display:flex;align-items:baseline;gap:10px;margin-bottom:4px;flex-wrap:wrap;}
+  section.exercise .exnum{
+    font-family:var(--mono);color:var(--gold);font-size:13px;letter-spacing:.1em;
+  }
+  section.exercise h2{
+    font-family:'Playfair Display', serif;
+    font-size:21px;margin:0;
+  }
+  section.exercise .instr{color:var(--muted);font-size:13.5px;margin:4px 0 18px;}
+
+  .qrow{
+    display:grid;
+    grid-template-columns:28px 1fr 220px;
+    gap:12px;
+    align-items:center;
+    padding:10px 0;
+    border-bottom:1px solid rgba(255,255,255,0.06);
+  }
+  .qrow:last-of-type{border-bottom:none;}
+  .qnum{color:var(--gold);font-family:var(--mono);font-size:13px;}
+  .qprompt{font-size:14.5px;}
+  .qprompt .mask{font-family:var(--mono);letter-spacing:.03em;font-size:15px;}
+  .qprompt .ru-hint{color:var(--muted);font-size:12.5px;margin-top:2px;}
+  .qprompt .ru{font-weight:500;}
+  .qprompt .def{color:var(--text);font-style:italic;}
+  .qinput{
+    background:var(--bg2);
+    border:1px solid rgba(255,255,255,0.15);
+    color:var(--text);
+    border-radius:8px;
+    padding:8px 10px;
+    font-size:14px;
+    font-family:'Inter',sans-serif;
+    width:100%;
+  }
+  .qinput.short{width:52px;text-align:center;text-transform:lowercase;}
+  .qinput:focus{outline:2px solid var(--gold);border-color:transparent;}
+  .qinput.correct{border-color:var(--green);box-shadow:0 0 0 1px var(--green) inset;}
+  .qinput.wrong{border-color:var(--red);box-shadow:0 0 0 1px var(--red) inset;}
+  textarea.qinput{resize:vertical;font-family:'Inter',sans-serif;}
+  .qfeedback{grid-column:1 / -1;font-size:12.5px;margin-top:-4px;}
+  .qfeedback.ok{color:var(--green);}
+  .qfeedback.bad{color:var(--red);}
+  .qfeedback.shown{color:var(--gold);}
+
+  .openrow{grid-template-columns:28px 1fr;}
+  .openrow .qinput.open{grid-column:2;}
+  .openrow .btn-mini{grid-column:2;justify-self:start;margin-top:6px;}
+
+  .halves-wrap{display:grid;grid-template-columns:1fr 1fr;gap:24px;}
+  @media (max-width:640px){.halves-wrap{grid-template-columns:1fr;}}
+  .half-right{
+    background:var(--panel2);
+    border-radius:8px;
+    padding:9px 12px;
+    margin-bottom:8px;
+    font-size:14px;
+  }
+  .halfrow{grid-template-columns:28px 1fr 52px;}
+
+  .controls{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px;align-items:center;}
+  button.btn{
+    border:none;border-radius:9px;padding:9px 16px;font-size:13.5px;font-weight:600;
+    cursor:pointer;font-family:'Inter',sans-serif;transition:transform .1s, opacity .1s;
+  }
+  button.btn:active{transform:scale(0.97);}
+  .btn-primary{background:var(--gold);color:#1a1a1a;}
+  .btn-primary:hover{opacity:.9;}
+  .btn-secondary{background:var(--panel2);color:var(--text);border:1px solid rgba(255,255,255,0.15);}
+  .btn-secondary:hover{border-color:var(--gold-dim);}
+  .btn-ghost{background:transparent;color:var(--muted);text-decoration:underline;padding:9px 4px;}
+  .btn-mini{background:rgba(232,184,74,0.12);color:var(--gold);border:1px solid var(--gold-dim);border-radius:7px;padding:5px 10px;font-size:12px;cursor:pointer;}
+  .score{font-family:var(--mono);color:var(--gold);font-size:13.5px;margin-left:auto;}
+
+  footer{text-align:center;color:var(--muted);font-size:12px;margin-top:40px;}
+  footer a{color:var(--gold);}
+
+  @media (max-width:640px){
+    .qrow{grid-template-columns:22px 1fr;}
+    .qinput{grid-column:1 / -1;}
+    .halfrow{grid-template-columns:22px 1fr;}
+    .halfrow .qinput.short{grid-column:1/-1;width:100%;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="eyebrow">Vocabulary · Superstitions &amp; Luck</div>
+    <h1>Суеверия и приметы</h1>
+    <p>Повторите слова, послушайте произношение (голос <strong>Google US English</strong>, если доступен в браузере), а затем пропишите ответы руками в 8 заданиях ниже.</p>
+  </header>
+
+  <div class="vocab-card">
+    <h2>🔮 Слова для повторения</h2>
+    <p class="hint">Нажмите на 🔊, чтобы прослушать произношение фразы, прежде чем переходить к заданиям.</p>
+    <div class="vocab-grid" id="vocabGrid"></div>
+  </div>
+
+  <div class="layout">
+    <main>
+
+      <section class="exercise">
+        <div class="exhead"><span class="exnum">01</span><h2>Вставь пропущенные буквы</h2></div>
+        <p class="instr">Впишите слово или фразу полностью — часть букв уже подсказана, перевод на русский поможет вспомнить фразу.</p>
+        <div id="ex1-rows"></div>
+        <div class="controls">
+          <button class="btn btn-primary" onclick="checkExercise('ex1')">Проверить</button>
+          <button class="btn btn-secondary" onclick="revealAnswers('ex1')">Показать ответы</button>
+          <button class="btn btn-secondary" onclick="resetExercise('ex1')">Сбросить</button>
+          <button class="btn btn-ghost" id="ex1-copybtn" onclick="copyAnswers('ex1')">📋 Скопировать мои ответы</button>
+          <span class="score" id="ex1-score"></span>
+        </div>
+      </section>
+
+      <section class="exercise">
+        <div class="exhead"><span class="exnum">02</span><h2>Перевод: с русского на английский</h2></div>
+        <p class="instr">Переведите фразу на английский язык.</p>
+        <div id="ex2-rows"></div>
+        <div class="controls">
+          <button class="btn btn-primary" onclick="checkExercise('ex2')">Проверить</button>
+          <button class="btn btn-secondary" onclick="revealAnswers('ex2')">Показать ответы</button>
+          <button class="btn btn-secondary" onclick="resetExercise('ex2')">Сбросить</button>
+          <button class="btn btn-ghost" id="ex2-copybtn" onclick="copyAnswers('ex2')">📋 Скопировать мои ответы</button>
+          <span class="score" id="ex2-score"></span>
+        </div>
+      </section>
+
+      <section class="exercise">
+        <div class="exhead"><span class="exnum">03</span><h2>Пропиши слово на слух</h2></div>
+        <p class="instr">Нажмите 🔊, прослушайте фразу и запишите её по-английски так, как услышали.</p>
+        <div id="ex3-rows"></div>
+        <div class="controls">
+          <button class="btn btn-primary" onclick="checkExercise('ex3')">Проверить</button>
+          <button class="btn btn-secondary" onclick="revealAnswers('ex3')">Показать ответы</button>
+          <button class="btn btn-secondary" onclick="resetExercise('ex3')">Сбросить</button>
+          <button class="btn btn-ghost" id="ex3-copybtn" onclick="copyAnswers('ex3')">📋 Скопировать мои ответы</button>
+          <span class="score" id="ex3-score"></span>
+        </div>
+      </section>
+
+      <section class="exercise">
+        <div class="exhead"><span class="exnum">04</span><h2>Дефиниция</h2></div>
+        <p class="instr">Прочитайте определение на английском и напишите, какое слово/фразу оно описывает.</p>
+        <div id="ex4-rows"></div>
+        <div class="controls">
+          <button class="btn btn-primary" onclick="checkExercise('ex4')">Проверить</button>
+          <button class="btn btn-secondary" onclick="revealAnswers('ex4')">Показать ответы</button>
+          <button class="btn btn-secondary" onclick="resetExercise('ex4')">Сбросить</button>
+          <button class="btn btn-ghost" id="ex4-copybtn" onclick="copyAnswers('ex4')">📋 Скопировать мои ответы</button>
+          <span class="score" id="ex4-score"></span>
+        </div>
+      </section>
+
+      <section class="exercise">
+        <div class="exhead"><span class="exnum">05</span><h2>Сочетаемость слов</h2></div>
+        <p class="instr">Впишите одно недостающее слово, которое верно сочетается в устойчивом выражении.</p>
+        <div id="ex5-rows"></div>
+        <div class="controls">
+          <button class="btn btn-primary" onclick="checkExercise('ex5')">Проверить</button>
+          <button class="btn btn-secondary" onclick="revealAnswers('ex5')">Показать ответы</button>
+          <button class="btn btn-secondary" onclick="resetExercise('ex5')">Сбросить</button>
+          <button class="btn btn-ghost" id="ex5-copybtn" onclick="copyAnswers('ex5')">📋 Скопировать мои ответы</button>
+          <span class="score" id="ex5-score"></span>
+        </div>
+      </section>
+
+      <section class="exercise">
+        <div class="exhead"><span class="exnum">06</span><h2>Измени форму глагола</h2></div>
+        <p class="instr">Поставьте глагол в скобках в указанное время и впишите фразу целиком.</p>
+        <div id="ex6-rows"></div>
+        <div class="controls">
+          <button class="btn btn-primary" onclick="checkExercise('ex6')">Проверить</button>
+          <button class="btn btn-secondary" onclick="revealAnswers('ex6')">Показать ответы</button>
+          <button class="btn btn-secondary" onclick="resetExercise('ex6')">Сбросить</button>
+          <button class="btn btn-ghost" id="ex6-copybtn" onclick="copyAnswers('ex6')">📋 Скопировать мои ответы</button>
+          <span class="score" id="ex6-score"></span>
+        </div>
+      </section>
+
+      <section class="exercise">
+        <div class="exhead"><span class="exnum">07</span><h2>Соедини половинки выражений</h2></div>
+        <p class="instr">Слева — начало фразы, справа — окончания под буквами. Впишите нужную букву в поле напротив каждого номера.</p>
+        <div class="halves-wrap">
+          <div id="ex7-left"></div>
+          <div id="ex7-right"></div>
+        </div>
+        <div class="controls">
+          <button class="btn btn-primary" onclick="checkHalves()">Проверить</button>
+          <button class="btn btn-secondary" onclick="revealHalves()">Показать ответы</button>
+          <button class="btn btn-secondary" onclick="resetHalves()">Сбросить</button>
+          <button class="btn btn-ghost" onclick="copyHalves()">📋 Скопировать мои ответы</button>
+          <span class="score" id="ex7-score"></span>
+        </div>
+      </section>
+
+      <section class="exercise">
+        <div class="exhead"><span class="exnum">08</span><h2>Закончи предложения своими идеями</h2></div>
+        <p class="instr">Здесь нет единственно верного ответа — напишите то, что думаете сами. Кнопка «Пример» покажет один из возможных вариантов.</p>
+        <div id="ex8-rows"></div>
+        <div class="controls">
+          <button class="btn btn-secondary" onclick="resetOpen()">Сбросить</button>
+          <button class="btn btn-primary" id="ex8-copybtn" onclick="copyOpen()">📋 Скопировать все мои ответы</button>
+        </div>
+      </section>
+
+    </main>
+
+    <aside class="sidebar">
+      <h3>⚠ Проблемные слова</h3>
+      <p class="sub">Сюда попадают фразы, в которых была допущена ошибка хотя бы раз.</p>
+      <ul id="problemList"></ul>
+    </aside>
+  </div>
+
+  <footer>Голос озвучки: браузер попытается использовать «Google US English»; если такого голоса нет, будет выбран любой доступный голос en-US (лучше всего работает в Chrome).</footer>
+</div>
+
+<script>
+/* ================= DATA ================= */
+const vocab = [
+  {en:"break a mirror", ru:"разбить зеркало", ipa:"/breɪk ə ˈmɪrə/",
+   def:"to accidentally or deliberately smash a mirror, which some people believe causes bad luck"},
+  {en:"bring bad luck", ru:"приносить неудачу", ipa:"/brɪŋ bæd lʌk/", alt:["brings bad luck"],
+   def:"to cause misfortune to happen"},
+  {en:"bring good luck", ru:"приносить удачу", ipa:"/brɪŋ ɡʊd lʌk/", alt:["brings good luck"],
+   def:"to cause fortunate things to happen"},
+  {en:"be considered unlucky", ru:"считаться несчастливым / приносящим неудачу", ipa:"/bi kənˈsɪdəd ʌnˈlʌki/", alt:["is considered unlucky","considered unlucky"],
+   def:"to be generally believed by people to bring misfortune"},
+  {en:"an unlucky day", ru:"несчастливый день", ipa:"/ən ʌnˈlʌki deɪ/",
+   def:"a day when, according to superstition, bad things happen more easily"},
+  {en:"Friday the 13th", ru:"пятница, 13-е", ipa:"/ˌfraɪdeɪ ðə ˌθɜːˈtiːnθ/",
+   def:"a date that many Western cultures traditionally consider unlucky"},
+  {en:"protect yourself from bad luck", ru:"защититься от неудачи", ipa:"/prəˈtekt jəˈself frəm bæd lʌk/", alt:["protecting yourself from bad luck"],
+   def:"to do something so that misfortune does not affect you"},
+  {en:"make a wish", ru:"загадать желание", ipa:"/meɪk ə wɪʃ/", alt:["make a wish"],
+   def:"to silently hope for something special to happen"},
+  {en:"shooting star", ru:"падающая звезда", ipa:"/ˈʃuːtɪŋ stɑː/",
+   def:"a small piece of rock that burns brightly as it falls through the night sky"},
+  {en:"make a wish on a shooting star", ru:"загадать желание на падающую звезду", ipa:"/meɪk ə wɪʃ ɒn ə ˈʃuːtɪŋ stɑː/",
+   def:"to silently ask for something the moment you see a meteor cross the sky"},
+  {en:"come true", ru:"сбыться", ipa:"/kʌm truː/",
+   def:"to actually happen after being hoped for, wished for, or imagined"},
+  {en:"your palm itches", ru:"чешется ладонь", ipa:"/jɔː pɑːm ˈɪtʃɪz/",
+   def:"a superstition in which a tingling hand is said to mean money is coming"},
+  {en:"four-leaf clover", ru:"четырёхлистный клевер", ipa:"/ˌfɔː liːf ˈkləʊvə/",
+   def:"a rare plant with four leaflets instead of the usual three, believed to bring luck"},
+  {en:"be superstitious about", ru:"быть суеверным насчёт", ipa:"/bi ˌsuːpəˈstɪʃəs əˈbaʊt/", alt:["is superstitious about","superstitious about"],
+   def:"to believe that a particular object or action can influence events by supernatural means"},
+  {en:"superstition", ru:"суеверие", ipa:"/ˌsuːpəˈstɪʃən/",
+   def:"a widely held belief that isn't based on reason, often connected to luck"},
+];
+
+/* ================= HELPERS ================= */
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+function pickIdx(n){ return shuffle(vocab.map((_,i)=>i)).slice(0,n); }
+function normalize(s){
+  return (s||"").trim().toLowerCase().replace(/[.,!?;:'"’]/g,"").replace(/\s+/g," ");
+}
+function maskPhrase(phrase){
+  return phrase.split(" ").map(w=>{
+    if(w.length<=2) return w;
+    const chars = w.split("");
+    for(let i=1;i<chars.length-1;i++){ if(i%2===1) chars[i]="_"; }
+    return chars.join("");
+  }).join(" ");
+}
+
+/* ================= SPEECH ================= */
+let cachedVoices = [];
+function loadVoices(){ cachedVoices = window.speechSynthesis ? speechSynthesis.getVoices() : []; }
+if('speechSynthesis' in window){
+  loadVoices();
+  speechSynthesis.onvoiceschanged = loadVoices;
+}
+function speak(text){
+  if(!('speechSynthesis' in window)){
+    alert('Этот браузер не поддерживает озвучку. Попробуйте Chrome.');
+    return;
+  }
+  if(!cachedVoices.length) loadVoices();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-US';
+  u.rate = 0.85;
+  const preferred = cachedVoices.find(v => v.name === 'Google US English')
+                 || cachedVoices.find(v => v.lang === 'en-US');
+  if(preferred) u.voice = preferred;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+}
+
+/* ================= PROBLEM WORDS SIDEBAR ================= */
+const problemWords = new Map();
+function markProblem(label){
+  problemWords.set(label, (problemWords.get(label)||0)+1);
+  renderProblemSidebar();
+}
+function renderProblemSidebar(){
+  const el = document.getElementById('problemList');
+  if(problemWords.size===0){
+    el.innerHTML = '<li class="empty">Пока нет ошибок 🌟</li>';
+    return;
+  }
+  const arr = Array.from(problemWords.entries()).sort((a,b)=>b[1]-a[1]);
+  el.innerHTML = arr.map(([w,c])=>`<li><span>${w}</span><span class="count">×${c}</span></li>`).join('');
+}
+
+/* ================= VOCAB REVIEW RENDER ================= */
+function renderVocabReview(){
+  const grid = document.getElementById('vocabGrid');
+  grid.innerHTML = vocab.map(v => `
+    <div class="vocab-item">
+      <button class="btn-speak" data-text="${v.en}" onclick="speak(this.dataset.text)" title="Слушать">🔊</button>
+      <div class="vocab-text">
+        <div class="en">${v.en}</div>
+        <div class="ipa">${v.ipa}</div>
+        <div class="ru">${v.ru}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ================= GENERIC SIMPLE EXERCISE ENGINE ================= */
+const exercisesData = {};
+
+function renderExercise(exId, items){
+  exercisesData[exId] = items;
+  const container = document.getElementById(exId + '-rows');
+  container.innerHTML = items.map((it,i) => `
+    <div class="qrow">
+      <div class="qnum">${i+1}</div>
+      <div class="qprompt">${it.prompt}</div>
+      <input type="text" class="qinput" id="${exId}-input-${i}" autocomplete="off" spellcheck="false" placeholder="введите ответ">
+      <div class="qfeedback" id="${exId}-fb-${i}"></div>
+    </div>
+  `).join('');
+  document.getElementById(exId + '-score').textContent = '';
+}
+
+function answerVariants(it){
+  return Array.isArray(it.answer) ? it.answer : [it.answer];
+}
+
+function checkExercise(exId){
+  const items = exercisesData[exId];
+  let score = 0;
+  items.forEach((it,i)=>{
+    const inputEl = document.getElementById(`${exId}-input-${i}`);
+    const fb = document.getElementById(`${exId}-fb-${i}`);
+    const userVal = normalize(inputEl.value);
+    const variants = answerVariants(it).map(normalize);
+    const correct = userVal.length>0 && variants.includes(userVal);
+    if(correct){
+      score++;
+      inputEl.classList.add('correct'); inputEl.classList.remove('wrong');
+      fb.textContent = '✓ верно';
+      fb.className = 'qfeedback ok';
+    } else {
+      inputEl.classList.add('wrong'); inputEl.classList.remove('correct');
+      fb.textContent = `✗ верный ответ: ${answerVariants(it)[0]}`;
+      fb.className = 'qfeedback bad';
+      if(it.track) markProblem(it.track);
+    }
+  });
+  document.getElementById(exId + '-score').textContent = `Результат: ${score} / ${items.length}`;
+}
+
+function revealAnswers(exId){
+  const items = exercisesData[exId];
+  items.forEach((it,i)=>{
+    const inputEl = document.getElementById(`${exId}-input-${i}`);
+    inputEl.value = answerVariants(it)[0];
+    inputEl.classList.add('correct'); inputEl.classList.remove('wrong');
+    const fb = document.getElementById(`${exId}-fb-${i}`);
+    fb.textContent = '(ответ показан)';
+    fb.className = 'qfeedback shown';
+  });
+  document.getElementById(exId + '-score').textContent = '';
+}
+
+function resetExercise(exId){
+  const items = exercisesData[exId];
+  items.forEach((it,i)=>{
+    const inputEl = document.getElementById(`${exId}-input-${i}`);
+    inputEl.value = '';
+    inputEl.classList.remove('correct','wrong');
+    document.getElementById(`${exId}-fb-${i}`).textContent = '';
+  });
+  document.getElementById(exId + '-score').textContent = '';
+}
+
+function copyAnswers(exId){
+  const items = exercisesData[exId];
+  const lines = items.map((it,i)=>`${i+1}. ${document.getElementById(`${exId}-input-${i}`).value}`);
+  const text = lines.join('\n');
+  copyToClipboard(text, document.getElementById(exId + '-copybtn'));
+}
+
+function copyToClipboard(text, btn){
+  const done = ()=>{
+    if(btn){
+      const old = btn.textContent;
+      btn.textContent = 'Скопировано ✓';
+      setTimeout(()=>{ btn.textContent = old; }, 1500);
+    }
+  };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(done).catch(()=>fallbackCopy(text, done));
+  } else {
+    fallbackCopy(text, done);
+  }
+}
+function fallbackCopy(text, done){
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.left = '-9999px';
+  document.body.appendChild(ta);
+  ta.select();
+  try{ document.execCommand('copy'); done(); }
+  catch(e){ alert('Не удалось скопировать автоматически. Вот ваши ответы:\n\n'+text); }
+  document.body.removeChild(ta);
+}
+
+/* ================= EXERCISE 1: FILL IN MISSING LETTERS ================= */
+function buildEx1(){
+  const idx = pickIdx(10);
+  return idx.map(i=>{
+    const v = vocab[i];
+    return {
+      prompt: `<div class="mask">${maskPhrase(v.en)}</div><div class="ru-hint">${v.ru}</div>`,
+      answer: [v.en, ...(v.alt||[])],
+      track: v.en
+    };
+  });
+}
+
+/* ================= EXERCISE 2: RU -> EN TRANSLATION ================= */
+function buildEx2(){
+  const idx = pickIdx(10);
+  return idx.map(i=>{
+    const v = vocab[i];
+    return {
+      prompt: `<div class="ru">${v.ru}</div>`,
+      answer: [v.en, ...(v.alt||[])],
+      track: v.en
+    };
+  });
+}
+
+/* ================= EXERCISE 3: DICTATION ================= */
+function buildEx3(){
+  const idx = pickIdx(10);
+  return idx.map(i=>{
+    const v = vocab[i];
+    return {
+      prompt: `<button class="btn-speak" data-text="${v.en}" onclick="speak(this.dataset.text)" title="Слушать">🔊 Слушать</button>`,
+      answer: [v.en, ...(v.alt||[])],
+      track: v.en
+    };
+  });
+}
+
+/* ================= EXERCISE 4: DEFINITIONS ================= */
+function buildEx4(){
+  const idx = pickIdx(10);
+  return idx.map(i=>{
+    const v = vocab[i];
+    return {
+      prompt: `<div class="def">"${v.def}"</div>`,
+      answer: [v.en, ...(v.alt||[])],
+      track: v.en
+    };
+  });
+}
+
+/* ================= EXERCISE 5: COLLOCATIONS ================= */
+const collocationBank = [
+  {sentence:'Break a ______.', answer:'mirror', track:'break a mirror'},
+  {sentence:'Black cats bring bad ______.', answer:'luck', track:'bring bad luck'},
+  {sentence:'An ______ day.', answer:'unlucky', track:'an unlucky day'},
+  {sentence:'______ yourself from bad luck.', answer:'protect', track:'protect yourself from bad luck'},
+  {sentence:'Make a ______ on a shooting star.', answer:'wish', track:'make a wish'},
+  {sentence:'A ______ star crossed the sky.', answer:'shooting', track:'shooting star'},
+  {sentence:'A four-leaf ______ is a symbol of luck.', answer:'clover', track:'four-leaf clover'},
+  {sentence:'I am ______ about walking under ladders.', answer:'superstitious', track:'be superstitious about'},
+  {sentence:'My palm ______ — maybe money is coming!', answer:'itches', track:'your palm itches'},
+  {sentence:'Friday the ______ is considered unlucky.', answer:'13th', track:'Friday the 13th'},
+];
+function buildEx5(){
+  const chosen = shuffle(collocationBank);
+  return chosen.map(c=>({
+    prompt: `<div class="ru">${c.sentence}</div>`,
+    answer: c.answer,
+    track: c.track
+  }));
+}
+
+/* ================= EXERCISE 6: VERB TENSES ================= */
+const tenseBank = [
+  {sentence:'Yesterday, he ______ (break) a mirror by accident.', tense:'Past Simple', answer:'broke a mirror', track:'break a mirror'},
+  {sentence:'Many people believe black cats ______ (bring) bad luck.', tense:'Present Simple', answer:'bring bad luck', track:'bring bad luck'},
+  {sentence:'Friday the 13th ______ (be considered) unlucky by many cultures.', tense:'Present Simple Passive', answer:'is considered', track:'be considered unlucky'},
+  {sentence:'She ______ (already / make) a wish before the star disappeared.', tense:'Present Perfect', answer:'has already made a wish', track:'make a wish'},
+  {sentence:'We ______ (protect) ourselves from bad luck by carrying charms.', tense:'Present Simple', answer:'protect ourselves from bad luck', track:'protect yourself from bad luck'},
+  {sentence:'Look! A star ______ (shoot) across the sky right now!', tense:'Present Continuous', answer:'is shooting', track:'shooting star'},
+  {sentence:'I ______ (make) a wish on a shooting star last night.', tense:'Past Simple', answer:'made a wish on a shooting star', track:'make a wish on a shooting star'},
+  {sentence:'Her dream finally ______ (come) true.', tense:'Past Simple', answer:'came true', track:'come true'},
+  {sentence:'My palm ______ (itch) all morning.', tense:'Past Simple', answer:'itched', track:'your palm itches'},
+  {sentence:'He ______ (be superstitious) about walking under ladders since childhood.', tense:'Present Perfect', answer:'has been superstitious', track:'be superstitious about'},
+];
+function buildEx6(){
+  const chosen = shuffle(tenseBank);
+  return chosen.map(t=>({
+    prompt: `<div class="ru">${t.sentence}</div><div class="ru-hint">Время: ${t.tense}</div>`,
+    answer: t.answer,
+    track: t.track
+  }));
+}
+
+/* ================= EXERCISE 7: MATCH THE HALVES ================= */
+const halvesBank = [
+  {left:'break', right:'a mirror', track:'break a mirror'},
+  {left:'bring', right:'bad luck', track:'bring bad luck'},
+  {left:'an unlucky', right:'day', track:'an unlucky day'},
+  {left:'protect yourself', right:'from bad luck', track:'protect yourself from bad luck'},
+  {left:'make', right:'a wish', track:'make a wish'},
+  {left:'shooting', right:'star', track:'shooting star'},
+  {left:'come', right:'true', track:'come true'},
+  {left:'four-leaf', right:'clover', track:'four-leaf clover'},
+  {left:'be superstitious', right:'about something', track:'be superstitious about'},
+  {left:'your palm', right:'itches', track:'your palm itches'},
+];
+let ex7map = [];
+function renderHalves(){
+  const leftOrder = shuffle(halvesBank.map((_,i)=>i));
+  const rightOrder = shuffle(halvesBank.map((_,i)=>i));
+  const letters = 'abcdefghij'.split('');
+
+  const rightHtml = rightOrder.map((origIdx,pos)=>
+    `<div class="half-right"><b>${letters[pos]})</b> ${halvesBank[origIdx].right}</div>`
+  ).join('');
+
+  const correctLetterFor = {};
+  rightOrder.forEach((origIdx,pos)=>{ correctLetterFor[origIdx] = letters[pos]; });
+
+  const leftHtml = leftOrder.map((origIdx,pos)=>`
+    <div class="qrow halfrow">
+      <div class="qnum">${pos+1}</div>
+      <div class="qprompt">${halvesBank[origIdx].left} — ___</div>
+      <input type="text" maxlength="1" class="qinput short" id="ex7-input-${pos}" placeholder="?">
+    </div>
+  `).join('');
+
+  document.getElementById('ex7-left').innerHTML = leftHtml;
+  document.getElementById('ex7-right').innerHTML = rightHtml;
+
+  ex7map = leftOrder.map((origIdx,pos)=>({
+    pos, correct: correctLetterFor[origIdx], track: halvesBank[origIdx].track
+  }));
+  document.getElementById('ex7-score').textContent = '';
+}
+function checkHalves(){
+  let score = 0;
+  ex7map.forEach(d=>{
+    const inputEl = document.getElementById(`ex7-input-${d.pos}`);
+    const val = inputEl.value.trim().toLowerCase();
+    if(val === d.correct){
+      score++;
+      inputEl.classList.add('correct'); inputEl.classList.remove('wrong');
+    } else {
+      inputEl.classList.add('wrong'); inputEl.classList.remove('correct');
+      if(d.track) markProblem(d.track);
+    }
+  });
+  document.getElementById('ex7-score').textContent = `Результат: ${score} / ${ex7map.length}`;
+}
+function revealHalves(){
+  ex7map.forEach(d=>{
+    const inputEl = document.getElementById(`ex7-input-${d.pos}`);
+    inputEl.value = d.correct;
+    inputEl.classList.add('correct'); inputEl.classList.remove('wrong');
+  });
+  document.getElementById('ex7-score').textContent = '';
+}
+function resetHalves(){
+  ex7map.forEach(d=>{
+    const inputEl = document.getElementById(`ex7-input-${d.pos}`);
+    inputEl.value = '';
+    inputEl.classList.remove('correct','wrong');
+  });
+  document.getElementById('ex7-score').textContent = '';
+}
+function copyHalves(){
+  const lines = ex7map.map((d,i)=>`${i+1}. ${document.getElementById('ex7-input-'+d.pos).value}`);
+  copyToClipboard(lines.join('\n'), null);
+  alert('Ответы скопированы в буфер обмена.');
+}
+
+/* ================= EXERCISE 8: OPEN SENTENCES ================= */
+const openBank = [
+  {prompt:'I try to protect myself from bad luck by …', sample:'I try to protect myself from bad luck by carrying a four-leaf clover.'},
+  {prompt:'In my opinion, Friday the 13th is / isn\'t unlucky because …', sample:'In my opinion, Friday the 13th isn\'t unlucky because it\'s just a normal day.'},
+  {prompt:'If I saw a shooting star, I would make a wish for …', sample:'If I saw a shooting star, I would make a wish for good health for my family.'},
+  {prompt:'I am / am not superstitious about …', sample:'I am not superstitious about black cats, but I never break a mirror on purpose.'},
+  {prompt:'One superstition in my country is …', sample:'One superstition in my country is that spilling salt brings bad luck.'},
+  {prompt:'I think four-leaf clovers …', sample:'I think four-leaf clovers are more about luck than any real magic.'},
+  {prompt:'When my palm itches, I …', sample:'When my palm itches, I joke that money is coming soon.'},
+  {prompt:'My biggest wish that I hope will come true is …', sample:'My biggest wish that I hope will come true is to travel around the world.'},
+  {prompt:'Some people believe black cats bring bad luck because …', sample:'Some people believe black cats bring bad luck because of old folk tales.'},
+  {prompt:'The most unlucky day I ever had was when …', sample:'The most unlucky day I ever had was when I lost my phone and missed my train.'},
+];
+function renderOpen(){
+  const container = document.getElementById('ex8-rows');
+  container.innerHTML = openBank.map((it,i)=>`
+    <div class="qrow openrow">
+      <div class="qnum">${i+1}</div>
+      <div class="qprompt">${it.prompt}</div>
+      <textarea class="qinput open" id="ex8-input-${i}" rows="2" placeholder="ваш ответ..."></textarea>
+      <button class="btn-mini" onclick="showSample(${i})">Показать пример</button>
+      <div class="qfeedback" id="ex8-fb-${i}"></div>
+    </div>
+  `).join('');
+}
+function showSample(i){
+  const fb = document.getElementById(`ex8-fb-${i}`);
+  fb.textContent = 'Пример: ' + openBank[i].sample;
+  fb.className = 'qfeedback shown';
+}
+function resetOpen(){
+  openBank.forEach((it,i)=>{
+    document.getElementById(`ex8-input-${i}`).value = '';
+    document.getElementById(`ex8-fb-${i}`).textContent = '';
+  });
+}
+function copyOpen(){
+  const lines = openBank.map((it,i)=>`${i+1}. ${it.prompt}\n   ${document.getElementById('ex8-input-'+i).value}`);
+  copyToClipboard(lines.join('\n\n'), document.getElementById('ex8-copybtn'));
+}
+
+/* ================= INIT ================= */
+function init(){
+  renderVocabReview();
+  renderProblemSidebar();
+  renderExercise('ex1', buildEx1());
+  renderExercise('ex2', buildEx2());
+  renderExercise('ex3', buildEx3());
+  renderExercise('ex4', buildEx4());
+  renderExercise('ex5', buildEx5());
+  renderExercise('ex6', buildEx6());
+  renderHalves();
+  renderOpen();
+}
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
