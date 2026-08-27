@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Фразы для выражения мнения — тренажёр</title>
+<style>
+  :root{
+    --bg:#f6f7fb; --card:#ffffff; --ink:#1e2433; --muted:#6b7280;
+    --accent:#4f46e5; --accent2:#7c3aed; --good:#16a34a; --bad:#dc2626;
+    --border:#e5e7eb; --soft:#eef0fb;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:'Segoe UI',Roboto,Arial,sans-serif; background:var(--bg); color:var(--ink);
+    line-height:1.5;
+  }
+  header.top{
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    color:white; padding:28px 20px; text-align:center;
+  }
+  header.top h1{margin:0 0 6px; font-size:1.6rem;}
+  header.top p{margin:0; opacity:.9; font-size:.95rem;}
+  .layout{
+    max-width:1200px; margin:0 auto; padding:20px;
+    display:grid; grid-template-columns: 1fr 260px; gap:20px; align-items:start;
+  }
+  @media(max-width:900px){ .layout{grid-template-columns:1fr;} .sidebar{order:-1;} }
+  .card{
+    background:var(--card); border:1px solid var(--border); border-radius:14px;
+    padding:20px; margin-bottom:22px; box-shadow:0 1px 3px rgba(0,0,0,.04);
+  }
+  .card h2{margin-top:0; font-size:1.15rem; color:var(--accent);}
+  .card .sub{color:var(--muted); font-size:.9rem; margin-bottom:14px;}
+  .vocab-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:12px;}
+  .vocab-item{
+    border:1px solid var(--border); border-radius:10px; padding:10px 12px; background:var(--soft);
+    display:flex; flex-direction:column; gap:2px;
+  }
+  .vocab-item .en{font-weight:600;}
+  .vocab-item .ipa{color:var(--accent2); font-size:.85rem;}
+  .vocab-item .ru{color:var(--muted); font-size:.9rem;}
+  .listen-btn{
+    align-self:flex-start; margin-top:6px; border:none; background:var(--accent);
+    color:white; padding:4px 10px; border-radius:20px; font-size:.8rem; cursor:pointer;
+  }
+  .listen-btn:hover{background:var(--accent2);}
+  .item-row{
+    border-top:1px dashed var(--border); padding:12px 0; display:flex; flex-direction:column; gap:6px;
+  }
+  .item-row:first-of-type{border-top:none;}
+  .item-num{font-weight:600; color:var(--accent2); margin-right:6px;}
+  input[type=text]{
+    width:100%; padding:8px 10px; border:1px solid var(--border); border-radius:8px; font-size:.95rem;
+  }
+  textarea{
+    width:100%; min-height:60px; padding:8px 10px; border:1px solid var(--border); border-radius:8px; font-size:.95rem; resize:vertical;
+  }
+  select{padding:6px 8px; border-radius:8px; border:1px solid var(--border); font-size:.9rem;}
+  .feedback{font-size:.85rem; font-weight:600;}
+  .feedback.ok{color:var(--good);}
+  .feedback.no{color:var(--bad);}
+  .answer-key{font-size:.85rem; color:var(--muted); font-style:italic; display:none;}
+  .answer-key.show{display:block;}
+  .btnrow{display:flex; gap:10px; flex-wrap:wrap; margin-top:14px;}
+  button.action{
+    border:none; padding:9px 16px; border-radius:9px; cursor:pointer; font-size:.9rem; font-weight:600;
+    background:var(--accent); color:white;
+  }
+  button.action.secondary{background:var(--soft); color:var(--accent);}
+  button.action.copy{background:#0891b2;}
+  button.action:hover{opacity:.9;}
+  .score{font-weight:700; margin-left:auto;}
+  .mcq-opt{display:block; margin:4px 0; cursor:pointer;}
+  .dialogue-line{background:var(--soft); border-radius:8px; padding:8px 10px; margin-bottom:6px;}
+  .sidebar .card{position:sticky; top:16px;}
+  table.problems{width:100%; border-collapse:collapse; font-size:.85rem;}
+  table.problems th, table.problems td{border-bottom:1px solid var(--border); padding:6px 4px; text-align:left;}
+  table.problems th{color:var(--muted); font-weight:600;}
+  .empty-note{color:var(--muted); font-size:.85rem; font-style:italic;}
+  .toast{
+    position:fixed; bottom:20px; left:50%; transform:translateX(-50%);
+    background:#111827; color:white; padding:10px 18px; border-radius:8px; font-size:.9rem;
+    opacity:0; pointer-events:none; transition:opacity .25s; z-index:50;
+  }
+  .toast.show{opacity:1;}
+  footer{max-width:1200px; margin:0 auto 40px; padding:0 20px; color:var(--muted); font-size:.85rem;}
+  .diag{display:flex; gap:10px; align-items:center; flex-wrap:wrap;}
+  .badge{
+    display:inline-block; background:var(--soft); color:var(--accent); border-radius:20px;
+    padding:2px 10px; font-size:.75rem; font-weight:600;
+  }
+  .mistake-sentence{font-style:italic; margin-bottom:4px;}
+  .mistake-sentence b{color:var(--bad); text-decoration:underline;}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <h1>🗣️ Фразы для выражения мнения — интерактивный тренажёр</h1>
+  <p>Прослушайте, прочитайте, впишите руками свои ответы. Ошибки автоматически попадают в таблицу «Проблемные слова» →</p>
+</header>
+
+<div class="layout">
+  <main>
+
+    <!-- VOCAB REMINDER -->
+    <section class="card" id="vocab-card">
+      <h2>📖 Повторяем фразы</h2>
+      <div class="sub">Нажмите 🔊, чтобы прослушать произношение (голос Google US English). Прочитайте транскрипцию и перевод.</div>
+      <div class="vocab-grid" id="vocabGrid"></div>
+    </section>
+
+    <!-- EXERCISE 1: DICTATION -->
+    <section class="card" id="ex1">
+      <h2>1️⃣ Прописать фразу по звуку</h2>
+      <div class="sub">Нажмите 🔊, прослушайте фразу и запишите её точно так, как услышали.</div>
+      <div id="ex1_items"></div>
+      <div class="btnrow">
+        <button class="action" onclick="checkExercise('ex1')">Проверить</button>
+        <button class="action secondary" onclick="toggleAnswers('ex1')">Показать ответы</button>
+        <span class="score" id="ex1_score"></span>
+      </div>
+    </section>
+
+    <!-- EXERCISE 2: COLLOCATIONS -->
+    <section class="card" id="ex2">
+      <h2>2️⃣ Сочетаемость фраз</h2>
+      <div class="sub">Впишите пропущенное слово, чтобы фраза была верной.</div>
+      <div id="ex2_items"></div>
+      <div class="btnrow">
+        <button class="action" onclick="checkExercise('ex2')">Проверить</button>
+        <button class="action secondary" onclick="toggleAnswers('ex2')">Показать ответы</button>
+        <span class="score" id="ex2_score"></span>
+      </div>
+    </section>
+
+    <!-- EXERCISE 3: MATCH HALVES -->
+    <section class="card" id="ex3">
+      <h2>3️⃣ Соедините половинки выражений</h2>
+      <div class="sub">Выберите вторую половину, которая подходит к началу фразы.</div>
+      <div id="ex3_items"></div>
+      <div class="btnrow">
+        <button class="action" onclick="checkExercise('ex3')">Проверить</button>
+        <button class="action secondary" onclick="toggleAnswers('ex3')">Показать ответы</button>
+        <span class="score" id="ex3_score"></span>
+      </div>
+    </section>
+
+    <!-- EXERCISE 4: FIND MISTAKES -->
+    <section class="card" id="ex4">
+      <h2>4️⃣ Find the mistakes</h2>
+      <div class="sub">В каждом предложении ошибка в выделенной части фразы-клише. Впишите правильный вариант фразы.</div>
+      <div id="ex4_items"></div>
+      <div class="btnrow">
+        <button class="action" onclick="checkExercise('ex4')">Проверить</button>
+        <button class="action secondary" onclick="toggleAnswers('ex4')">Показать ответы</button>
+        <span class="score" id="ex4_score"></span>
+      </div>
+    </section>
+
+    <!-- EXERCISE 5: WHAT COMES AFTER -->
+    <section class="card" id="ex5">
+      <h2>5️⃣ What usually comes after?</h2>
+      <div class="sub">Выберите, что обычно грамматически следует за фразой.</div>
+      <div id="ex5_items"></div>
+      <div class="btnrow">
+        <button class="action" onclick="checkExercise('ex5')">Проверить</button>
+        <button class="action secondary" onclick="toggleAnswers('ex5')">Показать ответы</button>
+        <span class="score" id="ex5_score"></span>
+      </div>
+    </section>
+
+    <!-- EXERCISE 6: RANK / CATEGORIZE -->
+    <section class="card" id="ex6">
+      <h2>6️⃣ Распределите фразы по таблице</h2>
+      <div class="sub">Выберите категорию для каждой фразы: Мнение / Согласие-несогласие / Причина-пример.</div>
+      <div id="ex6_items"></div>
+      <div class="btnrow">
+        <button class="action" onclick="checkExercise('ex6')">Проверить</button>
+        <button class="action secondary" onclick="toggleAnswers('ex6')">Показать ответы</button>
+        <span class="score" id="ex6_score"></span>
+      </div>
+    </section>
+
+    <!-- EXERCISE 7: WOULD YOU RATHER -->
+    <section class="card" id="ex7">
+      <h2>7️⃣ Would you rather…?</h2>
+      <div class="sub">Ответьте полным предложением, используя одну из фраз-клише (In my opinion, I'd rather… because…).</div>
+      <div id="ex7_items"></div>
+      <div class="btnrow">
+        <button class="action" onclick="checkExercise('ex7')">Проверить</button>
+        <button class="action secondary" onclick="toggleAnswers('ex7')">Показать пример</button>
+        <button class="action copy" onclick="copyAnswers('ex7')">📋 Скопировать все ответы</button>
+        <span class="score" id="ex7_score"></span>
+      </div>
+    </section>
+
+    <!-- EXERCISE 8: FINISH THE DIALOGUE -->
+    <section class="card" id="ex8">
+      <h2>8️⃣ Finish the dialogue</h2>
+      <div class="sub">Допишите реплику B, используя фразу-клише для выражения мнения/согласия/несогласия.</div>
+      <div id="ex8_items"></div>
+      <div class="btnrow">
+        <button class="action" onclick="checkExercise('ex8')">Проверить</button>
+        <button class="action secondary" onclick="toggleAnswers('ex8')">Показать пример</button>
+        <button class="action copy" onclick="copyAnswers('ex8')">📋 Скопировать все ответы</button>
+        <span class="score" id="ex8_score"></span>
+      </div>
+    </section>
+
+    <!-- EXERCISE 9: IMPROVE THE STATEMENT -->
+    <section class="card" id="ex9">
+      <h2>9️⃣ Улучшите высказывание</h2>
+      <div class="sub">Перепишите простое предложение, добавив 1-2 фразы-клише. Возможно несколько вариантов ответа.</div>
+      <div id="ex9_items"></div>
+      <div class="btnrow">
+        <button class="action" onclick="checkExercise('ex9')">Проверить</button>
+        <button class="action secondary" onclick="toggleAnswers('ex9')">Показать пример</button>
+        <button class="action copy" onclick="copyAnswers('ex9')">📋 Скопировать все ответы</button>
+        <span class="score" id="ex9_score"></span>
+      </div>
+    </section>
+
+    <!-- AUDIO DIAGNOSTIC -->
+    <section class="card">
+      <h2>🔧 Проверка звука</h2>
+      <div class="sub">Если фразы не озвучиваются — используйте Google Chrome. Голос "Google US English" появляется только после первого клика на странице (политика браузеров).</div>
+      <div class="diag">
+        <button class="action secondary" onclick="testAudio()">▶️ Проверить звук</button>
+        <span id="voiceInfo" class="badge">голос ещё не выбран</span>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="card">
+      <h2 style="margin-top:0;">⚠️ Проблемные слова</h2>
+      <div id="problemsWrap"><p class="empty-note">Пока ошибок нет. Они появятся здесь после проверки заданий.</p></div>
+      <div class="btnrow"><button class="action secondary" onclick="resetProblems()">Очистить список</button></div>
+    </div>
+  </aside>
+</div>
+
+<footer>
+  Все ответы студентов хранятся в памяти страницы (не сохраняются на сервере) и сбрасываются при перезагрузке. Кнопки «Скопировать все ответы» используют буфер обмена — при первом использовании браузер может запросить разрешение.
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================= DATA ================= */
+const PHRASES = [
+  {en:"In my opinion, …", ipa:"/ɪn maɪ əˈpɪnjən/", ru:"По моему мнению, …"},
+  {en:"From my point of view, …", ipa:"/frʌm maɪ pɔɪnt əv vjuː/", ru:"С моей точки зрения, …"},
+  {en:"As far as I'm concerned, …", ipa:"/æz fɑːr əz aɪm kənˈsɜːrnd/", ru:"Что касается меня, …"},
+  {en:"The main reason is that…", ipa:"/ðə meɪn ˈriːzn ɪz ðæt/", ru:"Основная причина в том, что…"},
+  {en:"One advantage is…", ipa:"/wʌn ədˈvæntɪdʒ ɪz/", ru:"Одно из преимуществ — …"},
+  {en:"I'm not sure I agree.", ipa:"/aɪm nɒt ʃʊər aɪ əˈɡriː/", ru:"Не уверен, что согласен."},
+  {en:"One problem is…", ipa:"/wʌn ˈprɒbləm ɪz/", ru:"Одна из проблем — …"},
+  {en:"For example, …", ipa:"/fər ɪɡˈzɑːmpl/", ru:"Например, …"},
+  {en:"I completely agree.", ipa:"/aɪ kəmˈpliːtli əˈɡriː/", ru:"Я полностью согласен."},
+  {en:"I completely disagree.", ipa:"/aɪ kəmˈpliːtli ˌdɪsəˈɡriː/", ru:"Я полностью не согласен."},
+  {en:"Put yourself in someone's shoes.", ipa:"/pʊt jɔːˈself ɪn ˈsʌmwʌnz ʃuːz/", ru:"Поставь себя на чьё-то место."}
+];
+
+const PHRASE_KEYWORDS = [
+  /in my opinion/i, /point of view/i, /as far as i.?m concerned/i, /main reason is/i,
+  /advantage is/i, /not sure i agree/i, /problem is/i, /for example/i,
+  /completely agree/i, /completely disagree/i, /(yourself|myself|himself|herself).{0,15}(shoes|place|position)/i
+];
+function usesClichePhrase(text){ return PHRASE_KEYWORDS.some(r=>r.test(text)); }
+
+/* ================= SPEECH ================= */
+let voices = [];
+function loadVoices(){ voices = window.speechSynthesis ? speechSynthesis.getVoices() : []; }
+loadVoices();
+if ('speechSynthesis' in window) speechSynthesis.onvoiceschanged = loadVoices;
+
+function pickVoice(){
+  return voices.find(v=>v.name.includes('Google US English'))
+      || voices.find(v=>v.lang==='en-US')
+      || voices[0] || null;
+}
+function speak(text){
+  if(!('speechSynthesis' in window)){ toast('Ваш браузер не поддерживает озвучку.'); return; }
+  speechSynthesis.cancel();
+  const clean = text.replace(/…/g,'.').replace(/_/g,' blank ');
+  const u = new SpeechSynthesisUtterance(clean);
+  const v = pickVoice();
+  if(v) u.voice = v;
+  u.lang = 'en-US';
+  u.rate = 0.92;
+  speechSynthesis.speak(u);
+}
+function testAudio(){
+  speak("This is a test of the Google US English voice.");
+  setTimeout(()=>{
+    const v = pickVoice();
+    document.getElementById('voiceInfo').textContent = v ? ('используется: ' + v.name) : 'голос не найден';
+  }, 300);
+}
+
+/* ================= HELPERS ================= */
+function norm(s){
+  return (s||'').toLowerCase()
+    .replace(/[…"“”'’.,!?;:_-]/g,' ')
+    .replace(/\s+/g,' ')
+    .trim();
+}
+function isMatch(user, correct){
+  const arr = Array.isArray(correct) ? correct : [correct];
+  const u = norm(user);
+  return arr.some(c => norm(c) === u);
+}
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 1800);
+}
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+
+/* ================= PROBLEM WORDS ================= */
+let problemStats = {};
+function logProblem(label){
+  problemStats[label] = (problemStats[label]||0) + 1;
+  renderProblems();
+}
+function resetProblems(){ problemStats = {}; renderProblems(); }
+function renderProblems(){
+  const wrap = document.getElementById('problemsWrap');
+  const entries = Object.entries(problemStats).sort((a,b)=>b[1]-a[1]);
+  if(entries.length===0){
+    wrap.innerHTML = '<p class="empty-note">Пока ошибок нет. Они появятся здесь после проверки заданий.</p>';
+    return;
+  }
+  let html = '<table class="problems"><tr><th>Фраза</th><th>Ошибок</th></tr>';
+  entries.forEach(([k,v])=>{ html += `<tr><td>${k}</td><td>${v}</td></tr>`; });
+  html += '</table>';
+  wrap.innerHTML = html;
+}
+
+/* ================= VOCAB REMINDER ================= */
+function renderVocab(){
+  const grid = document.getElementById('vocabGrid');
+  grid.innerHTML = PHRASES.map((p,i)=>`
+    <div class="vocab-item">
+      <span class="en">${p.en}</span>
+      <span class="ipa">${p.ipa}</span>
+      <span class="ru">${p.ru}</span>
+      <button class="listen-btn" onclick="speak('${p.en.replace(/'/g,"\\'")}')">🔊 Слушать</button>
+    </div>`).join('');
+}
+
+/* ================= GENERIC CHECK / TOGGLE ================= */
+function toggleAnswers(exId){
+  document.querySelectorAll('#'+exId+' .answer-key').forEach(el=>el.classList.toggle('show'));
+}
+
+function checkExercise(exId){
+  const cfg = EXDATA[exId];
+  let correctCount = 0;
+  cfg.items.forEach((item, idx)=>{
+    const fb = document.getElementById(exId+'_fb_'+idx);
+    const result = cfg.grade(item, idx);
+    if(result.ok){
+      correctCount++;
+      fb.textContent = '✔ Верно';
+      fb.className = 'feedback ok';
+    } else {
+      fb.textContent = '✘ ' + result.msg;
+      fb.className = 'feedback no';
+      logProblem(result.problemLabel);
+    }
+  });
+  document.getElementById(exId+'_score').textContent = `${correctCount} / ${cfg.items.length}`;
+}
+
+function copyAnswers(exId){
+  const cfg = EXDATA[exId];
+  let text = '';
+  cfg.items.forEach((item, idx)=>{
+    const el = document.getElementById(exId+'_input_'+idx);
+    const val = el ? el.value.trim() : '';
+    text += `${idx+1}. ${val}\n`;
+  });
+  navigator.clipboard.writeText(text).then(()=>{
+    toast('Ответы скопированы в буфер обмена!');
+  }).catch(()=>{
+    const ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    try{ document.execCommand('copy'); toast('Скопировано (fallback)!'); }
+    catch(e){ toast('Не удалось скопировать — скопируйте вручную.'); }
+    document.body.removeChild(ta);
+  });
+}
+
+/* ================= EXERCISE 1: DICTATION ================= */
+const ex1_order = [3,8,0,10,5,2,7,4];
+const ex1_items = ex1_order.map(i=>PHRASES[i]);
+function renderEx1(){
+  const wrap = document.getElementById('ex1_items');
+  wrap.innerHTML = ex1_items.map((p,idx)=>`
+    <div class="item-row">
+      <div><span class="item-num">${idx+1}.</span>
+        <button class="listen-btn" onclick="speak('${p.en.replace(/'/g,"\\'")}')">🔊 Прослушать</button>
+      </div>
+      <input type="text" id="ex1_input_${idx}" placeholder="Запишите фразу, которую услышали">
+      <div class="feedback" id="ex1_fb_${idx}"></div>
+      <div class="answer-key" id="ex1_key_${idx}">Ответ: ${p.en}</div>
+    </div>`).join('');
+}
+EXDATA_ex1_grade = (item, idx) => {
+  const val = document.getElementById('ex1_input_'+idx).value;
+  const ok = isMatch(val, item.en);
+  return ok ? {ok:true} : {ok:false, msg:'правильный ответ: '+item.en, problemLabel:item.en};
+};
+
+/* ================= EXERCISE 2: COLLOCATIONS ================= */
+const ex2_data = [
+  {before:"From my point of", blank:"view", after:", technology helps us learn.", full:"From my point of view"},
+  {before:"One", blank:"problem", after:" is pollution in big cities.", full:"One problem is"},
+  {before:"I completely", blank:"disagree", after:" with this statement.", full:"I completely disagree"},
+  {before:"As far as", blank:"I'm", after:" concerned, sport is essential.", full:"As far as I'm concerned"},
+  {before:"One", blank:"advantage", after:" is saving time.", full:"One advantage is"},
+  {before:"For", blank:"example", after:", cats sleep most of the day.", full:"For example"},
+  {before:"The main", blank:"reason", after:" is that people want convenience.", full:"The main reason"},
+  {before:"I completely", blank:"agree", after:" with you.", full:"I completely agree"}
+];
+const ex2_items = shuffle(ex2_data);
+function renderEx2(){
+  const wrap = document.getElementById('ex2_items');
+  wrap.innerHTML = ex2_items.map((d,idx)=>`
+    <div class="item-row">
+      <div><span class="item-num">${idx+1}.</span> ${d.before} <b>_____</b>${d.after}</div>
+      <input type="text" id="ex2_input_${idx}" placeholder="Впишите пропущенное слово">
+      <div class="feedback" id="ex2_fb_${idx}"></div>
+      <div class="answer-key" id="ex2_key_${idx}">Ответ: ${d.blank}</div>
+    </div>`).join('');
+}
+EXDATA_ex2_grade = (item, idx) => {
+  const val = document.getElementById('ex2_input_'+idx).value;
+  const ok = norm(val) === norm(item.blank);
+  return ok ? {ok:true} : {ok:false, msg:'правильно: '+item.blank, problemLabel:item.full};
+};
+
+/* ================= EXERCISE 3: MATCH HALVES ================= */
+const ex3_pairs = [
+  {start:"The main reason", end:"is that…"},
+  {start:"One advantage", end:"is…"},
+  {start:"One problem", end:"is…"},
+  {start:"As far as", end:"I'm concerned,…"},
+  {start:"From my point", end:"of view,…"},
+  {start:"I completely", end:"agree."},
+  {start:"I completely", end:"disagree."},
+  {start:"Put yourself in", end:"someone's shoes."}
+];
+const ex3_items = shuffle(ex3_pairs);
+const ex3_endsPool = shuffle(ex3_pairs.map(p=>p.end));
+function renderEx3(){
+  const wrap = document.getElementById('ex3_items');
+  wrap.innerHTML = ex3_items.map((p,idx)=>`
+    <div class="item-row">
+      <div><span class="item-num">${idx+1}.</span> ${p.start} …</div>
+      <select id="ex3_input_${idx}">
+        <option value="">— выберите окончание —</option>
+        ${ex3_endsPool.map(e=>`<option value="${e.replace(/"/g,'&quot;')}">${e}</option>`).join('')}
+      </select>
+      <div class="feedback" id="ex3_fb_${idx}"></div>
+      <div class="answer-key" id="ex3_key_${idx}">Ответ: ${p.end}</div>
+    </div>`).join('');
+}
+EXDATA_ex3_grade = (item, idx) => {
+  const sel = document.getElementById('ex3_input_'+idx);
+  const val = sel.value;
+  const ok = norm(val) === norm(item.end);
+  return ok ? {ok:true} : {ok:false, msg:'правильно: '+item.end, problemLabel: item.start+' … '+item.end};
+};
+
+/* ================= EXERCISE 4: FIND MISTAKES ================= */
+const ex4_data = [
+  {sentence:"<b>As long as</b> I'm concerned, the film was boring.", correct:"As far as I'm concerned"},
+  {sentence:"<b>From my point of few</b>, we should recycle more.", correct:"From my point of view"},
+  {sentence:"<b>The main reason why that</b> people travel is curiosity.", correct:"The main reason is that"},
+  {sentence:"<b>One problem with</b> is traffic in big cities.", correct:"One problem is"},
+  {sentence:"<b>One advantage for</b> is saving time.", correct:"One advantage is"},
+  {sentence:"<b>I complete disagree</b> with this idea.", correct:"I completely disagree"},
+  {sentence:"<b>For instance example</b>, dogs are loyal animals.", correct:"For example"},
+  {sentence:"<b>Put himself in</b> someone's shoes before judging.", correct:"Put yourself in someone's shoes"}
+];
+const ex4_items = shuffle(ex4_data);
+function renderEx4(){
+  const wrap = document.getElementById('ex4_items');
+  wrap.innerHTML = ex4_items.map((d,idx)=>`
+    <div class="item-row">
+      <div class="mistake-sentence"><span class="item-num">${idx+1}.</span> ${d.sentence}</div>
+      <input type="text" id="ex4_input_${idx}" placeholder="Напишите правильный вариант фразы">
+      <div class="feedback" id="ex4_fb_${idx}"></div>
+      <div class="answer-key" id="ex4_key_${idx}">Ответ: ${d.correct}</div>
+    </div>`).join('');
+}
+EXDATA_ex4_grade = (item, idx) => {
+  const val = document.getElementById('ex4_input_'+idx).value;
+  const ok = isMatch(val, item.correct);
+  return ok ? {ok:true} : {ok:false, msg:'правильно: '+item.correct, problemLabel:item.correct};
+};
+
+/* ================= EXERCISE 5: WHAT COMES AFTER ================= */
+const ex5_data = [
+  {start:"One advantage is …", options:["convenient","convenience","conveniently"], correct:"convenience"},
+  {start:"One problem is …", options:["pollution","polluted","pollute"], correct:"pollution"},
+  {start:"The main reason is that …", options:["traffic","there is a lot of traffic","traffic,"], correct:"there is a lot of traffic"},
+  {start:"For example, …", options:["cats","cats sleep a lot","sleep"], correct:"cats sleep a lot"},
+  {start:"I completely agree …", options:["with you.","you","for you"], correct:"with you."},
+  {start:"I completely disagree …", options:["you","with you.","at you"], correct:"with you."},
+  {start:"As far as I'm concerned, …", options:["important","this is important","importantly"], correct:"this is important"},
+  {start:"From my point of view, …", options:["interesting","this topic is interesting","interestingly"], correct:"this topic is interesting"}
+];
+const ex5_items = shuffle(ex5_data);
+function renderEx5(){
+  const wrap = document.getElementById('ex5_items');
+  wrap.innerHTML = ex5_items.map((d,idx)=>{
+    const opts = shuffle(d.options);
+    return `<div class="item-row">
+      <div><span class="item-num">${idx+1}.</span> ${d.start}</div>
+      ${opts.map((o,oi)=>`<label class="mcq-opt"><input type="radio" name="ex5_input_${idx}" value="${o.replace(/"/g,'&quot;')}"> ${o}</label>`).join('')}
+      <div class="feedback" id="ex5_fb_${idx}"></div>
+      <div class="answer-key" id="ex5_key_${idx}">Ответ: ${d.correct}</div>
+    </div>`;
+  }).join('');
+}
+EXDATA_ex5_grade = (item, idx) => {
+  const chosen = document.querySelector(`input[name="ex5_input_${idx}"]:checked`);
+  const val = chosen ? chosen.value : '';
+  const ok = norm(val) === norm(item.correct);
+  return ok ? {ok:true} : {ok:false, msg:'правильно: '+item.correct, problemLabel:item.start};
+};
+
+/* ================= EXERCISE 6: CATEGORIZE ================= */
+const ex6_data = [
+  {phrase:"In my opinion, …", cat:"Мнение"},
+  {phrase:"From my point of view, …", cat:"Мнение"},
+  {phrase:"As far as I'm concerned, …", cat:"Мнение"},
+  {phrase:"I completely agree.", cat:"Согласие/несогласие"},
+  {phrase:"I completely disagree.", cat:"Согласие/несогласие"},
+  {phrase:"I'm not sure I agree.", cat:"Согласие/несогласие"},
+  {phrase:"The main reason is that…", cat:"Причина/пример"},
+  {phrase:"For example, …", cat:"Причина/пример"}
+];
+const ex6_items = shuffle(ex6_data);
+const CATS = ["Мнение","Согласие/несогласие","Причина/пример"];
+function renderEx6(){
+  const wrap = document.getElementById('ex6_items');
+  wrap.innerHTML = ex6_items.map((d,idx)=>`
+    <div class="item-row">
+      <div><span class="item-num">${idx+1}.</span> ${d.phrase}</div>
+      <select id="ex6_input_${idx}">
+        <option value="">— выберите категорию —</option>
+        ${CATS.map(c=>`<option value="${c}">${c}</option>`).join('')}
+      </select>
+      <div class="feedback" id="ex6_fb_${idx}"></div>
+      <div class="answer-key" id="ex6_key_${idx}">Ответ: ${d.cat}</div>
+    </div>`).join('');
+}
+EXDATA_ex6_grade = (item, idx) => {
+  const val = document.getElementById('ex6_input_'+idx).value;
+  const ok = val === item.cat;
+  return ok ? {ok:true} : {ok:false, msg:'правильно: '+item.cat, problemLabel:item.phrase};
+};
+
+/* ================= EXERCISE 7: WOULD YOU RATHER ================= */
+const ex7_data = [
+  "Would you rather live in a big city or a small town?",
+  "Would you rather study alone or in a group?",
+  "Would you rather travel by train or by plane?",
+  "Would you rather read a book or watch a film?",
+  "Would you rather have more free time or more money?",
+  "Would you rather work from home or in an office?",
+  "Would you rather learn a new language or a new instrument?",
+  "Would you rather eat at home or eat out?"
+];
+const ex7_items = shuffle(ex7_data.map(q=>({q})));
+function renderEx7(){
+  const wrap = document.getElementById('ex7_items');
+  wrap.innerHTML = ex7_items.map((d,idx)=>`
+    <div class="item-row">
+      <div><span class="item-num">${idx+1}.</span> ${d.q}</div>
+      <textarea id="ex7_input_${idx}" placeholder="Ответьте, используя фразу-клише, например: In my opinion, I'd rather... because..."></textarea>
+      <div class="feedback" id="ex7_fb_${idx}"></div>
+      <div class="answer-key" id="ex7_key_${idx}">Пример: In my opinion, I'd rather... because... / As far as I'm concerned,...</div>
+    </div>`).join('');
+}
+EXDATA_ex7_grade = (item, idx) => {
+  const val = document.getElementById('ex7_input_'+idx).value;
+  const ok = val.trim().length > 15 && usesClichePhrase(val);
+  return ok ? {ok:true} : {ok:false, msg:'используйте фразу-клише и полный ответ', problemLabel:"Фразы-клише не использованы"};
+};
+
+/* ================= EXERCISE 8: FINISH THE DIALOGUE ================= */
+const ex8_data = [
+  "I think social media does more harm than good. What do you think?",
+  "Should schools give homework every day?",
+  "Is it better to save money or spend it on experiences?",
+  "Do you think robots will replace most jobs?",
+  "Is online learning as effective as classroom learning?",
+  "Should people be allowed to work remotely full-time?",
+  "Do you think zoos should be closed?",
+  "Is it important to learn history?"
+];
+const ex8_items = shuffle(ex8_data.map(a=>({a})));
+function renderEx8(){
+  const wrap = document.getElementById('ex8_items');
+  wrap.innerHTML = ex8_items.map((d,idx)=>`
+    <div class="item-row">
+      <div class="dialogue-line"><span class="item-num">${idx+1}. A:</span> ${d.a}</div>
+      <div><b>B:</b></div>
+      <textarea id="ex8_input_${idx}" placeholder="Допишите ответ B, используя фразу-клише"></textarea>
+      <div class="feedback" id="ex8_fb_${idx}"></div>
+      <div class="answer-key" id="ex8_key_${idx}">Пример: I completely agree. / I'm not sure I agree. One problem is...</div>
+    </div>`).join('');
+}
+EXDATA_ex8_grade = (item, idx) => {
+  const val = document.getElementById('ex8_input_'+idx).value;
+  const ok = val.trim().length > 10 && usesClichePhrase(val);
+  return ok ? {ok:true} : {ok:false, msg:'используйте фразу-клише', problemLabel:"Фразы-клише не использованы"};
+};
+
+/* ================= EXERCISE 9: IMPROVE THE STATEMENT ================= */
+const ex9_data = [
+  "Cars pollute the air.",
+  "Homework is useless.",
+  "Video games are bad for children.",
+  "Tourism helps the economy.",
+  "Social media connects people.",
+  "Fast food is unhealthy.",
+  "Sport is important for health.",
+  "Reading books is better than watching TV."
+];
+const ex9_items = shuffle(ex9_data.map(s=>({s})));
+function renderEx9(){
+  const wrap = document.getElementById('ex9_items');
+  wrap.innerHTML = ex9_items.map((d,idx)=>`
+    <div class="item-row">
+      <div><span class="item-num">${idx+1}.</span> Простое предложение: <i>"${d.s}"</i></div>
+      <textarea id="ex9_input_${idx}" placeholder="Перепишите, добавив фразу-клише"></textarea>
+      <div class="feedback" id="ex9_fb_${idx}"></div>
+      <div class="answer-key" id="ex9_key_${idx}">Пример: In my opinion, ${d.s.charAt(0).toLowerCase()+d.s.slice(1)}</div>
+    </div>`).join('');
+}
+EXDATA_ex9_grade = (item, idx) => {
+  const val = document.getElementById('ex9_input_'+idx).value;
+  const ok = val.trim().length > 10 && usesClichePhrase(val);
+  return ok ? {ok:true} : {ok:false, msg:'добавьте фразу-клише', problemLabel:"Фразы-клише не использованы"};
+};
+
+/* ================= EXDATA REGISTRY ================= */
+const EXDATA = {
+  ex1:{items:ex1_items, grade:(i,idx)=>EXDATA_ex1_grade(i,idx)},
+  ex2:{items:ex2_items, grade:(i,idx)=>EXDATA_ex2_grade(i,idx)},
+  ex3:{items:ex3_items, grade:(i,idx)=>EXDATA_ex3_grade(i,idx)},
+  ex4:{items:ex4_items, grade:(i,idx)=>EXDATA_ex4_grade(i,idx)},
+  ex5:{items:ex5_items, grade:(i,idx)=>EXDATA_ex5_grade(i,idx)},
+  ex6:{items:ex6_items, grade:(i,idx)=>EXDATA_ex6_grade(i,idx)},
+  ex7:{items:ex7_items, grade:(i,idx)=>EXDATA_ex7_grade(i,idx)},
+  ex8:{items:ex8_items, grade:(i,idx)=>EXDATA_ex8_grade(i,idx)},
+  ex9:{items:ex9_items, grade:(i,idx)=>EXDATA_ex9_grade(i,idx)}
+};
+
+/* ================= INIT ================= */
+renderVocab();
+renderEx1(); renderEx2(); renderEx3(); renderEx4(); renderEx5();
+renderEx6(); renderEx7(); renderEx8(); renderEx9();
+renderProblems();
+</script>
+</body>
+</html>
