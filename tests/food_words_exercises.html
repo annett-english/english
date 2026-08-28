@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Еда: исчисляемые и неисчисляемые существительные</title>
+<style>
+  :root{
+    --bg:#f4f6fb;
+    --card:#ffffff;
+    --ink:#1f2937;
+    --muted:#6b7280;
+    --accent:#4f46e5;
+    --accent-light:#eef2ff;
+    --good:#16a34a;
+    --good-bg:#ecfdf5;
+    --bad:#dc2626;
+    --bad-bg:#fef2f2;
+    --border:#e5e7eb;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    line-height:1.5;
+    padding-bottom:60px;
+  }
+  header{
+    background:linear-gradient(135deg,#4f46e5,#7c3aed);
+    color:#fff;
+    padding:28px 20px 34px;
+    text-align:center;
+  }
+  header h1{margin:0 0 6px;font-size:26px;}
+  header p{margin:0;opacity:.9;font-size:14px;}
+
+  .wrap{
+    max-width:1180px;
+    margin:0 auto;
+    padding:0 16px;
+  }
+
+  .reminder{
+    background:var(--card);
+    border-radius:var(--radius);
+    box-shadow:0 6px 20px rgba(0,0,0,.06);
+    padding:20px 22px;
+    margin:-20px auto 24px;
+    position:relative;
+    z-index:2;
+  }
+  .reminder h2{margin-top:0;font-size:18px;}
+  .word-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(230px,1fr));
+    gap:10px;
+    margin-top:14px;
+  }
+  .word-card{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    background:var(--accent-light);
+    border-radius:10px;
+    padding:10px 12px;
+  }
+  .word-card .emoji{font-size:26px;}
+  .word-card .info{flex:1;min-width:0;}
+  .word-card .en{font-weight:600;font-size:14.5px;}
+  .word-card .ipa{color:var(--accent);font-size:12.5px;}
+  .word-card .ru{color:var(--muted);font-size:12.5px;}
+  .word-card .type-tag{
+    font-size:10.5px;
+    font-weight:700;
+    padding:2px 6px;
+    border-radius:6px;
+    color:#fff;
+  }
+  .type-C{background:#0ea5e9;}
+  .type-U{background:#f97316;}
+  .play-btn{
+    border:none;
+    background:#4f46e5;
+    color:#fff;
+    width:32px;height:32px;
+    border-radius:50%;
+    cursor:pointer;
+    font-size:14px;
+    flex-shrink:0;
+  }
+  .play-btn:hover{background:#3730a3;}
+
+  .layout{
+    display:flex;
+    gap:24px;
+    align-items:flex-start;
+  }
+  .main-col{flex:1;min-width:0;}
+  .side-col{
+    width:260px;
+    flex-shrink:0;
+    position:sticky;
+    top:16px;
+  }
+  @media (max-width:900px){
+    .layout{flex-direction:column;}
+    .side-col{width:100%;position:static;}
+  }
+
+  .sidebar-box{
+    background:var(--card);
+    border-radius:var(--radius);
+    box-shadow:0 6px 20px rgba(0,0,0,.06);
+    padding:16px 18px;
+    margin-bottom:16px;
+  }
+  .sidebar-box h3{margin:0 0 10px;font-size:15px;}
+  #problemTable{width:100%;border-collapse:collapse;font-size:13px;}
+  #problemTable th, #problemTable td{
+    text-align:left;
+    padding:5px 4px;
+    border-bottom:1px solid var(--border);
+  }
+  #problemTable th{color:var(--muted);font-weight:600;font-size:12px;}
+  .empty-msg{color:var(--muted);font-size:13px;}
+
+  .global-actions{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+
+  .exercise{
+    background:var(--card);
+    border-radius:var(--radius);
+    box-shadow:0 6px 20px rgba(0,0,0,.06);
+    padding:20px 22px 22px;
+    margin-bottom:22px;
+  }
+  .exercise h2{
+    margin:0 0 4px;
+    font-size:18px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .ex-num{
+    background:var(--accent);
+    color:#fff;
+    width:26px;height:26px;
+    border-radius:50%;
+    display:inline-flex;
+    align-items:center;justify-content:center;
+    font-size:13px;
+    flex-shrink:0;
+  }
+  .ex-instructions{color:var(--muted);font-size:13.5px;margin:0 0 14px;}
+
+  .item-row{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:9px 0;
+    border-bottom:1px dashed var(--border);
+    flex-wrap:wrap;
+  }
+  .item-row:last-of-type{border-bottom:none;}
+  .item-index{
+    width:22px;
+    color:var(--muted);
+    font-size:13px;
+    flex-shrink:0;
+  }
+  .item-prompt{
+    flex:1 1 260px;
+    min-width:160px;
+    font-size:14.5px;
+  }
+  .item-prompt .rus{font-weight:600;}
+  .item-emoji{font-size:34px;line-height:1;}
+  .sentence-wrong{font-style:italic;color:#7c2d12;}
+
+  input.answer-input{
+    flex:1 1 220px;
+    min-width:160px;
+    padding:8px 10px;
+    border:1.5px solid var(--border);
+    border-radius:8px;
+    font-size:14px;
+    font-family:inherit;
+  }
+  input.answer-input:focus{outline:none;border-color:var(--accent);}
+  input.answer-input.correct{border-color:var(--good);background:var(--good-bg);}
+  input.answer-input.incorrect{border-color:var(--bad);background:var(--bad-bg);}
+
+  .feedback-icon{width:20px;text-align:center;font-size:15px;flex-shrink:0;}
+  .answer-reveal{
+    font-size:13px;
+    color:var(--accent);
+    flex-basis:100%;
+    padding-left:34px;
+    display:none;
+  }
+  .answer-reveal.show{display:block;}
+
+  .mini-play{
+    border:none;
+    background:#eef2ff;
+    color:var(--accent);
+    padding:6px 10px;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:13px;
+    flex-shrink:0;
+  }
+  .mini-play:hover{background:#e0e7ff;}
+
+  .ex-footer{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-top:14px;
+    flex-wrap:wrap;
+  }
+  button.action-btn{
+    border:none;
+    padding:9px 16px;
+    border-radius:8px;
+    font-size:13.5px;
+    cursor:pointer;
+    font-weight:600;
+  }
+  .btn-check{background:var(--accent);color:#fff;}
+  .btn-check:hover{background:#3730a3;}
+  .btn-show{background:#e5e7eb;color:var(--ink);}
+  .btn-show:hover{background:#d1d5db;}
+  .btn-reset{background:#fff;color:var(--muted);border:1.5px solid var(--border) !important;}
+  .btn-reset:hover{background:#f9fafb;}
+  .score-badge{
+    margin-left:auto;
+    font-weight:700;
+    font-size:14px;
+    color:var(--accent);
+  }
+
+  .global-bar{
+    max-width:1180px;
+    margin:0 auto 20px;
+    padding:0 16px;
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    justify-content:center;
+  }
+  .global-bar button{
+    border:none;
+    padding:10px 18px;
+    border-radius:10px;
+    font-weight:700;
+    font-size:14px;
+    cursor:pointer;
+  }
+  .btn-primary{background:#111827;color:#fff;}
+  .btn-primary:hover{background:#000;}
+  .btn-secondary{background:#fff;color:#111827;border:1.5px solid var(--border);}
+  .btn-secondary:hover{background:#f3f4f6;}
+
+  #totalScore{
+    text-align:center;
+    font-size:14px;
+    color:var(--muted);
+    margin-bottom:10px;
+  }
+  #totalScore b{color:var(--accent);font-size:16px;}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🍇 Food Words: Countable & Uncountable</h1>
+  <p>Слова на тему еды — прописываем руками, проверяем, слушаем произношение</p>
+</header>
+
+<div class="wrap">
+  <div class="reminder">
+    <h2>📖 Напоминание слов</h2>
+    <div class="word-grid" id="wordGrid"></div>
+  </div>
+
+  <div class="layout">
+    <div class="main-col" id="exercisesRoot"></div>
+
+    <div class="side-col">
+      <div class="sidebar-box">
+        <h3>⚠️ Проблемные слова</h3>
+        <table id="problemTable">
+          <thead><tr><th>Слово</th><th>Ошибок</th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <div class="empty-msg" id="problemEmpty">Пока ошибок нет 🎉</div>
+      </div>
+
+      <div class="sidebar-box">
+        <h3>💾 Действия</h3>
+        <div class="global-actions">
+          <button class="action-btn btn-check" id="checkAllBtn">Проверить всё</button>
+          <button class="action-btn btn-show" id="downloadBtn">Скачать мои ответы</button>
+          <button class="action-btn btn-reset" id="resetAllBtn">Сбросить всё</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="totalScore"></div>
+
+<script>
+/* ================= DATA ================= */
+const words = [
+  {key:"orange",     en:"an orange",    bare:"orange",     ipa:"/ˈɒrɪndʒ/",   ru:"апельсин",  emoji:"🍊", type:"C"},
+  {key:"strawberry", en:"a strawberry", bare:"strawberry", ipa:"/ˈstrɔːbəri/",ru:"клубника",  emoji:"🍓", type:"C"},
+  {key:"melon",      en:"a melon",      bare:"melon",      ipa:"/ˈmelən/",    ru:"дыня",      emoji:"🍈", type:"C"},
+  {key:"pear",       en:"a pear",       bare:"pear",       ipa:"/peər/",      ru:"груша",     emoji:"🍐", type:"C"},
+  {key:"cheese",     en:"cheese",       bare:"cheese",     ipa:"/tʃiːz/",     ru:"сыр",       emoji:"🧀", type:"U"},
+  {key:"butter",     en:"butter",       bare:"butter",     ipa:"/ˈbʌtər/",    ru:"масло",     emoji:"🧈", type:"U"},
+  {key:"egg",        en:"an egg",       bare:"egg",        ipa:"/eɡ/",        ru:"яйцо",      emoji:"🥚", type:"C"},
+  {key:"milk",       en:"milk",         bare:"milk",       ipa:"/mɪlk/",      ru:"молоко",    emoji:"🥛", type:"U"},
+  {key:"fish",       en:"fish",         bare:"fish",       ipa:"/fɪʃ/",       ru:"рыба",      emoji:"🐟", type:"U"},
+];
+
+function norm(s){
+  return (s||"").toLowerCase().trim().replace(/[.,!?;:]+$/,"").replace(/\s+/g," ");
+}
+function normStrict(s){
+  return (s||"").toLowerCase().replace(/[^a-zа-я\s]/gi,"").replace(/\s+/g," ").trim();
+}
+
+const exercises = [
+  {
+    id:"ex1",
+    title:"Упражнение 1. Перевод с русского на английский",
+    instr:"Переведите слово на английский язык (не забудьте a / an, если нужно).",
+    type:"text",
+    items:[
+      {word:"strawberry", prompt:"клубника", accept:["a strawberry","strawberry"]},
+      {word:"cheese",     prompt:"сыр", accept:["cheese"]},
+      {word:"egg",        prompt:"яйцо", accept:["an egg","egg"]},
+      {word:"milk",       prompt:"молоко", accept:["milk"]},
+      {word:"pear",       prompt:"груша", accept:["a pear","pear"]},
+      {word:"melon",      prompt:"дыня", accept:["a melon","melon"]},
+      {word:"butter",     prompt:"масло", accept:["butter"]},
+      {word:"orange",     prompt:"апельсин", accept:["an orange","orange"]},
+      {word:"fish",       prompt:"рыба", accept:["fish"]},
+      {word:"egg",        prompt:"яйца (мн. число)", accept:["eggs"]},
+    ]
+  },
+  {
+    id:"ex2",
+    title:"Упражнение 2. Пропишите слово на слух",
+    instr:"Нажмите 🔊, прослушайте слово и напишите его по-английски (с артиклем, если он есть).",
+    type:"audio",
+    items:[
+      {word:"cheese",     audio:"cheese", accept:["cheese"]},
+      {word:"orange",     audio:"an orange", accept:["an orange"]},
+      {word:"pear",       audio:"a pear", accept:["a pear"]},
+      {word:"milk",       audio:"milk", accept:["milk"]},
+      {word:"egg",        audio:"an egg", accept:["an egg"]},
+      {word:"strawberry", audio:"a strawberry", accept:["a strawberry"]},
+      {word:"butter",     audio:"butter", accept:["butter"]},
+      {word:"fish",       audio:"fish", accept:["fish"]},
+      {word:"melon",      audio:"a melon", accept:["a melon"]},
+      {word:"orange",     audio:"oranges", accept:["oranges"]},
+    ]
+  },
+  {
+    id:"ex3",
+    title:"Упражнение 3. Исчисляемое или неисчисляемое?",
+    instr:"Напишите «исч» — если слово исчисляемое, или «неисч» — если неисчисляемое.",
+    type:"classify",
+    items:[
+      {word:"butter",     prompt:"butter", answer:"U"},
+      {word:"pear",       prompt:"a pear", answer:"C"},
+      {word:"fish",       prompt:"fish", answer:"U"},
+      {word:"egg",        prompt:"an egg", answer:"C"},
+      {word:"milk",       prompt:"milk", answer:"U"},
+      {word:"orange",     prompt:"an orange", answer:"C"},
+      {word:"cheese",     prompt:"cheese", answer:"U"},
+      {word:"strawberry", prompt:"a strawberry", answer:"C"},
+      {word:"melon",      prompt:"a melon", answer:"C"},
+      {word:"egg",        prompt:"eggs", answer:"C"},
+    ]
+  },
+  {
+    id:"ex4",
+    title:"Упражнение 4. Добавьте a / an или ничего",
+    instr:"Впишите слово в правильной форме: с a, с an, или без артикля (—), если слово неисчисляемое.",
+    type:"text",
+    items:[
+      {word:"orange",     prompt:"orange", accept:["an orange"]},
+      {word:"milk",       prompt:"milk", accept:["milk"]},
+      {word:"egg",        prompt:"egg", accept:["an egg"]},
+      {word:"cheese",     prompt:"cheese", accept:["cheese"]},
+      {word:"pear",       prompt:"pear", accept:["a pear"]},
+      {word:"butter",     prompt:"butter", accept:["butter"]},
+      {word:"strawberry", prompt:"strawberry", accept:["a strawberry"]},
+      {word:"fish",       prompt:"fish", accept:["fish"]},
+      {word:"melon",      prompt:"melon", accept:["a melon"]},
+      {word:"egg",        prompt:"eggs", accept:["eggs"]},
+    ]
+  },
+  {
+    id:"ex5",
+    title:"Упражнение 5. Назовите слово по картинке",
+    instr:"Посмотрите на картинку и напишите слово по-английски.",
+    type:"picture",
+    items:[
+      {word:"strawberry", emoji:"🍓", accept:["a strawberry","strawberry"]},
+      {word:"cheese",     emoji:"🧀", accept:["cheese"]},
+      {word:"melon",      emoji:"🍈", accept:["a melon","melon"]},
+      {word:"egg",        emoji:"🥚", accept:["an egg","egg"]},
+      {word:"milk",       emoji:"🥛", accept:["milk"]},
+      {word:"pear",       emoji:"🍐", accept:["a pear","pear"]},
+      {word:"butter",     emoji:"🧈", accept:["butter"]},
+      {word:"orange",     emoji:"🍊", accept:["an orange","orange"]},
+      {word:"fish",       emoji:"🐟", accept:["fish"]},
+      {word:"egg",        emoji:"🥚🥚", accept:["eggs"]},
+    ]
+  },
+  {
+    id:"ex6",
+    title:"Упражнение 6. Исправьте ошибку",
+    instr:"В предложении есть ошибка, связанная с артиклем или числом. Перепишите предложение правильно.",
+    type:"correct",
+    items:[
+      {word:"fish", prompt:"I eat a fish every day.",
+        accept:["i eat fish every day"],
+        rule:n=>/\bfish\b/.test(n) && !/\ba fish\b/.test(n)},
+      {word:"milk", prompt:"I have three milk in the fridge.",
+        accept:["i have milk in the fridge","i have some milk in the fridge"],
+        rule:n=>/\bmilk\b/.test(n) && !/\bthree milk\b/.test(n)},
+      {word:"butter", prompt:"She bought a butter at the shop.",
+        accept:["she bought butter at the shop"],
+        rule:n=>/\bbutter\b/.test(n) && !/\ba butter\b/.test(n)},
+      {word:"cheese", prompt:"There is an cheese on the table.",
+        accept:["there is cheese on the table"],
+        rule:n=>/\bcheese\b/.test(n) && !/\ban cheese\b/.test(n)},
+      {word:"pear", prompt:"He ate two pear this morning.",
+        accept:["he ate two pears this morning"],
+        rule:n=>/\bpears\b/.test(n)},
+      {word:"milk", prompt:"I want an milk, please.",
+        accept:["i want milk please","i want some milk please"],
+        rule:n=>/\bmilk\b/.test(n) && !/\ban milk\b/.test(n)},
+      {word:"egg", prompt:"This is egg.",
+        accept:["this is an egg"],
+        rule:n=>/\ban egg\b/.test(n)},
+      {word:"fish", prompt:"I like a fish.",
+        accept:["i like fish"],
+        rule:n=>/\bfish\b/.test(n) && !/\ba fish\b/.test(n)},
+      {word:"strawberry", prompt:"She has a many strawberries.",
+        accept:["she has many strawberries"],
+        rule:n=>/\bmany strawberries\b/.test(n)},
+      {word:"orange", prompt:"I bought a oranges.",
+        accept:["i bought oranges","i bought some oranges"],
+        rule:n=>/\boranges\b/.test(n) && !/\ba oranges\b/.test(n)},
+    ]
+  },
+];
+
+/* ================= AUDIO ================= */
+let cachedVoice = null;
+function pickVoice(){
+  const voices = window.speechSynthesis ? speechSynthesis.getVoices() : [];
+  if(!voices || voices.length===0) return null;
+  return voices.find(v=>/Google US English/i.test(v.name)) ||
+         voices.find(v=>v.lang==="en-US") ||
+         voices.find(v=>/en/i.test(v.lang)) ||
+         voices[0];
+}
+function ensureVoices(cb){
+  if(!('speechSynthesis' in window)){ cb(null); return; }
+  let v = pickVoice();
+  if(v){ cb(v); return; }
+  speechSynthesis.onvoiceschanged = ()=>{ cb(pickVoice()); };
+  // fallback in case event never fires
+  setTimeout(()=>{ if(!cachedVoice) cb(pickVoice()); }, 400);
+}
+function speak(text){
+  if(!('speechSynthesis' in window)){
+    alert("Ваш браузер не поддерживает озвучивание (Web Speech API).");
+    return;
+  }
+  speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = "en-US";
+  utter.rate = 0.85;
+  ensureVoices(v=>{
+    if(v){ utter.voice = v; cachedVoice = v; }
+    speechSynthesis.speak(utter);
+  });
+}
+
+/* ================= PROBLEM WORDS TRACKING ================= */
+const problemCounts = {}; // key -> count
+function markProblem(wordKey){
+  problemCounts[wordKey] = (problemCounts[wordKey]||0) + 1;
+  renderProblemTable();
+}
+function renderProblemTable(){
+  const tbody = document.querySelector("#problemTable tbody");
+  const emptyMsg = document.getElementById("problemEmpty");
+  const entries = Object.entries(problemCounts).sort((a,b)=>b[1]-a[1]);
+  tbody.innerHTML = "";
+  if(entries.length===0){
+    emptyMsg.style.display = "block";
+    document.getElementById("problemTable").style.display = "none";
+    return;
+  }
+  emptyMsg.style.display = "none";
+  document.getElementById("problemTable").style.display = "table";
+  entries.forEach(([key,count])=>{
+    const w = words.find(w=>w.key===key);
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${w ? w.en : key}</td><td>${count}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+/* ================= RENDER REMINDER ================= */
+function renderWordGrid(){
+  const grid = document.getElementById("wordGrid");
+  grid.innerHTML = "";
+  words.forEach(w=>{
+    const card = document.createElement("div");
+    card.className = "word-card";
+    card.innerHTML = `
+      <div class="emoji">${w.emoji}</div>
+      <div class="info">
+        <div class="en">${w.en} <span class="type-tag type-${w.type}">${w.type==="C"?"исч.":"неисч."}</span></div>
+        <div class="ipa">${w.ipa}</div>
+        <div class="ru">${w.ru}</div>
+      </div>
+      <button class="play-btn" title="Прослушать">🔊</button>
+    `;
+    card.querySelector(".play-btn").addEventListener("click", ()=>speak(w.en));
+    grid.appendChild(card);
+  });
+}
+
+/* ================= RENDER EXERCISES ================= */
+function checkAnswer(item, rawValue){
+  const val = item.type === undefined ? rawValue : rawValue;
+  if(item.answer !== undefined){
+    // classification exercise
+    const v = norm(rawValue).replace(/\./g,"");
+    const isC = /^(c|исч|исчисляемое)$/i.test(v);
+    const isU = /^(u|неисч|неисчисляемое)$/i.test(v);
+    if(item.answer==="C") return isC;
+    if(item.answer==="U") return isU;
+    return false;
+  }
+  const strict = normStrict(rawValue);
+  const acceptStrict = (item.accept||[]).map(normStrict);
+  if(acceptStrict.includes(strict)) return true;
+  if(item.rule && item.rule(strict)) return true;
+  // also allow loose (light) comparison ignoring articles for text/picture/audio types
+  const loose = norm(rawValue);
+  const acceptLoose = (item.accept||[]).map(norm);
+  return acceptLoose.includes(loose);
+}
+
+function correctAnswerLabel(item){
+  if(item.answer!==undefined){
+    return item.answer==="C" ? "исч. (C)" : "неисч. (U)";
+  }
+  return item.accept[0];
+}
+
+function renderExercises(){
+  const root = document.getElementById("exercisesRoot");
+  root.innerHTML = "";
+  exercises.forEach((ex, exIndex)=>{
+    const section = document.createElement("section");
+    section.className = "exercise";
+    section.id = ex.id;
+
+    const header = document.createElement("h2");
+    header.innerHTML = `<span class="ex-num">${exIndex+1}</span> ${ex.title}`;
+    section.appendChild(header);
+
+    const instr = document.createElement("p");
+    instr.className = "ex-instructions";
+    instr.textContent = ex.instr;
+    section.appendChild(instr);
+
+    ex.items.forEach((item, i)=>{
+      const row = document.createElement("div");
+      row.className = "item-row";
+      row.dataset.exIndex = exIndex;
+      row.dataset.itemIndex = i;
+
+      const idx = document.createElement("div");
+      idx.className = "item-index";
+      idx.textContent = (i+1)+".";
+      row.appendChild(idx);
+
+      const promptEl = document.createElement("div");
+      promptEl.className = "item-prompt";
+
+      if(ex.type === "text"){
+        promptEl.innerHTML = `<span class="rus">${item.prompt}</span>`;
+      } else if(ex.type === "audio"){
+        promptEl.innerHTML = `<button class="mini-play" type="button">🔊 Слушать</button>`;
+      } else if(ex.type === "classify"){
+        promptEl.innerHTML = `<span class="rus">${item.prompt}</span>`;
+      } else if(ex.type === "picture"){
+        promptEl.innerHTML = `<span class="item-emoji">${item.emoji}</span>`;
+      } else if(ex.type === "correct"){
+        promptEl.innerHTML = `<span class="sentence-wrong">“${item.prompt}”</span>`;
+      }
+      row.appendChild(promptEl);
+
+      if(ex.type === "audio"){
+        promptEl.querySelector(".mini-play").addEventListener("click", ()=>speak(item.audio));
+      }
+
+      const input = document.createElement("input");
+      input.type = "text";
+      input.className = "answer-input";
+      input.autocomplete = "off";
+      input.spellcheck = false;
+      input.placeholder = ex.type === "classify" ? "исч / неисч" : "напишите ответ...";
+      row.appendChild(input);
+
+      const feedback = document.createElement("div");
+      feedback.className = "feedback-icon";
+      row.appendChild(feedback);
+
+      const reveal = document.createElement("div");
+      reveal.className = "answer-reveal";
+      reveal.textContent = "Правильный ответ: " + correctAnswerLabel(item);
+      row.appendChild(reveal);
+
+      section.appendChild(row);
+    });
+
+    const footer = document.createElement("div");
+    footer.className = "ex-footer";
+    footer.innerHTML = `
+      <button class="action-btn btn-check" data-action="check">Проверить ответы</button>
+      <button class="action-btn btn-show" data-action="show">Показать ответы</button>
+      <button class="action-btn btn-reset" data-action="reset">Очистить</button>
+      <span class="score-badge" data-score></span>
+    `;
+    section.appendChild(footer);
+
+    footer.querySelector('[data-action="check"]').addEventListener("click", ()=>gradeExercise(exIndex, section));
+    footer.querySelector('[data-action="show"]').addEventListener("click", ()=>{
+      section.querySelectorAll(".answer-reveal").forEach(r=>r.classList.add("show"));
+    });
+    footer.querySelector('[data-action="reset"]').addEventListener("click", ()=>{
+      section.querySelectorAll(".answer-input").forEach(inp=>{
+        inp.value = "";
+        inp.classList.remove("correct","incorrect");
+      });
+      section.querySelectorAll(".answer-reveal").forEach(r=>r.classList.remove("show"));
+      section.querySelector("[data-score]").textContent = "";
+    });
+
+    root.appendChild(section);
+  });
+}
+
+function gradeExercise(exIndex, section){
+  const ex = exercises[exIndex];
+  const rows = section.querySelectorAll(".item-row");
+  let correctCount = 0;
+  rows.forEach((row, i)=>{
+    const item = ex.items[i];
+    const input = row.querySelector(".answer-input");
+    const ok = checkAnswer(item, input.value);
+    input.classList.remove("correct","incorrect");
+    input.classList.add(ok ? "correct" : "incorrect");
+    if(ok){
+      correctCount++;
+    } else {
+      markProblem(item.word);
+    }
+  });
+  section.querySelector("[data-score]").textContent = `Результат: ${correctCount}/${ex.items.length}`;
+}
+
+function gradeAll(){
+  let totalCorrect = 0, totalItems = 0;
+  document.querySelectorAll(".exercise").forEach((section, exIndex)=>{
+    gradeExercise(exIndex, section);
+    const scoreText = section.querySelector("[data-score]").textContent;
+    const m = scoreText.match(/(\d+)\/(\d+)/);
+    if(m){ totalCorrect += parseInt(m[1]); totalItems += parseInt(m[2]); }
+  });
+  document.getElementById("totalScore").innerHTML =
+    `Общий результат: <b>${totalCorrect} / ${totalItems}</b>`;
+}
+
+function collectAllAnswers(){
+  let lines = [];
+  const now = new Date();
+  lines.push("Ответы студента — " + now.toLocaleString());
+  lines.push("=".repeat(50));
+  document.querySelectorAll(".exercise").forEach((section, exIndex)=>{
+    const ex = exercises[exIndex];
+    lines.push("");
+    lines.push(ex.title);
+    const rows = section.querySelectorAll(".item-row");
+    rows.forEach((row, i)=>{
+      const input = row.querySelector(".answer-input");
+      const val = input.value.trim();
+      lines.push(`  ${i+1}. ${val || "(пусто)"}`);
+    });
+  });
+  const scoreLine = document.getElementById("totalScore").textContent;
+  if(scoreLine){
+    lines.push("");
+    lines.push(scoreLine);
+  }
+  return lines.join("\n");
+}
+
+function downloadAnswers(){
+  const text = collectAllAnswers();
+  const blob = new Blob([text], {type:"text/plain;charset=utf-8"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "moi_otvety.txt";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function resetAll(){
+  document.querySelectorAll(".answer-input").forEach(inp=>{
+    inp.value = "";
+    inp.classList.remove("correct","incorrect");
+  });
+  document.querySelectorAll(".answer-reveal").forEach(r=>r.classList.remove("show"));
+  document.querySelectorAll("[data-score]").forEach(s=>s.textContent = "");
+  document.getElementById("totalScore").textContent = "";
+  for(const k in problemCounts) delete problemCounts[k];
+  renderProblemTable();
+}
+
+/* ================= INIT ================= */
+renderWordGrid();
+renderExercises();
+renderProblemTable();
+document.getElementById("checkAllBtn").addEventListener("click", gradeAll);
+document.getElementById("downloadBtn").addEventListener("click", downloadAnswers);
+document.getElementById("resetAllBtn").addEventListener("click", resetAll);
+
+// warm up voice list (some browsers need a nudge)
+if('speechSynthesis' in window){
+  speechSynthesis.getVoices();
+}
+</script>
+</body>
+</html>
