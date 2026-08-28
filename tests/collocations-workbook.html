@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Get / Have / Do — Workbook B1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#EDF1F5;
+    --paper:#FFFFFF;
+    --ink:#1E2430;
+    --ink-soft:#5B6472;
+    --indigo:#2B4570;
+    --indigo-dark:#1B2E4F;
+    --gold:#E3A857;
+    --gold-dark:#C98A34;
+    --green:#3F8F5F;
+    --green-bg:#E7F4EC;
+    --red:#C1443A;
+    --red-bg:#FBEAE8;
+    --line:#DCE3EB;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{background:var(--gold); color:var(--indigo-dark);}
+
+  a{color:var(--indigo);}
+
+  .topbar{
+    background:var(--indigo-dark);
+    color:#EFE9DD;
+    padding:28px 24px 22px;
+    position:relative;
+    overflow:hidden;
+  }
+  .topbar::after{
+    content:"";
+    position:absolute; right:-40px; top:-60px;
+    width:220px; height:220px; border-radius:50%;
+    background:radial-gradient(circle at 30% 30%, rgba(227,168,87,0.35), transparent 70%);
+  }
+  .topbar-inner{max-width:1180px; margin:0 auto; position:relative; z-index:1;}
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12.5px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--gold);
+    margin:0 0 8px;
+  }
+  h1.title{
+    font-family:'Fraunces',serif;
+    font-weight:700;
+    font-size:clamp(28px,4vw,42px);
+    line-height:1.1;
+    margin:0 0 10px;
+  }
+  h1.title em{font-style:italic; color:var(--gold);}
+  .subtitle{color:#C7CEDA; font-size:15.5px; max-width:640px; line-height:1.5; margin:0;}
+
+  .layout{
+    max-width:1180px;
+    margin:0 auto;
+    padding:26px 24px 80px;
+    display:grid;
+    grid-template-columns: 1fr 260px;
+    gap:24px;
+    align-items:start;
+  }
+  @media (max-width:900px){
+    .layout{grid-template-columns:1fr;}
+    .sidebar{order:-1;}
+  }
+
+  .card{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:22px 24px;
+    margin-bottom:20px;
+    box-shadow:0 1px 2px rgba(20,30,50,0.04);
+  }
+
+  h2.section-title{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:21px;
+    margin:0 0 4px;
+    color:var(--indigo-dark);
+  }
+  .section-sub{color:var(--ink-soft); font-size:13.5px; margin:0 0 16px;}
+
+  /* vocab table */
+  table.vocab{width:100%; border-collapse:collapse; font-size:14.5px;}
+  table.vocab th{
+    text-align:left; font-size:11.5px; text-transform:uppercase; letter-spacing:.06em;
+    color:var(--ink-soft); border-bottom:1px solid var(--line); padding:8px 8px;
+  }
+  table.vocab td{padding:10px 8px; border-bottom:1px solid #EEF1F5; vertical-align:middle;}
+  table.vocab tr:last-child td{border-bottom:none;}
+  .phrase-en{font-weight:600; color:var(--indigo-dark);}
+  .ipa{font-family:'JetBrains Mono',monospace; color:var(--ink-soft); font-size:13px;}
+  .btn-listen{
+    border:1px solid var(--indigo);
+    background:#fff; color:var(--indigo);
+    border-radius:999px; padding:6px 12px; font-size:13px; cursor:pointer;
+    font-weight:600; white-space:nowrap;
+    transition:.15s;
+  }
+  .btn-listen:hover{background:var(--indigo); color:#fff;}
+
+  /* tabs */
+  .tabs{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:18px;}
+  .tab-btn{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12.5px; font-weight:600;
+    border:1px solid var(--line); background:#fff; color:var(--ink-soft);
+    padding:8px 12px; border-radius:999px; cursor:pointer; transition:.15s;
+  }
+  .tab-btn .num{color:var(--gold-dark); margin-right:5px;}
+  .tab-btn.active{background:var(--indigo-dark); color:#fff; border-color:var(--indigo-dark);}
+  .tab-btn.active .num{color:var(--gold);}
+  .tab-btn:hover:not(.active){border-color:var(--indigo);}
+
+  .exercise-panel{display:none;}
+  .exercise-panel.active{display:block;}
+  .ex-head{display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap;}
+  .ex-actions{display:flex; gap:8px; flex-wrap:wrap; margin:14px 0 6px;}
+
+  .btn{
+    border:none; border-radius:10px; padding:10px 16px; font-size:14px; font-weight:600;
+    cursor:pointer; transition:.15s; font-family:'Inter',sans-serif;
+  }
+  .btn-primary{background:var(--indigo); color:#fff;}
+  .btn-primary:hover{background:var(--indigo-dark);}
+  .btn-ghost{background:#fff; border:1px solid var(--line); color:var(--ink);}
+  .btn-ghost:hover{border-color:var(--indigo); color:var(--indigo);}
+  .btn-gold{background:var(--gold); color:var(--indigo-dark);}
+  .btn-gold:hover{background:var(--gold-dark); color:#fff;}
+
+  .score-badge{
+    font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:600;
+    color:var(--indigo-dark); background:#EEF2FA; border-radius:8px; padding:6px 10px;
+  }
+
+  .item{
+    border-top:1px dashed var(--line);
+    padding:14px 0;
+  }
+  .item:first-child{border-top:none; padding-top:6px;}
+  .item-prompt{font-size:15px; line-height:1.5; margin-bottom:8px;}
+  .item-prompt b{color:var(--indigo-dark);}
+  .item-prompt .hint{color:var(--ink-soft); font-size:13px;}
+  .scramble{
+    font-family:'JetBrains Mono',monospace; letter-spacing:.12em; font-weight:600;
+    background:#FBF3E4; color:var(--gold-dark); padding:3px 8px; border-radius:6px;
+  }
+
+  .answer-input{
+    width:100%; max-width:420px; padding:9px 12px; border:1.5px solid var(--line);
+    border-radius:9px; font-size:14.5px; font-family:'Inter',sans-serif; outline:none;
+    transition:.15s;
+  }
+  .answer-input:focus{border-color:var(--indigo);}
+  .answer-input.correct{border-color:var(--green); background:var(--green-bg);}
+  .answer-input.incorrect{border-color:var(--red); background:var(--red-bg);}
+
+  .feedback{font-size:13px; margin-top:5px; min-height:16px;}
+  .feedback.ok{color:var(--green); font-weight:600;}
+  .feedback.bad{color:var(--red);}
+  .feedback.shown{color:var(--gold-dark); font-style:italic;}
+
+  textarea.open-input{
+    width:100%; min-height:56px; padding:10px 12px; border:1.5px solid var(--line);
+    border-radius:9px; font-size:14.5px; font-family:'Inter',sans-serif; outline:none; resize:vertical;
+  }
+  textarea.open-input:focus{border-color:var(--indigo);}
+
+  .model-line{
+    background:#F5F7FB; border-left:3px solid var(--gold); padding:8px 12px; border-radius:0 8px 8px 0;
+    font-size:14px; color:var(--indigo-dark); margin-bottom:8px;
+  }
+
+  /* sidebar */
+  .sidebar .card{position:sticky; top:16px;}
+  .problem-row{display:flex; justify-content:space-between; align-items:center; padding:7px 0; border-bottom:1px solid #EEF1F5; font-size:13.5px;}
+  .problem-row:last-child{border-bottom:none;}
+  .problem-count{
+    font-family:'JetBrains Mono',monospace; background:var(--red-bg); color:var(--red);
+    padding:2px 8px; border-radius:999px; font-size:12px; font-weight:700; min-width:22px; text-align:center;
+  }
+  .empty-note{color:var(--ink-soft); font-size:13.5px; line-height:1.5;}
+
+  .footer-check{
+    background:#F5F7FB; border:1px dashed var(--indigo); border-radius:12px; padding:16px 18px;
+    font-size:14px; color:var(--ink-soft);
+  }
+  .footer-check code{background:#fff; border:1px solid var(--line); padding:1px 6px; border-radius:5px; font-family:'JetBrains Mono',monospace;}
+  #audio-status{margin-top:8px; font-size:13.5px; font-weight:600;}
+  #audio-status.ok{color:var(--green);}
+  #audio-status.bad{color:var(--red);}
+
+  .toast{
+    position:fixed; bottom:22px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:var(--indigo-dark); color:#fff; padding:10px 18px; border-radius:999px;
+    font-size:13.5px; font-weight:600; opacity:0; pointer-events:none; transition:.25s;
+    z-index:50; box-shadow:0 6px 18px rgba(0,0,0,.2);
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <p class="eyebrow">Workbook · Level B1</p>
+    <h1 class="title">Get, Have, Do — <em>Life Collocations</em></h1>
+    <p class="subtitle">8 ключевых словосочетаний, 10 упражнений, всё прописываем руками. Прослушайте фразы (голос Google US English), проверяйте себя и следите за «проблемными словами» справа.</p>
+  </div>
+</div>
+
+<div class="layout">
+  <div class="main">
+
+    <!-- VOCAB REMINDER -->
+    <div class="card" id="vocab-card">
+      <h2 class="section-title">Слова для повторения</h2>
+      <p class="section-sub">Нажмите 🔊, чтобы услышать произношение, прежде чем приступать к упражнениям.</p>
+      <table class="vocab" id="vocab-table"></table>
+    </div>
+
+    <!-- TABS -->
+    <div class="card" style="padding-bottom:8px;">
+      <div class="tabs" id="tabs"></div>
+    </div>
+
+    <!-- EXERCISE PANELS -->
+    <div id="panels"></div>
+
+    <!-- FINAL CHECK -->
+    <div class="card footer-check">
+      <b style="color:var(--indigo-dark);">Финальная проверка</b>
+      <p style="margin:8px 0 10px;">1. Нажмите «Проверить озвучку» — убедитесь, что браузер нашёл голос <code>Google US English</code> (en-US).<br>
+      2. Соберите все ответы студента одной кнопкой — они скопируются в буфер обмена в текстовом виде.</p>
+      <div class="ex-actions">
+        <button class="btn btn-ghost" onclick="testAudio()">🔊 Проверить озвучку</button>
+        <button class="btn btn-gold" onclick="copyAllAnswers()">📋 Скопировать ВСЕ ответы студента</button>
+      </div>
+      <div id="audio-status"></div>
+    </div>
+
+  </div>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="card">
+      <h2 class="section-title" style="font-size:17px;">Проблемные слова</h2>
+      <p class="section-sub">Обновляется после каждой проверки</p>
+      <div id="problem-list"><p class="empty-note">Пока нет ошибок — так держать! Начните проверять упражнения, и здесь появится статистика.</p></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============ DATA ============ */
+const phrases = [
+  {en:"have a discussion", ru:"вести дискуссию / обсуждать", ipa:"/hæv ə dɪˈskʌʃn/", verb:"have", noun:"a discussion", key:"discussion",
+   def:"a conversation in which people share ideas or opinions about a topic"},
+  {en:"get an education", ru:"получить образование", ipa:"/ɡet ən ˌedʒʊˈkeɪʃn/", verb:"get", noun:"an education", key:"education",
+   def:"to study and gain knowledge and skills, usually at school or university"},
+  {en:"receive an invitation", ru:"получить приглашение", ipa:"/rɪˈsiːv ən ˌɪnvɪˈteɪʃn/", verb:"receive", noun:"an invitation", key:"invitation",
+   def:"to be formally asked to come to an event"},
+  {en:"get a promotion", ru:"получить повышение", ipa:"/ɡet ə prəˈmoʊʃn/", verb:"get", noun:"a promotion", key:"promotion",
+   def:"to be given a higher position or rank at work",
+   altDef:"to move up to a better, usually higher-paid, position at work"},
+  {en:"submit an application", ru:"подать заявление / заявку", ipa:"/səbˈmɪt ən ˌæplɪˈkeɪʃn/", verb:"submit", noun:"an application", key:"application",
+   def:"to officially send a form requesting something, e.g. a job or a visa"},
+  {en:"get a qualification", ru:"получить квалификацию", ipa:"/ɡet ə ˌkwɒlɪfɪˈkeɪʃn/", verb:"get", noun:"a qualification", key:"qualification",
+   def:"to obtain a certificate or degree that proves you have particular skills"},
+  {en:"hand in your resignation", ru:"подать заявление об увольнении", ipa:"/hænd ɪn jɔːr ˌrezɪɡˈneɪʃn/", verb:"hand in", noun:"your resignation", key:"resignation",
+   def:"to formally tell your employer, usually in writing, that you are leaving your job",
+   altDef:"to officially quit your job by informing your boss in person or in writing"},
+  {en:"plan your retirement", ru:"планировать выход на пенсию", ipa:"/plæn jɔːr rɪˈtaɪrmənt/", verb:"plan", noun:"your retirement", key:"retirement",
+   def:"to prepare in advance for the period of life after you stop working"}
+];
+
+const verbForms = {
+  "have":   {past:"had", pp:"had", ing:"having", s:"has"},
+  "get":    {past:"got", pp:"got", ing:"getting", s:"gets"},
+  "receive":{past:"received", pp:"received", ing:"receiving", s:"receives"},
+  "submit": {past:"submitted", pp:"submitted", ing:"submitting", s:"submits"},
+  "hand in":{past:"handed in", pp:"handed in", ing:"handing in", s:"hands in"},
+  "plan":   {past:"planned", pp:"planned", ing:"planning", s:"plans"}
+};
+
+/* ============ SPEECH ============ */
+let chosenVoice = null;
+function pickVoice(){
+  const voices = speechSynthesis.getVoices();
+  chosenVoice = voices.find(v => v.name === "Google US English")
+             || voices.find(v => v.name.toLowerCase().includes("google") && v.lang === "en-US")
+             || voices.find(v => v.lang === "en-US")
+             || voices.find(v => v.lang && v.lang.startsWith("en"))
+             || null;
+}
+if ('speechSynthesis' in window){
+  speechSynthesis.onvoiceschanged = pickVoice;
+  pickVoice();
+}
+function speak(text){
+  if(!('speechSynthesis' in window)){
+    showToast("Синтез речи не поддерживается в этом браузере");
+    return;
+  }
+  if(!chosenVoice) pickVoice();
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = "en-US";
+  u.rate = 0.92;
+  if(chosenVoice) u.voice = chosenVoice;
+  speechSynthesis.speak(u);
+}
+function testAudio(){
+  pickVoice();
+  const el = document.getElementById('audio-status');
+  if(!('speechSynthesis' in window)){
+    el.textContent = "✗ Синтез речи недоступен в этом браузере.";
+    el.className = "bad";
+    return;
+  }
+  speak("This is a test of the Google US English voice.");
+  if(chosenVoice){
+    el.textContent = `✓ Аудио работает. Используется голос: "${chosenVoice.name}" (${chosenVoice.lang}).` +
+      (chosenVoice.name !== "Google US English" ? " Точный голос «Google US English» не найден в этом браузере — включён ближайший en-US голос. В Chrome на компьютере голос обычно доступен." : "");
+    el.className = "ok";
+  } else {
+    el.textContent = "✗ Не найден ни один английский голос. Попробуйте открыть страницу в Chrome.";
+    el.className = "bad";
+  }
+}
+
+/* ============ VOCAB TABLE ============ */
+function renderVocab(){
+  const rows = phrases.map(p => `
+    <tr>
+      <td class="phrase-en">${p.en}</td>
+      <td class="ipa">${p.ipa}</td>
+      <td>${p.ru}</td>
+      <td><button type="button" class="btn-listen" data-say="${p.en}">🔊 Слушать</button></td>
+    </tr>`).join('');
+  document.getElementById('vocab-table').innerHTML = `
+    <thead><tr><th>Фраза</th><th>Транскрипция</th><th>Перевод</th><th></th></tr></thead>
+    <tbody>${rows}</tbody>`;
+}
+
+/* ============ PROBLEM WORDS ============ */
+const mistakes = {}; // phraseIndex -> count
+function registerMistake(idx){
+  mistakes[idx] = (mistakes[idx]||0) + 1;
+  renderProblemWords();
+}
+function renderProblemWords(){
+  const entries = Object.entries(mistakes).filter(([,c])=>c>0).sort((a,b)=>b[1]-a[1]);
+  const box = document.getElementById('problem-list');
+  if(entries.length === 0){
+    box.innerHTML = `<p class="empty-note">Пока нет ошибок — так держать! Начните проверять упражнения, и здесь появится статистика.</p>`;
+    return;
+  }
+  box.innerHTML = entries.map(([idx,count]) => `
+    <div class="problem-row">
+      <span>${phrases[idx].en}</span>
+      <span class="problem-count">${count}</span>
+    </div>`).join('');
+}
+
+/* ============ HELPERS ============ */
+function normalize(s){
+  return (s||"").toLowerCase().trim().replace(/[.,!?;:"'`]/g,'').replace(/\s+/g,' ');
+}
+function maskWord(w){
+  const stop = ['a','an','your','the','in','of'];
+  if(w.length<=3 || stop.includes(w.toLowerCase())) return w;
+  const chars = w.split('');
+  for(let i=1;i<chars.length;i++){
+    if('aeiouAEIOU'.includes(chars[i])) chars[i]='_';
+  }
+  return chars.join('');
+}
+function maskPhrase(en){ return en.split(' ').map(maskWord).join(' '); }
+function shuffleLetters(word){
+  let arr = word.split('');
+  do{
+    for(let i=arr.length-1;i>0;i--){
+      const j = Math.floor(Math.random()*(i+1));
+      [arr[i],arr[j]] = [arr[j],arr[i]];
+    }
+  } while(arr.join('') === word && word.length>1);
+  return arr.join('').toUpperCase();
+}
+function occurrenceMap(order){
+  const seen = {}; return order.map(idx=>{ seen[idx]=(seen[idx]||0)+1; return seen[idx]; });
+}
+
+/* ============ ORDER ARRAYS (mixed, no adjacent repeats) ============ */
+const order1 = [4,7,1,3,6,0,5,2,7,4];   // fill letters
+const order2 = [6,2,5,0,3,7,1,4,2,6];   // translation
+const order3 = [1,5,7,2,6,0,4,3,7,1];   // dictation
+const order4 = [3,6,0,4,7,1,5,2,6,3];   // definition
+const order5 = [5,1,3,7,0,4,6,2,1,5];   // collocation verb
+const order6 = [2,4,6,1,5,7,0,3,4,2];   // context insertion
+const order7 = [7,3,5,0,2,6,1,4,3,7];   // tense change
+const order8 = [0,6,2,7,4,1,3,5,6,0];   // guess the word
+
+const formCycle7 = ['past','sPerson','ing','pp','past','sPerson','pp','ing','past','pp'];
+const formLabels = {
+  past:"Past Simple (she ___ )",
+  sPerson:"Present Simple, 3-е лицо (she/he ___ )",
+  ing:"-ing form / Gerund",
+  pp:"Present Perfect (she has ___ )"
+};
+
+const contextSentences = {
+  0:"The teacher asked the students to _____ about climate change.",
+  1:"Many children in remote villages struggle to _____ .",
+  2:"I was excited to _____ to the wedding.",
+  "2b":"The whole team was surprised to _____ from the CEO herself.",
+  3:"She worked hard all year, hoping to _____ .",
+  4:"The deadline to _____ for the scholarship is Friday.",
+  "4b":"Make sure to _____ before the visa office closes today.",
+  5:"He took evening classes in order to _____ in accounting.",
+  6:"After the argument with his boss, he decided to _____ .",
+  7:"It's never too early to _____ ."
+};
+
+/* ============ BUILD EXERCISES ============ */
+function ex1(){
+  return order1.map(idx => ({
+    phraseIndex: idx,
+    prompt: `Восстановите фразу по пропущенным буквам: <b>"${maskPhrase(phrases[idx].en)}"</b><br><span class="hint">${phrases[idx].ru}</span>`,
+    answer: [phrases[idx].en]
+  }));
+}
+function ex2(){
+  return order2.map(idx => ({
+    phraseIndex: idx,
+    prompt: `Переведите на английский язык: <b>${phrases[idx].ru}</b>`,
+    answer: [phrases[idx].en]
+  }));
+}
+function ex3(){
+  return order3.map(idx => ({
+    phraseIndex: idx,
+    prompt: `Прослушайте и запишите фразу целиком: <button type="button" class="btn-listen" data-say="${phrases[idx].en}">🔊 Слушать</button>`,
+    answer: [phrases[idx].en]
+  }));
+}
+function ex4(){
+  const occ = occurrenceMap(order4);
+  return order4.map((idx,i) => {
+    const useAlt = occ[i] > 1 && phrases[idx].altDef;
+    const def = useAlt ? phrases[idx].altDef : phrases[idx].def;
+    return {
+      phraseIndex: idx,
+      prompt: `Какое словосочетание соответствует определению?<br><i>"${def}"</i>`,
+      answer: [phrases[idx].en]
+    };
+  });
+}
+function ex5(){
+  return order5.map(idx => ({
+    phraseIndex: idx,
+    prompt: `Вставьте нужный глагол: <b>______ ${phrases[idx].noun}</b>`,
+    answer: [phrases[idx].verb]
+  }));
+}
+function ex6(){
+  const occ = occurrenceMap(order6);
+  return order6.map((idx,i) => {
+    const key = occ[i] > 1 && contextSentences[idx+"b"] ? (idx+"b") : idx;
+    return {
+      phraseIndex: idx,
+      prompt: `Вставьте подходящую фразу в контекст:<br>${contextSentences[key]}`,
+      answer: [phrases[idx].en]
+    };
+  });
+}
+function ex7(){
+  return order7.map((idx,i) => {
+    const type = formCycle7[i];
+    const vf = verbForms[phrases[idx].verb];
+    const noun = phrases[idx].noun;
+    let answer;
+    if(type==='past') answer = vf.past+' '+noun;
+    if(type==='sPerson') answer = vf.s+' '+noun;
+    if(type==='ing') answer = vf.ing+' '+noun;
+    if(type==='pp') answer = 'has '+vf.pp+' '+noun;
+    return {
+      phraseIndex: idx,
+      prompt: `Измените словосочетание "<b>${phrases[idx].en}</b>" в форму: <b>${formLabels[type]}</b>`,
+      answer: [answer]
+    };
+  });
+}
+function ex8(){
+  return order8.map(idx => ({
+    phraseIndex: idx,
+    prompt: `Прочитайте определение и составьте слово из букв:<br><i>"${phrases[idx].def}"</i><br><span class="scramble">${shuffleLetters(phrases[idx].key)}</span>`,
+    answer: [phrases[idx].key]
+  }));
+}
+
+const ex9items = [
+  "I would love to have a discussion about...",
+  "If I could get any education for free, I would study...",
+  "The best invitation I ever received was...",
+  "To get a promotion at my job, I think I need to...",
+  "Before submitting an application for a new job, I always...",
+  "The most useful qualification I would like to get is...",
+  "If I ever handed in my resignation, the reason would probably be...",
+  "When I plan my retirement, I imagine myself...",
+  "One discussion I will never forget is...",
+  "The qualification I am most proud of is..."
+];
+
+const ex10items = [
+  {model:"Yesterday, I had a discussion with my colleague about the new project.", task:"Ваш вариант (Past Simple, have a discussion):"},
+  {model:"She has just received an invitation to a conference in Berlin.", task:"Ваш вариант (Present Perfect, receive an invitation):"},
+  {model:"He is planning to submit an application next week.", task:"Ваш вариант (Present Continuous + infinitive, submit an application):"},
+  {model:"By the time she is 60, she will have planned her retirement carefully.", task:"Ваш вариант (Future Perfect, plan your retirement):"},
+  {model:"If he studies hard, he will get a good education.", task:"Ваш вариант (First Conditional, get an education):"},
+  {model:"I wish I hadn't handed in my resignation so quickly.", task:"Ваш вариант (Wish + Past Perfect, hand in your resignation):"},
+  {model:"It's important to get a qualification before applying for this job.", task:"Ваш вариант (It's important to..., get a qualification):"},
+  {model:"She was promoted last year because she had worked really hard.", task:"Ваш вариант (Passive + reason clause, get a promotion):"},
+  {model:"Have you ever received an invitation you had to refuse?", task:"Ваш вариант (Present Perfect question, receive an invitation):"},
+  {model:"After discussing the problem for hours, they finally found a solution.", task:"Ваш вариант (After + -ing, have a discussion):"}
+];
+
+/* ============ EXERCISE REGISTRY ============ */
+const exercises = [
+  {id:'ex1', title:'Пропущенные буквы', sub:'Впишите слово полностью, восстановив пропущенные буквы.', type:'check', items:ex1()},
+  {id:'ex2', title:'Перевод RU → EN', sub:'Переведите словосочетание на английский язык.', type:'check', items:ex2()},
+  {id:'ex3', title:'Пишем на слух', sub:'Нажмите на значок звука и запишите то, что услышали.', type:'check', items:ex3()},
+  {id:'ex4', title:'Дефиниции', sub:'По определению напишите нужное словосочетание.', type:'check', items:ex4()},
+  {id:'ex5', title:'Сочетаемость', sub:'Подберите правильный глагол к существительному.', type:'check', items:ex5()},
+  {id:'ex6', title:'Вставь в контекст', sub:'Впишите фразу, подходящую по смыслу предложения.', type:'check', items:ex6()},
+  {id:'ex7', title:'Времена глагола', sub:'Измените словосочетание в указанную грамматическую форму.', type:'check', items:ex7()},
+  {id:'ex8', title:'Guess the word', sub:'По определению и перепутанным буквам угадайте слово.', type:'check', items:ex8()},
+  {id:'ex9', title:'Закончи предложение', sub:'Допишите предложение своей идеей. Готовые ответы можно скопировать одной кнопкой.', type:'open', items:ex9items},
+  {id:'ex10', title:'Repeat & Change', sub:'По образцу составьте свой пример с той же грамматической структурой.', type:'drill', items:ex10items}
+];
+
+/* ============ RENDER TABS + PANELS ============ */
+function renderTabs(){
+  document.getElementById('tabs').innerHTML = exercises.map((ex,i) => `
+    <button class="tab-btn ${i===0?'active':''}" data-tab="${ex.id}">
+      <span class="num">${String(i+1).padStart(2,'0')}</span>${ex.title}
+    </button>`).join('');
+}
+
+function renderPanels(){
+  const container = document.getElementById('panels');
+  container.innerHTML = exercises.map((ex,i) => {
+    if(ex.type === 'check'){
+      const itemsHtml = ex.items.map((it,j) => `
+        <div class="item">
+          <div class="item-prompt">${j+1}. ${it.prompt}</div>
+          <input type="text" class="answer-input" id="${ex.id}-input-${j}" autocomplete="off" placeholder="Введите ответ">
+          <div class="feedback" id="${ex.id}-fb-${j}"></div>
+        </div>`).join('');
+      return `
+        <div class="card exercise-panel ${i===0?'active':''}" id="panel-${ex.id}">
+          <div class="ex-head">
+            <div>
+              <h2 class="section-title">${String(i+1).padStart(2,'0')}. ${ex.title}</h2>
+              <p class="section-sub">${ex.sub}</p>
+            </div>
+            <span class="score-badge" id="${ex.id}-score">Результат: — / ${ex.items.length}</span>
+          </div>
+          ${itemsHtml}
+          <div class="ex-actions">
+            <button class="btn btn-primary" onclick="checkExercise('${ex.id}')">Проверить ответы</button>
+            <button class="btn btn-ghost" onclick="showAnswers('${ex.id}')">Показать ответы</button>
+            <button class="btn btn-gold" onclick="copyExercise('${ex.id}')">📋 Скопировать ответы</button>
+          </div>
+        </div>`;
+    }
+    if(ex.type === 'open'){
+      const itemsHtml = ex.items.map((starter,j) => `
+        <div class="item">
+          <div class="item-prompt">${j+1}. ${starter}</div>
+          <textarea class="open-input" id="${ex.id}-input-${j}" placeholder="Допишите своими словами..."></textarea>
+        </div>`).join('');
+      return `
+        <div class="card exercise-panel" id="panel-${ex.id}">
+          <div class="ex-head">
+            <div>
+              <h2 class="section-title">${String(i+1).padStart(2,'0')}. ${ex.title}</h2>
+              <p class="section-sub">${ex.sub}</p>
+            </div>
+          </div>
+          ${itemsHtml}
+          <div class="ex-actions">
+            <button class="btn btn-gold" onclick="copyExercise('${ex.id}')">📋 Скопировать все ответы</button>
+          </div>
+        </div>`;
+    }
+    if(ex.type === 'drill'){
+      const itemsHtml = ex.items.map((it,j) => `
+        <div class="item">
+          <div class="item-prompt">${j+1}. ${it.task}</div>
+          <div class="model-line">Пример: ${it.model}</div>
+          <textarea class="open-input" id="${ex.id}-input-${j}" placeholder="Ваше предложение..."></textarea>
+        </div>`).join('');
+      return `
+        <div class="card exercise-panel" id="panel-${ex.id}">
+          <div class="ex-head">
+            <div>
+              <h2 class="section-title">${String(i+1).padStart(2,'0')}. ${ex.title}</h2>
+              <p class="section-sub">${ex.sub}</p>
+            </div>
+          </div>
+          ${itemsHtml}
+          <div class="ex-actions">
+            <button class="btn btn-gold" onclick="copyExercise('${ex.id}')">📋 Скопировать все ответы</button>
+          </div>
+        </div>`;
+    }
+  }).join('');
+}
+
+/* ============ CHECK / SHOW ============ */
+function checkExercise(exId){
+  const ex = exercises.find(e => e.id === exId);
+  let correctCount = 0;
+  ex.items.forEach((it,j) => {
+    const inp = document.getElementById(`${exId}-input-${j}`);
+    const fb = document.getElementById(`${exId}-fb-${j}`);
+    const val = normalize(inp.value);
+    const accepted = it.answer.map(a => normalize(a));
+    const isCorrect = val.length > 0 && accepted.includes(val);
+    inp.classList.remove('correct','incorrect');
+    if(isCorrect){
+      inp.classList.add('correct');
+      fb.textContent = '✓ верно';
+      fb.className = 'feedback ok';
+      correctCount++;
+    } else {
+      inp.classList.add('incorrect');
+      fb.textContent = `✗ правильный ответ: ${it.answer[0]}`;
+      fb.className = 'feedback bad';
+      if(it.phraseIndex !== undefined) registerMistake(it.phraseIndex);
+    }
+  });
+  document.getElementById(`${exId}-score`).textContent = `Результат: ${correctCount} / ${ex.items.length}`;
+}
+
+function showAnswers(exId){
+  const ex = exercises.find(e => e.id === exId);
+  ex.items.forEach((it,j) => {
+    const inp = document.getElementById(`${exId}-input-${j}`);
+    const fb = document.getElementById(`${exId}-fb-${j}`);
+    inp.value = it.answer[0];
+    inp.classList.remove('incorrect');
+    inp.classList.add('correct');
+    fb.textContent = 'ответ показан';
+    fb.className = 'feedback shown';
+  });
+}
+
+/* ============ COPY ============ */
+function copyExercise(exId){
+  const ex = exercises.find(e => e.id === exId);
+  let lines = [`${ex.title} — ответы студента`, ''];
+  ex.items.forEach((it,j) => {
+    const inp = document.getElementById(`${exId}-input-${j}`);
+    lines.push(`${j+1}. ${inp.value || '(пусто)'}`);
+  });
+  copyText(lines.join('\n'));
+}
+
+function copyAllAnswers(){
+  let lines = ['ВСЕ ОТВЕТЫ СТУДЕНТА', '====================', ''];
+  exercises.forEach((ex,i) => {
+    lines.push(`${String(i+1).padStart(2,'0')}. ${ex.title}`);
+    ex.items.forEach((it,j) => {
+      const inp = document.getElementById(`${ex.id}-input-${j}`);
+      lines.push(`  ${j+1}. ${inp.value || '(пусто)'}`);
+    });
+    lines.push('');
+  });
+  copyText(lines.join('\n'));
+}
+
+function copyText(text){
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(() => showToast('Скопировано в буфер обмена!'))
+      .catch(() => fallbackCopy(text));
+  } else {
+    fallbackCopy(text);
+  }
+}
+function fallbackCopy(text){
+  const ta = document.createElement('textarea');
+  ta.value = text; document.body.appendChild(ta); ta.select();
+  try{ document.execCommand('copy'); showToast('Скопировано в буфер обмена!'); }
+  catch(e){ showToast('Не удалось скопировать автоматически'); }
+  document.body.removeChild(ta);
+}
+
+let toastTimer;
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+/* ============ TABS SWITCHING + LISTEN DELEGATION ============ */
+function initTabs(){
+  document.getElementById('tabs').addEventListener('click', e => {
+    const btn = e.target.closest('.tab-btn');
+    if(!btn) return;
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.exercise-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('panel-' + btn.dataset.tab).classList.add('active');
+    document.getElementById('panel-' + btn.dataset.tab).scrollIntoView({behavior:'smooth', block:'start'});
+  });
+}
+function initListenDelegation(){
+  document.body.addEventListener('click', e => {
+    const btn = e.target.closest('.btn-listen');
+    if(btn) speak(btn.dataset.say);
+  });
+}
+
+/* ============ INIT ============ */
+renderVocab();
+renderTabs();
+renderPanels();
+renderProblemWords();
+initTabs();
+initListenDelegation();
+</script>
+</body>
+</html>
