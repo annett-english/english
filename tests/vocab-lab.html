@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vocabulary Lab — тренажёр слов</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#12232E;
+    --bg-deep:#0D1A22;
+    --panel:#1B3242;
+    --panel-2:#20394A;
+    --line:#2D4A5C;
+    --ink:#EDEFF2;
+    --ink-dim:#A9BDC9;
+    --gold:#E8B94F;
+    --coral:#FF8B6B;
+    --good:#6FCF97;
+    --bad:#EF6F6C;
+    --good-bg:rgba(111,207,151,0.12);
+    --bad-bg:rgba(239,111,108,0.14);
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(1200px 600px at 10% -10%, rgba(232,185,79,0.08), transparent 60%),
+      radial-gradient(900px 500px at 100% 0%, rgba(255,139,107,0.07), transparent 55%),
+      var(--bg);
+    color:var(--ink);
+    font-family:'IBM Plex Sans', sans-serif;
+    line-height:1.5;
+    padding-bottom:80px;
+  }
+  h1,h2,h3{font-family:'Fraunces', serif; font-weight:600; margin:0 0 6px;}
+  .mono{font-family:'IBM Plex Mono', monospace;}
+  a{color:var(--gold);}
+
+  /* HERO */
+  .hero{
+    padding:48px 24px 28px;
+    max-width:1180px; margin:0 auto;
+    border-bottom:1px solid var(--line);
+  }
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:'IBM Plex Mono', monospace; font-size:12px; letter-spacing:.12em;
+    text-transform:uppercase; color:var(--gold); margin-bottom:14px;
+  }
+  .eyebrow::before{content:'●'; font-size:8px;}
+  .hero h1{font-size:clamp(28px,4vw,42px); color:var(--ink);}
+  .hero p.lead{color:var(--ink-dim); max-width:640px; font-size:15.5px;}
+  .hero-actions{display:flex; gap:10px; flex-wrap:wrap; margin-top:18px; align-items:center;}
+  #audio-status{font-family:'IBM Plex Mono',monospace; font-size:12.5px; color:var(--ink-dim);}
+
+  /* BUTTONS */
+  button{
+    font-family:'IBM Plex Sans', sans-serif; font-weight:600; font-size:13.5px;
+    border-radius:999px; border:1px solid var(--line); cursor:pointer;
+    padding:9px 16px; background:var(--panel-2); color:var(--ink);
+    transition:transform .12s ease, background .15s ease, border-color .15s ease;
+  }
+  button:hover{transform:translateY(-1px); border-color:var(--gold);}
+  button:active{transform:translateY(0);}
+  button.primary{background:var(--gold); color:#1B1204; border-color:var(--gold);}
+  button.primary:hover{background:#f0c766;}
+  button.ghost{background:transparent;}
+  button.small{padding:6px 12px; font-size:12.5px;}
+  button.speak-btn{padding:6px 10px; font-size:14px; border-radius:10px;}
+  button:disabled{opacity:.45; cursor:not-allowed; transform:none;}
+
+  /* LAYOUT */
+  .wrap{max-width:1180px; margin:0 auto; padding:0 24px;}
+  .layout{display:grid; grid-template-columns:1fr 300px; gap:28px; align-items:start; margin-top:30px;}
+  @media (max-width:900px){ .layout{grid-template-columns:1fr;} .sidebar{position:static !important;} }
+
+  /* WORD BANK */
+  .wordbank{margin-top:26px;}
+  .wordbank-head{display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;}
+  .grid-words{
+    display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:10px; margin-top:14px;
+    max-height:340px; overflow-y:auto; padding-right:4px;
+  }
+  .grid-words.collapsed{display:none;}
+  .word-card{
+    background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:12px 14px;
+  }
+  .word-card .en{font-weight:600; font-size:14.5px;}
+  .word-card .ipa{color:var(--gold); font-size:12px; margin:3px 0;}
+  .word-card .ru{color:var(--ink-dim); font-size:13px; margin-bottom:8px;}
+
+  /* SIDEBAR */
+  .sidebar{position:sticky; top:20px; background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:18px;}
+  .sidebar h3{font-size:16px; color:var(--coral);}
+  .sidebar p.hint{color:var(--ink-dim); font-size:12.5px; margin-top:0;}
+  table.mistakes{width:100%; border-collapse:collapse; font-size:13px; margin-top:10px;}
+  table.mistakes th, table.mistakes td{text-align:left; padding:6px 4px; border-bottom:1px solid var(--line);}
+  table.mistakes th{color:var(--ink-dim); font-weight:600; font-size:11.5px; text-transform:uppercase; letter-spacing:.05em;}
+  table.mistakes .cnt{color:var(--bad); font-weight:700; text-align:right;}
+  .empty-note{color:var(--ink-dim); font-size:13px; font-style:italic;}
+  .sidebar .total-score{margin-top:16px; padding-top:14px; border-top:1px solid var(--line); font-size:13.5px;}
+  .sidebar .total-score b{color:var(--gold); font-family:'Fraunces',serif; font-size:22px; display:block;}
+
+  /* EXERCISES */
+  .exercise{
+    background:var(--panel); border:1px solid var(--line); border-radius:var(--radius);
+    padding:22px 22px 20px; margin-bottom:22px;
+  }
+  .exercise-head{display:flex; justify-content:space-between; align-items:flex-start; gap:16px; flex-wrap:wrap;}
+  .exercise-tag{font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--gold); text-transform:uppercase; letter-spacing:.1em;}
+  .exercise-head p{color:var(--ink-dim); font-size:13.5px; margin:4px 0 0; max-width:560px;}
+  .exercise-tools{display:flex; gap:8px; flex-wrap:wrap;}
+  .score-tag{font-family:'IBM Plex Mono',monospace; font-size:12.5px; padding:6px 12px; border-radius:999px; background:var(--panel-2); border:1px solid var(--line);}
+
+  .items{margin-top:16px; display:flex; flex-direction:column; gap:14px;}
+  .item{background:var(--bg-deep); border:1px solid var(--line); border-radius:10px; padding:12px 14px;}
+  .item .q-num{color:var(--gold); font-family:'IBM Plex Mono',monospace; font-size:12px; margin-right:6px;}
+  .item .prompt{font-size:14.5px; margin-bottom:8px;}
+  .item .prompt .gap{font-family:'IBM Plex Mono',monospace; letter-spacing:2px; font-size:16px; color:var(--coral);}
+  .item .hint-ru{color:var(--ink-dim); font-size:13px;}
+  .item input[type=text]{
+    width:100%; max-width:420px; padding:9px 12px; border-radius:8px; border:1px solid var(--line);
+    background:var(--panel); color:var(--ink); font-size:14px; font-family:'IBM Plex Sans',sans-serif;
+  }
+  .item input[type=text]:focus{outline:none; border-color:var(--gold);}
+  .item.correct{border-color:var(--good); background:var(--good-bg);}
+  .item.incorrect{border-color:var(--bad); background:var(--bad-bg);}
+  .feedback{margin-top:6px; font-size:12.5px; font-family:'IBM Plex Mono',monospace;}
+  .feedback.ok{color:var(--good);}
+  .feedback.no{color:var(--bad);}
+  .correct-reveal{margin-top:6px; font-size:12.5px; color:var(--gold); display:none;}
+  .correct-reveal.shown{display:block;}
+
+  .choice-row{display:flex; flex-direction:column; gap:8px; margin-top:4px;}
+  .choice-opt{
+    display:flex; align-items:center; gap:8px; padding:8px 12px; border:1px solid var(--line);
+    border-radius:8px; background:var(--panel); cursor:pointer; font-size:14px;
+  }
+  .choice-opt:hover{border-color:var(--gold);}
+  .choice-opt input{accent-color:var(--gold);}
+
+  .dialogue-line{margin:2px 0; font-size:14.5px;}
+  .dialogue-line b{color:var(--gold);}
+
+  footer.bottom-bar{
+    position:fixed; bottom:0; left:0; right:0; background:var(--bg-deep);
+    border-top:1px solid var(--line); padding:12px 24px; display:flex; gap:10px;
+    justify-content:center; flex-wrap:wrap; z-index:10;
+  }
+  #copy-flash{font-family:'IBM Plex Mono',monospace; font-size:12.5px; color:var(--good); align-self:center;}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="eyebrow">Vocabulary Lab · 48 слов · 7 упражнений</div>
+  <h1>Словарный тренажёр</h1>
+  <p class="lead">Сначала повторите слова сверху (можно прослушать произношение), затем пропишите их руками в семи упражнениях. Ошибки автоматически попадают в таблицу «Проблемные слова» справа.</p>
+  <div class="hero-actions">
+    <button class="primary" id="test-audio-btn">🔊 Проверить звук</button>
+    <button class="ghost" id="toggle-words-btn">Свернуть / развернуть список слов</button>
+    <span id="audio-status">голос ещё не выбран…</span>
+  </div>
+</div>
+
+<div class="wrap wordbank">
+  <div class="wordbank-head">
+    <h2>Повторение слов</h2>
+  </div>
+  <div class="grid-words" id="wordbank-grid"></div>
+</div>
+
+<div class="wrap layout">
+  <main id="main-col">
+
+    <!-- EX1 -->
+    <section class="exercise" id="ex1">
+      <div class="exercise-head">
+        <div>
+          <div class="exercise-tag">Упражнение 1 · Spelling</div>
+          <h3>Вставь пропущенные буквы</h3>
+          <p>По пропущенным буквам и переводу впиши слово целиком.</p>
+        </div>
+        <div class="exercise-tools">
+          <span class="score-tag" id="ex1-score">0 / 10</span>
+          <button class="small" onclick="checkExercise(1)">Проверить</button>
+          <button class="small ghost" onclick="toggleAnswers(1)">Показать ответы</button>
+          <button class="small ghost" onclick="copyExercise(1)">Скопировать</button>
+        </div>
+      </div>
+      <div class="items" id="ex1-items"></div>
+    </section>
+
+    <!-- EX2 -->
+    <section class="exercise" id="ex2">
+      <div class="exercise-head">
+        <div>
+          <div class="exercise-tag">Упражнение 2 · Translation</div>
+          <h3>Переведи с русского на английский</h3>
+          <p>Напиши английский эквивалент фразы.</p>
+        </div>
+        <div class="exercise-tools">
+          <span class="score-tag" id="ex2-score">0 / 10</span>
+          <button class="small" onclick="checkExercise(2)">Проверить</button>
+          <button class="small ghost" onclick="toggleAnswers(2)">Показать ответы</button>
+          <button class="small ghost" onclick="copyExercise(2)">Скопировать</button>
+        </div>
+      </div>
+      <div class="items" id="ex2-items"></div>
+    </section>
+
+    <!-- EX3 -->
+    <section class="exercise" id="ex3">
+      <div class="exercise-head">
+        <div>
+          <div class="exercise-tag">Упражнение 3 · Dictation</div>
+          <h3>Прослушай и напиши слово по звуку</h3>
+          <p>Нажми 🔊, послушай произношение (US English) и запиши услышанное.</p>
+        </div>
+        <div class="exercise-tools">
+          <span class="score-tag" id="ex3-score">0 / 10</span>
+          <button class="small" onclick="checkExercise(3)">Проверить</button>
+          <button class="small ghost" onclick="toggleAnswers(3)">Показать ответы</button>
+          <button class="small ghost" onclick="copyExercise(3)">Скопировать</button>
+        </div>
+      </div>
+      <div class="items" id="ex3-items"></div>
+    </section>
+
+    <!-- EX4 -->
+    <section class="exercise" id="ex4">
+      <div class="exercise-head">
+        <div>
+          <div class="exercise-tag">Упражнение 4 · Definition</div>
+          <h3>Угадай слово по определению</h3>
+          <p>Прочитай определение на английском и напиши нужное слово/фразу.</p>
+        </div>
+        <div class="exercise-tools">
+          <span class="score-tag" id="ex4-score">0 / 10</span>
+          <button class="small" onclick="checkExercise(4)">Проверить</button>
+          <button class="small ghost" onclick="toggleAnswers(4)">Показать ответы</button>
+          <button class="small ghost" onclick="copyExercise(4)">Скопировать</button>
+        </div>
+      </div>
+      <div class="items" id="ex4-items"></div>
+    </section>
+
+    <!-- EX5 -->
+    <section class="exercise" id="ex5">
+      <div class="exercise-head">
+        <div>
+          <div class="exercise-tag">Упражнение 5 · Collocations</div>
+          <h3>Выбери более естественное сочетание</h3>
+          <p>Отметь вариант, который реально используют носители языка.</p>
+        </div>
+        <div class="exercise-tools">
+          <span class="score-tag" id="ex5-score">0 / 10</span>
+          <button class="small" onclick="checkExercise(5)">Проверить</button>
+          <button class="small ghost" onclick="toggleAnswers(5)">Показать ответы</button>
+          <button class="small ghost" onclick="copyExercise(5)">Скопировать</button>
+        </div>
+      </div>
+      <div class="items" id="ex5-items"></div>
+    </section>
+
+    <!-- EX6 -->
+    <section class="exercise" id="ex6">
+      <div class="exercise-head">
+        <div>
+          <div class="exercise-tag">Упражнение 6 · Find two mistakes</div>
+          <h3>Найди и исправь две ошибки</h3>
+          <p>В каждом предложении спрятаны 2 ошибки. Перепиши предложение целиком в исправленном виде.</p>
+        </div>
+        <div class="exercise-tools">
+          <span class="score-tag" id="ex6-score">0 / 10</span>
+          <button class="small" onclick="checkExercise(6)">Проверить</button>
+          <button class="small ghost" onclick="toggleAnswers(6)">Показать ответы</button>
+          <button class="small ghost" onclick="copyExercise(6)">Скопировать</button>
+        </div>
+      </div>
+      <div class="items" id="ex6-items"></div>
+    </section>
+
+    <!-- EX7 -->
+    <section class="exercise" id="ex7">
+      <div class="exercise-head">
+        <div>
+          <div class="exercise-tag">Упражнение 7 · Finish the dialogue</div>
+          <h3>Закончи диалог нужным словом</h3>
+          <p>Допиши реплику B, используя слово из банка слов по смыслу.</p>
+        </div>
+        <div class="exercise-tools">
+          <span class="score-tag" id="ex7-score">0 / 10</span>
+          <button class="small" onclick="checkExercise(7)">Проверить</button>
+          <button class="small ghost" onclick="toggleAnswers(7)">Показать ответы</button>
+          <button class="small ghost" onclick="copyExercise(7)">Скопировать</button>
+        </div>
+      </div>
+      <div class="items" id="ex7-items"></div>
+    </section>
+
+  </main>
+
+  <aside class="sidebar">
+    <h3>⚠ Проблемные слова</h3>
+    <p class="hint">Здесь появляются слова, в которых были допущены ошибки.</p>
+    <div id="mistakes-wrap"><p class="empty-note">Пока всё чисто — ошибок нет.</p></div>
+    <div class="total-score">
+      Общий результат
+      <b id="total-score">0 / 70</b>
+    </div>
+  </aside>
+</div>
+
+<footer class="bottom-bar">
+  <button class="primary" onclick="checkAll()">✅ Проверить всё</button>
+  <button onclick="revealAll()">👁 Показать все ответы</button>
+  <button onclick="copyAllAnswers()">📋 Скопировать все ответы</button>
+  <span id="copy-flash"></span>
+</footer>
+
+<script>
+/* ============ WORD BANK ============ */
+const WORD_INFO = {
+  "crystal glassware": {ru:"хрустальная посуда", ipa:"/ˈkrɪstl ˈɡlɑːswɛə/"},
+  "bummer": {ru:"облом, разочарование", ipa:"/ˈbʌmə/"},
+  "sparklers": {ru:"бенгальские огни", ipa:"/ˈspɑːkləz/"},
+  "drop the matter": {ru:"закрыть вопрос, перестать обсуждать", ipa:"/drɒp ðə ˈmætə/"},
+  "a third as much": {ru:"в три раза меньше", ipa:"/ə ˈθɜːd æz mʌtʃ/"},
+  "bristle": {ru:"щетина; рассердиться", ipa:"/ˈbrɪsl/"},
+  "be pregnant by someone": {ru:"быть беременной от кого-то", ipa:"/biː ˈprɛɡnənt baɪ ˈsʌmwʌn/"},
+  "have an affair": {ru:"завести интрижку", ipa:"/hæv ən əˈfeə/"},
+  "commit a blooper": {ru:"совершить досадную ошибку", ipa:"/kəˈmɪt ə ˈbluːpə/"},
+  "talk back": {ru:"огрызаться, дерзить", ipa:"/tɔːk bæk/"},
+  "fine finishing": {ru:"чистовая отделка", ipa:"/faɪn ˈfɪnɪʃɪŋ/"},
+  "be the talk of the town": {ru:"быть у всех на устах", ipa:"/biː ðə tɔːk əv ðə taʊn/"},
+  "worth a shot": {ru:"стоит попробовать", ipa:"/wɜːθ ə ʃɒt/"},
+  "sit on someone's lap": {ru:"сидеть на коленях", ipa:"/sɪt ɒn ˈsʌmwʌnz læp/"},
+  "there is an assumption": {ru:"есть предположение", ipa:"/ðeər ɪz ən əˈsʌmpʃn/"},
+  "become hung up on someone": {ru:"зацикливаться на ком-то", ipa:"/bɪˈkʌm hʌŋ ʌp ɒn ˈsʌmwʌn/"},
+  "freeze in terror": {ru:"застыть в ужасе", ipa:"/friːz ɪn ˈterə/"},
+  "whole wheat bread": {ru:"хлеб из цельнозерновой муки", ipa:"/həʊl wiːt bred/"},
+  "sympathize with someone": {ru:"сочувствовать кому-либо", ipa:"/ˈsɪmpəθaɪz wɪð ˈsʌmwʌn/"},
+  "stand by": {ru:"не отступаться от своих слов", ipa:"/stænd baɪ/"},
+  "corset": {ru:"корсет", ipa:"/ˈkɔːsɪt/"},
+  "take it on the chin": {ru:"стойко переносить, не падать духом", ipa:"/teɪk ɪt ɒn ðə tʃɪn/"},
+  "scrupulous": {ru:"принципиальный, щепетильный", ipa:"/ˈskruːpjʊləs/"},
+  "jump to conclusions": {ru:"делать поспешные выводы", ipa:"/dʒʌmp tuː kənˈkluːʒnz/"},
+  "hitch a ride": {ru:"поймать попутку", ipa:"/hɪtʃ ə raɪd/"},
+  "stress out": {ru:"сильно нервничать", ipa:"/stres aʊt/"},
+  "senior job": {ru:"высокопоставленная должность", ipa:"/ˈsiːniə dʒɒb/"},
+  "battery about to die": {ru:"батарея вот-вот сядет", ipa:"/ˈbætri əˈbaʊt tuː daɪ/"},
+  "punching bag": {ru:"боксёрская груша", ipa:"/ˈpʌntʃɪŋ bæɡ/"},
+  "retain valued employees": {ru:"удерживать ценных сотрудников", ipa:"/rɪˈteɪn ˈvæljuːd ɪmˈplɔɪiːz/"},
+  "die out": {ru:"вымирать", ipa:"/daɪ aʊt/"},
+  "schizophrenia": {ru:"шизофрения", ipa:"/ˌskɪtsəˈfriːniə/"},
+  "deep cut": {ru:"глубокий порез", ipa:"/diːp kʌt/"},
+  "get cracking": {ru:"начинай быстрее, берись за дело", ipa:"/ɡet ˈkrækɪŋ/"},
+  "go overboard with": {ru:"перебарщивать с чем-то", ipa:"/ɡəʊ ˈəʊvəbɔːd wɪð/"},
+  "skirting board": {ru:"плинтус", ipa:"/ˈskɜːtɪŋ bɔːd/"},
+  "clothes hamper": {ru:"корзина для белья", ipa:"/kləʊðz ˈhæmpə/"},
+  "get hooked on": {ru:"подсесть на что-то", ipa:"/ɡet hʊkt ɒn/"},
+  "for the meantime": {ru:"на это время, временно", ipa:"/fɔː ðə ˈmiːntaɪm/"},
+  "all along": {ru:"с самого начала, всё время", ipa:"/ɔːl əˈlɒŋ/"},
+  "accomplice": {ru:"сообщник", ipa:"/əˈkʌmplɪs/"},
+  "hold a grudge": {ru:"затаить обиду", ipa:"/həʊld ə ɡrʌdʒ/"},
+  "get in between": {ru:"встать между кем-то", ipa:"/ɡet ɪn bɪˈtwiːn/"},
+  "sincerity": {ru:"искренность", ipa:"/sɪnˈserəti/"},
+  "give up on someone": {ru:"махнуть рукой на кого-то", ipa:"/ɡɪv ʌp ɒn ˈsʌmwʌn/"},
+  "frame someone": {ru:"подставить кого-то", ipa:"/freɪm ˈsʌmwʌn/"},
+  "cellulite": {ru:"целлюлит", ipa:"/ˈseljʊlaɪt/"},
+  "get by": {ru:"как-то справляться, обходиться", ipa:"/ɡet baɪ/"}
+};
+
+/* ============ EXERCISE DATA ============ */
+const EX1 = [ // fill in missing letters
+  {gap:"b_mm_r", ru:WORD_INFO["bummer"].ru, word:"bummer", answers:["bummer"]},
+  {gap:"sp_rkl_rs", ru:WORD_INFO["sparklers"].ru, word:"sparklers", answers:["sparklers"]},
+  {gap:"br_stl_", ru:WORD_INFO["bristle"].ru, word:"bristle", answers:["bristle"]},
+  {gap:"c_rs_t", ru:WORD_INFO["corset"].ru, word:"corset", answers:["corset"]},
+  {gap:"scr_p_l_us", ru:WORD_INFO["scrupulous"].ru, word:"scrupulous", answers:["scrupulous"]},
+  {gap:"_cc_mpl_c_", ru:WORD_INFO["accomplice"].ru, word:"accomplice", answers:["accomplice"]},
+  {gap:"s_nc_r_ty", ru:WORD_INFO["sincerity"].ru, word:"sincerity", answers:["sincerity"]},
+  {gap:"c_ll_l_t_", ru:WORD_INFO["cellulite"].ru, word:"cellulite", answers:["cellulite"]},
+  {gap:"sch_z_phr_n_a", ru:WORD_INFO["schizophrenia"].ru, word:"schizophrenia", answers:["schizophrenia"]},
+  {gap:"p_nch_ng b_g", ru:WORD_INFO["punching bag"].ru, word:"punching bag", answers:["punching bag"]}
+];
+
+const EX2 = [ // RU -> EN
+  {ru:"закрыть вопрос, перестать обсуждать", word:"drop the matter", answers:["drop the matter"]},
+  {ru:"стоит попробовать", word:"worth a shot", answers:["worth a shot"]},
+  {ru:"делать поспешные выводы", word:"jump to conclusions", answers:["jump to conclusions"]},
+  {ru:"подсесть на что-то", word:"get hooked on", answers:["get hooked on","get hooked"]},
+  {ru:"затаить обиду", word:"hold a grudge", answers:["hold a grudge"]},
+  {ru:"как-то справляться, обходиться", word:"get by", answers:["get by"]},
+  {ru:"перебарщивать с чем-то", word:"go overboard with", answers:["go overboard with","go overboard"]},
+  {ru:"поймать попутку", word:"hitch a ride", answers:["hitch a ride"]},
+  {ru:"стойко переносить, не падать духом", word:"take it on the chin", answers:["take it on the chin"]},
+  {ru:"махнуть рукой на кого-то", word:"give up on someone", answers:["give up on someone","give up on him","give up on her"]}
+];
+
+const EX3 = [ // dictation
+  {speak:"bummer", word:"bummer", answers:["bummer"]},
+  {speak:"sparklers", word:"sparklers", answers:["sparklers"]},
+  {speak:"stress out", word:"stress out", answers:["stress out"]},
+  {speak:"whole wheat bread", word:"whole wheat bread", answers:["whole wheat bread"]},
+  {speak:"skirting board", word:"skirting board", answers:["skirting board"]},
+  {speak:"deep cut", word:"deep cut", answers:["deep cut"]},
+  {speak:"get cracking", word:"get cracking", answers:["get cracking"]},
+  {speak:"sit on the lap", word:"sit on someone's lap", answers:["sit on the lap","sit on someone's lap"]},
+  {speak:"freeze in terror", word:"freeze in terror", answers:["freeze in terror"]},
+  {speak:"clothes hamper", word:"clothes hamper", answers:["clothes hamper","clothes basket"]}
+];
+
+const EX4 = [ // definition -> word
+  {def:"A word used to express disappointment about a minor unfortunate event.", word:"bummer", answers:["bummer"]},
+  {def:"Small firework sticks that burn with bright sparks, often used at celebrations.", word:"sparklers", answers:["sparklers"]},
+  {def:"To become extremely worried or anxious, often due to pressure.", word:"stress out", answers:["stress out"]},
+  {def:"A strip of wood or other material along the bottom of an interior wall.", word:"skirting board", answers:["skirting board"]},
+  {def:"Someone who helps another person commit a crime.", word:"accomplice", answers:["accomplice"]},
+  {def:"The quality of being honest and genuine, without pretending.", word:"sincerity", answers:["sincerity"]},
+  {def:"To gradually disappear until none are left.", word:"die out", answers:["die out"]},
+  {def:"A mental disorder involving disturbed thinking, emotions and perception of reality.", word:"schizophrenia", answers:["schizophrenia"]},
+  {def:"A tightly fitted piece of underwear that shapes the waist and torso.", word:"corset", answers:["corset"]},
+  {def:"A person who follows moral principles very strictly and carefully.", word:"scrupulous", answers:["scrupulous"]}
+];
+
+const EX5 = [ // collocations, correctText marks the natural one
+  {a:"commit a blooper", b:"do a blooper", correct:"commit a blooper", word:"commit a blooper"},
+  {a:"keep a grudge", b:"hold a grudge", correct:"hold a grudge", word:"hold a grudge"},
+  {a:"hitch a ride", b:"hook a ride", correct:"hitch a ride", word:"hitch a ride"},
+  {a:"take it on the shoulder", b:"take it on the chin", correct:"take it on the chin", word:"take it on the chin"},
+  {a:"jump to conclusions", b:"jump into conclusions", correct:"jump to conclusions", word:"jump to conclusions"},
+  {a:"retain valued employees", b:"keep valued employees", correct:"retain valued employees", word:"retain valued employees"},
+  {a:"freeze from terror", b:"freeze in terror", correct:"freeze in terror", word:"freeze in terror"},
+  {a:"get hooked with a series", b:"get hooked on a series", correct:"get hooked on a series", word:"get hooked on"},
+  {a:"stand for your word", b:"stand by your word", correct:"stand by your word", word:"stand by"},
+  {a:"go overboard on the decorations", b:"go overboard with the decorations", correct:"go overboard with the decorations", word:"go overboard with"}
+];
+
+const EX6 = [ // find two mistakes
+  {broken:"He commit a blooper and everyone in the office talk about it.",
+   corrected:"He committed a blooper and everyone in the office talked about it.",
+   key:["committed","talked"], word:"commit a blooper"},
+  {broken:"She jump into conclusions before she sympathize with him.",
+   corrected:"She jumped to conclusions before she sympathized with him.",
+   key:["jumped to conclusions","sympathized"], word:"jump to conclusions"},
+  {broken:"They was hitch a ride to the city yesterday.",
+   corrected:"They hitched a ride to the city yesterday.",
+   key:["hitched a ride"], word:"hitch a ride"},
+  {broken:"He always stand by his words, so everyone trust him.",
+   corrected:"He always stands by his words, so everyone trusts him.",
+   key:["stands by","trusts"], word:"stand by"},
+  {broken:"I get by on small salary, but it are difficult sometimes.",
+   corrected:"I get by on a small salary, but it is difficult sometimes.",
+   key:["on a small salary","it is difficult"], word:"get by"},
+  {broken:"She become hung up on he after the breakup.",
+   corrected:"She became hung up on him after the breakup.",
+   key:["became","on him"], word:"become hung up on someone"},
+  {broken:"The company want to retain they valued employees.",
+   corrected:"The company wants to retain its valued employees.",
+   key:["wants","its valued employees"], word:"retain valued employees"},
+  {broken:"He freeze in terror when he seen the accident.",
+   corrected:"He froze in terror when he saw the accident.",
+   key:["froze in terror","saw the accident"], word:"freeze in terror"},
+  {broken:"We was stress out because of the deadline.",
+   corrected:"We were stressed out because of the deadline.",
+   key:["were stressed out"], word:"stress out"},
+  {broken:"She give up on he a long time ago.",
+   corrected:"She gave up on him a long time ago.",
+   key:["gave up on him"], word:"give up on someone"}
+];
+
+const EX7 = [ // finish the dialogue
+  {a:"I heard you failed the exam again.", b:"Yeah, total ______.", key:["bummer"], word:"bummer"},
+  {a:"Should I apply for that position?", b:"Definitely, it's ______.", key:["worth a shot"], word:"worth a shot"},
+  {a:"Why is he so upset with his sister?", b:"He's still ______ against her for something that happened years ago.", key:["grudge"], word:"hold a grudge"},
+  {a:"How did you get to the festival without a car?", b:"We ______ from a stranger.", key:["hitched"], word:"hitch a ride"},
+  {a:"Are you worried about tomorrow's presentation?", b:"A bit, I don't want to ______ if I make a mistake.", key:["stress out","stress"], word:"stress out"},
+  {a:"Have you finished the report?", b:"Not yet, let's ______, we're late.", key:["cracking"], word:"get cracking"},
+  {a:"Why does she never admit she's wrong?", b:"She just can't ______, she always defends herself.", key:["chin"], word:"take it on the chin"},
+  {a:"Do you still watch that show?", b:"Yes, I'm totally ______ it.", key:["hooked"], word:"get hooked on"},
+  {a:"Is he really guilty?", b:"No, someone ______ him for the crime.", key:["framed"], word:"frame someone"},
+  {a:"Why didn't you say anything before?", b:"I knew ______, I just didn't want to worry you.", key:["all along"], word:"all along"}
+];
+
+/* ============ STATE ============ */
+const registry = {1:[],2:[],3:[],4:[],5:[],6:[],7:[]};
+const mistakeCounts = {};
+const EX_TITLES = {
+  1:"Вставь пропущенные буквы", 2:"Перевод RU→EN", 3:"Диктант (аудио)",
+  4:"Дефиниция", 5:"Сочетаемость", 6:"Найди 2 ошибки", 7:"Диалог"
+};
+
+/* ============ HELPERS ============ */
+function norm(s){
+  return (s||"").toLowerCase().trim()
+    .replace(/[.,!?;:"“”'’]/g,"")
+    .replace(/\s+/g," ");
+}
+function containsAll(text, keys){
+  const t = norm(text);
+  return keys.every(k => t.includes(norm(k)));
+}
+function matchesAny(text, answers){
+  const t = norm(text);
+  return answers.some(a => norm(a) === t);
+}
+function el(tag, cls, html){
+  const e = document.createElement(tag);
+  if(cls) e.className = cls;
+  if(html !== undefined) e.innerHTML = html;
+  return e;
+}
+
+/* ============ AUDIO (TTS) ============ */
+let chosenVoice = null;
+function pickVoice(){
+  const voices = window.speechSynthesis ? speechSynthesis.getVoices() : [];
+  if(!voices.length) return null;
+  let v = voices.find(v => /Google US English/i.test(v.name) && /en-US/i.test(v.lang));
+  if(!v) v = voices.find(v => /en-US/i.test(v.lang) && /female|Samantha|Zira|Google/i.test(v.name));
+  if(!v) v = voices.find(v => v.lang === "en-US");
+  if(!v) v = voices.find(v => /^en/i.test(v.lang));
+  return v || voices[0];
+}
+function refreshVoice(){
+  chosenVoice = pickVoice();
+  const statusEl = document.getElementById("audio-status");
+  if(chosenVoice){
+    statusEl.textContent = "голос: " + chosenVoice.name + " (" + chosenVoice.lang + ")";
+  } else {
+    statusEl.textContent = "голоса ещё загружаются…";
+  }
+}
+if("speechSynthesis" in window){
+  refreshVoice();
+  speechSynthesis.onvoiceschanged = refreshVoice;
+} else {
+  document.getElementById("audio-status").textContent = "SpeechSynthesis не поддерживается в этом браузере";
+}
+function speak(text){
+  if(!("speechSynthesis" in window)){
+    alert("Ваш браузер не поддерживает озвучивание (Web Speech API). Попробуйте Chrome.");
+    return;
+  }
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  if(chosenVoice) u.voice = chosenVoice;
+  u.lang = "en-US";
+  u.rate = 0.92;
+  u.pitch = 1;
+  speechSynthesis.speak(u);
+}
+document.getElementById("test-audio-btn").addEventListener("click", ()=>{
+  refreshVoice();
+  speak("Testing, one two three. Audio is working.");
+});
+document.getElementById("toggle-words-btn").addEventListener("click", ()=>{
+  document.getElementById("wordbank-grid").classList.toggle("collapsed");
+});
+
+/* ============ RENDER WORD BANK ============ */
+function renderWordBank(){
+  const grid = document.getElementById("wordbank-grid");
+  Object.keys(WORD_INFO).forEach(key=>{
+    const info = WORD_INFO[key];
+    const card = el("div","word-card");
+    card.appendChild(el("div","en", key));
+    card.appendChild(el("div","ipa mono", info.ipa));
+    card.appendChild(el("div","ru", info.ru));
+    const btn = el("button","speak-btn","🔊");
+    btn.addEventListener("click", ()=>speak(key));
+    card.appendChild(btn);
+    grid.appendChild(card);
+  });
+}
+
+/* ============ RENDER EXERCISES ============ */
+function makeItemShell(exNum, idx, promptHTML){
+  const item = el("div","item");
+  item.dataset.ex = exNum; item.dataset.idx = idx;
+  const p = el("div","prompt");
+  p.innerHTML = '<span class="q-num">'+(idx+1)+'.</span>' + promptHTML;
+  item.appendChild(p);
+  return item;
+}
+
+function renderEx1(){
+  const box = document.getElementById("ex1-items");
+  EX1.forEach((d,i)=>{
+    const item = makeItemShell(1,i, '<span class="gap mono">'+d.gap+'</span>');
+    item.appendChild(el("div","hint-ru", "перевод: " + d.ru));
+    const input = el("input"); input.type="text"; input.placeholder="впиши слово…";
+    item.appendChild(input);
+    const fb = el("div","feedback"); item.appendChild(fb);
+    const rev = el("div","correct-reveal","Ответ: <b>"+d.answers[0]+"</b>");
+    item.appendChild(rev);
+    box.appendChild(item);
+    registry[1].push({item, input, answers:d.answers, word:d.word, fb, rev});
+  });
+}
+
+function renderEx2(){
+  const box = document.getElementById("ex2-items");
+  EX2.forEach((d,i)=>{
+    const item = makeItemShell(2,i, '«' + d.ru + '»');
+    const input = el("input"); input.type="text"; input.placeholder="type the English phrase…";
+    item.appendChild(input);
+    const fb = el("div","feedback"); item.appendChild(fb);
+    const rev = el("div","correct-reveal","Ответ: <b>"+d.answers[0]+"</b>");
+    item.appendChild(rev);
+    box.appendChild(item);
+    registry[2].push({item, input, answers:d.answers, word:d.word, fb, rev});
+  });
+}
+
+function renderEx3(){
+  const box = document.getElementById("ex3-items");
+  EX3.forEach((d,i)=>{
+    const item = makeItemShell(3,i, "Нажми 🔊 и запиши, что услышал(а):");
+    const btn = el("button","speak-btn","🔊 Слушать");
+    btn.addEventListener("click", ()=>speak(d.speak));
+    item.querySelector(".prompt").appendChild(document.createElement("br"));
+    item.querySelector(".prompt").appendChild(btn);
+    const input = el("input"); input.type="text"; input.placeholder="напиши на слух…";
+    item.appendChild(input);
+    const fb = el("div","feedback"); item.appendChild(fb);
+    const rev = el("div","correct-reveal","Ответ: <b>"+d.answers[0]+"</b> · "+(WORD_INFO[d.word]?WORD_INFO[d.word].ipa:""));
+    item.appendChild(rev);
+    box.appendChild(item);
+    registry[3].push({item, input, answers:d.answers, word:d.word, fb, rev});
+  });
+}
+
+function renderEx4(){
+  const box = document.getElementById("ex4-items");
+  EX4.forEach((d,i)=>{
+    const item = makeItemShell(4,i, '"' + d.def + '"');
+    const input = el("input"); input.type="text"; input.placeholder="what word is this?";
+    item.appendChild(input);
+    const fb = el("div","feedback"); item.appendChild(fb);
+    const rev = el("div","correct-reveal","Ответ: <b>"+d.answers[0]+"</b>");
+    item.appendChild(rev);
+    box.appendChild(item);
+    registry[4].push({item, input, answers:d.answers, word:d.word, fb, rev});
+  });
+}
+
+function renderEx5(){
+  const box = document.getElementById("ex5-items");
+  EX5.forEach((d,i)=>{
+    const item = makeItemShell(5,i, "Какой вариант звучит естественнее для носителя языка?");
+    const options = Math.random() < 0.5 ? [d.a, d.b] : [d.b, d.a];
+    const row = el("div","choice-row");
+    const radios = [];
+    options.forEach((opt, oi)=>{
+      const label = el("label","choice-opt");
+      const radio = document.createElement("input");
+      radio.type = "radio"; radio.name = "ex5-"+i; radio.value = opt;
+      label.appendChild(radio);
+      label.appendChild(document.createTextNode(opt));
+      row.appendChild(label);
+      radios.push(radio);
+    });
+    item.appendChild(row);
+    const fb = el("div","feedback"); item.appendChild(fb);
+    const rev = el("div","correct-reveal","Правильно: <b>"+d.correct+"</b>");
+    item.appendChild(rev);
+    box.appendChild(item);
+    registry[5].push({item, radios, correct:d.correct, word:d.word, fb, rev});
+  });
+}
+
+function renderEx6(){
+  const box = document.getElementById("ex6-items");
+  EX6.forEach((d,i)=>{
+    const item = makeItemShell(6,i, "<i>" + d.broken + "</i><br><span class='hint-ru'>Найди 2 ошибки и перепиши предложение целиком:</span>");
+    const input = el("input"); input.type="text"; input.placeholder="перепиши исправленное предложение…";
+    item.appendChild(input);
+    const fb = el("div","feedback"); item.appendChild(fb);
+    const rev = el("div","correct-reveal","Верно: <b>"+d.corrected+"</b>");
+    item.appendChild(rev);
+    box.appendChild(item);
+    registry[6].push({item, input, key:d.key, correctedFull:d.corrected, word:d.word, fb, rev});
+  });
+}
+
+function renderEx7(){
+  const box = document.getElementById("ex7-items");
+  EX7.forEach((d,i)=>{
+    const item = makeItemShell(7,i,
+      "<div class='dialogue-line'><b>A:</b> " + d.a + "</div>" +
+      "<div class='dialogue-line'><b>B:</b> " + d.b + "</div>");
+    const input = el("input"); input.type="text"; input.placeholder="закончи реплику B…";
+    item.appendChild(input);
+    const fb = el("div","feedback"); item.appendChild(fb);
+    const rev = el("div","correct-reveal","Пример ответа: <b>"+d.b.replace("______", d.key[0])+"</b>");
+    item.appendChild(rev);
+    box.appendChild(item);
+    registry[7].push({item, input, key:d.key, word:d.word, fb, rev});
+  });
+}
+
+/* ============ CHECKING ============ */
+function markItem(entry, isCorrect){
+  entry.item.classList.remove("correct","incorrect");
+  entry.item.classList.add(isCorrect ? "correct" : "incorrect");
+  entry.fb.textContent = isCorrect ? "✓ верно" : "✗ неверно";
+  entry.fb.className = "feedback " + (isCorrect ? "ok" : "no");
+  if(!isCorrect) recordMistake(entry.word);
+}
+
+function checkExercise(exNum){
+  const entries = registry[exNum];
+  let score = 0;
+  entries.forEach(entry=>{
+    let ok = false;
+    if(exNum === 5){
+      const picked = entry.radios.find(r=>r.checked);
+      ok = picked && norm(picked.value) === norm(entry.correct);
+    } else if(exNum === 6){
+      ok = containsAll(entry.input.value, entry.key) && entry.input.value.trim().length > 0;
+    } else if(exNum === 7){
+      ok = containsAll(entry.input.value, entry.key) && entry.input.value.trim().length > 0;
+    } else {
+      ok = matchesAny(entry.input.value, entry.answers);
+    }
+    markItem(entry, ok);
+    if(ok) score++;
+  });
+  document.getElementById("ex"+exNum+"-score").textContent = score + " / 10";
+  updateTotalScore();
+}
+
+function checkAll(){
+  for(let n=1;n<=7;n++) checkExercise(n);
+  document.querySelector(".sidebar").scrollIntoView({behavior:"smooth", block:"start"});
+}
+
+function toggleAnswers(exNum){
+  registry[exNum].forEach(entry=>{
+    entry.rev.classList.toggle("shown");
+  });
+}
+function revealAll(){
+  for(let n=1;n<=7;n++){
+    registry[n].forEach(entry=> entry.rev.classList.add("shown"));
+  }
+}
+
+function updateTotalScore(){
+  let total = 0;
+  for(let n=1;n<=7;n++){
+    const t = document.getElementById("ex"+n+"-score").textContent;
+    total += parseInt(t.split("/")[0].trim(), 10) || 0;
+  }
+  document.getElementById("total-score").textContent = total + " / 70";
+}
+
+/* ============ MISTAKE TRACKER ============ */
+function recordMistake(word){
+  if(!word) return;
+  mistakeCounts[word] = (mistakeCounts[word] || 0) + 1;
+  renderMistakes();
+}
+function renderMistakes(){
+  const wrap = document.getElementById("mistakes-wrap");
+  const keys = Object.keys(mistakeCounts);
+  if(!keys.length){
+    wrap.innerHTML = '<p class="empty-note">Пока всё чисто — ошибок нет.</p>';
+    return;
+  }
+  keys.sort((a,b)=> mistakeCounts[b]-mistakeCounts[a]);
+  let html = '<table class="mistakes"><thead><tr><th>Слово</th><th>Перевод</th><th>Ошибок</th></tr></thead><tbody>';
+  keys.forEach(k=>{
+    const ru = WORD_INFO[k] ? WORD_INFO[k].ru : "";
+    html += '<tr><td>'+k+'</td><td>'+ru+'</td><td class="cnt">'+mistakeCounts[k]+'</td></tr>';
+  });
+  html += '</tbody></table>';
+  wrap.innerHTML = html;
+}
+
+/* ============ COPY ANSWERS ============ */
+function collectExerciseText(exNum){
+  let lines = ["=== Упражнение "+exNum+" — "+EX_TITLES[exNum]+" ==="];
+  registry[exNum].forEach((entry,i)=>{
+    let val;
+    if(exNum === 5){
+      const picked = entry.radios.find(r=>r.checked);
+      val = picked ? picked.value : "(не выбрано)";
+    } else {
+      val = entry.input.value.trim() || "(пусто)";
+    }
+    lines.push((i+1)+". "+val);
+  });
+  return lines.join("\n");
+}
+function copyToClipboard(text){
+  const flash = document.getElementById("copy-flash");
+  function done(){ flash.textContent = "Скопировано ✓"; setTimeout(()=>flash.textContent="",2000); }
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(done).catch(()=>fallbackCopy(text,done));
+  } else {
+    fallbackCopy(text,done);
+  }
+}
+function fallbackCopy(text, cb){
+  const ta = document.createElement("textarea");
+  ta.value = text; document.body.appendChild(ta); ta.select();
+  try{ document.execCommand("copy"); }catch(e){}
+  document.body.removeChild(ta);
+  cb();
+}
+function copyExercise(exNum){
+  copyToClipboard(collectExerciseText(exNum));
+}
+function copyAllAnswers(){
+  let out = ["ОТВЕТЫ СТУДЕНТА — Vocabulary Lab", "Дата: " + new Date().toLocaleString("ru-RU"), ""];
+  for(let n=1;n<=7;n++){
+    out.push(collectExerciseText(n));
+    out.push("Результат: " + document.getElementById("ex"+n+"-score").textContent);
+    out.push("");
+  }
+  out.push("ИТОГО: " + document.getElementById("total-score").textContent);
+  copyToClipboard(out.join("\n"));
+}
+
+/* ============ INIT ============ */
+renderWordBank();
+renderEx1(); renderEx2(); renderEx3(); renderEx4(); renderEx5(); renderEx6(); renderEx7();
+</script>
+</body>
+</html>
