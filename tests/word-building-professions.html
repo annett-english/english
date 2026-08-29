@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Word Building: Professions — тренажёр</title>
+<style>
+:root{
+  --ink:#1f2a33;
+  --paper:#f3efe3;
+  --card:#fffdf7;
+  --line:#d8d0ba;
+  --teal:#2f6f6b;
+  --teal-dark:#204b48;
+  --amber:#c98a2c;
+  --amber-dark:#8f5f18;
+  --red:#b3413a;
+  --green:#3d7a3d;
+  --mono:'IBM Plex Mono','Courier New',monospace;
+  --serif:'Source Serif 4','Georgia',serif;
+  --sans:'Space Grotesk','Segoe UI',sans-serif;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  background:var(--ink);
+  background-image:
+    linear-gradient(var(--ink),var(--ink));
+  color:var(--paper);
+  font-family:var(--serif);
+  padding-bottom:60px;
+}
+.wrap{max-width:1180px;margin:0 auto;padding:28px 20px 0;}
+header.hero{
+  border-bottom:2px solid var(--amber);
+  padding-bottom:22px;
+  margin-bottom:26px;
+}
+header.hero .eyebrow{
+  font-family:var(--mono);
+  font-size:12px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--amber);
+  margin:0 0 8px;
+}
+header.hero h1{
+  font-family:var(--sans);
+  font-size:clamp(28px,4vw,42px);
+  margin:0 0 10px;
+  font-weight:600;
+  color:var(--paper);
+}
+header.hero p{margin:0;color:#cfd3ce;max-width:700px;line-height:1.5;font-size:15px;}
+
+#audio-check{
+  margin-top:16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+}
+#audio-check button{
+  background:var(--amber);color:#2a1c05;border:none;padding:8px 14px;border-radius:6px;
+  font-family:var(--sans);font-weight:600;cursor:pointer;font-size:13px;
+}
+#audio-check button:hover{background:#e0a13f;}
+#audio-status{font-family:var(--mono);font-size:12px;color:#cfd3ce;}
+#audio-status.ok{color:#8fd18f;}
+#audio-status.bad{color:#e08a84;}
+
+.layout{display:grid;grid-template-columns:1fr 260px;gap:24px;align-items:start;}
+@media(max-width:900px){.layout{grid-template-columns:1fr;}}
+
+section.card{
+  background:var(--card);color:var(--ink);border-radius:10px;
+  border:1px solid var(--line);padding:20px 22px;margin-bottom:22px;
+}
+h2.section-title{
+  font-family:var(--sans);font-size:19px;margin:0 0 4px;color:var(--teal-dark);font-weight:600;
+}
+p.section-sub{margin:0 0 16px;color:#5a5648;font-size:13.5px;}
+
+.vocab-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;
+}
+.vocab-item{
+  border:1px solid var(--line);border-radius:8px;padding:10px 12px;
+  display:flex;flex-direction:column;gap:3px;background:#fbf9f2;
+}
+.vocab-item .en{font-family:var(--sans);font-weight:600;font-size:15px;color:var(--ink);}
+.vocab-item .ipa{font-family:var(--mono);font-size:12px;color:var(--teal-dark);}
+.vocab-item .ru{font-size:13px;color:#5a5648;}
+.vocab-item button{
+  align-self:flex-start;margin-top:4px;border:1px solid var(--teal);background:transparent;
+  color:var(--teal-dark);border-radius:5px;padding:3px 9px;font-size:12px;cursor:pointer;font-family:var(--mono);
+}
+.vocab-item button:hover{background:var(--teal);color:#fff;}
+
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px;}
+.tab-btn{
+  font-family:var(--sans);font-size:12.5px;font-weight:600;padding:8px 12px;border-radius:20px;
+  border:1px solid var(--line);background:var(--card);color:#5a5648;cursor:pointer;
+}
+.tab-btn.active{background:var(--teal);color:#fff;border-color:var(--teal);}
+
+.exercise{display:none;}
+.exercise.active{display:block;}
+
+.item-row{
+  display:flex;flex-wrap:wrap;align-items:flex-start;gap:10px;padding:11px 0;
+  border-bottom:1px dashed var(--line);
+}
+.item-row:last-of-type{border-bottom:none;}
+.item-num{font-family:var(--mono);color:var(--amber-dark);font-size:13px;min-width:22px;padding-top:8px;}
+.item-prompt{flex:1;min-width:220px;font-size:14.5px;line-height:1.5;padding-top:6px;}
+.item-prompt b{color:var(--teal-dark);}
+.item-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+input.answer-input{
+  font-family:var(--mono);font-size:14px;padding:7px 9px;border:1px solid var(--line);
+  border-radius:6px;width:190px;background:#fff;color:var(--ink);
+}
+input.answer-input.correct{border-color:var(--green);background:#eef7ee;}
+input.answer-input.wrong{border-color:var(--red);background:#fbecea;}
+textarea.answer-area{
+  font-family:var(--serif);font-size:14px;padding:8px 10px;border:1px solid var(--line);
+  border-radius:6px;width:100%;min-height:56px;background:#fff;color:var(--ink);resize:vertical;
+}
+select.answer-select{
+  font-family:var(--mono);font-size:13px;padding:6px 8px;border:1px solid var(--line);
+  border-radius:6px;background:#fff;color:var(--ink);
+}
+.mini-btn{
+  border:1px solid var(--teal);background:transparent;color:var(--teal-dark);
+  border-radius:5px;padding:5px 8px;font-size:12px;cursor:pointer;font-family:var(--mono);
+}
+.mini-btn:hover{background:var(--teal);color:#fff;}
+.reveal-note{
+  font-family:var(--mono);font-size:12.5px;color:var(--teal-dark);margin-left:4px;display:none;
+}
+.reveal-note.show{display:inline;}
+
+.actions-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px;}
+.btn{
+  font-family:var(--sans);font-weight:600;font-size:13px;padding:9px 16px;border-radius:7px;
+  border:none;cursor:pointer;
+}
+.btn-primary{background:var(--teal);color:#fff;}
+.btn-primary:hover{background:var(--teal-dark);}
+.btn-secondary{background:var(--amber);color:#2a1c05;}
+.btn-secondary:hover{background:#e0a13f;}
+.btn-ghost{background:transparent;border:1px solid var(--line);color:#5a5648;}
+.btn-ghost:hover{background:#eee9db;}
+.score-note{font-family:var(--mono);font-size:13px;color:var(--teal-dark);align-self:center;}
+.copy-toast{
+  font-family:var(--mono);font-size:12px;color:var(--green);margin-left:6px;display:none;
+}
+.copy-toast.show{display:inline;}
+
+table.change-table{width:100%;border-collapse:collapse;font-size:13.5px;}
+table.change-table th,table.change-table td{
+  border:1px solid var(--line);padding:8px 10px;text-align:left;
+}
+table.change-table th{background:#eee6d2;font-family:var(--sans);font-size:12.5px;color:var(--teal-dark);}
+table.change-table input.answer-input{width:100%;}
+
+aside.sidebar{position:sticky;top:16px;}
+.side-card{
+  background:var(--card);color:var(--ink);border-radius:10px;border:1px solid var(--line);
+  padding:16px 16px 18px;
+}
+.side-card h3{font-family:var(--sans);font-size:15px;margin:0 0 4px;color:var(--red);}
+.side-card p.side-sub{font-size:12px;color:#5a5648;margin:0 0 10px;}
+table.problem-table{width:100%;border-collapse:collapse;font-size:12.5px;}
+table.problem-table th,table.problem-table td{
+  border-bottom:1px solid var(--line);padding:6px 4px;text-align:left;
+}
+table.problem-table th{color:#5a5648;font-family:var(--sans);font-size:11.5px;}
+.problem-empty{font-size:12.5px;color:#8a8672;font-style:italic;}
+.hint-def{font-style:italic;color:#5a5648;}
+.riddle-badge{font-family:var(--mono);font-size:11px;color:var(--amber-dark);}
+footer.note{max-width:1180px;margin:20px auto 0;padding:0 20px;color:#9aa39d;font-size:12px;line-height:1.6;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <p class="eyebrow">Word building · professions</p>
+    <h1>teach → teacher, act → actor…</h1>
+    <p>Тренажёр словообразования: глагол/сфера → профессия. Сначала прослушайте и повторите слова, затем пройдите 9 упражнений. Каждое упражнение — 10 заданий, порядок слов в каждом упражнении перемешан по‑своему.</p>
+    <div id="audio-check">
+      <button id="btn-audio-test" type="button">🔊 Проверить аудио</button>
+      <span id="audio-status">Голос ещё не проверен.</span>
+    </div>
+  </header>
+
+  <div class="layout">
+    <main>
+      <section class="card" id="vocab-section">
+        <h2 class="section-title">Словарь: повторение</h2>
+        <p class="section-sub">Нажмите на колонку 🔊, чтобы услышать произношение (голос en‑US). Повторите слово вслух.</p>
+        <div class="vocab-grid" id="vocab-grid"></div>
+      </section>
+
+      <section class="card">
+        <h2 class="section-title">Упражнения</h2>
+        <div class="tabs" id="tabs"></div>
+
+        <div class="exercise active" id="ex1">
+          <p class="section-sub"><b>Упр. 1.</b> Вставьте пропущенные буквы — слово подсказано корнем и переводом.</p>
+          <div id="ex1-items"></div>
+          <div class="actions-row">
+            <button class="btn btn-primary" data-check="ex1">Проверить</button>
+            <button class="btn btn-secondary" data-reveal="ex1">Показать ответы</button>
+            <button class="btn btn-ghost" data-copy="ex1">Скопировать ответы</button>
+            <span class="score-note" id="ex1-score"></span>
+            <span class="copy-toast" id="ex1-toast">скопировано ✓</span>
+          </div>
+        </div>
+
+        <div class="exercise" id="ex2">
+          <p class="section-sub"><b>Упр. 2.</b> Переведите слово с русского на английский.</p>
+          <div id="ex2-items"></div>
+          <div class="actions-row">
+            <button class="btn btn-primary" data-check="ex2">Проверить</button>
+            <button class="btn btn-secondary" data-reveal="ex2">Показать ответы</button>
+            <button class="btn btn-ghost" data-copy="ex2">Скопировать ответы</button>
+            <span class="score-note" id="ex2-score"></span>
+            <span class="copy-toast" id="ex2-toast">скопировано ✓</span>
+          </div>
+        </div>
+
+        <div class="exercise" id="ex3">
+          <p class="section-sub"><b>Упр. 3.</b> Прослушайте произношение (🔊) и запишите слово по звуку.</p>
+          <div id="ex3-items"></div>
+          <div class="actions-row">
+            <button class="btn btn-primary" data-check="ex3">Проверить</button>
+            <button class="btn btn-secondary" data-reveal="ex3">Показать ответы</button>
+            <button class="btn btn-ghost" data-copy="ex3">Скопировать ответы</button>
+            <span class="score-note" id="ex3-score"></span>
+            <span class="copy-toast" id="ex3-toast">скопировано ✓</span>
+          </div>
+        </div>
+
+        <div class="exercise" id="ex4">
+          <p class="section-sub"><b>Упр. 4.</b> По определению (definition) напишите профессию.</p>
+          <div id="ex4-items"></div>
+          <div class="actions-row">
+            <button class="btn btn-primary" data-check="ex4">Проверить</button>
+            <button class="btn btn-secondary" data-reveal="ex4">Показать ответы</button>
+            <button class="btn btn-ghost" data-copy="ex4">Скопировать ответы</button>
+            <span class="score-note" id="ex4-score"></span>
+            <span class="copy-toast" id="ex4-toast">скопировано ✓</span>
+          </div>
+        </div>
+
+        <div class="exercise" id="ex5">
+          <p class="section-sub"><b>Упр. 5.</b> Заполните таблицу изменения слова: глагол → существительное (процесс) → человек (профессия).</p>
+          <table class="change-table" id="ex5-table">
+            <thead><tr><th style="width:8%">#</th><th>Verb</th><th>Noun (process)</th><th>Person</th></tr></thead>
+            <tbody id="ex5-body"></tbody>
+          </table>
+          <div class="actions-row">
+            <button class="btn btn-primary" data-check="ex5">Проверить</button>
+            <button class="btn btn-secondary" data-reveal="ex5">Показать ответы</button>
+            <button class="btn btn-ghost" data-copy="ex5">Скопировать ответы</button>
+            <span class="score-note" id="ex5-score"></span>
+            <span class="copy-toast" id="ex5-toast">скопировано ✓</span>
+          </div>
+        </div>
+
+        <div class="exercise" id="ex6">
+          <p class="section-sub"><b>Упр. 6.</b> Guess the word — отгадайте профессию по описанию-загадке.</p>
+          <div id="ex6-items"></div>
+          <div class="actions-row">
+            <button class="btn btn-primary" data-check="ex6">Проверить</button>
+            <button class="btn btn-secondary" data-reveal="ex6">Показать ответы</button>
+            <button class="btn btn-ghost" data-copy="ex6">Скопировать ответы</button>
+            <span class="score-note" id="ex6-score"></span>
+            <span class="copy-toast" id="ex6-toast">скопировано ✓</span>
+          </div>
+        </div>
+
+        <div class="exercise" id="ex7">
+          <p class="section-sub"><b>Упр. 7.</b> Распределите слова по смыслу — выберите правильную сферу (категорию) для каждой профессии.</p>
+          <div id="ex7-items"></div>
+          <div class="actions-row">
+            <button class="btn btn-primary" data-check="ex7">Проверить</button>
+            <button class="btn btn-secondary" data-reveal="ex7">Показать ответы</button>
+            <button class="btn btn-ghost" data-copy="ex7">Скопировать ответы</button>
+            <span class="score-note" id="ex7-score"></span>
+            <span class="copy-toast" id="ex7-toast">скопировано ✓</span>
+          </div>
+        </div>
+
+        <div class="exercise" id="ex8">
+          <p class="section-sub"><b>Упр. 8.</b> Напишите своё предложение с каждым словом (self-check — при желании нажмите «пример» для подсказки).</p>
+          <div id="ex8-items"></div>
+          <div class="actions-row">
+            <button class="btn btn-ghost" data-copy="ex8">Скопировать ответы</button>
+            <span class="copy-toast" id="ex8-toast">скопировано ✓</span>
+          </div>
+        </div>
+
+        <div class="exercise" id="ex9">
+          <p class="section-sub"><b>Упр. 9.</b> Drilling: Repeat &amp; Change. Изучите образец (модель), затем составьте свою пару предложений по такому же принципу с указанным корнем — придумайте свой контекст.</p>
+          <div id="ex9-items"></div>
+          <div class="actions-row">
+            <button class="btn btn-ghost" data-copy="ex9">Скопировать ответы</button>
+            <span class="copy-toast" id="ex9-toast">скопировано ✓</span>
+          </div>
+        </div>
+
+      </section>
+    </main>
+
+    <aside class="sidebar">
+      <div class="side-card">
+        <h3>Проблемные слова</h3>
+        <p class="side-sub">Слова, в которых были ошибки во время проверки (счётчик ошибок).</p>
+        <table class="problem-table" id="problem-table">
+          <thead><tr><th>Слово</th><th>Ошибок</th></tr></thead>
+          <tbody id="problem-body"></tbody>
+        </table>
+        <p class="problem-empty" id="problem-empty">Пока нет ошибок — отлично!</p>
+      </div>
+    </aside>
+  </div>
+
+  <footer class="note">
+    Голос синтеза речи: приоритет отдаётся "Google US English" (en‑US), если недоступен — используется любой доступный английский голос браузера. Кнопка «Проверить аудио» вверху страницы подтверждает, что звук воспроизводится корректно. Кнопки «Скопировать ответы» копируют в буфер обмена вопрос и текущий ответ студента по каждому заданию упражнения.
+  </footer>
+</div>
+
+<script>
+const WORDS = [
+  {word:"teacher",root:"teach",ru:"учитель",ipa:"/ˈtiːtʃər/",def:"a person whose job is to help students learn at school",riddle:"I stand in front of a class every day and explain new topics. Who am I?",category:"Education",example:"My aunt is a teacher who works at a primary school."},
+  {word:"actor",root:"act",ru:"актёр",ipa:"/ˈæktər/",def:"a man who performs roles in films, TV shows or plays",riddle:"I learn lines and pretend to be someone else on stage or screen. Who am I?",category:"Arts",example:"The actor forgot his lines during the live performance."},
+  {word:"actress",root:"act",ru:"актриса",ipa:"/ˈæktrəs/",def:"a woman who performs roles in films, TV shows or plays",riddle:"I am a woman who plays characters in movies and theatre. Who am I?",category:"Arts",example:"The actress won an award for her role in the new film."},
+  {word:"designer",root:"design",ru:"дизайнер",ipa:"/dɪˈzaɪnər/",def:"a person who plans how something will look or work",riddle:"I sketch new looks for clothes, websites or buildings. Who am I?",category:"Arts",example:"The designer created a new logo for the company."},
+  {word:"scientist",root:"science",ru:"учёный",ipa:"/ˈsaɪəntɪst/",def:"a person who studies nature through experiments and research",riddle:"I wear a lab coat and run experiments to discover new facts. Who am I?",category:"Science",example:"The scientist published her research on climate change."},
+  {word:"musician",root:"music",ru:"музыкант",ipa:"/mjuˈzɪʃən/",def:"a person who writes or performs music",riddle:"I play an instrument or sing in front of an audience. Who am I?",category:"Arts",example:"The musician practised the violin for three hours."},
+  {word:"artist",root:"art",ru:"художник",ipa:"/ˈɑːrtɪst/",def:"a person who paints, draws or creates other works of art",riddle:"I use a brush and canvas to create pictures. Who am I?",category:"Arts",example:"The artist painted a beautiful landscape."},
+  {word:"electrician",root:"electric",ru:"электрик",ipa:"/ɪˌlekˈtrɪʃən/",def:"a person whose job is to install or repair electrical equipment",riddle:"I fix wires and lights when your power stops working. Who am I?",category:"Trades",example:"We called an electrician to fix the broken lights."},
+  {word:"photographer",root:"photograph",ru:"фотограф",ipa:"/fəˈtɑːɡrəfər/",def:"a person who takes photographs, especially as a job",riddle:"I take pictures at weddings and for magazines. Who am I?",category:"Media",example:"The photographer took amazing pictures of the wedding."},
+  {word:"journalist",root:"journal",ru:"журналист",ipa:"/ˈdʒɜːrnəlɪst/",def:"a person who writes news stories for newspapers, TV or websites",riddle:"I ask questions, investigate stories and write the news. Who am I?",category:"Media",example:"The journalist interviewed the mayor about the new project."},
+  {word:"translator",root:"translate",ru:"переводчик",ipa:"/trænsˈleɪtər/",def:"a person who changes written text from one language into another",riddle:"I turn books and documents from one language into another. Who am I?",category:"Language",example:"The translator worked on the new edition of the novel."},
+  {word:"farmer",root:"farm",ru:"фермер",ipa:"/ˈfɑːrmər/",def:"a person who grows crops or keeps animals for a living",riddle:"I grow crops and raise animals on my land. Who am I?",category:"Trades",example:"The farmer woke up early to milk the cows."},
+  {word:"director",root:"direct",ru:"режиссёр",ipa:"/dəˈrektər/",def:"a person who controls how a film, play or TV programme is made",riddle:"I tell actors what to do and control the making of a film. Who am I?",category:"Arts",example:"The director shouted 'Action!' to start the scene."},
+  {word:"pianist",root:"piano",ru:"пианист",ipa:"/piˈænɪst/",def:"a person who plays the piano, especially professionally",riddle:"I sit at a big instrument with black and white keys. Who am I?",category:"Arts",example:"The pianist performed a difficult piece by Chopin."},
+  {word:"politician",root:"politics",ru:"политик",ipa:"/ˌpɒləˈtɪʃən/",def:"a person who works in government or is involved in politics",riddle:"I make speeches and try to get elected to govern the country. Who am I?",category:"Politics/Law",example:"The politician promised to lower taxes."},
+  {word:"psychologist",root:"psychology",ru:"психолог",ipa:"/saɪˈkɒlədʒɪst/",def:"a person who studies the human mind and behaviour",riddle:"I help people understand their feelings and thoughts. Who am I?",category:"Science",example:"The psychologist helped him deal with his anxiety."},
+  {word:"lawyer",root:"law",ru:"юрист",ipa:"/ˈlɔɪər/",def:"a person trained to advise people about the law and represent them",riddle:"I defend or advise people in court. Who am I?",category:"Politics/Law",example:"She hired a lawyer to help with the contract."},
+  {word:"pharmacist",root:"pharmacy",ru:"фармацевт",ipa:"/ˈfɑːrməsɪst/",def:"a person qualified to prepare and sell medicines",riddle:"I stand behind the counter and give you your medicine. Who am I?",category:"Science",example:"The pharmacist explained how to take the tablets."},
+  {word:"employer",root:"employ",ru:"работодатель",ipa:"/ɪmˈplɔɪər/",def:"a person or company that pays others to work for them",riddle:"I hire people and pay their salary. Who am I?",category:"Business",example:"Her employer gave her a bonus for good work."},
+  {word:"employee",root:"employ",ru:"работник",ipa:"/ɪmˌplɔɪˈiː/",def:"a person who is paid to work for a person or company",riddle:"I get paid a salary for working at a company. Who am I?",category:"Business",example:"Every employee received a holiday bonus this year."},
+  {word:"educator",root:"educate",ru:"педагог",ipa:"/ˈedʒukeɪtər/",def:"a person who teaches or trains people, often professionally",riddle:"I train and guide people in schools or courses. Who am I?",category:"Education",example:"The educator designed a new course for teenagers."},
+  {word:"advertiser",root:"advertise",ru:"рекламодатель",ipa:"/ˈædvərtaɪzər/",def:"a person or company that pays for adverts to sell a product",riddle:"I pay to promote my product on TV and online. Who am I?",category:"Business",example:"The advertiser paid for a big billboard downtown."}
+];
+
+const TRIPLES = [
+  {verb:"employ",noun:"employment",person:"employer",ru:"нанимать"},
+  {verb:"educate",noun:"education",person:"educator",ru:"обучать"},
+  {verb:"advertise",noun:"advertisement",person:"advertiser",ru:"рекламировать"},
+  {verb:"translate",noun:"translation",person:"translator",ru:"переводить"},
+  {verb:"design",noun:"design",person:"designer",ru:"проектировать"},
+  {verb:"act",noun:"acting",person:"actor",ru:"играть"},
+  {verb:"direct",noun:"direction",person:"director",ru:"руководить"},
+  {verb:"teach",noun:"teaching",person:"teacher",ru:"обучать"},
+  {verb:"photograph",noun:"photography",person:"photographer",ru:"фотографировать"},
+  {verb:"farm",noun:"farming",person:"farmer",ru:"заниматься сельским хозяйством"}
+];
+
+const CATEGORIES = ["Education","Arts","Science","Trades","Media","Language","Politics/Law","Business"];
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+function pick10(){ return shuffle(WORDS).slice(0,10); }
+function norm(s){ return (s||"").trim().toLowerCase().replace(/[.,!?;:]/g,""); }
+
+let voices = [];
+function loadVoices(){ voices = speechSynthesis.getVoices(); }
+if('speechSynthesis' in window){
+  loadVoices();
+  speechSynthesis.onvoiceschanged = loadVoices;
+}
+function pickVoice(){
+  if(!voices.length) voices = speechSynthesis.getVoices();
+  return voices.find(v=>v.name.indexOf('Google US English')!==-1) ||
+         voices.find(v=>v.lang==='en-US') ||
+         voices.find(v=>v.lang && v.lang.indexOf('en')===0) ||
+         voices[0] || null;
+}
+function speak(text){
+  if(!('speechSynthesis' in window)){
+    alert('Синтез речи не поддерживается этим браузером.');
+    return;
+  }
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  const v = pickVoice();
+  if(v) u.voice = v;
+  u.lang = 'en-US';
+  u.rate = 0.85;
+  speechSynthesis.speak(u);
+}
+
+const audioStatus = document.getElementById('audio-status');
+document.getElementById('btn-audio-test').addEventListener('click', ()=>{
+  if(!('speechSynthesis' in window)){
+    audioStatus.textContent = 'Синтез речи недоступен в этом браузере.';
+    audioStatus.className = 'bad';
+    return;
+  }
+  audioStatus.textContent = 'Проверка...';
+  audioStatus.className = '';
+  const u = new SpeechSynthesisUtterance('This is a test of the English pronunciation.');
+  const v = pickVoice();
+  if(v) u.voice = v;
+  u.lang = 'en-US';
+  u.onstart = ()=>{
+    audioStatus.textContent = 'Звук работает. Голос: ' + (v ? v.name : 'по умолчанию');
+    audioStatus.className = 'ok';
+  };
+  u.onerror = ()=>{
+    audioStatus.textContent = 'Ошибка воспроизведения. Проверьте звук браузера.';
+    audioStatus.className = 'bad';
+  };
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+  setTimeout(()=>{
+    if(audioStatus.textContent === 'Проверка...'){
+      audioStatus.textContent = 'Голос не запустился — попробуйте ещё раз или проверьте звук.';
+      audioStatus.className = 'bad';
+    }
+  }, 2500);
+});
+
+const problemWords = {};
+function markProblem(word){
+  problemWords[word] = (problemWords[word]||0) + 1;
+  renderProblemTable();
+}
+function renderProblemTable(){
+  const body = document.getElementById('problem-body');
+  const empty = document.getElementById('problem-empty');
+  const entries = Object.entries(problemWords).sort((a,b)=>b[1]-a[1]);
+  body.innerHTML = '';
+  if(!entries.length){ empty.style.display='block'; return; }
+  empty.style.display='none';
+  entries.forEach(([w,c])=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = '<td>'+w+'</td><td>'+c+'</td>';
+    body.appendChild(tr);
+  });
+}
+
+function vocabWord(w){
+  const div = document.createElement('div');
+  div.className = 'vocab-item';
+  div.innerHTML =
+    '<span class="en">'+w.word+'</span>'+
+    '<span class="ipa">'+w.ipa+'</span>'+
+    '<span class="ru">'+w.ru+' · от <b>'+w.root+'</b></span>'+
+    '<button type="button">🔊 Слушать</button>';
+  div.querySelector('button').addEventListener('click', ()=>speak(w.word));
+  return div;
+}
+const vocabGrid = document.getElementById('vocab-grid');
+shuffle(WORDS).forEach(w=>vocabGrid.appendChild(vocabWord(w)));
+
+const TABS = [
+  {id:'ex1', label:'1. Буквы'},
+  {id:'ex2', label:'2. Перевод'},
+  {id:'ex3', label:'3. На слух'},
+  {id:'ex4', label:'4. Дефиниция'},
+  {id:'ex5', label:'5. Таблица'},
+  {id:'ex6', label:'6. Guess the word'},
+  {id:'ex7', label:'7. По смыслу'},
+  {id:'ex8', label:'8. Своё предложение'},
+  {id:'ex9', label:'9. Repeat & Change'}
+];
+const tabsEl = document.getElementById('tabs');
+TABS.forEach((t,i)=>{
+  const b = document.createElement('button');
+  b.className = 'tab-btn' + (i===0?' active':'');
+  b.textContent = t.label;
+  b.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab-btn').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.exercise').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    document.getElementById(t.id).classList.add('active');
+  });
+  tabsEl.appendChild(b);
+});
+
+const exState = {};
+
+function maskWord(word){
+  const chars = word.split('');
+  const maskCount = Math.max(2, Math.round(chars.length*0.4));
+  const idxs = shuffle(chars.map((_,i)=>i)).slice(0, maskCount);
+  return chars.map((c,i)=> idxs.includes(i) ? '_' : c).join('');
+}
+
+function buildInputExercise(exId, items, promptBuilder, answerBuilder){
+  const container = document.getElementById(exId+'-items');
+  container.innerHTML = '';
+  exState[exId] = { rows: [] };
+  items.forEach((w,i)=>{
+    const row = document.createElement('div');
+    row.className = 'item-row';
+    const answer = answerBuilder(w);
+    row.innerHTML =
+      '<span class="item-num">'+(i+1)+'.</span>'+
+      '<div class="item-prompt">'+promptBuilder(w)+'</div>'+
+      '<div class="item-controls">'+
+        '<input class="answer-input" type="text" placeholder="ваш ответ" autocomplete="off">'+
+        '<span class="reveal-note">= '+answer+'</span>'+
+      '</div>';
+    container.appendChild(row);
+    exState[exId].rows.push({
+      word: w,
+      answer: answer,
+      input: row.querySelector('input'),
+      revealNote: row.querySelector('.reveal-note'),
+      promptText: row.querySelector('.item-prompt').textContent
+    });
+  });
+}
+
+function checkExercise(exId){
+  const st = exState[exId];
+  let correctCount = 0;
+  st.rows.forEach(r=>{
+    const val = norm(r.input.value);
+    const ok = val === norm(r.answer);
+    r.input.classList.remove('correct','wrong');
+    if(!r.input.value){ return; }
+    if(ok){ r.input.classList.add('correct'); correctCount++; }
+    else{ r.input.classList.add('wrong'); markProblem(r.word.word); }
+  });
+  document.getElementById(exId+'-score').textContent =
+    'Правильно: ' + correctCount + ' из ' + st.rows.length;
+}
+function revealExercise(exId){
+  const st = exState[exId];
+  st.rows.forEach(r=> r.revealNote.classList.add('show'));
+}
+function copyExercise(exId, extraLines){
+  const st = exState[exId];
+  let lines = [];
+  if(extraLines){
+    lines = extraLines();
+  } else {
+    lines = st.rows.map((r,i)=> (i+1)+'. '+r.promptText+' — ответ студента: '+(r.input.value||'(пусто)'));
+  }
+  const text = lines.join('\n');
+  navigator.clipboard.writeText(text).then(()=>{
+    const t = document.getElementById(exId+'-toast');
+    t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'), 1800);
+  }).catch(()=>{
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    const t = document.getElementById(exId+'-toast');
+    t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'), 1800);
+  });
+}
+
+document.querySelectorAll('[data-check]').forEach(b=>b.addEventListener('click', ()=>checkExercise(b.dataset.check)));
+document.querySelectorAll('[data-reveal]').forEach(b=>b.addEventListener('click', ()=>revealExercise(b.dataset.reveal)));
+document.querySelectorAll('[data-copy]').forEach(b=>b.addEventListener('click', ()=>{
+  const id = b.dataset.copy;
+  if(id==='ex5') copyEx5();
+  else if(id==='ex7') copyEx7();
+  else if(id==='ex8') copyEx8();
+  else if(id==='ex9') copyEx9();
+  else copyExercise(id);
+}));
+
+buildInputExercise('ex1', pick10(),
+  w => 'Составьте слово: <b style="letter-spacing:2px">'+maskWord(w.word)+'</b><br><span class="hint-def">корень: '+w.root+' · '+w.ru+'</span>',
+  w => w.word
+);
+
+buildInputExercise('ex2', pick10(),
+  w => 'Переведите на английский: <b>'+w.ru+'</b>',
+  w => w.word
+);
+
+buildInputExercise('ex3', pick10(),
+  w => 'Нажмите 🔊 и запишите слово, которое услышали: <button type="button" class="mini-btn ex3-play">🔊 слушать</button>',
+  w => w.word
+);
+(function attachEx3Audio(){
+  const rows = exState['ex3'].rows;
+  document.querySelectorAll('#ex3-items .ex3-play').forEach((btn,i)=>{
+    btn.addEventListener('click', ()=>speak(rows[i].word.word));
+  });
+})();
+
+buildInputExercise('ex4', pick10(),
+  w => 'Definition: <span class="hint-def">"'+w.def+'"</span><br>Какое это слово?',
+  w => w.word
+);
+
+const ex5Words = shuffle(TRIPLES).slice(0,10);
+(function buildEx5(){
+  const body = document.getElementById('ex5-body');
+  body.innerHTML = '';
+  exState['ex5'] = { rows: [] };
+  ex5Words.forEach((t,i)=>{
+    const blankChoice = Math.floor(Math.random()*3);
+    const cells = {verb:t.verb, noun:t.noun, person:t.person};
+    const blankKey = ['verb','noun','person'][blankChoice];
+    const tr = document.createElement('tr');
+    function cellHtml(key){
+      if(key===blankKey){
+        return '<td><input class="answer-input" type="text" placeholder="?" autocomplete="off"></td>';
+      }
+      return '<td>'+cells[key]+'</td>';
+    }
+    tr.innerHTML = '<td>'+(i+1)+'</td>'+cellHtml('verb')+cellHtml('noun')+cellHtml('person');
+    body.appendChild(tr);
+    exState['ex5'].rows.push({
+      word: cells[blankKey],
+      answer: cells[blankKey],
+      input: tr.querySelector('input'),
+      promptText: 'verb: '+t.verb+' | noun: '+t.noun+' | person: '+t.person+' (пропущено: '+blankKey+')',
+      revealNote: null,
+      blankKey: blankKey,
+      allCells: cells
+    });
+  });
+})();
+function revealEx5(){
+  exState['ex5'].rows.forEach(r=>{
+    if(!r.input.nextElementSibling){
+      const span = document.createElement('span');
+      span.className = 'reveal-note show';
+      span.style.marginLeft = '6px';
+      span.textContent = '= '+r.answer;
+      r.input.parentElement.appendChild(span);
+    }
+  });
+}
+document.querySelector('[data-reveal="ex5"]').addEventListener('click', revealEx5);
+function copyEx5(){
+  const lines = exState['ex5'].rows.map((r,i)=>
+    (i+1)+'. verb: '+r.allCells.verb+' | noun: '+r.allCells.noun+' | person: '+r.allCells.person+
+    ' — ответ студента ('+r.blankKey+'): '+(r.input.value||'(пусто)')
+  );
+  const text = lines.join('\n');
+  navigator.clipboard.writeText(text).then(()=>{
+    const t = document.getElementById('ex5-toast');
+    t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1800);
+  });
+}
+
+buildInputExercise('ex6', pick10(),
+  w => '<span class="riddle-badge">Riddle:</span> '+w.riddle,
+  w => w.word
+);
+
+const ex7Words = pick10();
+(function buildEx7(){
+  const container = document.getElementById('ex7-items');
+  container.innerHTML = '';
+  exState['ex7'] = { rows: [] };
+  ex7Words.forEach((w,i)=>{
+    const row = document.createElement('div');
+    row.className = 'item-row';
+    const opts = shuffle(CATEGORIES).map(c=>'<option value="'+c+'">'+c+'</option>').join('');
+    row.innerHTML =
+      '<span class="item-num">'+(i+1)+'.</span>'+
+      '<div class="item-prompt"><b>'+w.word+'</b> ('+w.ru+') — к какой сфере относится?</div>'+
+      '<div class="item-controls">'+
+        '<select class="answer-select"><option value="">— выберите —</option>'+opts+'</select>'+
+        '<span class="reveal-note">= '+w.category+'</span>'+
+      '</div>';
+    container.appendChild(row);
+    exState['ex7'].rows.push({
+      word: w.word,
+      answer: w.category,
+      select: row.querySelector('select'),
+      revealNote: row.querySelector('.reveal-note'),
+      promptText: w.word+' ('+w.ru+')'
+    });
+  });
+})();
+document.querySelector('[data-check="ex7"]').addEventListener('click', ()=>{
+  let correctCount = 0;
+  exState['ex7'].rows.forEach(r=>{
+    r.select.style.borderColor = '';
+    if(!r.select.value) return;
+    if(r.select.value === r.answer){ r.select.style.borderColor='var(--green)'; correctCount++; }
+    else { r.select.style.borderColor='var(--red)'; markProblem(r.word); }
+  });
+  document.getElementById('ex7-score').textContent = 'Правильно: '+correctCount+' из '+exState['ex7'].rows.length;
+});
+document.querySelector('[data-reveal="ex7"]').addEventListener('click', ()=>{
+  exState['ex7'].rows.forEach(r=>r.revealNote.classList.add('show'));
+});
+function copyEx7(){
+  const lines = exState['ex7'].rows.map((r,i)=> (i+1)+'. '+r.promptText+' — ответ студента: '+(r.select.value||'(не выбрано)'));
+  navigator.clipboard.writeText(lines.join('\n')).then(()=>{
+    const t = document.getElementById('ex7-toast');
+    t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1800);
+  });
+}
+
+const ex8Words = pick10();
+(function buildEx8(){
+  const container = document.getElementById('ex8-items');
+  container.innerHTML = '';
+  exState['ex8'] = { rows: [] };
+  ex8Words.forEach((w,i)=>{
+    const row = document.createElement('div');
+    row.className = 'item-row';
+    row.innerHTML =
+      '<span class="item-num">'+(i+1)+'.</span>'+
+      '<div class="item-prompt">Напишите своё предложение со словом <b>'+w.word+'</b> ('+w.ru+').'+
+        ' <button type="button" class="mini-btn ex8-example">пример</button>'+
+        '<div class="reveal-note ex8-note">пример: '+w.example+'</div></div>'+
+      '<div class="item-controls" style="flex:1;min-width:260px;">'+
+        '<textarea class="answer-area" placeholder="Ваше предложение..."></textarea>'+
+      '</div>';
+    container.appendChild(row);
+    row.querySelector('.ex8-example').addEventListener('click', ()=>{
+      row.querySelector('.ex8-note').classList.add('show');
+    });
+    exState['ex8'].rows.push({
+      word: w.word,
+      textarea: row.querySelector('textarea'),
+      promptText: 'Предложение со словом "'+w.word+'"'
+    });
+  });
+})();
+function copyEx8(){
+  const lines = exState['ex8'].rows.map((r,i)=> (i+1)+'. '+r.promptText+' — ответ студента: '+(r.textarea.value||'(пусто)'));
+  navigator.clipboard.writeText(lines.join('\n')).then(()=>{
+    const t = document.getElementById('ex8-toast');
+    t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1800);
+  });
+}
+
+const ex9Roots = shuffle(TRIPLES).slice(0,10);
+(function buildEx9(){
+  const container = document.getElementById('ex9-items');
+  container.innerHTML = '';
+  exState['ex9'] = { rows: [] };
+  ex9Roots.forEach((t,i)=>{
+    const modelVerbSentence = 'They '+t.verb+' every day.';
+    const modelPersonSentence = 'She wants to become a(n) '+t.person+'.';
+    const row = document.createElement('div');
+    row.className = 'item-row';
+    row.innerHTML =
+      '<span class="item-num">'+(i+1)+'.</span>'+
+      '<div class="item-prompt">Model: <i>"'+modelVerbSentence+'"</i> → <i>"'+modelPersonSentence+'"</i><br>'+
+      'Ваш ход: используйте корень <b>'+t.verb+'</b> ('+t.ru+') — придумайте свою пару предложений по этому же принципу (глагол → своё предложение, затем существительное-профессия → своё предложение).</div>'+
+      '<div class="item-controls" style="flex:1;min-width:260px;">'+
+        '<textarea class="answer-area" placeholder="1) предложение с '+t.verb+'... 2) предложение с '+t.person+'..."></textarea>'+
+      '</div>';
+    container.appendChild(row);
+    exState['ex9'].rows.push({
+      root: t.verb,
+      person: t.person,
+      textarea: row.querySelector('textarea'),
+      promptText: 'Drill for root "'+t.verb+'" / "'+t.person+'"'
+    });
+  });
+})();
+function copyEx9(){
+  const lines = exState['ex9'].rows.map((r,i)=> (i+1)+'. '+r.promptText+' — ответ студента: '+(r.textarea.value||'(пусто)'));
+  navigator.clipboard.writeText(lines.join('\n')).then(()=>{
+    const t = document.getElementById('ex9-toast');
+    t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1800);
+  });
+}
+
+renderProblemTable();
+</script>
+</body>
+</html>
