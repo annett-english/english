@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Магазины и покупки — тренажёр слов</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#16231E;
+    --bg2:#1E2F27;
+    --paper:#F3E9CE;
+    --paper-dark:#E9DCB8;
+    --ink:#241F14;
+    --muted:#8B8368;
+    --accent:#E7B549;
+    --accent-ink:#3A2C05;
+    --good:#3F8F5F;
+    --good-bg:#E2F1E5;
+    --bad:#B23A3A;
+    --bad-bg:#F6E2E0;
+    --line:#cbbf95;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    background-image:
+      radial-gradient(circle at 20% 10%, rgba(231,181,73,0.05), transparent 40%),
+      radial-gradient(circle at 90% 80%, rgba(231,181,73,0.04), transparent 40%);
+    color:var(--paper);
+    font-family:'Inter',sans-serif;
+    line-height:1.5;
+    padding-bottom:80px;
+  }
+  h1,h2,h3,.tag,.num,.receipt-title{font-family:'Courier Prime',monospace;}
+  a{color:inherit;}
+
+  .wrap{max-width:1180px;margin:0 auto;padding:32px 20px 0;}
+
+  header.top{
+    text-align:center;
+    padding:10px 0 30px;
+    border-bottom:1px dashed var(--line);
+    margin-bottom:34px;
+  }
+  header.top h1{
+    font-size:clamp(28px,4vw,44px);
+    letter-spacing:1px;
+    color:var(--accent);
+    margin:0 0 10px;
+    text-transform:uppercase;
+  }
+  header.top p{
+    color:#cfd6cd;
+    max-width:680px;
+    margin:0 auto;
+    font-size:15px;
+  }
+  .soundcheck{
+    margin-top:18px;
+    display:inline-flex;
+    gap:10px;
+    align-items:center;
+    background:var(--bg2);
+    border:1px solid var(--line);
+    padding:8px 14px;
+    border-radius:8px;
+    font-size:13px;
+    color:#cfd6cd;
+  }
+
+  /* layout */
+  .layout{display:grid;grid-template-columns:1fr 260px;gap:28px;align-items:start;}
+  @media (max-width:880px){.layout{grid-template-columns:1fr;}}
+
+  aside.sidebar{
+    position:sticky; top:16px;
+    background:#fffdf6;
+    color:var(--ink);
+    border-radius:2px;
+    padding:18px 16px 20px;
+    box-shadow:0 8px 22px rgba(0,0,0,0.35);
+    transform:rotate(-1deg);
+  }
+  aside.sidebar h3{margin:0 0 4px;font-size:16px;color:var(--bad);}
+  aside.sidebar .sub{font-size:12px;color:var(--muted);margin-bottom:12px;}
+  #problemList{list-style:none;margin:0;padding:0;font-size:14px;}
+  #problemList li{
+    display:flex;justify-content:space-between;gap:8px;
+    padding:6px 0;border-bottom:1px dotted var(--line);
+  }
+  #problemList li b{color:var(--bad);}
+  .empty-note{font-size:13px;color:var(--good);}
+
+  /* word review table */
+  .review{
+    background:var(--paper);
+    color:var(--ink);
+    border-radius:4px;
+    padding:22px 22px 30px;
+    margin-bottom:50px;
+    position:relative;
+  }
+  .review h2{margin-top:0;font-size:20px;color:var(--accent-ink);}
+  .review .hint{font-size:13px;color:var(--muted);margin-bottom:16px;}
+  table.wordtable{width:100%;border-collapse:collapse;font-size:14.5px;}
+  table.wordtable th{
+    text-align:left;font-family:'Courier Prime',monospace;font-weight:700;
+    border-bottom:2px solid var(--ink);padding:8px 6px;font-size:12.5px;
+    text-transform:uppercase;letter-spacing:.5px;
+  }
+  table.wordtable td{padding:8px 6px;border-bottom:1px dashed var(--line);vertical-align:middle;}
+  table.wordtable tr:hover{background:rgba(0,0,0,0.03);}
+  .ipa{color:var(--muted);font-size:13px;}
+  .playbtn{
+    border:none;background:var(--accent-ink);color:var(--accent);
+    width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:15px;
+    display:inline-flex;align-items:center;justify-content:center;
+    transition:transform .15s;
+  }
+  .playbtn:hover{transform:scale(1.1);}
+  .playbtn:active{transform:scale(.95);}
+
+  /* receipt cards */
+  .receipt{
+    background:var(--paper);
+    color:var(--ink);
+    position:relative;
+    padding:26px 24px 20px;
+    margin-bottom:48px;
+    border-radius:2px 2px 0 0;
+  }
+  .receipt::after{
+    content:"";
+    position:absolute;left:0;right:0;bottom:-13px;height:13px;
+    background:
+      linear-gradient(135deg,var(--paper) 50%,transparent 50%),
+      linear-gradient(-135deg,var(--paper) 50%,transparent 50%);
+    background-size:18px 18px;
+    background-position:top left, top right;
+    background-repeat:repeat-x;
+  }
+  .receipt-head{
+    display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:10px;
+    border-bottom:2px solid var(--ink);padding-bottom:10px;margin-bottom:6px;
+  }
+  .receipt-title{font-size:18px;letter-spacing:.5px;}
+  .receipt-num{font-size:12px;color:var(--muted);}
+  .receipt-desc{font-size:13.5px;color:#544c33;margin:8px 0 18px;}
+  .wordbank{
+    background:var(--paper-dark);border:1px dashed var(--muted);
+    padding:8px 12px;border-radius:4px;font-size:13.5px;margin-bottom:18px;
+  }
+  .wordbank b{font-family:'Courier Prime',monospace;}
+
+  .item{padding:14px 0;border-bottom:1px dotted var(--line);}
+  .item:last-of-type{border-bottom:none;}
+  .itemhead{display:flex;align-items:center;gap:10px;margin-bottom:6px;}
+  .num{
+    display:inline-block;min-width:26px;text-align:center;
+    background:var(--ink);color:var(--accent);font-size:12px;
+    padding:2px 6px;border-radius:3px;
+  }
+  .prompt{font-size:15px;margin-bottom:8px;}
+  .prompt code{background:var(--paper-dark);padding:1px 5px;border-radius:3px;}
+  input.ans, textarea.ans-open{
+    width:100%;max-width:420px;padding:8px 10px;font-size:14.5px;
+    border:1.5px solid var(--muted);border-radius:5px;font-family:'Inter',sans-serif;
+    background:#fffef9;
+  }
+  textarea.ans-open{max-width:100%;resize:vertical;}
+  input.ans:focus, textarea.ans-open:focus{outline:none;border-color:var(--accent-ink);}
+  .item.correct input.ans{border-color:var(--good);background:var(--good-bg);}
+  .item.incorrect input.ans{border-color:var(--bad);background:var(--bad-bg);}
+  .fb{font-size:13px;margin-top:6px;min-height:16px;}
+  .fb.ok{color:var(--good);font-weight:600;}
+  .fb.bad{color:var(--bad);font-weight:600;}
+  .hintbox{font-size:13px;margin-top:8px;padding:8px 10px;background:var(--paper-dark);border-left:3px solid var(--accent-ink);display:none;}
+  .hintbox.show{display:block;}
+
+  .tfbtns{display:flex;gap:8px;}
+  .tfbtn{
+    padding:6px 18px;border-radius:20px;border:1.5px solid var(--ink);
+    background:transparent;color:var(--ink);cursor:pointer;font-size:13px;font-weight:600;
+  }
+  .tfbtn.active{background:var(--accent-ink);color:var(--accent);border-color:var(--accent-ink);}
+  .item.correct .tfbtn.active{background:var(--good);border-color:var(--good);color:#fff;}
+  .item.incorrect .tfbtn.active{background:var(--bad);border-color:var(--bad);color:#fff;}
+
+  .speakmini{
+    border:none;background:var(--accent-ink);color:var(--accent);
+    padding:5px 12px;border-radius:14px;font-size:12.5px;cursor:pointer;
+  }
+
+  .receipt-foot{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:18px;padding-top:14px;border-top:1px dashed var(--line);}
+  .btn{
+    border:none;padding:9px 16px;border-radius:6px;cursor:pointer;font-size:13.5px;font-weight:600;
+    font-family:'Inter',sans-serif;
+  }
+  .btn-check{background:var(--accent-ink);color:var(--accent);}
+  .btn-show{background:transparent;color:var(--ink);border:1.5px solid var(--ink);}
+  .btn-reset{background:transparent;color:var(--muted);border:1.5px solid var(--muted);}
+  .score{margin-left:auto;font-family:'Courier Prime',monospace;font-size:14px;}
+
+  footer.global{
+    max-width:1180px;margin:10px auto 0;padding:0 20px;
+    display:flex;justify-content:center;
+  }
+  .copybar{
+    background:var(--bg2);border:1px solid var(--line);border-radius:8px;
+    padding:16px 20px;text-align:center;max-width:560px;
+  }
+  .copybar p{font-size:13px;color:#cfd6cd;margin:0 0 10px;}
+  .btn-copy{background:var(--accent);color:var(--accent-ink);font-size:14.5px;padding:11px 22px;}
+  #toast{
+    position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+    background:var(--accent);color:var(--accent-ink);padding:10px 18px;border-radius:6px;
+    font-size:13.5px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .3s;
+    box-shadow:0 6px 18px rgba(0,0,0,0.3);
+  }
+  #toast.show{opacity:1;}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+<header class="top">
+  <h1>Магазины и покупки</h1>
+  <p>Повторите слова, прослушайте произношение, а затем пройдите 7 упражнений — по 10 заданий в каждом. Пишите ответы вручную английскими буквами.</p>
+  <div class="soundcheck">
+    🔊 <span>Проверка звука:</span>
+    <button class="btn btn-check" style="padding:6px 12px;" onclick="soundCheck()">Проверить звук</button>
+  </div>
+</header>
+
+<div class="review">
+  <h2>Повторение слов</h2>
+  <div class="hint">Нажмите на 🔊, чтобы услышать произношение (голос Google US English / en-US).</div>
+  <table class="wordtable">
+    <thead><tr><th>Слово</th><th>Транскрипция</th><th>Перевод</th><th>Звук</th></tr></thead>
+    <tbody id="wordTableBody"></tbody>
+  </table>
+</div>
+
+<div class="layout">
+  <main id="exercisesRoot"></main>
+  <aside class="sidebar">
+    <h3>⚠ Проблемные слова</h3>
+    <div class="sub">Слова, в которых вы чаще всего ошибались</div>
+    <ul id="problemList"></ul>
+  </aside>
+</div>
+
+<footer class="global">
+  <div class="copybar">
+    <p>Скопировать все ваши ответы из всех упражнений (например, чтобы отправить учителю):</p>
+    <button class="btn btn-copy" onclick="copyAllAnswers()">📋 Скопировать все ответы</button>
+  </div>
+</footer>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* ================= DATA ================= */
+const WORDS = [
+  {en:"stationer's", ipa:"/ˈsteɪʃənəz/", ru:"канцелярский магазин", tts:"stationer's"},
+  {en:"jeweller's", ipa:"/ˈdʒuːələz/", ru:"ювелирный магазин", tts:"jeweller's"},
+  {en:"fold (clothes)", ipa:"/fəʊld/", ru:"складывать (одежду)", tts:"fold"},
+  {en:"chemist's / pharmacy", ipa:"/ˈkemɪsts/", ru:"аптека", tts:"chemist's"},
+  {en:"pack (a suitcase)", ipa:"/pæk/", ru:"укладывать вещи, паковать (чемодан)", tts:"pack"},
+  {en:"electronics shop / store", ipa:"/ɪˌlekˈtrɒnɪks ʃɒp/", ru:"магазин электроники", tts:"electronics shop"},
+  {en:"roll up (clothes)", ipa:"/rəʊl ʌp/", ru:"скатывать, скручивать (одежду)", tts:"roll up"},
+  {en:"wrapper", ipa:"/ˈræpə/", ru:"обёртка, фантик", tts:"wrapper"},
+  {en:"convenience store", ipa:"/kənˈviːniəns stɔː/", ru:"магазин у дома, круглосуточный магазин", tts:"convenience store"},
+  {en:"wrapping paper", ipa:"/ˈræpɪŋ ˌpeɪpə/", ru:"обёрточная бумага", tts:"wrapping paper"},
+  {en:"unpack", ipa:"/ʌnˈpæk/", ru:"распаковывать", tts:"unpack"},
+  {en:"newsagent's", ipa:"/ˈnjuːzˌeɪdʒənts/", ru:"газетный киоск", tts:"newsagent's"},
+  {en:"wrap (fragile things)", ipa:"/ræp/", ru:"заворачивать, упаковывать (хрупкие вещи)", tts:"wrap"},
+  {en:"bookshop / bookstore", ipa:"/ˈbʊkʃɒp/", ru:"книжный магазин", tts:"bookshop"},
+  {en:"shoe shop", ipa:"/ʃuː ʃɒp/", ru:"обувной магазин", tts:"shoe shop"},
+];
+
+/* ================= SPEECH ================= */
+let cachedVoice = null;
+function pickVoice(){
+  const voices = window.speechSynthesis ? speechSynthesis.getVoices() : [];
+  cachedVoice = voices.find(v=>v.name==='Google US English') ||
+                voices.find(v=>v.lang==='en-US' && /en/i.test(v.lang)) ||
+                voices.find(v=>v.lang && v.lang.startsWith('en')) ||
+                voices[0] || null;
+}
+if('speechSynthesis' in window){
+  pickVoice();
+  speechSynthesis.onvoiceschanged = pickVoice;
+}
+function speak(text){
+  if(!('speechSynthesis' in window)){
+    alert('Ваш браузер не поддерживает озвучивание текста. Попробуйте открыть страницу в Chrome.');
+    return;
+  }
+  if(!cachedVoice) pickVoice();
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  if(cachedVoice) u.voice = cachedVoice;
+  u.lang = 'en-US';
+  u.rate = 0.88;
+  speechSynthesis.speak(u);
+}
+function soundCheck(){
+  speak("This is a sound check. If you can hear me, the audio is working.");
+  showToast('Если звука нет — проверьте громкость и разрешите звук для страницы (лучше открыть в Chrome).');
+}
+
+/* render word table */
+const tbody = document.getElementById('wordTableBody');
+WORDS.forEach(w=>{
+  const tr = document.createElement('tr');
+  tr.innerHTML = `<td><b>${w.en}</b></td><td class="ipa">${w.ipa}</td><td>${w.ru}</td>
+    <td><button class="playbtn" title="Прослушать">🔊</button></td>`;
+  tr.querySelector('.playbtn').onclick = ()=>speak(w.tts);
+  tbody.appendChild(tr);
+});
+
+/* ================= HELPERS ================= */
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+function normalize(s){
+  return (s||'').toLowerCase()
+    .replace(/[’‘]/g,"'")
+    .replace(/'/g,'')
+    .replace(/[.,!?]/g,'')
+    .replace(/\s+/g,' ')
+    .trim();
+}
+function isCorrectText(value, accepted){
+  const v = normalize(value);
+  if(!v) return false;
+  return accepted.some(a=>normalize(a)===v);
+}
+const problemWords = {}; // label -> count
+function addProblem(label){
+  problemWords[label] = (problemWords[label]||0)+1;
+  renderProblemList();
+}
+function renderProblemList(){
+  const ul = document.getElementById('problemList');
+  const entries = Object.entries(problemWords).sort((a,b)=>b[1]-a[1]);
+  if(entries.length===0){
+    ul.innerHTML = '<li class="empty-note" style="border:none;">Пока нет ошибок — отлично! 🎉</li>';
+    return;
+  }
+  ul.innerHTML = entries.map(([w,c])=>`<li><span>${w}</span><b>${c}</b></li>`).join('');
+}
+renderProblemList();
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(()=>t.classList.remove('show'), 3200);
+}
+
+/* ================= EXERCISE DATA ================= */
+const EXERCISES = [
+{
+  id:'ex1', num:1, kind:'text',
+  title:'Вставь пропущенные буквы',
+  desc:'Впишите слово целиком (без пропусков), ориентируясь на буквы, которые уже есть.',
+  items: shuffle([
+    {prompt:'st_t_on_r\'s', accepted:["stationer's","stationers"], answerLabel:"stationer's"},
+    {prompt:'j_w_ll_r\'s', accepted:["jeweller's","jewellers","jeweler's","jewelers"], answerLabel:"jeweller's"},
+    {prompt:'ch_m_st\'s', accepted:["chemist's","chemists","pharmacy"], answerLabel:"chemist's / pharmacy"},
+    {prompt:'conv_n__nce st_re', accepted:["convenience store","convenience shop"], answerLabel:"convenience store"},
+    {prompt:'n_wsag_nt\'s', accepted:["newsagent's","newsagents"], answerLabel:"newsagent's"},
+    {prompt:'wr_pp_ng p_p_r', accepted:["wrapping paper"], answerLabel:"wrapping paper"},
+    {prompt:'el_ctr_n_cs sh_p', accepted:["electronics shop","electronics store"], answerLabel:"electronics shop / store"},
+    {prompt:'b__ksh_p', accepted:["bookshop","bookstore","book shop","book store"], answerLabel:"bookshop / bookstore"},
+    {prompt:'sh__ sh_p', accepted:["shoe shop","shoe store"], answerLabel:"shoe shop"},
+    {prompt:'wr_pp_r', accepted:["wrapper"], answerLabel:"wrapper"},
+  ])
+},
+{
+  id:'ex2', num:2, kind:'audio',
+  title:'Напиши слово на слух',
+  desc:'Нажмите 🔊, прослушайте слово и напишите его по-английски.',
+  items: shuffle([
+    {tts:'fold', accepted:["fold"], answerLabel:"fold"},
+    {tts:'pack', accepted:["pack"], answerLabel:"pack"},
+    {tts:'roll up', accepted:["roll up"], answerLabel:"roll up"},
+    {tts:'unpack', accepted:["unpack"], answerLabel:"unpack"},
+    {tts:'wrap', accepted:["wrap"], answerLabel:"wrap"},
+    {tts:"stationer's", accepted:["stationer's","stationers"], answerLabel:"stationer's"},
+    {tts:"jeweller's", accepted:["jeweller's","jewellers","jeweler's","jewelers"], answerLabel:"jeweller's"},
+    {tts:"newsagent's", accepted:["newsagent's","newsagents"], answerLabel:"newsagent's"},
+    {tts:'convenience store', accepted:["convenience store","convenience shop"], answerLabel:"convenience store"},
+    {tts:'shoe shop', accepted:["shoe shop","shoe store"], answerLabel:"shoe shop"},
+  ])
+},
+{
+  id:'ex3', num:3, kind:'text',
+  title:'Дефиниция → слово',
+  desc:'Прочитайте определение и напишите нужное слово или словосочетание по-английски.',
+  items: shuffle([
+    {prompt:'A shop where you buy pens, notebooks and paper.', accepted:["stationer's","stationers"], answerLabel:"stationer's"},
+    {prompt:'A shop that sells rings, necklaces and watches.', accepted:["jeweller's","jewellers","jeweler's","jewelers"], answerLabel:"jeweller's"},
+    {prompt:'To put clothes and things into a suitcase before a trip.', accepted:["pack"], answerLabel:"pack"},
+    {prompt:'A shop where you buy medicine.', accepted:["chemist's","chemists","pharmacy"], answerLabel:"chemist's / pharmacy"},
+    {prompt:'To bend clothes neatly instead of hanging them up.', accepted:["fold"], answerLabel:"fold"},
+    {prompt:'To roll clothes into a tube shape to save space in a bag.', accepted:["roll up"], answerLabel:"roll up"},
+    {prompt:'To take things out of a suitcase or bag after a trip.', accepted:["unpack"], answerLabel:"unpack"},
+    {prompt:'Paper that is used to cover a present.', accepted:["wrapping paper"], answerLabel:"wrapping paper"},
+    {prompt:'A small shop that is open long hours and sells everyday items.', accepted:["convenience store","convenience shop"], answerLabel:"convenience store"},
+    {prompt:'A shop that sells newspapers and magazines.', accepted:["newsagent's","newsagents"], answerLabel:"newsagent's"},
+  ])
+},
+{
+  id:'ex4', num:4, kind:'text',
+  title:'Распредели по магазинам',
+  desc:'Напишите, в какой магазин вы пойдёте за каждой вещью (используйте слова из списка выше).',
+  items: shuffle([
+    {prompt:'a gold ring', accepted:["jeweller's","jewellers","jeweler's","jewelers"], answerLabel:"jeweller's"},
+    {prompt:'a notebook and coloured pens', accepted:["stationer's","stationers"], answerLabel:"stationer's"},
+    {prompt:'tablets for a headache', accepted:["chemist's","chemists","pharmacy"], answerLabel:"chemist's / pharmacy"},
+    {prompt:'a new laptop', accepted:["electronics shop","electronics store"], answerLabel:"electronics shop / store"},
+    {prompt:'your favourite novel', accepted:["bookshop","bookstore","book shop","book store"], answerLabel:"bookshop / bookstore"},
+    {prompt:'a pair of running shoes', accepted:["shoe shop","shoe store"], answerLabel:"shoe shop / store"},
+    {prompt:"this morning's newspaper", accepted:["newsagent's","newsagents"], answerLabel:"newsagent's"},
+    {prompt:'a bottle of milk at 11 p.m.', accepted:["convenience store","convenience shop"], answerLabel:"convenience store"},
+    {prompt:'a diamond necklace', accepted:["jeweller's","jewellers","jeweler's","jewelers"], answerLabel:"jeweller's"},
+    {prompt:'a phone charger', accepted:["electronics shop","electronics store"], answerLabel:"electronics shop / store"},
+  ])
+},
+{
+  id:'ex5', num:5, kind:'tf',
+  title:'True or False',
+  desc:'Прочитайте утверждение и нажмите True (правда) или False (ложь).',
+  items: shuffle([
+    {prompt:'"Fold" means to roll clothes into a tube shape.', accepted:false},
+    {prompt:'A chemist\'s is the same as a pharmacy.', accepted:true},
+    {prompt:'"Unpack" means to put things into a suitcase.', accepted:false},
+    {prompt:'A newsagent\'s sells newspapers and magazines.', accepted:true},
+    {prompt:'A wrapper is the paper or plastic around sweets or food.', accepted:true},
+    {prompt:'A convenience store is usually a huge supermarket.', accepted:false},
+    {prompt:'You wrap fragile things carefully so they don\'t break.', accepted:true},
+    {prompt:'A jeweller\'s mainly sells books.', accepted:false},
+    {prompt:'Wrapping paper is used to cover presents.', accepted:true},
+    {prompt:'"Roll up" means to hang clothes on hangers.', accepted:false},
+  ])
+},
+{
+  id:'ex6', num:6, kind:'text', wordbank:"fold, pack, unpack, roll up, wrap, shoe shop, jeweller's, convenience store, bookshop, chemist's",
+  title:'Which word fits?',
+  desc:'Выберите подходящее слово из банка слов и впишите его в пропуск.',
+  items: shuffle([
+    {prompt:'Please ___ your T-shirts neatly before putting them in the drawer.', accepted:["fold"], answerLabel:"fold"},
+    {prompt:"Don't forget to ___ your toothbrush before the trip.", accepted:["pack"], answerLabel:"pack"},
+    {prompt:'As soon as we arrived, we started to ___ our suitcases.', accepted:["unpack"], answerLabel:"unpack"},
+    {prompt:'It saves space if you ___ your socks instead of folding them.', accepted:["roll up"], answerLabel:"roll up"},
+    {prompt:"Could you ___ this vase carefully? It's very fragile.", accepted:["wrap"], answerLabel:"wrap"},
+    {prompt:'I need new trainers, let\'s go to the ___.', accepted:["shoe shop","shoe store"], answerLabel:"shoe shop"},
+    {prompt:'She bought a beautiful ring at the ___.', accepted:["jeweller's","jewellers","jeweler's","jewelers"], answerLabel:"jeweller's"},
+    {prompt:"We just need milk, let's pop into the ___ round the corner.", accepted:["convenience store","convenience shop"], answerLabel:"convenience store"},
+    {prompt:'My favourite place in town is the ___ — I love books.', accepted:["bookshop","bookstore","book shop","book store"], answerLabel:"bookshop"},
+    {prompt:'He has a bad cough, he should go to the ___.', accepted:["chemist's","chemists","pharmacy"], answerLabel:"chemist's / pharmacy"},
+  ])
+},
+{
+  id:'ex7', num:7, kind:'open',
+  title:'Твоя очередь: объясни, расширь, придумай',
+  desc:'Открытые задания — напишите свой вариант. Готового «правильного» ответа нет, но можно посмотреть пример.',
+  items: [
+    {prompt:'Explain the difference: <b>fold</b> vs <b>roll up</b>.', hint:'Example: You fold flat things like T-shirts, but you roll up things like socks or a sleeping bag to save space.'},
+    {prompt:'Explain the difference: <b>pack</b> vs <b>unpack</b>.', hint:'Example: You pack your suitcase before a trip and unpack it when you get home.'},
+    {prompt:'Explain the difference: <b>chemist\'s</b> vs <b>pharmacy</b>.', hint:'Example: They mean almost the same thing — "chemist\'s" is more common in British English, "pharmacy" is used in both British and American English.'},
+    {prompt:'Explain the difference: <b>shop</b> vs <b>store</b>.', hint:'Example: "Shop" is more common in British English, "store" is more common in American English (e.g. bookshop / bookstore).'},
+    {prompt:'Expand the sentence: <i>"I went to the shop."</i> Add details: which shop, why, what you bought.', hint:'Example: I went to the newsagent\'s after school to buy a magazine and a bottle of water.'},
+    {prompt:'Expand the sentence: <i>"She packed her suitcase."</i> Add details: when, for what trip, what she packed.', hint:'Example: On Sunday evening, she packed her suitcase for a business trip and rolled up all her shirts to save space.'},
+    {prompt:'Write your own sentence using <b>wrap</b> and <b>fragile</b>.', hint:'Example: Please wrap the glasses carefully because they are fragile.'},
+    {prompt:'Write your own sentence using <b>convenience store</b>.', hint:'Example: There is a 24-hour convenience store just next to my flat.'},
+    {prompt:'Write your own sentence using <b>roll up</b>.', hint:'Example: I always roll up my jeans when I pack for a holiday.'},
+    {prompt:'Write your own sentence using <b>newsagent\'s</b>.', hint:'Example: My grandfather buys his newspaper at the newsagent\'s every morning.'},
+  ]
+}
+];
+
+/* ================= RENDER EXERCISES ================= */
+const root = document.getElementById('exercisesRoot');
+
+EXERCISES.forEach(ex=>{
+  const card = document.createElement('section');
+  card.className = 'receipt';
+  card.id = 'card-'+ex.id;
+
+  let itemsHtml = '';
+  ex.items.forEach((it,i)=>{
+    if(ex.kind==='text'){
+      itemsHtml += `
+      <div class="item" data-idx="${i}">
+        <div class="itemhead"><span class="num">№ ${i+1}</span></div>
+        <div class="prompt">${it.prompt.replace(/___/,'<code>_____</code>')}</div>
+        <input type="text" class="ans" placeholder="Введите ответ...">
+        <div class="fb"></div>
+      </div>`;
+    } else if(ex.kind==='audio'){
+      itemsHtml += `
+      <div class="item" data-idx="${i}">
+        <div class="itemhead">
+          <span class="num">№ ${i+1}</span>
+          <button class="speakmini">🔊 Слушать</button>
+        </div>
+        <div class="prompt">Напишите слово, которое вы услышали:</div>
+        <input type="text" class="ans" placeholder="Введите ответ...">
+        <div class="fb"></div>
+      </div>`;
+    } else if(ex.kind==='tf'){
+      itemsHtml += `
+      <div class="item" data-idx="${i}" data-selected="">
+        <div class="itemhead"><span class="num">№ ${i+1}</span></div>
+        <div class="prompt">${it.prompt}</div>
+        <div class="tfbtns">
+          <button class="tfbtn" data-val="true">True</button>
+          <button class="tfbtn" data-val="false">False</button>
+        </div>
+        <div class="fb"></div>
+      </div>`;
+    } else if(ex.kind==='open'){
+      itemsHtml += `
+      <div class="item" data-idx="${i}">
+        <div class="itemhead"><span class="num">№ ${i+1}</span></div>
+        <div class="prompt">${it.prompt}</div>
+        <textarea class="ans-open" rows="2" placeholder="Ваш ответ..."></textarea>
+        <div class="hintbox">💡 ${it.hint}</div>
+      </div>`;
+    }
+  });
+
+  card.innerHTML = `
+    <div class="receipt-head">
+      <span class="receipt-title">Упражнение ${ex.num}. ${ex.title}</span>
+      <span class="receipt-num">CHECK № ${ex.num.toString().padStart(3,'0')} · 10 items</span>
+    </div>
+    <div class="receipt-desc">${ex.desc}</div>
+    ${ex.wordbank ? `<div class="wordbank"><b>Word bank:</b> ${ex.wordbank}</div>` : ''}
+    ${itemsHtml}
+    <div class="receipt-foot">
+      ${ex.kind!=='open' ? '<button class="btn btn-check">Проверить</button>' : '<button class="btn btn-check">Готово ✓</button>'}
+      <button class="btn btn-show">${ex.kind==='open' ? 'Показать примеры' : 'Показать ответы'}</button>
+      <button class="btn btn-reset">Сбросить</button>
+      ${ex.kind!=='open' ? '<span class="score"></span>' : ''}
+    </div>
+  `;
+  root.appendChild(card);
+
+  // wire speak buttons for audio exercise
+  if(ex.kind==='audio'){
+    card.querySelectorAll('.item').forEach((row,i)=>{
+      row.querySelector('.speakmini').onclick = ()=>speak(ex.items[i].tts);
+    });
+  }
+  // wire tf buttons
+  if(ex.kind==='tf'){
+    card.querySelectorAll('.item').forEach(row=>{
+      row.querySelectorAll('.tfbtn').forEach(btn=>{
+        btn.onclick = ()=>{
+          row.querySelectorAll('.tfbtn').forEach(b=>b.classList.remove('active'));
+          btn.classList.add('active');
+          row.dataset.selected = btn.dataset.val;
+        };
+      });
+    });
+  }
+
+  // check button
+  const checkBtn = card.querySelector('.btn-check');
+  checkBtn.onclick = ()=>{
+    if(ex.kind==='open'){
+      showToast('Ответы записаны. Можно сравнить со примером ответа.');
+      return;
+    }
+    let score = 0;
+    card.querySelectorAll('.item').forEach((row,i)=>{
+      const it = ex.items[i];
+      const fb = row.querySelector('.fb');
+      let correct = false, label = it.answerLabel;
+      if(ex.kind==='tf'){
+        const sel = row.dataset.selected;
+        label = it.accepted ? 'True' : 'False';
+        correct = sel === String(it.accepted);
+        if(sel===''){ fb.textContent='Выберите True или False'; fb.className='fb bad'; row.classList.remove('correct','incorrect'); return; }
+      } else {
+        const val = row.querySelector('.ans').value;
+        correct = isCorrectText(val, it.accepted);
+      }
+      row.classList.toggle('correct', correct);
+      row.classList.toggle('incorrect', !correct);
+      if(correct){
+        score++;
+        fb.textContent = '✓ Верно';
+        fb.className = 'fb ok';
+      } else {
+        fb.textContent = '✗ Неверно. Правильный ответ: ' + label;
+        fb.className = 'fb bad';
+        addProblem(label);
+      }
+    });
+    card.querySelector('.score').textContent = `Результат: ${score}/${ex.items.length}`;
+  };
+
+  // show answers button
+  card.querySelector('.btn-show').onclick = ()=>{
+    card.querySelectorAll('.item').forEach((row,i)=>{
+      const it = ex.items[i];
+      if(ex.kind==='text'||ex.kind==='audio'){
+        row.querySelector('.ans').value = it.answerLabel;
+      } else if(ex.kind==='tf'){
+        row.querySelectorAll('.tfbtn').forEach(b=>{
+          b.classList.toggle('active', b.dataset.val===String(it.accepted));
+        });
+        row.dataset.selected = String(it.accepted);
+      } else if(ex.kind==='open'){
+        row.querySelector('.hintbox').classList.add('show');
+      }
+    });
+  };
+
+  // reset button
+  card.querySelector('.btn-reset').onclick = ()=>{
+    card.querySelectorAll('.item').forEach(row=>{
+      row.classList.remove('correct','incorrect');
+      const inp = row.querySelector('.ans');
+      if(inp) inp.value='';
+      const ta = row.querySelector('.ans-open');
+      if(ta) ta.value='';
+      const fb = row.querySelector('.fb');
+      if(fb){ fb.textContent=''; fb.className='fb'; }
+      row.querySelectorAll('.tfbtn').forEach(b=>b.classList.remove('active'));
+      row.dataset.selected = '';
+      const hb = row.querySelector('.hintbox');
+      if(hb) hb.classList.remove('show');
+    });
+    const sc = card.querySelector('.score');
+    if(sc) sc.textContent='';
+  };
+});
+
+/* ================= COPY ALL ANSWERS ================= */
+function copyAllAnswers(){
+  let out = 'МОИ ОТВЕТЫ — Магазины и покупки\n' + '='.repeat(40) + '\n\n';
+  EXERCISES.forEach(ex=>{
+    out += `Упражнение ${ex.num}. ${ex.title}\n`;
+    const card = document.getElementById('card-'+ex.id);
+    card.querySelectorAll('.item').forEach((row,i)=>{
+      let ans = '';
+      if(ex.kind==='tf'){
+        ans = row.dataset.selected === 'true' ? 'True' : row.dataset.selected==='false' ? 'False' : '(нет ответа)';
+      } else if(ex.kind==='open'){
+        ans = row.querySelector('.ans-open').value.trim() || '(нет ответа)';
+      } else {
+        ans = row.querySelector('.ans').value.trim() || '(нет ответа)';
+      }
+      out += `  ${i+1}. ${ans}\n`;
+    });
+    out += '\n';
+  });
+
+  const finish = (ok)=>{
+    showToast(ok ? '📋 Все ответы скопированы в буфер обмена!' : 'Не удалось скопировать автоматически — текст выделен, нажмите Ctrl+C.');
+  };
+
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(out).then(()=>finish(true)).catch(()=>fallbackCopy(out,finish));
+  } else {
+    fallbackCopy(out,finish);
+  }
+}
+function fallbackCopy(text, cb){
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position='fixed'; ta.style.opacity='0';
+  document.body.appendChild(ta);
+  ta.focus(); ta.select();
+  let ok=false;
+  try{ ok = document.execCommand('copy'); }catch(e){ ok=false; }
+  document.body.removeChild(ta);
+  cb(ok);
+}
+</script>
+</body>
+</html>
