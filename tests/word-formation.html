@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Бюро словообразования — Word Formation Bureau</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Libre+Franklin:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#e9e4d6;
+    --paper-card:#f4f0e4;
+    --ink:#191816;
+    --rule:#191816;
+    --stamp:#b23a2e;
+    --press:#2b4570;
+    --gold:#c99a2e;
+    --good:#3f7d4f;
+    --bad:#b23a2e;
+    --muted:#6b6455;
+    --font-display:'Oswald',sans-serif;
+    --font-body:'Libre Franklin',sans-serif;
+    --font-mono:'IBM Plex Mono',monospace;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    background-image:
+      repeating-linear-gradient(0deg, rgba(0,0,0,0.015) 0px, rgba(0,0,0,0.015) 1px, transparent 1px, transparent 3px);
+    color:var(--ink);
+    font-family:var(--font-body);
+    line-height:1.5;
+  }
+  a{color:var(--press);}
+
+  /* ---- MASTHEAD ---- */
+  header.masthead{
+    background:var(--ink);
+    color:var(--paper);
+    padding:22px 20px 18px;
+    border-bottom:6px solid var(--stamp);
+  }
+  .masthead-inner{max-width:1180px;margin:0 auto;display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;}
+  .masthead h1{
+    font-family:var(--font-display);
+    text-transform:uppercase;
+    font-size:clamp(28px,4.2vw,44px);
+    letter-spacing:1px;
+    margin:0;
+    font-weight:700;
+  }
+  .masthead .kicker{
+    font-family:var(--font-mono);
+    font-size:12px;
+    letter-spacing:3px;
+    color:var(--gold);
+    text-transform:uppercase;
+    margin-bottom:6px;
+  }
+  .masthead .sub{font-family:var(--font-body);font-size:14px;color:#c9c4b4;max-width:520px;}
+  .sound-check{
+    font-family:var(--font-mono);
+    font-size:12px;
+    background:rgba(255,255,255,0.06);
+    border:1px solid rgba(255,255,255,0.25);
+    padding:10px 14px;
+    border-radius:2px;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    min-width:230px;
+  }
+  .sound-check button{
+    font-family:var(--font-mono);
+    background:var(--gold);
+    color:var(--ink);
+    border:none;
+    padding:6px 10px;
+    cursor:pointer;
+    font-weight:600;
+    border-radius:2px;
+  }
+  .sound-check button:hover{filter:brightness(1.08);}
+
+  /* ---- LAYOUT ---- */
+  .layout{
+    max-width:1180px;
+    margin:0 auto;
+    padding:28px 20px 80px;
+    display:grid;
+    grid-template-columns:1fr 300px;
+    gap:28px;
+    align-items:start;
+  }
+  @media(max-width:880px){
+    .layout{grid-template-columns:1fr;}
+    .sidebar{order:-1;}
+  }
+
+  /* ---- CARD / CLIPPING STYLE ---- */
+  .clip{
+    background:var(--paper-card);
+    border:1px solid rgba(25,24,22,0.35);
+    position:relative;
+    padding:24px 22px 26px;
+    margin-bottom:30px;
+    box-shadow:2px 3px 0 rgba(25,24,22,0.06);
+  }
+  .clip::before, .clip::after{
+    content:"";
+    position:absolute;
+    left:16px; right:16px;
+    height:0;
+    border-top:1px dashed rgba(25,24,22,0.35);
+  }
+  .clip::before{top:6px;}
+  .clip::after{bottom:6px;}
+  .tag{
+    font-family:var(--font-mono);
+    font-size:11px;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    color:#fff;
+    background:var(--stamp);
+    display:inline-block;
+    padding:4px 10px;
+    transform:rotate(-1.2deg);
+    margin-bottom:14px;
+  }
+  .clip h2{
+    font-family:var(--font-display);
+    text-transform:uppercase;
+    font-size:22px;
+    letter-spacing:0.5px;
+    margin:0 0 6px;
+  }
+  .clip p.desc{margin:0 0 18px;color:var(--muted);font-size:14.5px;}
+
+  /* ---- VOCAB TABLE ---- */
+  table.vocab{width:100%;border-collapse:collapse;font-size:14.5px;}
+  table.vocab th{
+    text-align:left;font-family:var(--font-mono);font-size:11px;letter-spacing:1.5px;
+    text-transform:uppercase;color:var(--muted);border-bottom:2px solid var(--ink);padding:6px 8px;
+  }
+  table.vocab td{padding:7px 8px;border-bottom:1px solid rgba(25,24,22,0.15);vertical-align:middle;}
+  table.vocab tr.fam-start td{border-top:2px solid rgba(25,24,22,0.5);}
+  .word-en{font-weight:700;}
+  .ipa{font-family:var(--font-mono);color:var(--press);font-size:13px;}
+  .play-btn{
+    border:1px solid var(--ink);background:var(--paper);cursor:pointer;
+    border-radius:50%;width:30px;height:30px;font-size:14px;line-height:1;
+  }
+  .play-btn:hover{background:var(--gold);}
+
+  /* ---- FORM ELEMENTS ---- */
+  input.blank-input, textarea.answer-box{
+    font-family:var(--font-mono);
+    font-size:15px;
+    border:none;
+    border-bottom:2px solid var(--ink);
+    background:transparent;
+    padding:4px 3px;
+    color:var(--ink);
+    outline:none;
+  }
+  input.blank-input{width:16ch;}
+  input.blank-input:focus, textarea.answer-box:focus{border-bottom-color:var(--press);}
+  input.blank-input.correct{border-bottom-color:var(--good);background:rgba(63,125,79,0.1);}
+  input.blank-input.wrong{border-bottom-color:var(--bad);background:rgba(178,58,46,0.1);}
+  textarea.answer-box{width:100%;min-height:56px;resize:vertical;border:1px solid rgba(25,24,22,0.4);padding:8px;}
+
+  .item-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 0;border-bottom:1px dotted rgba(25,24,22,0.25);}
+  .item-row:last-child{border-bottom:none;}
+  .item-num{font-family:var(--font-mono);color:var(--muted);width:22px;flex-shrink:0;}
+  .hint{color:var(--muted);font-size:13px;font-style:italic;}
+  .answer-reveal{font-family:var(--font-mono);color:var(--press);font-size:13.5px;margin-left:4px;}
+
+  .btn{
+    font-family:var(--font-mono);font-size:12.5px;letter-spacing:0.5px;text-transform:uppercase;
+    border:1px solid var(--ink);background:var(--paper-card);color:var(--ink);
+    padding:7px 12px;cursor:pointer;border-radius:2px;font-weight:600;
+  }
+  .btn:hover{background:var(--ink);color:var(--paper);}
+  .btn.primary{background:var(--press);color:#fff;border-color:var(--press);}
+  .btn.primary:hover{background:#1e3355;}
+  .btn.gold{background:var(--gold);border-color:var(--gold);}
+  .btn.gold:hover{filter:brightness(1.08);}
+  .btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;}
+  .btn-sm{padding:4px 9px;font-size:11px;}
+
+  .feedback-line{font-family:var(--font-mono);font-size:13px;margin-top:14px;min-height:18px;}
+  .feedback-line.good{color:var(--good);}
+  .feedback-line.bad{color:var(--bad);}
+
+  /* ---- EXERCISE 2 TABLE ---- */
+  table.formtable{width:100%;border-collapse:collapse;font-size:14.5px;margin-bottom:8px;}
+  table.formtable th{
+    font-family:var(--font-mono);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;
+    color:#fff;background:var(--ink);padding:8px;text-align:left;
+  }
+  table.formtable td{padding:10px 8px;border-bottom:1px solid rgba(25,24,22,0.2);}
+  table.formtable tr:nth-child(even){background:rgba(25,24,22,0.035);}
+  .given-cell{font-weight:700;}
+  .note{font-size:11.5px;color:var(--muted);font-style:italic;}
+
+  /* ---- DIALOGUE ---- */
+  .dialogue-line{margin-bottom:14px;}
+  .speaker{font-family:var(--font-mono);font-weight:700;color:var(--press);margin-right:6px;}
+  .dialogue-line .txt{display:inline;}
+
+  /* ---- SIDEBAR ---- */
+  .sidebar{position:sticky;top:20px;}
+  .corkboard{
+    background:#5b4a3a;
+    padding:18px 16px 20px;
+    border:1px solid #3b2f24;
+    box-shadow:2px 3px 0 rgba(0,0,0,0.2);
+    position:relative;
+  }
+  .pin{
+    width:14px;height:14px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #ff8a7a, var(--stamp));
+    position:absolute;top:-7px;left:50%;transform:translateX(-50%);
+    box-shadow:0 2px 3px rgba(0,0,0,0.4);
+  }
+  .corkboard h3{
+    font-family:var(--font-display);color:#f4efe0;text-transform:uppercase;
+    font-size:17px;letter-spacing:0.5px;margin:6px 0 4px;text-align:center;
+  }
+  .corkboard .sub{font-family:var(--font-mono);color:#d8cdb8;font-size:11px;text-align:center;margin-bottom:14px;}
+  .index-card{
+    background:#f4efe0;
+    padding:10px 12px;
+    margin-bottom:10px;
+    box-shadow:1px 2px 4px rgba(0,0,0,0.3);
+    transform:rotate(-0.6deg);
+  }
+  .index-card:nth-child(odd){transform:rotate(0.7deg);}
+  table.mistakes{width:100%;border-collapse:collapse;font-size:13px;}
+  table.mistakes th{font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);text-align:left;border-bottom:1px solid var(--ink);padding-bottom:4px;}
+  table.mistakes td{padding:4px 0;border-bottom:1px dotted rgba(25,24,22,0.25);}
+  .mistake-count{font-family:var(--font-mono);color:var(--stamp);font-weight:700;}
+  .empty-msg{font-family:var(--font-mono);font-size:12.5px;color:var(--muted);text-align:center;padding:10px 0;}
+
+  .toast{
+    position:fixed;bottom:22px;left:50%;transform:translateX(-50%);
+    background:var(--ink);color:var(--paper);font-family:var(--font-mono);font-size:13px;
+    padding:10px 18px;border-radius:2px;opacity:0;pointer-events:none;transition:opacity 0.25s ease, transform 0.25s ease;
+    z-index:50;box-shadow:0 4px 12px rgba(0,0,0,0.3);
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(-6px);}
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <div>
+      <div class="kicker">Practice Sheet · Suffix Families</div>
+      <h1>Бюро словообразования</h1>
+      <div class="sub">employ · educate · advertise · translate · design · act — тренируем производные слова: глагол → существительное → человек.</div>
+    </div>
+    <div class="sound-check">
+      <span>🔊 Голос: <span id="voiceStatus">определяется…</span></span>
+      <button onclick="testVoice()">Проверить звук</button>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+
+  <main>
+
+    <!-- INTRO / VOCAB REMINDER -->
+    <section class="clip">
+      <span class="tag">Словарь</span>
+      <h2>Вспоминаем слова</h2>
+      <p class="desc">Нажмите на 🔊, чтобы услышать произношение (голос Google US English). Транскрипция и перевод — рядом.</p>
+      <table class="vocab" id="vocabTable"></table>
+    </section>
+
+    <!-- EXERCISE 1 -->
+    <section class="clip">
+      <span class="tag">Задание 1</span>
+      <h2>Напиши слово по звуку</h2>
+      <p class="desc">Нажми 🔊, послушай слово и запиши его по-английски. Перевод дан как подсказка.</p>
+      <div id="ex1-list"></div>
+      <div class="btn-row">
+        <button class="btn primary" onclick="checkEx1()">Проверить</button>
+        <button class="btn" onclick="showAnswersEx1()">Показать ответы</button>
+        <button class="btn gold" onclick="copyEx1()">Скопировать ответы</button>
+      </div>
+      <div class="feedback-line" id="ex1-feedback"></div>
+    </section>
+
+    <!-- EXERCISE 2 -->
+    <section class="clip">
+      <span class="tag">Задание 2</span>
+      <h2>Заполни таблицу словообразования</h2>
+      <p class="desc">Часть слов уже дана — допиши недостающие формы. Если у слова два варианта «человека» (например, employer / employee), впиши оба через «/».</p>
+      <table class="formtable" id="ex2-table">
+        <thead><tr><th>Глагол</th><th>Существительное</th><th>Человек</th></tr></thead>
+        <tbody id="ex2-body"></tbody>
+      </table>
+      <p class="note">* design — одно и то же слово для глагола и существительного.</p>
+      <div class="btn-row">
+        <button class="btn primary" onclick="checkEx2()">Проверить</button>
+        <button class="btn" onclick="showAnswersEx2()">Показать ответы</button>
+        <button class="btn gold" onclick="copyEx2()">Скопировать ответы</button>
+      </div>
+      <div class="feedback-line" id="ex2-feedback"></div>
+    </section>
+
+    <!-- EXERCISE 3 -->
+    <section class="clip">
+      <span class="tag">Задание 3</span>
+      <h2>Контекст</h2>
+      <p class="desc">Впиши в пропуск нужную форму слова, подходящую по смыслу предложения.</p>
+      <div id="ex3-list"></div>
+      <div class="btn-row">
+        <button class="btn primary" onclick="checkEx3()">Проверить</button>
+        <button class="btn" onclick="showAnswersEx3()">Показать ответы</button>
+        <button class="btn gold" onclick="copyEx3()">Скопировать ответы</button>
+      </div>
+      <div class="feedback-line" id="ex3-feedback"></div>
+    </section>
+
+    <!-- EXERCISE 4 -->
+    <section class="clip">
+      <span class="tag">Задание 4</span>
+      <h2>Напиши своё предложение</h2>
+      <p class="desc">Составь собственное предложение с каждым словом. Если не уверен — нажми «Пример», чтобы увидеть образец.</p>
+      <div id="ex4-list"></div>
+      <div class="btn-row">
+        <button class="btn gold" onclick="copyEx4()">Скопировать все предложения</button>
+      </div>
+      <div class="feedback-line" id="ex4-feedback"></div>
+    </section>
+
+    <!-- EXERCISE 5 -->
+    <section class="clip">
+      <span class="tag">Задание 5</span>
+      <h2>Finish the Dialogue</h2>
+      <p class="desc">Заполни пропуски в диалоге собеседования нужными словами.</p>
+      <div id="ex5-dialogue"></div>
+      <div class="btn-row">
+        <button class="btn primary" onclick="checkEx5()">Проверить</button>
+        <button class="btn" onclick="showAnswersEx5()">Показать ответы</button>
+        <button class="btn gold" onclick="copyEx5()">Скопировать диалог</button>
+      </div>
+      <div class="feedback-line" id="ex5-feedback"></div>
+    </section>
+
+  </main>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="corkboard">
+      <div class="pin"></div>
+      <h3>Проблемные слова</h3>
+      <div class="sub">слова с ошибками</div>
+      <div class="index-card">
+        <table class="mistakes">
+          <thead><tr><th>Слово</th><th>Ошибок</th></tr></thead>
+          <tbody id="mistakeBody"></tbody>
+        </table>
+        <div class="empty-msg" id="mistakeEmpty">Пока нет ошибок — отлично! 🎉</div>
+      </div>
+    </div>
+  </aside>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============ VOCAB DATA ============ */
+const VOCAB = [
+  {word:"employ", ipa:"/ɪmˈplɔɪ/", ru:"нанимать (на работу)", family:"employ"},
+  {word:"employment", ipa:"/ɪmˈplɔɪmənt/", ru:"занятость, трудоустройство", family:"employ"},
+  {word:"employer", ipa:"/ɪmˈplɔɪər/", ru:"работодатель", family:"employ"},
+  {word:"employee", ipa:"/ˌɪmplɔɪˈiː/", ru:"работник, сотрудник", family:"employ"},
+  {word:"educate", ipa:"/ˈedʒukeɪt/", ru:"обучать, давать образование", family:"educate"},
+  {word:"education", ipa:"/ˌedʒʊˈkeɪʃn/", ru:"образование", family:"educate"},
+  {word:"educator", ipa:"/ˈedʒukeɪtər/", ru:"педагог, преподаватель", family:"educate"},
+  {word:"advertise", ipa:"/ˈædvətaɪz/", ru:"рекламировать", family:"advertise"},
+  {word:"advertisement", ipa:"/ədˈvɜːtɪsmənt/", ru:"реклама, объявление", family:"advertise"},
+  {word:"advertiser", ipa:"/ˈædvətaɪzər/", ru:"рекламодатель", family:"advertise"},
+  {word:"translate", ipa:"/trænsˈleɪt/", ru:"переводить", family:"translate"},
+  {word:"translation", ipa:"/trænsˈleɪʃn/", ru:"перевод", family:"translate"},
+  {word:"translator", ipa:"/trænsˈleɪtər/", ru:"переводчик", family:"translate"},
+  {word:"design", ipa:"/dɪˈzaɪn/", ru:"проектировать; дизайн", family:"design"},
+  {word:"designer", ipa:"/dɪˈzaɪnər/", ru:"дизайнер", family:"design"},
+  {word:"act", ipa:"/ækt/", ru:"играть (роль), действовать", family:"act"},
+  {word:"acting", ipa:"/ˈæktɪŋ/", ru:"актёрское мастерство", family:"act"},
+  {word:"actor", ipa:"/ˈæktər/", ru:"актёр", family:"act"},
+  {word:"actress", ipa:"/ˈæktrɪs/", ru:"актриса", family:"act"}
+];
+
+/* ============ HELPERS ============ */
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+function norm(s){ return (s||"").trim().toLowerCase().replace(/\s+/g," "); }
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(()=>t.classList.remove('show'), 2200);
+}
+function copyText(text){
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(()=>showToast('Скопировано в буфер обмена!'))
+      .catch(()=>fallbackCopy(text));
+  } else {
+    fallbackCopy(text);
+  }
+}
+function fallbackCopy(text){
+  const ta = document.createElement('textarea');
+  ta.value = text; document.body.appendChild(ta); ta.select();
+  try{ document.execCommand('copy'); showToast('Скопировано в буфер обмена!'); }
+  catch(e){ showToast('Не удалось скопировать :('); }
+  document.body.removeChild(ta);
+}
+
+/* ============ SPEECH ============ */
+let chosenVoice = null;
+function loadVoices(){
+  const voices = speechSynthesis.getVoices();
+  if(!voices.length) return false;
+  chosenVoice = voices.find(v => v.name === "Google US English")
+             || voices.find(v => v.name.toLowerCase().includes("google") && v.lang==="en-US")
+             || voices.find(v => v.lang === "en-US")
+             || voices.find(v => v.lang && v.lang.startsWith("en"))
+             || voices[0];
+  const statusEl = document.getElementById('voiceStatus');
+  if(chosenVoice){
+    statusEl.textContent = chosenVoice.name + (chosenVoice.name==="Google US English" ? " ✓" : " (замена)");
+  } else {
+    statusEl.textContent = "не найден";
+  }
+  return true;
+}
+if('speechSynthesis' in window){
+  speechSynthesis.onvoiceschanged = loadVoices;
+  loadVoices();
+  setTimeout(loadVoices, 400);
+} else {
+  document.getElementById('voiceStatus').textContent = "не поддерживается браузером";
+}
+function speak(text){
+  if(!('speechSynthesis' in window)){ showToast('Синтез речи не поддерживается в этом браузере'); return; }
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = "en-US";
+  u.rate = 0.88;
+  if(chosenVoice) u.voice = chosenVoice;
+  speechSynthesis.speak(u);
+}
+function testVoice(){ speak("This is a test of the English voice. Can you hear me clearly?"); }
+
+/* ============ MISTAKE TRACKER ============ */
+const mistakes = {};
+function registerMistake(word){
+  const key = word.toLowerCase();
+  mistakes[key] = (mistakes[key]||0)+1;
+  renderMistakes();
+}
+function renderMistakes(){
+  const body = document.getElementById('mistakeBody');
+  const empty = document.getElementById('mistakeEmpty');
+  const entries = Object.entries(mistakes).sort((a,b)=>b[1]-a[1]);
+  if(!entries.length){ body.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display='none';
+  body.innerHTML = entries.map(([w,c])=>`<tr><td>${w}</td><td class="mistake-count">${c}</td></tr>`).join('');
+}
+
+/* ============ VOCAB TABLE RENDER ============ */
+(function renderVocab(){
+  const table = document.getElementById('vocabTable');
+  let html = `<thead><tr><th></th><th>Word</th><th>Transcription</th><th>Перевод</th></tr></thead><tbody>`;
+  let lastFam = null;
+  VOCAB.forEach(v=>{
+    const famStart = v.family !== lastFam;
+    lastFam = v.family;
+    html += `<tr class="${famStart?'fam-start':''}">
+      <td><button class="play-btn" onclick="speak('${v.word.replace(/'/g,"\\'")}')" title="Прослушать">🔊</button></td>
+      <td class="word-en">${v.word}</td>
+      <td class="ipa">${v.ipa}</td>
+      <td>${v.ru}</td>
+    </tr>`;
+  });
+  html += '</tbody>';
+  table.innerHTML = html;
+})();
+
+/* ============ EXERCISE 1: DICTATION ============ */
+const ex1Words = shuffle(["employer","education","advertisement","translator","designer","actress","employee","acting"]);
+function vocabLookup(w){ return VOCAB.find(v=>v.word===w); }
+(function renderEx1(){
+  const list = document.getElementById('ex1-list');
+  list.innerHTML = ex1Words.map((w,i)=>{
+    const v = vocabLookup(w);
+    return `<div class="item-row" data-word="${w}">
+      <span class="item-num">${i+1}.</span>
+      <button class="play-btn" onclick="speak('${w}')">🔊</button>
+      <span class="hint">${v.ru}</span>
+      <input type="text" class="blank-input" id="ex1-input-${i}" placeholder="type the word" autocomplete="off" spellcheck="false" style="width:18ch">
+      <span class="answer-reveal" id="ex1-answer-${i}"></span>
+    </div>`;
+  }).join('');
+})();
+function checkEx1(){
+  let correct=0;
+  ex1Words.forEach((w,i)=>{
+    const input = document.getElementById(`ex1-input-${i}`);
+    const ok = norm(input.value)===norm(w);
+    input.classList.remove('correct','wrong');
+    input.classList.add(ok?'correct':'wrong');
+    if(ok) correct++; else registerMistake(w);
+  });
+  const fb = document.getElementById('ex1-feedback');
+  fb.className = 'feedback-line ' + (correct===ex1Words.length ? 'good':'bad');
+  fb.textContent = `Правильно: ${correct} из ${ex1Words.length}`;
+}
+function showAnswersEx1(){
+  ex1Words.forEach((w,i)=>{
+    document.getElementById(`ex1-answer-${i}`).textContent = `→ ${w}`;
+  });
+}
+function copyEx1(){
+  const lines = ex1Words.map((w,i)=>`${i+1}. ${document.getElementById(`ex1-input-${i}`).value || '___'}`);
+  copyText("Задание 1 — Напиши слово по звуку\n" + lines.join('\n'));
+}
+
+/* ============ EXERCISE 2: FORM TABLE ============ */
+/* rows: [verb, noun, person] ; blank: array of column indices (0,1,2) that are blank */
+const ex2Rows = [
+  {family:"employ",   verb:"employ",    noun:"employment",  person:"employer / employee", blanks:[1,2]},
+  {family:"educate",  verb:"educate",   noun:"education",    person:"educator",            blanks:[2]},
+  {family:"advertise",verb:"advertise", noun:"advertisement",person:"advertiser",          blanks:[1]},
+  {family:"translate",verb:"translate", noun:"translation",  person:"translator",          blanks:[0]},
+  {family:"design",   verb:"design",    noun:"design",       person:"designer",            blanks:[2]},
+  {family:"act",      verb:"act",       noun:"acting",       person:"actor / actress",     blanks:[1,2]}
+];
+const ex2Order = shuffle(ex2Rows.map((_,i)=>i));
+(function renderEx2(){
+  const body = document.getElementById('ex2-body');
+  const cols = ["verb","noun","person"];
+  body.innerHTML = ex2Order.map(rowIdx=>{
+    const r = ex2Rows[rowIdx];
+    const cells = cols.map((c,ci)=>{
+      if(r.blanks.includes(ci)){
+        return `<td><input type="text" class="blank-input" id="ex2-${rowIdx}-${ci}" style="width:15ch" autocomplete="off" spellcheck="false"><span class="answer-reveal" id="ex2-ans-${rowIdx}-${ci}"></span></td>`;
+      }
+      return `<td class="given-cell">${r[c]}</td>`;
+    }).join('');
+    return `<tr data-row="${rowIdx}">${cells}</tr>`;
+  }).join('');
+})();
+function checkEx2(){
+  let total=0, correct=0;
+  const cols = ["verb","noun","person"];
+  ex2Order.forEach(rowIdx=>{
+    const r = ex2Rows[rowIdx];
+    r.blanks.forEach(ci=>{
+      total++;
+      const input = document.getElementById(`ex2-${rowIdx}-${ci}`);
+      const expectedRaw = r[cols[ci]];
+      const accepted = expectedRaw.split('/').map(s=>norm(s));
+      const userVal = norm(input.value);
+      const ok = accepted.includes(userVal) || norm(input.value.replace(/\s*\/\s*/g,'/'))===norm(expectedRaw);
+      input.classList.remove('correct','wrong');
+      input.classList.add(ok?'correct':'wrong');
+      if(ok) correct++; else registerMistake(r[cols[ci]].split('/')[0].trim());
+    });
+  });
+  const fb = document.getElementById('ex2-feedback');
+  fb.className = 'feedback-line ' + (correct===total ? 'good':'bad');
+  fb.textContent = `Правильно: ${correct} из ${total}`;
+}
+function showAnswersEx2(){
+  const cols = ["verb","noun","person"];
+  ex2Order.forEach(rowIdx=>{
+    const r = ex2Rows[rowIdx];
+    r.blanks.forEach(ci=>{
+      const el = document.getElementById(`ex2-ans-${rowIdx}-${ci}`);
+      if(el) el.textContent = `→ ${r[cols[ci]]}`;
+    });
+  });
+}
+function copyEx2(){
+  const cols = ["verb","noun","person"];
+  const lines = ["Задание 2 — Таблица словообразования"];
+  ex2Order.forEach(rowIdx=>{
+    const r = ex2Rows[rowIdx];
+    const vals = cols.map((c,ci)=> r.blanks.includes(ci) ? (document.getElementById(`ex2-${rowIdx}-${ci}`).value || '___') : r[c]);
+    lines.push(`${vals[0]} — ${vals[1]} — ${vals[2]}`);
+  });
+  copyText(lines.join('\n'));
+}
+
+/* ============ EXERCISE 3: CONTEXT ============ */
+const ex3Data = shuffle([
+  {text:"After the factory closed, hundreds of workers lost their ____.", answer:"employment"},
+  {text:"A good ____ must understand both the source language and the target culture.", answer:"translator"},
+  {text:"He wants to study ____ at a famous drama school in London.", answer:"acting"},
+  {text:"Every child has the right to a free ____.", answer:"education"},
+  {text:"I saw an ____ for a cheap flight to Rome in the newspaper.", answer:"advertisement"},
+  {text:"The ____ of this website is really user-friendly.", answer:"design"},
+  {text:"The new ____ was warmly welcomed by her colleagues on her first day.", answer:"employee"},
+  {text:"My favourite ____ won an Oscar for his role in that film.", answer:"actor"}
+]);
+(function renderEx3(){
+  const list = document.getElementById('ex3-list');
+  list.innerHTML = ex3Data.map((item,i)=>{
+    const parts = item.text.split('____');
+    return `<div class="item-row">
+      <span class="item-num">${i+1}.</span>
+      <span>${parts[0]}</span>
+      <input type="text" class="blank-input" id="ex3-input-${i}" autocomplete="off" spellcheck="false">
+      <span>${parts[1]}</span>
+      <span class="answer-reveal" id="ex3-answer-${i}"></span>
+    </div>`;
+  }).join('');
+})();
+function checkEx3(){
+  let correct=0;
+  ex3Data.forEach((item,i)=>{
+    const input = document.getElementById(`ex3-input-${i}`);
+    const ok = norm(input.value)===norm(item.answer);
+    input.classList.remove('correct','wrong');
+    input.classList.add(ok?'correct':'wrong');
+    if(ok) correct++; else registerMistake(item.answer);
+  });
+  const fb = document.getElementById('ex3-feedback');
+  fb.className = 'feedback-line ' + (correct===ex3Data.length ? 'good':'bad');
+  fb.textContent = `Правильно: ${correct} из ${ex3Data.length}`;
+}
+function showAnswersEx3(){
+  ex3Data.forEach((item,i)=>{
+    document.getElementById(`ex3-answer-${i}`).textContent = `→ ${item.answer}`;
+  });
+}
+function copyEx3(){
+  const lines = ex3Data.map((item,i)=>{
+    const val = document.getElementById(`ex3-input-${i}`).value || '___';
+    return `${i+1}. ${item.text.replace('____', val)}`;
+  });
+  copyText("Задание 3 — Контекст\n" + lines.join('\n'));
+}
+
+/* ============ EXERCISE 4: WRITE YOUR OWN SENTENCE ============ */
+const ex4Data = shuffle([
+  {word:"employer", example:"My employer gave me a day off to see the doctor."},
+  {word:"education", example:"Higher education can open a lot of doors for young people."},
+  {word:"advertiser", example:"The biggest advertiser on this website is a shoe company."},
+  {word:"translation", example:"Her translation of the novel sounded very natural in Russian."},
+  {word:"designer", example:"The designer chose a bright blue colour for the new logo."},
+  {word:"actress", example:"The actress thanked the whole crew during her speech."},
+  {word:"employee", example:"Every employee gets a bonus at the end of the year."}
+]);
+(function renderEx4(){
+  const list = document.getElementById('ex4-list');
+  list.innerHTML = ex4Data.map((item,i)=>`
+    <div style="margin-bottom:16px;">
+      <div class="item-row" style="border:none;padding-bottom:6px;">
+        <span class="item-num">${i+1}.</span>
+        <span class="word-en">${item.word}</span>
+        <button class="btn btn-sm" onclick="toggleExample(${i})">Пример</button>
+      </div>
+      <textarea class="answer-box" id="ex4-input-${i}" placeholder="Write your own sentence with '${item.word}'..."></textarea>
+      <div class="answer-reveal" id="ex4-example-${i}" style="display:none;margin-top:4px;">💡 ${item.example}</div>
+    </div>
+  `).join('');
+})();
+function toggleExample(i){
+  const el = document.getElementById(`ex4-example-${i}`);
+  el.style.display = el.style.display==='none' ? 'block' : 'none';
+}
+function copyEx4(){
+  const lines = ex4Data.map((item,i)=>{
+    const val = document.getElementById(`ex4-input-${i}`).value.trim();
+    return `${i+1}. (${item.word}) ${val || '[пусто]'}`;
+  });
+  copyText("Задание 4 — Свои предложения\n" + lines.join('\n'));
+}
+
+/* ============ EXERCISE 5: DIALOGUE ============ */
+const ex5Lines = [
+  {sp:"HR", text:"Good morning! Please, have a seat. First, tell me a bit about your ___ — where did you study?", ans:"education"},
+  {sp:"Candidate", text:"I have a degree in Marketing and Communications from the State University.", ans:null},
+  {sp:"HR", text:"Great. Our agency helps small businesses ___ their products, both online and offline.", ans:"advertise"},
+  {sp:"Candidate", text:"That sounds exciting. Actually, I worked as an ___ for a local radio station last year.", ans:"advertiser"},
+  {sp:"HR", text:"Perfect experience! We also have a small in-house ___ team that creates all our visual materials.", ans:"design"},
+  {sp:"Candidate", text:"I'd love to work with them — my best friend is actually a professional ___.", ans:"designer"},
+  {sp:"HR", text:"Nice! Sometimes we shoot short video ads and need a real ___ for the role.", ans:"actor / actress"},
+  {sp:"Candidate", text:"I actually took some ___ classes in college, so I wouldn't mind trying that.", ans:"acting"},
+  {sp:"HR", text:"Excellent. One last thing: this position is for a full-time ___, not a freelancer. Is that OK?", ans:"employee"},
+  {sp:"Candidate", text:"Yes, that works perfectly for me!", ans:null}
+];
+let ex5BlankCount = 0;
+(function renderEx5(){
+  const box = document.getElementById('ex5-dialogue');
+  let blankIdx = 0;
+  box.innerHTML = ex5Lines.map(line=>{
+    if(line.ans===null){
+      return `<div class="dialogue-line"><span class="speaker">${line.sp}:</span><span class="txt">${line.text}</span></div>`;
+    }
+    const idx = blankIdx++;
+    const parts = line.text.split('___');
+    return `<div class="dialogue-line" data-blank="${idx}">
+      <span class="speaker">${line.sp}:</span><span class="txt">${parts[0]}
+      <input type="text" class="blank-input" id="ex5-input-${idx}" style="width:14ch" autocomplete="off" spellcheck="false">
+      <span class="answer-reveal" id="ex5-answer-${idx}"></span>${parts[1]}</span>
+    </div>`;
+  }).join('');
+  ex5BlankCount = blankIdx;
+})();
+function ex5BlankAnswers(){
+  return ex5Lines.filter(l=>l.ans!==null).map(l=>l.ans);
+}
+function checkEx5(){
+  const answers = ex5BlankAnswers();
+  let correct=0;
+  answers.forEach((ans,i)=>{
+    const input = document.getElementById(`ex5-input-${i}`);
+    const accepted = ans.split('/').map(s=>norm(s));
+    const ok = accepted.includes(norm(input.value));
+    input.classList.remove('correct','wrong');
+    input.classList.add(ok?'correct':'wrong');
+    if(ok) correct++; else registerMistake(ans.split('/')[0].trim());
+  });
+  const fb = document.getElementById('ex5-feedback');
+  fb.className = 'feedback-line ' + (correct===answers.length ? 'good':'bad');
+  fb.textContent = `Правильно: ${correct} из ${answers.length}`;
+}
+function showAnswersEx5(){
+  const answers = ex5BlankAnswers();
+  answers.forEach((ans,i)=>{
+    document.getElementById(`ex5-answer-${i}`).textContent = ` (→ ${ans})`;
+  });
+}
+function copyEx5(){
+  let blankIdx = 0;
+  const lines = ex5Lines.map(line=>{
+    if(line.ans===null) return `${line.sp}: ${line.text}`;
+    const idx = blankIdx++;
+    const val = document.getElementById(`ex5-input-${idx}`).value.trim() || '___';
+    return `${line.sp}: ${line.text.replace('___', val)}`;
+  });
+  copyText("Задание 5 — Finish the Dialogue\n" + lines.join('\n'));
+}
+
+/* init mistakes panel */
+renderMistakes();
+</script>
+</body>
+</html>
