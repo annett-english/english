@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Family Words — тренажёр по семейной лексике</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F1F4EC;
+    --card:#FFFFFF;
+    --ink:#233127;
+    --ink-soft:#5B6B60;
+    --line:#D9DECF;
+    --teal:#2F5D53;
+    --teal-dark:#1E4038;
+    --amber:#C9863B;
+    --amber-dark:#A66A28;
+    --rose:#B65340;
+    --moss:#4C7A5E;
+    --sky:#3E6E8E;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:
+      linear-gradient(var(--paper),var(--paper)),
+      repeating-linear-gradient(0deg, transparent, transparent 27px, rgba(47,93,83,0.06) 28px);
+    color:var(--ink);
+    font-family:'Source Sans 3', sans-serif;
+    line-height:1.5;
+    padding-bottom:80px;
+  }
+  h1,h2,h3{
+    font-family:'Caveat', cursive;
+    color:var(--teal-dark);
+    margin:0 0 6px 0;
+    font-weight:700;
+  }
+  h1{font-size:2.6rem;}
+  h2{font-size:1.9rem;}
+  .page{
+    max-width:1180px;
+    margin:0 auto;
+    padding:28px 20px 0;
+  }
+  header.top{
+    border-bottom:2px solid var(--line);
+    padding-bottom:18px;
+    margin-bottom:22px;
+  }
+  header.top p{color:var(--ink-soft); max-width:640px;}
+  .audio-check{
+    display:flex; align-items:center; gap:10px; margin-top:10px; flex-wrap:wrap;
+  }
+  .audio-check button{
+    background:var(--sky); color:#fff; border:none; border-radius:999px;
+    padding:8px 16px; cursor:pointer; font-size:0.92rem;
+  }
+  #audio-status{font-size:0.88rem; color:var(--ink-soft);}
+  .layout{
+    display:grid;
+    grid-template-columns: 1fr 260px;
+    gap:26px;
+    align-items:start;
+  }
+  main{min-width:0;}
+  aside{
+    position:sticky; top:20px;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:16px;
+  }
+  aside h3{font-size:1.4rem; margin-bottom:4px;}
+  aside p.hint{font-size:0.82rem; color:var(--ink-soft); margin-top:0;}
+  #problem-list{list-style:none; padding:0; margin:10px 0 0;}
+  #problem-list li{
+    display:flex; justify-content:space-between; align-items:center;
+    background:#FBF1EA; border:1px solid #ECD9C8; border-radius:8px;
+    padding:7px 10px; margin-bottom:7px; font-size:0.92rem; cursor:pointer;
+  }
+  #problem-list li:hover{background:#F6E6D7;}
+  #problem-list li span.ru{color:var(--ink-soft); font-size:0.82rem;}
+  #problem-empty{color:var(--ink-soft); font-size:0.88rem;}
+
+  section.card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:22px 24px;
+    margin-bottom:24px;
+  }
+  section.card p.instr{color:var(--ink-soft); margin-top:0;}
+
+  table.vocab{width:100%; border-collapse:collapse; margin-top:12px;}
+  table.vocab th{
+    text-align:left; font-size:0.82rem; color:var(--ink-soft);
+    border-bottom:1px solid var(--line); padding:6px 8px;
+    font-weight:600;
+  }
+  table.vocab td{padding:8px; border-bottom:1px solid #EEF1E7; vertical-align:middle;}
+  .ipa{color:var(--ink-soft); font-style:italic;}
+  .listen-btn{
+    background:none; border:1.5px solid var(--teal); color:var(--teal);
+    border-radius:999px; width:32px; height:32px; cursor:pointer; font-size:0.95rem;
+    display:inline-flex; align-items:center; justify-content:center;
+  }
+  .listen-btn:hover{background:var(--teal); color:#fff;}
+
+  .qrow{
+    display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+    padding:10px 0; border-bottom:1px dashed var(--line);
+  }
+  .qrow:last-of-type{border-bottom:none;}
+  .qnum{
+    font-family:'Caveat', cursive; font-size:1.3rem; color:var(--amber-dark);
+    min-width:24px;
+  }
+  .qtext{flex:1 1 320px; min-width:220px;}
+  .qtext b{color:var(--teal-dark);}
+  input.answer{
+    flex:0 0 220px;
+    padding:8px 10px;
+    border:1.5px solid var(--line);
+    border-radius:8px;
+    font-size:1rem;
+    font-family:'Source Sans 3', sans-serif;
+  }
+  input.answer:focus{outline:none; border-color:var(--teal);}
+  input.answer.correct{border-color:var(--moss); background:#EFF7F1;}
+  input.answer.wrong{border-color:var(--rose); background:#FBEFEC;}
+  .feedback{min-width:26px; font-size:1.1rem;}
+  .reveal{
+    font-size:0.9rem; color:var(--moss); font-weight:600;
+    display:none; margin-left:4px;
+  }
+  .reveal.show{display:inline;}
+  .small-listen{
+    background:none; border:1.5px solid var(--sky); color:var(--sky);
+    border-radius:999px; width:30px; height:30px; cursor:pointer;
+  }
+  .small-listen:hover{background:var(--sky); color:#fff;}
+
+  .ex-controls{
+    display:flex; gap:10px; margin-top:14px; flex-wrap:wrap; align-items:center;
+  }
+  button.action{
+    border:none; border-radius:999px; padding:9px 18px; cursor:pointer;
+    font-size:0.95rem; font-weight:600;
+  }
+  button.check{background:var(--teal); color:#fff;}
+  button.check:hover{background:var(--teal-dark);}
+  button.show{background:none; border:1.5px solid var(--amber); color:var(--amber-dark);}
+  button.show:hover{background:var(--amber); color:#fff;}
+  .ex-score{font-size:0.9rem; color:var(--ink-soft);}
+
+  /* family tree */
+  .tree{
+    display:flex; flex-direction:column; align-items:center; gap:6px;
+    margin:16px 0 8px;
+  }
+  .gen{display:flex; gap:34px; justify-content:center; flex-wrap:wrap; position:relative;}
+  .branch{display:flex; flex-direction:column; align-items:center; gap:4px;}
+  .couple{display:flex; align-items:center; gap:8px;}
+  .person{
+    background:#F5EFE2; border:1.5px solid var(--amber); border-radius:8px;
+    padding:6px 14px; font-weight:600; color:var(--teal-dark); font-size:0.95rem;
+  }
+  .heart{color:var(--rose); font-size:0.9rem;}
+  .kids{display:flex; gap:14px; margin-top:6px;}
+  .connector{width:2px; height:16px; background:var(--line);}
+  .legend{
+    background:#F6F8F2; border:1px dashed var(--line); border-radius:8px;
+    padding:12px 16px; font-size:0.92rem; color:var(--ink-soft); margin-top:10px;
+  }
+
+  textarea.sentence{
+    width:100%; min-height:52px; padding:9px 10px; border:1.5px solid var(--line);
+    border-radius:8px; font-family:'Source Sans 3', sans-serif; font-size:1rem; resize:vertical;
+  }
+  textarea.sentence:focus{outline:none; border-color:var(--teal);}
+  .sent-status{font-size:0.85rem; color:var(--ink-soft); margin-top:4px;}
+  .sent-block{padding:12px 0; border-bottom:1px dashed var(--line);}
+  .sent-block:last-of-type{border-bottom:none;}
+
+  .copy-wrap{
+    background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+    padding:22px 24px; text-align:center;
+  }
+  #copy-btn{
+    background:var(--amber); color:#fff; font-size:1.05rem; padding:12px 26px;
+  }
+  #copy-btn:hover{background:var(--amber-dark);}
+  #copy-status{margin-top:10px; color:var(--moss); font-weight:600; min-height:20px;}
+
+  @media (max-width: 860px){
+    .layout{grid-template-columns:1fr;}
+    aside{position:static;}
+    input.answer{flex:1 1 100%;}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="top">
+    <h1>Family Words — тренажёр</h1>
+    <p>Повтори слова о семье, прослушай произношение и пропиши каждое слово руками в семи заданиях. Ошибочные слова автоматически попадают в список справа — вернись к ним в конце.</p>
+    <div class="audio-check">
+      <button id="test-audio">🔊 Проверить, работает ли звук</button>
+      <span id="audio-status">Нажми кнопку — должен прозвучать голос на английском.</span>
+    </div>
+  </header>
+
+  <div class="layout">
+    <main>
+
+      <section class="card" id="vocab-section">
+        <h2>Повторение слов</h2>
+        <p class="instr">Нажми на 🔊, чтобы услышать произношение каждого слова (голос — Google US English).</p>
+        <table class="vocab">
+          <thead><tr><th></th><th>Word</th><th>Транскрипция</th><th>Перевод</th></tr></thead>
+          <tbody id="vocab-body"></tbody>
+        </table>
+      </section>
+
+      <section class="card" id="ex1">
+        <h2>Задание 1. Вставь пропущенные буквы</h2>
+        <p class="instr">Впиши слово целиком вместо пропусков (каждый пропуск — одна буква).</p>
+        <div id="ex1-rows"></div>
+        <div class="ex-controls">
+          <button class="action check" data-ex="ex1">Проверить</button>
+          <button class="action show" data-ex="ex1">Показать ответы</button>
+          <span class="ex-score" id="ex1-score"></span>
+        </div>
+      </section>
+
+      <section class="card" id="ex2">
+        <h2>Задание 2. Переведи с русского на английский</h2>
+        <p class="instr">Напиши английское слово.</p>
+        <div id="ex2-rows"></div>
+        <div class="ex-controls">
+          <button class="action check" data-ex="ex2">Проверить</button>
+          <button class="action show" data-ex="ex2">Показать ответы</button>
+          <span class="ex-score" id="ex2-score"></span>
+        </div>
+      </section>
+
+      <section class="card" id="ex3">
+        <h2>Задание 3. Напиши слово на слух</h2>
+        <p class="instr">Нажми 🔊, прослушай слово и запиши его правильно.</p>
+        <div id="ex3-rows"></div>
+        <div class="ex-controls">
+          <button class="action check" data-ex="ex3">Проверить</button>
+          <button class="action show" data-ex="ex3">Показать ответы</button>
+          <span class="ex-score" id="ex3-score"></span>
+        </div>
+      </section>
+
+      <section class="card" id="ex4">
+        <h2>Задание 4. Догадайся по определению (possessive 's)</h2>
+        <p class="instr">Дополни предложение одним словом.</p>
+        <div id="ex4-rows"></div>
+        <div class="ex-controls">
+          <button class="action check" data-ex="ex4">Проверить</button>
+          <button class="action show" data-ex="ex4">Показать ответы</button>
+          <span class="ex-score" id="ex4-score"></span>
+        </div>
+      </section>
+
+      <section class="card" id="ex5">
+        <h2>Задание 5. Угадай слово по семейному древу</h2>
+        <p class="instr">Посмотри на древо семьи и ответь, кем один человек приходится другому.</p>
+        <div class="tree">
+          <div class="gen">
+            <div class="couple">
+              <div class="person">Robert</div>
+              <span class="heart">♥</span>
+              <div class="person">Susan</div>
+            </div>
+          </div>
+          <div class="connector"></div>
+          <div class="gen">
+            <div class="branch">
+              <div class="couple">
+                <div class="person">Michael</div>
+                <span class="heart">♥</span>
+                <div class="person">Laura</div>
+              </div>
+              <div class="connector"></div>
+              <div class="kids">
+                <div class="person">Emma</div>
+                <div class="person">Jack</div>
+              </div>
+            </div>
+            <div class="branch">
+              <div class="couple">
+                <div class="person">Karen</div>
+                <span class="heart">♥</span>
+                <div class="person">David</div>
+              </div>
+              <div class="connector"></div>
+              <div class="kids">
+                <div class="person">Peter</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="legend">Robert и Susan — родители Michael и Karen. Michael женат на Laura, у них дети Emma и Jack. Karen замужем за David, их сын — Peter.</div>
+        <div id="ex5-rows" style="margin-top:14px;"></div>
+        <div class="ex-controls">
+          <button class="action check" data-ex="ex5">Проверить</button>
+          <button class="action show" data-ex="ex5">Показать ответы</button>
+          <span class="ex-score" id="ex5-score"></span>
+        </div>
+      </section>
+
+      <section class="card" id="ex6">
+        <h2>Задание 6. Expand the sentence</h2>
+        <p class="instr">Дополни и «расширь» предложение нужным словом.</p>
+        <div id="ex6-rows"></div>
+        <div class="ex-controls">
+          <button class="action check" data-ex="ex6">Проверить</button>
+          <button class="action show" data-ex="ex6">Показать ответы</button>
+          <span class="ex-score" id="ex6-score"></span>
+        </div>
+      </section>
+
+      <section class="card" id="ex7">
+        <h2>Задание 7. Составь своё предложение</h2>
+        <p class="instr">Напиши предложение на английском с указанным словом.</p>
+        <div id="ex7-rows"></div>
+        <div class="ex-controls">
+          <button class="action check" data-ex="ex7">Проверить</button>
+          <span class="ex-score" id="ex7-score"></span>
+        </div>
+      </section>
+
+      <section class="copy-wrap">
+        <h2>Готово?</h2>
+        <p class="instr">Скопируй все свои ответы одной кнопкой — можно вставить в тетрадь, чат или отправить преподавателю.</p>
+        <button class="action" id="copy-btn">📋 Скопировать все ответы</button>
+        <div id="copy-status"></div>
+      </section>
+
+    </main>
+
+    <aside>
+      <h3>Проблемные слова</h3>
+      <p class="hint">Сюда попадают слова с ошибками. Нажми на слово, если выучил(а) его — оно исчезнет из списка.</p>
+      <p id="problem-empty">Пока ошибок нет 🎉</p>
+      <ul id="problem-list"></ul>
+    </aside>
+  </div>
+</div>
+
+<script>
+/* ---------- vocabulary ---------- */
+const WORDS = [
+  {en:'father', ru:'отец', ipa:'ˈfɑːðər'},
+  {en:'mother', ru:'мать', ipa:'ˈmʌðər'},
+  {en:'brother', ru:'брат', ipa:'ˈbrʌðər'},
+  {en:'sister', ru:'сестра', ipa:'ˈsɪstər'},
+  {en:'daughter', ru:'дочь', ipa:'ˈdɔːtər'},
+  {en:'son', ru:'сын', ipa:'sʌn'},
+  {en:'grandfather', ru:'дедушка', ipa:'ˈɡrænfɑːðər'},
+  {en:'grandmother', ru:'бабушка', ipa:'ˈɡrænmʌðər'},
+  {en:'aunt', ru:'тётя', ipa:'ænt'},
+  {en:'uncle', ru:'дядя', ipa:'ˈʌŋkl'},
+  {en:'nephew', ru:'племянник', ipa:'ˈnefjuː'},
+  {en:'niece', ru:'племянница', ipa:'niːs'},
+  {en:'cousin', ru:'двоюродный брат / сестра', ipa:'ˈkʌzn'},
+  {en:'wife', ru:'жена', ipa:'waɪf'},
+  {en:'children', ru:'дети', ipa:'ˈtʃɪldrən'},
+  {en:'parents', ru:'родители', ipa:'ˈperənts'},
+  {en:'grandparents', ru:'бабушка и дедушка', ipa:'ˈɡrænperənts'},
+  {en:'parents-in-law', ru:'родители мужа / жены', ipa:'ˈperənts ɪn lɔː'},
+  {en:'mother-in-law', ru:'свекровь / тёща', ipa:'ˈmʌðər ɪn lɔː'},
+  {en:'couple', ru:'супружеская пара', ipa:'ˈkʌpl'},
+  {en:'sister-in-law', ru:'золовка / невестка', ipa:'ˈsɪstər ɪn lɔː'},
+  {en:'partner', ru:'партнёр', ipa:'ˈpɑːrtnər'},
+  {en:'stepmother', ru:'мачеха', ipa:'ˈstepmʌðər'},
+  {en:'stepfather', ru:'отчим', ipa:'ˈstepfɑːðər'}
+];
+const RU_OF = {}; WORDS.forEach(w=>RU_OF[w.en]=w.ru);
+
+/* ---------- speech ---------- */
+let cachedVoice = null;
+function pickVoice(){
+  const voices = speechSynthesis.getVoices();
+  if(!voices.length) return null;
+  return voices.find(v=>v.name.includes('Google US English')) ||
+         voices.find(v=>v.lang==='en-US') ||
+         voices.find(v=>v.lang && v.lang.startsWith('en')) ||
+         voices[0];
+}
+if('speechSynthesis' in window){
+  speechSynthesis.onvoiceschanged = ()=>{ cachedVoice = pickVoice(); };
+  cachedVoice = pickVoice();
+}
+function speak(text, statusEl){
+  if(!('speechSynthesis' in window)){
+    if(statusEl) statusEl.textContent = 'Браузер не поддерживает озвучку.';
+    return;
+  }
+  const v = cachedVoice || pickVoice();
+  const u = new SpeechSynthesisUtterance(text);
+  if(v) u.voice = v;
+  u.lang = 'en-US';
+  u.rate = 0.85;
+  if(statusEl){
+    u.onstart = ()=> statusEl.textContent = 'Звук: ' + (v ? v.name : 'голос браузера по умолчанию');
+    u.onerror = ()=> statusEl.textContent = 'Не удалось воспроизвести звук.';
+  }
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+}
+document.getElementById('test-audio').addEventListener('click', ()=>{
+  speak('Hello, can you hear me? Let\'s practice family words.', document.getElementById('audio-status'));
+});
+
+/* ---------- problem words sidebar ---------- */
+const problemWords = new Set();
+function renderProblems(){
+  const list = document.getElementById('problem-list');
+  const empty = document.getElementById('problem-empty');
+  list.innerHTML = '';
+  if(problemWords.size===0){ empty.style.display='block'; return; }
+  empty.style.display='none';
+  [...problemWords].forEach(w=>{
+    const li = document.createElement('li');
+    li.innerHTML = '<span>'+w+' <span class="ru">— '+ (RU_OF[w]||'') +'</span></span>';
+    li.title = 'Нажми, если выучил(а) это слово';
+    li.addEventListener('click', ()=>{ problemWords.delete(w); renderProblems(); });
+    list.appendChild(li);
+  });
+}
+function addProblem(word){
+  if(!word) return;
+  problemWords.add(word);
+  renderProblems();
+}
+renderProblems();
+
+/* ---------- helpers ---------- */
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+function normalize(s){
+  return (s||'').toString().trim().toLowerCase().replace(/[\s-]+/g,'');
+}
+
+/* ---------- vocab table ---------- */
+const vocabBody = document.getElementById('vocab-body');
+shuffle(WORDS).forEach(w=>{ // display order mixed, not the numbered order above
+  const tr = document.createElement('tr');
+  tr.innerHTML =
+    '<td><button class="listen-btn" aria-label="Слушать">🔊</button></td>'+
+    '<td><b>'+w.en+'</b></td>'+
+    '<td class="ipa">/'+w.ipa+'/</td>'+
+    '<td>'+w.ru+'</td>';
+  tr.querySelector('.listen-btn').addEventListener('click', ()=>speak(w.en));
+  vocabBody.appendChild(tr);
+});
+
+/* ---------- generic exercise engine ---------- */
+// each item: {prompt (HTML string), answer (string), word (for problem tracking), listen (optional bool/text)}
+function buildExercise(containerId, items, opts={}){
+  const container = document.getElementById(containerId);
+  const order = shuffle(items.map((it,idx)=>idx)); // mixed order
+  container.innerHTML='';
+  order.forEach((origIdx, pos)=>{
+    const it = items[origIdx];
+    const row = document.createElement('div');
+    row.className='qrow';
+    row.dataset.answer = it.answer;
+    row.dataset.word = it.word;
+    let listenBtn = '';
+    if(it.listenText){
+      listenBtn = '<button type="button" class="small-listen" data-say="'+it.listenText.replace(/"/g,'&quot;')+'">🔊</button>';
+    }
+    row.innerHTML =
+      '<span class="qnum">'+(pos+1)+'.</span>'+
+      '<span class="qtext">'+it.prompt+'</span>'+
+      listenBtn+
+      '<input type="text" class="answer" autocomplete="off" spellcheck="false">'+
+      '<span class="feedback"></span>'+
+      '<span class="reveal"></span>';
+    const listenElem = row.querySelector('.small-listen');
+    if(listenElem){
+      listenElem.addEventListener('click', ()=>speak(listenElem.dataset.say));
+    }
+    row.querySelector('.reveal').textContent = '→ '+it.answer;
+    container.appendChild(row);
+  });
+}
+
+function checkExercise(exId){
+  const container = document.getElementById(exId+'-rows');
+  const rows = container.querySelectorAll('.qrow');
+  let correct=0;
+  rows.forEach(row=>{
+    const input = row.querySelector('.answer');
+    const fb = row.querySelector('.feedback');
+    const answer = row.dataset.answer;
+    const word = row.dataset.word;
+    const ok = normalize(input.value) === normalize(answer);
+    input.classList.remove('correct','wrong');
+    if(input.value.trim()===''){ fb.textContent=''; return; }
+    if(ok){
+      input.classList.add('correct'); fb.textContent='✓'; correct++;
+    } else {
+      input.classList.add('wrong'); fb.textContent='✗';
+      addProblem(word);
+    }
+  });
+  document.getElementById(exId+'-score').textContent = 'Правильно: '+correct+' из '+rows.length;
+}
+
+function showAnswers(exId){
+  const container = document.getElementById(exId+'-rows');
+  container.querySelectorAll('.reveal').forEach(r=>r.classList.toggle('show'));
+}
+
+document.querySelectorAll('button.check').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const ex = btn.dataset.ex;
+    if(ex==='ex7'){ checkSentences(); } else { checkExercise(ex); }
+  });
+});
+document.querySelectorAll('button.show').forEach(btn=>{
+  btn.addEventListener('click', ()=> showAnswers(btn.dataset.ex));
+});
+
+/* ---------- Exercise 1: missing letters ---------- */
+buildExercise('ex1-rows', [
+  {prompt:'f_th_r', answer:'father', word:'father'},
+  {prompt:'m_th_r', answer:'mother', word:'mother'},
+  {prompt:'d__ght_r', answer:'daughter', word:'daughter'},
+  {prompt:'gr_ndm_th_r', answer:'grandmother', word:'grandmother'},
+  {prompt:'_unt', answer:'aunt', word:'aunt'},
+  {prompt:'neph_w', answer:'nephew', word:'nephew'},
+  {prompt:'c_us_n', answer:'cousin', word:'cousin'},
+  {prompt:'p_r_nts-in-l_w', answer:'parents-in-law', word:'parents-in-law'}
+]);
+
+/* ---------- Exercise 2: RU -> EN ---------- */
+buildExercise('ex2-rows', [
+  {prompt:'брат', answer:'brother', word:'brother'},
+  {prompt:'сестра', answer:'sister', word:'sister'},
+  {prompt:'сын', answer:'son', word:'son'},
+  {prompt:'дядя', answer:'uncle', word:'uncle'},
+  {prompt:'племянница', answer:'niece', word:'niece'},
+  {prompt:'жена', answer:'wife', word:'wife'},
+  {prompt:'бабушка и дедушка', answer:'grandparents', word:'grandparents'},
+  {prompt:'золовка / невестка', answer:'sister-in-law', word:'sister-in-law'}
+]);
+
+/* ---------- Exercise 3: dictation ---------- */
+buildExercise('ex3-rows', [
+  {prompt:'Прослушай и запиши слово:', answer:'grandfather', word:'grandfather', listenText:'grandfather'},
+  {prompt:'Прослушай и запиши слово:', answer:'children', word:'children', listenText:'children'},
+  {prompt:'Прослушай и запиши слово:', answer:'mother-in-law', word:'mother-in-law', listenText:'mother-in-law'},
+  {prompt:'Прослушай и запиши слово:', answer:'couple', word:'couple', listenText:'couple'},
+  {prompt:'Прослушай и запиши слово:', answer:'partner', word:'partner', listenText:'partner'},
+  {prompt:'Прослушай и запиши слово:', answer:'stepmother', word:'stepmother', listenText:'stepmother'},
+  {prompt:'Прослушай и запиши слово:', answer:'stepfather', word:'stepfather', listenText:'stepfather'},
+  {prompt:'Прослушай и запиши слово:', answer:'daughter', word:'daughter', listenText:'daughter'}
+]);
+
+/* ---------- Exercise 4: definitions with possessive 's ---------- */
+buildExercise('ex4-rows', [
+  {prompt:"My father's mother is my ___.", answer:'grandmother', word:'grandmother'},
+  {prompt:"My mother's brother is my ___.", answer:'uncle', word:'uncle'},
+  {prompt:"My brother's daughter is my ___.", answer:'niece', word:'niece'},
+  {prompt:"My sister's son is my ___.", answer:'nephew', word:'nephew'},
+  {prompt:"My uncle's wife is my ___.", answer:'aunt', word:'aunt'},
+  {prompt:"My parents' parents are my ___.", answer:'grandparents', word:'grandparents'},
+  {prompt:"My wife's mother is my ___.", answer:'mother-in-law', word:'mother-in-law'},
+  {prompt:"My wife's sister is my ___.", answer:'sister-in-law', word:'sister-in-law'}
+]);
+
+/* ---------- Exercise 5: family tree ---------- */
+buildExercise('ex5-rows', [
+  {prompt:'Robert and Susan are a ___.', answer:'couple', word:'couple'},
+  {prompt:"Michael is Robert and Susan's ___.", answer:'son', word:'son'},
+  {prompt:"Karen is Michael's ___.", answer:'sister', word:'sister'},
+  {prompt:"Emma is Michael and Laura's ___.", answer:'daughter', word:'daughter'},
+  {prompt:"Jack is Emma's ___.", answer:'brother', word:'brother'},
+  {prompt:"Peter is Emma and Jack's ___.", answer:'cousin', word:'cousin'},
+  {prompt:"Peter is Michael's ___.", answer:'nephew', word:'nephew'},
+  {prompt:"Emma is Karen's ___.", answer:'niece', word:'niece'}
+]);
+
+/* ---------- Exercise 6: expand the sentence ---------- */
+buildExercise('ex6-rows', [
+  {prompt:'My father and mother are my ___.', answer:'parents', word:'parents'},
+  {prompt:'My grandfather and grandmother are my ___.', answer:'grandparents', word:'grandparents'},
+  {prompt:'Ann and Mike love each other and live together — they are a ___.', answer:'couple', word:'couple'},
+  {prompt:"My father's new wife (not my mother) is my ___.", answer:'stepmother', word:'stepmother'},
+  {prompt:"My mother's new husband (not my father) is my ___.", answer:'stepfather', word:'stepfather'},
+  {prompt:"My husband's mother is my ___.", answer:'mother-in-law', word:'mother-in-law'},
+  {prompt:"My wife's sister is my ___.", answer:'sister-in-law', word:'sister-in-law'},
+  {prompt:"The person I'm dating but not married to is my ___.", answer:'partner', word:'partner'}
+]);
+
+/* ---------- Exercise 7: write your own sentence ---------- */
+const EX7_WORDS = shuffle(['mother','brother','son','grandmother','nephew','wife','children','partner']);
+(function buildEx7(){
+  const container = document.getElementById('ex7-rows');
+  container.innerHTML='';
+  EX7_WORDS.forEach((w,i)=>{
+    const block = document.createElement('div');
+    block.className='sent-block';
+    block.dataset.word = w;
+    block.innerHTML =
+      '<div class="qtext"><span class="qnum">'+(i+1)+'.</span> Составь предложение со словом <b>'+w+'</b>:</div>'+
+      '<textarea class="sentence" placeholder="Write your sentence here..."></textarea>'+
+      '<div class="sent-status"></div>';
+    container.appendChild(block);
+  });
+})();
+function checkSentences(){
+  const blocks = document.querySelectorAll('#ex7-rows .sent-block');
+  let done=0;
+  blocks.forEach(b=>{
+    const word = b.dataset.word;
+    const ta = b.querySelector('.sentence');
+    const status = b.querySelector('.sent-status');
+    const text = ta.value.trim();
+    if(text===''){ status.textContent=''; return; }
+    const has = new RegExp('\\b'+word.replace(/-/g,'[- ]')+'\\b','i').test(text);
+    if(has){
+      status.textContent = '✓ слово использовано';
+      status.style.color = 'var(--moss)';
+      done++;
+    } else {
+      status.textContent = '⚠ не найдено слово «'+word+'» — добавь его в предложение';
+      status.style.color = 'var(--rose)';
+      addProblem(word);
+    }
+  });
+  document.getElementById('ex7-score').textContent = 'Готово предложений: '+done+' из '+blocks.length;
+}
+
+/* ---------- copy all answers ---------- */
+document.getElementById('copy-btn').addEventListener('click', ()=>{
+  let lines = ['=== FAMILY WORDS — ответы студента ===',''];
+  const exTitles = {
+    ex1:'Задание 1. Вставь пропущенные буквы',
+    ex2:'Задание 2. Перевод RU→EN',
+    ex3:'Задание 3. Слово на слух',
+    ex4:'Задание 4. Определения (possessive \'s)',
+    ex5:'Задание 5. Семейное древо',
+    ex6:'Задание 6. Expand the sentence'
+  };
+  Object.keys(exTitles).forEach(exId=>{
+    lines.push('-- '+exTitles[exId]+' --');
+    document.querySelectorAll('#'+exId+'-rows .qrow').forEach((row,i)=>{
+      const q = row.querySelector('.qtext').textContent.trim();
+      const a = row.querySelector('.answer').value.trim();
+      lines.push((i+1)+'. '+q+'  =>  '+(a||'(нет ответа)'));
+    });
+    lines.push('');
+  });
+  lines.push('-- Задание 7. Свои предложения --');
+  document.querySelectorAll('#ex7-rows .sent-block').forEach((b,i)=>{
+    const word = b.dataset.word;
+    const text = b.querySelector('.sentence').value.trim();
+    lines.push((i+1)+'. ['+word+']  '+(text||'(нет ответа)'));
+  });
+  lines.push('');
+  lines.push('Проблемные слова: '+ ([...problemWords].join(', ') || 'нет'));
+
+  const fullText = lines.join('\n');
+  const status = document.getElementById('copy-status');
+  function done(){ status.textContent='Ответы скопированы в буфер обмена ✓'; setTimeout(()=>status.textContent='',4000); }
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(fullText).then(done).catch(()=>fallbackCopy(fullText, done));
+  } else {
+    fallbackCopy(fullText, done);
+  }
+  function fallbackCopy(text, cb){
+    const ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    try{ document.execCommand('copy'); cb(); } catch(e){ status.textContent='Не удалось скопировать автоматически, выдели текст вручную.'; }
+    document.body.removeChild(ta);
+  }
+});
+</script>
+</body>
+</html>
