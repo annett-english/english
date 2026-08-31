@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tenses practice — практикум по временам</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EFE8D8;
+    --paper-line:#DCD2B8;
+    --ink:#232B3D;
+    --ink-soft:#5B6478;
+    --card:#FBF8F0;
+    --rule-red:#AA3B3B;
+    --pen-blue:#2E4374;
+    --moss:#5C7A52;
+    --moss-deep:#3E5A38;
+    --wrong:#B23A48;
+    --wrong-bg:#F6E3E2;
+    --right:#3E6E44;
+    --right-bg:#E4EEDE;
+    --shadow: 4px 4px 0 rgba(35,43,61,0.08);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    line-height:1.55;
+    background-image:
+      linear-gradient(var(--paper-line) 1px, transparent 1px);
+    background-size: 100% 2.15em;
+    background-attachment:local;
+  }
+  a{color:var(--pen-blue);}
+
+  /* ---------- Layout shell ---------- */
+  .shell{
+    display:grid;
+    grid-template-columns: 250px 1fr;
+    min-height:100vh;
+  }
+  header.masthead{
+    grid-column:1/-1;
+    padding:34px 40px 22px;
+    background:var(--paper);
+    border-bottom:3px solid var(--ink);
+    position:relative;
+  }
+  header.masthead::after{
+    content:"";
+    position:absolute;
+    left:40px;right:40px;bottom:-8px;
+    height:1px;
+    background:var(--rule-red);
+    opacity:.55;
+  }
+  .masthead h1{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:2.5rem;
+    margin:0 0 6px;
+    letter-spacing:-0.01em;
+  }
+  .masthead h1 span{color:var(--rule-red);font-style:italic;font-weight:500;}
+  .masthead p{
+    margin:0;
+    max-width:640px;
+    color:var(--ink-soft);
+    font-size:1rem;
+  }
+
+  nav.side{
+    padding:26px 18px;
+    border-right:2px solid var(--ink);
+    position:sticky;
+    top:0;
+    align-self:start;
+    height:100vh;
+    overflow-y:auto;
+  }
+  nav.side button{
+    display:block;
+    width:100%;
+    text-align:left;
+    background:none;
+    border:none;
+    font-family:'Inter',sans-serif;
+    font-size:.95rem;
+    font-weight:600;
+    color:var(--ink-soft);
+    padding:11px 12px;
+    border-radius:3px;
+    cursor:pointer;
+    margin-bottom:3px;
+    border-left:3px solid transparent;
+    transition:background .15s, color .15s, border-color .15s;
+  }
+  nav.side button:hover{background:rgba(46,67,116,0.07); color:var(--ink);}
+  nav.side button.active{
+    color:var(--ink);
+    border-left-color:var(--rule-red);
+    background:var(--card);
+    box-shadow:var(--shadow);
+  }
+  nav.side .tag{
+    display:block;
+    font-size:.68rem;
+    text-transform:none;
+    color:var(--ink-soft);
+    font-weight:500;
+    margin-top:2px;
+  }
+  nav.side .divider{
+    margin:16px 4px 10px;
+    font-size:.72rem;
+    color:var(--ink-soft);
+    border-top:1px dashed var(--paper-line);
+    padding-top:12px;
+  }
+
+  main{
+    padding:36px 44px 90px;
+    max-width:900px;
+  }
+  section.view{display:none;}
+  section.view.active{display:block;}
+
+  h2.view-title{
+    font-family:'Fraunces',serif;
+    font-size:1.9rem;
+    font-weight:600;
+    margin:0 0 4px;
+  }
+  .view-sub{
+    color:var(--ink-soft);
+    margin:0 0 26px;
+    max-width:640px;
+    font-size:.95rem;
+  }
+
+  /* ---------- Rule cards ---------- */
+  .rule-grid{
+    display:grid;
+    gap:16px;
+  }
+  .rule-card{
+    background:var(--card);
+    border:1px solid var(--paper-line);
+    border-left:5px solid var(--pen-blue);
+    border-radius:4px;
+    padding:18px 22px;
+    box-shadow:var(--shadow);
+  }
+  .rule-card h3{
+    font-family:'Fraunces',serif;
+    font-size:1.2rem;
+    margin:0 0 4px;
+    color:var(--pen-blue);
+  }
+  .rule-card .formula{
+    font-family:'JetBrains Mono',monospace;
+    font-size:.82rem;
+    background:rgba(46,67,116,0.08);
+    padding:3px 8px;
+    border-radius:3px;
+    display:inline-block;
+    margin-bottom:10px;
+  }
+  .rule-card p{margin:6px 0;font-size:.93rem;}
+  .rule-card .signals{
+    font-size:.85rem;
+    color:var(--ink-soft);
+  }
+  .rule-card .signals b{color:var(--ink);font-weight:600;}
+  .rule-card .ex{
+    font-size:.88rem;
+    font-style:italic;
+    color:var(--moss-deep);
+    margin-top:8px;
+  }
+
+  /* ---------- Exercise header ---------- */
+  .ex-toolbar{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-bottom:24px;
+    align-items:center;
+  }
+  .btn{
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:.87rem;
+    padding:10px 18px;
+    border-radius:3px;
+    border:2px solid var(--ink);
+    background:var(--card);
+    color:var(--ink);
+    cursor:pointer;
+    transition:transform .1s, background .15s;
+  }
+  .btn:hover{background:var(--ink);color:var(--paper);}
+  .btn:active{transform:translateY(1px);}
+  .btn.primary{background:var(--pen-blue);color:#fff;border-color:var(--pen-blue);}
+  .btn.primary:hover{background:#20305a;}
+  .btn.ghost{background:transparent;}
+  .score-pill{
+    font-family:'JetBrains Mono',monospace;
+    font-size:.85rem;
+    background:var(--card);
+    border:1px solid var(--paper-line);
+    padding:8px 14px;
+    border-radius:20px;
+    margin-left:auto;
+  }
+
+  /* ---------- Question card ---------- */
+  .q-card{
+    background:var(--card);
+    border:1px solid var(--paper-line);
+    border-radius:4px;
+    padding:18px 20px;
+    margin-bottom:16px;
+    box-shadow:var(--shadow);
+    position:relative;
+  }
+  .q-num{
+    font-family:'JetBrains Mono',monospace;
+    font-size:.78rem;
+    color:var(--ink-soft);
+    margin-bottom:8px;
+    display:block;
+  }
+  .q-sentence{
+    font-size:1.02rem;
+    margin-bottom:12px;
+  }
+  .q-sentence u{text-decoration-color:var(--rule-red); text-decoration-thickness:2px;}
+  .q-sentence .verb-note{
+    color:var(--pen-blue);
+    font-weight:600;
+    font-family:'JetBrains Mono',monospace;
+    font-size:.85rem;
+  }
+
+  .options{display:flex;flex-direction:column;gap:8px;}
+  .opt{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:9px 12px;
+    border:1.5px solid var(--paper-line);
+    border-radius:3px;
+    cursor:pointer;
+    font-size:.94rem;
+    background:#fff;
+    transition:border-color .15s, background .15s;
+  }
+  .opt:hover{border-color:var(--pen-blue);}
+  .opt input{accent-color:var(--pen-blue);}
+  .opt.selected{border-color:var(--pen-blue); background:rgba(46,67,116,0.06);}
+  .opt.correct-mark{border-color:var(--right); background:var(--right-bg);}
+  .opt.wrong-mark{border-color:var(--wrong); background:var(--wrong-bg);}
+
+  .parts{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    font-size:1.02rem;
+    margin-bottom:6px;
+  }
+  .part{
+    padding:2px 4px;
+    border-radius:3px;
+    cursor:pointer;
+    border-bottom:2px solid transparent;
+  }
+  .part:hover{background:rgba(46,67,116,0.08);}
+  .part .lbl{
+    font-family:'JetBrains Mono',monospace;
+    font-size:.68rem;
+    vertical-align:super;
+    color:var(--pen-blue);
+    margin-right:1px;
+  }
+  .part.selected{border-bottom-color:var(--pen-blue); background:rgba(46,67,116,0.08);}
+  .part.correct-mark{border-bottom-color:var(--right); background:var(--right-bg);}
+  .part.wrong-mark{border-bottom-color:var(--wrong); background:var(--wrong-bg);}
+
+  .gap-input, .text-input{
+    font-family:'JetBrains Mono',monospace;
+    font-size:.95rem;
+    border:none;
+    border-bottom:2px solid var(--ink);
+    background:transparent;
+    padding:2px 4px;
+    min-width:140px;
+    color:var(--pen-blue);
+    outline:none;
+  }
+  .gap-input:focus, .text-input:focus{border-bottom-color:var(--rule-red);}
+  .text-input{width:100%;margin-top:6px;padding:8px 10px;border:1.5px solid var(--paper-line);border-radius:3px;background:#fff;}
+
+  .builder-words{
+    display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;
+  }
+  .word-chip{
+    font-family:'JetBrains Mono',monospace;
+    font-size:.85rem;
+    background:#fff;
+    border:1.5px solid var(--paper-line);
+    padding:5px 10px;
+    border-radius:14px;
+    color:var(--ink-soft);
+  }
+
+  .feedback{
+    display:none;
+    margin-top:12px;
+    padding:11px 14px;
+    border-radius:3px;
+    font-size:.88rem;
+    line-height:1.5;
+  }
+  .feedback.show{display:block;}
+  .feedback.ok{background:var(--right-bg); color:var(--moss-deep); border-left:4px solid var(--right);}
+  .feedback.no{background:var(--wrong-bg); color:#7a2530; border-left:4px solid var(--wrong);}
+  .feedback .sample{
+    display:block;
+    margin-top:5px;
+    font-style:italic;
+  }
+  .feedback .why{margin-top:5px;}
+
+  footer.pagefoot{
+    text-align:center;
+    color:var(--ink-soft);
+    font-size:.8rem;
+    padding:30px;
+  }
+
+  @media (max-width: 860px){
+    .shell{grid-template-columns:1fr;}
+    nav.side{
+      position:static; height:auto; border-right:none;
+      border-bottom:2px solid var(--ink);
+      display:flex; overflow-x:auto; gap:4px; padding:14px 16px;
+    }
+    nav.side button{white-space:nowrap; margin-bottom:0;}
+    nav.side .divider{display:none;}
+    main{padding:26px 18px 70px;}
+    .masthead{padding:26px 20px 18px;}
+    .masthead h1{font-size:1.9rem;}
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+  <header class="masthead">
+    <h1>Tenses <span>practice</span></h1>
+    <p>Правило и шесть типов упражнений на Present Simple / Continuous / Perfect / Perfect Continuous, Past Simple / Continuous / Perfect, will, be going to и be able to. Проверяй ответы или сразу смотри разбор — с объяснением к каждому пункту.</p>
+  </header>
+
+  <nav class="side" id="nav"></nav>
+
+  <main id="main"></main>
+</div>
+<footer class="pagefoot">10 форм × 6 форматов заданий · разбор объясняет выбор времени, а не просто даёт ответ</footer>
+
+<script>
+/* ============================= DATA: RULES ============================= */
+const rules = [
+  {t:"Present Simple", f:"V / V-s(es)  —  I work / She works", u:[
+    "постоянные факты, законы природы, general truths",
+    "привычки, регулярные действия, распорядок",
+    "расписания и таймтейблы (поезда, сеансы)"
+  ], sig:"always, usually, often, sometimes, never, every day, on Mondays", ex:"Water boils at 100°C. — The train leaves at 9.15."},
+  {t:"Present Continuous", f:"am/is/are + V-ing  —  I am working", u:[
+    "действие происходит прямо сейчас, в момент речи",
+    "временная ситуация вокруг настоящего момента",
+    "запланированное действие в ближайшем будущем (личная договорённость)"
+  ], sig:"now, right now, at the moment, Look!, Listen!, these days", ex:"Listen! Someone is knocking. — I'm meeting her on Friday."},
+  {t:"Present Perfect", f:"have/has + V3  —  I have worked", u:[
+    "прошедшее действие, результат которого важен сейчас",
+    "жизненный опыт — без указания, когда именно",
+    "действие в незавершённом периоде (today, this week, so far)"
+  ], sig:"already, just, yet, ever, never, since, for, so far", ex:"I've lost my keys. — Have you ever been to Japan?"},
+  {t:"Present Perfect Continuous", f:"have/has been + V-ing  —  I have been working", u:[
+    "длительность действия, начавшегося в прошлом и продолжающегося до сейчас",
+    "акцент на самом процессе, а не на результате",
+    "действие только что закончилось, но виден его эффект сейчас"
+  ], sig:"for, since, all day, lately, recently, how long", ex:"She has been working for three hours. Her eyes are red."},
+  {t:"Past Simple", f:"V2/-ed  —  I worked", u:[
+    "законченное действие в указанный момент прошлого",
+    "последовательность завершённых действий в рассказе"
+  ], sig:"yesterday, last week, in 2010, ago, when I was a child", ex:"We went to Rome last summer."},
+  {t:"Past Continuous", f:"was/were + V-ing  —  I was working", u:[
+    "действие было в процессе в конкретный момент прошлого",
+    "фоновое действие, которое прервало другое действие (Past Simple)",
+    "два одновременных действия в прошлом (while)"
+  ], sig:"while, when, at 5 o'clock yesterday, all evening", ex:"I was cooking dinner when the phone rang."},
+  {t:"Past Perfect", f:"had + V3  —  I had worked", u:[
+    "действие завершилось раньше другого действия в прошлом",
+    "действие завершилось до указанного момента в прошлом"
+  ], sig:"before, after, by the time, already, just, when (для более раннего события)", ex:"By the time we arrived, the film had already started."},
+  {t:"will", f:"will + V  —  I will work", u:[
+    "спонтанное решение, принятое в момент речи",
+    "предсказание, основанное на мнении/убеждении",
+    "обещания, предложения помощи, просьбы"
+  ], sig:"I think, probably, I'm sure, I promise, I bet", ex:"I think it will rain tomorrow. — I'll help you, don't worry."},
+  {t:"be going to", f:"am/is/are going to + V", u:[
+    "план или намерение, решённые заранее (до момента речи)",
+    "предсказание на основе видимых сейчас признаков"
+  ], sig:"already decided, tickets bought, dark clouds — видимое доказательство", ex:"Look at those clouds! It's going to rain. — She's going to study law."},
+  {t:"be able to", f:"am/is/are/was/were/will be/have been able to + V", u:[
+    "способность (замена can/could там, где у can нет нужной формы)",
+    "используется в будущем, перфекте и с другими модальными глаголами",
+    "can — только настоящее/будущее(нет) и could — только прошлое; для future/perfect нужен be able to"
+  ], sig:"in the future, after training, one day, so far", ex:"Robots will be able to perform surgery. — She has been able to swim since she was five."}
+];
+
+/* ============================= DATA: EXERCISES ============================= */
+
+const ex1 = { // Choose the correct answer
+  id:"ex1", label:"Упр. 1", tag:"Choose the correct answer",
+  title:"Упражнение 1 · Choose the correct answer",
+  sub:"Выбери вариант, который верно завершает предложение.",
+  type:"choice",
+  items:[
+    {q:"Water ___ at 100°C.", opts:["boils","is boiling","has boiled","boiled"], correct:0,
+     explain:"Общеизвестный факт (закон природы) → Present Simple: boils."},
+    {q:"Listen! Someone ___ at the door.", opts:["knocks","is knocking","has knocked","knocked"], correct:1,
+     explain:"Действие происходит прямо сейчас, в момент речи (сигнал Listen!) → Present Continuous: is knocking."},
+    {q:"I ___ my keys. I can't find them anywhere.", opts:["lose","am losing","have lost","lost"], correct:2,
+     explain:"Прошлое действие важно своим результатом сейчас, время не указано → Present Perfect: have lost."},
+    {q:"She ___ for three hours. Her eyes are red.", opts:["works","has worked","has been working","worked"], correct:2,
+     explain:"Важна длительность процесса, который виден по результату (усталые глаза) → Present Perfect Continuous: has been working."},
+    {q:"We ___ to Rome last summer.", opts:["go","went","have gone","were going"], correct:1,
+     explain:"Завершённое действие с точным указанием времени (last summer) → Past Simple: went."},
+    {q:"I ___ dinner when the phone rang.", opts:["cooked","was cooking","had cooked","cook"], correct:1,
+     explain:"Действие было в процессе, когда его прервало другое короткое действие → Past Continuous: was cooking."},
+    {q:"By the time we arrived, the film ___.", opts:["already started","had already started","was already starting","has already started"], correct:1,
+     explain:"Действие завершилось до другого момента в прошлом (arrived) → Past Perfect: had already started."},
+    {q:"I think it ___ rain tomorrow.", opts:["is going to","will","is","has"], correct:1,
+     explain:"Предсказание, основанное на личном мнении (I think) → will: will rain."},
+    {q:"Look at those clouds! It ___ rain.", opts:["will","is going to","is","has been"], correct:1,
+     explain:"Предсказание на основе видимого сейчас доказательства (тучи) → be going to: is going to rain."},
+    {q:"In the future, robots ___ perform complex surgery.", opts:["can","could","will be able to","are able to"], correct:2,
+     explain:"У can нет формы будущего времени, поэтому способность в будущем выражается через will be able to."}
+  ]
+};
+
+const ex2 = { // Find the mistake
+  id:"ex2", label:"Упр. 2", tag:"Find the mistake",
+  title:"Упражнение 2 · Find the mistake",
+  sub:"Нажми на часть предложения (A, B, C или D), в которой есть ошибка.",
+  type:"mistake",
+  items:[
+    {parts:["She always watch","TV in the evening,","but yesterday she didn't watch","it at all."], correct:0,
+     fix:"always watches", explain:"Present Simple, подлежащее в 3-м лице ед. числа требует окончания -s: watches."},
+    {parts:["Look! The children are playing","in the garden,","and their dog run","around them."], correct:2,
+     fix:"is running", explain:"Действие происходит прямо сейчас, параллельно с are playing → нужен Present Continuous: is running."},
+    {parts:["I have already finish","my homework,","so I can","go out now."], correct:0,
+     fix:"have already finished", explain:"Present Perfect строится как have/has + V3 (причастие прошедшего времени): have finished, а не finish."},
+    {parts:["He has been studying","English","since","three years."], correct:2,
+     fix:"for three years", explain:"since используется с точкой отсчёта во времени (since 2020), а for — с периодом длительности: for three years."},
+    {parts:["She didn't went","to school","yesterday","because she was ill."], correct:0,
+     fix:"didn't go", explain:"В отрицании Past Simple вспомогательный глагол did уже несёт прошедшее время, поэтому смысловой глагол ставится в базовой форме: didn't go."},
+    {parts:["While I was cooking","dinner,","my sister was arrived","home."], correct:2,
+     fix:"arrived", explain:"Короткое законченное действие, прервавшее фоновое (was cooking), выражается Past Simple: arrived, а не Past Continuous."},
+    {parts:["By the time the guests arrived,","we already cooked","everything","for the party."], correct:1,
+     fix:"had already cooked", explain:"Действие завершилось раньше другого прошедшего события (arrived) → нужен Past Perfect: had already cooked."},
+    {parts:["I'm sure she will passes","the exam","because","she studied hard."], correct:0,
+     fix:"will pass", explain:"После will смысловой глагол всегда стоит в базовой форме без -s: will pass."},
+    {parts:["We going to","travel to Japan","next","spring."], correct:0,
+     fix:"are going to", explain:"В конструкции be going to нельзя пропускать вспомогательный глагол be: we are going to."},
+    {parts:["In the past, people weren't able","to fly,","but now","they can able to."], correct:3,
+     fix:"they are able to", explain:"Модальный глагол can нельзя ставить рядом с able to — либо can, либо are able to: they are able to."}
+  ]
+};
+
+const ex3 = { // Fill in the gaps
+  id:"ex3", label:"Упр. 3", tag:"Fill in the gaps",
+  title:"Упражнение 3 · Fill in the gaps using the correct form",
+  sub:"Впиши глагол из скобок в правильной форме.",
+  type:"gap",
+  items:[
+    {pre:"Water ", verb:"(boil)", post:" at 100 degrees Celsius.", answer:"boils",
+     explain:"Общеизвестный факт → Present Simple, 3-е лицо ед. числа: boils."},
+    {pre:"Be quiet, please! The baby ", verb:"(sleep)", post:".", answer:"is sleeping",
+     explain:"Действие происходит прямо сейчас → Present Continuous: is sleeping."},
+    {pre:"I ", verb:"(never / be)", post:" to Japan.", answer:"have never been", alt:["haven't ever been","have not ever been"],
+     explain:"Жизненный опыт, время не указано → Present Perfect: have never been."},
+    {pre:"It ", verb:"(rain)", post:" since this morning, and the streets are still wet.", answer:"has been raining",
+     explain:"Действие длится от точки в прошлом (since this morning) до сейчас, важен процесс → Present Perfect Continuous: has been raining."},
+    {pre:"They ", verb:"(not / go)", post:" to the party last night.", answer:"didn't go", alt:["did not go"],
+     explain:"Завершённое действие с указанием времени (last night) → Past Simple, отрицание: didn't go."},
+    {pre:"At 8 p.m. yesterday, I ", verb:"(watch)", post:" TV.", answer:"was watching",
+     explain:"Действие было в процессе в конкретный момент прошлого (at 8 p.m.) → Past Continuous: was watching."},
+    {pre:"She was tired because she ", verb:"(not / sleep)", post:" well the night before.", answer:"hadn't slept", alt:["had not slept"],
+     explain:"Причина (недосып) произошла раньше другого прошедшего состояния (was tired) → Past Perfect: hadn't slept."},
+    {pre:"I'm sure you ", verb:"(like)", post:" this movie.", answer:"will like",
+     explain:"Предсказание на основе личного мнения (I'm sure) → will: will like."},
+    {pre:"Look at the sky! It ", verb:"(rain)", post:" soon.", answer:"is going to rain",
+     explain:"Предсказание по видимому сейчас признаку (небо) → be going to: is going to rain."},
+    {pre:"If you practice every day, you ", verb:"(speak)", post:" English fluently in a year.", answer:"will be able to speak",
+     explain:"Способность, которая появится в будущем → will be able to (у can нет формы будущего времени)."}
+  ]
+};
+
+const ex4 = { // Replace the highlighted word
+  id:"ex4", label:"Упр. 4", tag:"Replace the highlighted word",
+  title:"Упражнение 4 · Replace the highlighted word",
+  sub:"Подчёркнутое слово стоит не в той форме — выбери, чем его заменить.",
+  type:"replace",
+  items:[
+    {pre:"My brother ", word:"are working", post:" as a teacher.", opts:["works","is working","worked","has worked"], correct:0,
+     explain:"Профессия — постоянный факт → Present Simple: works (а не Continuous и не 'are' при подлежащем в 3-м лице)."},
+    {pre:"I ", word:"write", post:" an email right now, please wait.", opts:["write","am writing","wrote","have written"], correct:1,
+     explain:"Сигнал right now указывает на действие в моменте речи → Present Continuous: am writing."},
+    {pre:"I ", word:"am living", post:" here for ten years.", opts:["live","am living","have lived","lived"], correct:2,
+     explain:"Незавершённый период (for ten years, действие продолжается) → Present Perfect: have lived (также верно have been living)."},
+    {pre:"Her eyes are red because she ", word:"cried", post:" for hours.", opts:["cries","is crying","has cried","has been crying"], correct:3,
+     explain:"Важна длительность процесса, результат которого виден сейчас → Present Perfect Continuous: has been crying."},
+    {pre:"I ", word:"have seen", post:" that movie last week.", opts:["see","saw","have seen","was seeing"], correct:1,
+     explain:"Указано точное время в прошлом (last week) — с Present Perfect так нельзя, нужен Past Simple: saw."},
+    {pre:"At midnight, we ", word:"slept", post:" deeply, so the noise didn't wake us.", opts:["sleep","slept","were sleeping","had slept"], correct:2,
+     explain:"Состояние длилось в конкретный момент прошлого (at midnight) → Past Continuous: were sleeping."},
+    {pre:"When the police arrived, the thief ", word:"ran", post:" away already.", opts:["runs","ran","had run","was running"], correct:2,
+     explain:"Побег произошёл раньше прибытия полиции (arrived) → Past Perfect: had run."},
+    {pre:"I promise I ", word:"am helping", post:" you tomorrow.", opts:["help","am helping","will help","helped"], correct:2,
+     explain:"Обещание, данное в момент речи → will: will help."},
+    {pre:"She ", word:"will visit", post:" her grandmother next week — she has already bought the ticket.", opts:["visits","will visit","is going to visit","has visited"], correct:2,
+     explain:"Решение принято заранее, есть доказательство (билет уже куплен) → be going to: is going to visit."},
+    {pre:"He hopes he ", word:"can", post:" finish the marathon after all this training.", opts:["can","could","will be able to","is able to"], correct:2,
+     explain:"Речь о способности в будущем → will be able to (can не имеет формы будущего времени)."}
+  ]
+};
+
+const ex5 = { // Rephrase
+  id:"ex5", label:"Упр. 5", tag:"Rephrase",
+  title:"Упражнение 5 · Rephrase",
+  sub:"Перестрой предложение по инструкции, сохранив смысл.",
+  type:"rephrase",
+  items:[
+    {orig:"He likes spicy food.", task:"Rewrite in the negative form.",
+     answers:["he doesn't like spicy food","he does not like spicy food"],
+     explain:"Present Simple, отрицание: does not / doesn't + базовая форма → He doesn't like spicy food."},
+    {orig:"They are watching a film now.", task:"Rewrite as a question.",
+     answers:["are they watching a film now","are they watching a film"],
+     explain:"Present Continuous, вопрос: Am/Is/Are + подлежащее + V-ing → Are they watching a film now?"},
+    {orig:"She finished her work a moment ago.", task:"Rewrite using 'just'.",
+     answers:["she has just finished her work","she's just finished her work"],
+     explain:"Действие завершилось совсем недавно, результат актуален сейчас → Present Perfect с just: She has just finished her work."},
+    {orig:"He started running two hours ago and he is still running.", task:"Combine into one sentence using 'for'.",
+     answers:["he has been running for two hours"],
+     explain:"Действие началось в прошлом и продолжается до сейчас, важна длительность → Present Perfect Continuous: He has been running for two hours."},
+    {orig:"We visited London last year.", task:"Rewrite in the negative form.",
+     answers:["we didn't visit london last year","we did not visit london last year"],
+     explain:"Past Simple, отрицание: did not / didn't + базовая форма → We didn't visit London last year."},
+    {orig:"I was reading. My brother was playing games at the same time.", task:"Combine using 'while'.",
+     answers:["i was reading while my brother was playing games","while my brother was playing games i was reading"],
+     explain:"Два параллельных длительных действия в прошлом соединяются через while, оба глагола в Past Continuous."},
+    {orig:"The train left. Then we arrived at the station.", task:"Combine using 'before' and Past Perfect (the train first).",
+     answers:["the train had left before we arrived at the station","we arrived at the station after the train had left"],
+     explain:"Более раннее прошедшее действие (train left) оформляется Past Perfect: The train had left before we arrived."},
+    {orig:"I am going to help you clean the house.", task:"Rewrite as a spontaneous promise using 'will'.",
+     answers:["i will help you clean the house","i'll help you clean the house"],
+     explain:"Спонтанное обещание, решение в момент речи → will: I will help you clean the house."},
+    {orig:"She has bought a plane ticket. She plans to travel to Spain.", task:"Combine into one sentence about her plan using 'be going to'.",
+     answers:["she is going to travel to spain"],
+     explain:"План, решённый заранее, подкреплён доказательством (билет куплен) → be going to: She is going to travel to Spain."},
+    {orig:"He can't swim now, but he will learn by next summer.", task:"Rewrite using 'be able to' about the future.",
+     answers:["he will be able to swim by next summer"],
+     explain:"Способность появится в будущем → will be able to, так как у can нет формы будущего времени."}
+  ]
+};
+
+const ex6 = { // Sentence Builder
+  id:"ex6", label:"Упр. 6", tag:"Sentence Builder",
+  title:"Упражнение 6 · Sentence Builder",
+  sub:"Собери из данных слов грамматически верное предложение.",
+  type:"builder",
+  items:[
+    {words:["lives","in","London","every","day","She"],
+     answers:["she lives in london every day"],
+     explain:"Постоянный факт/привычка → Present Simple: She lives in London every day."},
+    {words:["now","raining","is","It"],
+     answers:["it is raining now"],
+     explain:"Действие происходит в момент речи → Present Continuous: It is raining now."},
+    {words:["never","this","seen","have","film","I"],
+     answers:["i have never seen this film"],
+     explain:"Жизненный опыт без указания времени → Present Perfect: I have never seen this film."},
+    {words:["hours","been","for","has","three","waiting","He"],
+     answers:["he has been waiting for three hours"],
+     explain:"Длительность действия, продолжающегося до сейчас → Present Perfect Continuous: He has been waiting for three hours."},
+    {words:["yesterday","did","homework","her","not","do","She"],
+     answers:["she did not do her homework yesterday","she didn't do her homework yesterday"],
+     explain:"Завершённое действие с указанием времени, отрицание → Past Simple: She did not do her homework yesterday."},
+    {words:["when","was","rang","I","phone","cooking","the"],
+     answers:["i was cooking when the phone rang"],
+     explain:"Фоновое действие в процессе, прерванное коротким действием → Past Continuous + Past Simple: I was cooking when the phone rang."},
+    {words:["had","left","the","train","before","we","arrived"],
+     answers:["the train had left before we arrived"],
+     explain:"Действие завершилось раньше другого прошедшего события → Past Perfect: The train had left before we arrived."},
+    {words:["you","tomorrow","call","I","will"],
+     answers:["i will call you tomorrow"],
+     explain:"Обещание / решение о будущем → will: I will call you tomorrow."},
+    {words:["buy","going","to","are","they","a","house","new"],
+     answers:["they are going to buy a new house"],
+     explain:"Заранее принятое намерение/план → be going to: They are going to buy a new house."},
+    {words:["to","drive","be","will","able","she","soon"],
+     answers:["she will be able to drive soon"],
+     explain:"Способность, которая появится в будущем → will be able to: She will be able to drive soon."}
+  ]
+};
+
+const exercises = [ex1, ex2, ex3, ex4, ex5, ex6];
+
+/* ============================= HELPERS ============================= */
+function normalize(s){
+  return (s||"").toLowerCase()
+    .replace(/’/g,"'")
+    .replace(/don't/g,"do not").replace(/doesn't/g,"does not").replace(/didn't/g,"did not")
+    .replace(/isn't/g,"is not").replace(/aren't/g,"are not").replace(/wasn't/g,"was not").replace(/weren't/g,"were not")
+    .replace(/hasn't/g,"has not").replace(/haven't/g,"have not").replace(/hadn't/g,"had not")
+    .replace(/won't/g,"will not").replace(/can't/g,"cannot").replace(/couldn't/g,"could not")
+    .replace(/i'm/g,"i am").replace(/it's/g,"it is").replace(/he's/g,"he is").replace(/she's/g,"she is").replace(/that's/g,"that is")
+    .replace(/'ve/g," have").replace(/'ll/g," will").replace(/'d/g," had")
+    .replace(/[.,!?;:]/g,"")
+    .replace(/\s+/g," ")
+    .trim();
+}
+function matchesAny(input, answers){
+  const n = normalize(input);
+  return answers.some(a => normalize(a) === n);
+}
+
+/* ============================= RENDER: NAV ============================= */
+const nav = document.getElementById("nav");
+const mainEl = document.getElementById("main");
+
+function navButton(id, label, tag){
+  const b = document.createElement("button");
+  b.dataset.view = id;
+  b.innerHTML = label + (tag ? `<span class="tag">${tag}</span>` : "");
+  b.onclick = () => showView(id);
+  return b;
+}
+nav.appendChild(navButton("rules","Правило","когда что используется"));
+const divider = document.createElement("div");
+divider.className = "divider";
+divider.textContent = "Упражнения";
+nav.appendChild(divider);
+exercises.forEach(ex => nav.appendChild(navButton(ex.id, ex.label, ex.tag)));
+
+/* ============================= RENDER: RULES VIEW ============================= */
+function renderRules(){
+  const sec = document.createElement("section");
+  sec.className = "view"; sec.id = "view-rules";
+  sec.innerHTML = `
+    <h2 class="view-title">Правило: когда что используется</h2>
+    <p class="view-sub">Десять форм, о которых пойдёт речь в упражнениях ниже — формула, случаи употребления и слова-сигналы.</p>
+    <div class="rule-grid">
+      ${rules.map(r => `
+        <div class="rule-card">
+          <h3>${r.t}</h3>
+          <span class="formula">${r.f}</span>
+          ${r.u.map(u => `<p>· ${u}</p>`).join("")}
+          <div class="signals"><b>Сигналы:</b> ${r.sig}</div>
+          <div class="ex">${r.ex}</div>
+        </div>
+      `).join("")}
+    </div>
+  `;
+  mainEl.appendChild(sec);
+}
+
+/* ============================= RENDER: EXERCISE VIEWS ============================= */
+function toolbar(ex){
+  return `
+    <div class="ex-toolbar">
+      <button class="btn primary" onclick="checkExercise('${ex.id}')">Проверить ответы</button>
+      <button class="btn" onclick="revealExercise('${ex.id}')">Показать ответы</button>
+      <button class="btn ghost" onclick="resetExercise('${ex.id}')">Сбросить</button>
+      <span class="score-pill" id="${ex.id}-score">0 / 10</span>
+    </div>
+  `;
+}
+
+function renderChoiceItem(ex, item, i){
+  return `
+    <div class="q-card" data-idx="${i}">
+      <span class="q-num">${i+1} / 10</span>
+      <div class="q-sentence">${item.q}</div>
+      <div class="options">
+        ${item.opts.map((o,oi) => `
+          <label class="opt" data-oi="${oi}">
+            <input type="radio" name="${ex.id}-q${i}" value="${oi}" onchange="selectChoice('${ex.id}',${i},${oi})">
+            <span>${o}</span>
+          </label>
+        `).join("")}
+      </div>
+      <div class="feedback" id="${ex.id}-fb${i}"></div>
+    </div>
+  `;
+}
+function renderMistakeItem(ex, item, i){
+  const letters = ["A","B","C","D"];
+  return `
+    <div class="q-card" data-idx="${i}">
+      <span class="q-num">${i+1} / 10</span>
+      <div class="parts">
+        ${item.parts.map((p,pi) => `<span class="part" data-oi="${pi}" onclick="selectPart('${ex.id}',${i},${pi})"><span class="lbl">${letters[pi]}</span>${p}</span>`).join(" ")}
+      </div>
+      <div class="feedback" id="${ex.id}-fb${i}"></div>
+    </div>
+  `;
+}
+function renderGapItem(ex, item, i){
+  return `
+    <div class="q-card" data-idx="${i}">
+      <span class="q-num">${i+1} / 10</span>
+      <div class="q-sentence">${item.pre}<span class="verb-note">${item.verb}</span>
+        <input type="text" class="gap-input" id="${ex.id}-in${i}" placeholder="…" autocomplete="off">${item.post}
+      </div>
+      <div class="feedback" id="${ex.id}-fb${i}"></div>
+    </div>
+  `;
+}
+function renderReplaceItem(ex, item, i){
+  return `
+    <div class="q-card" data-idx="${i}">
+      <span class="q-num">${i+1} / 10</span>
+      <div class="q-sentence">${item.pre}<u>${item.word}</u>${item.post}</div>
+      <div class="options">
+        ${item.opts.map((o,oi) => `
+          <label class="opt" data-oi="${oi}">
+            <input type="radio" name="${ex.id}-q${i}" value="${oi}" onchange="selectChoice('${ex.id}',${i},${oi})">
+            <span>${o}</span>
+          </label>
+        `).join("")}
+      </div>
+      <div class="feedback" id="${ex.id}-fb${i}"></div>
+    </div>
+  `;
+}
+function renderRephraseItem(ex, item, i){
+  return `
+    <div class="q-card" data-idx="${i}">
+      <span class="q-num">${i+1} / 10</span>
+      <div class="q-sentence"><i>${item.orig}</i></div>
+      <div style="font-size:.88rem;color:var(--ink-soft);margin-bottom:6px;">${item.task}</div>
+      <input type="text" class="text-input" id="${ex.id}-in${i}" placeholder="Твой вариант…" autocomplete="off">
+      <div class="feedback" id="${ex.id}-fb${i}"></div>
+    </div>
+  `;
+}
+function renderBuilderItem(ex, item, i){
+  return `
+    <div class="q-card" data-idx="${i}">
+      <span class="q-num">${i+1} / 10</span>
+      <div class="builder-words">${item.words.map(w => `<span class="word-chip">${w}</span>`).join("")}</div>
+      <input type="text" class="text-input" id="${ex.id}-in${i}" placeholder="Собери предложение…" autocomplete="off">
+      <div class="feedback" id="${ex.id}-fb${i}"></div>
+    </div>
+  `;
+}
+
+function renderExercise(ex){
+  const sec = document.createElement("section");
+  sec.className = "view"; sec.id = "view-" + ex.id;
+  let itemsHtml = "";
+  ex.items.forEach((item,i) => {
+    if(ex.type === "choice") itemsHtml += renderChoiceItem(ex,item,i);
+    else if(ex.type === "mistake") itemsHtml += renderMistakeItem(ex,item,i);
+    else if(ex.type === "gap") itemsHtml += renderGapItem(ex,item,i);
+    else if(ex.type === "replace") itemsHtml += renderReplaceItem(ex,item,i);
+    else if(ex.type === "rephrase") itemsHtml += renderRephraseItem(ex,item,i);
+    else if(ex.type === "builder") itemsHtml += renderBuilderItem(ex,item,i);
+  });
+  sec.innerHTML = `
+    <h2 class="view-title">${ex.title}</h2>
+    <p class="view-sub">${ex.sub}</p>
+    ${toolbar(ex)}
+    ${itemsHtml}
+  `;
+  mainEl.appendChild(sec);
+}
+
+/* ============================= STATE ============================= */
+const state = {}; // state[exId] = { selections: {idx: value} }
+exercises.forEach(ex => state[ex.id] = { sel:{} });
+
+function selectChoice(exId, i, oi){
+  state[exId].sel[i] = oi;
+  const card = document.querySelector(`#view-${exId} .q-card[data-idx="${i}"]`);
+  card.querySelectorAll(".opt").forEach(o => o.classList.remove("selected"));
+  card.querySelector(`.opt[data-oi="${oi}"]`).classList.add("selected");
+}
+function selectPart(exId, i, oi){
+  state[exId].sel[i] = oi;
+  const card = document.querySelector(`#view-${exId} .q-card[data-idx="${i}"]`);
+  card.querySelectorAll(".part").forEach(p => p.classList.remove("selected"));
+  card.querySelector(`.part[data-oi="${oi}"]`).classList.add("selected");
+}
+
+/* ============================= CHECK / REVEAL / RESET ============================= */
+function getExercise(id){ return exercises.find(e => e.id === id); }
+
+function clearMarks(exId){
+  document.querySelectorAll(`#view-${exId} .opt, #view-${exId} .part`).forEach(el => {
+    el.classList.remove("correct-mark","wrong-mark");
+  });
+  document.querySelectorAll(`#view-${exId} .feedback`).forEach(el => {
+    el.classList.remove("show","ok","no");
+    el.innerHTML = "";
+  });
+}
+
+function checkExercise(exId){
+  const ex = getExercise(exId);
+  clearMarks(exId);
+  let correctCount = 0;
+
+  ex.items.forEach((item,i) => {
+    const fb = document.getElementById(`${exId}-fb${i}`);
+    let isCorrect = false;
+    let userVal = null;
+
+    if(ex.type === "choice" || ex.type === "replace"){
+      userVal = state[exId].sel[i];
+      const card = document.querySelector(`#view-${exId} .q-card[data-idx="${i}"]`);
+      const correctIdx = item.correct;
+      if(userVal !== undefined){
+        isCorrect = userVal === correctIdx;
+        card.querySelector(`.opt[data-oi="${correctIdx}"]`).classList.add("correct-mark");
+        if(!isCorrect) card.querySelector(`.opt[data-oi="${userVal}"]`).classList.add("wrong-mark");
+      } else {
+        card.querySelector(`.opt[data-oi="${correctIdx}"]`).classList.add("correct-mark");
+      }
+    } else if(ex.type === "mistake"){
+      userVal = state[exId].sel[i];
+      const card = document.querySelector(`#view-${exId} .q-card[data-idx="${i}"]`);
+      const correctIdx = item.correct;
+      if(userVal !== undefined){
+        isCorrect = userVal === correctIdx;
+        card.querySelector(`.part[data-oi="${correctIdx}"]`).classList.add("correct-mark");
+        if(!isCorrect) card.querySelector(`.part[data-oi="${userVal}"]`).classList.add("wrong-mark");
+      } else {
+        card.querySelector(`.part[data-oi="${correctIdx}"]`).classList.add("correct-mark");
+      }
+    } else if(ex.type === "gap"){
+      const input = document.getElementById(`${exId}-in${i}`);
+      userVal = input.value;
+      const accepted = [item.answer].concat(item.alt || []);
+      isCorrect = matchesAny(userVal, accepted);
+    } else { // rephrase, builder
+      const input = document.getElementById(`${exId}-in${i}`);
+      userVal = input.value;
+      isCorrect = matchesAny(userVal, item.answers);
+    }
+
+    if(isCorrect) correctCount++;
+
+    fb.classList.add("show", isCorrect ? "ok" : "no");
+    let sampleText = "";
+    if(ex.type === "choice" || ex.type === "replace") sampleText = item.opts[item.correct];
+    else if(ex.type === "mistake") sampleText = `Ошибка в части ${["A","B","C","D"][item.correct]} → ${item.fix}`;
+    else if(ex.type === "gap") sampleText = item.answer;
+    else sampleText = item.answers[0];
+
+    fb.innerHTML = `<b>${isCorrect ? "Верно." : "Не совсем."}</b>
+      ${!isCorrect ? `<span class="sample">Правильный ответ: ${sampleText}</span>` : ""}
+      <span class="why">${item.explain}</span>`;
+  });
+
+  document.getElementById(`${exId}-score`).textContent = `${correctCount} / 10`;
+}
+
+function revealExercise(exId){
+  const ex = getExercise(exId);
+  clearMarks(exId);
+
+  ex.items.forEach((item,i) => {
+    const fb = document.getElementById(`${exId}-fb${i}`);
+    const card = document.querySelector(`#view-${exId} .q-card[data-idx="${i}"]`);
+    let sampleText = "";
+
+    if(ex.type === "choice" || ex.type === "replace"){
+      card.querySelector(`.opt[data-oi="${item.correct}"]`).classList.add("correct-mark");
+      sampleText = item.opts[item.correct];
+    } else if(ex.type === "mistake"){
+      card.querySelector(`.part[data-oi="${item.correct}"]`).classList.add("correct-mark");
+      sampleText = `Ошибка в части ${["A","B","C","D"][item.correct]} → ${item.fix}`;
+    } else if(ex.type === "gap"){
+      document.getElementById(`${exId}-in${i}`).value = item.answer;
+      sampleText = item.answer;
+    } else {
+      document.getElementById(`${exId}-in${i}`).value = item.answers[0];
+      sampleText = item.answers[0];
+    }
+
+    fb.classList.add("show","ok");
+    fb.innerHTML = `<b>Ответ:</b> <span class="sample">${sampleText}</span><span class="why">${item.explain}</span>`;
+  });
+
+  document.getElementById(`${exId}-score`).textContent = `— / 10`;
+}
+
+function resetExercise(exId){
+  const ex = getExercise(exId);
+  state[exId].sel = {};
+  clearMarks(exId);
+  document.querySelectorAll(`#view-${exId} .opt, #view-${exId} .part`).forEach(el => el.classList.remove("selected"));
+  document.querySelectorAll(`#view-${exId} input[type="radio"]`).forEach(r => r.checked = false);
+  document.querySelectorAll(`#view-${exId} .gap-input, #view-${exId} .text-input`).forEach(inp => inp.value = "");
+  document.getElementById(`${exId}-score`).textContent = `0 / 10`;
+}
+
+/* ============================= VIEW SWITCH ============================= */
+function showView(id){
+  document.querySelectorAll("nav.side button").forEach(b => b.classList.toggle("active", b.dataset.view === id));
+  document.querySelectorAll("section.view").forEach(s => s.classList.toggle("active", s.id === "view-" + id));
+  window.scrollTo({top:0, behavior:"instant"});
+}
+
+/* ============================= INIT ============================= */
+renderRules();
+exercises.forEach(renderExercise);
+showView("rules");
+</script>
+</body>
+</html>
