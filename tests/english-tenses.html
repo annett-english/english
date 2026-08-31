@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Present Simple / Continuous / Perfect / Perfect Continuous / Will / Going to</title>
+<style>
+  :root{
+    --bg:#0f1420; --panel:#161d2e; --panel2:#1d2740; --accent:#6c8cff; --accent2:#8b5cf6;
+    --green:#3ddc97; --red:#ff6b6b; --text:#e8ecf7; --muted:#98a2c0; --border:#2a3455;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:'Segoe UI', Roboto, Arial, sans-serif; background:linear-gradient(160deg,#0f1420,#141a2c 60%,#161327);
+    color:var(--text); min-height:100vh; padding-bottom:60px;
+  }
+  header{
+    padding:28px 20px 18px; text-align:center; border-bottom:1px solid var(--border);
+    background:radial-gradient(circle at top, rgba(108,140,255,.15), transparent 70%);
+  }
+  header h1{margin:0 0 6px; font-size:1.5rem; background:linear-gradient(90deg,var(--accent),var(--accent2)); -webkit-background-clip:text; background-clip:text; color:transparent;}
+  header p{margin:0; color:var(--muted); font-size:.95rem;}
+  nav{
+    display:flex; flex-wrap:wrap; gap:8px; justify-content:center; padding:16px 12px; position:sticky; top:0;
+    background:rgba(15,20,32,.92); backdrop-filter:blur(6px); z-index:50; border-bottom:1px solid var(--border);
+  }
+  nav button{
+    background:var(--panel2); color:var(--text); border:1px solid var(--border); padding:9px 14px; border-radius:20px;
+    cursor:pointer; font-size:.85rem; transition:.2s;
+  }
+  nav button:hover{border-color:var(--accent);}
+  nav button.active{background:linear-gradient(90deg,var(--accent),var(--accent2)); border-color:transparent; color:#0f1420; font-weight:600;}
+  main{max-width:900px; margin:0 auto; padding:24px 16px;}
+  .section{display:none;}
+  .section.active{display:block; animation:fade .3s ease;}
+  @keyframes fade{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);}}
+  .section h2{font-size:1.25rem; margin-bottom:4px;}
+  .section .desc{color:var(--muted); margin-bottom:18px; font-size:.9rem;}
+  .card{
+    background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:16px 18px; margin-bottom:14px;
+  }
+  .card .qnum{color:var(--accent); font-weight:700; margin-right:6px;}
+  .sentence{font-size:1.02rem; margin-bottom:12px; line-height:1.5;}
+  .options{display:flex; flex-direction:column; gap:8px;}
+  .opt{
+    display:flex; align-items:center; gap:10px; background:var(--panel2); border:1px solid var(--border);
+    border-radius:10px; padding:9px 12px; cursor:pointer; font-size:.92rem; transition:.15s;
+  }
+  .opt:hover{border-color:var(--accent);}
+  .opt.selected{border-color:var(--accent); background:#22305a;}
+  .opt.correct{border-color:var(--green); background:rgba(61,220,151,.12); color:var(--green);}
+  .opt.incorrect{border-color:var(--red); background:rgba(255,107,107,.12); color:var(--red);}
+  .parts{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:10px;}
+  .part{
+    background:var(--panel2); border:1px solid var(--border); border-radius:8px; padding:7px 12px; cursor:pointer; font-size:.95rem;
+  }
+  .part.selected{border-color:var(--accent); background:#22305a;}
+  .part.correct{border-color:var(--green); color:var(--green); background:rgba(61,220,151,.12);}
+  .part.incorrect{border-color:var(--red); color:var(--red); background:rgba(255,107,107,.12);}
+  input[type=text]{
+    width:100%; padding:9px 12px; border-radius:8px; border:1px solid var(--border); background:var(--panel2);
+    color:var(--text); font-size:.95rem;
+  }
+  input[type=text]:focus{outline:none; border-color:var(--accent);}
+  .row-btns{display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;}
+  button.small{
+    background:var(--panel2); border:1px solid var(--border); color:var(--text); padding:7px 13px; border-radius:8px;
+    cursor:pointer; font-size:.82rem;
+  }
+  button.small:hover{border-color:var(--accent);}
+  button.primary{background:linear-gradient(90deg,var(--accent),var(--accent2)); border:none; color:#0f1420; font-weight:600;}
+  .feedback{margin-top:10px; padding:10px 12px; border-radius:8px; font-size:.88rem; display:none; line-height:1.5;}
+  .feedback.show{display:block;}
+  .feedback.ok{background:rgba(61,220,151,.1); border:1px solid var(--green); color:var(--green);}
+  .feedback.bad{background:rgba(255,107,107,.1); border:1px solid var(--red); color:var(--red);}
+  .feedback .explain{color:var(--text); margin-top:4px; opacity:.9;}
+  .builder-bank{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:10px; min-height:20px;}
+  .builder-answer{
+    min-height:44px; border:2px dashed var(--border); border-radius:10px; padding:8px; display:flex; flex-wrap:wrap;
+    gap:8px; margin-bottom:10px; background:var(--panel2);
+  }
+  .footer-controls{
+    display:flex; gap:10px; justify-content:center; margin:26px 0; flex-wrap:wrap;
+  }
+  .score-box{
+    text-align:center; font-size:.95rem; color:var(--muted); margin-bottom:14px; min-height:20px;
+  }
+  .text-block{
+    background:var(--panel2); border:1px solid var(--border); border-radius:12px; padding:16px; line-height:1.7; margin-bottom:16px; font-size:1rem;
+  }
+  .copy-area{
+    width:100%; min-height:220px; background:var(--panel2); color:var(--text); border:1px solid var(--border);
+    border-radius:10px; padding:12px; font-family:inherit; font-size:.88rem; line-height:1.6; white-space:pre-wrap;
+  }
+  .badge{
+    display:inline-block; font-size:.7rem; padding:2px 8px; border-radius:10px; background:var(--panel2);
+    border:1px solid var(--border); color:var(--muted); margin-left:8px;
+  }
+  .toast{
+    position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:var(--green); color:#0f1420;
+    padding:10px 18px; border-radius:20px; font-weight:600; font-size:.85rem; opacity:0; transition:.3s; pointer-events:none;
+  }
+  .toast.show{opacity:1;}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Present Simple • Continuous • Perfect • Perfect Continuous • Will • Going to</h1>
+  <p>7 блоков упражнений — проверка ответов и объяснения к каждому пункту</p>
+</header>
+
+<nav id="nav"></nav>
+
+<main id="main"></main>
+
+<div class="toast" id="toast">Скопировано!</div>
+
+<script>
+/* ========================= DATA ========================= */
+
+const ruleData = [
+ {s:"She works in a bank.", opts:[
+   "Регулярное, привычное действие (habit) — Present Simple",
+   "Действие происходит прямо сейчас",
+   "Результат действия виден сейчас — Present Perfect",
+   "Запланированная встреча в будущем"], correct:0,
+   ex:"«works» — глагол в 3-м лице ед.ч. без вспом. слов «now/at the moment» → это регулярное действие, характеристика профессии. Present Simple."},
+ {s:"Look! It's raining.", opts:[
+   "Общий факт о природе",
+   "Действие происходит прямо сейчас, в момент речи",
+   "Действие завершилось только что",
+   "Запланированное действие в будущем"], correct:1,
+   ex:"«Look!» + происходит прямо сейчас в момент речи → Present Continuous (is + Ving)."},
+ {s:"I have lost my keys.", opts:[
+   "Действие в далёком прошлом с указанием даты",
+   "Привычка",
+   "Действие в прошлом, результат которого важен сейчас (не могу открыть дверь)",
+   "Действие, длившееся какое-то время до сейчас"], correct:2,
+   ex:"Нет точного времени, важен результат в настоящем (ключи потеряны сейчас) → Present Perfect."},
+ {s:"I have been waiting for an hour.", opts:[
+   "Действие завершено и результат виден",
+   "Действие, которое началось в прошлом и продолжается до сейчас, акцент на длительности",
+   "Привычное действие",
+   "Разовое действие в момент речи"], correct:1,
+   ex:"«for an hour» — указывает на длительность процесса, который продолжается → Present Perfect Continuous."},
+ {s:"Water boils at 100°C.", opts:[
+   "Постоянный факт, научная истина",
+   "Временная ситуация",
+   "Договорённость на будущее",
+   "Действие в процессе"], correct:0,
+   ex:"Неизменный научный факт → Present Simple."},
+ {s:"We are meeting him tomorrow.", opts:[
+   "Спонтанное решение",
+   "Привычка",
+   "Заранее запланированная договорённость (в календаре) на конкретное будущее время",
+   "Предсказание без доказательств"], correct:2,
+   ex:"«tomorrow» + личная договорённость → Present Continuous для будущего (fixed arrangement)."},
+ {s:"I think it will rain later.", opts:[
+   "План с намерением",
+   "Предположение/прогноз без явных доказательств (I think)",
+   "Договорённость",
+   "Привычка"], correct:1,
+   ex:"«I think» — субъективное мнение о будущем, нет видимых доказательств → will."},
+ {s:"I am going to study medicine.", opts:[
+   "Спонтанное решение прямо сейчас",
+   "Заранее обдуманное намерение/план на будущее",
+   "Факт",
+   "Действие в прошлом"], correct:1,
+   ex:"Заранее принятое решение/план → be going to."},
+ {s:"I have just finished my homework.", opts:[
+   "Действие завершилось совсем недавно, результат актуален сейчас",
+   "Действие происходит сейчас",
+   "Действие повторяется регулярно",
+   "Действие в будущем"], correct:0,
+   ex:"«just» — типичный маркер Present Perfect для недавно завершённого действия."},
+ {s:"He is living with his parents at the moment.", opts:[
+   "Постоянная ситуация навсегда",
+   "Временная ситуация, которая происходит сейчас, но не обязательно постоянно",
+   "Привычка на всю жизнь",
+   "Будущий план"], correct:1,
+   ex:"«at the moment» + «living» (временное состояние) → Present Continuous для временных ситуаций."}
+];
+
+const chooseData = [
+ {s:"Every morning she ___ coffee.", opts:["drink","drinks","is drinking"], correct:1,
+   ex:"Регулярное действие, 3-е лицо ед.ч. → drinks (Present Simple)."},
+ {s:"Listen! Someone ___ in the garden.", opts:["sings","is singing","has sung"], correct:1,
+   ex:"«Listen!» + сейчас → is singing (Present Continuous)."},
+ {s:"I ___ such a beautiful view before.", opts:["have never seen","never see","am never seeing"], correct:0,
+   ex:"Опыт без указания точного времени + «before» → have never seen (Present Perfect)."},
+ {s:"They ___ for two hours already.", opts:["argue","are arguing","have been arguing"], correct:2,
+   ex:"«for two hours» + акцент на длительности процесса → have been arguing (Present Perfect Continuous)."},
+ {s:"The train ___ at 9 p.m. every day.", opts:["leaves","is leaving","will leave"], correct:0,
+   ex:"Расписание = фиксированный факт → leaves (Present Simple для расписаний)."},
+ {s:"Look at those clouds! It ___ rain.", opts:["will","is going to","rains"], correct:1,
+   ex:"Есть видимые доказательства (тучи) → is going to rain."},
+ {s:"I promise I ___ help you tomorrow.", opts:["will","am helping","help"], correct:0,
+   ex:"Обещание, решение в момент речи → will help."},
+ {s:"She ___ here since 2015.", opts:["works","has worked","is working"], correct:1,
+   ex:"«since 2015» — типичный маркер Present Perfect → has worked."},
+ {s:"We ___ a party next Saturday. It's all arranged.", opts:["have","are having","will have"], correct:1,
+   ex:"Уже спланированная договорённость → are having (Present Continuous для будущего)."},
+ {s:"He ___ ill for three days.", opts:["is","was","has been"], correct:2,
+   ex:"Состояние, длящееся до сейчас + «for three days» → has been (Present Perfect)."}
+];
+
+const mistakeData = [
+ {parts:["She","go","to work","every day."], wrong:1, fix:"goes",
+   ex:"3-е лицо ед.ч. в Present Simple требует окончания -s/-es: goes."},
+ {parts:["I","am knowing","the answer","already."], wrong:1, fix:"know",
+   ex:"«know» — глагол состояния (stative verb), не используется в Continuous: I know."},
+ {parts:["Look!","The dog","run","after the cat."], wrong:2, fix:"is running",
+   ex:"«Look!» указывает на действие прямо сейчас → is running (Present Continuous)."},
+ {parts:["She","has","finish","her homework already."], wrong:2, fix:"finished",
+   ex:"После has нужен Past Participle: has finished (Present Perfect)."},
+ {parts:["We","live","here","since 2012."], wrong:1, fix:"have lived",
+   ex:"«since» — маркер Present Perfect: have lived here since 2012."},
+ {parts:["I","am going","to visiting","my grandma tomorrow."], wrong:2, fix:"to visit",
+   ex:"После «going to» нужен инфинитив без -ing: going to visit."},
+ {parts:["He","will","helps","you tomorrow."], wrong:2, fix:"help",
+   ex:"После will всегда инфинитив без частицы to и без -s: will help."},
+ {parts:["They","have been","play","football for two hours."], wrong:2, fix:"playing",
+   ex:"Present Perfect Continuous: have been + Ving → have been playing."},
+ {parts:["She","is","having","two brothers and a sister."], wrong:2, fix:"has",
+   ex:"«have» в значении обладания — глагол состояния, не используется в Continuous: she has."},
+ {parts:["The film","start","at 8","tomorrow evening."], wrong:1, fix:"starts",
+   ex:"Расписание сеанса — фиксированный факт → Present Simple: starts."}
+];
+
+const fillData = [
+ {s:"Myra ___ history, but ___ maths.", hint:"hate / like", ans:["hates","likes"], multi:true,
+   ex:"Общее отношение/чувство — Present Simple: hates / likes."},
+ {s:"Ow! I ___ my finger!", hint:"cut", ans:["have cut","'ve cut","i have cut"],
+   ex:"Действие только что произошло, результат виден сейчас (кровь) → Present Perfect: have cut."},
+ {s:"I'm too tired to walk home. I think I ___ a taxi.", hint:"take", ans:["will take","'ll take"],
+   ex:"Решение, принятое в момент речи → will take."},
+ {s:"I ___ anything since breakfast.", hint:"not eat", ans:["haven't eaten","have not eaten"],
+   ex:"«since breakfast» → Present Perfect (отрицание): haven't eaten."},
+ {s:"She ___ to the birds at the moment.", hint:"listen", ans:["is listening"],
+   ex:"«at the moment» → Present Continuous: is listening."},
+ {s:"He ___ his keys. He can't find them.", hint:"lose", ans:["has lost"],
+   ex:"Результат действия важен сейчас → Present Perfect: has lost."},
+ {s:"___ you please ___ the stereo down?", hint:"turn", ans:["will you please turn","would you please turn"],
+   ex:"Вежливая просьба → Will you (please) turn..."},
+ {s:"What ___ he ___ these days?", hint:"do", ans:["is he doing","does he do"],
+   ex:"«these days» подразумевает временный период занятости → is he doing (Present Continuous)."},
+ {s:"The population of the world ___ very fast.", hint:"increase", ans:["is increasing"],
+   ex:"Изменяющаяся ситуация (процесс) → Present Continuous: is increasing."},
+ {s:"I ___ four cups of tea today.", hint:"drink", ans:["have drunk","'ve drunk"],
+   ex:"«today» — незавершённый период времени → Present Perfect: have drunk."}
+];
+
+const translateData = [
+ {ru:"Я обычно встаю в 7 утра.", en:"I usually get up at 7 a.m.", ex:"Регулярная привычка → Present Simple."},
+ {ru:"Смотри! Идёт дождь.", en:"Look! It's raining.", ex:"Происходит сейчас → Present Continuous."},
+ {ru:"Я уже сделал домашнюю работу.", en:"I have already done my homework.", ex:"Маркер «already» → Present Perfect."},
+ {ru:"Мы ждём его уже два часа.", en:"We have been waiting for him for two hours.", ex:"Длительность процесса до сейчас → Present Perfect Continuous."},
+ {ru:"Я думаю, завтра будет дождь.", en:"I think it will rain tomorrow.", ex:"Предположение о будущем → will."},
+ {ru:"Я собираюсь купить новую машину.", en:"I am going to buy a new car.", ex:"Заранее обдуманное намерение → be going to."},
+ {ru:"Поезд отправляется в 9 вечера каждый день.", en:"The train leaves at 9 p.m. every day.", ex:"Расписание → Present Simple."},
+ {ru:"Она работает здесь с 2018 года.", en:"She has worked here since 2018.", ex:"Маркер «since» → Present Perfect."},
+ {ru:"У нас встреча в субботу.", en:"We are meeting on Saturday.", ex:"Договорённость на будущее → Present Continuous."},
+ {ru:"Не волнуйся, я тебе помогу.", en:"Don't worry, I will help you.", ex:"Спонтанное решение/обещание → will."}
+];
+
+const builderData = [
+ {words:["always","late.","She","is"], correct:"She is always late.", ex:"Present Simple: наречие частотности перед смысловым глаголом/после be."},
+ {words:["never","have","I","such","seen","a","beautiful","sunset."], correct:"I have never seen a beautiful sunset.", ex:"Present Perfect: have + never + Participle."},
+ {words:["going","We","to","are","travel","next","month."], correct:"We are going to travel next month.", ex:"be going to для плана."},
+ {words:["he","Will","help","us?"], correct:"Will he help us?", ex:"Вопрос с will: Will + subject + verb?"},
+ {words:["for","has","three","lived","She","years","here."], correct:"She has lived here for three years.", ex:"Present Perfect: has + Participle + for + период."},
+ {words:["is","raining","It","now."], correct:"It is raining now.", ex:"Present Continuous для действия сейчас."},
+ {words:["usually","to","I","work","drive."], correct:"I usually drive to work.", ex:"Present Simple с наречием частотности."},
+ {words:["been","have","We","working","all","day."], correct:"We have been working all day.", ex:"Present Perfect Continuous: have been + Ving."},
+ {words:["tomorrow.","meeting","are","We","him"], correct:"We are meeting him tomorrow.", ex:"Present Continuous для запланированного будущего."},
+ {words:["will","probably","late.","be","I"], correct:"I will probably be late.", ex:"will + probably для предположения о будущем."}
+];
+
+const textPassage = "Tom is a student. He usually studies at the university library, but today he is studying at home because it's raining. He has already finished his English essay, and he has been working on his maths project for three hours. Next week he is going to take his final exams, and he thinks he will pass them easily.";
+
+const textQuestions = [
+ {tense:"Present Simple", q:"Where does Tom usually study?"},
+ {tense:"Present Continuous", q:"Why is he studying at home today?"},
+ {tense:"Present Perfect", q:"Has he finished his English essay yet?"},
+ {tense:"Present Perfect Continuous", q:"How long has he been working on his maths project?"},
+ {tense:"Going to", q:"What is he going to do next week?"},
+ {tense:"Will", q:"Does he think he will pass his exams?"},
+ {tense:"Present Simple", q:"What does Tom usually do at the university library?"},
+ {tense:"Present Continuous", q:"What is the weather like today?"}
+];
+
+/* ========================= RENDER HELPERS ========================= */
+const tabs = [
+  {id:"rule", label:"Выбери правило"},
+  {id:"choose", label:"Choose the answer"},
+  {id:"mistake", label:"Find the mistake"},
+  {id:"fill", label:"Fill in the gaps"},
+  {id:"translate", label:"Translate"},
+  {id:"builder", label:"Sentence Builder"},
+  {id:"text", label:"Текст и вопросы"}
+];
+
+const navEl = document.getElementById("nav");
+const mainEl = document.getElementById("main");
+
+tabs.forEach((t,i)=>{
+  const b = document.createElement("button");
+  b.textContent = t.label;
+  b.onclick = ()=>showTab(t.id);
+  b.id = "navbtn-"+t.id;
+  navEl.appendChild(b);
+});
+
+function showTab(id){
+  document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
+  document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
+  document.getElementById("sec-"+id).classList.add("active");
+  document.getElementById("navbtn-"+id).classList.add("active");
+}
+
+function norm(str){
+  return str.toLowerCase().trim().replace(/[.!?]/g,"").replace(/\s+/g," ").replace(/’/g,"'");
+}
+
+/* ---- Rule / Choose (same MC structure) ---- */
+function buildMC(data, secId, title, desc){
+  const sec = document.createElement("div");
+  sec.className = "section"; sec.id = "sec-"+secId;
+  sec.innerHTML = `<h2>${title}</h2><div class="desc">${desc}</div>`;
+  data.forEach((item,idx)=>{
+    const card = document.createElement("div"); card.className = "card";
+    card.innerHTML = `<div class="sentence"><span class="qnum">${idx+1}.</span>${item.s}</div>
+      <div class="options">${item.opts.map((o,j)=>`<div class="opt" data-i="${j}">${o}</div>`).join("")}</div>
+      <div class="feedback"></div>`;
+    const opts = card.querySelectorAll(".opt");
+    let answered = false;
+    opts.forEach(o=>{
+      o.onclick = ()=>{
+        if(answered) return; answered = true;
+        const chosen = parseInt(o.dataset.i);
+        opts.forEach(x=>{
+          const xi = parseInt(x.dataset.i);
+          if(xi===item.correct) x.classList.add("correct");
+          else if(xi===chosen) x.classList.add("incorrect");
+        });
+        const fb = card.querySelector(".feedback");
+        fb.classList.add("show", chosen===item.correct?"ok":"bad");
+        fb.innerHTML = (chosen===item.correct?"✅ Верно! ":"❌ Неверно. ") + `<div class="explain">${item.ex}</div>`;
+      };
+    });
+    sec.appendChild(card);
+  });
+  mainEl.appendChild(sec);
+}
+
+/* ---- Find the mistake (parts) ---- */
+function buildMistake(){
+  const sec = document.createElement("div");
+  sec.className = "section"; sec.id = "sec-mistake";
+  sec.innerHTML = `<h2>Find the mistake</h2><div class="desc">Кликни на часть предложения, где ошибка.</div>`;
+  mistakeData.forEach((item,idx)=>{
+    const card = document.createElement("div"); card.className = "card";
+    card.innerHTML = `<div class="sentence"><span class="qnum">${idx+1}.</span></div>
+      <div class="parts">${item.parts.map((p,j)=>`<span class="part" data-i="${j}">${p}</span>`).join(" ")}</div>
+      <div class="feedback"></div>`;
+    const parts = card.querySelectorAll(".part");
+    let answered = false;
+    parts.forEach(p=>{
+      p.onclick = ()=>{
+        if(answered) return; answered = true;
+        const chosen = parseInt(p.dataset.i);
+        parts.forEach(x=>{
+          const xi = parseInt(x.dataset.i);
+          if(xi===item.wrong) x.classList.add("correct");
+          else if(xi===chosen) x.classList.add("incorrect");
+        });
+        const fb = card.querySelector(".feedback");
+        fb.classList.add("show", chosen===item.wrong?"ok":"bad");
+        fb.innerHTML = (chosen===item.wrong?"✅ Верно! ":"❌ Неверно. ") +
+          `Правильно: <b>${item.fix}</b><div class="explain">${item.ex}</div>`;
+      };
+    });
+    sec.appendChild(card);
+  });
+  mainEl.appendChild(sec);
+}
+
+/* ---- Fill / Translate (text input) ---- */
+function buildInput(data, secId, title, desc, mode){
+  const sec = document.createElement("div");
+  sec.className = "section"; sec.id = "sec-"+secId;
+  sec.innerHTML = `<h2>${title}</h2><div class="desc">${desc}</div>`;
+  data.forEach((item,idx)=>{
+    const card = document.createElement("div"); card.className = "card";
+    const label = mode==="fill" ? `<span class="qnum">${idx+1}.</span>${item.s} <span class="badge">${item.hint}</span>`
+                                 : `<span class="qnum">${idx+1}.</span>${item.ru}`;
+    card.innerHTML = `<div class="sentence">${label}</div>
+      <input type="text" placeholder="Введи ответ...">
+      <div class="row-btns">
+        <button class="small primary">Проверить</button>
+        <button class="small">Показать ответ</button>
+      </div>
+      <div class="feedback"></div>`;
+    const input = card.querySelector("input");
+    const [checkBtn, showBtn] = card.querySelectorAll("button");
+    const fb = card.querySelector(".feedback");
+    checkBtn.onclick = ()=>{
+      const val = norm(input.value);
+      let ok;
+      if(mode==="fill"){
+        ok = item.ans.some(a=>norm(a)===val);
+      } else {
+        ok = norm(item.en) === val;
+      }
+      fb.classList.remove("ok","bad"); fb.classList.add("show", ok?"ok":"bad");
+      const correctText = mode==="fill" ? item.ans[0] : item.en;
+      fb.innerHTML = (ok?"✅ Верно! ":"❌ Неверно. Правильный вариант: <b>"+correctText+"</b>") +
+        `<div class="explain">${item.ex}</div>`;
+    };
+    showBtn.onclick = ()=>{
+      const correctText = mode==="fill" ? item.ans.join(" / ") : item.en;
+      fb.classList.remove("bad"); fb.classList.add("show","ok");
+      fb.innerHTML = `Ответ: <b>${correctText}</b><div class="explain">${item.ex}</div>`;
+    };
+    input.addEventListener("keydown", e=>{ if(e.key==="Enter") checkBtn.click(); });
+    sec.appendChild(card);
+  });
+  mainEl.appendChild(sec);
+}
+
+/* ---- Sentence builder ---- */
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+function buildBuilder(){
+  const sec = document.createElement("div");
+  sec.className = "section"; sec.id = "sec-builder";
+  sec.innerHTML = `<h2>Sentence Builder</h2><div class="desc">Кликай на слова в правильном порядке, чтобы собрать предложение.</div>`;
+  builderData.forEach((item,idx)=>{
+    const card = document.createElement("div"); card.className = "card";
+    card.innerHTML = `<div class="sentence"><span class="qnum">${idx+1}.</span>Собери предложение:</div>
+      <div class="builder-answer"></div>
+      <div class="builder-bank"></div>
+      <div class="row-btns">
+        <button class="small">Сброс</button>
+        <button class="small primary">Проверить</button>
+        <button class="small">Показать ответ</button>
+      </div>
+      <div class="feedback"></div>`;
+    const bank = card.querySelector(".builder-bank");
+    const answerBox = card.querySelector(".builder-answer");
+    const [resetBtn, checkBtn, showBtn] = card.querySelectorAll("button");
+    const fb = card.querySelector(".feedback");
+    let chosen = [];
+
+    function renderBank(words){
+      bank.innerHTML = "";
+      words.forEach((w,i)=>{
+        const chip = document.createElement("span");
+        chip.className = "part"; chip.textContent = w; chip.dataset.w = w;
+        chip.onclick = ()=>{
+          chosen.push(w);
+          chip.remove();
+          renderAnswer();
+        };
+        bank.appendChild(chip);
+      });
+    }
+    function renderAnswer(){
+      answerBox.innerHTML = "";
+      chosen.forEach((w,i)=>{
+        const chip = document.createElement("span");
+        chip.className = "part selected"; chip.textContent = w;
+        chip.onclick = ()=>{
+          chosen.splice(i,1);
+          renderAnswer();
+          renderBank(shuffledRemaining());
+        };
+        answerBox.appendChild(chip);
+      });
+    }
+    function shuffledRemaining(){
+      const used = {};
+      chosen.forEach(w=>{used[w]=(used[w]||0)+1;});
+      const remaining = [];
+      item.words.forEach(w=>{
+        if(used[w]>0){ used[w]--; } else { remaining.push(w); }
+      });
+      return remaining;
+    }
+
+    const shuffledWords = shuffle(item.words);
+    renderBank(shuffledWords);
+
+    resetBtn.onclick = ()=>{
+      chosen = [];
+      renderAnswer();
+      renderBank(shuffle(item.words));
+      fb.classList.remove("show","ok","bad");
+    };
+    checkBtn.onclick = ()=>{
+      const built = norm(chosen.join(" "));
+      const ok = built === norm(item.correct);
+      fb.classList.remove("ok","bad"); fb.classList.add("show", ok?"ok":"bad");
+      fb.innerHTML = (ok?"✅ Верно! ":"❌ Пока не так. Правильно: <b>"+item.correct+"</b>") +
+        `<div class="explain">${item.ex}</div>`;
+    };
+    showBtn.onclick = ()=>{
+      fb.classList.remove("bad"); fb.classList.add("show","ok");
+      fb.innerHTML = `Ответ: <b>${item.correct}</b><div class="explain">${item.ex}</div>`;
+    };
+    sec.appendChild(card);
+  });
+  mainEl.appendChild(sec);
+}
+
+/* ---- Text + questions (no right/wrong, just samples + copy) ---- */
+function buildText(){
+  const sec = document.createElement("div");
+  sec.className = "section"; sec.id = "sec-text";
+  sec.innerHTML = `<h2>Текст и вопросы</h2>
+    <div class="desc">Прочитай текст и составь вопросы, используя указанное время. Правильных/неправильных ответов нет — только примеры.</div>
+    <div class="text-block">${textPassage}</div>`;
+
+  const list = document.createElement("div");
+  textQuestions.forEach((item,idx)=>{
+    const card = document.createElement("div"); card.className = "card";
+    card.innerHTML = `<div class="sentence"><span class="qnum">${idx+1}.</span>Составь вопрос (<span class="badge">${item.tense}</span>)</div>
+      <input type="text" placeholder="Твой вариант вопроса...">
+      <div class="row-btns"><button class="small">Показать пример</button></div>
+      <div class="feedback"></div>`;
+    const showBtn = card.querySelector("button");
+    const fb = card.querySelector(".feedback");
+    showBtn.onclick = ()=>{
+      fb.classList.add("show","ok");
+      fb.innerHTML = `Пример: <b>${item.q}</b>`;
+    };
+    list.appendChild(card);
+  });
+  sec.appendChild(list);
+
+  const copyCard = document.createElement("div");
+  copyCard.className = "card";
+  copyCard.innerHTML = `<div class="sentence">Все примеры вопросов (можно скопировать одной кнопкой):</div>
+    <textarea class="copy-area" readonly>${textQuestions.map((q,i)=>`${i+1}. (${q.tense}) ${q.q}`).join("\n")}</textarea>
+    <div class="row-btns"><button class="small primary" id="copyAllBtn">📋 Скопировать все ответы</button></div>`;
+  sec.appendChild(copyCard);
+
+  mainEl.appendChild(sec);
+
+  setTimeout(()=>{
+    document.getElementById("copyAllBtn").onclick = ()=>{
+      const text = textQuestions.map((q,i)=>`${i+1}. (${q.tense}) ${q.q}`).join("\n");
+      navigator.clipboard.writeText(text).then(showToast);
+    };
+  },0);
+}
+
+function showToast(){
+  const t = document.getElementById("toast");
+  t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"), 1600);
+}
+
+/* ========================= BUILD ALL ========================= */
+buildMC(ruleData, "rule", "Выбери правило (объяснение)", "Прочитай предложение и выбери, какое правило/объяснение соответствует использованному времени.");
+buildMC(chooseData, "choose", "Choose the correct answer", "Выбери правильную форму глагола.");
+buildMistake();
+buildInput(fillData, "fill", "Fill in the gaps", "Впиши глагол в правильной форме (подсказка — в скобках).", "fill");
+buildInput(translateData, "translate", "Translate", "Переведи предложение на английский, используя нужное время.", "translate");
+buildBuilder();
+buildText();
+
+showTab("rule");
+</script>
+</body>
+</html>
