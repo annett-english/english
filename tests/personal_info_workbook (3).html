@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Personal Information — рабочая тетрадь</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#24312a;
+    --paper:#fbf7ee;
+    --paper-line:#e3dcc7;
+    --ink:#2c2a22;
+    --ink-soft:#5b5748;
+    --chalk:#f5f1e6;
+    --chalk-soft:#c9d3c8;
+    --green:#4c9a6a;
+    --green-d:#3a7d54;
+    --red:#d9614f;
+    --red-d:#b94a3a;
+    --blue:#4a7fbe;
+    --blue-d:#3a6699;
+    --yellow:#e8b84b;
+    --margin:#df8a80;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(circle at 15% 0%, #33443a 0%, transparent 55%),
+      radial-gradient(circle at 100% 100%, #1f2b24 0%, transparent 55%),
+      var(--bg);
+    color:var(--chalk);
+    font-family:'Nunito', sans-serif;
+    min-height:100vh;
+    padding:28px 16px 80px;
+  }
+  .wrap{max-width:980px;margin:0 auto;}
+
+  header.hero{text-align:center;margin-bottom:22px;}
+  .chalk-tag{
+    display:inline-block;font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--yellow);border:1px solid rgba(232,184,75,.5);padding:4px 12px;border-radius:999px;margin-bottom:14px;
+  }
+  h1{font-family:'Caveat',cursive;font-weight:700;font-size:clamp(2.2rem,6.5vw,3.4rem);margin:0 0 6px;line-height:1.05;}
+  header.hero p{color:var(--chalk-soft);font-size:1rem;max-width:560px;margin:0 auto;}
+
+  /* ---------- VOCAB REMINDER ---------- */
+  .vocab-block{
+    background:var(--paper);color:var(--ink);border-radius:var(--radius);
+    padding:20px 22px 22px;margin:26px 0 24px;box-shadow:0 10px 24px rgba(0,0,0,.25);
+  }
+  .vocab-block h2{font-family:'Caveat',cursive;font-size:1.6rem;margin:0 0 4px;}
+  .vocab-block .sub{color:var(--ink-soft);font-size:.86rem;margin:0 0 14px;}
+  .vocab-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
+  @media (max-width:640px){.vocab-grid{grid-template-columns:1fr;}}
+  .vocab-card{
+    display:flex;align-items:center;gap:10px;
+    background:#fff;border:1px solid var(--paper-line);border-radius:10px;padding:9px 12px;
+  }
+  .vocab-word{flex:1;min-width:0;}
+  .vocab-word .en{font-weight:800;font-size:1rem;color:var(--ink);}
+  .vocab-word .ipa{font-family:'Caveat',cursive;font-size:1rem;color:var(--blue-d);margin-left:6px;}
+  .vocab-word .ru{display:block;font-size:.8rem;color:var(--ink-soft);}
+  .listen-btn{
+    flex:0 0 auto;border:none;cursor:pointer;background:var(--blue);color:#fff;
+    width:36px;height:36px;border-radius:50%;font-size:1rem;display:flex;align-items:center;justify-content:center;
+    transition:transform .1s ease, filter .15s ease;
+  }
+  .listen-btn:hover{filter:brightness(1.12);}
+  .listen-btn:active{transform:scale(.92);}
+  .vocab-note{margin-top:12px;font-size:.82rem;color:var(--ink-soft);}
+
+  /* ---------- LAYOUT ---------- */
+  .layout{display:grid;grid-template-columns:1fr 250px;gap:22px;align-items:start;}
+  @media (max-width:860px){.layout{grid-template-columns:1fr;}}
+
+  .progress-wrap{
+    background:rgba(255,255,255,.06);border-radius:999px;padding:4px;display:flex;align-items:center;gap:10px;
+    margin-bottom:20px;border:1px solid rgba(255,255,255,.08);
+  }
+  .progress-track{flex:1;height:10px;background:rgba(0,0,0,.25);border-radius:999px;overflow:hidden;}
+  .progress-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--green),var(--yellow));transition:width .4s ease;}
+  .progress-label{font-size:.82rem;color:var(--chalk-soft);padding-right:10px;white-space:nowrap;}
+
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px;}
+  .tab-btn{
+    font-family:'Nunito',sans-serif;font-weight:700;font-size:.82rem;border:none;cursor:pointer;
+    padding:9px 13px;border-radius:10px 10px 0 0;background:rgba(255,255,255,.08);color:var(--chalk-soft);
+    transition:.15s ease;
+  }
+  .tab-btn:hover{background:rgba(255,255,255,.14);}
+  .tab-btn.active{background:var(--paper);color:var(--ink);}
+  .tab-btn .score-pill{margin-left:6px;font-size:.7rem;background:rgba(0,0,0,.12);padding:1px 6px;border-radius:8px;}
+
+  .panel{
+    display:none;
+    background:repeating-linear-gradient(var(--paper) 0px, var(--paper) 37px, var(--paper-line) 38px, var(--paper) 39px);
+    border-radius:0 var(--radius) var(--radius) var(--radius);
+    padding:22px 22px 22px 50px;position:relative;box-shadow:0 14px 30px rgba(0,0,0,.3);
+  }
+  .panel.active{display:block;}
+  .panel::before{content:"";position:absolute;left:30px;top:0;bottom:0;width:2px;background:var(--margin);opacity:.55;}
+  .panel-header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:6px;flex-wrap:wrap;}
+  .panel-title{font-family:'Caveat',cursive;font-weight:700;font-size:1.55rem;color:var(--ink);margin:0;}
+  .panel-instruction{color:var(--ink-soft);font-size:.88rem;margin:0 0 16px;}
+  .score-badge{font-size:.8rem;font-weight:800;color:#fff;background:var(--ink-soft);padding:5px 12px;border-radius:999px;white-space:nowrap;}
+  .score-badge.good{background:var(--green);}
+  .score-badge.bad{background:var(--red-d);}
+  .score-badge.neutral{background:var(--blue-d);}
+
+  .context-text{
+    background:#fff;border:1px solid var(--paper-line);border-radius:10px;padding:14px 16px;
+    font-size:1rem;line-height:2.1;color:var(--ink);margin-bottom:16px;
+  }
+  .context-text input.answer-line{width:100px;}
+
+  .item{display:flex;gap:12px;align-items:flex-start;padding:8px 0;}
+  .item-num{
+    flex:0 0 24px;height:24px;border-radius:50%;border:2px solid var(--ink-soft);color:var(--ink-soft);
+    font-weight:800;font-size:.75rem;display:flex;align-items:center;justify-content:center;margin-top:2px;
+  }
+  .item-body{flex:1;min-width:0;}
+  .item-prompt{color:var(--ink);font-size:.95rem;margin-bottom:6px;line-height:1.45;}
+  .item-tag{
+    display:inline-block;font-size:.66rem;font-weight:800;letter-spacing:.03em;text-transform:uppercase;
+    padding:1px 7px;border-radius:6px;color:#fff;margin-left:6px;vertical-align:middle;background:var(--ink-soft);
+  }
+  .item-tag.tag-plus{background:var(--green);}
+  .item-tag.tag-minus{background:var(--red);}
+  .item-tag.tag-q{background:var(--blue);}
+  .item-tag.tag-sa{background:var(--yellow);color:var(--ink);}
+  .audio-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+  .audio-row .listen-btn{width:34px;height:34px;font-size:.9rem;}
+
+  .answer-line{
+    width:100%;max-width:420px;font-family:'Caveat',cursive;font-size:1.25rem;color:var(--ink);
+    background:transparent;border:none;border-bottom:2px dashed #b9b195;padding:2px 4px 4px;outline:none;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .answer-line:focus{border-bottom-color:var(--yellow);}
+  .item.correct .answer-line{border-bottom-color:var(--green);background:rgba(76,154,106,.08);}
+  .item.incorrect .answer-line{border-bottom-color:var(--red);background:rgba(217,97,79,.08);}
+
+  .reveal{display:none;margin-top:4px;font-size:.82rem;color:var(--green-d);font-weight:700;}
+  .reveal.show{display:block;}
+
+  .panel-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;padding-top:14px;border-top:1px dashed #cfc7ae;}
+  .btn{font-family:'Nunito',sans-serif;font-weight:800;font-size:.84rem;padding:9px 16px;border-radius:10px;border:none;cursor:pointer;transition:transform .1s ease, filter .15s ease;}
+  .btn:active{transform:scale(.97);}
+  .btn-check{background:var(--ink);color:#fff;}
+  .btn-check:hover{filter:brightness(1.15);}
+  .btn-reveal{background:#fff;color:var(--ink);border:2px solid var(--ink-soft);}
+  .btn-reveal:hover{border-color:var(--ink);}
+  .btn-reset{background:transparent;color:var(--ink-soft);text-decoration:underline;}
+  .btn-copy{background:var(--yellow);color:var(--ink);}
+  .btn-copy:hover{filter:brightness(1.08);}
+
+  /* ---------- SIDEBAR ---------- */
+  .sidebar-card{
+    background:var(--paper);color:var(--ink);border-radius:var(--radius);padding:16px 16px 18px;
+    box-shadow:0 10px 24px rgba(0,0,0,.25);position:sticky;top:16px;
+  }
+  .sidebar-card h3{font-family:'Caveat',cursive;font-size:1.3rem;margin:0 0 4px;color:var(--red-d);}
+  .sidebar-card .sub{font-size:.76rem;color:var(--ink-soft);margin:0 0 10px;}
+  .problem-empty{font-size:.82rem;color:var(--ink-soft);font-style:italic;}
+  .problem-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;}
+  .problem-list li{
+    display:flex;justify-content:space-between;gap:8px;font-size:.82rem;
+    border-bottom:1px dashed var(--paper-line);padding-bottom:5px;
+  }
+  .problem-list .en{font-weight:800;}
+  .problem-list .ru{color:var(--ink-soft);}
+  .clear-problems{margin-top:10px;font-size:.74rem;color:var(--ink-soft);background:none;border:none;text-decoration:underline;cursor:pointer;padding:0;}
+
+  footer{text-align:center;color:var(--chalk-soft);font-size:.78rem;margin-top:34px;}
+
+  .toast{
+    position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(20px);
+    background:var(--ink);color:#fff;padding:10px 18px;border-radius:10px;font-size:.85rem;font-weight:700;
+    opacity:0;pointer-events:none;transition:.25s ease;box-shadow:0 8px 20px rgba(0,0,0,.35);z-index:50;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <span class="chalk-tag">Level A0 – A1 · Personal Information</span>
+    <h1>Name · Job · Country · Age…</h1>
+    <p>Слова о себе: имя, работа, страна, возраст, любимое, цвет, национальность. Сначала послушай и повтори, потом — 7 упражнений по 10 заданий.</p>
+  </header>
+
+  <div class="vocab-block">
+    <h2>🔊 Повторим слова</h2>
+    <p class="sub">Нажми на кнопку, чтобы услышать произношение (голос Google US English). Повтори вслух перед началом упражнений.</p>
+    <div class="vocab-grid" id="vocabGrid"></div>
+    <p class="vocab-note" id="voiceNote"></p>
+  </div>
+
+  <div class="layout">
+    <main>
+      <div class="progress-wrap">
+        <span class="progress-label" id="progressLabel">Прогресс: 0 / 50</span>
+        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      </div>
+
+      <nav class="tabs" id="tabs"></nav>
+      <div id="panels"></div>
+    </main>
+
+    <aside>
+      <div class="sidebar-card">
+        <h3>⚠️ Проблемные слова</h3>
+        <p class="sub">Слова, в которых были ошибки, появятся здесь.</p>
+        <div id="problemBox"><p class="problem-empty">Пока всё отлично — ошибок нет.</p></div>
+        <button class="clear-problems" id="clearProblems">очистить список</button>
+      </div>
+    </aside>
+  </div>
+
+  <footer>Пиши ответы своими словами — регистр букв и точки/запятые не важны. Кнопка «Скопировать ответы» собирает всё, что ты написал, в один блок текста.</footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============ VOCAB BANK ============ */
+const vocab = [
+  {key:'Name',        en:'Name',        ru:'имя',                 ipa:'/neɪm/'},
+  {key:'Surname',     en:'Surname',     ru:'фамилия',              ipa:'/ˈsɜːrneɪm/'},
+  {key:'Age',         en:'Age',         ru:'возраст',              ipa:'/eɪdʒ/'},
+  {key:'Country',     en:'Country',     ru:'страна',               ipa:'/ˈkʌntri/'},
+  {key:'Nationality', en:'Nationality', ru:'национальность',       ipa:'/ˌnæʃəˈnæləti/'},
+  {key:'Job',         en:'Job',         ru:'работа / профессия',   ipa:'/dʒɒb/'},
+  {key:'Address',     en:'Address',     ru:'адрес',                ipa:'/əˈdres/'},
+  {key:'Favourite',   en:'Favourite',   ru:'любимый',              ipa:'/ˈfeɪvərɪt/'},
+  {key:'Colour',      en:'Colour',      ru:'цвет',                 ipa:'/ˈkʌlər/'},
+  {key:'Hobby',       en:'Hobby',       ru:'хобби',                ipa:'/ˈhɒbi/'}
+];
+const vocabByKey = {};
+vocab.forEach(v=>vocabByKey[v.key]=v);
+
+/* ============ SPEECH ============ */
+let voices = [];
+function loadVoices(){
+  voices = window.speechSynthesis ? speechSynthesis.getVoices() : [];
+  const note = document.getElementById('voiceNote');
+  if(!('speechSynthesis' in window)){
+    note.textContent = 'Озвучка не поддерживается в этом браузере — попробуй Chrome.';
+    return;
+  }
+  const google = voices.find(v=>v.name==='Google US English');
+  note.textContent = google
+    ? 'Голос: Google US English ✓'
+    : 'Голос Google US English не найден, используется другой английский голос. Лучше всего работает в Chrome.';
+}
+if('speechSynthesis' in window){
+  loadVoices();
+  speechSynthesis.onvoiceschanged = loadVoices;
+}
+function speak(text){
+  if(!('speechSynthesis' in window)){
+    alert('Озвучка не поддерживается в этом браузере. Попробуй открыть страницу в Chrome.');
+    return;
+  }
+  speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  const preferred = voices.find(v=>v.name==='Google US English') || voices.find(v=>v.lang==='en-US') || voices[0];
+  if(preferred) utter.voice = preferred;
+  utter.lang = 'en-US';
+  utter.rate = 0.85;
+  speechSynthesis.speak(utter);
+}
+
+/* ============ CLIPBOARD ============ */
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(showToast._timer);
+  showToast._timer = setTimeout(()=>t.classList.remove('show'), 1800);
+}
+function copyText(text){
+  if(!text.trim()){ showToast('Сначала напиши ответы'); return; }
+  const done = ()=>showToast('Ответы скопированы ✓');
+  const fail = ()=>{
+    const ta=document.createElement('textarea');
+    ta.value=text; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.focus(); ta.select();
+    try{ document.execCommand('copy'); done(); }
+    catch(e){ showToast('Не удалось скопировать'); }
+    document.body.removeChild(ta);
+  };
+  if(navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(text).then(done).catch(fail);
+  } else {
+    fail();
+  }
+}
+
+/* ============ RENDER VOCAB GRID ============ */
+const vocabGrid = document.getElementById('vocabGrid');
+vocab.forEach(v=>{
+  const card = document.createElement('div');
+  card.className='vocab-card';
+  card.innerHTML = `
+    <button class="listen-btn" title="Слушать">🔊</button>
+    <div class="vocab-word">
+      <span class="en">${v.en}</span><span class="ipa">${v.ipa}</span>
+      <span class="ru">${v.ru}</span>
+    </div>`;
+  card.querySelector('.listen-btn').addEventListener('click', ()=>speak(v.en));
+  vocabGrid.appendChild(card);
+});
+
+/* ============ EXERCISES DATA ============ */
+const exercises = [
+  {
+    id:'ex1', accent:'green', icon:'✏️', title:'1. Вставь пропущенные буквы',
+    instruction:'Впиши слово целиком — часть букв уже дана как подсказка.',
+    type:'spelling', checkable:true,
+    items:[
+      {word:'Job',         masked:'J _ b'},
+      {word:'Colour',      masked:'C _ l _ u r'},
+      {word:'Age',         masked:'A _ e'},
+      {word:'Hobby',       masked:'H _ b b _'},
+      {word:'Name',        masked:'N _ m e'},
+      {word:'Country',     masked:'C _ u n t r _'},
+      {word:'Address',     masked:'A d d r _ s s'},
+      {word:'Favourite',   masked:'F a v _ u r i t _'},
+      {word:'Nationality', masked:'N a t i _ n a l i t y'},
+      {word:'Surname',     masked:'S u r n _ m e'}
+    ]
+  },
+  {
+    id:'ex2', accent:'blue', icon:'➖', title:'2. Отрицание (−)',
+    instruction:'Сделай предложение отрицательным. По одному примеру на каждое местоимение: I, you, he, she, we, they.',
+    type:'text', checkable:true,
+    items:[
+      {word:'Job',         prompt:'I am a teacher.', tag:'minus', label:'(I)', answers:['i am not a teacher','im not a teacher']},
+      {word:'Age',         prompt:'You are 20 years old.', tag:'minus', label:'(You)', answers:['you are not 20 years old','you arent 20 years old']},
+      {word:'Country',     prompt:'He is from Spain.', tag:'minus', label:'(He)', answers:['he is not from spain','he isnt from spain']},
+      {word:'Nationality', prompt:'She is Russian.', tag:'minus', label:'(She)', answers:['she is not russian','she isnt russian']},
+      {word:null,          prompt:'We are at home.', tag:'minus', label:'(We)', answers:['we are not at home','we arent at home']},
+      {word:'Job',         prompt:'They are students.', tag:'minus', label:'(They)', answers:['they are not students','they arent students']}
+    ]
+  },
+  {
+    id:'ex3', accent:'red', icon:'➕', title:'3. Утверждение (+)',
+    instruction:'Убери отрицание или вопрос — сделай предложение утвердительным. По одному примеру на каждое местоимение.',
+    type:'text', checkable:true,
+    items:[
+      {word:null,          prompt:'I am not busy.', tag:'plus', label:'(I)', answers:['i am busy']},
+      {word:'Country',     prompt:'You are not from France.', tag:'plus', label:'(You)', answers:['you are from france']},
+      {word:'Job',         prompt:"He isn't a doctor.", tag:'plus', label:'(He)', answers:['he is a doctor','hes a doctor']},
+      {word:'Age',         prompt:'She is not 18 years old.', tag:'plus', label:'(She)', answers:['she is 18 years old']},
+      {word:null,          prompt:'Are we late?', tag:'plus', label:'(We)', answers:['we are late']},
+      {word:'Country',     prompt:'Are they from Poland?', tag:'plus', label:'(They)', answers:['they are from poland']}
+    ]
+  },
+  {
+    id:'ex4', accent:'green', icon:'❓', title:'4. Вопрос (?)',
+    instruction:'Сделай из предложения вопрос. По одному примеру на каждое местоимение.',
+    type:'text', checkable:true,
+    items:[
+      {word:null,          prompt:'I am your friend.', tag:'q', label:'(I)', answers:['am i your friend']},
+      {word:'Job',         prompt:'You are a student.', tag:'q', label:'(You)', answers:['are you a student']},
+      {word:'Job',         prompt:'He is a teacher.', tag:'q', label:'(He)', answers:['is he a teacher']},
+      {word:'Country',     prompt:'She is from Germany.', tag:'q', label:'(She)', answers:['is she from germany']},
+      {word:null,          prompt:'We are ready.', tag:'q', label:'(We)', answers:['are we ready']},
+      {word:'Job',         prompt:'They are students.', tag:'q', label:'(They)', answers:['are they students']}
+    ]
+  },
+  {
+    id:'ex5', accent:'blue', icon:'💬', title:'5. Короткий ответ',
+    instruction:'Ответь на вопрос коротко (Yes, ... . / No, ... .), как подсказано в скобках. Ответы по очереди на I, you, he, she, we, they.',
+    type:'text', checkable:true,
+    items:[
+      {word:'Country',     prompt:'Are you from Italy?', tag:'sa', label:'(Yes) → I', answers:['yes i am']},
+      {word:null,          prompt:'Am I right?', tag:'sa', label:'(Yes) → You', answers:['yes you are']},
+      {word:'Job',         prompt:'Is he a teacher?', tag:'sa', label:'(No) → He', answers:['no he isnt','no he is not']},
+      {word:'Nationality', prompt:'Is she Russian?', tag:'sa', label:'(Yes) → She', answers:['yes she is']},
+      {word:null,          prompt:'Are we late?', tag:'sa', label:'(No) → We', answers:['no we arent','no we are not']},
+      {word:'Job',         prompt:'Are they students?', tag:'sa', label:'(Yes) → They', answers:['yes they are']}
+    ]
+  },
+  {
+    id:'ex6', accent:'red', icon:'🔄', title:'6. Смешанное повторение (+ / − / ? / короткий ответ)',
+    instruction:'Итоговое повторение: преобразуй предложение так, как указано, а там, где стоит Yes/No — напиши короткий ответ.',
+    type:'text', checkable:true,
+    items:[
+      {word:'Job',         prompt:'I am a teacher.', tag:'minus', label:'→ отрицание', answers:['i am not a teacher','im not a teacher']},
+      {word:'Country',     prompt:'She is from Spain.', tag:'q', label:'→ вопрос', answers:['is she from spain']},
+      {word:'Age',         prompt:'They are 20 years old.', tag:'minus', label:'→ отрицание', answers:['they are not 20 years old','they arent 20 years old']},
+      {word:'Job',         prompt:'He is not a doctor.', tag:'plus', label:'→ утверждение', answers:['he is a doctor','hes a doctor']},
+      {word:'Favourite',   prompt:'Is your favourite colour blue?', tag:'sa', label:'(Yes) → короткий ответ', answers:['yes it is']},
+      {word:'Nationality', prompt:'Are you Russian?', tag:'sa', label:'(No) → короткий ответ', answers:['no i am not','no im not']},
+      {word:'Hobby',       prompt:'Her hobby is reading.', tag:'q', label:'→ вопрос', answers:['is her hobby reading']},
+      {word:'Surname',     prompt:'Is his surname Smith?', tag:'sa', label:'(Yes) → короткий ответ', answers:['yes it is']},
+      {word:'Address',     prompt:'My address is in Moscow.', tag:'minus', label:'→ отрицание', answers:['my address is not in moscow','my address isnt in moscow']},
+      {word:'Job',         prompt:'Are they students?', tag:'sa', label:'(No) → короткий ответ', answers:['no they arent','no they are not']}
+    ]
+  },
+  {
+    id:'ex7', accent:'blue', icon:'🎧', title:'7. Прописать слово по звуку',
+    instruction:'Нажми на 🔊, послушай слово и напиши его буквами.',
+    type:'dictation', checkable:true,
+    items:[
+      {word:'Nationality'},
+      {word:'Address'},
+      {word:'Name'},
+      {word:'Favourite'},
+      {word:'Job'},
+      {word:'Surname'},
+      {word:'Hobby'},
+      {word:'Age'},
+      {word:'Colour'},
+      {word:'Country'}
+    ]
+  },
+  {
+    id:'ex8', accent:'green', icon:'🧩', title:'8. Составь предложения с to be',
+    instruction:'Собери из слов правильное предложение.',
+    type:'text', checkable:true,
+    items:[
+      {word:'Job',         prompt:'is / Tom / a / teacher', answers:['tom is a teacher']},
+      {word:'Country',     prompt:'Poland / from / She / is', answers:['she is from poland']},
+      {word:'Age',         prompt:'years / am / I / 20 / old', answers:['i am 20 years old']},
+      {word:'Favourite',   prompt:'blue / favourite / My / colour / is', answers:['my favourite colour is blue','my favorite color is blue']},
+      {word:'Nationality', prompt:'Russian / are / We', answers:['we are russian']},
+      {word:'Surname',     prompt:'Smith / surname / His / is', answers:['his surname is smith']},
+      {word:'Address',     prompt:'address / my / This / is', answers:['this is my address']},
+      {word:'Hobby',       prompt:'drawing / hobby / My / is', answers:['my hobby is drawing']},
+      {word:'Job',         prompt:'a / Are / student / you', answers:['are you a student']},
+      {word:'Name',        prompt:'not / His / name / Tom / is', answers:['his name is not tom','his name isnt tom']}
+    ]
+  },
+  {
+    id:'ex9', accent:'blue', icon:'🌍', title:'9. Translate',
+    instruction:'Переведи предложения с русского на английский.',
+    type:'text', checkable:true,
+    items:[
+      {word:'Name',        prompt:'Меня зовут Анна.', answers:['my name is anna']},
+      {word:'Age',         prompt:'Мне 25 лет.', answers:['i am 25 years old','im 25 years old']},
+      {word:'Country',     prompt:'Я из России.', answers:['i am from russia','im from russia']},
+      {word:'Job',         prompt:'Он врач.', answers:['he is a doctor','hes a doctor']},
+      {word:'Favourite',   prompt:'Её любимый цвет — синий.', answers:['her favourite colour is blue','her favorite color is blue']},
+      {word:'Nationality', prompt:'Мы русские.', answers:['we are russian']},
+      {word:'Surname',     prompt:'Его фамилия Смит.', answers:['his surname is smith']},
+      {word:'Address',     prompt:'Это мой адрес.', answers:['this is my address']},
+      {word:'Hobby',       prompt:'Моё хобби — рисование.', answers:['my hobby is drawing']},
+      {word:'Age',         prompt:'Сколько тебе лет?', answers:['how old are you']}
+    ]
+  },
+  {
+    id:'ex10', accent:'red', icon:'📖', title:'10. Контекст',
+    instruction:'Прочитай текст и впиши пропущенные слова из списка выше.',
+    type:'context', checkable:true,
+    contextParts:[
+      'Hi! My ', {blank:0}, ' is Anna. My ', {blank:1}, ' is Petrova. I am 22 years ', {blank:2},
+      '. I am from ', {blank:3}, ': Russia. My ', {blank:4}, ' is Russian. I am a teacher — that is my ',
+      {blank:5}, '. My ', {blank:6}, ' is 5 Lenin Street, Moscow. My favourite ', {blank:7},
+      ' is green. My ', {blank:8}, ' is reading books. ', {blank:9}, ' you a student too?'
+    ],
+    items:[
+      {word:'Name',        answers:['name']},
+      {word:'Surname',     answers:['surname']},
+      {word:'Age',         answers:['old']},
+      {word:'Country',     answers:['russia']},
+      {word:'Nationality', answers:['nationality']},
+      {word:'Job',         answers:['job']},
+      {word:'Address',     answers:['address']},
+      {word:'Colour',      answers:['colour','color']},
+      {word:'Hobby',       answers:['hobby']},
+      {word:'Job',         answers:['are']}
+    ]
+  },
+  {
+    id:'ex11', accent:'green', icon:'💭', title:'11. Закончи предложения',
+    instruction:'Закончи предложения своими идеями о себе. Правильных/неправильных ответов нет — просто напиши правду о себе, а затем скопируй все ответы одной кнопкой.',
+    type:'open', checkable:false,
+    items:[
+      {prompt:'My name is ___.'},
+      {prompt:'I am ___ years old.'},
+      {prompt:'I am from ___.'},
+      {prompt:'My nationality is ___.'},
+      {prompt:'I am a / an ___. (job)'},
+      {prompt:'My address is ___.'},
+      {prompt:'My favourite colour is ___.'},
+      {prompt:'My favourite food is ___.'},
+      {prompt:'My hobby is ___.'},
+      {prompt:'My favourite country is ___.'}
+    ]
+  },
+  {
+    id:'ex12', accent:'blue', icon:'✍️', title:'12. Напиши своё предложение',
+    instruction:'Напиши собственное предложение на каждую тему, используя to be. Затем скопируй все ответы одной кнопкой.',
+    type:'open', checkable:false,
+    items:[
+      {prompt:'Напиши предложение о своём имени.'},
+      {prompt:'Напиши предложение о своём возрасте.'},
+      {prompt:'Напиши предложение о своей стране.'},
+      {prompt:'Напиши предложение о своей национальности.'},
+      {prompt:'Напиши предложение о своей работе/учёбе.'},
+      {prompt:'Напиши предложение о своём адресе.'},
+      {prompt:'Напиши предложение о своём любимом цвете.'},
+      {prompt:'Напиши предложение о своём хобби.'},
+      {prompt:'Напиши вопрос, который начинается с Are…'},
+      {prompt:'Напиши отрицательное предложение с to be о себе.'}
+    ]
+  }
+];
+
+/* ============ HELPERS ============ */
+function norm(s){
+  return s.toLowerCase()
+    .replace(/’/g,"'")
+    .replace(/[^a-z0-9' ]/g,'')
+    .replace(/'/g,'')
+    .replace(/\s+/g,' ')
+    .trim();
+}
+
+/* ============ PROBLEM WORDS TRACKER ============ */
+const problemWords = new Set();
+function updateProblemBox(){
+  const box = document.getElementById('problemBox');
+  if(problemWords.size===0){
+    box.innerHTML = '<p class="problem-empty">Пока всё отлично — ошибок нет.</p>';
+    return;
+  }
+  const ul = document.createElement('ul');
+  ul.className='problem-list';
+  Array.from(problemWords).sort().forEach(key=>{
+    const v = vocabByKey[key];
+    if(!v) return;
+    const li = document.createElement('li');
+    li.innerHTML = `<span class="en">${v.en}</span><span class="ru">${v.ru}</span>`;
+    ul.appendChild(li);
+  });
+  box.innerHTML='';
+  box.appendChild(ul);
+}
+document.getElementById('clearProblems').addEventListener('click', ()=>{
+  problemWords.clear();
+  updateProblemBox();
+});
+
+/* ============ RENDER EXERCISES ============ */
+const tabsEl = document.getElementById('tabs');
+const panelsEl = document.getElementById('panels');
+const scores = {};
+const totals = {};
+
+exercises.forEach((ex,idx)=>{
+  scores[ex.id] = null;
+  totals[ex.id] = ex.items.length;
+
+  const tab = document.createElement('button');
+  tab.className='tab-btn'+(idx===0?' active':'');
+  tab.dataset.target = ex.id;
+  tab.innerHTML = `<span class="dot" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--${ex.accent});margin-right:6px;vertical-align:middle;"></span>${ex.icon} ${ex.title.replace(/^\d+\.\s*/,'')}<span class="score-pill" id="pill-${ex.id}"></span>`;
+  tab.addEventListener('click', ()=>switchTab(ex.id));
+  tabsEl.appendChild(tab);
+
+  const panel = document.createElement('section');
+  panel.className='panel'+(idx===0?' active':'');
+  panel.id='panel-'+ex.id;
+
+  const header = document.createElement('div');
+  header.className='panel-header';
+  const badgeText = ex.checkable ? `— / ${ex.items.length}` : `0 / ${ex.items.length} заполнено`;
+  header.innerHTML = `<h2 class="panel-title">${ex.title}</h2><span class="score-badge${ex.checkable?'':' neutral'}" id="score-${ex.id}">${badgeText}</span>`;
+  panel.appendChild(header);
+
+  const instr = document.createElement('p');
+  instr.className='panel-instruction';
+  instr.textContent = ex.instruction;
+  panel.appendChild(instr);
+
+  if(ex.type==='context'){
+    const ctx = document.createElement('div');
+    ctx.className='context-text';
+    ex.contextParts.forEach(part=>{
+      if(typeof part==='string'){
+        ctx.appendChild(document.createTextNode(part));
+      } else {
+        const input = document.createElement('input');
+        input.type='text';
+        input.className='answer-line';
+        input.dataset.blankIndex = part.blank;
+        input.style.display='inline-block';
+        input.style.width='110px';
+        input.addEventListener('input', ()=>input.parentElement.classList && null);
+        ctx.appendChild(input);
+      }
+    });
+    panel.appendChild(ctx);
+  } else {
+    ex.items.forEach((item,i)=>{
+      const row = document.createElement('div');
+      row.className='item';
+      row.dataset.index = i;
+
+      const num = document.createElement('div');
+      num.className='item-num';
+      num.textContent = i+1;
+      row.appendChild(num);
+
+      const body = document.createElement('div');
+      body.className='item-body';
+
+      if(ex.type==='spelling'){
+        const p = document.createElement('div');
+        p.className='item-prompt';
+        p.innerHTML = `<span style="font-family:'Caveat',cursive;font-size:1.4rem;letter-spacing:2px;">${item.masked}</span>`;
+        body.appendChild(p);
+        const input = document.createElement('input');
+        input.type='text'; input.className='answer-line'; input.placeholder='Напиши слово...';
+        input.addEventListener('input', ()=>row.classList.remove('correct','incorrect'));
+        body.appendChild(input);
+      } else if(ex.type==='dictation'){
+        const audioRow = document.createElement('div');
+        audioRow.className='audio-row';
+        const btn = document.createElement('button');
+        btn.className='listen-btn'; btn.type='button'; btn.title='Слушать'; btn.textContent='🔊';
+        btn.addEventListener('click', ()=>speak(item.word));
+        audioRow.appendChild(btn);
+        const label = document.createElement('span');
+        label.style.color='var(--ink-soft)'; label.style.fontSize='.82rem';
+        label.textContent='Послушай и напиши слово';
+        audioRow.appendChild(label);
+        body.appendChild(audioRow);
+        const input = document.createElement('input');
+        input.type='text'; input.className='answer-line'; input.placeholder='Напиши слово...';
+        input.addEventListener('input', ()=>row.classList.remove('correct','incorrect'));
+        body.appendChild(input);
+      } else if(ex.type==='text'){
+        const p = document.createElement('div');
+        p.className='item-prompt';
+        const tagLabels = {plus:'+', minus:'-', q:'?', sa:'ответ'};
+        p.innerHTML = item.prompt
+          + (item.tag ? `<span class="item-tag tag-${item.tag}">${tagLabels[item.tag]}</span>` : '')
+          + (item.label ? ` <em style="color:var(--ink-soft);font-style:italic;">${item.label}</em>` : '');
+        body.appendChild(p);
+        const input = document.createElement('input');
+        input.type='text'; input.className='answer-line'; input.placeholder='Напиши ответ...';
+        input.addEventListener('input', ()=>row.classList.remove('correct','incorrect'));
+        input.addEventListener('keydown', e=>{
+          if(e.key==='Enter'){
+            e.preventDefault();
+            const inputs = Array.from(panel.querySelectorAll('.answer-line'));
+            const pos = inputs.indexOf(input);
+            if(pos>=0 && pos<inputs.length-1) inputs[pos+1].focus();
+          }
+        });
+        body.appendChild(input);
+      } else if(ex.type==='open'){
+        const p = document.createElement('div');
+        p.className='item-prompt';
+        p.textContent = item.prompt;
+        body.appendChild(p);
+        const input = document.createElement('input');
+        input.type='text'; input.className='answer-line'; input.placeholder='Твой ответ...';
+        body.appendChild(input);
+      }
+
+      if(ex.checkable){
+        const reveal = document.createElement('div');
+        reveal.className='reveal';
+        const answerText = ex.type==='spelling' ? item.word : (item.answers ? item.answers.join(' / ') : '');
+        reveal.textContent = 'Ответ: ' + answerText;
+        body.appendChild(reveal);
+      }
+
+      row.appendChild(body);
+      panel.appendChild(row);
+    });
+  }
+
+  const actions = document.createElement('div');
+  actions.className='panel-actions';
+  if(ex.checkable){
+    actions.innerHTML = `
+      <button class="btn btn-check" style="background:var(--${ex.accent})">Проверить</button>
+      <button class="btn btn-reveal">Показать ответы</button>
+      <button class="btn btn-reset">Очистить</button>`;
+    panel.appendChild(actions);
+    actions.querySelector('.btn-check').addEventListener('click', ()=>checkExercise(ex));
+    actions.querySelector('.btn-reveal').addEventListener('click', ()=>toggleReveal(ex));
+    actions.querySelector('.btn-reset').addEventListener('click', ()=>resetExercise(ex));
+  } else {
+    actions.innerHTML = `
+      <button class="btn btn-copy">📋 Скопировать все ответы</button>
+      <button class="btn btn-reset">Очистить</button>`;
+    panel.appendChild(actions);
+    actions.querySelector('.btn-copy').addEventListener('click', ()=>copyOpenExercise(ex));
+    actions.querySelector('.btn-reset').addEventListener('click', ()=>resetExercise(ex));
+  }
+
+  panelsEl.appendChild(panel);
+});
+
+function switchTab(id){
+  document.querySelectorAll('.tab-btn').forEach(t=>t.classList.toggle('active', t.dataset.target===id));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active', p.id==='panel-'+id));
+}
+
+function checkExercise(ex){
+  const panel = document.getElementById('panel-'+ex.id);
+  let correctCount = 0;
+
+  if(ex.type==='context'){
+    const inputs = panel.querySelectorAll('.answer-line');
+    inputs.forEach(input=>{
+      const idx = parseInt(input.dataset.blankIndex,10);
+      const item = ex.items[idx];
+      const val = norm(input.value);
+      const isCorrect = val.length>0 && item.answers.some(a=>norm(a)===val);
+      input.parentElement.style.color = '';
+      input.style.borderBottomColor = isCorrect ? 'var(--green)' : 'var(--red)';
+      input.style.background = isCorrect ? 'rgba(76,154,106,.08)' : 'rgba(217,97,79,.08)';
+      if(isCorrect) correctCount++;
+      trackProblemWord(item.word, !isCorrect);
+    });
+  } else {
+    const rows = panel.querySelectorAll('.item');
+    rows.forEach((row,i)=>{
+      const item = ex.items[i];
+      const input = row.querySelector('.answer-line');
+      const val = norm(input.value);
+      let answers = item.answers ? item.answers : [item.word];
+      const isCorrect = val.length>0 && answers.some(a=>norm(a)===val);
+      row.classList.toggle('correct', isCorrect);
+      row.classList.toggle('incorrect', !isCorrect);
+      if(isCorrect) correctCount++;
+      trackProblemWord(item.word, !isCorrect);
+    });
+  }
+
+  scores[ex.id] = correctCount;
+  updateScoreBadge(ex, correctCount);
+  updateProgress();
+  updateProblemBox();
+}
+
+function trackProblemWord(word, isWrong){
+  if(!word) return;
+  if(isWrong) problemWords.add(word);
+  else problemWords.delete(word);
+}
+
+function updateScoreBadge(ex, count){
+  const badge = document.getElementById('score-'+ex.id);
+  const total = ex.items.length;
+  badge.textContent = count + ' / ' + total;
+  badge.classList.remove('good','bad');
+  badge.classList.add(count===total ? 'good' : 'bad');
+  document.getElementById('pill-'+ex.id).textContent = count+'/'+total;
+}
+
+function toggleReveal(ex){
+  const panel = document.getElementById('panel-'+ex.id);
+  const reveals = panel.querySelectorAll('.reveal');
+  const anyHidden = Array.from(reveals).some(r=>!r.classList.contains('show'));
+  reveals.forEach(r=>r.classList.toggle('show', anyHidden));
+  panel.querySelector('.btn-reveal').textContent = anyHidden ? 'Скрыть ответы' : 'Показать ответы';
+}
+
+function resetExercise(ex){
+  const panel = document.getElementById('panel-'+ex.id);
+  panel.querySelectorAll('.answer-line').forEach(i=>{
+    i.value='';
+    i.style.borderBottomColor='';
+    i.style.background='';
+  });
+  panel.querySelectorAll('.item').forEach(r=>r.classList.remove('correct','incorrect'));
+  panel.querySelectorAll('.reveal').forEach(r=>r.classList.remove('show'));
+  const revealBtn = panel.querySelector('.btn-reveal');
+  if(revealBtn) revealBtn.textContent = 'Показать ответы';
+  const badge = document.getElementById('score-'+ex.id);
+  if(ex.checkable){
+    badge.textContent = '— / ' + ex.items.length;
+    badge.classList.remove('good','bad');
+    document.getElementById('pill-'+ex.id).textContent='';
+    scores[ex.id] = null;
+  } else {
+    badge.textContent = '0 / ' + ex.items.length + ' заполнено';
+  }
+  updateProgress();
+}
+
+function copyOpenExercise(ex){
+  const panel = document.getElementById('panel-'+ex.id);
+  const rows = panel.querySelectorAll('.item');
+  let lines = [ex.title.replace(/^\d+\.\s*/,'')];
+  let filled = 0;
+  rows.forEach((row,i)=>{
+    const prompt = ex.items[i].prompt;
+    const input = row.querySelector('.answer-line');
+    const val = input.value.trim();
+    if(val) filled++;
+    lines.push((i+1)+'. '+prompt+'  ->  '+(val || '…'));
+  });
+  const badge = document.getElementById('score-'+ex.id);
+  badge.textContent = filled + ' / ' + ex.items.length + ' заполнено';
+  copyText(lines.join('\n'));
+}
+
+function updateProgress(){
+  const checkableExercises = exercises.filter(e=>e.checkable);
+  const total = checkableExercises.reduce((s,e)=>s+e.items.length,0);
+  const done = checkableExercises.reduce((s,e)=>s+(scores[e.id]||0),0);
+  document.getElementById('progressLabel').textContent = `Прогресс: ${done} / ${total}`;
+  document.getElementById('progressFill').style.width = (total? done/total*100 : 0)+'%';
+}
+updateProgress();
+</script>
+</body>
+</html>
