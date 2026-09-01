@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Feelings & States — практика A0-A1</title>
+<style>
+  :root{
+    --ink:#1f2a37;
+    --paper:#f6f8fb;
+    --panel:#ffffff;
+    --line:#dbe3ee;
+    --teal:#1f7a6c;
+    --teal-dark:#155a50;
+    --amber:#c9822a;
+    --amber-bg:#fbeedd;
+    --ok:#2f8f4e;
+    --ok-bg:#e7f6ec;
+    --bad:#c0453b;
+    --bad-bg:#fbe9e7;
+    --chip:#eef3f8;
+    font-size:16px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:"Segoe UI", Verdana, Arial, sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+    line-height:1.5;
+  }
+  header{
+    background:var(--teal);
+    color:#fff;
+    padding:22px 24px 26px;
+  }
+  header h1{
+    margin:0 0 6px;
+    font-size:1.5rem;
+    font-weight:700;
+    letter-spacing:.2px;
+  }
+  header p{
+    margin:0;
+    max-width:760px;
+    color:#dff2ee;
+    font-size:.95rem;
+  }
+  .audio-check{
+    margin-top:14px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .audio-check select{
+    padding:6px 8px;
+    border-radius:6px;
+    border:1px solid var(--line);
+    font-size:.85rem;
+  }
+  #audioStatus{
+    font-size:.85rem;
+    color:#dff2ee;
+  }
+  .layout{
+    display:grid;
+    grid-template-columns:1fr 260px;
+    gap:22px;
+    max-width:1180px;
+    margin:0 auto;
+    padding:22px 20px 60px;
+    align-items:start;
+  }
+  @media (max-width: 880px){
+    .layout{grid-template-columns:1fr;}
+    aside{position:static !important;}
+  }
+  main section{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:20px 22px;
+    margin-bottom:22px;
+  }
+  main h2{
+    margin-top:0;
+    font-size:1.15rem;
+    color:var(--teal-dark);
+    border-bottom:2px solid var(--chip);
+    padding-bottom:8px;
+  }
+  .instr{
+    font-size:.9rem;
+    color:#51606f;
+    margin-bottom:14px;
+  }
+  table.words{
+    width:100%;
+    border-collapse:collapse;
+    font-size:.95rem;
+  }
+  table.words th, table.words td{
+    text-align:left;
+    padding:8px 10px;
+    border-bottom:1px solid var(--line);
+  }
+  table.words th{
+    color:var(--teal-dark);
+    font-size:.82rem;
+    text-transform:uppercase;
+    letter-spacing:.4px;
+  }
+  .ipa{
+    color:#6b7a89;
+    font-style:italic;
+  }
+  .playBtn{
+    border:none;
+    background:var(--chip);
+    color:var(--teal-dark);
+    padding:6px 10px;
+    border-radius:6px;
+    cursor:pointer;
+    font-size:.9rem;
+  }
+  .playBtn:hover{background:#dfeae8;}
+  .collo-box{
+    margin-top:16px;
+    background:var(--amber-bg);
+    border:1px solid #eccb9c;
+    border-radius:8px;
+    padding:12px 16px;
+    font-size:.92rem;
+  }
+  .collo-box b{color:var(--amber);}
+  .item-row{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:8px;
+    padding:9px 0;
+    border-bottom:1px dashed var(--line);
+  }
+  .item-row:last-child{border-bottom:none;}
+  .item-num{
+    color:#8b98a6;
+    font-size:.85rem;
+    min-width:20px;
+  }
+  .item-prompt{flex:1 1 320px;font-size:.96rem;}
+  .item-prompt .ru{color:#51606f;}
+  input.ans{
+    padding:7px 9px;
+    border:1px solid var(--line);
+    border-radius:6px;
+    font-size:.95rem;
+    width:190px;
+    max-width:100%;
+  }
+  input.ans.correct{border-color:var(--ok);background:var(--ok-bg);}
+  input.ans.wrong{border-color:var(--bad);background:var(--bad-bg);}
+  .answer-reveal{
+    font-size:.85rem;
+    color:var(--teal-dark);
+    background:var(--chip);
+    padding:4px 8px;
+    border-radius:6px;
+    display:none;
+  }
+  .answer-reveal.show{display:inline-block;}
+  .small-play{
+    border:none;
+    background:none;
+    color:var(--teal-dark);
+    cursor:pointer;
+    font-size:1.05rem;
+  }
+  .controls{
+    margin-top:14px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  button.act{
+    border:none;
+    padding:9px 16px;
+    border-radius:7px;
+    font-size:.9rem;
+    cursor:pointer;
+    font-weight:600;
+  }
+  button.check{background:var(--teal);color:#fff;}
+  button.check:hover{background:var(--teal-dark);}
+  button.show{background:var(--chip);color:var(--teal-dark);}
+  button.show:hover{background:#dfeae8;}
+  button.copy{background:var(--amber);color:#fff;}
+  button.copy:hover{background:#a96a1e;}
+  .score{
+    font-size:.9rem;
+    font-weight:600;
+    color:var(--teal-dark);
+  }
+  .dialogue{
+    background:var(--chip);
+    border-radius:8px;
+    padding:14px 16px;
+    margin-bottom:14px;
+    font-size:.96rem;
+  }
+  .dialogue .line{margin:4px 0;}
+  .dialogue input.ans{width:130px;}
+  .own-item{
+    margin-bottom:14px;
+  }
+  .own-item label{
+    display:block;
+    font-weight:600;
+    margin-bottom:4px;
+    font-size:.92rem;
+  }
+  textarea.own{
+    width:100%;
+    min-height:48px;
+    padding:8px 10px;
+    border:1px solid var(--line);
+    border-radius:6px;
+    font-family:inherit;
+    font-size:.95rem;
+    resize:vertical;
+  }
+  aside{
+    position:sticky;
+    top:16px;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:16px 16px 18px;
+  }
+  aside h3{
+    margin:0 0 8px;
+    font-size:1rem;
+    color:var(--bad);
+  }
+  aside p.hint{
+    font-size:.8rem;
+    color:#7a8794;
+    margin:0 0 10px;
+  }
+  table.problem{
+    width:100%;
+    border-collapse:collapse;
+    font-size:.85rem;
+  }
+  table.problem th, table.problem td{
+    text-align:left;
+    padding:5px 4px;
+    border-bottom:1px solid var(--line);
+  }
+  table.problem td.count{
+    text-align:center;
+    font-weight:700;
+    color:var(--bad);
+  }
+  #noProblems{
+    font-size:.85rem;
+    color:#8b98a6;
+  }
+  button.resetProblems{
+    margin-top:10px;
+    background:none;
+    border:1px solid var(--line);
+    padding:5px 10px;
+    border-radius:6px;
+    font-size:.78rem;
+    color:#7a8794;
+    cursor:pointer;
+  }
+  .copied-msg{
+    font-size:.82rem;
+    color:var(--ok);
+    margin-left:6px;
+    display:none;
+  }
+  .word-bank{
+    font-size:.85rem;
+    color:#51606f;
+    background:var(--chip);
+    padding:8px 12px;
+    border-radius:6px;
+    margin-bottom:12px;
+  }
+  footer{
+    text-align:center;
+    font-size:.8rem;
+    color:#8b98a6;
+    padding:10px 0 30px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Feelings & States — расслабленный, уставший, голодный...</h1>
+  <p>8 слов о состояниях и настроении + 5 устойчивых сочетаний. Сначала прослушай и повтори слова, затем пройди 9 заданий. Уровень A0-A1.</p>
+  <div class="audio-check">
+    <button class="playBtn" id="testAudioBtn">🔊 Проверить звук</button>
+    <span id="audioStatus">проверка голоса...</span>
+    <label for="voiceSelect" style="color:#dff2ee;font-size:.85rem;">Голос:</label>
+    <select id="voiceSelect"></select>
+  </div>
+</header>
+
+<div class="layout">
+  <main>
+
+    <!-- WORD REMINDER -->
+    <section>
+      <h2>Слова для повторения</h2>
+      <p class="instr">Нажми 🔊, чтобы прослушать слово (голос Google US English). Повтори вслух каждое слово 2 раза.</p>
+      <table class="words" id="wordTable">
+        <thead>
+          <tr><th>Слово</th><th>Транскрипция</th><th>Перевод</th><th>Звук</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <div class="collo-box">
+        <b>Сочетания слов (collocations):</b>
+        bored <b>with</b> sth · angry <b>with</b> sb · angry <b>about</b> sth · relaxed <b>after</b> sth · tired <b>after</b> sth
+        <br><span style="font-size:.85rem;color:#8a5a1a;">sth = something (что-то), sb = somebody (кто-то)</span>
+      </div>
+    </section>
+
+    <!-- EX 1: missing letters -->
+    <section id="ex1">
+      <h2>Упражнение 1. Вставь пропущенные буквы</h2>
+      <p class="instr">Впиши слово целиком (буквы вместо пропусков).</p>
+      <div class="items" id="ex1-items"></div>
+      <div class="controls">
+        <button class="act check" onclick="checkExercise('ex1')">Проверить</button>
+        <button class="act show" onclick="showAnswers('ex1')">Показать ответы</button>
+        <span class="score" id="ex1-score"></span>
+      </div>
+    </section>
+
+    <!-- EX 2: translation -->
+    <section id="ex2">
+      <h2>Упражнение 2. Переведи на английский</h2>
+      <p class="instr">Напиши перевод слова или фразы полностью на английском.</p>
+      <div class="items" id="ex2-items"></div>
+      <div class="controls">
+        <button class="act check" onclick="checkExercise('ex2')">Проверить</button>
+        <button class="act show" onclick="showAnswers('ex2')">Показать ответы</button>
+        <span class="score" id="ex2-score"></span>
+      </div>
+    </section>
+
+    <!-- EX 3: dictation -->
+    <section id="ex3">
+      <h2>Упражнение 3. Напиши слово на слух</h2>
+      <p class="instr">Нажми 🔊, прослушай слово или фразу, и напиши то, что услышал(а).</p>
+      <div class="items" id="ex3-items"></div>
+      <div class="controls">
+        <button class="act check" onclick="checkExercise('ex3')">Проверить</button>
+        <button class="act show" onclick="showAnswers('ex3')">Показать ответы</button>
+        <span class="score" id="ex3-score"></span>
+      </div>
+    </section>
+
+    <!-- EX 4: definitions -->
+    <section id="ex4">
+      <h2>Упражнение 4. Угадай слово по определению</h2>
+      <p class="instr">Прочитай определение на английском и напиши нужное слово.</p>
+      <div class="items" id="ex4-items"></div>
+      <div class="controls">
+        <button class="act check" onclick="checkExercise('ex4')">Проверить</button>
+        <button class="act show" onclick="showAnswers('ex4')">Показать ответы</button>
+        <span class="score" id="ex4-score"></span>
+      </div>
+    </section>
+
+    <!-- EX 5: collocations -->
+    <section id="ex5">
+      <h2>Упражнение 5. Сочетаемость слов</h2>
+      <p class="instr">Впиши нужный предлог: with / about / after.</p>
+      <div class="items" id="ex5-items"></div>
+      <div class="controls">
+        <button class="act check" onclick="checkExercise('ex5')">Проверить</button>
+        <button class="act show" onclick="showAnswers('ex5')">Показать ответы</button>
+        <span class="score" id="ex5-score"></span>
+      </div>
+    </section>
+
+    <!-- EX 6: transform -->
+    <section id="ex6">
+      <h2>Упражнение 6. Вопросы, отрицания, краткие ответы</h2>
+      <p class="instr">Преобрази предложение так, как указано в задании.</p>
+      <div class="items" id="ex6-items"></div>
+      <div class="controls">
+        <button class="act check" onclick="checkExercise('ex6')">Проверить</button>
+        <button class="act show" onclick="showAnswers('ex6')">Показать ответы</button>
+        <span class="score" id="ex6-score"></span>
+      </div>
+    </section>
+
+    <!-- EX 7: pictures -->
+    <section id="ex7">
+      <h2>Упражнение 7. По картинке</h2>
+      <p class="instr">Посмотри на смайлик-подсказку и напиши нужное слово.</p>
+      <div class="items" id="ex7-items"></div>
+      <div class="controls">
+        <button class="act check" onclick="checkExercise('ex7')">Проверить</button>
+        <button class="act show" onclick="showAnswers('ex7')">Показать ответы</button>
+        <span class="score" id="ex7-score"></span>
+      </div>
+    </section>
+
+    <!-- EX 8: dialogues -->
+    <section id="ex8">
+      <h2>Упражнение 8. Закончи диалог</h2>
+      <p class="instr">Впиши пропущенные слова в диалогах.</p>
+      <div class="word-bank">Слова-подсказки: relaxed, tired, hungry, bored, angry, all right, thirsty, ill</div>
+      <div id="ex8-items"></div>
+      <div class="controls">
+        <button class="act check" onclick="checkExercise('ex8')">Проверить</button>
+        <button class="act show" onclick="showAnswers('ex8')">Показать ответы</button>
+        <button class="act copy" onclick="copyDialogues()">📋 Скопировать диалоги с ответами</button>
+        <span class="copied-msg" id="ex8-copied">Скопировано!</span>
+        <span class="score" id="ex8-score"></span>
+      </div>
+    </section>
+
+    <!-- EX 9: own sentences -->
+    <section id="ex9">
+      <h2>Упражнение 9. Напиши своё предложение</h2>
+      <p class="instr">Составь одно своё предложение с каждым словом.</p>
+      <div id="ex9-items"></div>
+      <div class="controls">
+        <button class="act show" onclick="checkOwnSentences()">Проверить, есть ли слово в предложении</button>
+        <button class="act copy" onclick="copyOwnSentences()">📋 Скопировать все предложения</button>
+        <span class="copied-msg" id="ex9-copied">Скопировано!</span>
+      </div>
+    </section>
+
+  </main>
+
+  <aside>
+    <h3>⚠ Проблемные слова</h3>
+    <p class="hint">Здесь появляются слова, в которых были ошибки.</p>
+    <table class="problem" id="problemTable">
+      <thead><tr><th>Слово</th><th>Ошибок</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <p id="noProblems">Пока ошибок нет 🎉</p>
+    <button class="resetProblems" onclick="resetProblems()">Сбросить список</button>
+  </aside>
+</div>
+
+<footer>Feelings & States practice · A0-A1</footer>
+
+<script>
+/* ================= DATA ================= */
+const WORDS = [
+  {key:"relaxed", en:"relaxed", ipa:"/rɪˈlækst/", ru:"расслабленный, спокойный", emoji:"😌"},
+  {key:"tired", en:"tired", ipa:"/ˈtaɪəd/", ru:"уставший", emoji:"😴"},
+  {key:"hungry", en:"hungry", ipa:"/ˈhʌŋɡri/", ru:"голодный", emoji:"🍔"},
+  {key:"bored", en:"bored", ipa:"/bɔːd/", ru:"скучающий, которому скучно", emoji:"😐"},
+  {key:"angry", en:"angry", ipa:"/ˈæŋɡri/", ru:"злой, сердитый", emoji:"😠"},
+  {key:"allright", en:"all right", ipa:"/ˌɔːl ˈraɪt/", ru:"в порядке, всё нормально", emoji:"👍"},
+  {key:"thirsty", en:"thirsty", ipa:"/ˈθɜːsti/", ru:"испытывающий жажду, хочется пить", emoji:"🥤"},
+  {key:"ill", en:"ill", ipa:"/ɪl/", ru:"больной, нездоровый", emoji:"🤒"}
+];
+const wordByKey = {};
+WORDS.forEach(w=>wordByKey[w.key]=w);
+
+const problemCounts = {}; // key -> count
+
+/* ================= UTIL ================= */
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+function normalize(s){
+  return (s||"").toLowerCase()
+    .replace(/’/g,"'")
+    .replace(/[.,!?;:]/g,"")
+    .replace(/\s+/g," ")
+    .trim();
+}
+function isCorrect(userVal, accepted){
+  const u = normalize(userVal);
+  if(!u) return false;
+  return accepted.some(a=>normalize(a)===u);
+}
+function registerMistake(key){
+  if(!key) return;
+  problemCounts[key] = (problemCounts[key]||0)+1;
+  renderProblemTable();
+}
+function renderProblemTable(){
+  const tbody = document.querySelector("#problemTable tbody");
+  tbody.innerHTML = "";
+  const entries = Object.entries(problemCounts).filter(([k,c])=>c>0)
+    .sort((a,b)=>b[1]-a[1]);
+  document.getElementById("noProblems").style.display = entries.length ? "none" : "block";
+  document.getElementById("problemTable").style.display = entries.length ? "table" : "none";
+  entries.forEach(([key,count])=>{
+    const w = wordByKey[key];
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${w ? w.en : key}</td><td class="count">${count}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+function resetProblems(){
+  Object.keys(problemCounts).forEach(k=>problemCounts[k]=0);
+  renderProblemTable();
+}
+
+/* ================= AUDIO ================= */
+let chosenVoice = null;
+function loadVoices(){
+  const voices = window.speechSynthesis ? speechSynthesis.getVoices() : [];
+  const select = document.getElementById("voiceSelect");
+  select.innerHTML = "";
+  const enVoices = voices.filter(v=>v.lang && v.lang.toLowerCase().startsWith("en"));
+  const list = enVoices.length ? enVoices : voices;
+  list.forEach(v=>{
+    const opt = document.createElement("option");
+    opt.value = v.name;
+    opt.textContent = `${v.name} (${v.lang})`;
+    select.appendChild(opt);
+  });
+  let preferred = voices.find(v=>v.name === "Google US English");
+  if(!preferred) preferred = enVoices.find(v=>v.lang.toLowerCase()==="en-us") || enVoices[0] || voices[0];
+  if(preferred){
+    chosenVoice = preferred;
+    select.value = preferred.name;
+  }
+  document.getElementById("audioStatus").textContent = voices.length
+    ? (chosenVoice ? `голос: ${chosenVoice.name}` : "голоса найдены")
+    : "голоса ещё загружаются...";
+}
+if(window.speechSynthesis){
+  speechSynthesis.onvoiceschanged = loadVoices;
+  loadVoices();
+  setTimeout(loadVoices, 300);
+}
+document.getElementById("voiceSelect").addEventListener("change", (e)=>{
+  const voices = speechSynthesis.getVoices();
+  chosenVoice = voices.find(v=>v.name===e.target.value) || chosenVoice;
+});
+function speak(text){
+  if(!window.speechSynthesis){
+    alert("Синтез речи не поддерживается в этом браузере.");
+    return;
+  }
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  if(chosenVoice){
+    u.voice = chosenVoice;
+    u.lang = chosenVoice.lang;
+  } else {
+    u.lang = "en-US";
+  }
+  u.rate = 0.9;
+  speechSynthesis.speak(u);
+}
+document.getElementById("testAudioBtn").addEventListener("click", ()=>{
+  speak("This is a test. Can you hear me?");
+});
+
+/* ================= WORD TABLE ================= */
+(function buildWordTable(){
+  const tbody = document.querySelector("#wordTable tbody");
+  WORDS.forEach(w=>{
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><b>${w.en}</b></td>
+      <td class="ipa">${w.ipa}</td>
+      <td>${w.ru}</td>
+      <td><button class="playBtn" data-text="${w.en}">🔊</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+  tbody.addEventListener("click", (e)=>{
+    if(e.target.matches(".playBtn")){
+      speak(e.target.getAttribute("data-text"));
+    }
+  });
+})();
+
+/* ================= GENERIC EXERCISE ENGINE ================= */
+// items: {id, prompt(html), accepted:[...], wordKey, playText(optional)}
+const EXERCISES = {}; // id -> items array
+
+function renderTextExercise(exId, items, containerId){
+  EXERCISES[exId] = items;
+  const container = document.getElementById(containerId);
+  container.innerHTML = "";
+  items.forEach((item, idx)=>{
+    const row = document.createElement("div");
+    row.className = "item-row";
+    row.dataset.idx = idx;
+    let playBtn = "";
+    if(item.playText){
+      playBtn = `<button class="small-play" data-play="${item.playText.replace(/"/g,'&quot;')}" title="Слушать">🔊</button>`;
+    }
+    row.innerHTML = `
+      <span class="item-num">${idx+1}.</span>
+      <span class="item-prompt">${item.prompt} ${playBtn}</span>
+      <input type="text" class="ans" data-key="${item.wordKey||''}" autocomplete="off" spellcheck="false">
+      <span class="answer-reveal">Ответ: ${item.accepted[0]}</span>
+    `;
+    container.appendChild(row);
+  });
+  container.addEventListener("click", (e)=>{
+    if(e.target.matches("[data-play]")){
+      speak(e.target.getAttribute("data-play"));
+    }
+  });
+}
+
+function checkExercise(exId){
+  const items = EXERCISES[exId];
+  const container = document.getElementById(exId+"-items");
+  const rows = container.querySelectorAll(".item-row");
+  let correctCount = 0;
+  rows.forEach((row, idx)=>{
+    const item = items[idx];
+    const input = row.querySelector("input.ans");
+    const ok = isCorrect(input.value, item.accepted);
+    input.classList.remove("correct","wrong");
+    input.classList.add(ok ? "correct" : "wrong");
+    if(ok){
+      correctCount++;
+    } else {
+      registerMistake(item.wordKey);
+    }
+  });
+  document.getElementById(exId+"-score").textContent = `${correctCount} / ${items.length}`;
+}
+
+function showAnswers(exId){
+  const items = EXERCISES[exId];
+  const container = document.getElementById(exId+"-items");
+  const rows = container.querySelectorAll(".item-row");
+  rows.forEach((row, idx)=>{
+    row.querySelector(".answer-reveal").classList.add("show");
+  });
+}
+
+/* ================= EX1: missing letters ================= */
+const ex1Data = shuffle([
+  {word:"relaxed", masked:"r_l_x_d", key:"relaxed"},
+  {word:"tired", masked:"t_r_d", key:"tired"},
+  {word:"hungry", masked:"h_ngr_", key:"hungry"},
+  {word:"bored", masked:"b_r_d", key:"bored"},
+  {word:"angry", masked:"_ngr_", key:"angry"},
+  {word:"all right", masked:"_ll r_ght", key:"allright"},
+  {word:"thirsty", masked:"th_rst_", key:"thirsty"},
+  {word:"ill", masked:"_ll", key:"ill"},
+  {word:"with", masked:"w_th", key:"angry"},
+  {word:"after", masked:"_ft_r", key:"tired"}
+]);
+renderTextExercise("ex1", ex1Data.map(d=>({
+  prompt: `<b>${d.masked}</b>`,
+  accepted:[d.word],
+  wordKey: d.key
+})), "ex1-items");
+
+/* ================= EX2: translation RU->EN ================= */
+const ex2Data = shuffle([
+  {ru:"расслабленный, спокойный", en:["relaxed"], key:"relaxed"},
+  {ru:"уставший", en:["tired"], key:"tired"},
+  {ru:"голодный", en:["hungry"], key:"hungry"},
+  {ru:"скучающий, которому скучно", en:["bored"], key:"bored"},
+  {ru:"злой, сердитый", en:["angry"], key:"angry"},
+  {ru:"в порядке, всё нормально", en:["all right","alright"], key:"allright"},
+  {ru:"испытывающий жажду", en:["thirsty"], key:"thirsty"},
+  {ru:"больной, нездоровый", en:["ill"], key:"ill"},
+  {ru:"Он устал после урока.", en:["he is tired after the lesson","he's tired after the lesson"], key:"tired"},
+  {ru:"Мне скучно от этой игры.", en:["i am bored with this game","i'm bored with this game"], key:"bored"}
+]);
+renderTextExercise("ex2", ex2Data.map(d=>({
+  prompt:`<span class="ru">${d.ru}</span>`,
+  accepted:d.en,
+  wordKey:d.key
+})), "ex2-items");
+
+/* ================= EX3: dictation ================= */
+const ex3Data = shuffle([
+  {say:"relaxed", accepted:["relaxed"], key:"relaxed"},
+  {say:"tired", accepted:["tired"], key:"tired"},
+  {say:"hungry", accepted:["hungry"], key:"hungry"},
+  {say:"bored", accepted:["bored"], key:"bored"},
+  {say:"angry", accepted:["angry"], key:"angry"},
+  {say:"all right", accepted:["all right","alright"], key:"allright"},
+  {say:"thirsty", accepted:["thirsty"], key:"thirsty"},
+  {say:"ill", accepted:["ill"], key:"ill"},
+  {say:"angry with", accepted:["angry with"], key:"angry"},
+  {say:"tired after", accepted:["tired after"], key:"tired"}
+]);
+renderTextExercise("ex3", ex3Data.map(d=>({
+  prompt:`Нажми 🔊 и напиши услышанное:`,
+  accepted:d.accepted,
+  wordKey:d.key,
+  playText:d.say
+})), "ex3-items");
+
+/* ================= EX4: definitions ================= */
+const ex4Data = shuffle([
+  {def:"You feel calm and have no stress.", ans:["relaxed"], key:"relaxed"},
+  {def:"You need to sleep because you have no energy.", ans:["tired"], key:"tired"},
+  {def:"You want to eat something.", ans:["hungry"], key:"hungry"},
+  {def:"Nothing is interesting for you right now.", ans:["bored"], key:"bored"},
+  {def:"You feel very unhappy about something bad and want to shout.", ans:["angry"], key:"angry"},
+  {def:"Not great, not bad — just okay.", ans:["all right","alright"], key:"allright"},
+  {def:"You want to drink something.", ans:["thirsty"], key:"thirsty"},
+  {def:"You are not healthy, you feel sick.", ans:["ill"], key:"ill"},
+  {def:"Your stomach is empty.", ans:["hungry"], key:"hungry"},
+  {def:"Your throat is dry and you need water.", ans:["thirsty"], key:"thirsty"}
+]);
+renderTextExercise("ex4", ex4Data.map(d=>({
+  prompt:`"${d.def}"`,
+  accepted:d.ans,
+  wordKey:d.key
+})), "ex4-items");
+
+/* ================= EX5: collocations ================= */
+const ex5Data = shuffle([
+  {sentence:"I'm bored ___ my job.", ans:["with"], key:"bored"},
+  {sentence:"She's angry ___ her friend.", ans:["with"], key:"angry"},
+  {sentence:"He's angry ___ the noise.", ans:["about"], key:"angry"},
+  {sentence:"We feel relaxed ___ yoga.", ans:["after"], key:"relaxed"},
+  {sentence:"They are tired ___ the trip.", ans:["after"], key:"tired"},
+  {sentence:"I'm bored ___ waiting.", ans:["with"], key:"bored"},
+  {sentence:"My mother is angry ___ me.", ans:["with"], key:"angry"},
+  {sentence:"I'm angry ___ the weather.", ans:["about"], key:"angry"},
+  {sentence:"I always feel relaxed ___ a bath.", ans:["after"], key:"relaxed"},
+  {sentence:"The children are tired ___ school.", ans:["after"], key:"tired"}
+]);
+renderTextExercise("ex5", ex5Data.map(d=>({
+  prompt:d.sentence,
+  accepted:d.ans,
+  wordKey:d.key
+})), "ex5-items");
+
+/* ================= EX6: transform ================= */
+const ex6Data = shuffle([
+  {task:"Question", src:"She is hungry.", ans:["is she hungry"], key:"hungry"},
+  {task:"Negative", src:"He is tired.", ans:["he isn't tired","he is not tired"], key:"tired"},
+  {task:"Short answer (Yes) to 'Are they angry?'", src:"They are angry.", ans:["yes they are"], key:"angry"},
+  {task:"Question", src:"You are thirsty.", ans:["are you thirsty"], key:"thirsty"},
+  {task:"Negative", src:"We are bored.", ans:["we aren't bored","we are not bored"], key:"bored"},
+  {task:"Question", src:"It is all right.", ans:["is it all right"], key:"allright"},
+  {task:"Short answer (No) to 'Is she ill?'", src:"She is ill.", ans:["no she isn't","no she is not"], key:"ill"},
+  {task:"Negative", src:"He is relaxed.", ans:["he isn't relaxed","he is not relaxed"], key:"relaxed"},
+  {task:"Question", src:"You are angry with me.", ans:["are you angry with me"], key:"angry"},
+  {task:"Negative", src:"They are tired after the game.", ans:["they aren't tired after the game","they are not tired after the game"], key:"tired"}
+]);
+renderTextExercise("ex6", ex6Data.map(d=>({
+  prompt:`<span style="color:#c9822a;font-weight:600;">[${d.task}]</span> ${d.src}`,
+  accepted:d.ans,
+  wordKey:d.key
+})), "ex6-items");
+
+/* ================= EX7: pictures ================= */
+const ex7Data = shuffle(WORDS.map(w=>({emoji:w.emoji, ans:[w.en], key:w.key})));
+renderTextExercise("ex7", ex7Data.map(d=>({
+  prompt:`<span style="font-size:1.6rem;">${d.emoji}</span>`,
+  accepted:d.ans,
+  wordKey:d.key
+})), "ex7-items");
+
+/* ================= EX8: dialogues ================= */
+const dialogues = [
+  {
+    lines:[
+      {speaker:"A", text:"Hi! How are you?"},
+      {speaker:"B", text:"I'm {0}. I have a lot of homework."},
+      {speaker:"A", text:"Are you {1} too?"},
+      {speaker:"B", text:"Yes, a little."}
+    ],
+    blanks:[{ans:["all right","alright"], key:"allright"}, {ans:["tired"], key:"tired"}]
+  },
+  {
+    lines:[
+      {speaker:"A", text:"Do you want a sandwich?"},
+      {speaker:"B", text:"Yes, please! I'm very {0}."},
+      {speaker:"A", text:"And are you {1} too? Here's some water."},
+      {speaker:"B", text:"Thank you! Yes, I am."}
+    ],
+    blanks:[{ans:["hungry"], key:"hungry"}, {ans:["thirsty"], key:"thirsty"}]
+  },
+  {
+    lines:[
+      {speaker:"A", text:"What's wrong? You look {0}."},
+      {speaker:"B", text:"I'm {1} with my brother. He broke my phone."}
+    ],
+    blanks:[{ans:["angry"], key:"angry"}, {ans:["angry"], key:"angry"}]
+  },
+  {
+    lines:[
+      {speaker:"A", text:"This film is boring."},
+      {speaker:"B", text:"Yes, I'm {0} with it too. Let's watch something else."}
+    ],
+    blanks:[{ans:["bored"], key:"bored"}]
+  },
+  {
+    lines:[
+      {speaker:"A", text:"Why aren't you at school today?"},
+      {speaker:"B", text:"I'm {0}. I have a headache."},
+      {speaker:"A", text:"Oh no! I hope you feel better soon."}
+    ],
+    blanks:[{ans:["ill"], key:"ill"}]
+  },
+  {
+    lines:[
+      {speaker:"A", text:"How do you feel after the yoga class?"},
+      {speaker:"B", text:"Very {0}! No stress at all."}
+    ],
+    blanks:[{ans:["relaxed"], key:"relaxed"}]
+  }
+];
+
+function buildDialogues(){
+  const container = document.getElementById("ex8-items");
+  container.innerHTML = "";
+  let globalIdx = 0;
+  EXERCISES["ex8"] = [];
+  dialogues.forEach((dlg, dIdx)=>{
+    const box = document.createElement("div");
+    box.className = "dialogue";
+    box.dataset.dialogueIdx = dIdx;
+    dlg.lines.forEach(line=>{
+      const p = document.createElement("div");
+      p.className = "line";
+      let text = line.text;
+      const replaced = text.replace(/\{(\d)\}/g, (m, n)=>{
+        const blank = dlg.blanks[parseInt(n)];
+        const globalItemIdx = EXERCISES["ex8"].length;
+        EXERCISES["ex8"].push({accepted:blank.ans, wordKey:blank.key});
+        return `<input type="text" class="ans" data-blank-idx="${globalItemIdx}" data-dialogue="${dIdx}" style="width:110px;" autocomplete="off">`;
+      });
+      p.innerHTML = `<b>${line.speaker}:</b> ${replaced}`;
+      box.appendChild(p);
+    });
+    container.appendChild(box);
+  });
+}
+buildDialogues();
+
+// override check/show for ex8 since inputs aren't in .item-row
+function checkDialogues(){
+  const items = EXERCISES["ex8"];
+  const inputs = document.querySelectorAll('#ex8-items input[data-blank-idx]');
+  let correctCount = 0;
+  inputs.forEach(input=>{
+    const idx = parseInt(input.dataset.blankIdx);
+    const item = items[idx];
+    const ok = isCorrect(input.value, item.accepted);
+    input.classList.remove("correct","wrong");
+    input.classList.add(ok ? "correct" : "wrong");
+    if(ok) correctCount++;
+    else registerMistake(item.wordKey);
+  });
+  document.getElementById("ex8-score").textContent = `${correctCount} / ${items.length}`;
+}
+function showDialogueAnswers(){
+  const items = EXERCISES["ex8"];
+  const inputs = document.querySelectorAll('#ex8-items input[data-blank-idx]');
+  inputs.forEach(input=>{
+    const idx = parseInt(input.dataset.blankIdx);
+    if(!input.value){
+      input.placeholder = items[idx].accepted[0];
+    } else {
+      input.title = "Ответ: " + items[idx].accepted[0];
+    }
+    input.value = input.value || "";
+  });
+  // simplest: show a small note box under each dialogue listing answers
+  document.querySelectorAll('.dialogue').forEach((box, dIdx)=>{
+    if(box.querySelector('.dlg-answers')) return;
+    const note = document.createElement('div');
+    note.className = 'dlg-answers';
+    note.style.cssText = "margin-top:6px;font-size:.82rem;color:#155a50;";
+    note.textContent = "Ответы: " + dialogues[dIdx].blanks.map(b=>b.ans[0]).join(", ");
+    box.appendChild(note);
+  });
+}
+function copyDialogues(){
+  let out = "";
+  document.querySelectorAll('#ex8-items .dialogue').forEach((box, dIdx)=>{
+    out += `--- Диалог ${dIdx+1} ---\n`;
+    box.querySelectorAll('.line').forEach(lineEl=>{
+      let clone = lineEl.cloneNode(true);
+      clone.querySelectorAll('input').forEach(inp=>{
+        const span = document.createElement('span');
+        span.textContent = inp.value ? inp.value : "____";
+        inp.replaceWith(span);
+      });
+      out += clone.textContent.trim() + "\n";
+    });
+    out += "\n";
+  });
+  copyToClipboard(out, "ex8-copied");
+}
+
+/* ================= EX9: own sentences ================= */
+function buildOwnSentences(){
+  const container = document.getElementById("ex9-items");
+  container.innerHTML = "";
+  WORDS.forEach(w=>{
+    const div = document.createElement("div");
+    div.className = "own-item";
+    div.innerHTML = `
+      <label>${w.en} <span style="font-weight:400;color:#8b98a6;">(${w.ru})</span></label>
+      <textarea class="own" data-word="${w.en}" placeholder="Write your own sentence with '${w.en}'..."></textarea>
+      <span class="own-feedback" style="font-size:.8rem;"></span>
+    `;
+    container.appendChild(div);
+  });
+}
+buildOwnSentences();
+
+function checkOwnSentences(){
+  document.querySelectorAll('#ex9-items .own-item').forEach(div=>{
+    const word = div.querySelector('textarea').dataset.word.toLowerCase();
+    const val = div.querySelector('textarea').value.toLowerCase();
+    const feedback = div.querySelector('.own-feedback');
+    if(!val.trim()){
+      feedback.textContent = "";
+      return;
+    }
+    const contains = val.includes(word) || (word==="all right" && (val.includes("all right")||val.includes("alright")));
+    feedback.textContent = contains ? "✅ слово использовано" : "⚠ слово не найдено в предложении";
+    feedback.style.color = contains ? "var(--ok)" : "var(--bad)";
+  });
+}
+function copyOwnSentences(){
+  let out = "";
+  document.querySelectorAll('#ex9-items .own-item').forEach(div=>{
+    const word = div.querySelector('textarea').dataset.word;
+    const val = div.querySelector('textarea').value.trim();
+    out += `${word}: ${val || "(нет ответа)"}\n`;
+  });
+  copyToClipboard(out, "ex9-copied");
+}
+
+/* ================= CLIPBOARD ================= */
+function copyToClipboard(text, msgId){
+  const done = ()=>{
+    const msg = document.getElementById(msgId);
+    if(msg){
+      msg.style.display = "inline";
+      setTimeout(()=>{msg.style.display="none";}, 2000);
+    }
+  };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(done).catch(()=>{
+      fallbackCopy(text); done();
+    });
+  } else {
+    fallbackCopy(text); done();
+  }
+}
+function fallbackCopy(text){
+  const ta = document.createElement("textarea");
+  ta.value = text;
+  ta.style.position = "fixed";
+  ta.style.opacity = "0";
+  document.body.appendChild(ta);
+  ta.select();
+  try{ document.execCommand("copy"); }catch(e){}
+  document.body.removeChild(ta);
+}
+
+/* wire up ex8 buttons to correct functions (override generic ones) */
+document.querySelector('#ex8 .controls .check').setAttribute('onclick','checkDialogues()');
+document.querySelector('#ex8 .controls .show').setAttribute('onclick','showDialogueAnswers()');
+
+renderProblemTable();
+</script>
+</body>
+</html>
