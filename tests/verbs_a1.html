@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Глаголы A1 — тренажёр</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F3F5F1;
+    --panel:#FFFFFF;
+    --ink:#20342C;
+    --ink-soft:#526158;
+    --line:#D8DED6;
+    --teal:#1F6F68;
+    --teal-deep:#164F4A;
+    --coral:#D96C4A;
+    --good:#2E8B57;
+    --good-bg:#E7F4EC;
+    --bad:#C24B3F;
+    --bad-bg:#FBEAE7;
+    --gold:#C99A3E;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{font-family:'Lora',serif;color:var(--teal-deep);margin:0 0 6px;}
+  .page{
+    max-width:1180px;
+    margin:0 auto;
+    padding:36px 24px 90px;
+    display:grid;
+    grid-template-columns: minmax(0,1fr) 268px;
+    gap:32px;
+    align-items:start;
+  }
+  header.hero{
+    grid-column:1 / -1;
+    border-bottom:2px solid var(--line);
+    padding-bottom:22px;
+    margin-bottom:6px;
+  }
+  header.hero h1{
+    font-size:clamp(28px,4vw,40px);
+    font-weight:700;
+    letter-spacing:-0.01em;
+  }
+  header.hero p{
+    color:var(--ink-soft);
+    max-width:640px;
+    font-size:15px;
+    margin:6px 0 0;
+  }
+  main{min-width:0;}
+  aside{
+    position:sticky;
+    top:20px;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:18px 18px 16px;
+  }
+  aside h3{font-size:16px;margin-bottom:4px;}
+  aside .hint{font-size:12.5px;color:var(--ink-soft);margin-bottom:12px;}
+  #problemList{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;}
+  #problemList li{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    gap:8px;
+    font-size:14px;
+    border-bottom:1px dashed var(--line);
+    padding-bottom:6px;
+  }
+  #problemList li .w{font-weight:600;color:var(--coral);}
+  #problemList li .ru{color:var(--ink-soft);font-size:12.5px;}
+  #problemList li .cnt{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-soft);}
+  #problemEmpty{font-size:13px;color:var(--ink-soft);}
+  .clearBtn{
+    margin-top:12px;
+    width:100%;
+    background:transparent;
+    border:1px solid var(--line);
+    color:var(--ink-soft);
+    padding:7px 10px;
+    border-radius:7px;
+    font-size:12.5px;
+    cursor:pointer;
+  }
+  .clearBtn:hover{border-color:var(--coral);color:var(--coral);}
+
+  /* word reminder */
+  .wordbank{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:20px 22px 22px;
+    margin-bottom:30px;
+  }
+  .wordbank h2{font-size:20px;}
+  .wordbank .sub{color:var(--ink-soft);font-size:13.5px;margin-bottom:14px;}
+  .wordgrid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(230px,1fr));
+    gap:8px;
+  }
+  .wordrow{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:8px 10px;
+  }
+  .wordrow button.play{
+    flex:none;
+    width:30px;height:30px;
+    border-radius:50%;
+    border:1px solid var(--teal);
+    background:var(--panel);
+    color:var(--teal);
+    cursor:pointer;
+    font-size:13px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .wordrow button.play:hover{background:var(--teal);color:#fff;}
+  .wordrow .txt{min-width:0;}
+  .wordrow .en{font-weight:700;font-size:14.5px;}
+  .wordrow .ipa{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--ink-soft);}
+  .wordrow .ru{font-size:12.5px;color:var(--ink-soft);}
+
+  /* exercises */
+  .ex{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:22px 24px 24px;
+    margin-bottom:26px;
+  }
+  .ex-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:14px;
+    flex-wrap:wrap;
+    margin-bottom:4px;
+  }
+  .ex-title{display:flex;align-items:baseline;gap:10px;}
+  .ex-num{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    color:var(--teal);
+    border:1px solid var(--teal);
+    border-radius:5px;
+    padding:1px 6px;
+  }
+  .ex h2{font-size:18px;}
+  .ex .instr{color:var(--ink-soft);font-size:13.5px;margin:2px 0 16px;max-width:640px;}
+  .score{font-size:13px;font-weight:600;color:var(--ink-soft);}
+  .score.done{color:var(--teal-deep);}
+  .items{display:flex;flex-direction:column;gap:12px;}
+  .item{
+    display:grid;
+    grid-template-columns: 26px 1fr;
+    gap:10px;
+    align-items:start;
+  }
+  .item .n{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    color:var(--ink-soft);
+    padding-top:9px;
+  }
+  .item .body{min-width:0;}
+  .item .prompt{font-size:14.5px;margin-bottom:6px;}
+  .item .prompt .gap{color:var(--coral);font-weight:600;letter-spacing:1px;}
+  .item .prompt em{font-style:normal;color:var(--ink-soft);}
+  .item input[type=text], .item select, .item textarea{
+    width:100%;
+    font-family:'Inter',sans-serif;
+    font-size:14.5px;
+    padding:9px 11px;
+    border-radius:7px;
+    border:1.5px solid var(--line);
+    background:var(--paper);
+    color:var(--ink);
+  }
+  .item textarea{resize:vertical;min-height:44px;}
+  .item input:focus, .item select:focus, .item textarea:focus{
+    outline:none;
+    border-color:var(--teal);
+    background:#fff;
+  }
+  .item input.correct{border-color:var(--good);background:var(--good-bg);}
+  .item input.incorrect{border-color:var(--bad);background:var(--bad-bg);}
+  .item .answer-reveal{
+    font-size:12.5px;
+    color:var(--teal-deep);
+    margin-top:5px;
+    display:none;
+  }
+  .item .answer-reveal.show{display:block;}
+  .item .dialog{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-left:3px solid var(--teal);
+    border-radius:6px;
+    padding:8px 10px;
+    font-size:13.5px;
+    margin-bottom:6px;
+  }
+  .item .dialog .speaker{font-weight:700;color:var(--teal-deep);margin-right:4px;}
+
+  .ex-actions{
+    display:flex;
+    gap:10px;
+    margin-top:18px;
+    flex-wrap:wrap;
+    align-items:center;
+  }
+  button.act{
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:13.5px;
+    padding:9px 16px;
+    border-radius:7px;
+    border:none;
+    cursor:pointer;
+  }
+  button.check{background:var(--teal);color:#fff;}
+  button.check:hover{background:var(--teal-deep);}
+  button.reveal{background:transparent;border:1.5px solid var(--line);color:var(--ink-soft);}
+  button.reveal:hover{border-color:var(--coral);color:var(--coral);}
+  button.copy-one{background:transparent;border:1.5px solid var(--line);color:var(--ink-soft);}
+  button.copy-one:hover{border-color:var(--teal);color:var(--teal);}
+
+  /* final check-panel */
+  .checkpanel{
+    background:var(--teal-deep);
+    color:#F3F5F1;
+    border-radius:12px;
+    padding:24px 26px 26px;
+    margin-top:8px;
+  }
+  .checkpanel h2{color:#fff;font-size:19px;}
+  .checkpanel p{color:#CFE3DE;font-size:13.5px;max-width:600px;}
+  .checkpanel .row{display:flex;gap:12px;flex-wrap:wrap;margin-top:14px;}
+  .checkpanel button{
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:13.5px;
+    padding:10px 18px;
+    border-radius:7px;
+    border:1.5px solid rgba(255,255,255,.5);
+    background:transparent;
+    color:#fff;
+    cursor:pointer;
+  }
+  .checkpanel button:hover{background:rgba(255,255,255,.12);}
+  .checkpanel .status{
+    margin-top:14px;
+    font-size:13px;
+    font-family:'JetBrains Mono',monospace;
+    background:rgba(0,0,0,.18);
+    border-radius:7px;
+    padding:10px 12px;
+    white-space:pre-wrap;
+    display:none;
+  }
+  .checkpanel .status.show{display:block;}
+
+  footer{
+    grid-column:1/-1;
+    text-align:center;
+    color:var(--ink-soft);
+    font-size:12px;
+    margin-top:10px;
+  }
+
+  @media (max-width: 880px){
+    .page{grid-template-columns:1fr;}
+    aside{position:static;order:-1;}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="hero">
+    <h1>Глаголы A1 — тренажёр</h1>
+    <p>Повтори 21 базовый глагол, прослушай произношение и пройди 11 заданий по 10 пунктов. Пиши ответы руками — это часть тренировки.</p>
+  </header>
+
+  <main>
+
+    <section class="wordbank">
+      <h2>Повторение слов</h2>
+      <p class="sub">Нажми на кружок 🔊, чтобы услышать слово (голос Google US English).</p>
+      <div class="wordgrid" id="wordGrid"></div>
+    </section>
+
+    <div id="exercises"></div>
+
+    <section class="checkpanel">
+      <h2>Проверка перед сдачей</h2>
+      <p>Проверь, что звук работает на этом устройстве, и скопируй все свои ответы одним нажатием — например, чтобы отправить преподавателю.</p>
+      <div class="row">
+        <button id="testAudioBtn">🔊 Проверить звук</button>
+        <button id="copyAllBtn">📋 Скопировать все ответы</button>
+      </div>
+      <div class="status" id="checkStatus"></div>
+    </section>
+
+  </main>
+
+  <aside>
+    <h3>Проблемные слова</h3>
+    <p class="hint">Сюда попадают слова из заданий, где был неверный ответ.</p>
+    <p id="problemEmpty">Пока ошибок нет — отлично!</p>
+    <ul id="problemList"></ul>
+    <button class="clearBtn" id="clearProblemsBtn">Очистить список</button>
+  </aside>
+
+  <footer>Тренажёр глаголов A1 · работает офлайн, кроме синтеза речи браузера</footer>
+</div>
+
+<script>
+/* ---------------------------------------------------------
+   DATA
+--------------------------------------------------------- */
+const WORDS = [
+  {en:'cook',   ru:'готовить',              ipa:'/kʊk/'},
+  {en:'live',   ru:'жить',                  ipa:'/lɪv/'},
+  {en:'eat',    ru:'есть, кушать',          ipa:'/iːt/'},
+  {en:'say',    ru:'говорить, сказать',     ipa:'/seɪ/'},
+  {en:'want',   ru:'хотеть',                ipa:'/wɒnt/'},
+  {en:'listen', ru:'слушать',               ipa:'/ˈlɪs(ə)n/'},
+  {en:'wear',   ru:'носить (одежду)',       ipa:'/weər/'},
+  {en:'play',   ru:'играть',                ipa:'/pleɪ/'},
+  {en:'study',  ru:'учиться, изучать',      ipa:'/ˈstʌdi/'},
+  {en:'drink',  ru:'пить',                  ipa:'/drɪŋk/'},
+  {en:'have',   ru:'иметь',                 ipa:'/hæv/'},
+  {en:'do',     ru:'делать',                ipa:'/duː/'},
+  {en:'need',   ru:'нуждаться (в чём-то)',  ipa:'/niːd/'},
+  {en:'go',     ru:'идти, ехать',           ipa:'/ɡəʊ/'},
+  {en:'speak',  ru:'говорить, разговаривать',ipa:'/spiːk/'},
+  {en:'watch',  ru:'смотреть',              ipa:'/wɒtʃ/'},
+  {en:'work',   ru:'работать',              ipa:'/wɜːk/'},
+  {en:'drive',  ru:'водить машину',         ipa:'/draɪv/'},
+  {en:'take',   ru:'брать',                 ipa:'/teɪk/'},
+  {en:'read',   ru:'читать',                ipa:'/riːd/'},
+  {en:'like',   ru:'нравиться',             ipa:'/laɪk/'}
+];
+const RU_BY_EN = Object.fromEntries(WORDS.map(w=>[w.en,w.ru]));
+
+function norm(s){
+  return (s||'')
+    .toLowerCase()
+    .trim()
+    .replace(/['’]/g,"'")
+    .replace(/\s+/g,' ')
+    .replace(/[.!?]+$/,'');
+}
+
+/* ---------------------------------------------------------
+   EXERCISES
+   type: 'text' | 'select' | 'free'
+--------------------------------------------------------- */
+const EXERCISES = [
+{
+  title:'Вставь пропущенные буквы',
+  instr:'Впиши слово целиком в поле ответа (пропуски показаны для подсказки).',
+  type:'text',
+  items:[
+    {prompt:'c _ _ k', answer:['cook'], word:'cook'},
+    {prompt:'l _ v e', answer:['live'], word:'live'},
+    {prompt:'e _ t', answer:['eat'], word:'eat'},
+    {prompt:'s _ y', answer:['say'], word:'say'},
+    {prompt:'w _ n t', answer:['want'], word:'want'},
+    {prompt:'l _ s t e n', answer:['listen'], word:'listen'},
+    {prompt:'w e _ r', answer:['wear'], word:'wear'},
+    {prompt:'p l _ y', answer:['play'], word:'play'},
+    {prompt:'s t _ d y', answer:['study'], word:'study'},
+    {prompt:'d r _ n k', answer:['drink'], word:'drink'}
+  ]
+},
+{
+  title:'Переведи с русского на английский',
+  instr:'Напиши словосочетание целиком (глагол + слово).',
+  type:'text',
+  items:[
+    {prompt:'готовить ужин', answer:['cook dinner'], word:'cook'},
+    {prompt:'жить в большом городе', answer:['live in a big city'], word:'live'},
+    {prompt:'есть яблоко', answer:['eat an apple'], word:'eat'},
+    {prompt:'сказать правду', answer:['say the truth'], word:'say'},
+    {prompt:'хотеть кофе', answer:['want coffee'], word:'want'},
+    {prompt:'слушать музыку', answer:['listen to music'], word:'listen'},
+    {prompt:'носить куртку', answer:['wear a jacket'], word:'wear'},
+    {prompt:'играть в футбол', answer:['play football'], word:'play'},
+    {prompt:'изучать английский', answer:['study english'], word:'study'},
+    {prompt:'пить воду', answer:['drink water'], word:'drink'}
+  ]
+},
+{
+  title:'Прослушай и запиши выражение',
+  instr:'Нажми 🔊, прослушай фразу (глагол + существительное) и напиши то, что услышал(а).',
+  type:'audio',
+  items:[
+    {prompt:'have breakfast', answer:['have breakfast'], word:'have', hint:'to have — иметь'},
+    {prompt:'do homework', answer:['do homework'], word:'do', hint:'to do — делать'},
+    {prompt:'need help', answer:['need help'], word:'need', hint:'to need — нуждаться'},
+    {prompt:'go home', answer:['go home'], word:'go', hint:'to go — идти, ехать'},
+    {prompt:'speak English', answer:['speak english'], word:'speak', hint:'to speak — разговаривать'},
+    {prompt:'watch a film', answer:['watch a film'], word:'watch', hint:'to watch — смотреть'},
+    {prompt:'work hard', answer:['work hard'], word:'work', hint:'to work — работать'},
+    {prompt:'drive a car', answer:['drive a car'], word:'drive', hint:'to drive — водить машину'},
+    {prompt:'take a photo', answer:['take a photo'], word:'take', hint:'to take — брать'},
+    {prompt:'read a book', answer:['read a book'], word:'read', hint:'to read — читать'}
+  ]
+},
+{
+  title:'Сочетаемость: выбери правильное слово',
+  instr:'Выбери существительное, которое обычно сочетается с глаголом.',
+  type:'select',
+  items:[
+    {prompt:'cook ___', options:['dinner','music','football'], answer:['dinner'], word:'cook'},
+    {prompt:'drink ___', options:['water','homework','jacket'], answer:['water'], word:'drink'},
+    {prompt:'play ___', options:['tennis','breakfast','a book'], answer:['tennis'], word:'play'},
+    {prompt:'do ___', options:['homework','coffee','a car'], answer:['homework'], word:'do'},
+    {prompt:'watch ___', options:['a film','an apple','a taxi'], answer:['a film'], word:'watch'},
+    {prompt:'take ___', options:['a photo','a city','music'], answer:['a photo'], word:'take'},
+    {prompt:'have ___', options:['lunch','a jacket','the truth'], answer:['lunch'], word:'have'},
+    {prompt:'read ___', options:['a newspaper','water','football'], answer:['a newspaper'], word:'read'},
+    {prompt:'drive ___', options:['a bus','a book','coffee'], answer:['a bus'], word:'drive'},
+    {prompt:'study ___', options:['maths','dinner','a film'], answer:['maths'], word:'study'}
+  ]
+},
+{
+  title:'Rephrase — перефразируй в отрицательную форму',
+  instr:'Перепиши предложение в отрицательной форме (don\'t / doesn\'t).',
+  type:'text',
+  items:[
+    {prompt:'I cook dinner every day.', answer:["i don't cook dinner every day"], word:'cook'},
+    {prompt:'She lives in Krakow.', answer:["she doesn't live in krakow"], word:'live'},
+    {prompt:'We eat meat.', answer:["we don't eat meat"], word:'eat'},
+    {prompt:'He says hello.', answer:["he doesn't say hello"], word:'say'},
+    {prompt:'They want tea.', answer:["they don't want tea"], word:'want'},
+    {prompt:'I listen to the radio.', answer:["i don't listen to the radio"], word:'listen'},
+    {prompt:'She wears glasses.', answer:["she doesn't wear glasses"], word:'wear'},
+    {prompt:'He plays chess.', answer:["he doesn't play chess"], word:'play'},
+    {prompt:'We study French.', answer:["we don't study french"], word:'study'},
+    {prompt:'You drink tea.', answer:["you don't drink tea"], word:'drink'}
+  ]
+},
+{
+  title:'Build the chunk — собери фразу',
+  instr:'Из перемешанных слов собери правильное словосочетание.',
+  type:'text',
+  items:[
+    {prompt:'book / a / read', answer:['read a book'], word:'read'},
+    {prompt:'bus / a / drive', answer:['drive a bus'], word:'drive'},
+    {prompt:'photo / a / take', answer:['take a photo'], word:'take'},
+    {prompt:'TV / watch', answer:['watch tv'], word:'watch'},
+    {prompt:'English / speak', answer:['speak english'], word:'speak'},
+    {prompt:'hard / work', answer:['work hard'], word:'work'},
+    {prompt:'home / go', answer:['go home'], word:'go'},
+    {prompt:'help / need', answer:['need help'], word:'need'},
+    {prompt:'homework / do', answer:['do homework'], word:'do'},
+    {prompt:'lunch / have', answer:['have lunch'], word:'have'}
+  ]
+},
+{
+  title:'Predict the verb — угадай глагол в диалоге',
+  instr:'Прочитай мини-диалог и впиши подходящий глагол в правильной форме.',
+  type:'dialog',
+  items:[
+    {a:"What's your job?", b:"I ___ as a teacher.", answer:['work'], word:'work'},
+    {a:'Are you hungry?', b:"Yes, I ___ to eat something.", answer:['want'], word:'want'},
+    {a:'What language do you ___ at home?', b:'Russian.', answer:['speak'], word:'speak'},
+    {a:'Do you have a car?', b:'Yes, I ___ to work every day.', answer:['drive'], word:'drive'},
+    {a:"What's on TV tonight?", b:'Let\'s ___ a film.', answer:['watch'], word:'watch'},
+    {a:'Can you hear that song?', b:'Yes, I ___ to it.', answer:['listen'], word:'listen'},
+    {a:'Where do you ___?', b:'In Krakow.', answer:['live'], word:'live'},
+    {a:'What subject do you ___ at university?', b:'Biology.', answer:['study'], word:'study'},
+    {a:"It's cold outside.", b:'I ___ a warm jacket.', answer:['wear'], word:'wear'},
+    {a:'Are you thirsty?', b:'Yes, I ___ some water.', answer:['drink'], word:'drink'}
+  ]
+},
+{
+  title:'One word → three sentences',
+  instr:'Напиши три разных предложения с этим глаголом (разное лицо/время). Ответы не проверяются автоматически — сравни с примером.',
+  type:'free3',
+  items:[
+    {prompt:'eat', sample:'I eat breakfast at 8. / She eats fruit. / We ate pizza yesterday.', word:'eat'},
+    {prompt:'say', sample:'He says "hello". / They say it\'s cold. / I said sorry.', word:'say'},
+    {prompt:'have', sample:'I have a car. / She has two cats. / We had a good day.', word:'have'},
+    {prompt:'do', sample:'I do sport. / He does the dishes. / We did our homework.', word:'do'},
+    {prompt:'need', sample:'I need a break. / She needs help. / We needed more time.', word:'need'},
+    {prompt:'go', sample:'I go to work by bus. / She goes home late. / We went to Paris.', word:'go'},
+    {prompt:'take', sample:'I take the bus. / He takes photos. / We took a taxi.', word:'take'},
+    {prompt:'read', sample:'I read every evening. / She reads fast. / We read that book.', word:'read'},
+    {prompt:'cook', sample:'I cook dinner. / He cooks well. / We cooked pasta.', word:'cook'},
+    {prompt:'play', sample:'I play tennis. / She plays the piano. / We played chess.', word:'play'}
+  ]
+},
+{
+  title:'Change the tense/person',
+  instr:'Перепиши предложение, заменив подлежащее на указанное в скобках.',
+  type:'text',
+  items:[
+    {prompt:'I eat breakfast at 8. (he)', answer:['he eats breakfast at 8'], word:'eat'},
+    {prompt:'They watch TV in the evening. (she)', answer:['she watches tv in the evening'], word:'watch'},
+    {prompt:'We study English. (he)', answer:['he studies english'], word:'study'},
+    {prompt:'I have a car. (she)', answer:['she has a car'], word:'have'},
+    {prompt:'You read books. (he)', answer:['he reads books'], word:'read'},
+    {prompt:'I go to work by bus. (she)', answer:['she goes to work by bus'], word:'go'},
+    {prompt:'They play football. (he)', answer:['he plays football'], word:'play'},
+    {prompt:'I do my homework. (she)', answer:['she does her homework'], word:'do'},
+    {prompt:'We drink coffee. (he)', answer:['he drinks coffee'], word:'drink'},
+    {prompt:'I live in a flat. (she)', answer:['she lives in a flat'], word:'live'}
+  ]
+},
+{
+  title:'Закончи предложения своими идеями',
+  instr:'Пиши всё, что хочешь — грамматически правильно. Эти ответы не проверяются автоматически, зато их можно скопировать все сразу.',
+  type:'free',
+  items:[
+    {prompt:'I like ... because ...', word:'like'},
+    {prompt:'On Sundays I usually cook ...', word:'cook'},
+    {prompt:'My favourite drink is ... I drink it when ...', word:'drink'},
+    {prompt:'I need ... every day.', word:'need'},
+    {prompt:'In my free time I like to watch ...', word:'watch'},
+    {prompt:'I usually go to ... at the weekend.', word:'go'},
+    {prompt:'I study ... because ...', word:'study'},
+    {prompt:'I want to learn how to ...', word:'want'},
+    {prompt:'At work / at school I do ...', word:'do'},
+    {prompt:'I wear ... when ...', word:'wear'}
+  ]
+},
+{
+  title:'Дриллинг: утверждение (+), отрицание (–), вопрос (?)',
+  instr:'Составь предложение указанного типа с данным подлежащим и глаголом.',
+  type:'text',
+  items:[
+    {prompt:'she / cook (+)', answer:['she cooks'], word:'cook'},
+    {prompt:'I / like (–)', answer:["i don't like"], word:'like'},
+    {prompt:'they / drive (?)', answer:['do they drive'], word:'drive'},
+    {prompt:'we / need (–)', answer:["we don't need"], word:'need'},
+    {prompt:'he / read (+)', answer:['he reads'], word:'read'},
+    {prompt:'you / speak (?)', answer:['do you speak'], word:'speak'},
+    {prompt:'they / take (+)', answer:['they take'], word:'take'},
+    {prompt:'she / watch (?)', answer:['does she watch'], word:'watch'},
+    {prompt:'I / go (–)', answer:["i don't go"], word:'go'},
+    {prompt:'he / have (+)', answer:['he has'], word:'have'}
+  ]
+}
+];
+
+/* Fisher-Yates shuffle so item order differs exercise to exercise */
+function shuffle(arr, seed){
+  let s = seed;
+  function rnd(){ s = (s*9301+49297)%233280; return s/233280; }
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(rnd()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+EXERCISES.forEach((ex,i)=>{ ex.items = shuffle(ex.items, 17+i*31); });
+
+/* ---------------------------------------------------------
+   SPEECH SYNTHESIS
+--------------------------------------------------------- */
+let chosenVoice = null;
+function pickVoice(){
+  const voices = speechSynthesis.getVoices();
+  chosenVoice =
+    voices.find(v => /Google US English/i.test(v.name)) ||
+    voices.find(v => v.lang === 'en-US') ||
+    voices.find(v => /^en/i.test(v.lang)) ||
+    null;
+}
+if('speechSynthesis' in window){
+  pickVoice();
+  speechSynthesis.onvoiceschanged = pickVoice;
+}
+function speak(text){
+  if(!('speechSynthesis' in window)){
+    alert('Синтез речи не поддерживается в этом браузере.');
+    return false;
+  }
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-US';
+  u.rate = 0.9;
+  if(chosenVoice) u.voice = chosenVoice;
+  speechSynthesis.speak(u);
+  return true;
+}
+
+/* ---------------------------------------------------------
+   PROBLEM WORDS SIDEBAR
+--------------------------------------------------------- */
+const PKEY = 'a1_verbs_problem_words';
+function loadProblems(){
+  try{ return JSON.parse(localStorage.getItem(PKEY)) || {}; }catch(e){ return {}; }
+}
+function saveProblems(p){ localStorage.setItem(PKEY, JSON.stringify(p)); }
+function addProblem(word){
+  const p = loadProblems();
+  p[word] = (p[word]||0)+1;
+  saveProblems(p);
+  renderProblems();
+}
+function renderProblems(){
+  const p = loadProblems();
+  const list = document.getElementById('problemList');
+  const empty = document.getElementById('problemEmpty');
+  const words = Object.keys(p).sort((a,b)=>p[b]-p[a]);
+  list.innerHTML='';
+  if(words.length===0){ empty.style.display='block'; return; }
+  empty.style.display='none';
+  words.forEach(w=>{
+    const li = document.createElement('li');
+    li.innerHTML = `<span><span class="w">${w}</span><br><span class="ru">${RU_BY_EN[w]||''}</span></span><span class="cnt">×${p[w]}</span>`;
+    list.appendChild(li);
+  });
+}
+document.getElementById('clearProblemsBtn').addEventListener('click', ()=>{
+  saveProblems({});
+  renderProblems();
+});
+
+/* ---------------------------------------------------------
+   RENDER WORD BANK
+--------------------------------------------------------- */
+const wordGrid = document.getElementById('wordGrid');
+WORDS.forEach(w=>{
+  const row = document.createElement('div');
+  row.className = 'wordrow';
+  row.innerHTML = `
+    <button class="play" title="Прослушать" aria-label="Прослушать ${w.en}">🔊</button>
+    <div class="txt">
+      <div class="en">${w.en} <span class="ipa">${w.ipa}</span></div>
+      <div class="ru">${w.ru}</div>
+    </div>`;
+  row.querySelector('button').addEventListener('click', ()=> speak(w.en));
+  wordGrid.appendChild(row);
+});
+
+/* ---------------------------------------------------------
+   RENDER EXERCISES
+--------------------------------------------------------- */
+const exWrap = document.getElementById('exercises');
+
+EXERCISES.forEach((ex, exIndex)=>{
+  const section = document.createElement('section');
+  section.className = 'ex';
+  section.id = `ex-${exIndex}`;
+
+  const head = document.createElement('div');
+  head.className = 'ex-head';
+  head.innerHTML = `
+    <div class="ex-title">
+      <span class="ex-num">№${exIndex+1}</span>
+      <h2>${ex.title}</h2>
+    </div>
+    <span class="score" id="score-${exIndex}"></span>`;
+  section.appendChild(head);
+
+  const instr = document.createElement('p');
+  instr.className = 'instr';
+  instr.textContent = ex.instr;
+  section.appendChild(instr);
+
+  const items = document.createElement('div');
+  items.className = 'items';
+
+  ex.items.forEach((it, itIndex)=>{
+    const row = document.createElement('div');
+    row.className = 'item';
+    const inputId = `in-${exIndex}-${itIndex}`;
+
+    let promptHtml = '';
+    let controlHtml = '';
+
+    if(ex.type === 'dialog'){
+      promptHtml = `
+        <div class="dialog"><span class="speaker">A:</span>${it.a}</div>
+        <div class="dialog"><span class="speaker">B:</span>${it.b.replace('___','<span class="gap">___</span>')}</div>`;
+      controlHtml = `<input type="text" id="${inputId}" placeholder="напиши глагол в нужной форме">`;
+    } else if(ex.type === 'audio'){
+      promptHtml = `<div class="prompt"><button class="act reveal" style="padding:6px 12px;margin-right:8px" data-speak="${it.prompt}">🔊 Слушать</button><em>${it.hint||''}</em></div>`;
+      controlHtml = `<input type="text" id="${inputId}" placeholder="напиши то, что услышал(а)">`;
+    } else if(ex.type === 'select'){
+      promptHtml = `<div class="prompt">${it.prompt}</div>`;
+      const opts = it.options.map(o=>`<option value="${o}">${o}</option>`).join('');
+      controlHtml = `<select id="${inputId}"><option value="">— выбери —</option>${opts}</select>`;
+    } else if(ex.type === 'free3'){
+      promptHtml = `<div class="prompt">Глагол: <strong>${it.prompt}</strong> (${RU_BY_EN[it.word]||''})</div>`;
+      controlHtml = `<textarea id="${inputId}" rows="2" placeholder="1) ... 2) ... 3) ..."></textarea>`;
+    } else if(ex.type === 'free'){
+      promptHtml = `<div class="prompt">${it.prompt}</div>`;
+      controlHtml = `<textarea id="${inputId}" rows="2" placeholder="напиши своё предложение"></textarea>`;
+    } else {
+      promptHtml = `<div class="prompt">${it.prompt}</div>`;
+      controlHtml = `<input type="text" id="${inputId}" placeholder="напиши ответ">`;
+    }
+
+    row.innerHTML = `
+      <div class="n">${itIndex+1}.</div>
+      <div class="body">
+        ${promptHtml}
+        ${controlHtml}
+        <div class="answer-reveal" id="rev-${exIndex}-${itIndex}"></div>
+      </div>`;
+    items.appendChild(row);
+  });
+
+  section.appendChild(items);
+
+  // wire up any "listen" buttons inside audio-type items
+  items.querySelectorAll('[data-speak]').forEach(btn=>{
+    btn.addEventListener('click', ()=> speak(btn.getAttribute('data-speak')));
+  });
+
+  // actions
+  const actions = document.createElement('div');
+  actions.className = 'ex-actions';
+  const isFree = (ex.type === 'free' || ex.type === 'free3');
+
+  if(!isFree){
+    actions.innerHTML = `
+      <button class="act check" data-exi="${exIndex}">Проверить</button>
+      <button class="act reveal" data-exi="${exIndex}">Показать ответы</button>`;
+  } else {
+    actions.innerHTML = `
+      <button class="act copy-one" data-exi="${exIndex}">📋 Скопировать ответы этого задания</button>
+      <button class="act reveal" data-exi="${exIndex}">Показать пример</button>`;
+  }
+  section.appendChild(actions);
+  exWrap.appendChild(section);
+
+  // CHECK handler
+  const checkBtn = actions.querySelector('.check');
+  if(checkBtn){
+    checkBtn.addEventListener('click', ()=>{
+      let correctCount = 0;
+      ex.items.forEach((it, itIndex)=>{
+        const inputId = `in-${exIndex}-${itIndex}`;
+        const el = document.getElementById(inputId);
+        const val = norm(el.value);
+        const ok = it.answer.some(a => norm(a) === val);
+        el.classList.remove('correct','incorrect');
+        el.classList.add(ok ? 'correct' : 'incorrect');
+        if(ok){ correctCount++; } else { addProblem(it.word); }
+      });
+      const scoreEl = document.getElementById(`score-${exIndex}`);
+      scoreEl.textContent = `${correctCount} / ${ex.items.length}`;
+      scoreEl.classList.add('done');
+    });
+  }
+
+  // REVEAL handler
+  const revealBtn = actions.querySelector('.reveal');
+  revealBtn.addEventListener('click', ()=>{
+    ex.items.forEach((it, itIndex)=>{
+      const revEl = document.getElementById(`rev-${exIndex}-${itIndex}`);
+      let text = '';
+      if(isFree){
+        text = 'Пример: ' + (it.sample || '—');
+      } else {
+        text = 'Ответ: ' + it.answer[0];
+      }
+      revEl.textContent = text;
+      revEl.classList.add('show');
+    });
+  });
+
+  // COPY ONE (free exercises)
+  const copyBtn = actions.querySelector('.copy-one');
+  if(copyBtn){
+    copyBtn.addEventListener('click', ()=>{
+      let out = `${ex.title}\n`;
+      ex.items.forEach((it, itIndex)=>{
+        const el = document.getElementById(`in-${exIndex}-${itIndex}`);
+        out += `${itIndex+1}. ${it.prompt}\n   → ${el.value.trim() || '(пусто)'}\n`;
+      });
+      navigator.clipboard.writeText(out).then(()=>{
+        copyBtn.textContent = '✓ Скопировано';
+        setTimeout(()=> copyBtn.textContent = '📋 Скопировать ответы этого задания', 1600);
+      });
+    });
+  }
+});
+
+renderProblems();
+
+/* ---------------------------------------------------------
+   FINAL CHECK PANEL: audio test + copy everything
+--------------------------------------------------------- */
+const statusBox = document.getElementById('checkStatus');
+function showStatus(text){
+  statusBox.textContent = text;
+  statusBox.classList.add('show');
+}
+
+document.getElementById('testAudioBtn').addEventListener('click', ()=>{
+  if(!('speechSynthesis' in window)){
+    showStatus('❌ speechSynthesis не поддерживается этим браузером.');
+    return;
+  }
+  pickVoice();
+  const ok = speak('This is an audio test. Cook, live, eat, say, want.');
+  const voiceName = chosenVoice ? chosenVoice.name : '(голос по умолчанию браузера)';
+  showStatus(ok
+    ? `✅ Аудио запущено.\nИспользуемый голос: ${voiceName}\nЕсли звука не слышно — проверь громкость устройства или разреши автовоспроизведение звука для этой страницы.`
+    : '❌ Не удалось запустить синтез речи.');
+});
+
+document.getElementById('copyAllBtn').addEventListener('click', ()=>{
+  let out = 'Ответы — Глаголы A1\n' + '='.repeat(28) + '\n\n';
+  EXERCISES.forEach((ex, exIndex)=>{
+    out += `№${exIndex+1}. ${ex.title}\n`;
+    ex.items.forEach((it, itIndex)=>{
+      const el = document.getElementById(`in-${exIndex}-${itIndex}`);
+      const val = el.value.trim() || '(пусто)';
+      const promptText = it.prompt || (it.a ? `${it.a} — ${it.b}` : '');
+      out += `  ${itIndex+1}. ${promptText}\n     → ${val}\n`;
+    });
+    out += '\n';
+  });
+  navigator.clipboard.writeText(out).then(()=>{
+    showStatus('✅ Все ответы скопированы в буфер обмена. Вставь их (Ctrl+V) в сообщение или документ.');
+  }).catch(()=>{
+    showStatus('❌ Не удалось скопировать автоматически. Вот твои ответы — выдели и скопируй вручную:\n\n' + out);
+  });
+});
+</script>
+</body>
+</html>
