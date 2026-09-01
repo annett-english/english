@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inventions — тренажёр лексики и Passive Voice</title>
+<style>
+  :root{
+    --bg:#f4f6fb;
+    --card:#ffffff;
+    --ink:#1c2333;
+    --muted:#6b7280;
+    --accent:#2f6fed;
+    --accent-dark:#1e4fc7;
+    --good:#1ba672;
+    --good-bg:#e6f7ef;
+    --bad:#e0483f;
+    --bad-bg:#fdecec;
+    --border:#e3e7f0;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:"Segoe UI", Roboto, Arial, sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    line-height:1.5;
+    padding-bottom:60px;
+  }
+  header.page-head{
+    background:linear-gradient(120deg,#1e4fc7,#2f6fed 60%,#5b8def);
+    color:#fff;
+    padding:28px 24px 32px;
+    text-align:center;
+  }
+  header.page-head h1{margin:0 0 6px;font-size:1.6rem;}
+  header.page-head p{margin:0;opacity:.9;font-size:.95rem;}
+
+  .layout{
+    display:flex;
+    gap:20px;
+    max-width:1200px;
+    margin:24px auto;
+    padding:0 16px;
+    align-items:flex-start;
+  }
+  .main-col{flex:1;min-width:0;}
+  .side-col{
+    width:250px;
+    flex-shrink:0;
+    position:sticky;
+    top:16px;
+  }
+  @media (max-width:900px){
+    .layout{flex-direction:column;}
+    .side-col{width:100%;position:static;}
+  }
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:20px 22px;
+    margin-bottom:22px;
+    box-shadow:0 2px 10px rgba(20,30,60,.04);
+  }
+  .card h2{
+    margin-top:0;
+    font-size:1.15rem;
+    color:var(--accent-dark);
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .badge{
+    display:inline-block;
+    background:var(--accent);
+    color:#fff;
+    font-size:.7rem;
+    padding:2px 8px;
+    border-radius:20px;
+    font-weight:600;
+  }
+  .instructions{color:var(--muted);font-size:.92rem;margin-bottom:14px;}
+
+  table.words-table{width:100%;border-collapse:collapse;font-size:.93rem;}
+  table.words-table th, table.words-table td{
+    padding:8px 10px;border-bottom:1px solid var(--border);text-align:left;
+  }
+  table.words-table th{color:var(--muted);font-weight:600;font-size:.8rem;text-transform:uppercase;letter-spacing:.03em;}
+  .ipa{color:var(--muted);font-style:italic;}
+  .btn{
+    border:none;border-radius:8px;padding:7px 13px;font-size:.85rem;cursor:pointer;
+    font-weight:600;transition:.15s;
+  }
+  .btn-play{background:#eef3ff;color:var(--accent-dark);}
+  .btn-play:hover{background:#dde8ff;}
+  .btn-primary{background:var(--accent);color:#fff;}
+  .btn-primary:hover{background:var(--accent-dark);}
+  .btn-ghost{background:#fff;border:1px solid var(--border);color:var(--ink);}
+  .btn-ghost:hover{background:#f2f4f9;}
+  .btn-copy{background:#fff4e2;color:#a15c00;}
+  .btn-copy:hover{background:#ffe8c4;}
+
+  .exercise-item{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:8px;
+    padding:9px 0;
+    border-bottom:1px dashed var(--border);
+  }
+  .exercise-item:last-child{border-bottom:none;}
+  .q-num{
+    width:22px;height:22px;border-radius:50%;background:#eef1f8;color:var(--muted);
+    display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;flex-shrink:0;
+  }
+  .q-text{flex:1;min-width:200px;}
+  input[type=text], textarea{
+    border:1px solid var(--border);border-radius:8px;padding:7px 10px;font-size:.92rem;
+    font-family:inherit;width:220px;
+  }
+  textarea{width:100%;min-height:44px;resize:vertical;}
+  input.correct, textarea.correct{border-color:var(--good);background:var(--good-bg);}
+  input.wrong, textarea.wrong{border-color:var(--bad);background:var(--bad-bg);}
+  .answer-reveal{font-size:.85rem;color:var(--good);font-weight:600;margin-left:4px;}
+  .mcq-options{display:flex;flex-wrap:wrap;gap:12px;}
+  .mcq-options label{
+    display:flex;align-items:center;gap:5px;font-size:.9rem;
+    border:1px solid var(--border);padding:5px 10px;border-radius:8px;cursor:pointer;
+  }
+  .mcq-options label.opt-correct{border-color:var(--good);background:var(--good-bg);}
+  .mcq-options label.opt-wrong{border-color:var(--bad);background:var(--bad-bg);}
+
+  .controls-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;}
+  .result-line{margin-top:10px;font-weight:600;font-size:.9rem;}
+  .result-good{color:var(--good);}
+  .result-mid{color:#b8860b;}
+
+  .side-card table{width:100%;border-collapse:collapse;font-size:.83rem;}
+  .side-card th, .side-card td{padding:6px 4px;border-bottom:1px solid var(--border);}
+  .side-card th{color:var(--muted);font-size:.72rem;text-transform:uppercase;}
+  .empty-note{color:var(--muted);font-size:.85rem;}
+  .count-pill{background:var(--bad-bg);color:var(--bad);border-radius:20px;padding:1px 8px;font-size:.75rem;font-weight:700;}
+
+  .audio-check{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  .audio-status{font-size:.85rem;color:var(--muted);}
+
+  .rephrase-block{margin-bottom:10px;padding-bottom:10px;border-bottom:1px dashed var(--border);}
+  .rephrase-block:last-child{border-bottom:none;}
+  .active-sent{font-size:.92rem;margin-bottom:6px;}
+  .self-check-btns{margin-top:6px;display:flex;gap:8px;}
+  .btn-yes{background:var(--good-bg);color:var(--good);}
+  .btn-no{background:var(--bad-bg);color:var(--bad);}
+  .passive-answer{display:none;font-size:.88rem;color:var(--accent-dark);margin-top:4px;}
+
+  .toast{
+    position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+    background:#1c2333;color:#fff;padding:10px 18px;border-radius:10px;font-size:.9rem;
+    opacity:0;pointer-events:none;transition:.25s;
+  }
+  .toast.show{opacity:1;}
+</style>
+</head>
+<body>
+
+<header class="page-head">
+  <h1>Inventions — тренажёр слов и Passive Voice</h1>
+  <p>the mobile phone · dynamite · CDs · glasses · guns · stamps · the saxophone · the wristwatch · the hot-air balloon · Lego</p>
+</header>
+
+<div class="layout">
+  <div class="main-col">
+
+    <!-- WORD REMINDER -->
+    <div class="card">
+      <h2>🔤 Повторение слов</h2>
+      <p class="instructions">Нажмите на 🔊, чтобы прослушать произношение (голос Google US English, если он доступен в вашем браузере).</p>
+      <div class="audio-check">
+        <button class="btn btn-ghost" id="testAudioBtn">🔊 Проверить, работает ли звук</button>
+        <span class="audio-status" id="audioStatus">Статус: не проверено</span>
+      </div>
+      <table class="words-table" style="margin-top:12px;">
+        <thead><tr><th>Слово</th><th>Транскрипция</th><th>Перевод</th><th>Прослушать</th></tr></thead>
+        <tbody id="wordsTableBody"></tbody>
+      </table>
+    </div>
+
+    <!-- EX 1 -->
+    <div class="card">
+      <h2><span class="badge">1</span> Вставьте пропущенные буквы</h2>
+      <p class="instructions">Впишите слово полностью в поле ввода.</p>
+      <div id="ex1-list"></div>
+      <div class="controls-row">
+        <button class="btn btn-primary" onclick="checkEx1()">Проверить</button>
+        <button class="btn btn-ghost" onclick="showEx1()">Показать ответы</button>
+      </div>
+      <div class="result-line" id="ex1-result"></div>
+    </div>
+
+    <!-- EX 2 -->
+    <div class="card">
+      <h2><span class="badge">2</span> Напишите слово по звуку</h2>
+      <p class="instructions">Нажмите 🔊, прослушайте слово и напишите его правильно.</p>
+      <div id="ex2-list"></div>
+      <div class="controls-row">
+        <button class="btn btn-primary" onclick="checkEx2()">Проверить</button>
+        <button class="btn btn-ghost" onclick="showEx2()">Показать ответы</button>
+      </div>
+      <div class="result-line" id="ex2-result"></div>
+    </div>
+
+    <!-- EX 3 -->
+    <div class="card">
+      <h2><span class="badge">3</span> Дефиниция → слово</h2>
+      <p class="instructions">Прочитайте определение и напишите, какое это слово.</p>
+      <div id="ex3-list"></div>
+      <div class="controls-row">
+        <button class="btn btn-primary" onclick="checkEx3()">Проверить</button>
+        <button class="btn btn-ghost" onclick="showEx3()">Показать ответы</button>
+      </div>
+      <div class="result-line" id="ex3-result"></div>
+    </div>
+
+    <!-- EX 4 -->
+    <div class="card">
+      <h2><span class="badge">4</span> Choose the correct answer <small style="color:var(--muted);font-weight:400;">(Past / Present Simple Passive)</small></h2>
+      <p class="instructions">Выберите правильный вариант.</p>
+      <div id="ex4-list"></div>
+      <div class="controls-row">
+        <button class="btn btn-primary" onclick="checkEx4()">Проверить</button>
+        <button class="btn btn-ghost" onclick="showEx4()">Показать ответы</button>
+      </div>
+      <div class="result-line" id="ex4-result"></div>
+    </div>
+
+    <!-- EX 5 -->
+    <div class="card">
+      <h2><span class="badge">5</span> Fill in the gaps using the correct form <small style="color:var(--muted);font-weight:400;">(Past / Present Simple Passive)</small></h2>
+      <p class="instructions">Поставьте глагол в скобках в нужную форму (страдательный залог).</p>
+      <div id="ex5-list"></div>
+      <div class="controls-row">
+        <button class="btn btn-primary" onclick="checkEx5()">Проверить</button>
+        <button class="btn btn-ghost" onclick="showEx5()">Показать ответы</button>
+      </div>
+      <div class="result-line" id="ex5-result"></div>
+    </div>
+
+    <!-- EX 6 -->
+    <div class="card">
+      <h2><span class="badge">6</span> Rephrase</h2>
+      <p class="instructions">Перепишите предложение в страдательном залоге (Passive Voice), затем нажмите «Показать ответ» и честно отметьте, верно ли вы написали.</p>
+      <div id="ex6-list"></div>
+      <div class="result-line" id="ex6-result"></div>
+    </div>
+
+    <!-- EX 7 -->
+    <div class="card">
+      <h2><span class="badge">7</span> Закончите предложения своими идеями</h2>
+      <p class="instructions">Здесь нет «правильного» ответа — пишите свои мысли. В конце можно скопировать все ответы одной кнопкой.</p>
+      <div id="ex7-list"></div>
+      <div class="controls-row">
+        <button class="btn btn-copy" onclick="copyBlock(7)">📋 Скопировать все ответы</button>
+      </div>
+    </div>
+
+    <!-- EX 8 -->
+    <div class="card">
+      <h2><span class="badge">8</span> Напишите своё предложение</h2>
+      <p class="instructions">Составьте своё предложение с каждым из данных слов.</p>
+      <div id="ex8-list"></div>
+      <div class="controls-row">
+        <button class="btn btn-copy" onclick="copyBlock(8)">📋 Скопировать все ответы</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>✅ Итог</h2>
+      <p class="instructions">Собрать все введённые ответы студента из упражнений 1–8 в один текст (удобно отправить учителю).</p>
+      <button class="btn btn-copy" onclick="copyAll()">📋 Скопировать ВСЕ ответы ученика</button>
+    </div>
+
+  </div>
+
+  <div class="side-col">
+    <div class="card side-card">
+      <h2 style="font-size:1rem;">⚠️ Проблемные слова</h2>
+      <p class="instructions" style="margin-bottom:8px;">Слова, в которых были допущены ошибки</p>
+      <table id="problemTable">
+        <thead><tr><th>Слово</th><th>Перевод</th><th>Ошибок</th></tr></thead>
+        <tbody id="problemTableBody"></tbody>
+      </table>
+      <p class="empty-note" id="problemEmptyNote">Пока нет ошибок 🎉</p>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================== DATA ================== */
+const words = [
+  {id:'mobile',   en:'the mobile phone',      ipa:'/ˈməʊbaɪl fəʊn/',       ru:'мобильный телефон'},
+  {id:'dynamite', en:'dynamite',               ipa:'/ˈdaɪnəmaɪt/',          ru:'динамит'},
+  {id:'cds',      en:'CDs',                    ipa:'/ˌsiːˈdiːz/',           ru:'компакт-диски'},
+  {id:'glasses',  en:'glasses',                ipa:'/ˈɡlɑːsɪz/',            ru:'очки'},
+  {id:'guns',     en:'guns',                   ipa:'/ɡʌnz/',                ru:'оружие / пистолеты'},
+  {id:'stamps',   en:'stamps',                 ipa:'/stæmps/',              ru:'почтовые марки'},
+  {id:'sax',      en:'the saxophone',          ipa:'/ˈsæksəfəʊn/',          ru:'саксофон'},
+  {id:'watch',    en:'the wristwatch',         ipa:'/ˈrɪstwɒtʃ/',           ru:'наручные часы'},
+  {id:'balloon',  en:'the hot-air balloon',    ipa:'/hɒt eə(r) bəˈluːn/',   ru:'воздушный шар'},
+  {id:'lego',     en:'Lego',                   ipa:'/ˈleɡəʊ/',              ru:'Лего'}
+];
+const wordById = {};
+words.forEach(w => wordById[w.id] = w);
+
+function acceptableAnswers(id){
+  const w = wordById[id];
+  const arr = [w.en];
+  if(w.en.toLowerCase().startsWith('the ')) arr.push(w.en.slice(4));
+  if(id === 'balloon') arr.push('hot air balloon', 'the hot air balloon');
+  return arr;
+}
+
+const masks = {
+  mobile:'m_b_le ph_ne', dynamite:'dyn_m_te', cds:'C_s', glasses:'gl_ss_s',
+  guns:'g_ns', stamps:'st_mps', sax:'s_x_ph_ne', watch:'wr_stw_tch',
+  balloon:'h_t-_ir b_ll__n', lego:'L_g_'
+};
+
+const definitions = {
+  mobile:'A small device that you can carry with you and use to make calls, send messages, take photos, etc.',
+  dynamite:'A powerful explosive substance used for blasting rock or demolishing buildings.',
+  cds:'Round, flat plastic discs used for storing and playing music or data.',
+  glasses:'Two lenses in a frame that people wear over their eyes to help them see better.',
+  guns:'Weapons that fire bullets.',
+  stamps:'Small pieces of paper you stick on an envelope or parcel to show that postage has been paid.',
+  sax:'A brass musical instrument with a curved shape, often used in jazz music.',
+  watch:'A small clock that you wear on your wrist.',
+  balloon:'A large balloon filled with hot air that can carry people in a basket high into the sky.',
+  lego:'Small plastic building bricks that children use to construct models and toys.'
+};
+
+const order1 = ['mobile','glasses','watch','dynamite','lego','guns','cds','balloon','stamps','sax'];
+const order2 = ['stamps','dynamite','balloon','glasses','mobile','sax','lego','cds','watch','guns'];
+const order3 = ['cds','lego','guns','watch','dynamite','stamps','mobile','balloon','glasses','sax'];
+
+const ex4data = [
+  {id:'mobile',  sentence:'The mobile phone ___ by Martin Cooper in 1973.', options:['was invented','is invented','invented'], correct:0},
+  {id:'dynamite',sentence:'Dynamite ___ by Alfred Nobel in 1867.', options:['is invented','was invented','invents'], correct:1},
+  {id:'cds',     sentence:'Nowadays, most music ___ online instead of on CDs.', options:['is listened to','was listened to','listened'], correct:0},
+  {id:'glasses', sentence:'Glasses ___ in Italy in the 13th century.', options:['are invented','were invented','invented'], correct:1},
+  {id:'guns',    sentence:'Firearms ___ in China many centuries ago.', options:['invented','are invented','were invented'], correct:2},
+  {id:'stamps',  sentence:'Millions of letters ___ every day, and stamps are used to pay for postage.', options:['are sent','were sent','sent'], correct:0},
+  {id:'sax',     sentence:'The saxophone ___ by Adolphe Sax in 1846.', options:['is invented','was invented','invents'], correct:1},
+  {id:'watch',   sentence:'The first wristwatch ___ by Patek Philippe in 1904.', options:['was invented','is invented','invent'], correct:0},
+  {id:'balloon', sentence:'The hot-air balloon ___ by the Montgolfier brothers in 1783.', options:['is invented','was invented','invented'], correct:1},
+  {id:'lego',    sentence:'Lego bricks ___ in a factory in Denmark today.', options:['are made','were made','made'], correct:0}
+];
+const displayOrder4 = [4,0,7,2,9,5,1,8,3,6];
+
+const ex5data = [
+  {id:'mobile',   sentence:'The telephone (invent) ___ by Alexander Graham Bell in 1876.', answers:['was invented']},
+  {id:'dynamite', sentence:'Dynamite (invent) ___ by Alfred Nobel in 1867.', answers:['was invented']},
+  {id:'cds',      sentence:'CDs (introduce) ___ to the public in the early 1980s.', answers:['were introduced']},
+  {id:'glasses',  sentence:'Glasses (wear) ___ by millions of people around the world today.', answers:['are worn']},
+  {id:'guns',     sentence:'Guns (make) ___ from metal.', answers:['are made']},
+  {id:'stamps',   sentence:'The first postage stamp (design) ___ by Rowland Hill in 1840.', answers:['was designed']},
+  {id:'sax',      sentence:'The saxophone (play) ___ often in jazz music today.', answers:['is played']},
+  {id:'watch',    sentence:'The first wristwatch (create) ___ by Patek Philippe.', answers:['was created']},
+  {id:'balloon',  sentence:'Hot-air balloons (fly) ___ for fun today.', answers:['are flown']},
+  {id:'lego',     sentence:'Lego (invent) ___ by Ole Kirk Christiansen in 1949.', answers:['was invented']}
+];
+const displayOrder5 = [6,2,9,5,0,8,1,7,4,3];
+
+const ex6data = [
+  {id:'mobile',  active:'Martin Cooper invented the mobile phone in 1973.', passive:'The mobile phone was invented by Martin Cooper in 1973.'},
+  {id:'dynamite',active:'Alfred Nobel invented dynamite in 1867.', passive:'Dynamite was invented by Alfred Nobel in 1867.'},
+  {id:'cds',     active:'Sony and Philips developed the CD in 1979.', passive:'The CD was developed by Sony and Philips in 1979.'},
+  {id:'glasses', active:'People wear glasses to see better.', passive:'Glasses are worn to see better.'},
+  {id:'guns',    active:'Someone invented guns in China.', passive:'Guns were invented in China.'},
+  {id:'stamps',  active:'Rowland Hill designed the first postage stamp in 1840.', passive:'The first postage stamp was designed by Rowland Hill in 1840.'},
+  {id:'sax',     active:'Adolphe Sax invented the saxophone in 1846.', passive:'The saxophone was invented by Adolphe Sax in 1846.'},
+  {id:'watch',   active:'Patek Philippe created the first wristwatch in 1904.', passive:'The first wristwatch was created by Patek Philippe in 1904.'},
+  {id:'balloon', active:'The Montgolfier brothers invented the hot-air balloon in 1783.', passive:'The hot-air balloon was invented by the Montgolfier brothers in 1783.'},
+  {id:'lego',    active:'Ole Kirk Christiansen invented Lego in 1949.', passive:'Lego was invented by Ole Kirk Christiansen in 1949.'}
+];
+const displayOrder6 = [9,7,3,0,5,1,8,4,6,2];
+
+const ex7data = [
+  "If I could keep only one invention from this list, I would choose ... because ...",
+  "I think life without the mobile phone would be ...",
+  "In my opinion, the most dangerous invention on this list is ... because ...",
+  "I would love to try travelling in a hot-air balloon because ...",
+  "When I was a child, I used to play with ...",
+  "I think glasses are important for people who ...",
+  "If Lego had never been invented, children today would ...",
+  "I believe stamps will disappear in the future because ...",
+  "The saxophone sounds ... to me because ...",
+  "I can't imagine my life without ... because ..."
+];
+const displayOrder8 = [3,6,0,9,2,5,8,1,4,7];
+
+/* ================== PROBLEM WORDS ================== */
+const problemCounts = {};
+function addProblem(id){
+  problemCounts[id] = (problemCounts[id] || 0) + 1;
+  renderProblemTable();
+}
+function renderProblemTable(){
+  const tbody = document.getElementById('problemTableBody');
+  const note = document.getElementById('problemEmptyNote');
+  const entries = Object.entries(problemCounts).sort((a,b)=>b[1]-a[1]);
+  if(entries.length === 0){
+    tbody.innerHTML = '';
+    note.style.display = 'block';
+    return;
+  }
+  note.style.display = 'none';
+  tbody.innerHTML = entries.map(([id,count]) => {
+    const w = wordById[id];
+    return `<tr><td>${w.en}</td><td>${w.ru}</td><td><span class="count-pill">${count}</span></td></tr>`;
+  }).join('');
+}
+
+/* ================== SPEECH ================== */
+let chosenVoice = null;
+function loadVoice(){
+  const voices = speechSynthesis.getVoices();
+  chosenVoice = voices.find(v => v.name.includes('Google US English'))
+             || voices.find(v => v.lang === 'en-US')
+             || voices[0] || null;
+}
+if('speechSynthesis' in window){
+  loadVoice();
+  speechSynthesis.onvoiceschanged = loadVoice;
+}
+function speak(text){
+  if(!('speechSynthesis' in window)){
+    setAudioStatus('Web Speech API не поддерживается в этом браузере.', false);
+    return;
+  }
+  loadVoice();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-US';
+  u.rate = 0.9;
+  if(chosenVoice) u.voice = chosenVoice;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+}
+function setAudioStatus(msg, ok){
+  const el = document.getElementById('audioStatus');
+  el.textContent = 'Статус: ' + msg;
+  el.style.color = ok ? 'var(--good)' : 'var(--bad)';
+}
+document.getElementById('testAudioBtn').addEventListener('click', function(){
+  if(!('speechSynthesis' in window)){
+    setAudioStatus('speechSynthesis не поддерживается браузером.', false);
+    return;
+  }
+  loadVoice();
+  const voiceName = chosenVoice ? chosenVoice.name : 'голос по умолчанию';
+  setAudioStatus('воспроизводится ("' + voiceName + '")...', true);
+  const u = new SpeechSynthesisUtterance('Testing, one two three. Audio is working.');
+  u.lang = 'en-US';
+  if(chosenVoice) u.voice = chosenVoice;
+  u.onend = () => setAudioStatus('звук проигран успешно ✔ (голос: ' + voiceName + ')', true);
+  u.onerror = () => setAudioStatus('ошибка воспроизведения ✘', false);
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+});
+
+/* ================== HELPERS ================== */
+function normalize(s){
+  return (s || '').toLowerCase().trim()
+    .replace(/^the\s+/,'')
+    .replace(/[.!,]+$/,'')
+    .replace(/\s+/g,' ');
+}
+function matchesAny(userVal, answers){
+  const u = normalize(userVal);
+  return answers.some(a => normalize(a) === u);
+}
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2200);
+}
+async function copyText(text){
+  try{
+    await navigator.clipboard.writeText(text);
+    toast('Скопировано в буфер обмена ✔');
+  }catch(e){
+    // fallback
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    try{ document.execCommand('copy'); toast('Скопировано в буфер обмена ✔'); }
+    catch(err){ toast('Не удалось скопировать автоматически — выделите текст вручную.'); }
+    document.body.removeChild(ta);
+  }
+}
+
+/* ================== WORDS TABLE ================== */
+(function renderWordsTable(){
+  const tbody = document.getElementById('wordsTableBody');
+  tbody.innerHTML = words.map(w => `
+    <tr>
+      <td><strong>${w.en}</strong></td>
+      <td class="ipa">${w.ipa}</td>
+      <td>${w.ru}</td>
+      <td><button class="btn btn-play" onclick="speak('${w.en.replace(/'/g,"\\'")}')">🔊</button></td>
+    </tr>
+  `).join('');
+})();
+
+/* ================== EX 1: MISSING LETTERS ================== */
+(function renderEx1(){
+  const el = document.getElementById('ex1-list');
+  el.innerHTML = order1.map((id,i) => `
+    <div class="exercise-item">
+      <span class="q-num">${i+1}</span>
+      <span class="q-text">${masks[id]}  <span style="color:var(--muted);font-size:.82rem;">(${wordById[id].ru})</span></span>
+      <input type="text" id="ex1_${i}" data-id="${id}" placeholder="напишите слово">
+      <span class="answer-reveal" id="ex1_reveal_${i}"></span>
+    </div>
+  `).join('');
+})();
+function checkEx1(){
+  let correct = 0;
+  order1.forEach((id,i) => {
+    const input = document.getElementById('ex1_' + i);
+    const ok = matchesAny(input.value, acceptableAnswers(id));
+    input.classList.toggle('correct', ok);
+    input.classList.toggle('wrong', !ok && input.value.trim() !== '');
+    if(ok) correct++; else if(input.value.trim() !== '') addProblem(id);
+  });
+  document.getElementById('ex1-result').innerHTML =
+    `<span class="${correct===10?'result-good':'result-mid'}">Правильно: ${correct} из 10</span>`;
+}
+function showEx1(){
+  order1.forEach((id,i) => {
+    document.getElementById('ex1_reveal_' + i).textContent = '→ ' + wordById[id].en;
+  });
+}
+
+/* ================== EX 2: DICTATION ================== */
+(function renderEx2(){
+  const el = document.getElementById('ex2-list');
+  el.innerHTML = order2.map((id,i) => `
+    <div class="exercise-item">
+      <span class="q-num">${i+1}</span>
+      <button class="btn btn-play" onclick="speak('${wordById[id].en.replace(/'/g,"\\'")}')">🔊 Прослушать</button>
+      <input type="text" id="ex2_${i}" data-id="${id}" placeholder="напишите слово, которое услышали">
+      <span class="answer-reveal" id="ex2_reveal_${i}"></span>
+    </div>
+  `).join('');
+})();
+function checkEx2(){
+  let correct = 0;
+  order2.forEach((id,i) => {
+    const input = document.getElementById('ex2_' + i);
+    const ok = matchesAny(input.value, acceptableAnswers(id));
+    input.classList.toggle('correct', ok);
+    input.classList.toggle('wrong', !ok && input.value.trim() !== '');
+    if(ok) correct++; else if(input.value.trim() !== '') addProblem(id);
+  });
+  document.getElementById('ex2-result').innerHTML =
+    `<span class="${correct===10?'result-good':'result-mid'}">Правильно: ${correct} из 10</span>`;
+}
+function showEx2(){
+  order2.forEach((id,i) => {
+    document.getElementById('ex2_reveal_' + i).textContent = '→ ' + wordById[id].en;
+  });
+}
+
+/* ================== EX 3: DEFINITIONS ================== */
+(function renderEx3(){
+  const el = document.getElementById('ex3-list');
+  el.innerHTML = order3.map((id,i) => `
+    <div class="exercise-item">
+      <span class="q-num">${i+1}</span>
+      <span class="q-text">${definitions[id]}</span>
+      <input type="text" id="ex3_${i}" data-id="${id}" placeholder="это слово...">
+      <span class="answer-reveal" id="ex3_reveal_${i}"></span>
+    </div>
+  `).join('');
+})();
+function checkEx3(){
+  let correct = 0;
+  order3.forEach((id,i) => {
+    const input = document.getElementById('ex3_' + i);
+    const ok = matchesAny(input.value, acceptableAnswers(id));
+    input.classList.toggle('correct', ok);
+    input.classList.toggle('wrong', !ok && input.value.trim() !== '');
+    if(ok) correct++; else if(input.value.trim() !== '') addProblem(id);
+  });
+  document.getElementById('ex3-result').innerHTML =
+    `<span class="${correct===10?'result-good':'result-mid'}">Правильно: ${correct} из 10</span>`;
+}
+function showEx3(){
+  order3.forEach((id,i) => {
+    document.getElementById('ex3_reveal_' + i).textContent = '→ ' + wordById[id].en;
+  });
+}
+
+/* ================== EX 4: MCQ PASSIVE ================== */
+(function renderEx4(){
+  const el = document.getElementById('ex4-list');
+  el.innerHTML = displayOrder4.map((qi,i) => {
+    const q = ex4data[qi];
+    const opts = q.options.map((opt,oi) => `
+      <label id="ex4_${i}_opt_${oi}">
+        <input type="radio" name="ex4_${i}" value="${oi}"> ${opt}
+      </label>`).join('');
+    return `
+    <div class="exercise-item" style="flex-direction:column;align-items:flex-start;">
+      <div><span class="q-num">${i+1}</span> <span class="q-text">${q.sentence}</span></div>
+      <div class="mcq-options">${opts}</div>
+    </div>`;
+  }).join('');
+})();
+function checkEx4(){
+  let correct = 0;
+  displayOrder4.forEach((qi,i) => {
+    const q = ex4data[qi];
+    const chosen = document.querySelector(`input[name="ex4_${i}"]:checked`);
+    for(let oi=0; oi<q.options.length; oi++){
+      document.getElementById(`ex4_${i}_opt_${oi}`).classList.remove('opt-correct','opt-wrong');
+    }
+    const val = chosen ? parseInt(chosen.value) : -1;
+    if(val === q.correct){
+      correct++;
+      document.getElementById(`ex4_${i}_opt_${val}`).classList.add('opt-correct');
+    } else {
+      if(chosen) document.getElementById(`ex4_${i}_opt_${val}`).classList.add('opt-wrong');
+      document.getElementById(`ex4_${i}_opt_${q.correct}`).classList.add('opt-correct');
+      addProblem(q.id);
+    }
+  });
+  document.getElementById('ex4-result').innerHTML =
+    `<span class="${correct===10?'result-good':'result-mid'}">Правильно: ${correct} из 10</span>`;
+}
+function showEx4(){
+  displayOrder4.forEach((qi,i) => {
+    const q = ex4data[qi];
+    document.getElementById(`ex4_${i}_opt_${q.correct}`).classList.add('opt-correct');
+  });
+}
+
+/* ================== EX 5: FILL CORRECT FORM ================== */
+(function renderEx5(){
+  const el = document.getElementById('ex5-list');
+  el.innerHTML = displayOrder5.map((qi,i) => {
+    const q = ex5data[qi];
+    return `
+    <div class="exercise-item">
+      <span class="q-num">${i+1}</span>
+      <span class="q-text">${q.sentence}</span>
+      <input type="text" id="ex5_${i}" placeholder="was/were/is/are + verb">
+      <span class="answer-reveal" id="ex5_reveal_${i}"></span>
+    </div>`;
+  }).join('');
+})();
+function checkEx5(){
+  let correct = 0;
+  displayOrder5.forEach((qi,i) => {
+    const q = ex5data[qi];
+    const input = document.getElementById('ex5_' + i);
+    const ok = matchesAny(input.value, q.answers);
+    input.classList.toggle('correct', ok);
+    input.classList.toggle('wrong', !ok && input.value.trim() !== '');
+    if(ok) correct++; else if(input.value.trim() !== '') addProblem(q.id);
+  });
+  document.getElementById('ex5-result').innerHTML =
+    `<span class="${correct===10?'result-good':'result-mid'}">Правильно: ${correct} из 10</span>`;
+}
+function showEx5(){
+  displayOrder5.forEach((qi,i) => {
+    const q = ex5data[qi];
+    document.getElementById('ex5_reveal_' + i).textContent = '→ ' + q.answers[0];
+  });
+}
+
+/* ================== EX 6: REPHRASE (self-check) ================== */
+(function renderEx6(){
+  const el = document.getElementById('ex6-list');
+  el.innerHTML = displayOrder6.map((qi,i) => {
+    const q = ex6data[qi];
+    return `
+    <div class="rephrase-block">
+      <div class="active-sent"><span class="q-num">${i+1}</span> ${q.active}</div>
+      <textarea id="ex6_${i}" placeholder="Rewrite in the passive voice..."></textarea>
+      <div class="controls-row" style="margin-top:6px;">
+        <button class="btn btn-ghost" onclick="revealEx6(${i})">Показать ответ</button>
+      </div>
+      <div class="passive-answer" id="ex6_answer_${i}">→ ${q.passive}</div>
+      <div class="self-check-btns" id="ex6_self_${i}" style="display:none;">
+        <button class="btn btn-yes" onclick="markEx6(${i}, '${q.id}', true)">✔ Всё верно</button>
+        <button class="btn btn-no" onclick="markEx6(${i}, '${q.id}', false)">✘ Была ошибка</button>
+      </div>
+    </div>`;
+  }).join('');
+})();
+function revealEx6(i){
+  document.getElementById('ex6_answer_' + i).style.display = 'block';
+  document.getElementById('ex6_self_' + i).style.display = 'flex';
+}
+let ex6Checked = 0, ex6Good = 0;
+function markEx6(i, id, isGood){
+  document.getElementById('ex6_self_' + i).style.display = 'none';
+  ex6Checked++;
+  if(isGood) ex6Good++; else addProblem(id);
+  document.getElementById('ex6-result').innerHTML =
+    `<span class="${ex6Good===10 && ex6Checked===10 ? 'result-good':'result-mid'}">Отмечено: ${ex6Checked} из 10, из них верно: ${ex6Good}</span>`;
+}
+
+/* ================== EX 7: OPEN SENTENCES ================== */
+(function renderEx7(){
+  const el = document.getElementById('ex7-list');
+  el.innerHTML = ex7data.map((s,i) => `
+    <div class="exercise-item">
+      <span class="q-num">${i+1}</span>
+      <textarea id="ex7_${i}" placeholder="ваш ответ...">${s}</textarea>
+    </div>`).join('');
+})();
+
+/* ================== EX 8: OWN SENTENCES ================== */
+(function renderEx8(){
+  const el = document.getElementById('ex8-list');
+  el.innerHTML = displayOrder8.map((wi,i) => {
+    const w = words[wi];
+    return `
+    <div class="exercise-item">
+      <span class="q-num">${i+1}</span>
+      <span class="q-text"><strong>${w.en}</strong></span>
+      <textarea id="ex8_${i}" placeholder="напишите своё предложение с этим словом..."></textarea>
+    </div>`;
+  }).join('');
+})();
+
+/* ================== COPY FUNCTIONS ================== */
+function copyBlock(exNum){
+  let lines = [];
+  if(exNum === 7){
+    lines.push('=== Упражнение 7: Закончите предложения своими идеями ===');
+    ex7data.forEach((s,i) => {
+      const val = document.getElementById('ex7_' + i).value.trim();
+      lines.push((i+1) + '. ' + val);
+    });
+  } else if(exNum === 8){
+    lines.push('=== Упражнение 8: Свои предложения со словами ===');
+    displayOrder8.forEach((wi,i) => {
+      const w = words[wi];
+      const val = document.getElementById('ex8_' + i).value.trim();
+      lines.push((i+1) + '. [' + w.en + '] ' + val);
+    });
+  }
+  copyText(lines.join('\n'));
+}
+
+function copyAll(){
+  let out = [];
+  out.push('==================== ОТВЕТЫ УЧЕНИКА ====================');
+
+  out.push('\n--- 1. Вставьте пропущенные буквы ---');
+  order1.forEach((id,i) => out.push((i+1) + '. ' + masks[id] + '  →  ' + (document.getElementById('ex1_'+i).value.trim() || '(пусто)')));
+
+  out.push('\n--- 2. Слово по звуку ---');
+  order2.forEach((id,i) => out.push((i+1) + '.  →  ' + (document.getElementById('ex2_'+i).value.trim() || '(пусто)')));
+
+  out.push('\n--- 3. Дефиниция → слово ---');
+  order3.forEach((id,i) => out.push((i+1) + '.  →  ' + (document.getElementById('ex3_'+i).value.trim() || '(пусто)')));
+
+  out.push('\n--- 4. Choose the correct answer ---');
+  displayOrder4.forEach((qi,i) => {
+    const q = ex4data[qi];
+    const chosen = document.querySelector(`input[name="ex4_${i}"]:checked`);
+    const val = chosen ? q.options[parseInt(chosen.value)] : '(не выбрано)';
+    out.push((i+1) + '. ' + q.sentence + '  →  ' + val);
+  });
+
+  out.push('\n--- 5. Fill in the gaps (correct form) ---');
+  displayOrder5.forEach((qi,i) => {
+    const q = ex5data[qi];
+    out.push((i+1) + '. ' + q.sentence + '  →  ' + (document.getElementById('ex5_'+i).value.trim() || '(пусто)'));
+  });
+
+  out.push('\n--- 6. Rephrase ---');
+  displayOrder6.forEach((qi,i) => {
+    const q = ex6data[qi];
+    out.push((i+1) + '. ' + q.active + '  →  ' + (document.getElementById('ex6_'+i).value.trim() || '(пусто)'));
+  });
+
+  out.push('\n--- 7. Закончите предложения своими идеями ---');
+  ex7data.forEach((s,i) => out.push((i+1) + '. ' + (document.getElementById('ex7_'+i).value.trim() || '(пусто)')));
+
+  out.push('\n--- 8. Свои предложения со словами ---');
+  displayOrder8.forEach((wi,i) => {
+    const w = words[wi];
+    out.push((i+1) + '. [' + w.en + '] ' + (document.getElementById('ex8_'+i).value.trim() || '(пусто)'));
+  });
+
+  const probEntries = Object.entries(problemCounts).sort((a,b)=>b[1]-a[1]);
+  out.push('\n--- Проблемные слова ---');
+  if(probEntries.length === 0){
+    out.push('Ошибок не было 🎉');
+  } else {
+    probEntries.forEach(([id,count]) => out.push(wordById[id].en + ' (' + wordById[id].ru + ') — ошибок: ' + count));
+  }
+
+  copyText(out.join('\n'));
+}
+
+renderProblemTable();
+</script>
+</body>
+</html>
