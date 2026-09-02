@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Гардеробная тетрадь — Одежда: тренажёр</title>
+<style>
+  :root{
+    --bg: #ECE6D6;
+    --panel: #F8F4E9;
+    --panel-2: #F1EBDB;
+    --ink: #232C3D;
+    --navy: #26364A;
+    --thread: #A63D2E;
+    --thread-dark: #7E2E22;
+    --mustard: #C6902F;
+    --sage: #4F7A5C;
+    --sage-bg: #E4EEE5;
+    --error: #8C3B2E;
+    --error-bg: #F3E3DE;
+    --line: #C9BFA6;
+    --radius: 4px;
+    --mono: 'Courier New', Courier, monospace;
+    --serif: Georgia, 'Iowan Old Style', 'Palatino Linotype', 'Times New Roman', serif;
+    --sans: 'Segoe UI', Tahoma, Verdana, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--sans);
+    line-height:1.5;
+  }
+  a{color:var(--thread-dark);}
+  header.top{
+    background:var(--navy);
+    color:#EDE7D6;
+    padding:34px 24px 26px;
+    border-bottom:6px solid var(--thread);
+  }
+  header.top h1{
+    font-family:var(--serif);
+    font-weight:700;
+    font-size:2.1rem;
+    margin:0 0 6px;
+    letter-spacing:.2px;
+  }
+  header.top p{
+    margin:0;
+    max-width:640px;
+    color:#CFC8B4;
+    font-size:.98rem;
+  }
+  nav.jump{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px 10px;
+    margin-top:18px;
+  }
+  nav.jump a{
+    font-family:var(--mono);
+    font-size:.78rem;
+    color:#EDE7D6;
+    text-decoration:none;
+    border:1px solid #56637a;
+    border-radius:2px;
+    padding:4px 8px;
+    background:#2f4058;
+  }
+  nav.jump a:hover{background:var(--thread);border-color:var(--thread);}
+
+  .layout{
+    max-width:1180px;
+    margin:0 auto;
+    padding:26px 20px 80px;
+    display:grid;
+    grid-template-columns:1fr 300px;
+    gap:26px;
+    align-items:start;
+  }
+  @media (max-width:920px){
+    .layout{grid-template-columns:1fr;}
+    aside.sidebar{order:-1;position:static;}
+  }
+
+  section{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:22px 24px 26px;
+    margin-bottom:26px;
+    position:relative;
+  }
+  section h2{
+    font-family:var(--serif);
+    font-size:1.35rem;
+    margin:0 0 4px;
+    color:var(--navy);
+  }
+  section .sub{
+    font-size:.9rem;
+    color:#5b5748;
+    margin:0 0 16px;
+    max-width:70ch;
+  }
+
+  /* vocab review grid */
+  .vocab-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(230px,1fr));
+    gap:10px;
+    max-height:560px;
+    overflow-y:auto;
+    padding-right:6px;
+    border-top:1px dashed var(--line);
+    padding-top:14px;
+  }
+  .vocab-card{
+    border:1.5px dashed var(--line);
+    border-radius:2px;
+    background:var(--panel-2);
+    padding:9px 10px;
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+  }
+  .vocab-card .en{
+    font-weight:700;
+    color:var(--navy);
+  }
+  .vocab-card .ipa{
+    font-family:var(--mono);
+    font-size:.82rem;
+    color:var(--thread-dark);
+  }
+  .vocab-card .ru{
+    font-size:.88rem;
+    color:#40412f;
+  }
+  .vocab-card .ex{
+    font-size:.78rem;
+    color:#7a7563;
+    font-style:italic;
+    margin-top:3px;
+  }
+  .vocab-card button.listen{
+    align-self:flex-start;
+    margin-top:5px;
+    background:none;
+    border:1px solid var(--thread);
+    color:var(--thread-dark);
+    border-radius:12px;
+    font-size:.76rem;
+    padding:2px 9px;
+    cursor:pointer;
+  }
+  .vocab-card button.listen:hover{background:var(--thread);color:#fff;}
+
+  /* generic buttons */
+  button{
+    font-family:var(--sans);
+    cursor:pointer;
+  }
+  .btn{
+    background:var(--navy);
+    color:#fff;
+    border:none;
+    border-radius:2px;
+    padding:9px 16px;
+    font-size:.9rem;
+    font-weight:600;
+  }
+  .btn:hover{background:#1b2735;}
+  .btn.secondary{
+    background:none;
+    color:var(--navy);
+    border:1.5px solid var(--navy);
+  }
+  .btn.secondary:hover{background:var(--navy);color:#fff;}
+  .btn.thread{background:var(--thread);}
+  .btn.thread:hover{background:var(--thread-dark);}
+  .btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;align-items:center;}
+  .score-tag{
+    font-family:var(--mono);
+    font-size:.85rem;
+    padding:6px 10px;
+    border:1px dashed var(--line);
+    border-radius:2px;
+    background:var(--panel-2);
+  }
+
+  /* exercise rows */
+  .ex-row{
+    display:grid;
+    grid-template-columns:28px minmax(160px,1fr) 200px 26px;
+    gap:10px;
+    align-items:center;
+    padding:8px 0;
+    border-bottom:1px solid var(--line);
+  }
+  .ex-row:last-child{border-bottom:none;}
+  .ex-num{font-family:var(--mono);color:#8b8467;font-size:.85rem;}
+  .ex-prompt{font-size:.95rem;}
+  .ex-prompt .tag-word{
+    font-family:var(--mono);
+    font-weight:700;
+    letter-spacing:1px;
+    color:var(--navy);
+    font-size:1.02rem;
+  }
+  .ex-prompt .ru-hint{color:#8b8467;font-size:.82rem;}
+  .ex-prompt .ru-prompt{font-weight:600;color:var(--navy);}
+  .ex-prompt .def-text{color:#3a3627;}
+  .emoji-big{font-size:1.9rem;}
+  .btn-audio-small{
+    background:none;
+    border:1px solid var(--thread);
+    color:var(--thread-dark);
+    border-radius:12px;
+    font-size:.8rem;
+    padding:3px 10px;
+  }
+  .btn-audio-small:hover{background:var(--thread);color:#fff;}
+  input.ex-input{
+    border:1.5px solid var(--line);
+    border-radius:2px;
+    padding:6px 8px;
+    font-size:.92rem;
+    width:100%;
+    background:#fff;
+  }
+  input.ex-input:focus{outline:2px solid var(--mustard);border-color:var(--mustard);}
+  input.ex-input.correct{background:var(--sage-bg);border-color:var(--sage);}
+  input.ex-input.wrong{background:var(--error-bg);border-color:var(--error);}
+  .ex-feedback{font-size:1.1rem;text-align:center;}
+  .ex-reveal{
+    grid-column:1 / -1;
+    font-size:.82rem;
+    color:var(--thread-dark);
+    font-family:var(--mono);
+    padding-left:38px;
+    margin-top:-4px;
+  }
+
+  /* situations & differences */
+  .scenario{margin-bottom:18px;}
+  .scenario h3{
+    font-family:var(--serif);
+    font-size:1.05rem;
+    margin:0 0 4px;
+    color:var(--navy);
+  }
+  .scenario p.hint{margin:0 0 6px;font-size:.85rem;color:#7a7563;}
+  textarea{
+    width:100%;
+    min-height:70px;
+    border:1.5px solid var(--line);
+    border-radius:2px;
+    padding:8px 10px;
+    font-family:var(--sans);
+    font-size:.92rem;
+    resize:vertical;
+    background:#fff;
+  }
+  textarea:focus{outline:2px solid var(--mustard);border-color:var(--mustard);}
+
+  table.diff-table{
+    width:100%;
+    border-collapse:collapse;
+    margin-bottom:18px;
+    font-size:.9rem;
+  }
+  table.diff-table th, table.diff-table td{
+    border:1px solid var(--line);
+    padding:7px 10px;
+    text-align:left;
+    vertical-align:top;
+  }
+  table.diff-table th{
+    background:var(--panel-2);
+    font-family:var(--serif);
+    color:var(--navy);
+  }
+  table.diff-table code{
+    font-family:var(--mono);
+    background:var(--panel-2);
+    padding:1px 5px;
+    border-radius:2px;
+  }
+
+  /* sidebar */
+  aside.sidebar{
+    position:sticky;
+    top:20px;
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+  }
+  .side-box{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:16px 16px 18px;
+  }
+  .side-box h3{
+    font-family:var(--serif);
+    font-size:1.05rem;
+    margin:0 0 8px;
+    color:var(--navy);
+  }
+  .side-box p.tiny{font-size:.8rem;color:#7a7563;margin:4px 0 10px;}
+  #voice-status{
+    font-family:var(--mono);
+    font-size:.78rem;
+    color:var(--thread-dark);
+    background:var(--panel-2);
+    border:1px dashed var(--line);
+    padding:6px 8px;
+    border-radius:2px;
+    margin-top:8px;
+    word-break:break-word;
+  }
+  table.problem-table{width:100%;border-collapse:collapse;font-size:.82rem;}
+  table.problem-table th,table.problem-table td{
+    padding:4px 4px;
+    border-bottom:1px solid var(--line);
+    text-align:left;
+  }
+  table.problem-table th{color:var(--navy);font-family:var(--mono);font-weight:700;font-size:.72rem;}
+  .empty-note{font-size:.82rem;color:#8b8467;font-style:italic;}
+  .toast{
+    position:fixed;
+    bottom:22px;
+    left:50%;
+    transform:translateX(-50%);
+    background:var(--navy);
+    color:#fff;
+    padding:10px 18px;
+    border-radius:20px;
+    font-size:.85rem;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .25s ease;
+    z-index:99;
+  }
+  .toast.show{opacity:1;}
+
+  .overall{
+    font-family:var(--mono);
+    font-size:.85rem;
+    color:var(--navy);
+    background:var(--panel-2);
+    border:1px dashed var(--line);
+    padding:8px 10px;
+    border-radius:2px;
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <h1>Гардеробная тетрадь: одежда</h1>
+  <p>Повторение лексики, аудирование и семь письменных упражнений по теме «Одежда, обувь и аксессуары». Прописывайте слова руками, проверяйте себя и следите за списком «проблемных слов».</p>
+  <nav class="jump">
+    <a href="#vocab-review">Слова</a>
+    <a href="#ex1">1. Буквы</a>
+    <a href="#ex2">2. Перевод</a>
+    <a href="#ex3">3. На слух</a>
+    <a href="#ex4">4. Дефиниция</a>
+    <a href="#ex5">5. Картинка</a>
+    <a href="#ex6">6. Ситуации</a>
+    <a href="#ex7">7. Разница глаголов</a>
+  </nav>
+</header>
+
+<div class="layout">
+  <main>
+
+    <section id="vocab-review">
+      <h2>Повторение слов</h2>
+      <p class="sub">Прочитайте слово, транскрипцию и перевод. Нажмите «🔊», чтобы услышать произношение (голос Google US English, если он установлен в браузере).</p>
+      <div class="vocab-grid" id="vocabGrid"></div>
+    </section>
+
+    <section id="ex1">
+      <h2>1. Вставьте пропущенные буквы</h2>
+      <p class="sub">Вместо пропусков напишите слово целиком. Рядом дан перевод как подсказка.</p>
+      <div id="exRows1"></div>
+      <div class="btn-row">
+        <button class="btn" onclick="checkExercise('1')">Проверить</button>
+        <button class="btn secondary" onclick="showAnswers('1')">Показать ответы</button>
+        <span class="score-tag" id="score1">0 / 20</span>
+      </div>
+    </section>
+
+    <section id="ex2">
+      <h2>2. Переведите с русского на английский</h2>
+      <p class="sub">Напишите английское слово или словосочетание.</p>
+      <div id="exRows2"></div>
+      <div class="btn-row">
+        <button class="btn" onclick="checkExercise('2')">Проверить</button>
+        <button class="btn secondary" onclick="showAnswers('2')">Показать ответы</button>
+        <span class="score-tag" id="score2">0 / 20</span>
+      </div>
+    </section>
+
+    <section id="ex3">
+      <h2>3. Напишите слово на слух</h2>
+      <p class="sub">Нажмите «🔊 Слушать», чтобы услышать произношение слова, и запишите его по-английски.</p>
+      <div id="exRows3"></div>
+      <div class="btn-row">
+        <button class="btn" onclick="checkExercise('3')">Проверить</button>
+        <button class="btn secondary" onclick="showAnswers('3')">Показать ответы</button>
+        <span class="score-tag" id="score3">0 / 20</span>
+      </div>
+    </section>
+
+    <section id="ex4">
+      <h2>4. Угадайте слово по определению</h2>
+      <p class="sub">Прочитайте определение на английском и напишите нужное слово.</p>
+      <div id="exRows4"></div>
+      <div class="btn-row">
+        <button class="btn" onclick="checkExercise('4')">Проверить</button>
+        <button class="btn secondary" onclick="showAnswers('4')">Показать ответы</button>
+        <span class="score-tag" id="score4">0 / 20</span>
+      </div>
+    </section>
+
+    <section id="ex5">
+      <h2>5. Назовите слово по картинке</h2>
+      <p class="sub">Вместо картинки используется эмодзи — напишите, как называется эта вещь по-английски.</p>
+      <div id="exRows5"></div>
+      <div class="btn-row">
+        <button class="btn" onclick="checkExercise('5')">Проверить</button>
+        <button class="btn secondary" onclick="showAnswers('5')">Показать ответы</button>
+        <span class="score-tag" id="score5">0 / 20</span>
+      </div>
+    </section>
+
+    <section id="ex6">
+      <h2>6. Что возьмёт с собой каждый человек?</h2>
+      <p class="sub">Опишите на английском, что нужно взять с собой в каждой ситуации. Используйте минимум 6 слов по теме «Одежда» в каждом ответе.</p>
+
+      <div class="scenario">
+        <h3>1. Поездка в горы на неделю (a week-long trip to the mountains)</h3>
+        <p class="hint">Что возьмёт Анна? Учтите холод, снег и активный отдых.</p>
+        <textarea id="sit1" placeholder="Anna will take a warm sweater, ..."></textarea>
+      </div>
+      <div class="scenario">
+        <h3>2. Концерт вечером (an evening concert)</h3>
+        <p class="hint">Что наденет Марк на концерт своей любимой группы?</p>
+        <textarea id="sit2" placeholder="Mark will wear ..."></textarea>
+      </div>
+      <div class="scenario">
+        <h3>3. Пляжный отдых (a beach holiday)</h3>
+        <p class="hint">Что упакует Лена для недели на море?</p>
+        <textarea id="sit3" placeholder="Lena will pack ..."></textarea>
+      </div>
+      <div class="scenario">
+        <h3>4. Свадьба друга (a friend's wedding)</h3>
+        <p class="hint">Что наденет Игорь на торжественную церемонию?</p>
+        <textarea id="sit4" placeholder="Igor will dress up in ..."></textarea>
+      </div>
+      <div class="scenario">
+        <h3>5. Поход под дождём (a rainy hike)</h3>
+        <p class="hint">Что возьмёт Ольга, чтобы не промокнуть?</p>
+        <textarea id="sit5" placeholder="Olga will take ..."></textarea>
+      </div>
+      <div class="scenario">
+        <h3>6. Зимняя поездка в город (a winter city trip)</h3>
+        <p class="hint">Что наденет Дима, чтобы не замёрзнуть в городе зимой?</p>
+        <textarea id="sit6" placeholder="Dima will wear ..."></textarea>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn thread" onclick="copyGroup(['sit1','sit2','sit3','sit4','sit5','sit6'], ['Горы','Концерт','Пляж','Свадьба','Дождь','Зима в городе'])">Скопировать все ответы</button>
+      </div>
+    </section>
+
+    <section id="ex7">
+      <h2>7. Explain the difference: wear / put on / take off / dress up / suit / fit</h2>
+      <p class="sub">Сначала — краткая разница между глаголами, затем 10 предложений, которые нужно составить самостоятельно.</p>
+
+      <table class="diff-table">
+        <tr><th>Слово</th><th>Значение</th><th>Пример</th></tr>
+        <tr><td><code>wear</code></td><td>носить (общее состояние — одежда уже на теле)</td><td>She wears jeans almost every day.</td></tr>
+        <tr><td><code>put on</code></td><td>надевать (само действие — процесс одевания)</td><td>He put on his coat and left.</td></tr>
+        <tr><td><code>take off</code></td><td>снимать (действие, обратное put on)</td><td>Please take off your shoes at the door.</td></tr>
+        <tr><td><code>dress up</code></td><td>наряжаться (надевать нарядную/особую одежду по случаю)</td><td>We always dress up for New Year's Eve.</td></tr>
+        <tr><td><code>suit</code> (verb)</td><td>идти, подходить к лицу/образу (о внешнем виде)</td><td>That colour really suits you.</td></tr>
+        <tr><td><code>fit</code> (verb)</td><td>подходить по размеру (о размере вещи)</td><td>These shoes don't fit me — they're too small.</td></tr>
+      </table>
+
+      <div id="sentenceRows7"></div>
+
+      <div class="btn-row">
+        <button class="btn thread" id="copySentences7">Скопировать все ответы</button>
+      </div>
+    </section>
+
+  </main>
+
+  <aside class="sidebar">
+    <div class="side-box">
+      <h3>Проверка звука</h3>
+      <p class="tiny">Нажмите, чтобы услышать тестовую фразу. Если звука нет — проверьте громкость и разрешения браузера на воспроизведение звука.</p>
+      <button class="btn secondary" onclick="testAudio()">🔊 Проверить голос</button>
+      <div id="voice-status">Голос ещё не выбран…</div>
+    </div>
+
+    <div class="side-box">
+      <h3>Общий результат</h3>
+      <div class="overall" id="overallScore">Пройдено упражнений: 0 / 5</div>
+    </div>
+
+    <div class="side-box">
+      <h3>Проблемные слова</h3>
+      <p class="tiny">Сюда автоматически попадают слова, в которых были допущены ошибки.</p>
+      <table class="problem-table" id="problemTable">
+        <tr><th>Слово</th><th>Перевод</th><th>Ошибок</th></tr>
+      </table>
+      <p class="empty-note" id="problemEmpty">Пока ошибок нет — так держать!</p>
+      <div class="btn-row" style="margin-top:10px;">
+        <button class="btn secondary" onclick="clearProblems()">Очистить список</button>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============ VOCAB DATA ============ */
+const vocab = [
+ {key:'1',en:'skirt',ru:'юбка',ipa:'/skɜːrt/',ex:"She wore a red skirt to the party.",def:"A piece of clothing for women or girls that hangs from the waist and covers the legs, worn instead of trousers."},
+ {key:'2',en:'shorts',ru:'шорты',ipa:'/ʃɔːrts/',ex:"He wears shorts in the summer.",def:"Trousers that end above the knee, often worn in warm weather or for sport.",emoji:'🩳'},
+ {key:'3',en:'t-shirt',ru:'футболка',ipa:'/ˈtiː ʃɜːrt/',ex:"I usually wear a t-shirt at home.",def:"A simple casual top with short sleeves and no collar.",emoji:'👕'},
+ {key:'4',en:'trousers',ru:'брюки',ipa:'/ˈtraʊ zərz/',ex:"He bought new trousers for work.",def:"An item of clothing that covers the body from the waist to the ankles, with a separate part for each leg."},
+ {key:'5',en:'jeans',ru:'джинсы',ipa:'/dʒiːnz/',ex:"She likes wearing jeans.",def:"Casual trousers made of strong cotton fabric, usually blue.",emoji:'👖'},
+ {key:'6',en:'sweater',ru:'свитер',ipa:'/ˈswet ər/',ex:"I put on a warm sweater.",def:"A warm knitted piece of clothing you pull over your head, worn on the upper body."},
+ {key:'7',en:'thermal clothes',ru:'термобельё',ipa:'/ˈθɜːr məl kloʊðz/',ex:"I wear thermal clothes in winter.",def:"Special underwear designed to keep the body warm in cold weather."},
+ {key:'8',en:'coat',ru:'пальто',ipa:'/koʊt/',ex:"She bought a new coat.",def:"A long piece of outer clothing with sleeves, worn over other clothes outdoors.",emoji:'🧥'},
+ {key:'9',en:'dress',ru:'платье',ipa:'/dres/',ex:"She wore a beautiful dress.",def:"A piece of women's clothing that covers the body and part of the legs in one piece.",emoji:'👗'},
+ {key:'10',en:'blouse',ru:'блузка',ipa:'/blaʊs/',ex:"She wears a blouse to work.",def:"A loose-fitting top for women, often worn with a skirt or trousers."},
+ {key:'11',en:'suit',ru:'костюм',ipa:'/suːt/',ex:"He wears a suit for meetings.",def:"A set of matching clothes, usually a jacket and trousers or a skirt, worn for formal occasions."},
+ {key:'12',en:'tracksuit',ru:'спортивный костюм',ipa:'/ˈtræk suːt/',ex:"I wear a tracksuit for jogging.",def:"A loose, comfortable set of clothes worn for sport or exercise."},
+ {key:'13',en:'underwear',ru:'нижнее бельё',ipa:'/ˈʌn dər wer/',ex:"She bought new underwear.",def:"Clothes worn under other clothes, next to the skin.",emoji:'🩲'},
+ {key:'14',en:'swimsuit',ru:'купальник',ipa:'/ˈswɪm suːt/',ex:"I need a new swimsuit for summer.",def:"Clothing worn for swimming.",emoji:'🩱'},
+ {key:'15',en:'longsleeve',ru:'лонгслив',ipa:'/ˈlɒŋ sliːv/',ex:"I put on a longsleeve because it's cold.",def:"A top with sleeves that cover the whole arm."},
+ {key:'16',en:'jumper',ru:'джемпер',ipa:'/ˈdʒʌm pər/',ex:"He wears a jumper in winter.",def:"A warm knitted piece of clothing, similar to a sweater."},
+ {key:'17',en:'down jacket',ru:'пуховик',ipa:'/daʊn ˈdʒæk ɪt/',ex:"I bought a down jacket for skiing.",def:"A very warm jacket filled with soft feathers, worn in cold weather."},
+ {key:'18',en:'waterproof trousers',ru:'непромокаемые штаны',ipa:'/ˈwɔː tər pruːf ˈtraʊ zərz/',ex:"I wear waterproof trousers when it rains.",def:"Trousers made to stop water getting through, worn in wet weather."},
+ {key:'19',en:'scarf',ru:'шарф',ipa:'/skɑːrf/',ex:"I wear a scarf in winter.",def:"A piece of cloth worn around the neck for warmth or style.",emoji:'🧣'},
+ {key:'20',en:'hat',ru:'шляпа',ipa:'/hæt/',ex:"He wears a hat in the sun.",def:"A covering for the head, often with a brim.",emoji:'🎩'},
+ {key:'21',en:'sunhat',ru:'панама',ipa:'/ˈsʌn hæt/',ex:"She wears a sunhat at the beach.",def:"A light hat with a wide brim, worn to protect from the sun.",emoji:'👒'},
+ {key:'22',en:'tie',ru:'галстук',ipa:'/taɪ/',ex:"He wears a tie to work.",def:"A long narrow piece of cloth worn around the neck under a shirt collar, tied in a knot.",emoji:'👔'},
+ {key:'23',en:'bow tie',ru:'бабочка',ipa:'/boʊ taɪ/',ex:"He wore a bow tie to the wedding.",def:"A necktie tied in the shape of a bow, worn on formal occasions."},
+ {key:'24',en:'earrings',ru:'серьги',ipa:'/ˈɪr rɪŋz/',ex:"She has beautiful earrings.",def:"Jewelry worn on the ears."},
+ {key:'25',en:'necklace',ru:'ожерелье',ipa:'/ˈnek ləs/',ex:"She wears a necklace every day.",def:"A piece of jewelry worn around the neck.",emoji:'📿'},
+ {key:'26',en:'rings',ru:'кольца',ipa:'/rɪŋz/',ex:"He wears two rings on his fingers.",def:"Small circles of jewelry worn on the fingers.",emoji:'💍'},
+ {key:'27',en:'gloves',ru:'перчатки',ipa:'/ɡlʌvz/',ex:"I wear gloves in winter.",def:"Coverings for the hands with separate parts for each finger.",emoji:'🧤'},
+ {key:'28',en:'mittens',ru:'варежки',ipa:'/ˈmɪt ənz/',ex:"She wears mittens instead of gloves.",def:"Hand coverings with one section for the thumb and one for the other fingers together."},
+ {key:'29',en:'bracelets',ru:'браслеты',ipa:'/ˈbreɪs ləts/',ex:"She has many bracelets on her wrist.",def:"Pieces of jewelry worn around the wrist."},
+ {key:'30',en:'socks',ru:'носки',ipa:'/sɒks/',ex:"I need clean socks.",def:"Soft coverings for the feet, worn inside shoes.",emoji:'🧦'},
+ {key:'31',en:'boots',ru:'сапоги',ipa:'/buːts/',ex:"I wear boots in the snow.",def:"Sturdy footwear that covers the foot and part of the leg.",emoji:'👢'},
+ {key:'32',en:'slippers',ru:'тапочки',ipa:'/ˈslɪp ərz/',ex:"I put on slippers at home.",def:"Soft, light shoes worn indoors."},
+ {key:'33',en:'flip-flops / slides',ru:'шлёпанцы',ipa:'/ˈflɪp flɒps/',ex:"I wear flip-flops at the beach.",def:"Simple, flat sandals held on by a strap between the toes."},
+ {key:'34',en:'high-heels',ru:'туфли на каблуке',ipa:'/haɪ hiːlz/',ex:"She wore high-heels to the party.",def:"Women's shoes with a raised heel, often worn for formal occasions.",emoji:'👠'},
+ {key:'35',en:'sneakers / trainers',ru:'кроссовки',ipa:'/ˈsniː kərz/',ex:"He wears sneakers to the gym.",def:"Comfortable sports shoes with a soft sole.",emoji:'👟'},
+ {key:'36',en:'rubber boots',ru:'резиновые сапоги',ipa:'/ˈrʌb ər buːts/',ex:"I wear rubber boots when it rains.",def:"Waterproof boots made of rubber, worn in wet or muddy conditions."},
+ {key:'37',en:'sandals',ru:'сандалии',ipa:'/ˈsæn dəlz/',ex:"She bought new sandals for summer.",def:"Light, open shoes held on by straps.",emoji:'👡'},
+ {key:'38',en:'cap',ru:'кепка',ipa:'/kæp/',ex:"He wears a cap to block the sun.",def:"A soft, flat hat with a curved part at the front called a peak.",emoji:'🧢'},
+ {key:'39',en:'wear',ru:'носить',ipa:'/wer/',ex:"I wear casual clothes at home.",def:"To have clothes on your body."},
+ {key:'40',en:'put on',ru:'надевать',ipa:'/pʊt ɒn/',ex:"I put on my coat.",def:"To place a piece of clothing onto your body — the action of dressing."},
+ {key:'41',en:'take off',ru:'снимать',ipa:'/teɪk ɒf/',ex:"Please take off your shoes.",def:"To remove a piece of clothing from your body."},
+ {key:'42',en:'dress up',ru:'наряжаться',ipa:'/dres ʌp/',ex:"We dress up for New Year's Eve.",def:"To put on smart or special clothes, often for an occasion."},
+ {key:'43',en:'suit',ru:'идти, подходить (к лицу)',ipa:'/suːt/',ex:"This dress suits me.",def:"To look good on someone, to match their appearance."},
+ {key:'44',en:'fit',ru:'подходить по размеру',ipa:'/fɪt/',ex:"This dress doesn't fit me.",def:"To be the right size and shape for someone."}
+];
+
+const pictureVocab = vocab.filter(w => w.emoji);
+
+/* ============ SEEDED SHUFFLE ============ */
+function mulberry32(a){
+  return function(){
+    a |= 0; a = a + 0x6D2B79F5 | 0;
+    let t = Math.imul(a ^ a >>> 15, 1 | a);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+function shuffleSeeded(arr, seed){
+  const rnd = mulberry32(seed);
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(rnd()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+const exWords = {
+  '1': shuffleSeeded(vocab, 11).slice(0,20),
+  '2': shuffleSeeded(vocab, 22).slice(0,20),
+  '3': shuffleSeeded(vocab, 33).slice(0,20),
+  '4': shuffleSeeded(vocab, 44).slice(0,20),
+  '5': shuffleSeeded(pictureVocab, 55).slice(0,20)
+};
+const exTypes = {'1':'blank','2':'translate','3':'sound','4':'definition','5':'picture'};
+
+/* ============ HELPERS ============ */
+function primaryOf(en){ return en.split('/')[0].trim(); }
+function normalize(s){ return s.toLowerCase().trim().replace(/[\s\-]/g,''); }
+function acceptableSet(en){ return en.split('/').map(s=>normalize(s)); }
+
+function blankWord(word){
+  return word.split(' ').map(tok=>{
+    if(tok.length<=2) return tok;
+    const arr = tok.split('');
+    for(let i=1;i<arr.length-1;i+=2){ arr[i]='_'; }
+    return arr.join('');
+  }).join(' ');
+}
+
+function promptContent(w, type){
+  switch(type){
+    case 'blank':
+      return `<span class="tag-word">${blankWord(primaryOf(w.en))}</span> <span class="ru-hint">(${w.ru.split(',')[0]})</span>`;
+    case 'translate':
+      return `<span class="ru-prompt">${w.ru}</span>`;
+    case 'sound':
+      return `<button type="button" class="btn-audio-small" onclick="speak('${primaryOf(w.en).replace(/'/g,"\\'")}')">🔊 Слушать</button>`;
+    case 'definition':
+      return `<span class="def-text">${w.def}</span>`;
+    case 'picture':
+      return `<span class="emoji-big">${w.emoji}</span>`;
+  }
+}
+
+/* ============ RENDER VOCAB REVIEW ============ */
+function renderVocabGrid(){
+  const grid = document.getElementById('vocabGrid');
+  grid.innerHTML = vocab.map(w => `
+    <div class="vocab-card">
+      <span class="en">${w.en}</span>
+      <span class="ipa">${w.ipa}</span>
+      <span class="ru">${w.ru}</span>
+      <span class="ex">${w.ex}</span>
+      <button class="listen" onclick="speak('${primaryOf(w.en).replace(/'/g,"\\'")}')">🔊 Слушать</button>
+    </div>
+  `).join('');
+}
+
+/* ============ RENDER EXERCISES ============ */
+function renderExercise(id){
+  const words = exWords[id];
+  const type = exTypes[id];
+  const container = document.getElementById('exRows'+id);
+  container.innerHTML = words.map((w,i) => `
+    <div class="ex-row" data-key="${w.key}">
+      <span class="ex-num">${i+1}.</span>
+      <div class="ex-prompt">${promptContent(w,type)}</div>
+      <input type="text" class="ex-input" autocomplete="off" spellcheck="false" placeholder="Ваш ответ">
+      <span class="ex-feedback"></span>
+      <span class="ex-reveal" hidden></span>
+    </div>
+  `).join('');
+}
+['1','2','3','4','5'].forEach(renderExercise);
+renderVocabGrid();
+
+/* ============ CHECK / REVEAL ============ */
+const exerciseDone = {'1':false,'2':false,'3':false,'4':false,'5':false};
+
+function checkExercise(id){
+  const words = exWords[id];
+  const rows = document.querySelectorAll('#exRows'+id+' .ex-row');
+  let correct = 0, attempted = 0;
+  rows.forEach((row,i) => {
+    const w = words[i];
+    const input = row.querySelector('.ex-input');
+    const feedback = row.querySelector('.ex-feedback');
+    const val = input.value.trim();
+    if(val === ''){
+      input.classList.remove('correct','wrong');
+      feedback.textContent = '';
+      return;
+    }
+    attempted++;
+    const ok = acceptableSet(w.en).includes(normalize(val));
+    if(ok){
+      input.classList.add('correct');
+      input.classList.remove('wrong');
+      feedback.textContent = '✓';
+      correct++;
+    } else {
+      input.classList.add('wrong');
+      input.classList.remove('correct');
+      feedback.textContent = '✗';
+      addProblem(w);
+    }
+  });
+  document.getElementById('score'+id).textContent = correct + ' / ' + words.length + (attempted<words.length ? ' (отвечено: '+attempted+')' : '');
+  exerciseDone[id] = true;
+  updateOverall();
+}
+
+function showAnswers(id){
+  const words = exWords[id];
+  const rows = document.querySelectorAll('#exRows'+id+' .ex-row');
+  rows.forEach((row,i) => {
+    const w = words[i];
+    const reveal = row.querySelector('.ex-reveal');
+    reveal.hidden = false;
+    reveal.textContent = 'Правильный ответ: ' + w.en;
+  });
+}
+
+function updateOverall(){
+  const doneCount = Object.values(exerciseDone).filter(Boolean).length;
+  document.getElementById('overallScore').textContent = 'Пройдено упражнений: ' + doneCount + ' / 5';
+}
+
+/* ============ PROBLEM WORDS ============ */
+const problemWords = new Map();
+function addProblem(w){
+  if(problemWords.has(w.key)){
+    problemWords.get(w.key).count++;
+  } else {
+    problemWords.set(w.key, {en:w.en, ru:w.ru, count:1});
+  }
+  renderProblemList();
+}
+function renderProblemList(){
+  const table = document.getElementById('problemTable');
+  const emptyNote = document.getElementById('problemEmpty');
+  const rows = [...problemWords.values()].sort((a,b)=>b.count-a.count);
+  table.innerHTML = '<tr><th>Слово</th><th>Перевод</th><th>Ошибок</th></tr>' +
+    rows.map(r => `<tr><td>${r.en}</td><td>${r.ru}</td><td>${r.count}</td></tr>`).join('');
+  emptyNote.style.display = rows.length ? 'none' : 'block';
+}
+function clearProblems(){
+  problemWords.clear();
+  renderProblemList();
+  showToast('Список проблемных слов очищен');
+}
+
+/* ============ SPEECH SYNTHESIS ============ */
+let preferredVoice = null;
+function pickVoice(){
+  const voices = speechSynthesis.getVoices();
+  if(!voices.length) return;
+  preferredVoice =
+    voices.find(v => v.name.includes('Google US English')) ||
+    voices.find(v => v.lang === 'en-US') ||
+    voices.find(v => v.lang && v.lang.startsWith('en')) ||
+    voices[0];
+  const status = document.getElementById('voice-status');
+  if(preferredVoice){
+    status.textContent = 'Используется голос: ' + preferredVoice.name + ' (' + preferredVoice.lang + ')';
+  } else {
+    status.textContent = 'Голоса не найдены в этом браузере.';
+  }
+}
+if('speechSynthesis' in window){
+  pickVoice();
+  speechSynthesis.onvoiceschanged = pickVoice;
+} else {
+  document.getElementById('voice-status').textContent = 'Ваш браузер не поддерживает синтез речи.';
+}
+
+function speak(text){
+  if(!('speechSynthesis' in window)){
+    alert('Ваш браузер не поддерживает озвучивание текста. Попробуйте Google Chrome.');
+    return;
+  }
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-US';
+  u.rate = 0.9;
+  if(preferredVoice) u.voice = preferredVoice;
+  speechSynthesis.speak(u);
+}
+
+function testAudio(){
+  if(!('speechSynthesis' in window)){
+    document.getElementById('voice-status').textContent = 'Синтез речи не поддерживается в этом браузере.';
+    return;
+  }
+  pickVoice();
+  speak("Hello! This is a test. If you can hear this sentence, the audio is working correctly.");
+}
+
+/* ============ SITUATIONS COPY (Exercise 6) ============ */
+function copyGroup(ids, titles){
+  const text = ids.map((id,i) => {
+    const val = document.getElementById(id).value.trim();
+    return titles[i] + ':\n' + (val || '(нет ответа)');
+  }).join('\n\n');
+  copyText(text);
+}
+
+/* ============ EXERCISE 7: sentences ============ */
+const verbCycle = ['wear','put on','take off','dress up','suit','fit','wear','put on','dress up','fit'];
+function renderSentenceRows7(){
+  const container = document.getElementById('sentenceRows7');
+  container.innerHTML = verbCycle.map((verb,i) => `
+    <div class="scenario">
+      <h3>${i+1}. Составьте предложение с <code>${verb}</code></h3>
+      <textarea id="sent7-${i}" placeholder="Write your own sentence using '${verb}'..."></textarea>
+    </div>
+  `).join('');
+}
+renderSentenceRows7();
+
+document.getElementById('copySentences7').addEventListener('click', () => {
+  const text = verbCycle.map((verb,i) => {
+    const val = document.getElementById('sent7-'+i).value.trim();
+    return (i+1) + '. [' + verb + '] ' + (val || '(нет ответа)');
+  }).join('\n');
+  copyText(text);
+});
+
+/* ============ CLIPBOARD ============ */
+function copyText(text){
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(() => showToast('Ответы скопированы!'))
+      .catch(() => fallbackCopy(text));
+  } else {
+    fallbackCopy(text);
+  }
+}
+function fallbackCopy(text){
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.left = '-9999px';
+  document.body.appendChild(ta);
+  ta.select();
+  try{
+    document.execCommand('copy');
+    showToast('Ответы скопированы!');
+  } catch(e){
+    showToast('Не удалось скопировать автоматически — выделите текст вручную.');
+  }
+  document.body.removeChild(ta);
+}
+
+let toastTimer;
+function showToast(msg){
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('show'), 2400);
+}
+</script>
+</body>
+</html>
