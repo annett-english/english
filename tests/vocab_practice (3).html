@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wherever, Whenever, Whatever… — тренажёр слов</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,500;0,600;1,400;1,500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F1EEE3;
+    --card:#FBFAF4;
+    --ink:#22312E;
+    --ink-soft:#5B655F;
+    --navy:#1F3A44;
+    --navy-soft:#3C5760;
+    --plum:#7A4B45;
+    --moss:#4C6B4F;
+    --moss-bg:#E7EEE4;
+    --rust:#A8402C;
+    --rust-bg:#F5E4DE;
+    --line:#DCD5C3;
+    --line-strong:#C6BEA8;
+    --radius:3px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:16px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{background:#D8CDBB;}
+  a{color:var(--navy);}
+
+  .wrap{
+    max-width:1080px;
+    margin:0 auto;
+    padding:40px 24px 100px;
+  }
+
+  header.top{
+    max-width:720px;
+    margin:0 0 8px;
+  }
+  header.top .eyebrow{
+    font-family:'Newsreader', serif;
+    font-style:italic;
+    font-size:16px;
+    color:var(--plum);
+    margin:0 0 6px;
+  }
+  header.top h1{
+    font-family:'Newsreader', serif;
+    font-weight:500;
+    font-size:clamp(30px, 5vw, 44px);
+    line-height:1.15;
+    margin:0 0 14px;
+    color:var(--navy);
+    letter-spacing:-0.01em;
+  }
+  header.top p.lede{
+    max-width:60ch;
+    color:var(--ink-soft);
+    font-size:16.5px;
+    margin:0 0 18px;
+  }
+
+  .audio-test{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-left:3px solid var(--navy);
+    padding:12px 16px;
+    max-width:640px;
+    border-radius:var(--radius);
+    margin-bottom:36px;
+  }
+  .audio-test span.status{font-size:14px; color:var(--ink-soft);}
+
+  .layout{
+    display:flex;
+    gap:44px;
+    align-items:flex-start;
+  }
+  main{flex:1; min-width:0;}
+  aside.sidebar{
+    width:250px;
+    flex-shrink:0;
+    position:sticky;
+    top:24px;
+  }
+
+  /* ---- vocab review ---- */
+  .vocab-review{margin-bottom:56px;}
+  .section-head{
+    display:flex;
+    align-items:baseline;
+    gap:12px;
+    border-bottom:1px solid var(--line-strong);
+    padding-bottom:10px;
+    margin-bottom:6px;
+  }
+  .section-head .num{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px;
+    color:var(--plum);
+    font-variant-numeric:tabular-nums;
+  }
+  .section-head h2{
+    font-family:'Newsreader', serif;
+    font-weight:500;
+    font-size:23px;
+    margin:0;
+    color:var(--navy);
+  }
+  .section-sub{
+    font-size:14.5px;
+    color:var(--ink-soft);
+    margin:8px 0 20px;
+    max-width:62ch;
+  }
+
+  .vocab-list{list-style:none; margin:0; padding:0;}
+  .vocab-row{
+    display:grid;
+    grid-template-columns:28px 1fr auto;
+    gap:14px;
+    align-items:start;
+    padding:14px 0;
+    border-bottom:1px solid var(--line);
+  }
+  .vocab-row:last-child{border-bottom:none;}
+  .vocab-row .idx{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px;
+    color:var(--ink-soft);
+    padding-top:3px;
+  }
+  .vocab-row .word-main{min-width:0;}
+  .vocab-row .en{
+    font-weight:600;
+    font-size:16.5px;
+    color:var(--ink);
+  }
+  .vocab-row .ipa{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px;
+    color:var(--plum);
+    margin-left:8px;
+  }
+  .vocab-row .ru{color:var(--navy-soft); font-size:14.5px; margin-top:2px;}
+  .vocab-row .example{
+    font-family:'Newsreader', serif;
+    font-style:italic;
+    font-size:14.5px;
+    color:var(--ink-soft);
+    margin-top:4px;
+  }
+  .play-btn{
+    border:1px solid var(--line-strong);
+    background:var(--card);
+    color:var(--navy);
+    border-radius:50%;
+    width:36px;
+    height:36px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    font-size:15px;
+    transition:background .15s ease, transform .1s ease;
+  }
+  .play-btn:hover{background:#E9E4D3;}
+  .play-btn:active{transform:scale(0.94);}
+
+  /* ---- exercises ---- */
+  .exercise{margin-bottom:60px;}
+  .exercise .task-line{
+    font-size:14.5px;
+    color:var(--ink-soft);
+    margin:8px 0 22px;
+    max-width:62ch;
+  }
+  .item{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:16px 18px;
+    margin-bottom:12px;
+  }
+  .item .prompt{font-size:15.5px; margin-bottom:10px;}
+  .item .prompt .ru-text{color:var(--navy-soft); font-weight:500;}
+  .item .prompt .mask{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:17px;
+    letter-spacing:1px;
+    color:var(--ink);
+  }
+  .item .prompt .def-text{font-family:'Newsreader', serif; font-style:italic; font-size:16.5px;}
+  .item .hint-note{font-size:13px; color:var(--ink-soft); margin-top:2px;}
+  .item .row{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    align-items:center;
+  }
+  input[type=text], textarea{
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:15px;
+    padding:8px 10px;
+    border:1px solid var(--line-strong);
+    border-radius:var(--radius);
+    background:#fff;
+    color:var(--ink);
+    flex:1;
+    min-width:200px;
+  }
+  textarea{width:100%; min-height:52px; resize:vertical; font-family:'IBM Plex Sans',sans-serif;}
+  input[type=text]:focus, textarea:focus, button:focus-visible{
+    outline:2px solid var(--navy-soft);
+    outline-offset:1px;
+  }
+  button{
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:14px;
+    font-weight:500;
+    padding:8px 14px;
+    border-radius:var(--radius);
+    border:1px solid var(--navy);
+    background:var(--navy);
+    color:#fff;
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  button:hover{background:var(--navy-soft); border-color:var(--navy-soft);}
+  button.ghost{
+    background:transparent;
+    color:var(--navy);
+    border:1px solid var(--line-strong);
+  }
+  button.ghost:hover{background:#EAE4D2;}
+  .feedback{
+    margin-top:10px;
+    font-size:14px;
+    display:none;
+    padding:8px 10px;
+    border-radius:var(--radius);
+  }
+  .feedback.show{display:block;}
+  .feedback.correct{background:var(--moss-bg); color:var(--moss);}
+  .feedback.incorrect{background:var(--rust-bg); color:var(--rust);}
+  .feedback.reveal{background:#EFEADA; color:var(--ink-soft);}
+
+  /* MC (ex 6) */
+  .mc-options{display:flex; flex-direction:column; gap:8px; margin:6px 0 12px;}
+  .mc-options label{
+    display:flex; align-items:center; gap:9px;
+    font-size:15px; cursor:pointer;
+    padding:6px 8px;
+    border-radius:var(--radius);
+  }
+  .mc-options label:hover{background:#EFEADA;}
+  .mc-options input{accent-color:var(--navy);}
+
+  /* cloze (ex 7) */
+  .cloze-text{
+    font-family:'Newsreader', serif;
+    font-size:18px;
+    line-height:2.05;
+    max-width:70ch;
+  }
+  .cloze-text input{
+    width:150px;
+    min-width:110px;
+    display:inline-block;
+    text-align:center;
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:15px;
+    padding:3px 6px;
+    border:none;
+    border-bottom:2px solid var(--line-strong);
+    border-radius:0;
+    background:transparent;
+    margin:0 2px;
+  }
+  .cloze-text input.correct{border-bottom-color:var(--moss); color:var(--moss);}
+  .cloze-text input.incorrect{border-bottom-color:var(--rust); color:var(--rust);}
+  .word-bank{
+    margin:18px 0 16px;
+    font-size:14px;
+    color:var(--ink-soft);
+  }
+  .word-bank .chip{
+    display:inline-block;
+    background:#EFEADA;
+    border:1px solid var(--line-strong);
+    border-radius:20px;
+    padding:3px 12px;
+    margin:3px 4px 3px 0;
+    font-size:13.5px;
+    color:var(--navy-soft);
+  }
+
+  /* sidebar problem words */
+  .problem-box{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-left:3px solid var(--plum);
+    border-radius:var(--radius);
+    padding:16px 18px 18px;
+  }
+  .problem-box h3{
+    font-family:'Newsreader', serif;
+    font-style:italic;
+    font-weight:500;
+    font-size:19px;
+    margin:0 0 4px;
+    color:var(--plum);
+  }
+  .problem-box .sub{font-size:12.5px; color:var(--ink-soft); margin-bottom:12px;}
+  #problemList{list-style:none; margin:0; padding:0;}
+  #problemList li{
+    font-size:14px;
+    padding:7px 0;
+    border-top:1px solid var(--line);
+  }
+  #problemList li:first-child{border-top:none;}
+  #problemList li .w-en{font-weight:600;}
+  #problemList li .w-ru{display:block; font-size:12.5px; color:var(--ink-soft);}
+  #problemList li.empty{color:var(--ink-soft); font-style:italic;}
+  .reset-link{
+    display:inline-block;
+    margin-top:12px;
+    font-size:12.5px;
+    color:var(--ink-soft);
+    cursor:pointer;
+    text-decoration:underline;
+    background:none;
+    border:none;
+    padding:0;
+  }
+
+  .finish{
+    margin-top:50px;
+    padding-top:26px;
+    border-top:1px solid var(--line-strong);
+  }
+  .finish h2{
+    font-family:'Newsreader', serif;
+    font-weight:500;
+    font-size:22px;
+    color:var(--navy);
+    margin:0 0 8px;
+  }
+  .finish p{color:var(--ink-soft); font-size:14.5px; max-width:60ch; margin:0 0 16px;}
+  .finish-actions{display:flex; align-items:center; gap:14px; flex-wrap:wrap;}
+  #copyStatus{font-size:13.5px; color:var(--moss);}
+
+  @media (max-width: 880px){
+    .layout{flex-direction:column;}
+    aside.sidebar{width:100%; position:static; order:-1;}
+    .vocab-row{grid-template-columns:22px 1fr auto;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <p class="eyebrow">Практика лексики</p>
+    <h1>Wherever, whenever, whatever…</h1>
+    <p class="lede">Десять слов и выражений — сначала послушай и повтори, затем пройди семь письменных упражнений и одно творческое. Каждый пункт можно проверить сразу и посмотреть верный ответ.</p>
+  </header>
+
+  <div class="audio-test">
+    <button id="audioTestBtn" type="button">🔊 Проверить звук</button>
+    <span class="status" id="audioTestStatus">Нажми кнопку — должен прозвучать голос: «This is a pronunciation test.»</span>
+  </div>
+
+  <div class="layout">
+    <main>
+
+      <!-- VOCAB REVIEW -->
+      <section class="vocab-review">
+        <div class="section-head"><span class="num">00</span><h2>Слова для повторения</h2></div>
+        <p class="section-sub">Нажми на кружок 🔊, чтобы услышать произношение (голос Google US English, если он доступен в браузере).</p>
+        <ul class="vocab-list" id="vocabList"></ul>
+      </section>
+
+      <!-- EX 1 -->
+      <section class="exercise" id="ex1-section">
+        <div class="section-head"><span class="num">01</span><h2>Вставь пропущенные буквы</h2></div>
+        <p class="task-line">Впиши слово или выражение целиком — по подсказке из пропущенных букв и переводу.</p>
+        <div id="ex1"></div>
+      </section>
+
+      <!-- EX 2 -->
+      <section class="exercise" id="ex2-section">
+        <div class="section-head"><span class="num">02</span><h2>Перевод: русский → английский</h2></div>
+        <p class="task-line">Переведи слово или выражение на английский язык.</p>
+        <div id="ex2"></div>
+      </section>
+
+      <!-- EX 3 -->
+      <section class="exercise" id="ex3-section">
+        <div class="section-head"><span class="num">03</span><h2>Напиши слово на слух</h2></div>
+        <p class="task-line">Нажми 🔊, прослушай произношение и запиши слово или выражение по-английски. Транскрипция откроется после проверки.</p>
+        <div id="ex3"></div>
+      </section>
+
+      <!-- EX 4 -->
+      <section class="exercise" id="ex4-section">
+        <div class="section-head"><span class="num">04</span><h2>Угадай слово по определению</h2></div>
+        <p class="task-line">Прочитай определение на английском и напиши, какое слово или выражение оно описывает.</p>
+        <div id="ex4"></div>
+      </section>
+
+      <!-- EX 5 -->
+      <section class="exercise" id="ex5-section">
+        <div class="section-head"><span class="num">05</span><h2>Rephrase — перефразируй</h2></div>
+        <p class="task-line">Перепиши предложение так, чтобы использовать нужное слово/выражение из списка, сохранив смысл.</p>
+        <div id="ex5"></div>
+      </section>
+
+      <!-- EX 6 -->
+      <section class="exercise" id="ex6-section">
+        <div class="section-head"><span class="num">06</span><h2>Which answer is impossible?</h2></div>
+        <p class="task-line">В каждом предложении три варианта подходят по смыслу и грамматике, а один — нет. Отметь невозможный вариант.</p>
+        <div id="ex6"></div>
+      </section>
+
+      <!-- EX 7 -->
+      <section class="exercise" id="ex7-section">
+        <div class="section-head"><span class="num">07</span><h2>Вставь слова в текст по контексту</h2></div>
+        <p class="task-line">Заполни пропуски словами из рамки ниже — каждое слово используется один раз.</p>
+        <div id="ex7"></div>
+      </section>
+
+      <!-- EX 8 -->
+      <section class="exercise" id="ex8-section">
+        <div class="section-head"><span class="num">08</span><h2>Составь своё предложение</h2></div>
+        <p class="task-line">Напиши собственное предложение с каждым словом/выражением. Проверка лишь смотрит, что слово действительно использовано — оценивай смысл сам(а).</p>
+        <div id="ex8"></div>
+      </section>
+
+      <div class="finish">
+        <h2>Готово?</h2>
+        <p>Убедись, что звук в упражнении 3 сработал у всех слов. Затем можно скопировать все свои ответы одной кнопкой — например, чтобы отправить преподавателю.</p>
+        <div class="finish-actions">
+          <button id="copyAllBtn" type="button">📋 Скопировать все ответы</button>
+          <span id="copyStatus"></span>
+        </div>
+      </div>
+
+    </main>
+
+    <aside class="sidebar">
+      <div class="problem-box">
+        <h3>Проблемные слова</h3>
+        <p class="sub">Здесь появляются слова, в которых была хотя бы одна ошибка.</p>
+        <ul id="problemList"><li class="empty">Пока нет ошибок</li></ul>
+        <button class="reset-link" id="resetProblemsBtn" type="button">очистить список</button>
+      </div>
+    </aside>
+  </div>
+
+</div>
+
+<script>
+/* ============ DATA ============ */
+const WORDS = [
+  { id:'wherever', en:'wherever', core:'wherever', ru:'куда бы (ты) ни пошёл / где бы ни', ipa:'/weərˈev.ər/',
+    example:`Wherever you go, I'll support you.`, exampleRu:`Куда бы ты ни пошёл, я буду тебя поддерживать.`,
+    def:`in, at, or to any place, no matter where`,
+    rephraseSource:`It doesn't matter where you go — I will support you.`,
+    match:{type:'substr', answers:['wherever']} },
+
+  { id:'whenever', en:'whenever', core:'whenever', ru:'всякий раз, когда / когда бы ни', ipa:'/wenˈev.ər/',
+    example:`Whenever I see her, she makes me laugh.`, exampleRu:`Всякий раз, когда я её вижу, она заставляет меня смеяться.`,
+    def:`at any time that; every time that`,
+    rephraseSource:`Every time I see her, she makes me laugh.`,
+    match:{type:'substr', answers:['whenever']} },
+
+  { id:'whatever', en:'whatever', core:'whatever', ru:'что бы (ты) ни', ipa:'/wɒtˈev.ər/',
+    example:`Whatever you choose, I'll support you.`, exampleRu:`Что бы ты ни выбрал, я тебя поддержу.`,
+    def:`anything or everything; no matter what`,
+    rephraseSource:`It doesn't matter what you choose — I'll support you.`,
+    match:{type:'substr', answers:['whatever']} },
+
+  { id:'whoever', en:'whoever', core:'whoever', ru:'кто бы ни / кого бы ни', ipa:'/huːˈev.ər/',
+    example:`Whoever you invite, I'll be happy to meet them.`, exampleRu:`Кого бы ты ни пригласил, я буду рад(а) с ним познакомиться.`,
+    def:`any person or people, no matter who`,
+    rephraseSource:`It doesn't matter who you invite — I'll be happy to meet them.`,
+    match:{type:'substr', answers:['whoever']} },
+
+  { id:'dont_get_me_wrong', en:`don't get me wrong`, core:`don't get me wrong`, ru:'не пойми меня неправильно', ipa:'/dəʊnt ɡet miː rɒŋ/',
+    example:`Don't get me wrong, I like my job.`, exampleRu:`Не пойми меня неправильно, мне нравится моя работа.`,
+    def:`said before a comment that might sound negative, so the listener doesn't misunderstand you`,
+    rephraseSource:`I don't want you to misunderstand me — I like my job.`,
+    match:{type:'substr', answers:['dont get me wrong']} },
+
+  { id:'puppy', en:'puppy', core:'puppy', ru:'щенок', ipa:'/ˈpʌp.i/',
+    example:`The puppy is playing in the garden.`, exampleRu:`Щенок играет в саду.`,
+    def:`a young dog`,
+    rephraseSource:`The young dog is playing in the garden.`,
+    match:{type:'substr', answers:['puppy','puppies']} },
+
+  { id:'be_into', en:'be into sth', core:'be into', ru:'увлекаться чем-либо, интересоваться чем-либо', ipa:`/biː ˈɪn.tuː ˈsʌmθɪŋ/`,
+    example:`I'm really into photography.`, exampleRu:`Я очень увлекаюсь фотографией.`,
+    def:`to be very interested in or enthusiastic about something`,
+    rephraseSource:`I'm really interested in photography.`,
+    match:{type:'tokens', groups:[['into'], ['be','is','are','am','was','were','im']]} },
+
+  { id:'redecorate', en:'redecorate', core:'redecorate', ru:'делать ремонт, обновлять интерьер', ipa:'/ˌriːˈdek.ər.eɪt/',
+    example:`We're going to redecorate the living room.`, exampleRu:`Мы собираемся сделать ремонт в гостиной.`,
+    def:`to paint or decorate a room again, giving it a new look`,
+    rephraseSource:`We're going to decorate the living room again, giving it a new look.`,
+    match:{type:'substr', answers:['redecorate','redecorating','redecorated','redecorates']} },
+
+  { id:'come_round', en:'come round', core:'come round', ru:'зайти в гости', ipa:'/kʌm raʊnd/',
+    example:`Why don't you come round this evening?`, exampleRu:`Почему бы тебе не зайти в гости сегодня вечером?`,
+    def:`to visit someone at their home, usually informally`,
+    rephraseSource:`Why don't you visit me informally this evening?`,
+    match:{type:'substr', answers:['come round']} },
+
+  { id:'however_adj', en:'however + adjective/adverb', core:'however', ru:'как бы ни / насколько бы ни', ipa:'/haʊˈev.ər/',
+    example:`However hard I try, I can't understand it.`, exampleRu:`Как бы я ни старался, я не могу это понять.`,
+    def:`no matter how (much, hard, fast, etc.)`,
+    rephraseSource:`No matter how hard I try, I can't understand it.`,
+    match:{type:'substr', answers:['however']} },
+];
+
+const byId = id => WORDS.find(w=>w.id===id);
+
+const EX6_ITEMS = [
+  { sentence:`_____ you decide to do, I'll support you.`, options:['Whatever','Whoever','Whichever','However'],
+    impossible:'However', relatedId:'whatever',
+    note:`«However» always goes with an adjective or adverb (however hard, however fast) — it can't stand alone as a subject like this.` },
+  { sentence:`_____ hard I study, I never remember new words.`, options:['However','No matter how','Whatever','As much as'],
+    impossible:'Whatever', relatedId:'however_adj',
+    note:`«Whatever» refers to things or actions, not degree — it can't combine directly with an adjective like «hard».` },
+  { sentence:`He'll find me _____ I hide.`, options:['wherever','no matter where','anywhere','whenever'],
+    impossible:'whenever', relatedId:'wherever',
+    note:`«Whenever» is about time, but the sentence is about a place to hide.` },
+  { sentence:`I'm really _____ jazz music these days.`, options:['into','keen on','fond of','redecorating'],
+    impossible:'redecorating', relatedId:'be_into',
+    note:`«Redecorating» means renovating a room — it doesn't collocate with music.` },
+  { sentence:`Why don't you _____ for coffee tomorrow?`, options:['come round','drop by','visit','come into'],
+    impossible:'come into', relatedId:'come_round',
+    note:`«Come into» means to enter a place or to inherit something — it doesn't fit a casual invitation.` },
+  { sentence:`She's just bought an adorable little _____.`, options:['puppy','kitten','puppy dog','redecoration'],
+    impossible:'redecoration', relatedId:'puppy',
+    note:`A «redecoration» isn't a living creature, so it can't be described as «adorable» here.` },
+  { sentence:`_____, I still think you were right to leave.`, options:[`Don't get me wrong`,'Whatever happens','However','Whoever knows'],
+    impossible:'Whoever knows', relatedId:'dont_get_me_wrong',
+    note:`«Whoever knows» isn't a fixed way to open a concession — it needs its own clause to make sense.` },
+  { sentence:`We're going to _____ the kitchen next month.`, options:['redecorate','repaint','do up','come round'],
+    impossible:'come round', relatedId:'redecorate',
+    note:`«Come round» is intransitive — you can't «come round the kitchen».` },
+];
+
+const EX7_TEMPLATE = `Last weekend Anna decided to {{1}} her flat. She's really {{2}} interior design, so she spent hours choosing new colours for the walls. {{3}} she starts a project like this, she gets very excited. Her neighbour Tom said, "{{4}}, I love your taste, but that shade of green is a bit too bright!" Anna just laughed. She told him he could {{5}} any time to see the result — she'd be happy to show anyone {{6}} was curious. Meanwhile, her new {{7}} was running around the room, knocking over paint cans. "{{8}} mess he makes, I still love him," Anna said, smiling at the little dog.`;
+
+const EX7_BLANKS = [
+  { n:1, id:'redecorate', answers:['redecorate'] },
+  { n:2, id:'be_into', answers:['into'] },
+  { n:3, id:'whenever', answers:['whenever'] },
+  { n:4, id:'dont_get_me_wrong', answers:['dont get me wrong'] },
+  { n:5, id:'come_round', answers:['come round'] },
+  { n:6, id:'whoever', answers:['whoever'] },
+  { n:7, id:'puppy', answers:['puppy'] },
+  { n:8, id:'whatever', answers:['whatever'] },
+];
+
+/* ============ HELPERS ============ */
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+function pickWords(n){ return shuffle(WORDS).slice(0,n); }
+
+function normalize(str){
+  return str.toLowerCase()
+    .replace(/[’']/g,'')
+    .replace(/[.,!?;:"“”]/g,'')
+    .replace(/\s+/g,' ')
+    .trim();
+}
+function hasToken(norm, token){
+  return new RegExp(`(^|\\s)${token.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}(\\s|$)`).test(norm);
+}
+function checkMatch(input, matchDef){
+  const norm = normalize(input);
+  if(!norm) return false;
+  if(matchDef.type==='substr'){
+    return matchDef.answers.some(a=> norm.includes(a));
+  }
+  if(matchDef.type==='tokens'){
+    return matchDef.groups.every(group => group.some(t=> hasToken(norm,t)));
+  }
+  return false;
+}
+
+function maskWord(phrase){
+  return phrase.split(' ').map(tok=>{
+    const chars = tok.split('');
+    return chars.map((c,i)=>{
+      if(!/[a-zA-Z]/.test(c)) return c;
+      if(i===0 || i===chars.length-1 || i%2===0) return c;
+      return '_';
+    }).join('');
+  }).join(' ');
+}
+
+/* ============ AUDIO ============ */
+let voices = [];
+function loadVoices(){ voices = window.speechSynthesis ? speechSynthesis.getVoices() : []; }
+if('speechSynthesis' in window){
+  loadVoices();
+  speechSynthesis.onvoiceschanged = loadVoices;
+}
+function pickVoice(){
+  return voices.find(v=>v.name==='Google US English')
+      || voices.find(v=>v.lang==='en-US' && /google/i.test(v.name))
+      || voices.find(v=>v.lang==='en-US')
+      || voices[0] || null;
+}
+function speak(text, onend){
+  if(!('speechSynthesis' in window)){
+    alert('Синтез речи не поддерживается в этом браузере.');
+    return;
+  }
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  const v = pickVoice();
+  if(v) u.voice = v;
+  u.lang = 'en-US';
+  u.rate = 0.92;
+  if(onend) u.onend = onend;
+  speechSynthesis.speak(u);
+}
+document.getElementById('audioTestBtn').addEventListener('click', ()=>{
+  const status = document.getElementById('audioTestStatus');
+  const v = pickVoice();
+  status.textContent = v ? `Звучит голос: ${v.name}. Если ты его слышишь — всё работает!` : 'Голоса ещё загружаются — попробуй ещё раз через секунду.';
+  speak('This is a pronunciation test.');
+});
+
+/* ============ PROBLEM WORDS ============ */
+const problemWords = new Set();
+function markWrong(id){
+  problemWords.add(id);
+  renderProblemList();
+}
+function renderProblemList(){
+  const ul = document.getElementById('problemList');
+  if(problemWords.size===0){
+    ul.innerHTML = `<li class="empty">Пока нет ошибок</li>`;
+    return;
+  }
+  ul.innerHTML = [...problemWords].map(id=>{
+    const w = byId(id);
+    return `<li><span class="w-en">${w.en}</span><span class="w-ru">${w.ru}</span></li>`;
+  }).join('');
+}
+document.getElementById('resetProblemsBtn').addEventListener('click', ()=>{
+  problemWords.clear();
+  renderProblemList();
+});
+
+/* ============ VOCAB REVIEW ============ */
+function renderVocabList(){
+  const ul = document.getElementById('vocabList');
+  ul.innerHTML = WORDS.map((w,i)=>`
+    <li class="vocab-row">
+      <span class="idx">${String(i+1).padStart(2,'0')}</span>
+      <div class="word-main">
+        <div><span class="en">${w.en}</span><span class="ipa">${w.ipa}</span></div>
+        <div class="ru">${w.ru}</div>
+        <div class="example">${w.example}</div>
+      </div>
+      <button class="play-btn" type="button" aria-label="Прослушать ${w.en}" data-speak="${w.core}">🔊</button>
+    </li>
+  `).join('');
+  ul.querySelectorAll('[data-speak]').forEach(btn=>{
+    btn.addEventListener('click', ()=> speak(btn.getAttribute('data-speak')));
+  });
+}
+
+/* ============ GENERIC TEXT-INPUT EXERCISES (1,2,3,4) ============ */
+function renderTextExercise(containerId, exNum, items, promptFn, opts){
+  opts = opts || {};
+  const container = document.getElementById(containerId);
+  container.innerHTML = items.map((w,i)=>`
+    <div class="item" data-idx="${i}">
+      <div class="prompt">${promptFn(w)}</div>
+      <div class="row">
+        <input type="text" class="ans-input" data-record="Ex.${exNum} · ${w.en}" placeholder="Введи ответ по-английски">
+        <button class="check-btn" type="button">Проверить</button>
+        <button class="show-btn ghost" type="button">Показать ответ</button>
+      </div>
+      ${opts.revealExtra ? `<div class="hint-note extra" style="display:none"></div>` : ''}
+      <div class="feedback"></div>
+    </div>
+  `).join('');
+
+  container.querySelectorAll('.item').forEach((el,i)=>{
+    const w = items[i];
+    const input = el.querySelector('.ans-input');
+    const fb = el.querySelector('.feedback');
+    el.querySelector('.check-btn').addEventListener('click', ()=>{
+      const ok = checkMatch(input.value, w.match);
+      fb.className = 'feedback show ' + (ok?'correct':'incorrect');
+      fb.textContent = ok ? 'Верно!' : 'Пока не совсем — попробуй ещё раз или посмотри ответ.';
+      if(!ok) markWrong(w.id);
+      if(ok && opts.onCorrectReveal){
+        const extra = el.querySelector('.extra');
+        if(extra){ extra.style.display='block'; extra.textContent = opts.onCorrectReveal(w); }
+      }
+    });
+    el.querySelector('.show-btn').addEventListener('click', ()=>{
+      input.value = w.core;
+      fb.className = 'feedback show reveal';
+      fb.textContent = `Ответ: ${w.core}`;
+      const extra = el.querySelector('.extra');
+      if(extra && opts.onCorrectReveal){ extra.style.display='block'; extra.textContent = opts.onCorrectReveal(w); }
+    });
+  });
+}
+
+/* EX1 — missing letters */
+function initEx1(){
+  const items = pickWords(8);
+  renderTextExercise('ex1', 1, items, w=>{
+    return `Слово: <span class="mask">${maskWord(w.en)}</span> &nbsp;(<span class="ru-text">${w.ru}</span>)`;
+  });
+}
+
+/* EX2 — RU to EN translate */
+function initEx2(){
+  const items = pickWords(8);
+  renderTextExercise('ex2', 2, items, w=>{
+    return `Переведи: <span class="ru-text">«${w.ru}»</span>`;
+  });
+}
+
+/* EX3 — listen & write */
+function initEx3(){
+  const items = pickWords(8);
+  const container = document.getElementById('ex3');
+  container.innerHTML = items.map((w,i)=>`
+    <div class="item" data-idx="${i}">
+      <div class="prompt row">
+        <button class="play-btn" type="button" data-speak="${w.core}">🔊</button>
+        <span>Прослушай и запиши слово или выражение.</span>
+      </div>
+      <div class="row">
+        <input type="text" class="ans-input" data-record="Ex.3 · ${w.en}" placeholder="Что ты услышал(а)?">
+        <button class="check-btn" type="button">Проверить</button>
+        <button class="show-btn ghost" type="button">Показать ответ</button>
+      </div>
+      <div class="hint-note ipa-reveal" style="display:none"></div>
+      <div class="feedback"></div>
+    </div>
+  `).join('');
+  container.querySelectorAll('.item').forEach((el,i)=>{
+    const w = items[i];
+    el.querySelector('.play-btn').addEventListener('click', ()=> speak(w.core));
+    const input = el.querySelector('.ans-input');
+    const fb = el.querySelector('.feedback');
+    const ipaReveal = el.querySelector('.ipa-reveal');
+    el.querySelector('.check-btn').addEventListener('click', ()=>{
+      const ok = checkMatch(input.value, w.match);
+      fb.className = 'feedback show ' + (ok?'correct':'incorrect');
+      fb.textContent = ok ? 'Верно!' : 'Не совсем — прослушай ещё раз или посмотри ответ.';
+      ipaReveal.style.display = 'block';
+      ipaReveal.textContent = `Транскрипция: ${w.ipa}`;
+      if(!ok) markWrong(w.id);
+    });
+    el.querySelector('.show-btn').addEventListener('click', ()=>{
+      input.value = w.core;
+      fb.className = 'feedback show reveal';
+      fb.textContent = `Ответ: ${w.core}`;
+      ipaReveal.style.display = 'block';
+      ipaReveal.textContent = `Транскрипция: ${w.ipa}`;
+    });
+  });
+}
+
+/* EX4 — definition */
+function initEx4(){
+  const items = pickWords(8);
+  renderTextExercise('ex4', 4, items, w=>{
+    return `<span class="def-text">"${w.def}"</span>`;
+  });
+}
+
+/* EX5 — rephrase (loose check, textarea) */
+function initEx5(){
+  const items = pickWords(8);
+  const container = document.getElementById('ex5');
+  container.innerHTML = items.map((w,i)=>`
+    <div class="item" data-idx="${i}">
+      <div class="prompt">Перефразируй, используя <strong>${w.core}</strong>:<br>«${w.rephraseSource}»</div>
+      <div class="row">
+        <textarea data-record="Ex.5 · ${w.en}" placeholder="Твой вариант..."></textarea>
+      </div>
+      <div class="row">
+        <button class="check-btn" type="button">Проверить</button>
+        <button class="show-btn ghost" type="button">Показать пример</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+  `).join('');
+  container.querySelectorAll('.item').forEach((el,i)=>{
+    const w = items[i];
+    const ta = el.querySelector('textarea');
+    const fb = el.querySelector('.feedback');
+    el.querySelector('.check-btn').addEventListener('click', ()=>{
+      const ok = checkMatch(ta.value, w.match);
+      fb.className = 'feedback show ' + (ok?'correct':'incorrect');
+      fb.textContent = ok ? `Отлично — слово «${w.core}» на месте! Проверь смысл сам(а) или сравни с примером.` : `Не вижу «${w.core}» в предложении — попробуй ещё раз.`;
+      if(!ok) markWrong(w.id);
+    });
+    el.querySelector('.show-btn').addEventListener('click', ()=>{
+      fb.className = 'feedback show reveal';
+      fb.textContent = `Пример: ${w.example}`;
+    });
+  });
+}
+
+/* EX6 — which answer is impossible (multiple choice) */
+function initEx6(){
+  const items = shuffle(EX6_ITEMS).slice(0,8);
+  const container = document.getElementById('ex6');
+  container.innerHTML = items.map((it,i)=>{
+    const opts = shuffle(it.options);
+    return `
+    <div class="item" data-idx="${i}">
+      <div class="prompt">${it.sentence.replace('_____','<u>_____</u>')}</div>
+      <div class="mc-options">
+        ${opts.map((o,oi)=>`
+          <label>
+            <input type="radio" name="ex6-${i}" value="${o}" data-record-radio="Ex.6 · item ${i+1}">
+            ${o}
+          </label>
+        `).join('')}
+      </div>
+      <div class="row">
+        <button class="check-btn" type="button">Проверить</button>
+        <button class="show-btn ghost" type="button">Показать ответ</button>
+      </div>
+      <div class="feedback"></div>
+    </div>`;
+  }).join('');
+
+  container.querySelectorAll('.item').forEach((el,i)=>{
+    const it = items[i];
+    const fb = el.querySelector('.feedback');
+    el.querySelector('.check-btn').addEventListener('click', ()=>{
+      const sel = el.querySelector(`input[name="ex6-${i}"]:checked`);
+      if(!sel){
+        fb.className = 'feedback show incorrect';
+        fb.textContent = 'Выбери один из вариантов.';
+        return;
+      }
+      const ok = sel.value === it.impossible;
+      fb.className = 'feedback show ' + (ok?'correct':'incorrect');
+      fb.textContent = (ok ? 'Верно! ' : `Неверно — невозможный вариант: «${it.impossible}». `) + it.note;
+      if(!ok) markWrong(it.relatedId);
+    });
+    el.querySelector('.show-btn').addEventListener('click', ()=>{
+      el.querySelectorAll(`input[name="ex6-${i}"]`).forEach(r=>{ r.checked = (r.value===it.impossible); });
+      fb.className = 'feedback show reveal';
+      fb.textContent = `Невозможный вариант: «${it.impossible}». ${it.note}`;
+    });
+  });
+}
+
+/* EX7 — cloze paragraph */
+function initEx7(){
+  const container = document.getElementById('ex7');
+  const bank = shuffle(EX7_BLANKS.map(b=>byId(b.id).core));
+  let html = EX7_TEMPLATE.replace(/\{\{(\d)\}\}/g, (m,n)=>{
+    return `<input type="text" class="cloze-input" data-n="${n}" data-record="Ex.7 · blank ${n}" aria-label="Пропуск ${n}">`;
+  });
+  container.innerHTML = `
+    <div class="item">
+      <div class="cloze-text">${html}</div>
+      <div class="word-bank">Слова для вставки: ${bank.map(w=>`<span class="chip">${w}</span>`).join('')}</div>
+      <div class="row">
+        <button class="check-btn" type="button">Проверить весь текст</button>
+        <button class="show-btn ghost" type="button">Показать ответы</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+  `;
+  const fb = container.querySelector('.feedback');
+  container.querySelector('.check-btn').addEventListener('click', ()=>{
+    let correctCount = 0;
+    EX7_BLANKS.forEach(b=>{
+      const input = container.querySelector(`.cloze-input[data-n="${b.n}"]`);
+      const ok = checkMatch(input.value, {type:'substr', answers:b.answers});
+      input.classList.remove('correct','incorrect');
+      input.classList.add(ok?'correct':'incorrect');
+      if(ok) correctCount++; else markWrong(b.id);
+    });
+    fb.className = 'feedback show ' + (correctCount===EX7_BLANKS.length ? 'correct' : 'incorrect');
+    fb.textContent = `Правильно заполнено: ${correctCount} из ${EX7_BLANKS.length}.`;
+  });
+  container.querySelector('.show-btn').addEventListener('click', ()=>{
+    EX7_BLANKS.forEach(b=>{
+      const input = container.querySelector(`.cloze-input[data-n="${b.n}"]`);
+      input.value = byId(b.id).core;
+      input.classList.remove('incorrect');
+      input.classList.add('correct');
+    });
+    fb.className = 'feedback show reveal';
+    fb.textContent = 'Показаны все верные ответы.';
+  });
+}
+
+/* EX8 — own sentences */
+function initEx8(){
+  const items = pickWords(8);
+  const container = document.getElementById('ex8');
+  container.innerHTML = items.map((w,i)=>`
+    <div class="item" data-idx="${i}">
+      <div class="prompt">Напиши предложение со словом/выражением <strong>${w.core}</strong> <span class="ru-text">(${w.ru})</span>:</div>
+      <div class="row">
+        <textarea data-record="Ex.8 · ${w.en}" placeholder="Моё предложение..."></textarea>
+      </div>
+      <div class="row">
+        <button class="check-btn" type="button">Проверить</button>
+        <button class="show-btn ghost" type="button">Показать пример</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+  `).join('');
+  container.querySelectorAll('.item').forEach((el,i)=>{
+    const w = items[i];
+    const ta = el.querySelector('textarea');
+    const fb = el.querySelector('.feedback');
+    el.querySelector('.check-btn').addEventListener('click', ()=>{
+      const ok = checkMatch(ta.value, w.match);
+      fb.className = 'feedback show ' + (ok?'correct':'incorrect');
+      fb.textContent = ok ? 'Слово использовано — молодец! Проверь смысл предложения сам(а).' : `Не вижу «${w.core}» в тексте — добавь его.`;
+    });
+    el.querySelector('.show-btn').addEventListener('click', ()=>{
+      fb.className = 'feedback show reveal';
+      fb.textContent = `Пример: ${w.example}`;
+    });
+  });
+}
+
+/* ============ COPY ALL ANSWERS ============ */
+document.getElementById('copyAllBtn').addEventListener('click', async ()=>{
+  const lines = [];
+  document.querySelectorAll('[data-record]').forEach(el=>{
+    const label = el.getAttribute('data-record');
+    const val = (el.value || '').trim();
+    lines.push(`${label}: ${val || '(пусто)'}`);
+  });
+  document.querySelectorAll('.item').forEach((item, idx)=>{
+    const radio = item.querySelector('input[type=radio]:checked');
+    if(radio){
+      const label = radio.getAttribute('data-record-radio') || `MC item ${idx+1}`;
+      lines.push(`${label}: ${radio.value}`);
+    }
+  });
+  const text = 'Мои ответы — ' + document.title + '\n\n' + lines.join('\n');
+  const status = document.getElementById('copyStatus');
+  try{
+    await navigator.clipboard.writeText(text);
+    status.textContent = 'Скопировано в буфер обмена ✓';
+  }catch(e){
+    window.prompt('Скопируй текст вручную (Ctrl/Cmd+C):', text);
+    status.textContent = '';
+  }
+  setTimeout(()=>{ status.textContent=''; }, 4000);
+});
+
+/* ============ INIT ============ */
+renderVocabList();
+initEx1(); initEx2(); initEx3(); initEx4(); initEx5(); initEx6(); initEx7(); initEx8();
+renderProblemList();
+</script>
+</body>
+</html>
