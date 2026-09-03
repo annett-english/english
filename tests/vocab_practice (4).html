@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Практика слов и выражений</title>
+<style>
+  :root{
+    --bg:#f5f6fa; --card:#ffffff; --accent:#4f6df5; --accent-dark:#3752c9;
+    --ok:#2e9e5b; --bad:#e0483f; --border:#e2e4ee; --text:#242938; --muted:#767c94;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:'Segoe UI', Roboto, Arial, sans-serif;
+    background:var(--bg); color:var(--text); display:flex; gap:20px;
+    padding:20px; align-items:flex-start;
+  }
+  .main{flex:1; min-width:0;}
+  .sidebar{
+    width:230px; flex-shrink:0; position:sticky; top:20px;
+    background:var(--card); border:1px solid var(--border); border-radius:12px;
+    padding:14px; box-shadow:0 2px 8px rgba(0,0,0,.04);
+  }
+  .sidebar h3{margin:0 0 10px; font-size:15px; color:var(--accent-dark);}
+  #problemTable{width:100%; border-collapse:collapse; font-size:13px;}
+  #problemTable th, #problemTable td{padding:5px 4px; border-bottom:1px solid var(--border); text-align:left;}
+  #problemTable th{color:var(--muted); font-weight:600;}
+  #problemEmpty{color:var(--muted); font-size:13px;}
+  h1{font-size:24px; margin-bottom:4px;}
+  .subtitle{color:var(--muted); margin-bottom:20px;}
+  .card{
+    background:var(--card); border:1px solid var(--border); border-radius:12px;
+    padding:20px; margin-bottom:22px; box-shadow:0 2px 8px rgba(0,0,0,.04);
+  }
+  .card h2{margin-top:0; font-size:19px; color:var(--accent-dark); display:flex; align-items:center; gap:8px;}
+  table.words{width:100%; border-collapse:collapse; margin-top:10px;}
+  table.words th, table.words td{padding:8px 6px; border-bottom:1px solid var(--border); text-align:left; font-size:14px; vertical-align:middle;}
+  table.words th{color:var(--muted); font-size:12px; text-transform:uppercase;}
+  .ipa{color:var(--muted); font-style:italic;}
+  .listenBtn{
+    border:none; background:var(--accent); color:#fff; border-radius:50%;
+    width:30px; height:30px; cursor:pointer; font-size:14px;
+  }
+  .listenBtn:hover{background:var(--accent-dark);}
+  .item{margin-bottom:14px; padding-bottom:12px; border-bottom:1px dashed var(--border);}
+  .item:last-child{border-bottom:none;}
+  .item .num{font-weight:600; color:var(--accent-dark); margin-right:6px;}
+  .item input[type=text], .item textarea{
+    width:100%; padding:8px 10px; border:1px solid var(--border); border-radius:8px;
+    font-size:14px; margin-top:6px; font-family:inherit;
+  }
+  .item textarea{min-height:50px; resize:vertical;}
+  .tf-options{margin-top:6px;}
+  .tf-options label{margin-right:16px; cursor:pointer; font-size:14px;}
+  .answerKey{display:none; margin-top:6px; font-size:13px; color:var(--ok); background:#eafaf0; padding:6px 8px; border-radius:6px;}
+  .result-icon{margin-left:8px; font-weight:bold;}
+  .result-icon.ok{color:var(--ok);}
+  .result-icon.bad{color:var(--bad);}
+  .btnrow{display:flex; gap:10px; margin-top:14px; flex-wrap:wrap;}
+  button.action{
+    border:none; background:var(--accent); color:#fff; padding:9px 16px;
+    border-radius:8px; cursor:pointer; font-size:14px; font-weight:500;
+  }
+  button.action:hover{background:var(--accent-dark);}
+  button.action.secondary{background:#eef0fb; color:var(--accent-dark);}
+  button.action.secondary:hover{background:#dde1f7;}
+  .score{font-size:14px; margin-top:8px; font-weight:600;}
+  .globalCopy{
+    background:var(--card); border:1px solid var(--border); border-radius:12px;
+    padding:18px; text-align:center;
+  }
+  .toast{
+    position:fixed; bottom:20px; left:50%; transform:translateX(-50%);
+    background:#242938; color:#fff; padding:10px 18px; border-radius:8px; font-size:14px;
+    opacity:0; transition:opacity .3s; pointer-events:none;
+  }
+  .toast.show{opacity:1;}
+  .audioWarn{font-size:12px; color:var(--bad); margin-top:6px; display:none;}
+</style>
+</head>
+<body>
+
+<div class="main">
+  <h1>Words &amp; Phrases Practice</h1>
+  <div class="subtitle">Прослушай, повтори, впиши руками — 4 упражнения по 10 пунктов</div>
+
+  <div class="card">
+    <h2>🔊 Повторение слов</h2>
+    <table class="words" id="wordsTable">
+      <thead><tr><th>Слово / фраза</th><th>Перевод</th><th>Транскрипция</th><th>Аудио</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <div class="audioWarn" id="audioWarn">⚠ Голос "Google US English" не найден в вашем браузере — используется стандартный английский голос.</div>
+  </div>
+
+  <div class="card" id="ex1">
+    <h2>Упражнение 1. Вставь слово по контексту</h2>
+    <div id="ex1items"></div>
+    <div class="score" id="ex1score"></div>
+    <div class="btnrow">
+      <button class="action" onclick="checkExercise(1)">Проверить</button>
+      <button class="action secondary" onclick="toggleAnswers(1)">Показать / скрыть ответы</button>
+      <button class="action secondary" onclick="copyExercise(1)">Скопировать ответы</button>
+    </div>
+  </div>
+
+  <div class="card" id="ex2">
+    <h2>Упражнение 2. True / False</h2>
+    <div id="ex2items"></div>
+    <div class="score" id="ex2score"></div>
+    <div class="btnrow">
+      <button class="action" onclick="checkExercise(2)">Проверить</button>
+      <button class="action secondary" onclick="toggleAnswers(2)">Показать / скрыть ответы</button>
+      <button class="action secondary" onclick="copyExercise(2)">Скопировать ответы</button>
+    </div>
+  </div>
+
+  <div class="card" id="ex3">
+    <h2>Упражнение 3. Составь своё предложение</h2>
+    <div id="ex3items"></div>
+    <div class="btnrow">
+      <button class="action secondary" onclick="toggleAnswers(3)">Показать пример ответа</button>
+      <button class="action secondary" onclick="copyExercise(3)">Скопировать ответы</button>
+    </div>
+  </div>
+
+  <div class="card" id="ex4">
+    <h2>Упражнение 4. Переведи (RU → EN)</h2>
+    <div id="ex4items"></div>
+    <div class="score" id="ex4score"></div>
+    <div class="btnrow">
+      <button class="action" onclick="checkExercise(4)">Проверить</button>
+      <button class="action secondary" onclick="toggleAnswers(4)">Показать / скрыть ответы</button>
+      <button class="action secondary" onclick="copyExercise(4)">Скопировать ответы</button>
+    </div>
+  </div>
+
+  <div class="globalCopy">
+    <button class="action" onclick="copyAll()">📋 Скопировать ВСЕ ответы (все упражнения)</button>
+  </div>
+</div>
+
+<div class="sidebar">
+  <h3>⚠ Проблемные слова</h3>
+  <div id="problemEmpty">Пока ошибок нет</div>
+  <table id="problemTable" style="display:none;">
+    <thead><tr><th>Слово</th><th>Ошибок</th></tr></thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ---------------- DATA ---------------- */
+const words = [
+  {id:1, en:"rebellious", ru:"бунтарский, непокорный", ipa:"/rɪˈbeljəs/"},
+  {id:2, en:"affectionate", ru:"ласковый, нежный", ipa:"/əˈfekʃənət/"},
+  {id:3, en:"except", ru:"кроме, за исключением", ipa:"/ɪkˈsept/"},
+  {id:4, en:"make (someone) mentally alert", ru:"сделать умственно бодрым, взбодрить ум", ipa:"/meɪk ˈmentəli əˈlɜːrt/"},
+  {id:5, en:"say hello", ru:"здороваться", ipa:"/seɪ helˈoʊ/"},
+  {id:6, en:"say goodbye", ru:"прощаться", ipa:"/seɪ ˌɡʊdˈbaɪ/"},
+  {id:7, en:"make your wishes come true", ru:"исполнить желания", ipa:"/meɪk jʊr wɪʃɪz kʌm truː/"},
+  {id:8, en:"controversy", ru:"спор, разногласия", ipa:"/ˈkɑːntrəvɜːrsi/"},
+  {id:9, en:"feel in my element / feel at home", ru:"чувствовать себя в своей стихии / как дома", ipa:"/fiːl ɪn maɪ ˈelɪmənt/"},
+  {id:10, en:"make somebody do something", ru:"заставить кого-то что-то сделать", ipa:"/meɪk ˈsʌmbədi duː ˈsʌmθɪŋ/"}
+];
+
+const ex1data = [
+  {id:1, sentence:"During his teenage years, he became quite ___ and stopped listening to his parents.", answers:["rebellious"]},
+  {id:2, sentence:"My grandmother is very ___ ; she hugs and kisses everyone she meets.", answers:["affectionate"]},
+  {id:3, sentence:"All the shops on the street were closed ___ the small pharmacy on the corner.", answers:["except"]},
+  {id:4, sentence:"A brisk walk in the fresh air can really ___ before an exam.", answers:["make you mentally alert","make mentally alert"]},
+  {id:5, sentence:"It's polite to ___ when you enter a room full of people.", answers:["say hello"]},
+  {id:6, sentence:"Don't forget to ___ to your colleagues before you leave the office.", answers:["say goodbye"]},
+  {id:7, sentence:"Blowing out all the candles on the cake in one breath is supposed to ___.", answers:["make your wishes come true"]},
+  {id:8, sentence:"The government's new tax plan caused a lot of ___ among politicians.", answers:["controversy"]},
+  {id:9, sentence:"When I'm cooking in my own kitchen, I really ___ — everything just feels natural.", answers:["feel in my element","feel at home"]},
+  {id:10, sentence:"You really can't ___ someone ___ something they don't want to do.", answers:["make ... do","make sb do sth","make somebody do something"]}
+];
+
+const ex2data = [
+  {id:1, statement:"A 'rebellious' teenager usually obeys every rule without question.", answer:false},
+  {id:2, statement:"An 'affectionate' person often shows love and warmth openly.", answer:true},
+  {id:3, statement:"'Except' is used to include everything with no exclusions.", answer:false},
+  {id:4, statement:"Something that makes you 'mentally alert' helps you feel more awake and focused.", answer:true},
+  {id:5, statement:"You usually 'say hello' when you are leaving a place.", answer:false},
+  {id:6, statement:"You usually 'say goodbye' when you are leaving a place.", answer:true},
+  {id:7, statement:"'Make your wishes come true' means to make your dreams become reality.", answer:true},
+  {id:8, statement:"A 'controversy' is a topic everyone calmly agrees on.", answer:false},
+  {id:9, statement:"If you 'feel in your element', you feel awkward and out of place.", answer:false},
+  {id:10, statement:"'To make somebody do something' means to force or cause them to do it.", answer:true}
+];
+
+const ex3data = [
+  {id:1, prompt:"Напиши предложение со словом 'rebellious'.", example:"My little brother went through a rebellious phase at 15."},
+  {id:2, prompt:"Напиши предложение со словом 'affectionate'.", example:"Our new puppy is incredibly affectionate with everyone."},
+  {id:3, prompt:"Напиши предложение со словом 'except'.", example:"Everyone passed the test except two students."},
+  {id:4, prompt:"Напиши предложение с фразой 'make mentally alert'.", example:"Drinking green tea can make you mentally alert."},
+  {id:5, prompt:"Напиши предложение со словом 'say hello'.", example:"I stopped by just to say hello to my old friend."},
+  {id:6, prompt:"Напиши предложение со словом 'say goodbye'.", example:"It was hard to say goodbye at the airport."},
+  {id:7, prompt:"Напиши предложение с фразой 'make your wishes come true'.", example:"Hard work, not luck, will make your wishes come true."},
+  {id:8, prompt:"Напиши предложение со словом 'controversy'.", example:"The film sparked a huge controversy online."},
+  {id:9, prompt:"Напиши предложение с фразой 'feel in my element'.", example:"On stage, performing music, I really feel in my element."},
+  {id:10, prompt:"Напиши предложение с фразой 'make somebody do something'.", example:"You can't make me eat something I hate."}
+];
+
+const ex4data = [
+  {id:1, ru:"бунтарский, непокорный", answers:["rebellious"]},
+  {id:2, ru:"ласковый, нежный", answers:["affectionate"]},
+  {id:3, ru:"кроме, за исключением", answers:["except"]},
+  {id:4, ru:"сделать умственно бодрым", answers:["make mentally alert","make you mentally alert"]},
+  {id:5, ru:"здороваться", answers:["say hello"]},
+  {id:6, ru:"прощаться", answers:["say goodbye"]},
+  {id:7, ru:"исполнить желания", answers:["make your wishes come true"]},
+  {id:8, ru:"спор, разногласия", answers:["controversy"]},
+  {id:9, ru:"чувствовать себя в своей стихии / как дома", answers:["feel in my element","feel at home"]},
+  {id:10, ru:"заставить кого-то что-то сделать", answers:["make somebody do something","make sb do sth"]}
+];
+
+const mistakes = {}; // wordId -> count
+words.forEach(w => mistakes[w.id] = 0);
+
+/* ---------------- UTILS ---------------- */
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+function normalize(s){
+  return s.toLowerCase().trim().replace(/[.,!?;:"']/g,"").replace(/\s+/g," ");
+}
+function wordById(id){ return words.find(w=>w.id===id); }
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+/* ---------------- TTS ---------------- */
+let chosenVoice = null;
+function setupVoices(){
+  const voices = speechSynthesis.getVoices();
+  chosenVoice = voices.find(v => v.name.includes("Google US English"))
+             || voices.find(v => v.lang === "en-US")
+             || voices.find(v => v.lang && v.lang.startsWith("en"))
+             || null;
+  document.getElementById('audioWarn').style.display =
+    (chosenVoice && chosenVoice.name.includes("Google US English")) ? "none" : "block";
+}
+if('speechSynthesis' in window){
+  speechSynthesis.onvoiceschanged = setupVoices;
+  setupVoices();
+} else {
+  document.getElementById('audioWarn').style.display = "block";
+  document.getElementById('audioWarn').textContent = "⚠ Ваш браузер не поддерживает синтез речи.";
+}
+function speak(text){
+  if(!('speechSynthesis' in window)){ showToast("Аудио не поддерживается в этом браузере"); return; }
+  const u = new SpeechSynthesisUtterance(text);
+  if(chosenVoice) u.voice = chosenVoice;
+  u.lang = "en-US";
+  u.rate = 0.9;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+}
+
+/* ---------------- RENDER WORD TABLE ---------------- */
+const wordsTbody = document.querySelector('#wordsTable tbody');
+words.forEach(w=>{
+  const tr = document.createElement('tr');
+  tr.innerHTML = `<td><b>${w.en}</b></td><td>${w.ru}</td><td class="ipa">${w.ipa}</td>
+    <td><button class="listenBtn" onclick="speak('${w.en.replace(/'/g,"\\'")}')">▶</button></td>`;
+  wordsTbody.appendChild(tr);
+});
+
+/* ---------------- RENDER EXERCISE 1 (fill in blank) ---------------- */
+const ex1order = shuffle(ex1data);
+const ex1Container = document.getElementById('ex1items');
+ex1order.forEach((item, idx)=>{
+  const div = document.createElement('div');
+  div.className = 'item';
+  div.dataset.wordId = item.id;
+  const parts = item.sentence.split('___');
+  div.innerHTML = `<div><span class="num">${idx+1}.</span>${parts[0]}<b>______</b>${parts[1]||''}</div>
+    <input type="text" placeholder="Впиши слово / фразу" data-idx="${idx}">
+    <div class="answerKey">Ответ: ${item.answers[0]}</div>
+    <span class="result-icon"></span>`;
+  ex1Container.appendChild(div);
+});
+
+/* ---------------- RENDER EXERCISE 2 (true/false) ---------------- */
+const ex2order = shuffle(ex2data);
+const ex2Container = document.getElementById('ex2items');
+ex2order.forEach((item, idx)=>{
+  const div = document.createElement('div');
+  div.className = 'item';
+  div.dataset.wordId = item.id;
+  div.innerHTML = `<div><span class="num">${idx+1}.</span>${item.statement}</div>
+    <div class="tf-options">
+      <label><input type="radio" name="ex2_${idx}" value="true"> True</label>
+      <label><input type="radio" name="ex2_${idx}" value="false"> False</label>
+    </div>
+    <div class="answerKey">Ответ: ${item.answer ? "True" : "False"}</div>
+    <span class="result-icon"></span>`;
+  ex2Container.appendChild(div);
+});
+
+/* ---------------- RENDER EXERCISE 3 (own sentences) ---------------- */
+const ex3order = shuffle(ex3data);
+const ex3Container = document.getElementById('ex3items');
+ex3order.forEach((item, idx)=>{
+  const div = document.createElement('div');
+  div.className = 'item';
+  div.dataset.wordId = item.id;
+  div.innerHTML = `<div><span class="num">${idx+1}.</span>${item.prompt}</div>
+    <textarea placeholder="Напиши своё предложение..." data-idx="${idx}"></textarea>
+    <div class="answerKey">Пример: ${item.example}</div>`;
+  ex3Container.appendChild(div);
+});
+
+/* ---------------- RENDER EXERCISE 4 (translation RU->EN) ---------------- */
+const ex4order = shuffle(ex4data);
+const ex4Container = document.getElementById('ex4items');
+ex4order.forEach((item, idx)=>{
+  const div = document.createElement('div');
+  div.className = 'item';
+  div.dataset.wordId = item.id;
+  div.innerHTML = `<div><span class="num">${idx+1}.</span>${item.ru}</div>
+    <input type="text" placeholder="Напиши по-английски" data-idx="${idx}">
+    <div class="answerKey">Ответ: ${item.answers[0]}</div>
+    <span class="result-icon"></span>`;
+  ex4Container.appendChild(div);
+});
+
+/* ---------------- CHECKING LOGIC ---------------- */
+function checkExercise(n){
+  let correct = 0, total = 0;
+  if(n===1){
+    const items = ex1Container.querySelectorAll('.item');
+    items.forEach((div, idx)=>{
+      const data = ex1order[idx];
+      const input = div.querySelector('input');
+      const icon = div.querySelector('.result-icon');
+      const val = normalize(input.value);
+      const ok = data.answers.some(a => val.includes(normalize(a).replace('...',' ')) || normalize(a).includes(val) && val.length>2);
+      total++;
+      if(ok && val.length>0){ correct++; icon.textContent='✔'; icon.className='result-icon ok'; }
+      else{ icon.textContent='✘'; icon.className='result-icon bad'; registerMistake(data.id); }
+    });
+    document.getElementById('ex1score').textContent = `Результат: ${correct} / ${total}`;
+  }
+  if(n===2){
+    const items = ex2Container.querySelectorAll('.item');
+    items.forEach((div, idx)=>{
+      const data = ex2order[idx];
+      const icon = div.querySelector('.result-icon');
+      const checked = div.querySelector('input[type=radio]:checked');
+      total++;
+      if(checked && (checked.value === String(data.answer))){ correct++; icon.textContent='✔'; icon.className='result-icon ok'; }
+      else{ icon.textContent='✘'; icon.className='result-icon bad'; registerMistake(data.id); }
+    });
+    document.getElementById('ex2score').textContent = `Результат: ${correct} / ${total}`;
+  }
+  if(n===4){
+    const items = ex4Container.querySelectorAll('.item');
+    items.forEach((div, idx)=>{
+      const data = ex4order[idx];
+      const input = div.querySelector('input');
+      const icon = div.querySelector('.result-icon');
+      const val = normalize(input.value);
+      const ok = data.answers.some(a => normalize(a) === val || val.includes(normalize(a)));
+      total++;
+      if(ok && val.length>0){ correct++; icon.textContent='✔'; icon.className='result-icon ok'; }
+      else{ icon.textContent='✘'; icon.className='result-icon bad'; registerMistake(data.id); }
+    });
+    document.getElementById('ex4score').textContent = `Результат: ${correct} / ${total}`;
+  }
+}
+
+function registerMistake(wordId){
+  mistakes[wordId] = (mistakes[wordId]||0) + 1;
+  renderMistakes();
+}
+
+function renderMistakes(){
+  const entries = Object.entries(mistakes).filter(([id,c]) => c>0).sort((a,b)=>b[1]-a[1]);
+  const table = document.getElementById('problemTable');
+  const empty = document.getElementById('problemEmpty');
+  const tbody = table.querySelector('tbody');
+  if(entries.length === 0){
+    table.style.display = 'none';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  table.style.display = 'table';
+  tbody.innerHTML = '';
+  entries.forEach(([id,count])=>{
+    const w = wordById(Number(id));
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${w.en}</td><td>${count}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+/* ---------------- SHOW/HIDE ANSWERS ---------------- */
+function toggleAnswers(n){
+  const container = document.getElementById('ex'+n+'items');
+  const keys = container.querySelectorAll('.answerKey');
+  keys.forEach(k => k.style.display = (k.style.display === 'block') ? 'none' : 'block');
+}
+
+/* ---------------- COPY ANSWERS ---------------- */
+function copyExercise(n){
+  let text = '';
+  if(n===1){
+    text = 'Упражнение 1 (заполни пропуски):\n';
+    ex1Container.querySelectorAll('.item').forEach((div,idx)=>{
+      const val = div.querySelector('input').value || '(пусто)';
+      text += `${idx+1}. ${val}\n`;
+    });
+  }
+  if(n===2){
+    text = 'Упражнение 2 (True/False):\n';
+    ex2Container.querySelectorAll('.item').forEach((div,idx)=>{
+      const checked = div.querySelector('input[type=radio]:checked');
+      text += `${idx+1}. ${checked ? checked.value : '(не выбрано)'}\n`;
+    });
+  }
+  if(n===3){
+    text = 'Упражнение 3 (свои предложения):\n';
+    ex3Container.querySelectorAll('.item').forEach((div,idx)=>{
+      const val = div.querySelector('textarea').value || '(пусто)';
+      text += `${idx+1}. ${val}\n`;
+    });
+  }
+  if(n===4){
+    text = 'Упражнение 4 (перевод RU->EN):\n';
+    ex4Container.querySelectorAll('.item').forEach((div,idx)=>{
+      const val = div.querySelector('input').value || '(пусто)';
+      text += `${idx+1}. ${val}\n`;
+    });
+  }
+  copyToClipboard(text);
+}
+
+function copyAll(){
+  let full = '';
+  [1,2,3,4].forEach(n=>{
+    const tmp = document.createElement('div');
+    // reuse copyExercise logic by capturing text
+  });
+  // Build full text directly
+  let text = '=== ОТВЕТЫ СТУДЕНТА ===\n\n';
+
+  text += 'Упражнение 1 (заполни пропуски):\n';
+  ex1Container.querySelectorAll('.item').forEach((div,idx)=>{
+    text += `${idx+1}. ${div.querySelector('input').value || '(пусто)'}\n`;
+  });
+
+  text += '\nУпражнение 2 (True/False):\n';
+  ex2Container.querySelectorAll('.item').forEach((div,idx)=>{
+    const checked = div.querySelector('input[type=radio]:checked');
+    text += `${idx+1}. ${checked ? checked.value : '(не выбрано)'}\n`;
+  });
+
+  text += '\nУпражнение 3 (свои предложения):\n';
+  ex3Container.querySelectorAll('.item').forEach((div,idx)=>{
+    text += `${idx+1}. ${div.querySelector('textarea').value || '(пусто)'}\n`;
+  });
+
+  text += '\nУпражнение 4 (перевод RU->EN):\n';
+  ex4Container.querySelectorAll('.item').forEach((div,idx)=>{
+    text += `${idx+1}. ${div.querySelector('input').value || '(пусто)'}\n`;
+  });
+
+  copyToClipboard(text);
+}
+
+function copyToClipboard(text){
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(()=>{
+      showToast('Ответы скопированы в буфер обмена!');
+    }).catch(()=>{
+      fallbackCopy(text);
+    });
+  } else {
+    fallbackCopy(text);
+  }
+}
+function fallbackCopy(text){
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  try{
+    document.execCommand('copy');
+    showToast('Ответы скопированы в буфер обмена!');
+  }catch(e){
+    showToast('Не удалось скопировать — скопируйте вручную');
+  }
+  document.body.removeChild(ta);
+}
+
+renderMistakes();
+</script>
+</body>
+</html>
