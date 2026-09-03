@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ABC · Пропись и словарь</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FAF4E6;
+    --paper-line:#CFE0E8;
+    --margin:#E3A9A0;
+    --ink:#2C3A4B;
+    --ink-soft:#5B6B80;
+    --pencil:#D98C2B;
+    --board:#26433C;
+    --board-2:#31554C;
+    --ok:#3F7D5C;
+    --ok-bg:#E4F1E8;
+    --bad:#C6493F;
+    --bad-bg:#FBE7E4;
+    --card:#FFFFFF;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--board);
+    background-image:
+      radial-gradient(circle at 15% 10%, rgba(255,255,255,0.04), transparent 40%),
+      radial-gradient(circle at 85% 90%, rgba(255,255,255,0.03), transparent 40%);
+    font-family:'Nunito', sans-serif;
+    color:var(--ink);
+    min-height:100vh;
+    padding:28px 16px 60px;
+  }
+  h1,h2,h3{font-family:'Patrick Hand', cursive; font-weight:400; letter-spacing:.3px;}
+  .wrap{max-width:1180px; margin:0 auto;}
+
+  /* header */
+  .hero{
+    text-align:center;
+    color:#F3EFE2;
+    margin-bottom:26px;
+  }
+  .hero h1{font-size:2.6rem; margin:0 0 6px; color:#F6EFD9;}
+  .hero p{margin:0; color:#BFD3CB; font-size:1.02rem;}
+  .hero .pin{
+    display:inline-block; margin-top:14px; font-size:.85rem; color:#9FBBAF;
+    border:1px dashed #4F776B; padding:6px 14px; border-radius:20px;
+  }
+
+  /* layout */
+  .layout{
+    display:grid;
+    grid-template-columns: 1fr 260px;
+    gap:22px;
+    align-items:start;
+  }
+  @media (max-width:880px){
+    .layout{grid-template-columns:1fr;}
+    .sidebar{order:-1;}
+  }
+
+  .sheet{
+    background:var(--paper);
+    border-radius:10px;
+    padding:26px 26px 26px 46px;
+    position:relative;
+    box-shadow:0 12px 30px rgba(0,0,0,.28);
+    background-image: repeating-linear-gradient(
+      to bottom, transparent 0, transparent 33px, var(--paper-line) 34px
+    );
+    background-position: 0 78px;
+  }
+  .sheet::before{
+    content:"";
+    position:absolute; left:28px; top:0; bottom:0; width:2px;
+    background:var(--margin);
+  }
+  .sheet > *:first-child{margin-top:0;}
+
+  section.block{margin-bottom:34px;}
+  section.block h2{font-size:1.55rem; color:var(--ink); margin:0 0 4px;}
+  .sub{color:var(--ink-soft); font-size:.92rem; margin:0 0 16px;}
+
+  /* alphabet */
+  .abc-controls{margin-bottom:14px;}
+  button{
+    font-family:'Nunito', sans-serif; font-weight:700; cursor:pointer;
+    border:none; border-radius:8px; padding:8px 14px; font-size:.88rem;
+  }
+  .btn-main{background:var(--pencil); color:#fff;}
+  .btn-main:hover{background:#C27B22;}
+  .btn-ghost{background:transparent; border:1.5px solid var(--ink-soft); color:var(--ink-soft);}
+  .btn-ghost:hover{border-color:var(--ink); color:var(--ink);}
+  .btn-small{padding:5px 9px; font-size:.8rem;}
+  .btn-check{background:var(--ok); color:#fff;}
+  .btn-check:hover{background:#356A4C;}
+  .btn-answers{background:transparent; border:1.5px solid var(--bad); color:var(--bad);}
+  .btn-answers:hover{background:var(--bad-bg);}
+
+  .abc-grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(96px,1fr));
+    gap:8px;
+  }
+  .abc-card{
+    background:var(--card); border-radius:8px; padding:8px 6px;
+    text-align:center; box-shadow:0 2px 6px rgba(0,0,0,.08);
+  }
+  .abc-card .ltr{font-family:'Patrick Hand', cursive; font-size:1.7rem; line-height:1;}
+  .abc-card .ipa{font-size:.72rem; color:var(--ink-soft); margin-top:2px;}
+  .abc-card .ru{font-size:.72rem; color:var(--pencil); margin-top:1px;}
+  .abc-card .spk{margin-top:6px;}
+  .spk-btn{
+    background:var(--board-2); color:#fff; border-radius:50%;
+    width:26px; height:26px; padding:0; font-size:.85rem;
+    display:inline-flex; align-items:center; justify-content:center;
+  }
+  .spk-btn:hover{background:var(--board);}
+
+  /* exercise items */
+  .ex-header{display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap; gap:8px;}
+  .ex-actions{display:flex; gap:8px; margin-bottom:14px;}
+  .ex-score{font-size:.85rem; color:var(--ink-soft); font-weight:700;}
+
+  .item-list{display:flex; flex-direction:column; gap:10px;}
+  .item{
+    background:var(--card); border-radius:8px; padding:10px 12px;
+    display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+    box-shadow:0 2px 6px rgba(0,0,0,.06);
+  }
+  .item .num{color:var(--ink-soft); font-size:.8rem; width:18px; flex-shrink:0;}
+  .item .prompt{flex:1 1 160px; min-width:120px; font-size:.98rem;}
+  .item .prompt .scramble{font-family:'Patrick Hand', cursive; font-size:1.3rem; letter-spacing:3px; color:var(--pencil);}
+  .item .prompt .mask{font-family:'Patrick Hand', cursive; font-size:1.3rem; letter-spacing:3px;}
+  .item .prompt .ru-word{font-weight:700;}
+  .item input[type=text]{
+    flex:1 1 160px; min-width:140px;
+    font-family:'Patrick Hand', cursive; font-size:1.15rem;
+    border:none; border-bottom:2px solid #C9BFA6; background:transparent;
+    padding:4px 2px; color:var(--ink); outline:none;
+  }
+  .item input[type=text]:focus{border-bottom-color:var(--pencil);}
+  .item input.correct{border-bottom-color:var(--ok); background:var(--ok-bg);}
+  .item input.wrong{border-bottom-color:var(--bad); background:var(--bad-bg);}
+  .item .answer-reveal{
+    font-size:.85rem; color:var(--ok); font-weight:700; flex-basis:100%;
+  }
+  .item .mark{font-size:1.05rem; width:20px; text-align:center;}
+
+  /* sidebar */
+  .sidebar{
+    background:var(--card); border-radius:10px; padding:18px;
+    box-shadow:0 12px 30px rgba(0,0,0,.28);
+    position:sticky; top:16px;
+  }
+  .sidebar h3{margin:0 0 4px; font-size:1.3rem; color:var(--ink);}
+  .sidebar .sub{margin:0 0 12px;}
+  table.mistakes{width:100%; border-collapse:collapse; font-size:.85rem;}
+  table.mistakes th, table.mistakes td{
+    text-align:left; padding:6px 4px; border-bottom:1px solid #EEE7D6;
+  }
+  table.mistakes th{color:var(--ink-soft); font-weight:700; font-size:.75rem;}
+  .empty-note{color:var(--ink-soft); font-size:.85rem; font-style:italic;}
+  .sidebar .reset{margin-top:14px; width:100%;}
+
+  .audio-warn{
+    display:none; background:var(--bad-bg); color:var(--bad); border-radius:8px;
+    padding:10px 14px; font-size:.85rem; margin-bottom:18px;
+  }
+  footer{text-align:center; color:#88A399; font-size:.8rem; margin-top:28px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero">
+    <h1>Пропись · Spelling &amp; Vocabulary</h1>
+    <p>Alphabet, listening &amp; handwriting practice — личные вещи (personal items)</p>
+    <span class="pin">Голос: Google US English (en-US)</span>
+  </div>
+
+  <div class="layout">
+    <div class="sheet">
+
+      <div class="audio-warn" id="audioWarn">
+        ⚠️ Синтез речи не поддерживается этим браузером. Попробуйте открыть страницу в Chrome.
+      </div>
+
+      <!-- ALPHABET -->
+      <section class="block">
+        <h2>Алфавит — напоминание</h2>
+        <p class="sub">Нажмите на 🔊, чтобы услышать, как называется буква по-английски. Транскрипция и примерное произношение — рядом.</p>
+        <div class="abc-controls">
+          <button class="btn-ghost" onclick="playFullAlphabet()">🔊 Прослушать весь алфавит</button>
+        </div>
+        <div class="abc-grid" id="abcGrid"></div>
+      </section>
+
+      <!-- EXERCISES will be injected here -->
+      <div id="exercises"></div>
+
+    </div>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <h3>Проблемные слова</h3>
+      <p class="sub">Слова и буквы, в которых были ошибки</p>
+      <table class="mistakes" id="mistakesTable" style="display:none;">
+        <thead><tr><th>Слово / буква</th><th>Ошибок</th></tr></thead>
+        <tbody id="mistakesBody"></tbody>
+      </table>
+      <p class="empty-note" id="mistakesEmpty">Пока ошибок нет 🙂</p>
+      <button class="btn-ghost reset" onclick="resetMistakes()">Очистить список</button>
+    </aside>
+  </div>
+
+  <footer>9 слов · 5 упражнений · порядок ответов перемешивается при каждой загрузке страницы</footer>
+</div>
+
+<script>
+/* ============ DATA ============ */
+const WORDS = [
+  {en:'scissors',   ipa:'ˈsɪzərz',        ru:['ножницы']},
+  {en:'wallet',     ipa:'ˈwɒlɪt',         ru:['кошелек','кошелёк']},
+  {en:'notebook',   ipa:'ˈnoʊtbʊk',       ru:['блокнот','тетрадь']},
+  {en:'sunglasses', ipa:'ˈsʌnˌɡlæsɪz',    ru:['солнцезащитные очки','солнечные очки']},
+  {en:'coin',       ipa:'kɔɪn',           ru:['монета','монетка']},
+  {en:'pencil',     ipa:'ˈpensl',         ru:['карандаш']},
+  {en:'watch',      ipa:'wɒtʃ',           ru:['часы','наручные часы']},
+  {en:'charger',    ipa:'ˈtʃɑːrdʒər',     ru:['зарядное устройство','зарядка']},
+  {en:'magazine',   ipa:'ˌmæɡəˈziːn',     ru:['журнал']}
+];
+
+const ALPHABET = [
+  ['A','eɪ','эй'],['B','biː','би'],['C','siː','си'],['D','diː','ди'],['E','iː','и'],
+  ['F','ɛf','эф'],['G','dʒiː','джи'],['H','eɪtʃ','эйч'],['I','aɪ','ай'],['J','dʒeɪ','джей'],
+  ['K','keɪ','кей'],['L','ɛl','эл'],['M','ɛm','эм'],['N','ɛn','эн'],['O','oʊ','оу'],
+  ['P','piː','пи'],['Q','kjuː','кью'],['R','ɑːr','ар'],['S','ɛs','эс'],['T','tiː','ти'],
+  ['U','juː','ю'],['V','viː','ви'],['W','ˈdʌbljuː','дабл-ю'],['X','ɛks','экс'],
+  ['Y','waɪ','уай'],['Z','ziː','зи']
+];
+
+const LETTER_POOL = ['S','C','O','W','N','P','G','A','E','T','B','M'];
+
+/* ============ SPEECH ============ */
+let usVoice = null;
+function pickVoice(){
+  const voices = speechSynthesis.getVoices();
+  usVoice = voices.find(v => v.name === 'Google US English')
+        || voices.find(v => v.lang === 'en-US' && /Google/i.test(v.name))
+        || voices.find(v => v.lang === 'en-US')
+        || voices.find(v => /^en/.test(v.lang))
+        || null;
+}
+if('speechSynthesis' in window){
+  pickVoice();
+  speechSynthesis.onvoiceschanged = pickVoice;
+} else {
+  document.getElementById('audioWarn').style.display = 'block';
+}
+
+function speak(text, rate){
+  if(!('speechSynthesis' in window)) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-US';
+  u.rate = rate || 0.95;
+  if(usVoice) u.voice = usVoice;
+  speechSynthesis.speak(u);
+}
+function speakLetterName(letter){ speak(letter, 0.9); }
+function speakWord(word){ speak(word, 0.9); }
+function speakSpelled(word){
+  speechSynthesis.cancel();
+  const letters = word.toUpperCase().split('');
+  letters.forEach((l, i) => {
+    const u = new SpeechSynthesisUtterance(l + ',');
+    u.lang = 'en-US'; u.rate = 0.8;
+    if(usVoice) u.voice = usVoice;
+    speechSynthesis.speak(u);
+  });
+}
+function playFullAlphabet(){
+  speechSynthesis.cancel();
+  ALPHABET.forEach(([letter]) => {
+    const u = new SpeechSynthesisUtterance(letter + ',');
+    u.lang = 'en-US'; u.rate = 0.85;
+    if(usVoice) u.voice = usVoice;
+    speechSynthesis.speak(u);
+  });
+}
+
+/* ============ UTIL ============ */
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+function pick(arr, n){ return shuffle(arr).slice(0, n); }
+function norm(s){ return (s || '').trim().toLowerCase().replace(/ё/g,'е').replace(/\s+/g,' '); }
+
+function scrambleWord(word){
+  let letters;
+  do { letters = shuffle(word.split('')); } while(letters.join('') === word);
+  return letters.join('-').toUpperCase();
+}
+function maskWord(word){
+  const chars = word.split('');
+  const maskCount = Math.max(1, Math.round(chars.length * 0.4));
+  const idxs = shuffle(chars.map((_,i)=>i).filter(i => i !== 0)).slice(0, maskCount);
+  return chars.map((c,i) => idxs.includes(i) ? '_' : c).join(' ');
+}
+
+/* ============ MISTAKES SIDEBAR ============ */
+let mistakes = {};
+function registerMistake(key){
+  mistakes[key] = (mistakes[key] || 0) + 1;
+  renderMistakes();
+}
+function renderMistakes(){
+  const entries = Object.entries(mistakes).sort((a,b) => b[1]-a[1]);
+  const table = document.getElementById('mistakesTable');
+  const body = document.getElementById('mistakesBody');
+  const empty = document.getElementById('mistakesEmpty');
+  if(entries.length === 0){
+    table.style.display = 'none';
+    empty.style.display = 'block';
+    return;
+  }
+  table.style.display = 'table';
+  empty.style.display = 'none';
+  body.innerHTML = entries.map(([k,v]) =>
+    `<tr><td>${k}</td><td>${v}</td></tr>`).join('');
+}
+function resetMistakes(){ mistakes = {}; renderMistakes(); }
+
+/* ============ EXERCISE DEFINITIONS ============ */
+const exercisesEl = document.getElementById('exercises');
+let exCounter = 0;
+
+function buildExercise(cfg){
+  exCounter++;
+  const id = 'ex' + exCounter;
+  const items = cfg.buildItems();
+
+  const itemsHtml = items.map((it, i) => `
+    <div class="item" data-answer="${encodeURIComponent(JSON.stringify(it.answers))}" data-key="${encodeURIComponent(it.key)}">
+      <span class="num">${i+1}.</span>
+      ${it.speak ? `<button class="spk-btn btn-small" onclick="${it.speak}">🔊</button>` : ''}
+      <span class="prompt">${it.promptHtml}</span>
+      <input type="text" id="${id}-i${i}" placeholder="напишите здесь..." autocomplete="off" spellcheck="false">
+      <span class="mark" id="${id}-m${i}"></span>
+    </div>
+  `).join('');
+
+  const html = `
+    <section class="block" id="${id}">
+      <div class="ex-header">
+        <h2>${cfg.title}</h2>
+        <span class="ex-score" id="${id}-score"></span>
+      </div>
+      <p class="sub">${cfg.instruction}</p>
+      <div class="ex-actions">
+        <button class="btn-check" onclick="checkExercise('${id}')">✓ Проверить</button>
+        <button class="btn-answers" onclick="showAnswers('${id}')">Показать ответы</button>
+      </div>
+      <div class="item-list">${itemsHtml}</div>
+    </section>
+  `;
+  exercisesEl.insertAdjacentHTML('beforeend', html);
+}
+
+function checkExercise(id){
+  const section = document.getElementById(id);
+  const items = section.querySelectorAll('.item');
+  let correctCount = 0;
+  items.forEach((item, i) => {
+    const answers = JSON.parse(decodeURIComponent(item.dataset.answer)).map(norm);
+    const key = decodeURIComponent(item.dataset.key);
+    const input = document.getElementById(id + '-i' + i);
+    const mark = document.getElementById(id + '-m' + i);
+    const val = norm(input.value);
+    const isCorrect = val.length > 0 && answers.includes(val);
+    input.classList.remove('correct','wrong');
+    if(isCorrect){
+      input.classList.add('correct');
+      mark.textContent = '✅';
+      correctCount++;
+    } else {
+      input.classList.add('wrong');
+      mark.textContent = '❌';
+      registerMistake(key);
+    }
+  });
+  document.getElementById(id + '-score').textContent = `Правильно: ${correctCount} / ${items.length}`;
+}
+
+function showAnswers(id){
+  const section = document.getElementById(id);
+  const items = section.querySelectorAll('.item');
+  items.forEach((item, i) => {
+    const answers = JSON.parse(decodeURIComponent(item.dataset.answer));
+    let reveal = item.querySelector('.answer-reveal');
+    if(!reveal){
+      reveal = document.createElement('span');
+      reveal.className = 'answer-reveal';
+      item.appendChild(reveal);
+    }
+    reveal.textContent = 'Ответ: ' + answers[0];
+  });
+}
+
+/* ---- Exercise 1: letter by sound ---- */
+buildExercise({
+  title: '1. Услышь звук — напиши букву',
+  instruction: 'Нажмите 🔊, послушайте, как называется буква по-английски, и впишите эту букву.',
+  buildItems(){
+    return pick(LETTER_POOL, 8).map(letter => ({
+      speak: `speakLetterName('${letter}')`,
+      promptHtml: `<span>какая это буква?</span>`,
+      answers: [letter],
+      key: `буква "${letter}"`
+    }));
+  }
+});
+
+/* ---- Exercise 2: spelling by letters ---- */
+buildExercise({
+  title: '2. Spelling — послушай буквы, напиши слово',
+  instruction: 'Нажмите 🔊 — слово будет произнесено по буквам (S‑C‑I‑S‑S‑O‑R‑S). Запишите слово целиком.',
+  buildItems(){
+    return pick(WORDS, 8).map(w => ({
+      speak: `speakSpelled('${w.en}')`,
+      promptHtml: `<span>по буквам:</span>`,
+      answers: [w.en],
+      key: w.en
+    }));
+  }
+});
+
+/* ---- Exercise 3: dictation, whole word ---- */
+buildExercise({
+  title: '3. Диктант — послушай слово целиком',
+  instruction: 'Нажмите 🔊, послушайте слово целиком и напишите его по-английски.',
+  buildItems(){
+    return pick(WORDS, 8).map(w => ({
+      speak: `speakWord('${w.en}')`,
+      promptHtml: `<span>слово:</span>`,
+      answers: [w.en],
+      key: w.en
+    }));
+  }
+});
+
+/* ---- Exercise 4: translation -> English word ---- */
+buildExercise({
+  title: '4. Перевод — напиши слово по-английски',
+  instruction: 'Прочитайте перевод на русском и напишите слово по-английски. Можно нажать 🔊, чтобы услышать правильное произношение (после проверки).',
+  buildItems(){
+    return pick(WORDS, 8).map(w => ({
+      speak: `speakWord('${w.en}')`,
+      promptHtml: `<span class="ru-word">${w.ru[0]}</span>`,
+      answers: [w.en],
+      key: w.en
+    }));
+  }
+});
+
+/* ---- Exercise 5: anagram ---- */
+buildExercise({
+  title: '5. Собери слово из букв',
+  instruction: 'Буквы перемешаны. Нажмите 🔊 для подсказки-звука и напишите слово правильно.',
+  buildItems(){
+    return pick(WORDS, 8).map(w => ({
+      speak: `speakWord('${w.en}')`,
+      promptHtml: `<span class="scramble">${scrambleWord(w.en)}</span>`,
+      answers: [w.en],
+      key: w.en
+    }));
+  }
+});
+
+/* ============ RENDER ALPHABET ============ */
+const abcGrid = document.getElementById('abcGrid');
+abcGrid.innerHTML = ALPHABET.map(([letter, ipa, ru]) => `
+  <div class="abc-card">
+    <div class="ltr">${letter}</div>
+    <div class="ipa">[${ipa}]</div>
+    <div class="ru">«${ru}»</div>
+    <div class="spk"><button class="spk-btn" onclick="speakLetterName('${letter}')">🔊</button></div>
+  </div>
+`).join('');
+
+renderMistakes();
+</script>
+</body>
+</html>
