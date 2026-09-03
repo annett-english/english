@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Making Plans — A1 практика</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F2F6F4;
+    --paper:#FFFFFF;
+    --ink:#1E2A24;
+    --ink-soft:#4A5750;
+    --accent:#2B6E5B;
+    --accent-deep:#1D4E41;
+    --warm:#E2A345;
+    --warm-soft:#FBEBCB;
+    --line:#D8E2DD;
+    --error:#C0453A;
+    --error-bg:#FBEAE8;
+    --success:#2B6E5B;
+    --success-bg:#E7F1EC;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Work Sans',sans-serif;
+    line-height:1.5;
+    padding-bottom:60px;
+  }
+  h1,h2,h3{
+    font-family:'Fraunces',serif;
+    color:var(--accent-deep);
+    margin:0 0 6px;
+    font-weight:600;
+  }
+  header.top{
+    background:var(--accent-deep);
+    color:#F2F6F4;
+    padding:34px 24px 30px;
+  }
+  header.top h1{color:#fff;font-size:clamp(28px,4vw,40px);margin-bottom:8px;}
+  header.top p{margin:0;color:#CFE3DA;max-width:640px;font-size:15px;}
+  .top-actions{margin-top:18px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+  #audioStatus{font-size:13px;color:#CFE3DA;}
+
+  .layout{
+    max-width:1180px;
+    margin:0 auto;
+    padding:28px 20px 0;
+    display:grid;
+    grid-template-columns:1fr 260px;
+    gap:28px;
+    align-items:start;
+  }
+  @media (max-width:880px){
+    .layout{grid-template-columns:1fr;}
+    aside{order:-1;}
+  }
+
+  main{min-width:0;}
+
+  section.block{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-left:5px solid var(--accent);
+    border-radius:6px;
+    padding:22px 24px 26px;
+    margin-bottom:26px;
+  }
+  section.block h2{font-size:22px;}
+  .ex-meta{font-size:13px;color:var(--ink-soft);margin-bottom:16px;}
+  .ex-score{display:inline-block;background:var(--warm-soft);color:#7A5410;border-radius:4px;padding:2px 9px;font-size:12.5px;font-weight:600;margin-left:8px;}
+
+  /* Vocab table */
+  table.vocab{width:100%;border-collapse:collapse;font-size:14.5px;}
+  table.vocab th{
+    text-align:left;font-family:'Fraunces',serif;font-weight:600;
+    color:var(--accent-deep);border-bottom:2px solid var(--line);
+    padding:8px 8px;font-size:14px;
+  }
+  table.vocab td{padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:top;}
+  table.vocab tr:hover td{background:#F7FAF9;}
+  .en-phrase{font-weight:600;color:var(--ink);}
+  .example{color:var(--ink-soft);font-size:12.5px;font-style:italic;display:block;margin-top:2px;}
+  .ipa{color:var(--ink-soft);font-family:'Work Sans',sans-serif;font-size:13px;}
+  button.play{
+    border:1px solid var(--accent);
+    background:#fff;color:var(--accent);
+    border-radius:50%;width:32px;height:32px;
+    cursor:pointer;font-size:15px;line-height:1;
+    display:inline-flex;align-items:center;justify-content:center;
+    transition:background .15s;
+  }
+  button.play:hover{background:var(--success-bg);}
+  button.play:active{transform:scale(.94);}
+
+  /* Items */
+  .item{
+    border-bottom:1px solid var(--line);
+    padding:14px 0;
+  }
+  .item:last-child{border-bottom:none;}
+  .item .qline{font-weight:600;margin-bottom:8px;font-size:15px;}
+  .item .ru{color:var(--accent-deep);}
+  .item .dialog-line{color:var(--ink-soft);margin-bottom:6px;font-size:14.5px;}
+  .item-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+  input[type=text], textarea{
+    font-family:'Work Sans',sans-serif;
+    border:1.5px solid var(--line);
+    border-radius:5px;
+    padding:8px 10px;
+    font-size:14.5px;
+    background:#FCFDFC;
+    color:var(--ink);
+    flex:1 1 260px;
+  }
+  textarea{width:100%;min-height:64px;resize:vertical;flex:none;}
+  input[type=text]:focus, textarea:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent);}
+  select{
+    font-family:'Work Sans',sans-serif;font-size:14px;padding:7px 8px;
+    border:1.5px solid var(--line);border-radius:5px;background:#FCFDFC;color:var(--ink);
+  }
+  button.check, button.reveal, button.util{
+    font-family:'Work Sans',sans-serif;font-weight:600;font-size:13.5px;
+    border-radius:5px;padding:8px 14px;cursor:pointer;border:1.5px solid transparent;
+  }
+  button.check{background:var(--accent);color:#fff;}
+  button.check:hover{background:var(--accent-deep);}
+  button.reveal{background:#fff;border-color:var(--line);color:var(--ink-soft);}
+  button.reveal:hover{border-color:var(--accent);color:var(--accent-deep);}
+  button.util{background:var(--warm);color:#4A360A;margin-top:6px;}
+  button.util:hover{background:#d4941f;}
+  .feedback{font-size:13.5px;margin-top:7px;font-weight:600;min-height:18px;}
+  .feedback.ok{color:var(--success);}
+  .feedback.bad{color:var(--error);}
+  .answer-box{
+    display:none;margin-top:7px;font-size:13.5px;background:var(--success-bg);
+    color:var(--accent-deep);border-radius:4px;padding:6px 10px;
+  }
+  .answer-box.show{display:block;}
+  .item.correct .item-row input, .item.correct .item-row select{border-color:var(--success);background:var(--success-bg);}
+  .item.wrong .item-row input, .item.wrong .item-row select{border-color:var(--error);background:var(--error-bg);}
+
+  .exercise-footer{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-top:16px;}
+  .copy-note{font-size:12.5px;color:var(--ink-soft);}
+
+  /* sidebar */
+  aside{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:16px 16px 18px;
+    position:sticky;top:20px;
+  }
+  aside h3{font-size:16px;margin-bottom:4px;}
+  aside p.hint{font-size:12.5px;color:var(--ink-soft);margin:0 0 10px;}
+  table.problems{width:100%;border-collapse:collapse;font-size:13px;}
+  table.problems th{text-align:left;border-bottom:1px solid var(--line);padding:4px 4px;color:var(--ink-soft);font-weight:600;}
+  table.problems td{padding:5px 4px;border-bottom:1px solid var(--line);}
+  table.problems tr:last-child td{border-bottom:none;}
+  .empty-msg{font-size:13px;color:var(--ink-soft);padding:6px 0;}
+  .count-pill{background:var(--error-bg);color:var(--error);border-radius:10px;padding:1px 8px;font-size:11.5px;font-weight:700;}
+  aside button.util{width:100%;margin-top:12px;}
+
+  footer.page{max-width:1180px;margin:10px auto 0;padding:0 20px;color:var(--ink-soft);font-size:12.5px;}
+  .toast{
+    position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+    background:var(--accent-deep);color:#fff;padding:10px 18px;border-radius:6px;
+    font-size:13.5px;opacity:0;pointer-events:none;transition:opacity .25s;z-index:40;
+  }
+  .toast.show{opacity:1;}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <h1>Making Plans — договариваемся о встрече</h1>
+  <p>Словарь, аудирование и 6 упражнений уровня A1. Все ответы можно проверить, посмотреть образец и скопировать для отправки преподавателю.</p>
+  <div class="top-actions">
+    <button class="check" id="testAudioBtn">🔊 Проверить звук</button>
+    <span id="audioStatus">Голос ещё не выбран…</span>
+  </div>
+</header>
+
+<div class="layout">
+  <main>
+
+    <section class="block" id="vocabBlock">
+      <h2>Слова и фразы</h2>
+      <p class="ex-meta">Нажми 🔊, чтобы услышать фразу (голос Google US English). Прочитай перевод и пример.</p>
+      <table class="vocab">
+        <thead><tr><th style="width:34px"></th><th>Phrase</th><th>Транскрипция</th><th>Перевод</th></tr></thead>
+        <tbody id="vocabTableBody"></tbody>
+      </table>
+    </section>
+
+    <section class="block" id="ex1Block">
+      <h2>Упражнение 1. Перевод с русского на английский<span class="ex-score" id="ex1score">0/10</span></h2>
+      <p class="ex-meta">Прочитай русскую фразу и напиши её по-английски.</p>
+      <div id="ex1items"></div>
+    </section>
+
+    <section class="block" id="ex2Block">
+      <h2>Упражнение 2. Диктант — пропиши фразу на слух<span class="ex-score" id="ex2score">0/10</span></h2>
+      <p class="ex-meta">Нажми 🔊 и напиши услышанную фразу по-английски (можно слушать несколько раз).</p>
+      <div id="ex2items"></div>
+    </section>
+
+    <section class="block" id="ex3Block">
+      <h2>Упражнение 3. Сочетаемость фраз<span class="ex-score" id="ex3score">0/10</span></h2>
+      <p class="ex-meta">Выбери подходящий ответ (реплику B) для каждой реплики A.</p>
+      <div id="ex3items"></div>
+    </section>
+
+    <section class="block" id="ex4Block">
+      <h2>Упражнение 4. Finish the dialogue</h2>
+      <p class="ex-meta">Заверши диалог — напиши реплику B. Это творческое задание: сравни свой вариант с примером.</p>
+      <div id="ex4items"></div>
+      <div class="exercise-footer">
+        <span class="copy-note">Скопируй все свои ответы одной кнопкой — можно отправить преподавателю.</span>
+        <button class="util" id="copyEx4">📋 Скопировать ответы (упр. 4)</button>
+      </div>
+    </section>
+
+    <section class="block" id="ex5Block">
+      <h2>Упражнение 5. Predict the ending</h2>
+      <p class="ex-meta">Прочитай начало диалога и предположи, что будет дальше. Открытое задание — сравни с примером.</p>
+      <div id="ex5items"></div>
+      <div class="exercise-footer">
+        <span class="copy-note">Собери все свои прогнозы в одну заметку.</span>
+        <button class="util" id="copyEx5">📋 Скопировать ответы (упр. 5)</button>
+      </div>
+    </section>
+
+    <section class="block" id="ex6Block">
+      <h2>Упражнение 6. Придумай свой диалог</h2>
+      <p class="ex-meta">Используй указанные фразы и напиши короткий диалог (2–4 реплики) на свою тему.</p>
+      <div id="ex6items"></div>
+      <div class="exercise-footer">
+        <span class="copy-note">Скопируй все диалоги одной кнопкой.</span>
+        <button class="util" id="copyEx6">📋 Скопировать ответы (упр. 6)</button>
+      </div>
+    </section>
+
+  </main>
+
+  <aside>
+    <h3>Проблемные слова</h3>
+    <p class="hint">Сюда автоматически попадают фразы, в которых была допущена ошибка.</p>
+    <table class="problems">
+      <thead><tr><th>Фраза</th><th style="text-align:right">Ошибок</th></tr></thead>
+      <tbody id="problemsBody"></tbody>
+    </table>
+    <div class="empty-msg" id="problemsEmpty">Пока нет ошибок — отлично!</div>
+    <button class="util" id="copyAllBtn">📋 Скопировать ВСЕ ответы</button>
+  </aside>
+</div>
+
+<footer class="page">
+  Making Plans A1 · озвучка через Web Speech API (голос Google US English, если доступен в браузере) · все ответы хранятся только в этой странице и никуда не отправляются автоматически.
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ---------------- DATA ---------------- */
+const VOCAB = [
+ {en:"give news", ru:"сообщать новости", ipa:"/ɡɪv njuːz/", ex:"She gave me news about her holiday."},
+ {en:"make an arrangement", ru:"договориться", ipa:"/meɪk ən əˈreɪndʒmənt/", ex:"We made an arrangement to meet tomorrow."},
+ {en:"Let's have a coffee!", ru:"давай выпьем кофе!", ipa:"/lets hæv ə ˈkɒfi/", ex:""},
+ {en:"Can we meet at half past seven?", ru:"Мы можем встретиться в 7:30?", ipa:"/kæn wiː miːt ət hɑːf pɑːst ˈsevən/", ex:""},
+ {en:"Would you like to see a film?", ru:"Хочешь посмотреть фильм?", ipa:"/wʊd juː laɪk tuː siː ə fɪlm/", ex:""},
+ {en:"How about a break?", ru:"Как насчёт перерыва?", ipa:"/haʊ əˈbaʊt ə breɪk/", ex:""},
+ {en:"What about three o'clock?", ru:"Как насчёт трёх часов?", ipa:"/wɒt əˈbaʊt θriː əˈklɒk/", ex:""},
+ {en:"How are things?", ru:"Как дела?", ipa:"/haʊ ɑː θɪŋz/", ex:""},
+ {en:"Do you want to do something today?", ru:"Хочешь что-то сделать сегодня?", ipa:"/duː juː wɒnt tuː duː ˈsʌmθɪŋ təˈdeɪ/", ex:""},
+ {en:"Let's try a new cafe near me.", ru:"Давай попробуем новое кафе рядом со мной", ipa:"/lets traɪ ə njuː ˈkæfeɪ nɪə miː/", ex:""},
+ {en:"See you there.", ru:"Увидимся там", ipa:"/siː juː ðeə/", ex:""},
+ {en:"Sure.", ru:"Конечно", ipa:"/ʃʊə/", ex:""},
+ {en:"Busy day.", ru:"Загруженный день", ipa:"/ˈbɪzi deɪ/", ex:""},
+ {en:"Let me know.", ru:"Дай знать", ipa:"/let miː nəʊ/", ex:""},
+ {en:"Would you like a coffee?", ru:"Хочешь кофе?", ipa:"/wʊd juː laɪk ə ˈkɒfi/", ex:""},
+ {en:"Would you like to drink a coffee?", ru:"Хочешь выпить кофе?", ipa:"/wʊd juː laɪk tuː drɪŋk ə ˈkɒfi/", ex:""},
+ {en:"I'd love to.", ru:"Я бы с удовольствием", ipa:"/aɪd lʌv tuː/", ex:""},
+ {en:"Sorry, I'm busy then.", ru:"Извини, я тогда занят", ipa:"/ˈsɒri aɪm ˈbɪzi ðen/", ex:""},
+ {en:"Sorry, I can't. Another time?", ru:"Извини, не могу. В другой раз?", ipa:"/ˈsɒri aɪ kɑːnt əˈnʌðə taɪm/", ex:""},
+ {en:"Good idea!", ru:"Хорошая идея!", ipa:"/ɡʊd aɪˈdɪə/", ex:""},
+ {en:"Perfect!", ru:"Отлично!", ipa:"/ˈpɜːfɪkt/", ex:""},
+ {en:"Is it convenient for you to meet at...?", ru:"Тебе удобно встретиться в...?", ipa:"/ɪz ɪt kənˈviːniənt fə juː tuː miːt ət/", ex:""},
+ {en:"unfortunately", ru:"к несчастью, к сожалению", ipa:"/ʌnˈfɔːtʃənətli/", ex:""},
+ {en:"fortunately", ru:"к счастью", ipa:"/ˈfɔːtʃənətli/", ex:""},
+ {en:"free time", ru:"свободное время", ipa:"/friː taɪm/", ex:"I like reading in my free time."},
+ {en:"I'm free", ru:"я свободен", ipa:"/aɪm friː/", ex:"I'm free this afternoon, we can meet."},
+ {en:"have a break", ru:"делать перерыв", ipa:"/hæv ə breɪk/", ex:"Let's have a break after two hours of work."},
+ {en:"I'm free tonight", ru:"я свободен сегодня вечером", ipa:"/aɪm friː təˈnaɪt/", ex:""},
+ {en:"I have free time", ru:"у меня есть свободное время", ipa:"/aɪ hæv friː taɪm/", ex:"I have free time on weekends."},
+ {en:"I'm fine", ru:"я в порядке", ipa:"/aɪm faɪn/", ex:""},
+ {en:"I'm OK", ru:"у меня всё нормально", ipa:"/aɪm ˌəʊˈkeɪ/", ex:""},
+ {en:"I'm good", ru:"всё хорошо", ipa:"/aɪm ɡʊd/", ex:""},
+ {en:"Not bad", ru:"неплохо", ipa:"/nɒt bæd/", ex:""},
+ {en:"so-so", ru:"так себе, средне", ipa:"/ˈsəʊ səʊ/", ex:"The movie was so-so."}
+];
+
+const MATCH_PAIRS = [
+ {a:"Would you like to see a film?", b:"I'd love to."},
+ {a:"Can we meet at half past seven?", b:"Sorry, I'm busy then."},
+ {a:"How about a break?", b:"Good idea!"},
+ {a:"Would you like a coffee?", b:"Sure."},
+ {a:"Do you want to do something today?", b:"Sorry, I can't. Another time?"},
+ {a:"How are things?", b:"Not bad."},
+ {a:"Let's try a new cafe near me.", b:"See you there."},
+ {a:"What about three o'clock?", b:"Perfect!"},
+ {a:"Is it convenient for you to meet at...?", b:"Let me know."},
+ {a:"Would you like to drink a coffee?", b:"I'm free tonight."}
+];
+
+const FINISH_DIALOGUES = [
+ {a:"How are things?", model:"Not bad, thanks. And you?"},
+ {a:"Would you like a coffee?", model:"I'd love to."},
+ {a:"Can we meet at half past seven?", model:"Sorry, I'm busy then. What about eight?"},
+ {a:"Do you want to do something today?", model:"Sure, let's go!"},
+ {a:"What about three o'clock?", model:"Perfect, see you then!"},
+ {a:"Is it convenient for you to meet at six?", model:"Sorry, I can't. Another time?"},
+ {a:"Let's try a new cafe near me.", model:"Good idea! See you there."},
+ {a:"How about a break?", model:"Good idea, I have free time now."},
+ {a:"Would you like to see a film tonight?", model:"I'm free tonight, let's go!"},
+ {a:"Busy day?", model:"Yes, unfortunately. Let's meet another time."}
+];
+
+const PREDICT_DIALOGUES = [
+ {lines:["A: Would you like to have a coffee this weekend?","B: I'd love to! What time is good for you?"], model:"A: How about Saturday at eleven?"},
+ {lines:["A: Can we meet at half past seven?","B: Sorry, I'm busy then."], model:"A: OK, what about eight o'clock?"},
+ {lines:["A: How are things?","B: Not bad. Busy day though."], model:"A: Would you like a break?"},
+ {lines:["A: Do you want to do something today?","B: Sorry, I can't. Another time?"], model:"A: Sure, let me know when you're free."},
+ {lines:["A: Let's try a new cafe near me.","B: Good idea!"], model:"A: Great, see you there at four."},
+ {lines:["A: Would you like to see a film?","B: Unfortunately, I'm busy tonight."], model:"A: No problem, how about tomorrow?"},
+ {lines:["A: I have free time this afternoon.","B: Great, how about a coffee?"], model:"A: Perfect! Let's have a coffee at three."},
+ {lines:["A: Is it convenient for you to meet at three?","B: Perfect!"], model:"A: See you at three then."},
+ {lines:["A: How about a break?","B: Good idea, I'm tired."], model:"A: Let's have a break for ten minutes."},
+ {lines:["A: Would you like to drink a coffee?","B: Sure!"], model:"A: Great, let's go now."}
+];
+
+const OWN_DIALOGUES = [
+ ["Would you like to see a film?", "I'd love to"],
+ ["Can we meet at half past seven?", "Sorry, I'm busy then"],
+ ["How are things?", "Not bad"],
+ ["Let's try a new cafe near me.", "See you there"],
+ ["Do you want to do something today?", "Sorry, I can't. Another time?"],
+ ["Would you like a coffee?", "Sure"],
+ ["What about three o'clock?", "Perfect!"],
+ ["How about a break?", "Good idea!"],
+ ["I'm free tonight", "Would you like to drink a coffee?"],
+ ["Is it convenient for you to meet at...?", "Let me know"]
+];
+
+/* ---------------- HELPERS ---------------- */
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+function normalize(s){
+  return s.toLowerCase()
+    .replace(/[’]/g,"'")
+    .replace(/[.,!?;:()"…]/g,"")
+    .replace(/\s+/g," ")
+    .trim();
+}
+function altAnswers(en){
+  const base = en.replace(/\.$/,"").trim();
+  const set = new Set([en, base]);
+  if(en.endsWith(".")) set.add(base);
+  else set.add(base+".");
+  if(en.startsWith("I'd")) set.add(en.replace("I'd","I would"));
+  if(en.startsWith("Let's")) set.add(en.replace("Let's","Let us"));
+  return Array.from(set);
+}
+
+const problems = {}; // { phrase: count }
+function reportProblem(phrase){
+  problems[phrase] = (problems[phrase]||0)+1;
+  renderProblems();
+}
+function renderProblems(){
+  const body = document.getElementById('problemsBody');
+  const empty = document.getElementById('problemsEmpty');
+  const entries = Object.entries(problems).sort((a,b)=>b[1]-a[1]);
+  if(entries.length===0){
+    body.innerHTML = "";
+    empty.style.display = "block";
+    return;
+  }
+  empty.style.display = "none";
+  body.innerHTML = entries.map(([w,c])=>
+    `<tr><td>${w}</td><td style="text-align:right"><span class="count-pill">${c}</span></td></tr>`
+  ).join("");
+}
+
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 1800);
+}
+function copyText(text){
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(()=>toast("Скопировано в буфер обмена!"))
+      .catch(()=>fallbackCopy(text));
+  } else {
+    fallbackCopy(text);
+  }
+}
+function fallbackCopy(text){
+  const ta = document.createElement('textarea');
+  ta.value = text; document.body.appendChild(ta); ta.select();
+  try{ document.execCommand('copy'); toast("Скопировано в буфер обмена!"); }
+  catch(e){ toast("Не удалось скопировать — выдели текст вручную."); }
+  document.body.removeChild(ta);
+}
+
+/* ---------------- SPEECH ---------------- */
+let voices = [];
+let chosenVoice = null;
+function loadVoices(){
+  voices = window.speechSynthesis ? window.speechSynthesis.getVoices() : [];
+  if(voices.length){
+    chosenVoice = voices.find(v => v.name === "Google US English")
+      || voices.find(v => v.name.toLowerCase().includes("google") && v.lang === "en-US")
+      || voices.find(v => v.lang === "en-US")
+      || voices.find(v => v.lang && v.lang.startsWith("en"))
+      || voices[0];
+    const st = document.getElementById('audioStatus');
+    st.textContent = chosenVoice ? `Голос: ${chosenVoice.name} (${chosenVoice.lang})` : "Голос не найден в этом браузере";
+  }
+}
+if('speechSynthesis' in window){
+  loadVoices();
+  window.speechSynthesis.onvoiceschanged = loadVoices;
+} else {
+  document.getElementById('audioStatus').textContent = "Web Speech API недоступен в этом браузере";
+}
+function speak(text){
+  if(!('speechSynthesis' in window)){ toast("Синтез речи не поддерживается этим браузером."); return; }
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = "en-US";
+  u.rate = 0.92;
+  if(chosenVoice) u.voice = chosenVoice;
+  u.onerror = ()=> toast("Ошибка воспроизведения звука.");
+  window.speechSynthesis.speak(u);
+}
+document.getElementById('testAudioBtn').addEventListener('click', ()=>{
+  loadVoices();
+  speak("Would you like to have a coffee?");
+});
+
+/* ---------------- RENDER: VOCAB ---------------- */
+function renderVocab(){
+  const body = document.getElementById('vocabTableBody');
+  body.innerHTML = VOCAB.map((v,i)=>`
+    <tr>
+      <td><button class="play" data-say="${encodeURIComponent(v.en)}" title="Слушать">🔊</button></td>
+      <td>
+        <span class="en-phrase">${v.en}</span>
+        ${v.ex ? `<span class="example">${v.ex}</span>` : ""}
+      </td>
+      <td class="ipa">${v.ipa}</td>
+      <td>${v.ru}</td>
+    </tr>
+  `).join("");
+  body.querySelectorAll('button.play').forEach(btn=>{
+    btn.addEventListener('click', ()=> speak(decodeURIComponent(btn.dataset.say)));
+  });
+}
+
+/* ---------------- EX1: RU -> EN translation ---------------- */
+let ex1State = {};
+function renderEx1(){
+  const items = shuffle(VOCAB).slice(0,10);
+  ex1State = {};
+  const container = document.getElementById('ex1items');
+  container.innerHTML = items.map((v,i)=>`
+    <div class="item" id="ex1-item-${i}" data-answers='${JSON.stringify(altAnswers(v.en))}' data-phrase="${v.en.replace(/"/g,'&quot;')}">
+      <div class="qline">${i+1}. <span class="ru">${v.ru}</span></div>
+      <div class="item-row">
+        <input type="text" id="ex1-input-${i}" placeholder="Введи фразу по-английски…">
+        <button class="check" data-ex="1" data-i="${i}">Проверить</button>
+        <button class="reveal" data-ex="1" data-i="${i}">Показать ответ</button>
+      </div>
+      <div class="feedback" id="ex1-fb-${i}"></div>
+      <div class="answer-box" id="ex1-ans-${i}">${v.en}</div>
+    </div>
+  `).join("");
+  attachCheckHandlers('ex1', items.length);
+}
+
+/* ---------------- EX2: dictation ---------------- */
+function renderEx2(){
+  const items = shuffle(VOCAB).slice(0,10);
+  const container = document.getElementById('ex2items');
+  container.innerHTML = items.map((v,i)=>`
+    <div class="item" id="ex2-item-${i}" data-answers='${JSON.stringify(altAnswers(v.en))}'>
+      <div class="qline">${i+1}. <button class="play" data-say="${encodeURIComponent(v.en)}" title="Слушать">🔊</button></div>
+      <div class="item-row">
+        <input type="text" id="ex2-input-${i}" placeholder="Напиши то, что услышал(а)…">
+        <button class="check" data-ex="2" data-i="${i}">Проверить</button>
+        <button class="reveal" data-ex="2" data-i="${i}">Показать ответ</button>
+      </div>
+      <div class="feedback" id="ex2-fb-${i}"></div>
+      <div class="answer-box" id="ex2-ans-${i}">${v.en} <span style="color:var(--ink-soft)">— ${v.ru}</span></div>
+    </div>
+  `).join("");
+  container.querySelectorAll('button.play').forEach(btn=>{
+    btn.addEventListener('click', ()=> speak(decodeURIComponent(btn.dataset.say)));
+  });
+  attachCheckHandlers('ex2', items.length);
+}
+
+/* ---------------- EX3: matching (select) ---------------- */
+function renderEx3(){
+  const pairsShuffledOrder = shuffle(MATCH_PAIRS);
+  const rightOptions = shuffle(MATCH_PAIRS.map(p=>p.b));
+  const container = document.getElementById('ex3items');
+  container.innerHTML = pairsShuffledOrder.map((p,i)=>`
+    <div class="item" id="ex3-item-${i}" data-answer="${p.b.replace(/"/g,'&quot;')}">
+      <div class="qline">${i+1}. A: ${p.a}</div>
+      <div class="item-row">
+        <span style="color:var(--ink-soft)">B:</span>
+        <select id="ex3-input-${i}">
+          <option value="">— выбери ответ —</option>
+          ${rightOptions.map(o=>`<option value="${o.replace(/"/g,'&quot;')}">${o}</option>`).join("")}
+        </select>
+        <button class="check" data-ex="3" data-i="${i}">Проверить</button>
+      </div>
+      <div class="feedback" id="ex3-fb-${i}"></div>
+    </div>
+  `).join("");
+
+  document.querySelectorAll('#ex3items button.check').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const i = btn.dataset.i;
+      const item = document.getElementById(`ex3-item-${i}`);
+      const sel = document.getElementById(`ex3-input-${i}`);
+      const correct = item.dataset.answer;
+      const fb = document.getElementById(`ex3-fb-${i}`);
+      if(!sel.value){ fb.textContent = "Выбери вариант."; fb.className="feedback bad"; return; }
+      if(sel.value === correct){
+        fb.textContent = "Верно!"; fb.className = "feedback ok";
+        item.classList.remove('wrong'); item.classList.add('correct');
+      } else {
+        fb.textContent = `Неверно. Правильный ответ: ${correct}`; fb.className = "feedback bad";
+        item.classList.remove('correct'); item.classList.add('wrong');
+        reportProblem(item.querySelector('.qline').textContent.replace(/^\d+\.\s*A:\s*/,''));
+      }
+      updateScore('ex3');
+    });
+  });
+}
+
+/* ---------------- Generic check for text inputs (ex1/ex2) ---------------- */
+function attachCheckHandlers(ex, count){
+  document.querySelectorAll(`#${ex}items button.check`).forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const i = btn.dataset.i;
+      const item = document.getElementById(`${ex}-item-${i}`);
+      const input = document.getElementById(`${ex}-input-${i}`);
+      const answers = JSON.parse(item.dataset.answers).map(normalize);
+      const fb = document.getElementById(`${ex}-fb-${i}`);
+      const val = normalize(input.value);
+      if(!val){ fb.textContent = "Введи ответ."; fb.className = "feedback bad"; return; }
+      if(answers.includes(val)){
+        fb.textContent = "Верно!"; fb.className = "feedback ok";
+        item.classList.remove('wrong'); item.classList.add('correct');
+      } else {
+        fb.textContent = "Неверно. Попробуй ещё раз или посмотри ответ."; fb.className = "feedback bad";
+        item.classList.remove('correct'); item.classList.add('wrong');
+        const phrase = item.dataset.phrase || JSON.parse(item.dataset.answers)[0];
+        reportProblem(phrase);
+      }
+      updateScore(ex);
+    });
+  });
+  document.querySelectorAll(`#${ex}items button.reveal`).forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const i = btn.dataset.i;
+      const box = document.getElementById(`${ex}-ans-${i}`);
+      box.classList.toggle('show');
+      btn.textContent = box.classList.contains('show') ? "Скрыть ответ" : "Показать ответ";
+    });
+  });
+}
+function updateScore(ex){
+  const correctCount = document.querySelectorAll(`#${ex}items .item.correct`).length;
+  const scoreEl = document.getElementById(`${ex}score`);
+  if(scoreEl) scoreEl.textContent = `${correctCount}/10`;
+}
+
+/* ---------------- EX4: finish the dialogue ---------------- */
+function renderEx4(){
+  const items = shuffle(FINISH_DIALOGUES);
+  const container = document.getElementById('ex4items');
+  container.innerHTML = items.map((d,i)=>`
+    <div class="item">
+      <div class="dialog-line">A: ${d.a}</div>
+      <div class="item-row">
+        <span style="color:var(--ink-soft)">B:</span>
+        <input type="text" id="ex4-input-${i}" placeholder="Заверши диалог…">
+        <button class="reveal" data-target="ex4-ans-${i}">Показать пример</button>
+      </div>
+      <div class="answer-box" id="ex4-ans-${i}">Пример: ${d.model}</div>
+    </div>
+  `).join("");
+  attachRevealToggle(container);
+}
+
+/* ---------------- EX5: predict the ending ---------------- */
+function renderEx5(){
+  const items = shuffle(PREDICT_DIALOGUES);
+  const container = document.getElementById('ex5items');
+  container.innerHTML = items.map((d,i)=>`
+    <div class="item">
+      ${d.lines.map(l=>`<div class="dialog-line">${l}</div>`).join("")}
+      <div class="item-row">
+        <input type="text" id="ex5-input-${i}" placeholder="Что будет дальше?">
+        <button class="reveal" data-target="ex5-ans-${i}">Показать идею</button>
+      </div>
+      <div class="answer-box" id="ex5-ans-${i}">Идея: ${d.model}</div>
+    </div>
+  `).join("");
+  attachRevealToggle(container);
+}
+
+/* ---------------- EX6: own dialogue ---------------- */
+function renderEx6(){
+  const items = shuffle(OWN_DIALOGUES);
+  const container = document.getElementById('ex6items');
+  container.innerHTML = items.map((pair,i)=>`
+    <div class="item">
+      <div class="qline">${i+1}. Используй фразы: <span class="ru">"${pair[0]}"</span> и <span class="ru">"${pair[1]}"</span></div>
+      <textarea id="ex6-input-${i}" placeholder="Напиши свой короткий диалог (2–4 реплики)…"></textarea>
+    </div>
+  `).join("");
+}
+
+function attachRevealToggle(container){
+  container.querySelectorAll('button.reveal').forEach(btn=>{
+    const original = btn.textContent;
+    btn.addEventListener('click', ()=>{
+      const box = document.getElementById(btn.dataset.target);
+      box.classList.toggle('show');
+      btn.textContent = box.classList.contains('show') ? "Скрыть" : original;
+    });
+  });
+}
+
+/* ---------------- COPY ALL ---------------- */
+function collectExercise(prefix, count, label){
+  let out = `--- ${label} ---\n`;
+  for(let i=0;i<count;i++){
+    const el = document.getElementById(`${prefix}-input-${i}`);
+    if(el) out += `${i+1}. ${el.value || "(пусто)"}\n`;
+  }
+  return out + "\n";
+}
+document.getElementById('copyEx4').addEventListener('click', ()=>{
+  copyText(collectExercise('ex4', FINISH_DIALOGUES.length, "Упражнение 4. Finish the dialogue"));
+});
+document.getElementById('copyEx5').addEventListener('click', ()=>{
+  copyText(collectExercise('ex5', PREDICT_DIALOGUES.length, "Упражнение 5. Predict the ending"));
+});
+document.getElementById('copyEx6').addEventListener('click', ()=>{
+  copyText(collectExercise('ex6', OWN_DIALOGUES.length, "Упражнение 6. Свой диалог"));
+});
+document.getElementById('copyAllBtn').addEventListener('click', ()=>{
+  let all = "Making Plans A1 — ответы студента\n\n";
+  all += collectExercise('ex1', 10, "Упражнение 1. Перевод RU→EN");
+  all += collectExercise('ex2', 10, "Упражнение 2. Диктант");
+  all += collectExercise('ex4', FINISH_DIALOGUES.length, "Упражнение 4. Finish the dialogue");
+  all += collectExercise('ex5', PREDICT_DIALOGUES.length, "Упражнение 5. Predict the ending");
+  all += collectExercise('ex6', OWN_DIALOGUES.length, "Упражнение 6. Свой диалог");
+  copyText(all);
+});
+
+/* ---------------- INIT ---------------- */
+renderVocab();
+renderEx1();
+renderEx2();
+renderEx3();
+renderEx4();
+renderEx5();
+renderEx6();
+renderProblems();
+</script>
+</body>
+</html>
