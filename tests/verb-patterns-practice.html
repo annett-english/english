@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Want to / Like -ing: тренажёр A1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#eaf1f5;
+    --paper:#fffdf7;
+    --rule:#cfe1e8;
+    --margin:#d65b4a;
+    --ink:#1f3a5f;
+    --ink-soft:#5c7590;
+    --correct:#2f7a4f;
+    --correct-bg:#dcefe1;
+    --wrong:#c9463a;
+    --wrong-bg:#fbdfda;
+    --highlight:#ffe58a;
+    --hand:'Patrick Hand', cursive;
+    --sans:'Nunito', Arial, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:var(--sans);
+    color:var(--ink);
+    background:var(--bg);
+    background-image:
+      repeating-linear-gradient(to bottom, transparent 0 37px, var(--rule) 37px 38px);
+    background-attachment:local;
+    padding-bottom:60px;
+  }
+  .wrap{max-width:1160px;margin:0 auto;padding:0 24px;}
+
+  /* ---------- HERO ---------- */
+  header.hero{
+    padding:44px 0 28px;
+  }
+  .hero-title{
+    font-family:var(--hand);
+    font-size:clamp(32px,5vw,52px);
+    color:var(--ink);
+    margin:0 0 6px;
+    line-height:1.1;
+  }
+  .hero-sub{
+    font-size:15px;
+    color:var(--ink-soft);
+    max-width:64ch;
+    margin:0 0 26px;
+  }
+
+  /* reference table of patterns */
+  .ref-card{
+    background:var(--paper);
+    border:1.5px solid var(--ink);
+    border-radius:10px;
+    padding:20px 22px 18px;
+    position:relative;
+    box-shadow:5px 5px 0 rgba(31,58,95,.12);
+  }
+  .ref-card::before{
+    content:"";
+    position:absolute;left:38px;top:0;bottom:0;
+    width:1.5px;background:var(--margin);
+    opacity:.5;
+  }
+  .ref-title{
+    font-family:var(--hand);
+    font-size:22px;
+    margin:0 0 12px;
+  }
+  .ref-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+    gap:12px;
+  }
+  .ref-item{
+    border:1px solid var(--rule);
+    border-radius:8px;
+    padding:10px 12px;
+    background:#fefefb;
+  }
+  .ref-verb{
+    font-weight:800;
+    font-size:15px;
+  }
+  .ref-verb .tag{
+    display:inline-block;
+    font-family:var(--sans);
+    font-weight:700;
+    font-size:10.5px;
+    color:#8a6d00;
+    background:var(--highlight);
+    border-radius:10px;
+    padding:1px 7px;
+    margin-left:6px;
+    vertical-align:middle;
+  }
+  .ref-ipa{font-size:12.5px;color:var(--ink-soft);margin:2px 0 4px;}
+  .ref-ru{font-size:13px;margin-bottom:5px;}
+  .ref-ex{font-size:12.5px;font-style:italic;color:var(--ink-soft);}
+
+  /* ---------- LAYOUT ---------- */
+  main{max-width:1160px;margin:0 auto;}
+
+  .exercise{
+    background:var(--paper);
+    border:1.5px solid var(--ink);
+    border-radius:10px;
+    padding:24px 26px 26px;
+    margin:28px 0;
+    position:relative;
+    box-shadow:5px 5px 0 rgba(31,58,95,.10);
+  }
+  .exercise::before{
+    content:"";
+    position:absolute;left:38px;top:0;bottom:0;
+    width:1.5px;background:var(--margin);
+    opacity:.35;
+  }
+  .ex-head{display:flex;align-items:baseline;gap:12px;margin-bottom:4px;}
+  .ex-num{
+    font-family:var(--hand);
+    font-size:24px;
+    color:var(--margin);
+  }
+  .ex-title{
+    font-family:var(--hand);
+    font-size:24px;
+    margin:0;
+  }
+  .ex-desc{
+    font-size:13.5px;
+    color:var(--ink-soft);
+    margin:2px 0 18px;
+    max-width:74ch;
+  }
+
+  .items{display:grid;grid-template-columns:1fr 1fr;gap:14px 20px;}
+  @media (max-width:640px){ .items{grid-template-columns:1fr;} }
+
+  .item{
+    border:1px solid var(--rule);
+    background:#fefefb;
+    border-radius:8px;
+    padding:12px 13px 13px;
+  }
+  .item .qnum{font-size:11px;color:var(--margin);font-weight:800;}
+  .item .qtext{font-size:15px;font-weight:600;margin:4px 0 8px;}
+  .item .qmeta{font-size:12px;color:var(--ink-soft);margin-bottom:8px;}
+  .item input[type=text]{
+    width:100%;
+    font-family:var(--sans);
+    font-size:14px;
+    padding:8px 9px;
+    border:1px solid var(--rule);
+    background:#fff;
+    border-radius:6px;
+    color:var(--ink);
+  }
+  .item input[type=text]:focus{outline:2px solid var(--margin);outline-offset:1px;}
+  .item.correct{border-color:var(--correct);background:var(--correct-bg);}
+  .item.wrong{border-color:var(--wrong);background:var(--wrong-bg);}
+
+  .fb{font-size:12.5px;margin-top:8px;min-height:14px;}
+  .fb.ok{color:var(--correct);font-weight:700;}
+  .fb.bad{color:var(--wrong);font-weight:700;}
+  .fb .why{display:block;color:var(--ink-soft);font-weight:400;margin-top:3px;}
+  .fb .answer{font-style:italic;}
+
+  .mc-options{display:flex;flex-direction:column;gap:6px;}
+  .mc-opt{
+    text-align:left;
+    border:1px solid var(--rule);
+    background:#fff;
+    padding:8px 10px;
+    border-radius:6px;
+    font-size:14px;
+    cursor:pointer;
+  }
+  .mc-opt:hover{border-color:var(--margin);}
+  .mc-opt.picked{border-color:var(--margin);background:#fff4f1;}
+  .mc-opt.right{border-color:var(--correct);background:var(--correct-bg);}
+  .mc-opt.wrongpick{border-color:var(--wrong);background:var(--wrong-bg);}
+
+  .ex-controls{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap;align-items:center;}
+  .btn{
+    font-family:var(--sans);
+    font-weight:800;
+    font-size:13px;
+    padding:9px 16px;
+    border-radius:20px;
+    border:1.5px solid var(--ink);
+    background:var(--ink);
+    color:#fff;
+    cursor:pointer;
+  }
+  .btn:hover{background:#122544;}
+  .btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--ink-soft);}
+  .btn.ghost:hover{background:rgba(31,58,95,.06);}
+  .btn.copy{background:var(--margin);border-color:var(--margin);}
+  .btn.copy:hover{background:#b8493a;}
+  .ex-score{font-size:13px;color:var(--ink-soft);margin-left:auto;}
+  .ex-score b{color:var(--ink);}
+  .copy-note{font-size:12.5px;color:var(--correct);font-weight:700;}
+
+  .model-box{
+    margin-top:14px;
+    border-top:1px dashed var(--rule);
+    padding-top:10px;
+    font-size:12.5px;
+    color:var(--ink-soft);
+    display:none;
+  }
+  .model-box.show{display:block;}
+  .model-box b{color:var(--ink);}
+
+  footer{max-width:1160px;margin:20px auto 0;padding:0 24px;font-size:12px;color:#7c93ab;}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="hero">
+    <h1 class="hero-title">Want to, need to, like -ing…</h1>
+    <p class="hero-sub">Простые глаголы + глагол-партнёр. Сначала — таблица с примерами, потом 7 заданий по 8 пунктов, чтобы закрепить правило руками.</p>
+
+    <div class="ref-card">
+      <p class="ref-title">Сначала посмотри правило</p>
+      <div class="ref-grid" id="refGrid"></div>
+    </div>
+  </header>
+
+  <main id="exercises"></main>
+</div>
+
+<footer>Ответы сохраняются автоматически, обновление страницы их не сотрёт.</footer>
+
+<script>
+(function(){
+
+/* ===================== REFERENCE DATA ===================== */
+
+const PATTERNS = [
+  {verb:"want to", ipa:"/wɒnt tə/", ru:"хотеть", forms:"want to + V", example:"I want to play football.", two:false},
+  {verb:"need to", ipa:"/niːd tə/", ru:"нуждаться / нужно", forms:"need to + V", example:"I need to sleep.", two:false},
+  {verb:"like", ipa:"/laɪk/", ru:"любить", forms:"like to + V  или  like + V-ing", example:"I like to read. / I like reading.", two:true},
+  {verb:"love", ipa:"/lʌv/", ru:"очень любить", forms:"love to + V  или  love + V-ing", example:"I love to swim. / I love swimming.", two:true},
+  {verb:"prefer to", ipa:"/prɪˈfɜː tə/", ru:"предпочитать", forms:"prefer to + V", example:"I prefer to walk.", two:false},
+  {verb:"plan to", ipa:"/plæn tə/", ru:"планировать", forms:"plan to + V", example:"I plan to visit Paris.", two:false},
+  {verb:"can", ipa:"/kæn/", ru:"мочь / уметь", forms:"can + V  (БЕЗ to!)", example:"I can draw.", two:false}
+];
+
+const EXPL = {
+  want:"После want всегда идёт to + глагол: want to do.",
+  need:"После need всегда идёт to + глагол: need to do.",
+  like:"После like можно и to + глагол, и глагол + ing — оба варианта верны.",
+  love:"После love можно и to + глагол, и глагол + ing — оба варианта верны.",
+  prefer:"После prefer обычно идёт to + глагол: prefer to do.",
+  plan:"После plan всегда идёт to + глагол: plan to do.",
+  can:"После can никогда не ставим to — только глагол без to: can do."
+};
+
+/* ===================== HELPERS ===================== */
+
+function shuffle(arr, seed){
+  const a = arr.slice();
+  let s = seed;
+  function rnd(){ s = (s*9301+49297) % 233280; return s/233280; }
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(rnd()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+function normalize(str){
+  return (str||"").toLowerCase().replace(/[.,!?…"“”'’]/g,"").replace(/\s+/g," ").trim();
+}
+function el(tag, cls, html){
+  const e = document.createElement(tag);
+  if(cls) e.className = cls;
+  if(html!==undefined) e.innerHTML = html;
+  return e;
+}
+function debounce(fn, ms){
+  let t; return function(...a){ clearTimeout(t); t=setTimeout(()=>fn(...a), ms); };
+}
+async function copyText(text){
+  try{
+    await navigator.clipboard.writeText(text);
+    return true;
+  }catch(e){
+    try{
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position='fixed'; ta.style.opacity='0';
+      document.body.appendChild(ta);
+      ta.focus(); ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      return true;
+    }catch(e2){ return false; }
+  }
+}
+
+/* ===================== STORAGE ===================== */
+
+let answersCache = {};
+async function loadStorage(){
+  try{
+    const a = await window.storage.get('verbpatterns-answers-v1', false);
+    if(a && a.value) answersCache = JSON.parse(a.value);
+  }catch(e){ answersCache = {}; }
+}
+const saveAnswers = debounce(async function(){
+  try{ await window.storage.set('verbpatterns-answers-v1', JSON.stringify(answersCache), false); }
+  catch(e){ /* best effort */ }
+}, 400);
+
+/* ===================== REFERENCE TABLE ===================== */
+
+function renderRef(){
+  const grid = document.getElementById('refGrid');
+  PATTERNS.forEach(p=>{
+    const c = el('div','ref-item');
+    c.innerHTML = `
+      <div class="ref-verb">${p.verb}${p.two?'<span class="tag">2 варианта</span>':''}</div>
+      <div class="ref-ipa">${p.ipa} — ${p.forms}</div>
+      <div class="ref-ru">${p.ru}</div>
+      <div class="ref-ex">${p.example}</div>
+    `;
+    grid.appendChild(c);
+  });
+}
+
+/* ===================== ITEM BUILDERS ===================== */
+
+function inputItem({num, prompt, meta, answerId, checkFn, revealFn, why}){
+  const wrap = el('div','item');
+  let head = `<div class="qnum">${num}</div><p class="qtext">${prompt}</p>`;
+  if(meta) head += `<p class="qmeta">${meta}</p>`;
+  wrap.innerHTML = head;
+
+  const input = el('input');
+  input.type='text'; input.autocomplete='off'; input.spellcheck=false;
+  input.placeholder='Впиши ответ…';
+  if(answersCache[answerId]) input.value = answersCache[answerId];
+  input.addEventListener('input', ()=>{ answersCache[answerId]=input.value; saveAnswers(); });
+  wrap.appendChild(input);
+
+  const fb = el('div','fb');
+  wrap.appendChild(fb);
+
+  wrap._check = function(){
+    const ok = checkFn(input.value);
+    wrap.classList.remove('correct','wrong');
+    wrap.classList.add(ok?'correct':'wrong');
+    fb.className = 'fb ' + (ok?'ok':'bad');
+    fb.innerHTML = (ok?'✓ верно':'✗ пока не то') + (why?('<span class="why">'+why+'</span>'):'');
+    return ok;
+  };
+  wrap._reveal = function(){
+    fb.className = 'fb';
+    fb.innerHTML = 'Ответ: <span class="answer">'+revealFn()+'</span>' + (why?('<span class="why">'+why+'</span>'):'');
+  };
+  return wrap;
+}
+
+function mcItem({num, prompt, meta, options, correctIndices, answerId, why}){
+  const wrap = el('div','item');
+  let head = `<div class="qnum">${num}</div><p class="qtext">${prompt}</p>`;
+  if(meta) head += `<p class="qmeta">${meta}</p>`;
+  wrap.innerHTML = head;
+
+  const optsBox = el('div','mc-options');
+  let picked = (answersCache[answerId]!==undefined) ? Number(answersCache[answerId]) : null;
+  const btns = options.map((optText,i)=>{
+    const b = el('button','mc-opt'); b.type='button'; b.textContent=optText;
+    if(picked===i) b.classList.add('picked');
+    b.addEventListener('click', ()=>{
+      btns.forEach(x=>x.classList.remove('picked'));
+      b.classList.add('picked');
+      picked = i;
+      answersCache[answerId]=String(i); saveAnswers();
+    });
+    optsBox.appendChild(b);
+    return b;
+  });
+  wrap.appendChild(optsBox);
+
+  const fb = el('div','fb');
+  wrap.appendChild(fb);
+
+  wrap._check = function(){
+    const ok = picked!==null && correctIndices.includes(picked);
+    btns.forEach((b,i)=>{
+      b.classList.remove('right','wrongpick');
+      if(correctIndices.includes(i)) b.classList.add('right');
+      else if(i===picked) b.classList.add('wrongpick');
+    });
+    wrap.classList.remove('correct','wrong');
+    wrap.classList.add(ok?'correct':'wrong');
+    fb.className = 'fb ' + (ok?'ok':'bad');
+    fb.innerHTML = (ok?'✓ верно':(picked===null?'выбери вариант':'✗ не совсем')) + (why?('<span class="why">'+why+'</span>'):'');
+    return ok;
+  };
+  wrap._reveal = function(){
+    btns.forEach((b,i)=>{ if(correctIndices.includes(i)) b.classList.add('right'); });
+    fb.className = 'fb';
+    fb.innerHTML = 'Верный вариант отмечен зелёным.' + (why?('<span class="why">'+why+'</span>'):'');
+  };
+  return wrap;
+}
+
+function openItem({num, prompt, meta, answerId, model}){
+  const wrap = el('div','item');
+  let head = `<div class="qnum">${num}</div><p class="qtext">${prompt}</p>`;
+  if(meta) head += `<p class="qmeta">${meta}</p>`;
+  wrap.innerHTML = head;
+
+  const input = el('input');
+  input.type='text'; input.autocomplete='off'; input.spellcheck=false;
+  input.placeholder='Напиши свою идею…';
+  if(answersCache[answerId]) input.value = answersCache[answerId];
+  input.addEventListener('input', ()=>{ answersCache[answerId]=input.value; saveAnswers(); });
+  wrap.appendChild(input);
+
+  const mb = el('div','model-box','Пример: <b>'+model+'</b>');
+  wrap.appendChild(mb);
+
+  wrap._getAnswer = function(){ return input.value.trim(); };
+  wrap._prompt = prompt;
+  wrap._reveal = function(){ mb.classList.add('show'); };
+  return wrap;
+}
+
+/* ===================== EXERCISE BUILDER ===================== */
+
+function buildGradedExercise({num, title, desc, items}){
+  const card = el('div','exercise');
+  card.innerHTML = `<div class="ex-head"><span class="ex-num">${num}.</span><h2 class="ex-title">${title}</h2></div><p class="ex-desc">${desc}</p>`;
+  const grid = el('div','items');
+  items.forEach(it=>grid.appendChild(it));
+  card.appendChild(grid);
+
+  const controls = el('div','ex-controls');
+  const checkBtn = el('button','btn','Проверить');
+  const revealBtn = el('button','btn ghost','Показать ответы и объяснение');
+  const score = el('span','ex-score');
+  controls.appendChild(checkBtn); controls.appendChild(revealBtn); controls.appendChild(score);
+  card.appendChild(controls);
+
+  checkBtn.addEventListener('click', ()=>{
+    let right=0;
+    items.forEach(it=>{ if(it._check()) right++; });
+    score.innerHTML = `<b>${right} / ${items.length}</b> верно`;
+  });
+  revealBtn.addEventListener('click', ()=>{ items.forEach(it=>it._reveal()); });
+
+  return card;
+}
+
+function buildOpenExercise({num, title, desc, items}){
+  const card = el('div','exercise');
+  card.innerHTML = `<div class="ex-head"><span class="ex-num">${num}.</span><h2 class="ex-title">${title}</h2></div><p class="ex-desc">${desc}</p>`;
+  const grid = el('div','items');
+  items.forEach(it=>grid.appendChild(it));
+  card.appendChild(grid);
+
+  const controls = el('div','ex-controls');
+  const modelBtn = el('button','btn ghost','Показать примеры');
+  const copyBtn = el('button','btn copy','📋 Скопировать все ответы');
+  const note = el('span','copy-note','');
+  controls.appendChild(modelBtn); controls.appendChild(copyBtn); controls.appendChild(note);
+  card.appendChild(controls);
+
+  modelBtn.addEventListener('click', ()=>{ items.forEach(it=>it._reveal()); });
+  copyBtn.addEventListener('click', async ()=>{
+    const lines = items.map((it,i)=>{
+      const ans = it._getAnswer();
+      return (i+1)+'. '+it._prompt.replace(/_+/g,'').trim()+' '+(ans||'…');
+    });
+    const ok = await copyText(lines.join('\n'));
+    note.textContent = ok ? 'скопировано ✓' : 'не удалось скопировать';
+    setTimeout(()=>{ note.textContent=''; }, 2500);
+  });
+
+  return card;
+}
+
+/* ===================== EXERCISE 1: Choose the correct answer ===================== */
+
+function makeEx1(){
+  const data = [
+    {prompt:"I want ___ football.", opts:["to play","playing","play"], correct:[0], why:EXPL.want},
+    {prompt:"She needs ___ some water.", opts:["to drink","drinking","drink"], correct:[0], why:EXPL.need},
+    {prompt:"We like ___ music.", opts:["to listen to","listening to","listens to"], correct:[0,1], why:EXPL.like},
+    {prompt:"I love ___ in the rain.", opts:["to dance","dancing","danced"], correct:[0,1], why:EXPL.love},
+    {prompt:"He prefers ___ tea to coffee.", opts:["to drink","drinking","drinks"], correct:[0], why:EXPL.prefer},
+    {prompt:"They plan ___ the museum tomorrow.", opts:["to visit","visiting","visit"], correct:[0], why:EXPL.plan},
+    {prompt:"My dog can ___ very fast.", opts:["run","to run","running"], correct:[0], why:EXPL.can},
+    {prompt:"I need ___ my homework now.", opts:["to do","doing","do"], correct:[0], why:EXPL.need}
+  ];
+  const order = shuffle(data.map((d,i)=>i), 5);
+  const items = order.map((idx,i)=>{
+    const d = data[idx];
+    const optOrder = shuffle(d.opts.map((o,j)=>j), idx+3);
+    const opts = optOrder.map(j=>d.opts[j]);
+    const correctIndices = optOrder.map((origIdx,newIdx)=> d.correct.includes(origIdx)?newIdx:-1).filter(x=>x!==-1);
+    return mcItem({num:i+1, prompt:d.prompt, options:opts, correctIndices, answerId:'ex1-'+idx, why:d.why});
+  });
+  return buildGradedExercise({num:1, title:'Choose the correct answer', desc:'Выбери правильный вариант глагола после каждого слова.', items});
+}
+
+/* ===================== EXERCISE 2: Find the mistake ===================== */
+
+function makeEx2(){
+  const data = [
+    {wrong:"I want playing football.", right:"I want to play football.", why:EXPL.want},
+    {wrong:"She needs going home.", right:"She needs to go home.", why:EXPL.need},
+    {wrong:"We can to swim very well.", right:"We can swim very well.", why:EXPL.can},
+    {wrong:"He plans visiting his friend.", right:"He plans to visit his friend.", why:EXPL.plan},
+    {wrong:"I prefer swim to walk.", right:"I prefer to swim.", why:EXPL.prefer},
+    {wrong:"My cat can jumping high.", right:"My cat can jump high.", why:EXPL.can},
+    {wrong:"I like to swimming in the sea.", right:"I like swimming in the sea.", why:EXPL.like},
+    {wrong:"We plan to going to Spain.", right:"We plan to go to Spain.", why:EXPL.plan}
+  ];
+  const order = shuffle(data.map((d,i)=>i), 17);
+  const items = order.map((idx,i)=>{
+    const d = data[idx];
+    return inputItem({
+      num:i+1,
+      prompt:'"'+d.wrong+'"',
+      meta:'Найди ошибку и напиши предложение правильно',
+      answerId:'ex2-'+idx,
+      checkFn:(val)=>normalize(val)===normalize(d.right) || normalize(val)===normalize(d.right.replace('I like to swim','I like swimming')),
+      revealFn:()=>d.right,
+      why:d.why
+    });
+  });
+  return buildGradedExercise({num:2, title:'Find the mistake', desc:'В каждом предложении есть ошибка в форме глагола. Перепиши предложение правильно.', items});
+}
+
+/* ===================== EXERCISE 3: Fill in the gaps ===================== */
+
+function makeEx3(){
+  const data = [
+    {prompt:"I want ___ (read) a new book.", right:"to read", why:EXPL.want},
+    {prompt:"She needs ___ (buy) some milk.", right:"to buy", why:EXPL.need},
+    {prompt:"We like ___ (cook) pasta.", right:"to cook", alt:["cooking"], why:EXPL.like},
+    {prompt:"He loves ___ (paint) pictures.", right:"to paint", alt:["painting"], why:EXPL.love},
+    {prompt:"They prefer ___ (stay) at home.", right:"to stay", why:EXPL.prefer},
+    {prompt:"I plan ___ (study) English every day.", right:"to study", why:EXPL.plan},
+    {prompt:"My brother can ___ (draw) very well.", right:"draw", why:EXPL.can},
+    {prompt:"We need ___ (finish) the project today.", right:"to finish", why:EXPL.need}
+  ];
+  const order = shuffle(data.map((d,i)=>i), 29);
+  const items = order.map((idx,i)=>{
+    const d = data[idx];
+    const accepted = [d.right].concat(d.alt||[]);
+    return inputItem({
+      num:i+1, prompt:d.prompt,
+      meta:'Впиши глагол в скобках в правильной форме',
+      answerId:'ex3-'+idx,
+      checkFn:(val)=>accepted.some(a=>normalize(a)===normalize(val)),
+      revealFn:()=>accepted.join(' / '),
+      why:d.why
+    });
+  });
+  return buildGradedExercise({num:3, title:'Fill in the gaps using the correct form', desc:'Поставь глагол в скобках в нужную форму: to + глагол, глагол+ing, или просто глагол.', items});
+}
+
+/* ===================== EXERCISE 4: Translate ===================== */
+
+function makeEx4(){
+  const data = [
+    {ru:"Я хочу играть в футбол.", right:"I want to play football.", why:EXPL.want},
+    {ru:"Ей нужно купить хлеб.", right:"She needs to buy bread.", why:EXPL.need},
+    {ru:"Мы любим готовить.", right:"We like to cook.", alt:["We like cooking."], why:EXPL.like},
+    {ru:"Он очень любит танцевать.", right:"He loves to dance.", alt:["He loves dancing."], why:EXPL.love},
+    {ru:"Я предпочитаю пить чай.", right:"I prefer to drink tea.", why:EXPL.prefer},
+    {ru:"Они планируют посетить музей.", right:"They plan to visit the museum.", why:EXPL.plan},
+    {ru:"Моя собака умеет плавать.", right:"My dog can swim.", why:EXPL.can},
+    {ru:"Мне нужно делать домашнее задание.", right:"I need to do my homework.", why:EXPL.need}
+  ];
+  const order = shuffle(data.map((d,i)=>i), 41);
+  const items = order.map((idx,i)=>{
+    const d = data[idx];
+    const accepted = [d.right].concat(d.alt||[]);
+    return inputItem({
+      num:i+1, prompt:d.ru,
+      meta:'Переведи на английский',
+      answerId:'ex4-'+idx,
+      checkFn:(val)=>accepted.some(a=>normalize(a)===normalize(val)),
+      revealFn:()=>accepted.join(' / '),
+      why:d.why
+    });
+  });
+  return buildGradedExercise({num:4, title:'Translate', desc:'Переведи простые предложения на английский язык.', items});
+}
+
+/* ===================== EXERCISE 5: Rephrase (like/love: to V ⇄ V-ing) ===================== */
+
+function makeEx5(){
+  const data = [
+    {given:"I like to read books.", right:"I like reading books.", why:EXPL.like},
+    {given:"She loves to sing.", right:"She loves singing.", why:EXPL.love},
+    {given:"We like swimming in summer.", right:"We like to swim in summer.", why:EXPL.like},
+    {given:"He loves cooking dinner.", right:"He loves to cook dinner.", why:EXPL.love},
+    {given:"I like to play chess.", right:"I like playing chess.", why:EXPL.like},
+    {given:"They love travelling.", right:"They love to travel.", why:EXPL.love},
+    {given:"My friend likes to draw.", right:"My friend likes drawing.", why:EXPL.like},
+    {given:"We love dancing at parties.", right:"We love to dance at parties.", why:EXPL.love}
+  ];
+  const order = shuffle(data.map((d,i)=>i), 53);
+  const items = order.map((idx,i)=>{
+    const d = data[idx];
+    return inputItem({
+      num:i+1, prompt:'"'+d.given+'"',
+      meta:'Перепиши так же по смыслу, но другой формой (to V ⇄ V-ing)',
+      answerId:'ex5-'+idx,
+      checkFn:(val)=>normalize(val)===normalize(d.right),
+      revealFn:()=>d.right,
+      why:d.why
+    });
+  });
+  return buildGradedExercise({num:5, title:'Rephrase', desc:'У like и love есть два варианта формы. Перепиши предложение, используя другую форму.', items});
+}
+
+/* ===================== EXERCISE 6: Finish the sentences (own ideas, open) ===================== */
+
+function makeEx6(){
+  const starters = [
+    {prompt:"I want to ___", model:"I want to travel to Italy."},
+    {prompt:"I need to ___", model:"I need to call my mom."},
+    {prompt:"I like ___ (to / -ing)", model:"I like playing computer games."},
+    {prompt:"I love ___ (to / -ing)", model:"I love reading before bed."},
+    {prompt:"I prefer to ___", model:"I prefer to walk in the park."},
+    {prompt:"I plan to ___", model:"I plan to visit my grandma."},
+    {prompt:"I can ___", model:"I can ride a bike."},
+    {prompt:"My friend likes to ___", model:"My friend likes to cook pizza."}
+  ];
+  const items = starters.map((s,i)=>openItem({num:i+1, prompt:s.prompt, meta:'Закончи предложение своей идеей', answerId:'ex6-'+i, model:s.model}));
+  return buildOpenExercise({num:6, title:'Finish the sentences with your own ideas', desc:'Допиши предложения своими словами. Когда закончишь — скопируй все ответы одной кнопкой.', items});
+}
+
+/* ===================== EXERCISE 7: Drilling — Repeat & Change ===================== */
+
+function makeEx7(){
+  const drills = [
+    {prompt:'Model: "I want to play football." Замени want на need: ___', model:'I need to play football.'},
+    {prompt:'Model: "She likes to read." Замени на loves + форму -ing: ___', model:'She loves reading.'},
+    {prompt:'Model: "We can swim." Замени can на plan (не забудь to!): ___', model:'We plan to swim.'},
+    {prompt:'Model: "He prefers to walk." Замени he на I: ___', model:'I prefer to walk.'},
+    {prompt:'Model: "They plan to visit Rome." Замени Rome на своё место: ___', model:'They plan to visit London.'},
+    {prompt:'Model: "I love dancing." Замени на like + форму to V: ___', model:'I like to dance.'},
+    {prompt:'Model: "My cat can jump." Замени cat на другое животное: ___', model:'My dog can jump.'},
+    {prompt:'Model: "We need to study." Замени study на своё занятие: ___', model:'We need to clean the house.'}
+  ];
+  const items = drills.map((d,i)=>openItem({num:i+1, prompt:d.prompt, meta:'Составь своё предложение по образцу', answerId:'ex7-'+i, model:d.model}));
+  return buildOpenExercise({num:7, title:'Drilling: Repeat & Change', desc:'Повтори структуру, но поменяй одно слово на своё. Скопируй все ответы одной кнопкой в конце.', items});
+}
+
+/* ===================== INIT ===================== */
+
+(async function init(){
+  await loadStorage();
+  renderRef();
+  const host = document.getElementById('exercises');
+  [makeEx1(), makeEx2(), makeEx3(), makeEx4(), makeEx5(), makeEx6(), makeEx7()]
+    .forEach(card=>host.appendChild(card));
+})();
+
+})();
+</script>
+</body>
+</html>
