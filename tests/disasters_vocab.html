@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Стихийные бедствия — тренажёр словаря</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=PT+Sans:wght@400;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-deep:#0d1420;
+    --bg-panel:#141d2e;
+    --bg-panel-2:#1a2438;
+    --line:#2a3650;
+    --text:#e7ecf3;
+    --text-muted:#8d9bb3;
+    --amber:#ffb703;
+    --amber-dim:#7a5a12;
+    --red:#ef5d5d;
+    --green:#3bc98f;
+    --headline:'Oswald', sans-serif;
+    --body:'PT Sans', sans-serif;
+    --mono:'JetBrains Mono', monospace;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg-deep);
+    color:var(--text);
+    font-family:var(--body);
+    line-height:1.5;
+  }
+  .hazard-strip{
+    height:8px;
+    background:repeating-linear-gradient(135deg, var(--amber) 0 18px, #0d1420 18px 36px);
+  }
+  header.hero{
+    padding:38px 6vw 30px;
+    background:linear-gradient(180deg, #101a2c 0%, var(--bg-deep) 100%);
+    border-bottom:1px solid var(--line);
+  }
+  .eyebrow{
+    font-family:var(--mono);
+    font-size:12px;
+    color:var(--amber);
+    letter-spacing:.04em;
+  }
+  h1{
+    font-family:var(--headline);
+    font-weight:600;
+    font-size:clamp(28px,4vw,44px);
+    margin:6px 0 10px;
+    color:var(--text);
+  }
+  .hero p{
+    max-width:640px;
+    color:var(--text-muted);
+    margin:0 0 18px;
+    font-size:15px;
+  }
+  .audio-check{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    flex-wrap:wrap;
+  }
+  button{
+    font-family:var(--body);
+    cursor:pointer;
+    border-radius:3px;
+    border:1px solid var(--line);
+    background:var(--bg-panel-2);
+    color:var(--text);
+    padding:9px 16px;
+    font-size:14px;
+    transition:border-color .15s, background .15s;
+  }
+  button:hover{border-color:var(--amber);}
+  button.primary{
+    background:var(--amber);
+    color:#1a1305;
+    border-color:var(--amber);
+    font-weight:700;
+  }
+  button.primary:hover{background:#ffc733;}
+  button.ghost{background:transparent;}
+  #audioStatus{font-family:var(--mono); font-size:12px; color:var(--text-muted);}
+  .layout{
+    display:grid;
+    grid-template-columns:1fr 300px;
+    gap:32px;
+    padding:34px 6vw 80px;
+    align-items:start;
+  }
+  @media (max-width:900px){
+    .layout{grid-template-columns:1fr;}
+    aside{position:static !important;}
+  }
+  main section{
+    background:var(--bg-panel);
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:26px 26px 30px;
+    margin-bottom:28px;
+  }
+  main section h2{
+    font-family:var(--headline);
+    font-weight:600;
+    font-size:22px;
+    margin:0 0 4px;
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+  }
+  main section h2 .tag{
+    font-family:var(--mono);
+    font-size:12px;
+    color:var(--amber);
+    border:1px solid var(--amber-dim);
+    padding:2px 8px;
+    border-radius:12px;
+  }
+  .instructions{
+    color:var(--text-muted);
+    font-size:14px;
+    margin:0 0 18px;
+  }
+  .vocab-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(260px,1fr));
+    gap:12px;
+  }
+  .vocab-card{
+    background:var(--bg-panel-2);
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:12px 14px;
+  }
+  .vocab-card .word-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:8px;
+  }
+  .vocab-card .en{
+    font-weight:700;
+    font-size:15px;
+  }
+  .vocab-card .ipa{
+    font-family:var(--mono);
+    color:var(--amber);
+    font-size:12px;
+    display:block;
+    margin-top:2px;
+  }
+  .vocab-card .ru{
+    color:var(--text-muted);
+    font-size:13px;
+    margin-top:4px;
+  }
+  .listen-btn{
+    padding:6px 9px;
+    font-size:13px;
+    flex-shrink:0;
+  }
+  .item{
+    border-top:1px solid var(--line);
+    padding:16px 0;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  .item:first-of-type{border-top:none; padding-top:0;}
+  .item .prompt{font-size:15px;}
+  .item .prompt b{color:var(--amber);}
+  .item .mask{
+    font-family:var(--mono);
+    letter-spacing:2px;
+    font-size:16px;
+    color:var(--text);
+  }
+  .item input[type=text], .item textarea{
+    background:var(--bg-deep);
+    border:1px solid var(--line);
+    color:var(--text);
+    padding:9px 11px;
+    border-radius:3px;
+    font-family:var(--body);
+    font-size:14px;
+    width:100%;
+    max-width:420px;
+  }
+  .item textarea{max-width:100%; min-height:60px; resize:vertical;}
+  .item.correct input, .item.correct textarea{border-color:var(--green);}
+  .item.incorrect input, .item.incorrect textarea{border-color:var(--red);}
+  .verdict{font-size:13px; font-family:var(--mono);}
+  .verdict.correct{color:var(--green);}
+  .verdict.incorrect{color:var(--red);}
+  .reveal{
+    font-size:13px;
+    color:var(--amber);
+    display:none;
+  }
+  .reveal.shown{display:block;}
+  .tf-buttons{display:flex; gap:8px;}
+  .tf-buttons button{padding:7px 14px;}
+  .tf-buttons button.selected-true{background:var(--green); color:#06241a; border-color:var(--green);}
+  .tf-buttons button.selected-false{background:var(--red); color:#2a0808; border-color:var(--red);}
+  .section-actions{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-top:20px;
+  }
+  .score-badge{
+    font-family:var(--mono);
+    font-size:13px;
+    color:var(--text-muted);
+    align-self:center;
+  }
+  aside{
+    position:sticky;
+    top:20px;
+    background:var(--bg-panel);
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:20px;
+  }
+  aside h3{
+    font-family:var(--headline);
+    font-size:17px;
+    margin:0 0 4px;
+    color:var(--amber);
+  }
+  aside p.sub{
+    color:var(--text-muted);
+    font-size:12px;
+    margin:0 0 14px;
+  }
+  table.problem-table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:13px;
+  }
+  table.problem-table th, table.problem-table td{
+    text-align:left;
+    padding:6px 4px;
+    border-bottom:1px solid var(--line);
+  }
+  table.problem-table th{color:var(--text-muted); font-weight:400; font-family:var(--mono); font-size:11px;}
+  .empty-note{color:var(--text-muted); font-size:13px; font-style:italic;}
+  footer{
+    padding:0 6vw 60px;
+  }
+  .final-box{
+    background:var(--bg-panel);
+    border:1px solid var(--amber-dim);
+    border-radius:4px;
+    padding:24px;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+  .final-box h2{font-family:var(--headline); margin:0; color:var(--amber);}
+  #copyStatus{font-family:var(--mono); font-size:12px; color:var(--green); min-height:16px;}
+</style>
+</head>
+<body>
+
+<div class="hazard-strip"></div>
+<header class="hero">
+  <div class="eyebrow">VOCABULARY DRILL · NATURAL DISASTERS</div>
+  <h1>Стихийные бедствия: словарь и практика</h1>
+  <p>Повторите слова, послушайте произношение, затем пройдите 7 заданий. Ошибки автоматически попадают в таблицу «Проблемные слова» справа.</p>
+  <div class="audio-check">
+    <button class="primary" onclick="testAudio()">🔊 Проверить звук</button>
+    <span id="audioStatus">Голос не выбран…</span>
+  </div>
+</header>
+
+<div class="layout">
+  <main>
+
+    <section id="vocab-section">
+      <h2>Повторение слов <span class="tag">0 · SETUP</span></h2>
+      <p class="instructions">Нажмите на 🔊, чтобы прослушать слово (голос Google US English, если доступен). Прочитайте перевод и транскрипцию, затем переходите к заданиям.</p>
+      <div class="vocab-grid" id="vocabGrid"></div>
+    </section>
+
+    <section id="ex1">
+      <h2>Упражнение 1 <span class="tag">15 · SPELLING</span></h2>
+      <p class="instructions">Вставьте пропущенные буквы — впишите слово целиком в поле ответа.</p>
+      <div id="ex1Items"></div>
+      <div class="section-actions">
+        <button class="primary" onclick="checkSection('ex1')">Проверить ответы</button>
+        <button onclick="revealSection('ex1')">Показать ответы</button>
+        <span class="score-badge" id="ex1Score"></span>
+      </div>
+    </section>
+
+    <section id="ex2">
+      <h2>Упражнение 2 <span class="tag">15 · TRANSLATION</span></h2>
+      <p class="instructions">Переведите слово с русского на английский.</p>
+      <div id="ex2Items"></div>
+      <div class="section-actions">
+        <button class="primary" onclick="checkSection('ex2')">Проверить ответы</button>
+        <button onclick="revealSection('ex2')">Показать ответы</button>
+        <span class="score-badge" id="ex2Score"></span>
+      </div>
+    </section>
+
+    <section id="ex3">
+      <h2>Упражнение 3 <span class="tag">15 · DICTATION</span></h2>
+      <p class="instructions">Нажмите 🔊, прослушайте слово и запишите его по звуку.</p>
+      <div id="ex3Items"></div>
+      <div class="section-actions">
+        <button class="primary" onclick="checkSection('ex3')">Проверить ответы</button>
+        <button onclick="revealSection('ex3')">Показать ответы</button>
+        <span class="score-badge" id="ex3Score"></span>
+      </div>
+    </section>
+
+    <section id="ex4">
+      <h2>Упражнение 4 <span class="tag">15 · DEFINITIONS</span></h2>
+      <p class="instructions">Прочитайте определение (на английском) и напишите нужное слово.</p>
+      <div id="ex4Items"></div>
+      <div class="section-actions">
+        <button class="primary" onclick="checkSection('ex4')">Проверить ответы</button>
+        <button onclick="revealSection('ex4')">Показать ответы</button>
+        <span class="score-badge" id="ex4Score"></span>
+      </div>
+    </section>
+
+    <section id="ex5">
+      <h2>Упражнение 5 <span class="tag">8 · TRUE / FALSE</span></h2>
+      <p class="instructions">Отметьте, верно (True) или неверно (False) утверждение.</p>
+      <div id="ex5Items"></div>
+      <div class="section-actions">
+        <button class="primary" onclick="checkSection('ex5')">Проверить ответы</button>
+        <button onclick="revealSection('ex5')">Показать ответы</button>
+        <span class="score-badge" id="ex5Score"></span>
+      </div>
+    </section>
+
+    <section id="ex6">
+      <h2>Упражнение 6 <span class="tag">8 · REPHRASE</span></h2>
+      <p class="instructions">Перефразируйте предложение так, чтобы использовать нужное слово из словаря. Единственно верного ответа нет — сверьтесь с примером.</p>
+      <div id="ex6Items"></div>
+      <div class="section-actions">
+        <button onclick="revealSection('ex6')">Показать ответы</button>
+      </div>
+    </section>
+
+    <section id="ex7">
+      <h2>Упражнение 7 <span class="tag">8 · YOUR OWN SENTENCES</span></h2>
+      <p class="instructions">Напишите своё предложение с указанным словом. Единственно верного ответа нет — сверьтесь с примером, если нужно.</p>
+      <div id="ex7Items"></div>
+      <div class="section-actions">
+        <button onclick="revealSection('ex7')">Показать примеры</button>
+        <button class="primary" onclick="copyEx7()">📋 Скопировать все ответы (упр. 7)</button>
+      </div>
+      <div id="copyStatus7" style="font-family:var(--mono); font-size:12px; color:var(--green); margin-top:6px;"></div>
+    </section>
+
+  </main>
+
+  <aside>
+    <h3>⚠ Проблемные слова</h3>
+    <p class="sub">Слова, в которых были допущены ошибки</p>
+    <div id="problemWords"><p class="empty-note">Пока ошибок нет</p></div>
+  </aside>
+</div>
+
+<footer>
+  <div class="final-box">
+    <h2>Итог</h2>
+    <p style="color:var(--text-muted); font-size:14px; margin:0;">Скопируйте все свои ответы одной кнопкой — их можно вставить в чат, документ или письмо преподавателю.</p>
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+      <button class="primary" onclick="copyAllAnswers()">📋 Скопировать ВСЕ ответы ученика</button>
+    </div>
+    <div id="copyStatus"></div>
+  </div>
+</footer>
+
+<script>
+/* ---------- DATA ---------- */
+const WORDS = [
+  {en:'tornado', ru:'смерч, торнадо', ipa:'/tɔːrˈneɪdoʊ/', def:"A violently rotating column of air extending from a thunderstorm to the ground."},
+  {en:'tsunami', ru:'цунами', ipa:'/tsuːˈnɑːmi/', def:"A series of huge ocean waves usually caused by an underwater earthquake."},
+  {en:'volcanic eruption', ru:'извержение вулкана', ipa:'/vɒlˈkænɪk ɪˈrʌpʃn/', def:"A sudden release of lava, ash and gas from a volcano."},
+  {en:'flood', ru:'наводнение', ipa:'/flʌd/', def:"An overflow of water that covers land which is normally dry."},
+  {en:'blizzard', ru:'метель, буран', ipa:'/ˈblɪzərd/', def:"A severe snowstorm with strong winds and very low visibility."},
+  {en:'thunderstorm', ru:'гроза', ipa:'/ˈθʌndərstɔːrm/', def:"A storm with thunder, lightning and usually heavy rain."},
+  {en:'earthquake', ru:'землетрясение', ipa:'/ˈɜːrθkweɪk/', def:"A sudden shaking of the ground caused by movement of the earth's crust."},
+  {en:'wildfire', ru:'лесной пожар', ipa:'/ˈwaɪldfaɪər/', def:"An uncontrolled fire that spreads quickly through forests or dry land."},
+  {en:'hurricane', ru:'ураган', ipa:'/ˈhɜːrɪkeɪn/', def:"A violent tropical storm with very strong winds, common in the Atlantic region."},
+  {en:'typhoon', ru:'тайфун', ipa:'/taɪˈfuːn/', def:"A violent tropical storm typical of the western Pacific and Indian Ocean region."},
+  {en:'dust storm', ru:'пыльная буря', ipa:'/dʌst stɔːrm/', def:"A strong wind that carries large clouds of dust across a dry area."},
+  {en:'drought', ru:'засуха', ipa:'/draʊt/', def:"A long period of unusually low rainfall leading to a water shortage."},
+  {en:'monsoon', ru:'муссон', ipa:'/mɒnˈsuːn/', def:"A seasonal wind that brings very heavy rain, especially in South Asia."},
+  {en:'cyclone', ru:'циклон', ipa:'/ˈsaɪkloʊn/', def:"A system of winds rotating around a low-pressure area, often bringing storms."},
+  {en:'survive', ru:'выжить, уцелеть', ipa:'/sərˈvaɪv/', def:"To continue to live or exist after a dangerous or difficult event."}
+];
+
+const TF_STATEMENTS = [
+  {text:'A tornado is a period of very dry weather with little or no rain.', answer:false, note:'That describes a drought, not a tornado.', word:'tornado'},
+  {text:'A tsunami is usually caused by an earthquake or volcanic eruption under the sea.', answer:true, word:'tsunami'},
+  {text:'A blizzard is a severe snowstorm with strong wind and very low visibility.', answer:true, word:'blizzard'},
+  {text:'A wildfire is a slow flood that covers farmland with water.', answer:false, note:'A wildfire is an uncontrolled fire, not a flood.', word:'wildfire'},
+  {text:'Hurricanes and typhoons are basically the same type of storm, just named differently by region.', answer:true, word:'hurricane / typhoon'},
+  {text:'A drought means there is too much rain and water everywhere.', answer:false, note:'A drought is a lack of rain, not an excess.', word:'drought'},
+  {text:'A monsoon is a seasonal wind that brings very heavy rainfall, especially in South Asia.', answer:true, word:'monsoon'},
+  {text:'To survive a disaster means to cause it.', answer:false, note:'To survive means to stay alive despite it.', word:'survive'}
+];
+
+const REPHRASE = [
+  {src:'The city was hit by a huge wave after the undersea earthquake.', word:'tsunami', sample:'The city was hit by a tsunami after the undersea earthquake.'},
+  {src:'The mountain suddenly exploded, sending lava and ash into the sky.', word:'volcanic eruption', sample:'There was a volcanic eruption, sending lava and ash into the sky.'},
+  {src:'There was no rain for six months and the fields dried up completely.', word:'drought', sample:'A drought lasted six months and the fields dried up completely.'},
+  {src:'Strong winds and heavy snow made it impossible to see the road.', word:'blizzard', sample:'A blizzard made it impossible to see the road.'},
+  {src:'The forest fire spread quickly because of the dry, windy weather.', word:'wildfire', sample:'The wildfire spread quickly because of the dry, windy weather.'},
+  {src:'The river overflowed and water covered the streets of the village.', word:'flood', sample:'A flood covered the streets of the village.'},
+  {src:'There was thunder, lightning and heavy rain over the village that night.', word:'thunderstorm', sample:'A thunderstorm hit the village that night.'},
+  {src:'The ground shook violently and several buildings collapsed within seconds.', word:'earthquake', sample:'An earthquake made several buildings collapse within seconds.'}
+];
+
+const OWN_SENTENCES = ['tornado','hurricane','flood','earthquake','wildfire','drought','blizzard','survive'];
+
+/* ---------- STATE ---------- */
+const problemWords = {}; // word -> mistake count
+let chosenVoice = null;
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+function norm(s){
+  return (s||'').trim().toLowerCase().replace(/\s+/g,' ').replace(/[.,!?]/g,'');
+}
+function markMistake(word){
+  problemWords[word] = (problemWords[word]||0)+1;
+  renderProblemWords();
+}
+function renderProblemWords(){
+  const box = document.getElementById('problemWords');
+  const keys = Object.keys(problemWords);
+  if(keys.length===0){
+    box.innerHTML = '<p class="empty-note">Пока ошибок нет</p>';
+    return;
+  }
+  keys.sort((a,b)=>problemWords[b]-problemWords[a]);
+  let html = '<table class="problem-table"><tr><th>Слово</th><th>Ошибок</th></tr>';
+  keys.forEach(w=>{
+    html += `<tr><td>${w}</td><td>${problemWords[w]}</td></tr>`;
+  });
+  html += '</table>';
+  box.innerHTML = html;
+}
+
+/* ---------- SPEECH ---------- */
+function pickVoice(){
+  const voices = window.speechSynthesis ? window.speechSynthesis.getVoices() : [];
+  if(!voices.length) return null;
+  let v = voices.find(v => /Google US English/i.test(v.name));
+  if(!v) v = voices.find(v => v.lang === 'en-US');
+  if(!v) v = voices.find(v => /^en/i.test(v.lang));
+  return v || voices[0];
+}
+function speak(text){
+  if(!window.speechSynthesis){
+    document.getElementById('audioStatus').textContent = 'Синтез речи не поддерживается в этом браузере.';
+    return;
+  }
+  const u = new SpeechSynthesisUtterance(text);
+  chosenVoice = chosenVoice || pickVoice();
+  if(chosenVoice) u.voice = chosenVoice;
+  u.lang = 'en-US';
+  u.rate = 0.95;
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(u);
+}
+function testAudio(){
+  chosenVoice = pickVoice();
+  const status = document.getElementById('audioStatus');
+  if(!window.speechSynthesis){
+    status.textContent = 'Синтез речи не поддерживается в этом браузере.';
+    return;
+  }
+  status.textContent = chosenVoice ? `Голос: ${chosenVoice.name}` : 'Голос не найден, будет использован голос по умолчанию.';
+  speak('Testing audio. Tornado. Earthquake. Survive.');
+}
+if(window.speechSynthesis){
+  window.speechSynthesis.onvoiceschanged = () => {
+    chosenVoice = pickVoice();
+    const status = document.getElementById('audioStatus');
+    if(chosenVoice) status.textContent = `Готово. Голос: ${chosenVoice.name}`;
+  };
+}
+
+/* ---------- MASK for ex1 ---------- */
+function maskWord(word){
+  const chars = word.split('');
+  let blanks = 0;
+  const masked = chars.map((ch,i)=>{
+    if(ch === ' ') return ' ';
+    if(i===0 || i===chars.length-1) return ch;
+    if(Math.random() < 0.55){ blanks++; return '_'; }
+    return ch;
+  });
+  if(blanks===0){
+    for(let i=1;i<chars.length-1;i++){
+      if(chars[i] !== ' '){ masked[i] = '_'; break; }
+    }
+  }
+  return masked.join('');
+}
+
+/* ---------- BUILD SECTIONS ---------- */
+function buildVocab(){
+  const grid = document.getElementById('vocabGrid');
+  WORDS.forEach(w=>{
+    const card = document.createElement('div');
+    card.className = 'vocab-card';
+    card.innerHTML = `
+      <div class="word-row">
+        <div>
+          <span class="en">${w.en}</span>
+          <span class="ipa">${w.ipa}</span>
+        </div>
+        <button class="listen-btn" onclick="speak('${w.en.replace(/'/g,"\\'")}')">🔊</button>
+      </div>
+      <div class="ru">${w.ru}</div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function buildEx1(){
+  const container = document.getElementById('ex1Items');
+  const list = shuffle(WORDS);
+  list.forEach((w,idx)=>{
+    const masked = maskWord(w.en);
+    const item = document.createElement('div');
+    item.className = 'item';
+    item.dataset.word = w.en;
+    item.innerHTML = `
+      <div class="prompt">${idx+1}. <span class="mask">${masked}</span> <span style="color:var(--text-muted); font-size:13px;">(${w.ru})</span></div>
+      <input type="text" placeholder="Впишите слово целиком">
+      <div class="verdict"></div>
+      <div class="reveal">Ответ: <b>${w.en}</b></div>
+    `;
+    container.appendChild(item);
+  });
+}
+
+function buildEx2(){
+  const container = document.getElementById('ex2Items');
+  const list = shuffle(WORDS);
+  list.forEach((w,idx)=>{
+    const item = document.createElement('div');
+    item.className = 'item';
+    item.dataset.word = w.en;
+    item.innerHTML = `
+      <div class="prompt">${idx+1}. ${w.ru}</div>
+      <input type="text" placeholder="Write the word in English">
+      <div class="verdict"></div>
+      <div class="reveal">Ответ: <b>${w.en}</b></div>
+    `;
+    container.appendChild(item);
+  });
+}
+
+function buildEx3(){
+  const container = document.getElementById('ex3Items');
+  const list = shuffle(WORDS);
+  list.forEach((w,idx)=>{
+    const item = document.createElement('div');
+    item.className = 'item';
+    item.dataset.word = w.en;
+    item.innerHTML = `
+      <div class="prompt">${idx+1}. <button class="listen-btn" onclick="speak('${w.en.replace(/'/g,"\\'")}')">🔊 Слушать</button></div>
+      <input type="text" placeholder="Запишите слово по звуку">
+      <div class="verdict"></div>
+      <div class="reveal">Ответ: <b>${w.en}</b> ${w.ipa}</div>
+    `;
+    container.appendChild(item);
+  });
+}
+
+function buildEx4(){
+  const container = document.getElementById('ex4Items');
+  const list = shuffle(WORDS);
+  list.forEach((w,idx)=>{
+    const item = document.createElement('div');
+    item.className = 'item';
+    item.dataset.word = w.en;
+    item.innerHTML = `
+      <div class="prompt">${idx+1}. ${w.def}</div>
+      <input type="text" placeholder="Write the word">
+      <div class="verdict"></div>
+      <div class="reveal">Ответ: <b>${w.en}</b></div>
+    `;
+    container.appendChild(item);
+  });
+}
+
+function buildEx5(){
+  const container = document.getElementById('ex5Items');
+  const list = shuffle(TF_STATEMENTS);
+  list.forEach((s,idx)=>{
+    const item = document.createElement('div');
+    item.className = 'item';
+    item.dataset.answer = s.answer;
+    item.dataset.word = s.word;
+    item.innerHTML = `
+      <div class="prompt">${idx+1}. ${s.text}</div>
+      <div class="tf-buttons">
+        <button onclick="selectTF(this,true)">True</button>
+        <button onclick="selectTF(this,false)">False</button>
+      </div>
+      <div class="verdict"></div>
+      <div class="reveal">Правильный ответ: <b>${s.answer ? 'True' : 'False'}</b>${s.note ? ' — ' + s.note : ''}</div>
+    `;
+    container.appendChild(item);
+  });
+}
+function selectTF(btn, value){
+  const wrap = btn.parentElement;
+  const item = btn.closest('.item');
+  wrap.querySelectorAll('button').forEach(b=>{b.classList.remove('selected-true','selected-false');});
+  btn.classList.add(value ? 'selected-true' : 'selected-false');
+  item.dataset.selected = value;
+}
+
+function buildEx6(){
+  const container = document.getElementById('ex6Items');
+  const list = shuffle(REPHRASE);
+  list.forEach((r,idx)=>{
+    const item = document.createElement('div');
+    item.className = 'item';
+    item.innerHTML = `
+      <div class="prompt">${idx+1}. ${r.src} <span style="color:var(--amber); font-size:12px;">(use: ${r.word})</span></div>
+      <textarea placeholder="Ваш вариант перефразировки"></textarea>
+      <div class="reveal">Пример: <i>${r.sample}</i></div>
+    `;
+    container.appendChild(item);
+  });
+}
+
+function buildEx7(){
+  const container = document.getElementById('ex7Items');
+  const list = shuffle(OWN_SENTENCES);
+  list.forEach((word,idx)=>{
+    const item = document.createElement('div');
+    item.className = 'item';
+    item.dataset.promptWord = word;
+    item.innerHTML = `
+      <div class="prompt">${idx+1}. Write your own sentence using: <b>${word}</b></div>
+      <textarea placeholder="Your sentence..."></textarea>
+      <div class="reveal">Пример: <i>${sampleSentence(word)}</i></div>
+    `;
+    container.appendChild(item);
+  });
+}
+function sampleSentence(word){
+  const samples = {
+    tornado:'A tornado destroyed several houses on the edge of town.',
+    hurricane:'The hurricane forced thousands of people to leave the coast.',
+    flood:'Heavy rain caused a flood in the lower part of the city.',
+    earthquake:'The earthquake was felt across the whole region.',
+    wildfire:'Firefighters worked all night to stop the wildfire.',
+    drought:'The long drought damaged most of the crops.',
+    blizzard:'Schools were closed because of the blizzard.',
+    survive:'Rescue teams helped the family survive the storm.'
+  };
+  return samples[word] || '';
+}
+
+/* ---------- CHECKING ---------- */
+function checkSection(id){
+  const container = document.getElementById(id + 'Items');
+  const items = container.querySelectorAll('.item');
+  let correct = 0;
+  items.forEach(item=>{
+    if(id === 'ex5'){
+      const selected = item.dataset.selected;
+      const verdictEl = item.querySelector('.verdict');
+      if(selected === undefined){
+        verdictEl.textContent = 'Выберите вариант';
+        verdictEl.className = 'verdict incorrect';
+        item.classList.add('incorrect');
+        return;
+      }
+      const isCorrect = (selected === item.dataset.answer);
+      item.classList.toggle('correct', isCorrect);
+      item.classList.toggle('incorrect', !isCorrect);
+      verdictEl.textContent = isCorrect ? '✓ Верно' : '✗ Неверно';
+      verdictEl.className = 'verdict ' + (isCorrect ? 'correct':'incorrect');
+      if(isCorrect) correct++; else markMistake(item.dataset.word);
+      return;
+    }
+    const input = item.querySelector('input');
+    const verdictEl = item.querySelector('.verdict');
+    const isCorrect = norm(input.value) === norm(item.dataset.word);
+    item.classList.toggle('correct', isCorrect);
+    item.classList.toggle('incorrect', !isCorrect);
+    verdictEl.textContent = isCorrect ? '✓ Верно' : '✗ Неверно';
+    verdictEl.className = 'verdict ' + (isCorrect ? 'correct':'incorrect');
+    if(isCorrect) correct++; else markMistake(item.dataset.word);
+  });
+  document.getElementById(id + 'Score').textContent = `${correct} / ${items.length} верно`;
+}
+
+function revealSection(id){
+  const container = document.getElementById(id + 'Items');
+  container.querySelectorAll('.reveal').forEach(r => r.classList.add('shown'));
+}
+
+/* ---------- COPY ---------- */
+function copyEx7(){
+  const items = document.querySelectorAll('#ex7Items .item');
+  let text = 'Упражнение 7 — Мои предложения:\n\n';
+  items.forEach((item,idx)=>{
+    const word = item.dataset.promptWord;
+    const answer = item.querySelector('textarea').value.trim() || '(нет ответа)';
+    text += `${idx+1}. [${word}] ${answer}\n`;
+  });
+  navigator.clipboard.writeText(text).then(()=>{
+    document.getElementById('copyStatus7').textContent = 'Скопировано в буфер обмена ✓';
+  }).catch(()=>{
+    document.getElementById('copyStatus7').textContent = 'Не удалось скопировать — скопируйте вручную.';
+  });
+}
+
+function copyAllAnswers(){
+  let text = 'ОТВЕТЫ УЧЕНИКА — Стихийные бедствия\n';
+  text += '====================================\n\n';
+
+  function dumpInputs(sectionId, label){
+    text += `--- ${label} ---\n`;
+    document.querySelectorAll('#' + sectionId + 'Items .item').forEach((item,idx)=>{
+      const input = item.querySelector('input, textarea');
+      const val = input ? (input.value.trim() || '(пусто)') : '(пусто)';
+      text += `${idx+1}. ${val}\n`;
+    });
+    text += '\n';
+  }
+  dumpInputs('ex1','Упражнение 1 — Пропущенные буквы');
+  dumpInputs('ex2','Упражнение 2 — Перевод');
+  dumpInputs('ex3','Упражнение 3 — Диктант');
+  dumpInputs('ex4','Упражнение 4 — Определения');
+
+  text += '--- Упражнение 5 — True/False ---\n';
+  document.querySelectorAll('#ex5Items .item').forEach((item,idx)=>{
+    const sel = item.dataset.selected;
+    text += `${idx+1}. ${sel===undefined ? '(нет ответа)' : (sel==='true' ? 'True' : 'False')}\n`;
+  });
+  text += '\n';
+
+  dumpInputs('ex6','Упражнение 6 — Rephrase');
+  dumpInputs('ex7','Упражнение 7 — Свои предложения');
+
+  text += '\nСлова с ошибками: ' + (Object.keys(problemWords).length ? Object.keys(problemWords).join(', ') : 'нет') + '\n';
+
+  navigator.clipboard.writeText(text).then(()=>{
+    document.getElementById('copyStatus').textContent = 'Все ответы скопированы в буфер обмена ✓';
+  }).catch(()=>{
+    document.getElementById('copyStatus').textContent = 'Не удалось скопировать автоматически — выделите текст вручную.';
+  });
+}
+
+/* ---------- INIT ---------- */
+buildVocab();
+buildEx1();
+buildEx2();
+buildEx3();
+buildEx4();
+buildEx5();
+buildEx6();
+buildEx7();
+</script>
+</body>
+</html>
