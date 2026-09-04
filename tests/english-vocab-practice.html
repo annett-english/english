@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fitting Room English — тренажёр слов</title>
+<style>
+  :root{
+    --paper:#EEEFE9;
+    --card:#FBFAF6;
+    --ink:#232620;
+    --ink-soft:#5A5D54;
+    --line:#C9C7B8;
+    --mustard:#D9A02B;
+    --mustard-dark:#B07E17;
+    --denim:#33465C;
+    --sage:#5C8264;
+    --brick:#AE5236;
+    --brick-bg:#F6E4DC;
+    --sage-bg:#E5EEE3;
+    --radius:10px;
+    font-size:16px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family: "Iowan Old Style","Palatino Linotype", Georgia, serif;
+    line-height:1.5;
+  }
+  .sans{ font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  header.top{
+    background:var(--denim);
+    color:#F4F1E8;
+    padding:28px 20px 22px;
+    text-align:center;
+    border-bottom:4px solid var(--mustard);
+  }
+  header.top h1{
+    margin:0 0 6px;
+    font-size:1.9rem;
+    letter-spacing:.01em;
+    font-weight:600;
+  }
+  header.top p{
+    margin:0;
+    font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color:#C9D2DC;
+    font-size:.95rem;
+  }
+
+  .wrap{
+    max-width:1120px;
+    margin:0 auto;
+    padding:24px 18px 70px;
+    display:grid;
+    grid-template-columns: 1fr 260px;
+    gap:26px;
+    align-items:start;
+  }
+  @media (max-width: 880px){
+    .wrap{ grid-template-columns: 1fr; }
+    .sidebar{ order:-1; }
+  }
+
+  .main-col{ min-width:0; }
+
+  /* ---------- Receipt-style vocab reminder ---------- */
+  .receipt{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:2px;
+    padding:22px 22px 20px;
+    margin-bottom:26px;
+    position:relative;
+    box-shadow: 0 2px 0 var(--line);
+  }
+  .receipt::before, .receipt::after{
+    content:"";
+    position:absolute;
+    left:0; right:0; height:8px;
+    background-image: radial-gradient(circle at 6px 4px, var(--paper) 4px, transparent 4.5px);
+    background-size: 16px 8px;
+    background-repeat: repeat-x;
+  }
+  .receipt::before{ top:-4px; }
+  .receipt::after{ bottom:-4px; transform: rotate(180deg); }
+  .receipt h2{
+    font-family:"Courier New", monospace;
+    text-align:center;
+    letter-spacing:.14em;
+    font-size:1.05rem;
+    margin:0 0 4px;
+  }
+  .receipt .sub{
+    text-align:center;
+    font-family:"Courier New", monospace;
+    color:var(--ink-soft);
+    font-size:.8rem;
+    margin-bottom:14px;
+  }
+  .receipt hr{
+    border:none;
+    border-top:1px dashed var(--line);
+    margin:12px 0;
+  }
+  .vocab-row{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:9px 2px;
+    border-bottom:1px dashed var(--line);
+    font-family:"Courier New", monospace;
+    flex-wrap:wrap;
+  }
+  .vocab-row:last-of-type{ border-bottom:none; }
+  .vocab-word{ font-weight:700; min-width:150px; }
+  .vocab-ipa{ color:var(--denim); min-width:150px; }
+  .vocab-ru{ color:var(--ink-soft); flex:1; min-width:150px; }
+  .play-btn{
+    border:1px solid var(--denim);
+    background:var(--denim);
+    color:#fff;
+    width:34px; height:34px;
+    border-radius:50%;
+    cursor:pointer;
+    font-size:.95rem;
+    line-height:1;
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+    transition: transform .1s ease;
+  }
+  .play-btn:hover{ transform:scale(1.08); background:var(--mustard-dark); border-color:var(--mustard-dark); }
+  .play-btn:active{ transform:scale(.95); }
+
+  .audio-status{
+    margin-top:14px;
+    font-family:-apple-system, sans-serif;
+    font-size:.82rem;
+    color:var(--ink-soft);
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .test-audio-btn{
+    font-family:-apple-system, sans-serif;
+    border:1px solid var(--denim);
+    background:transparent;
+    color:var(--denim);
+    padding:5px 12px;
+    border-radius:20px;
+    cursor:pointer;
+    font-size:.82rem;
+  }
+  .test-audio-btn:hover{ background:var(--denim); color:#fff; }
+  .status-ok{ color:var(--sage); font-weight:600; }
+  .status-bad{ color:var(--brick); font-weight:600; }
+
+  /* ---------- Exercise cards ---------- */
+  .exercise{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:20px 22px 22px;
+    margin-bottom:22px;
+  }
+  .exercise h3{
+    margin:0 0 4px;
+    font-size:1.2rem;
+    color:var(--denim);
+  }
+  .exercise .instr{
+    font-family:-apple-system, sans-serif;
+    color:var(--ink-soft);
+    font-size:.9rem;
+    margin-bottom:16px;
+  }
+  .item{
+    display:flex;
+    gap:12px;
+    align-items:flex-start;
+    padding:10px 0;
+    border-top:1px solid var(--line);
+    flex-wrap:wrap;
+  }
+  .item:first-of-type{ border-top:none; }
+  .item-num{
+    font-family:"Courier New", monospace;
+    color:var(--mustard-dark);
+    font-weight:700;
+    width:22px;
+    flex-shrink:0;
+    padding-top:8px;
+  }
+  .item-body{ flex:1; min-width:220px; }
+  .item-prompt{ margin-bottom:6px; font-size:1.02rem; }
+  .blank-pattern{
+    font-family:"Courier New", monospace;
+    font-size:1.15rem;
+    letter-spacing:.06em;
+    background:var(--sage-bg);
+    padding:2px 8px;
+    border-radius:4px;
+  }
+  .item input[type="text"]{
+    font-family:-apple-system, sans-serif;
+    font-size:.98rem;
+    padding:7px 10px;
+    border:1px solid var(--line);
+    border-radius:6px;
+    width:100%;
+    max-width:340px;
+    background:#fff;
+  }
+  .item textarea{
+    font-family:-apple-system, sans-serif;
+    font-size:.95rem;
+    padding:8px 10px;
+    border:1px solid var(--line);
+    border-radius:6px;
+    width:100%;
+    resize:vertical;
+    min-height:52px;
+    background:#fff;
+  }
+  .item input.correct{ border-color:var(--sage); background:var(--sage-bg); }
+  .item input.incorrect{ border-color:var(--brick); background:var(--brick-bg); }
+  .feedback-icon{ font-weight:700; margin-left:6px; }
+  .feedback-icon.ok{ color:var(--sage); }
+  .feedback-icon.bad{ color:var(--brick); }
+  .reveal-line{
+    font-family:-apple-system, sans-serif;
+    font-size:.85rem;
+    color:var(--denim);
+    margin-top:5px;
+    display:none;
+  }
+  .reveal-line.show{ display:block; }
+  .dialogue-block{
+    font-family:-apple-system, sans-serif;
+    white-space:pre-line;
+    background:#F5F4EE;
+    border-radius:6px;
+    padding:10px 12px;
+    margin-bottom:6px;
+    font-size:.95rem;
+  }
+  .dialogue-block input{ display:inline-block; width:150px; margin:0 4px; vertical-align:middle; }
+
+  .btn-row{
+    display:flex;
+    gap:10px;
+    margin-top:16px;
+    flex-wrap:wrap;
+    font-family:-apple-system, sans-serif;
+  }
+  .btn{
+    border:none;
+    padding:9px 16px;
+    border-radius:20px;
+    font-size:.88rem;
+    cursor:pointer;
+    font-weight:600;
+  }
+  .btn-check{ background:var(--denim); color:#fff; }
+  .btn-check:hover{ background:#243546; }
+  .btn-reveal{ background:transparent; border:1px solid var(--mustard-dark); color:var(--mustard-dark); }
+  .btn-reveal:hover{ background:var(--mustard); color:#fff; border-color:var(--mustard); }
+  .btn-copy{ background:transparent; border:1px solid var(--sage); color:var(--sage); }
+  .btn-copy:hover{ background:var(--sage); color:#fff; }
+  .btn-sample{ background:transparent; border:1px solid var(--ink-soft); color:var(--ink-soft); font-size:.8rem; padding:5px 10px; }
+  .copy-toast{
+    font-size:.82rem;
+    color:var(--sage);
+    font-weight:600;
+    align-self:center;
+    display:none;
+  }
+  .copy-toast.show{ display:inline; }
+
+  .score{
+    font-family:-apple-system, sans-serif;
+    font-size:.85rem;
+    color:var(--ink-soft);
+    margin-top:10px;
+  }
+
+  /* ---------- Sidebar ---------- */
+  .sidebar{ position:sticky; top:16px; }
+  .tag-box{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:16px 16px 18px;
+    position:relative;
+  }
+  .tag-box h4{
+    margin:0 0 4px;
+    font-size:1.02rem;
+    color:var(--brick);
+    font-family:-apple-system, sans-serif;
+  }
+  .tag-box .hint{
+    font-family:-apple-system, sans-serif;
+    font-size:.78rem;
+    color:var(--ink-soft);
+    margin-bottom:10px;
+  }
+  table.mistakes{
+    width:100%;
+    border-collapse:collapse;
+    font-family:-apple-system, sans-serif;
+    font-size:.85rem;
+  }
+  table.mistakes th, table.mistakes td{
+    text-align:left;
+    padding:5px 4px;
+    border-bottom:1px solid var(--line);
+  }
+  table.mistakes th{ color:var(--ink-soft); font-weight:600; font-size:.75rem; }
+  .empty-note{
+    font-family:-apple-system, sans-serif;
+    font-size:.82rem;
+    color:var(--ink-soft);
+    font-style:italic;
+  }
+  .mistake-count{
+    display:inline-block;
+    background:var(--brick);
+    color:#fff;
+    border-radius:10px;
+    padding:0 8px;
+    font-size:.78rem;
+    font-weight:700;
+  }
+  footer{
+    text-align:center;
+    font-family:-apple-system, sans-serif;
+    color:var(--ink-soft);
+    font-size:.78rem;
+    padding:20px;
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <h1>Fitting Room English</h1>
+  <p>tight · loose · receipt · try on · changing room</p>
+</header>
+
+<div class="wrap">
+  <div class="main-col">
+
+    <!-- VOCAB REMINDER -->
+    <div class="receipt">
+      <h2>SHOP VOCAB RECEIPT</h2>
+      <div class="sub">нажми ▶, чтобы прослушать слово (голос: Google US English)</div>
+      <hr>
+      <div id="vocabList"></div>
+      <hr>
+      <div class="audio-status sans">
+        <button class="test-audio-btn" id="testAudioBtn">🔊 Проверить звук</button>
+        <span id="voiceStatus">Определяем доступные голоса…</span>
+      </div>
+    </div>
+
+    <!-- EXERCISE 1 -->
+    <div class="exercise" id="ex1">
+      <h3>Упражнение 1 — Вставь пропущенные буквы</h3>
+      <div class="instr">Посмотри на слово с пропусками и впиши слово целиком в поле ниже.</div>
+      <div id="ex1items"></div>
+      <div class="btn-row">
+        <button class="btn btn-check" onclick="checkExercise('ex1')">Проверить</button>
+        <button class="btn btn-reveal" onclick="revealExercise('ex1')">Показать ответы</button>
+        <button class="btn btn-copy" onclick="copyExercise('ex1')">Скопировать ответы</button>
+        <span class="copy-toast" id="ex1toast">Скопировано!</span>
+      </div>
+      <div class="score" id="ex1score"></div>
+    </div>
+
+    <!-- EXERCISE 2 -->
+    <div class="exercise" id="ex2">
+      <h3>Упражнение 2 — Прослушай и напиши слово</h3>
+      <div class="instr">Нажми на кнопку ▶, прослушай произношение и напиши слово (или фразу) по звуку.</div>
+      <div id="ex2items"></div>
+      <div class="btn-row">
+        <button class="btn btn-check" onclick="checkExercise('ex2')">Проверить</button>
+        <button class="btn btn-reveal" onclick="revealExercise('ex2')">Показать ответы</button>
+        <button class="btn btn-copy" onclick="copyExercise('ex2')">Скопировать ответы</button>
+        <span class="copy-toast" id="ex2toast">Скопировано!</span>
+      </div>
+      <div class="score" id="ex2score"></div>
+    </div>
+
+    <!-- EXERCISE 3 -->
+    <div class="exercise" id="ex3">
+      <h3>Упражнение 3 — Определение → слово</h3>
+      <div class="instr">Прочитай определение на английском и напиши, какое это слово.</div>
+      <div id="ex3items"></div>
+      <div class="btn-row">
+        <button class="btn btn-check" onclick="checkExercise('ex3')">Проверить</button>
+        <button class="btn btn-reveal" onclick="revealExercise('ex3')">Показать ответы</button>
+        <button class="btn btn-copy" onclick="copyExercise('ex3')">Скопировать ответы</button>
+        <span class="copy-toast" id="ex3toast">Скопировано!</span>
+      </div>
+      <div class="score" id="ex3score"></div>
+    </div>
+
+    <!-- EXERCISE 4 -->
+    <div class="exercise" id="ex4">
+      <h3>Упражнение 4 — Finish the dialogue</h3>
+      <div class="instr">Заполни пропуск в диалоге нужным словом или фразой.</div>
+      <div id="ex4items"></div>
+      <div class="btn-row">
+        <button class="btn btn-check" onclick="checkExercise('ex4')">Проверить</button>
+        <button class="btn btn-reveal" onclick="revealExercise('ex4')">Показать ответы</button>
+        <button class="btn btn-copy" onclick="copyExercise('ex4')">Скопировать ответы</button>
+        <span class="copy-toast" id="ex4toast">Скопировано!</span>
+      </div>
+      <div class="score" id="ex4score"></div>
+    </div>
+
+    <!-- EXERCISE 5 -->
+    <div class="exercise" id="ex5">
+      <h3>Упражнение 5 — Придумай своё предложение</h3>
+      <div class="instr">Напиши собственное предложение с каждым словом (без «правильного» ответа — можно посмотреть пример).</div>
+      <div id="ex5items"></div>
+      <div class="btn-row">
+        <button class="btn btn-copy" onclick="copyExercise('ex5')">Скопировать все предложения</button>
+        <span class="copy-toast" id="ex5toast">Скопировано!</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="tag-box">
+      <h4>Проблемные слова</h4>
+      <div class="hint">Слова, в которых были ошибки при проверке</div>
+      <div id="mistakesBody"><div class="empty-note">Пока ошибок нет</div></div>
+    </div>
+  </div>
+</div>
+
+<footer>Fitting Room English · practice sheet</footer>
+
+<script>
+/* ======================= DATA ======================= */
+const WORDS = [
+  { id:'tight', word:'tight', ipa:'/taɪt/', ru:'тесный, обтягивающий',
+    blank:'ti__t',
+    definition:'fitting very closely to the body, often too closely for comfort',
+    dialogue:{before:"A: How do the new boots feel?\nB: Way too", after:", they're squeezing my feet."} },
+  { id:'loose', word:'loose', ipa:'/luːs/', ru:'свободный, просторный',
+    blank:'l__se',
+    definition:'not fitting closely; bigger than your body needs',
+    dialogue:{before:"A: Do these trousers fit you?\nB: No, they're too", after:", they keep sliding down."} },
+  { id:'receipt', word:'receipt', ipa:'/rɪˈsiːt/', ru:'чек, квитанция',
+    blank:'rec__pt',
+    definition:'a piece of paper proving that you paid for something, useful if you want a refund',
+    dialogue:{before:"A: I'd like to return this shirt.\nB: No problem, do you have the", after:"?"} },
+  { id:'tryon', word:'try on', ipa:'/traɪ ɒn/', ru:'примерять',
+    blank:'t__ on',
+    definition:'to put on a piece of clothing to see if it fits or looks good before buying it',
+    dialogue:{before:"A: Can I", after:"this jacket before I buy it?\nB: Sure, the changing room is over there."} },
+  { id:'changingroom', word:'changing room', ipa:'/ˈtʃeɪndʒɪŋ ruːm/', ru:'примерочная',
+    blank:'chan__ng room',
+    definition:'a small room in a shop where you put on clothes to check if they fit',
+    dialogue:{before:"A: Where can I try this dress on?\nB: The", after:"is next to the mirrors."} },
+];
+
+// mixed orders so the same word order never repeats across exercises
+const ORDER = {
+  ex1:[2,0,4,1,3],
+  ex2:[3,4,1,2,0],
+  ex3:[1,3,0,4,2],
+  ex4:[4,1,3,0,2],
+  ex5:[0,2,4,3,1],
+};
+
+const SAMPLES = {
+  tight: "These jeans are so tight I can barely bend my knees.",
+  loose: "I prefer loose sweaters when I travel, they're more comfortable.",
+  receipt: "Always ask for a receipt in case you need to exchange the item.",
+  tryon: "Can I try on this dress in a different size?",
+  changingroom: "The changing room had a long queue on Saturday morning."
+};
+
+const mistakes = {}; // id -> count
+
+/* ======================= SPEECH ======================= */
+let chosenVoice = null;
+
+function pickVoice(){
+  const voices = window.speechSynthesis ? speechSynthesis.getVoices() : [];
+  if(!voices.length) return null;
+  let v = voices.find(v => /Google US English/i.test(v.name));
+  if(!v) v = voices.find(v => v.lang === 'en-US');
+  if(!v) v = voices.find(v => /^en/i.test(v.lang));
+  return v || null;
+}
+
+function refreshVoiceStatus(){
+  const statusEl = document.getElementById('voiceStatus');
+  if(!('speechSynthesis' in window)){
+    statusEl.innerHTML = '<span class="status-bad">Синтез речи не поддерживается в этом браузере</span>';
+    return;
+  }
+  chosenVoice = pickVoice();
+  if(chosenVoice){
+    statusEl.innerHTML = 'Голос: <span class="status-ok">' + chosenVoice.name + ' (' + chosenVoice.lang + ')</span>';
+  } else {
+    statusEl.innerHTML = '<span class="status-bad">Голоса ещё загружаются… нажмите «Проверить звук» ещё раз через пару секунд</span>';
+  }
+}
+
+if('speechSynthesis' in window){
+  speechSynthesis.onvoiceschanged = refreshVoiceStatus;
+}
+window.addEventListener('load', () => setTimeout(refreshVoiceStatus, 300));
+
+function speak(text){
+  if(!('speechSynthesis' in window)){
+    alert('Ваш браузер не поддерживает озвучивание. Попробуйте Chrome.');
+    return;
+  }
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  chosenVoice = chosenVoice || pickVoice();
+  if(chosenVoice){ u.voice = chosenVoice; u.lang = chosenVoice.lang; }
+  else { u.lang = 'en-US'; }
+  u.rate = 0.9;
+  speechSynthesis.speak(u);
+}
+
+document.getElementById('testAudioBtn').addEventListener('click', () => {
+  refreshVoiceStatus();
+  speak('Testing audio. Tight, loose, receipt.');
+});
+
+/* ======================= RENDER VOCAB REMINDER ======================= */
+const vocabList = document.getElementById('vocabList');
+WORDS.forEach(w => {
+  const row = document.createElement('div');
+  row.className = 'vocab-row';
+  row.innerHTML = `
+    <button class="play-btn" title="Прослушать" onclick="speak('${w.word.replace(/'/g,"\\'")}')">▶</button>
+    <span class="vocab-word">${w.word}</span>
+    <span class="vocab-ipa">${w.ipa}</span>
+    <span class="vocab-ru">${w.ru}</span>
+  `;
+  vocabList.appendChild(row);
+});
+
+/* ======================= HELPERS ======================= */
+function norm(s){
+  return (s || '').trim().toLowerCase().replace(/\s+/g,' ');
+}
+
+function byId(id){ return WORDS.find(w => w.id === id); }
+
+function markMistake(wordId){
+  mistakes[wordId] = (mistakes[wordId] || 0) + 1;
+  renderMistakes();
+}
+
+function renderMistakes(){
+  const body = document.getElementById('mistakesBody');
+  const entries = Object.entries(mistakes).sort((a,b) => b[1]-a[1]);
+  if(!entries.length){
+    body.innerHTML = '<div class="empty-note">Пока ошибок нет</div>';
+    return;
+  }
+  let html = '<table class="mistakes"><tr><th>Слово</th><th>Ошибок</th></tr>';
+  entries.forEach(([id,count]) => {
+    const w = byId(id);
+    html += `<tr><td>${w ? w.word : id}</td><td><span class="mistake-count">${count}</span></td></tr>`;
+  });
+  html += '</table>';
+  body.innerHTML = html;
+}
+
+function toast(exId){
+  const t = document.getElementById(exId + 'toast');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 1800);
+}
+
+async function copyText(text, exId){
+  try{
+    await navigator.clipboard.writeText(text);
+  }catch(e){
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+  }
+  toast(exId);
+}
+
+/* ======================= EXERCISE 1: missing letters ======================= */
+const ex1Container = document.getElementById('ex1items');
+ORDER.ex1.forEach((idx, i) => {
+  const w = WORDS[idx];
+  const div = document.createElement('div');
+  div.className = 'item';
+  div.dataset.wordId = w.id;
+  div.innerHTML = `
+    <div class="item-num">${i+1}.</div>
+    <div class="item-body">
+      <div class="item-prompt">Впиши слово целиком: <span class="blank-pattern">${w.blank}</span> <span class="sans" style="color:var(--ink-soft);font-size:.82rem;">(${w.ru})</span></div>
+      <input type="text" class="ex1-input" placeholder="напиши слово…">
+      <span class="feedback-icon"></span>
+      <div class="reveal-line">Ответ: <strong>${w.word}</strong></div>
+    </div>
+  `;
+  ex1Container.appendChild(div);
+});
+
+/* ======================= EXERCISE 2: dictation ======================= */
+const ex2Container = document.getElementById('ex2items');
+ORDER.ex2.forEach((idx, i) => {
+  const w = WORDS[idx];
+  const div = document.createElement('div');
+  div.className = 'item';
+  div.dataset.wordId = w.id;
+  div.innerHTML = `
+    <div class="item-num">${i+1}.</div>
+    <button class="play-btn" title="Прослушать" onclick="speak('${w.word.replace(/'/g,"\\'")}')">▶</button>
+    <div class="item-body">
+      <div class="item-prompt">Прослушай и напиши слово по звуку:</div>
+      <input type="text" class="ex2-input" placeholder="напиши, что услышал(а)…">
+      <span class="feedback-icon"></span>
+      <div class="reveal-line">Ответ: <strong>${w.word}</strong> ${w.ipa}</div>
+    </div>
+  `;
+  ex2Container.appendChild(div);
+});
+
+/* ======================= EXERCISE 3: definition -> word ======================= */
+const ex3Container = document.getElementById('ex3items');
+ORDER.ex3.forEach((idx, i) => {
+  const w = WORDS[idx];
+  const div = document.createElement('div');
+  div.className = 'item';
+  div.dataset.wordId = w.id;
+  div.innerHTML = `
+    <div class="item-num">${i+1}.</div>
+    <div class="item-body">
+      <div class="item-prompt sans">${w.definition}</div>
+      <input type="text" class="ex3-input" placeholder="это слово — …">
+      <span class="feedback-icon"></span>
+      <div class="reveal-line">Ответ: <strong>${w.word}</strong></div>
+    </div>
+  `;
+  ex3Container.appendChild(div);
+});
+
+/* ======================= EXERCISE 4: finish the dialogue ======================= */
+const ex4Container = document.getElementById('ex4items');
+ORDER.ex4.forEach((idx, i) => {
+  const w = WORDS[idx];
+  const div = document.createElement('div');
+  div.className = 'item';
+  div.dataset.wordId = w.id;
+  div.innerHTML = `
+    <div class="item-num">${i+1}.</div>
+    <div class="item-body">
+      <div class="dialogue-block">${w.dialogue.before} <input type="text" class="ex4-input" placeholder="…"> ${w.dialogue.after}</div>
+      <span class="feedback-icon"></span>
+      <div class="reveal-line">Ответ: <strong>${w.word}</strong></div>
+    </div>
+  `;
+  ex4Container.appendChild(div);
+});
+
+/* ======================= EXERCISE 5: own sentence ======================= */
+const ex5Container = document.getElementById('ex5items');
+ORDER.ex5.forEach((idx, i) => {
+  const w = WORDS[idx];
+  const div = document.createElement('div');
+  div.className = 'item';
+  div.dataset.wordId = w.id;
+  div.innerHTML = `
+    <div class="item-num">${i+1}.</div>
+    <div class="item-body">
+      <div class="item-prompt">Напиши своё предложение со словом <strong>${w.word}</strong>:</div>
+      <textarea class="ex5-input" placeholder="твоё предложение…"></textarea>
+      <div style="margin-top:6px;">
+        <button class="btn btn-sample" onclick="toggleSample(this,'${w.id}')">Показать пример</button>
+        <div class="reveal-line sample-line">Пример: <em>${SAMPLES[w.id]}</em></div>
+      </div>
+    </div>
+  `;
+  ex5Container.appendChild(div);
+});
+
+function toggleSample(btn, wordId){
+  const line = btn.parentElement.querySelector('.sample-line');
+  line.classList.toggle('show');
+}
+
+/* ======================= CHECK / REVEAL / COPY ======================= */
+function checkExercise(exId){
+  const container = document.getElementById(exId + 'items');
+  const items = container.querySelectorAll('.item');
+  let correctCount = 0;
+  items.forEach(item => {
+    const wordId = item.dataset.wordId;
+    const w = byId(wordId);
+    const input = item.querySelector('input[type="text"]');
+    const icon = item.querySelector('.feedback-icon');
+    if(!input) return;
+    const val = norm(input.value);
+    const answer = norm(w.word);
+    const isCorrect = val.length > 0 && val === answer;
+    input.classList.remove('correct','incorrect');
+    if(isCorrect){
+      input.classList.add('correct');
+      icon.textContent = '✓';
+      icon.className = 'feedback-icon ok';
+      correctCount++;
+    } else {
+      input.classList.add('incorrect');
+      icon.textContent = '✗';
+      icon.className = 'feedback-icon bad';
+      if(val.length > 0) markMistake(wordId); // only count as a real mistake if they attempted
+    }
+  });
+  const scoreEl = document.getElementById(exId + 'score');
+  if(scoreEl) scoreEl.textContent = `Правильно: ${correctCount} из ${items.length}`;
+}
+
+function revealExercise(exId){
+  const container = document.getElementById(exId + 'items');
+  container.querySelectorAll('.reveal-line').forEach(el => el.classList.add('show'));
+}
+
+function copyExercise(exId){
+  const container = document.getElementById(exId + 'items');
+  const items = container.querySelectorAll('.item');
+  const exTitle = document.querySelector('#' + exId + ' h3').textContent;
+  let lines = [exTitle, ''];
+  items.forEach((item, i) => {
+    const inputEl = item.querySelector('input[type="text"], textarea');
+    const val = inputEl ? inputEl.value.trim() : '';
+    lines.push(`${i+1}. ${val || '(пусто)'}`);
+  });
+  copyText(lines.join('\n'), exId);
+}
+</script>
+
+</body>
+</html>
