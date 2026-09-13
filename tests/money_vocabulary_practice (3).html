@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Money & Finance — практика лексики</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1B2A41;
+    --paper:#F6F1E7;
+    --paper-2:#EFE8D8;
+    --green:#2F6B52;
+    --green-bg:#E7F0EA;
+    --rust:#A6432F;
+    --rust-bg:#F6E7E3;
+    --gold:#B8912F;
+    --line:#C9BFA6;
+    --muted:#6B7280;
+    --white:#FFFDF8;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{
+    font-family:'Lora',serif;
+    font-weight:600;
+    margin:0 0 6px 0;
+    color:var(--ink);
+  }
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  .wrap{
+    max-width:900px;
+    margin:0 auto;
+    padding:28px 20px 120px;
+    display:flex;
+    flex-direction:column;
+    gap:28px;
+  }
+  header.top .kicker{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    letter-spacing:.03em;
+    color:var(--gold);
+    margin-bottom:8px;
+  }
+  header.top h1{font-size:30px;}
+  header.top p{color:var(--muted);max-width:640px;margin:8px 0 0;}
+
+  /* Toolbar (was sidebar) */
+  .sidebar{
+    display:flex;
+    flex-direction:row;
+    flex-wrap:wrap;
+    gap:16px;
+  }
+  .sidebar .box{flex:1 1 220px;min-width:200px;}
+  .sidebar.collapsed .box{display:none;}
+  .sidebar-toggle{
+    width:100%;
+    background:var(--paper-2);
+    border:1px solid var(--line);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:13px;
+    padding:10px 12px;
+    cursor:pointer;
+    text-align:left;
+  }
+  .box{
+    background:var(--white);
+    border:1px solid var(--line);
+    padding:16px;
+  }
+  .box h3{font-size:15px;margin-bottom:10px;}
+  #problemTable{width:100%;border-collapse:collapse;font-size:13px;}
+  #problemTable th{
+    text-align:left;font-weight:600;color:var(--muted);
+    border-bottom:1px solid var(--line);padding:4px 4px;font-size:11px;
+    text-transform:none;
+  }
+  #problemTable td{padding:5px 4px;border-bottom:1px dotted var(--line);}
+  #problemTable tr:last-child td{border-bottom:none;}
+  #problemEmpty{color:var(--muted);font-size:13px;font-style:italic;}
+  .count-pill{
+    display:inline-block;min-width:20px;text-align:center;
+    background:var(--rust-bg);color:var(--rust);
+    border-radius:10px;font-size:11px;padding:1px 6px;font-family:'IBM Plex Mono',monospace;
+  }
+  .side-btn{
+    display:block;width:100%;text-align:left;
+    background:var(--ink);color:var(--white);
+    border:none;padding:10px 12px;font-family:'Inter',sans-serif;
+    font-size:13px;font-weight:600;cursor:pointer;margin-bottom:8px;
+  }
+  .side-btn:last-child{margin-bottom:0;}
+  .side-btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--ink);}
+  .side-btn:hover{opacity:.85;}
+  #audioStatus{font-size:12px;color:var(--muted);margin-top:8px;}
+  #audioStatus.ok{color:var(--green);}
+  #audioStatus.bad{color:var(--rust);}
+
+  /* Vocab reminder */
+  .vocab-section{grid-column:1/-1;margin-bottom:8px;}
+  .vocab-section h2{font-size:20px;}
+  .vocab-section .instructions{color:var(--muted);font-size:14px;margin:4px 0 14px;}
+  table.vocab{width:100%;border-collapse:collapse;background:var(--white);border:1px solid var(--line);}
+  table.vocab th{
+    text-align:left;font-size:11px;color:var(--muted);font-weight:600;
+    padding:8px 10px;border-bottom:1px solid var(--ink);background:var(--paper-2);
+  }
+  table.vocab td{padding:9px 10px;border-bottom:1px solid var(--line);font-size:14px;vertical-align:middle;}
+  table.vocab tr:last-child td{border-bottom:none;}
+  table.vocab td.word{font-weight:600;}
+  table.vocab td.ipa{color:var(--gold);font-family:'IBM Plex Mono',monospace;font-size:13px;}
+  table.vocab td.ru{color:var(--muted);}
+  .play-btn{
+    border:1px solid var(--ink);background:var(--white);color:var(--ink);
+    width:30px;height:30px;border-radius:50%;cursor:pointer;
+    display:inline-flex;align-items:center;justify-content:center;font-size:13px;
+  }
+  .play-btn:hover{background:var(--ink);color:var(--white);}
+  .play-btn:active{transform:scale(.94);}
+
+  /* Main / exercises */
+  .main{display:flex;flex-direction:column;gap:36px;min-width:0;}
+  .exercise{
+    background:var(--white);
+    border:1px solid var(--line);
+  }
+  .exercise-head{
+    padding:16px 20px;
+    border-bottom:2px solid var(--ink);
+    display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;
+  }
+  .exercise-head .num{
+    font-family:'IBM Plex Mono',monospace;color:var(--gold);font-size:13px;margin-bottom:4px;display:block;
+  }
+  .exercise-head h2{font-size:19px;}
+  .exercise-head .instr{color:var(--muted);font-size:13.5px;margin-top:4px;max-width:560px;}
+  .ex-score{
+    font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--muted);white-space:nowrap;
+  }
+  .items{padding:4px 0;}
+  .item{
+    display:grid;
+    grid-template-columns:34px 1fr;
+    gap:12px;
+    padding:14px 20px;
+    border-bottom:1px solid var(--line);
+    align-items:start;
+  }
+  .item:last-child{border-bottom:none;}
+  .item .n{
+    font-family:'IBM Plex Mono',monospace;color:var(--line);font-size:14px;padding-top:9px;
+  }
+  .item .content{min-width:0;}
+  .prompt{font-size:14.5px;margin-bottom:8px;}
+  .prompt .blank{border-bottom:2px solid var(--ink);padding:0 4px;}
+  .prompt .base-verb{color:var(--muted);font-style:italic;}
+  .row-input{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+  input.answer{
+    flex:1;min-width:180px;
+    font-family:'Inter',sans-serif;font-size:14.5px;
+    padding:8px 10px;border:1px solid var(--line);background:var(--paper);
+    color:var(--ink);
+  }
+  input.answer:focus{outline:2px solid var(--gold);outline-offset:1px;border-color:var(--gold);}
+  input.answer.correct{border-color:var(--green);background:var(--green-bg);}
+  input.answer.incorrect{border-color:var(--rust);background:var(--rust-bg);}
+  .verdict{font-size:12.5px;font-family:'IBM Plex Mono',monospace;min-width:70px;}
+  .verdict.ok{color:var(--green);}
+  .verdict.no{color:var(--rust);}
+  .answer-reveal{
+    font-size:13px;color:var(--muted);margin-top:6px;display:none;
+  }
+  .answer-reveal.shown{display:block;}
+  .answer-reveal b{color:var(--ink);font-weight:600;}
+  .listen-inline{
+    border:1px solid var(--ink);background:var(--white);color:var(--ink);
+    padding:6px 10px;font-size:12.5px;cursor:pointer;white-space:nowrap;
+  }
+  .listen-inline:hover{background:var(--ink);color:var(--white);}
+
+  .exercise-foot{
+    display:flex;gap:10px;flex-wrap:wrap;justify-content:space-between;align-items:center;
+    padding:14px 20px;border-top:1px solid var(--line);background:var(--paper-2);
+  }
+  .btn{
+    font-family:'Inter',sans-serif;font-weight:600;font-size:13.5px;
+    padding:9px 16px;border:1px solid var(--ink);background:var(--ink);color:var(--white);
+    cursor:pointer;
+  }
+  .btn.secondary{background:transparent;color:var(--ink);}
+  .btn.small{padding:7px 12px;font-size:12.5px;}
+  .btn:hover{opacity:.85;}
+  .foot-left{display:flex;gap:10px;flex-wrap:wrap;}
+  .copy-note{font-size:12px;color:var(--muted);}
+
+  /* Floating copy-all bar */
+  .float-bar{
+    position:fixed;left:0;right:0;bottom:0;
+    background:var(--ink);color:var(--white);
+    padding:12px 20px;display:flex;justify-content:center;align-items:center;gap:16px;
+    z-index:50;box-shadow:0 -2px 10px rgba(0,0,0,.15);
+  }
+  .float-bar .btn{background:var(--gold);border-color:var(--gold);color:var(--ink);}
+  .float-bar span{font-size:12.5px;opacity:.85;}
+  #copyToast{
+    position:fixed;bottom:70px;left:50%;transform:translateX(-50%);
+    background:var(--green);color:var(--white);padding:8px 16px;font-size:13px;
+    opacity:0;transition:opacity .25s ease;pointer-events:none;z-index:60;
+  }
+  #copyToast.show{opacity:1;}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header class="top">
+    <div class="kicker">MONEY &amp; FINANCE — VOCABULARY LEDGER — B1</div>
+    <h1>Money &amp; Finance: practice sheet</h1>
+    <p>18 слов и выражений по теме денег. Сначала прослушайте и повторите произношение, затем пропишите слова руками в шести упражнениях. Проверяйте себя, смотрите правильные ответы и в конце скопируйте свои ответы одной кнопкой.</p>
+  </header>
+
+  <aside class="sidebar" id="sidebar">
+    <button class="sidebar-toggle" id="sidebarToggle">▾ Скрыть панель (аудио / ошибки / экспорт)</button>
+    <div class="box">
+      <h3>Аудио</h3>
+      <button class="side-btn" id="testAudioBtn">▶ Проверить звук (test)</button>
+      <div id="audioStatus">Нажмите, чтобы проверить голос браузера.</div>
+    </div>
+
+    <div class="box">
+      <h3>Проблемные слова</h3>
+      <table id="problemTable">
+        <thead><tr><th>Слово</th><th style="text-align:right;">Ошибок</th></tr></thead>
+        <tbody id="problemBody"></tbody>
+      </table>
+      <div id="problemEmpty">Пока ошибок нет — они появятся здесь после проверки.</div>
+    </div>
+
+    <div class="box">
+      <h3>Экспорт</h3>
+      <button class="side-btn ghost" id="copyAllSideBtn">Скопировать все ответы</button>
+      <div class="copy-note" style="margin-top:8px;">Копирует все 6 заданий и ваши варианты в буфер обмена.</div>
+    </div>
+  </aside>
+
+  <section class="vocab-section">
+    <h2>Напоминание слов</h2>
+    <p class="instructions">Нажмите ▶, чтобы прослушать слово (голос Google US English, если доступен в вашем браузере), и повторите вслух.</p>
+    <table class="vocab" id="vocabTable">
+      <thead>
+        <tr><th style="width:34px;"></th><th>Word</th><th>Transcription</th><th>Перевод</th></tr>
+      </thead>
+      <tbody id="vocabBody"></tbody>
+    </table>
+  </section>
+
+  <main class="main" id="mainExercises"></main>
+
+</div>
+
+<div class="float-bar">
+  <span>Итог: <span id="globalScore">0 / 0</span> проверено верно</span>
+  <button class="btn" id="copyAllBtn">Скопировать все ответы</button>
+</div>
+<div id="copyToast">Скопировано в буфер обмена</div>
+
+<script>
+/* =========================================================
+   DATA
+   ========================================================= */
+const VOCAB = [
+  {en:"contactless payment", ru:"бесконтактный платёж", ipa:"/ˈkɒntæktləs ˈpeɪmənt/"},
+  {en:"salary", ru:"зарплата (оклад)", ipa:"/ˈsæləri/"},
+  {en:"charge", ru:"взимать плату; заряжать", ipa:"/tʃɑːdʒ/"},
+  {en:"insurance", ru:"страхование", ipa:"/ɪnˈʃʊərəns/"},
+  {en:"earn", ru:"зарабатывать", ipa:"/ɜːn/"},
+  {en:"owe", ru:"быть должным (кому-то деньги)", ipa:"/oʊ/"},
+  {en:"lend", ru:"одалживать (давать в долг)", ipa:"/lend/"},
+  {en:"inherit", ru:"наследовать", ipa:"/ɪnˈherɪt/"},
+  {en:"loan", ru:"заём, кредит", ipa:"/loʊn/"},
+  {en:"cost", ru:"стоить", ipa:"/kɒst/"},
+  {en:"can't afford", ru:"не может себе позволить", ipa:"/kænt əˈfɔːrd/"},
+  {en:"mortgage", ru:"ипотека", ipa:"/ˈmɔːrɡɪdʒ/"},
+  {en:"waste", ru:"тратить впустую", ipa:"/weɪst/"},
+  {en:"be worth", ru:"стоить, иметь ценность", ipa:"/biː wɜːrθ/"},
+  {en:"save", ru:"экономить, копить", ipa:"/seɪv/"},
+  {en:"borrow", ru:"брать взаймы", ipa:"/ˈbɒroʊ/"},
+  {en:"raise", ru:"повышение (зарплаты)", ipa:"/reɪz/"},
+  {en:"get into debt", ru:"влезть в долги", ipa:"/ɡet ˈɪntuː det/"}
+];
+
+function norm(s){
+  return (s||"")
+    .toLowerCase()
+    .replace(/[’‘]/g,"'")
+    .replace(/[.,!?;:]/g,"")
+    .replace(/\s+/g," ")
+    .trim();
+}
+
+/* ---------- Exercise 1: dictation (listen & type) ---------- */
+const ex1Words = ["salary","contactless payment","insurance","earn","owe","lend",
+  "inherit","loan","mortgage","borrow","raise","get into debt"];
+const EX1 = ex1Words.map((w,i)=>({
+  id:"e1-"+i,
+  word:w,
+  prompt:`Прослушайте слово и напишите его:`,
+  type:"exact",
+  answer:w
+}));
+
+/* ---------- Exercise 2: definitions -> word ---------- */
+const EX2 = [
+  {id:"e2-0", word:"owe", prompt:"To have to pay money back to someone.", type:"exact", answer:"owe"},
+  {id:"e2-1", word:"salary", prompt:"Money that you receive regularly (usually monthly) for doing your job.", type:"exact", answer:"salary"},
+  {id:"e2-2", word:"lend", prompt:"To give someone money that they must pay back later.", type:"exact", answer:"lend"},
+  {id:"e2-3", word:"inherit", prompt:"To receive money or property from someone after they die.", type:"exact", answer:"inherit"},
+  {id:"e2-4", word:"loan", prompt:"A sum of money that a bank lends you, which you pay back with interest.", type:"exact", answer:"loan"},
+  {id:"e2-5", word:"contactless payment", prompt:"A way of paying with a card or phone by tapping, without entering a PIN.", type:"exact", answer:"contactless payment"},
+  {id:"e2-6", word:"insurance", prompt:"An agreement to pay money if you have an accident, illness or fire.", type:"exact", answer:"insurance"},
+  {id:"e2-7", word:"mortgage", prompt:"A loan used specifically to buy a house or a flat.", type:"exact", answer:"mortgage"},
+  {id:"e2-8", word:"waste", prompt:"To use money, time or another resource in a careless, unnecessary way.", type:"exact", answer:"waste"},
+  {id:"e2-9", word:"can't afford", prompt:"To not have enough money to buy or do something.", type:"exact", answer:"can't afford"},
+  {id:"e2-10", word:"borrow", prompt:"To take money or an object from someone that you must return later.", type:"exact", answer:"borrow"},
+  {id:"e2-11", word:"get into debt", prompt:"To reach a situation where you owe more and more money you can't pay back.", type:"exact", answer:"get into debt"}
+];
+
+/* ---------- Exercise 3: prepositions / collocations (short phrases) ---------- */
+const EX3 = [
+  {id:"e3-0", word:"waste", prompt:'waste money <span class="blank">_____</span> something', type:"exact", answer:"on"},
+  {id:"e3-1", word:"save", prompt:'save money <span class="blank">_____</span> something', type:"exact", answer:"for"},
+  {id:"e3-2", word:"contactless payment", prompt:'pay <span class="blank">_____</span> contactless / card', type:"exact", answer:"by"},
+  {id:"e3-3", word:"borrow", prompt:'borrow money <span class="blank">_____</span> someone', type:"exact", answer:"from"},
+  {id:"e3-4", word:"lend", prompt:'lend money <span class="blank">_____</span> someone', type:"exact", answer:"to"},
+  {id:"e3-5", word:"owe", prompt:'owe money <span class="blank">_____</span> someone', type:"exact", answer:"to"},
+  {id:"e3-6", word:"insurance", prompt:'insurance <span class="blank">_____</span> fire / theft', type:"exact", answer:"against"},
+  {id:"e3-7", word:"inherit", prompt:'inherit something <span class="blank">_____</span> someone', type:"exact", answer:"from"},
+  {id:"e3-8", word:"mortgage", prompt:'pay <span class="blank">_____</span> a mortgage', type:"exact", answer:"off"},
+  {id:"e3-9", word:"loan", prompt:'take out a loan <span class="blank">_____</span> something', type:"exact", answer:"for"},
+  {id:"e3-10", word:"be worth", prompt:'worth <span class="blank">_____</span> least $100', type:"exact", answer:"at"},
+  {id:"e3-11", word:"get into debt", prompt:'get <span class="blank">_____</span> debt', type:"exact", answer:"into"}
+];
+
+/* ---------- Exercise 4: verb tenses (B1) ---------- */
+const EX4 = [
+  {id:"e4-0", word:"earn", prompt:'She <span class="base-verb">(earn — Present Simple)</span> $3,000 a month.', type:"exact", answer:"earns"},
+  {id:"e4-1", word:"owe", prompt:'He <span class="base-verb">(owe — Present Simple)</span> me money at the moment.', type:"exact", answer:"owes"},
+  {id:"e4-2", word:"lend", prompt:'They <span class="base-verb">(lend — Past Simple)</span> me their car last weekend.', type:"exact", answer:"lent"},
+  {id:"e4-3", word:"inherit", prompt:'She <span class="base-verb">(inherit — Past Simple)</span> a fortune when her uncle died.', type:"exact", answer:"inherited"},
+  {id:"e4-4", word:"save", prompt:'We <span class="base-verb">(save — Present Perfect)</span> $2,000 so far.', type:"exact", answer:"have saved", acceptable:["have saved","we have saved"]},
+  {id:"e4-5", word:"borrow", prompt:'He <span class="base-verb">(borrow — Present Continuous)</span> my laptop right now.', type:"exact", answer:"is borrowing"},
+  {id:"e4-6", word:"waste", prompt:'I <span class="base-verb">(waste — Past Simple)</span> so much time yesterday.', type:"exact", answer:"wasted"},
+  {id:"e4-7", word:"cost", prompt:'This car <span class="base-verb">(cost — Present Simple)</span> a lot of money.', type:"exact", answer:"costs"},
+  {id:"e4-8", word:"get into debt", prompt:'If prices go up, we <span class="base-verb">(get into debt — Future Simple)</span>.', type:"exact", answer:"will get into debt", acceptable:["will get into debt","'ll get into debt","we will get into debt"]},
+  {id:"e4-9", word:"charge", prompt:'She <span class="base-verb">(charge — Past Simple)</span> me too much last time.', type:"exact", answer:"charged"},
+  {id:"e4-10", word:"mortgage", prompt:'They <span class="base-verb">(pay off the mortgage — Future Simple)</span> next year.', type:"exact", answer:"will pay off the mortgage", acceptable:["will pay off the mortgage","'ll pay off the mortgage","they will pay off the mortgage"]},
+  {id:"e4-11", word:"save", prompt:'While I <span class="base-verb">(save — Past Continuous)</span> for a house, I lived very cheaply.', type:"exact", answer:"was saving"}
+];
+
+/* ---------- Exercise 5: rephrase ---------- */
+const EX5 = [
+  {id:"e5-0", word:"can't afford", prompt:"I don't have enough money to buy a new phone.", hint:"can't afford", type:"contains", key:"can't afford", model:"I can't afford a new phone."},
+  {id:"e5-1", word:"inherit", prompt:"My uncle gave me his house after he died.", hint:"inherit", type:"contains", key:"inherit", model:"I inherited my uncle's house."},
+  {id:"e5-2", word:"mortgage", prompt:"The bank gave us money to buy a flat, and we pay it back with interest every month.", hint:"mortgage", type:"contains", key:"mortgage", model:"We have a mortgage on our flat."},
+  {id:"e5-3", word:"lend", prompt:"Please give me £20 — I'll return it tomorrow.", hint:"lend", type:"contains", key:"lend", model:"Could you lend me £20? I'll give it back tomorrow."},
+  {id:"e5-4", word:"borrow / owe", prompt:"I took £20 from Tom and I still need to return it.", hint:"borrow / owe", type:"contains", key:"borrow", model:"I borrowed £20 from Tom, so now I owe him £20."},
+  {id:"e5-5", word:"be worth", prompt:"This painting has a value of about $10,000.", hint:"be worth", type:"contains", key:"worth", model:"This painting is worth about $10,000."},
+  {id:"e5-6", word:"save", prompt:"I don't spend all my salary — I put some money aside every month.", hint:"save", type:"contains", key:"save", model:"I save some money every month."},
+  {id:"e5-7", word:"waste", prompt:"He spends money carelessly on things he never uses.", hint:"waste", type:"contains", key:"waste", model:"He wastes money on things he never uses."},
+  {id:"e5-8", word:"contactless payment", prompt:"I pay with my card just by tapping it near the machine.", hint:"contactless", type:"contains", key:"contactless", model:"I pay by contactless."},
+  {id:"e5-9", word:"salary", prompt:"The company pays me €2,500 every month.", hint:"salary", type:"contains", key:"salary", model:"My salary is €2,500 a month."},
+  {id:"e5-10", word:"get into debt", prompt:"I spend more money than I make, so I keep owing more and more.", hint:"get into debt", type:"contains", key:"debt", model:"I keep getting into debt."},
+  {id:"e5-11", word:"raise", prompt:"My boss is going to increase my salary next year.", hint:"raise", type:"contains", key:"raise", model:"I'm going to get a raise next year."}
+];
+
+/* ---------- Exercise 6: finish the dialogue ---------- */
+const EX6 = [
+  {id:"e6-0", word:"contactless payment", prompt:"A: Can I pay by card?<br>B: Sure, we accept ______.", type:"contains", key:"contactless", model:"contactless payments"},
+  {id:"e6-1", word:"salary", prompt:"A: How much do you earn a month?<br>B: My ______ is about $2,000.", type:"contains", key:"salary", model:"salary"},
+  {id:"e6-2", word:"can't afford", prompt:"A: Why can't we buy the house?<br>B: Because we ______ it — it's too expensive.", type:"contains", key:"afford", model:"can't afford"},
+  {id:"e6-3", word:"borrow", prompt:"A: Whose car is this?<br>B: It's not mine, I just ______ it from a friend for the weekend.", type:"contains", key:"borrow", model:"borrowed"},
+  {id:"e6-4", word:"insurance", prompt:"A: Why do you need insurance?<br>B: To protect yourself ______ accidents and theft.", type:"contains", key:"against", model:"against"},
+  {id:"e6-5", word:"inherit", prompt:"A: Did your aunt leave you anything?<br>B: Yes, I ______ her old flat.", type:"contains", key:"inherit", model:"inherited"},
+  {id:"e6-6", word:"mortgage", prompt:"A: How are you paying for the house?<br>B: We took out a ______ from the bank.", type:"contains", key:"mortgage", model:"mortgage"},
+  {id:"e6-7", word:"waste", prompt:"A: Don't spend all your money at once!<br>B: Don't worry, I never ______ money on useless things.", type:"contains", key:"waste", model:"waste"},
+  {id:"e6-8", word:"owe", prompt:"A: Do you still owe your brother money?<br>B: Yes, I ______ him $100.", type:"contains", key:"owe", model:"owe"},
+  {id:"e6-9", word:"be worth", prompt:"A: How much is this ring worth?<br>B: It's ______ around $500.", type:"contains", key:"worth", model:"worth"},
+  {id:"e6-10", word:"get into debt", prompt:"A: Why is your bank account empty?<br>B: I spent too much and ______.", type:"contains", key:"debt", model:"got into debt"},
+  {id:"e6-11", word:"raise", prompt:"A: Did you get more money this year?<br>B: Yes, my boss gave me a ______.", type:"contains", key:"raise", model:"raise"}
+];
+
+const EXERCISES = [
+  {key:"ex1", num:"01", title:"Прописать слово по звуку", instr:"Нажмите ▶, прослушайте слово и напишите его буквами.", items:EX1, listen:true},
+  {key:"ex2", num:"02", title:"Дефиниция → слово", instr:"Прочитайте определение и напишите слово или выражение, которое оно описывает.", items:EX2},
+  {key:"ex3", num:"03", title:"Сочетаемость слов с предлогом", instr:"Впишите нужный предлог в пропуск.", items:EX3},
+  {key:"ex4", num:"04", title:"Изменение глагола по временам (B1)", instr:"Поставьте глагол в скобках в указанное время.", items:EX4},
+  {key:"ex5", num:"05", title:"Rephrase", instr:"Перефразируйте предложение, используя указанное слово/выражение, сохранив смысл.", items:EX5, flexible:true, copy:true},
+  {key:"ex6", num:"06", title:"Finish the dialogue", instr:"Закончите реплику подходящим словом или выражением из темы.", items:EX6, flexible:true, copy:true}
+];
+
+/* =========================================================
+   SPEECH SYNTHESIS
+   ========================================================= */
+let chosenVoice = null;
+function pickVoice(){
+  if(!('speechSynthesis' in window)) return null;
+  const voices = window.speechSynthesis.getVoices();
+  if(!voices || !voices.length) return null;
+  let v = voices.find(v=>/google us english/i.test(v.name));
+  if(!v) v = voices.find(v=>/en-US/i.test(v.lang) && /google/i.test(v.name));
+  if(!v) v = voices.find(v=>/en-US/i.test(v.lang));
+  if(!v) v = voices.find(v=>/^en/i.test(v.lang));
+  return v || voices[0];
+}
+function refreshVoice(){ chosenVoice = pickVoice(); }
+if('speechSynthesis' in window){
+  refreshVoice();
+  window.speechSynthesis.onvoiceschanged = refreshVoice;
+}
+function speak(text){
+  if(!('speechSynthesis' in window)){
+    setAudioStatus("Синтез речи не поддерживается в этом браузере.", false);
+    return;
+  }
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-US';
+  u.rate = 0.92;
+  if(!chosenVoice) refreshVoice();
+  if(chosenVoice) u.voice = chosenVoice;
+  u.onerror = ()=> setAudioStatus("Ошибка воспроизведения аудио.", false);
+  window.speechSynthesis.speak(u);
+}
+function setAudioStatus(msg, ok){
+  const el = document.getElementById('audioStatus');
+  el.textContent = msg;
+  el.className = ok===true ? 'ok' : (ok===false ? 'bad' : '');
+}
+document.getElementById('testAudioBtn').addEventListener('click', ()=>{
+  if(!('speechSynthesis' in window)){
+    setAudioStatus("Синтез речи не поддерживается в этом браузере.", false);
+    return;
+  }
+  refreshVoice();
+  speak("This is a test. Money, salary, insurance.");
+  setAudioStatus("Голос: " + (chosenVoice ? chosenVoice.name : "не найден, используется голос по умолчанию") + ". Если звук не идёт — проверьте громкость.", !!chosenVoice);
+});
+
+/* =========================================================
+   SIDEBAR COLLAPSE (mobile: panel was covering exercises)
+   ========================================================= */
+const sidebarEl = document.getElementById('sidebar');
+const sidebarToggleBtn = document.getElementById('sidebarToggle');
+function setSidebarCollapsed(collapsed){
+  sidebarEl.classList.toggle('collapsed', collapsed);
+  sidebarToggleBtn.textContent = collapsed ? '▸ Показать панель (аудио / ошибки / экспорт)' : '▾ Скрыть панель (аудио / ошибки / экспорт)';
+}
+sidebarToggleBtn.addEventListener('click', ()=> setSidebarCollapsed(!sidebarEl.classList.contains('collapsed')));
+if(window.matchMedia('(max-width:880px)').matches){ setSidebarCollapsed(true); }
+
+/* =========================================================
+   RENDER: vocabulary reminder table
+   ========================================================= */
+const vocabBody = document.getElementById('vocabBody');
+VOCAB.forEach(w=>{
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td><button class="play-btn" aria-label="Listen: ${w.en}" data-word="${w.en}">▶</button></td>
+    <td class="word">${w.en}</td>
+    <td class="ipa">${w.ipa}</td>
+    <td class="ru">${w.ru}</td>
+  `;
+  vocabBody.appendChild(tr);
+});
+vocabBody.addEventListener('click', e=>{
+  const btn = e.target.closest('.play-btn');
+  if(btn) speak(btn.dataset.word);
+});
+
+/* =========================================================
+   PROBLEM WORDS TRACKER
+   ========================================================= */
+const problemWords = {}; // word -> count of mistakes
+function registerMistake(word){
+  if(!word) return;
+  problemWords[word] = (problemWords[word]||0) + 1;
+  renderProblemWords();
+}
+function renderProblemWords(){
+  const body = document.getElementById('problemBody');
+  const empty = document.getElementById('problemEmpty');
+  const entries = Object.entries(problemWords).sort((a,b)=>b[1]-a[1]);
+  body.innerHTML = "";
+  if(entries.length===0){
+    empty.style.display='block';
+    document.getElementById('problemTable').style.display='none';
+    return;
+  }
+  empty.style.display='none';
+  document.getElementById('problemTable').style.display='table';
+  entries.forEach(([word,count])=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${word}</td><td style="text-align:right;"><span class="count-pill">${count}</span></td>`;
+    body.appendChild(tr);
+  });
+}
+renderProblemWords();
+
+/* =========================================================
+   RENDER EXERCISES
+   ========================================================= */
+const mainEl = document.getElementById('mainExercises');
+
+function shuffledIndices(n){
+  const arr = Array.from({length:n}, (_,i)=>i);
+  for(let i=arr.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]] = [arr[j],arr[i]];
+  }
+  return arr;
+}
+
+EXERCISES.forEach(ex=>{
+  const order = shuffledIndices(ex.items.length);
+  const displayItems = order.map(i=>ex.items[i]);
+
+  const section = document.createElement('section');
+  section.className = 'exercise';
+  section.id = ex.key;
+
+  const head = document.createElement('div');
+  head.className = 'exercise-head';
+  head.innerHTML = `
+    <div>
+      <span class="num">УПРАЖНЕНИЕ ${ex.num}</span>
+      <h2>${ex.title}</h2>
+      <div class="instr">${ex.instr}</div>
+    </div>
+    <div class="ex-score" id="${ex.key}-score">— / ${ex.items.length}</div>
+  `;
+  section.appendChild(head);
+
+  const itemsWrap = document.createElement('div');
+  itemsWrap.className = 'items';
+
+  displayItems.forEach((it, idx)=>{
+    const row = document.createElement('div');
+    row.className = 'item';
+    const listenBtn = ex.listen ? `<button class="listen-inline" data-word="${it.word}">▶ Слушать</button>` : '';
+    row.innerHTML = `
+      <div class="n">${String(idx+1).padStart(2,'0')}</div>
+      <div class="content">
+        <div class="prompt">${it.prompt}</div>
+        <div class="row-input">
+          ${listenBtn}
+          <input type="text" class="answer" data-id="${it.id}" placeholder="${ex.listen ? 'напишите слово...' : 'ваш ответ...'}" autocomplete="off" autocapitalize="off" spellcheck="false">
+          <span class="verdict" data-verdict="${it.id}"></span>
+        </div>
+        <div class="answer-reveal" data-reveal="${it.id}"><b>Ответ:</b> ${it.model ? it.model : it.answer}</div>
+      </div>
+    `;
+    itemsWrap.appendChild(row);
+  });
+  section.appendChild(itemsWrap);
+
+  const foot = document.createElement('div');
+  foot.className = 'exercise-foot';
+  foot.innerHTML = `
+    <div class="foot-left">
+      <button class="btn" data-check="${ex.key}">Проверить</button>
+      <button class="btn secondary" data-reveal-toggle="${ex.key}">Показать ответы</button>
+      <button class="btn secondary small" data-copy="${ex.key}">Скопировать ответы</button>
+    </div>
+    <div class="copy-note">12 пунктов</div>
+  `;
+  section.appendChild(foot);
+
+  mainEl.appendChild(section);
+
+  // store items map for later checking
+  section._items = displayItems;
+});
+
+/* Inline listen buttons (exercise 1) */
+mainEl.addEventListener('click', e=>{
+  const lb = e.target.closest('.listen-inline');
+  if(lb){ speak(lb.dataset.word); return; }
+});
+
+/* =========================================================
+   CHECKING LOGIC
+   ========================================================= */
+function isCorrect(item, raw){
+  const val = norm(raw);
+  if(!val) return false;
+  if(item.type === 'exact'){
+    const accepted = item.acceptable ? item.acceptable.map(norm) : [norm(item.answer)];
+    return accepted.includes(val);
+  }
+  if(item.type === 'contains'){
+    return val.includes(norm(item.key));
+  }
+  return false;
+}
+
+function checkExercise(key){
+  const section = document.getElementById(key);
+  const items = section._items;
+  let correctCount = 0;
+  items.forEach(it=>{
+    const input = section.querySelector(`input[data-id="${it.id}"]`);
+    const verdict = section.querySelector(`[data-verdict="${it.id}"]`);
+    const ok = isCorrect(it, input.value);
+    input.classList.remove('correct','incorrect');
+    if(ok){
+      input.classList.add('correct');
+      verdict.textContent = '✓ верно';
+      verdict.className = 'verdict ok';
+      correctCount++;
+    } else {
+      input.classList.add('incorrect');
+      verdict.textContent = input.value.trim() ? '✗ неверно' : '— пусто';
+      verdict.className = 'verdict no';
+      if(input.value.trim()) registerMistake(it.word);
+    }
+  });
+  document.getElementById(key+'-score').textContent = `${correctCount} / ${items.length}`;
+  updateGlobalScore();
+}
+
+function revealToggle(key){
+  const section = document.getElementById(key);
+  const reveals = section.querySelectorAll('.answer-reveal');
+  const willShow = ![...reveals].every(r=>r.classList.contains('shown'));
+  reveals.forEach(r=> r.classList.toggle('shown', willShow));
+  const btn = section.querySelector(`[data-reveal-toggle="${key}"]`);
+  btn.textContent = willShow ? 'Скрыть ответы' : 'Показать ответы';
+}
+
+function updateGlobalScore(){
+  let total=0, correct=0;
+  EXERCISES.forEach(ex=>{
+    const section = document.getElementById(ex.key);
+    total += section._items.length;
+    section._items.forEach(it=>{
+      const input = section.querySelector(`input[data-id="${it.id}"]`);
+      if(input.classList.contains('correct')) correct++;
+    });
+  });
+  document.getElementById('globalScore').textContent = `${correct} / ${total}`;
+}
+
+mainEl.addEventListener('click', e=>{
+  const c = e.target.closest('[data-check]');
+  if(c){ checkExercise(c.dataset.check); return; }
+  const r = e.target.closest('[data-reveal-toggle]');
+  if(r){ revealToggle(r.dataset.revealToggle); return; }
+  const cp = e.target.closest('[data-copy]');
+  if(cp){ copyExercise(cp.dataset.copy); return; }
+});
+
+/* =========================================================
+   COPY TO CLIPBOARD
+   ========================================================= */
+function stripHtml(html){
+  const tmp = document.createElement('div');
+  tmp.innerHTML = html.replace(/<br\s*\/?>/gi, ' / ');
+  return tmp.textContent.replace(/\s+/g,' ').trim();
+}
+
+function buildExerciseText(ex){
+  const section = document.getElementById(ex.key);
+  let out = `УПРАЖНЕНИЕ ${ex.num}. ${ex.title}\n`;
+  section._items.forEach((it,idx)=>{
+    const input = section.querySelector(`input[data-id="${it.id}"]`);
+    out += `${idx+1}. ${stripHtml(it.prompt)}\n   Ответ студента: ${input.value.trim() || '(пусто)'}\n`;
+  });
+  return out;
+}
+
+function copyExercise(key){
+  const ex = EXERCISES.find(e=>e.key===key);
+  const text = buildExerciseText(ex);
+  copyToClipboard(text);
+}
+
+function copyAll(){
+  let out = `MONEY & FINANCE — практика лексики\nОтветы студента\n\n`;
+  EXERCISES.forEach(ex=>{ out += buildExerciseText(ex) + '\n'; });
+  copyToClipboard(out);
+}
+
+function copyToClipboard(text){
+  const done = ()=>{
+    const toast = document.getElementById('copyToast');
+    toast.classList.add('show');
+    setTimeout(()=> toast.classList.remove('show'), 1600);
+  };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(done).catch(()=>fallbackCopy(text, done));
+  } else {
+    fallbackCopy(text, done);
+  }
+}
+function fallbackCopy(text, done){
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  try{ document.execCommand('copy'); done(); }catch(e){ alert('Не удалось скопировать автоматически. Скопируйте вручную.'); }
+  document.body.removeChild(ta);
+}
+
+document.getElementById('copyAllBtn').addEventListener('click', copyAll);
+document.getElementById('copyAllSideBtn').addEventListener('click', copyAll);
+
+/* Allow Enter key inside inputs to trigger check for that exercise */
+mainEl.addEventListener('keydown', e=>{
+  if(e.key === 'Enter' && e.target.classList.contains('answer')){
+    const section = e.target.closest('.exercise');
+    if(section) checkExercise(section.id);
+  }
+});
+</script>
+</body>
+</html>
