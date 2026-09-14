@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Character adjectives — практика</title>
+<style>
+  :root{
+    --paper:#F7F3E9;
+    --rule:#DCD3BE;
+    --ink:#28324A;
+    --ink-soft:#4A5573;
+    --accent:#C9862F;
+    --accent-dark:#9C6620;
+    --good:#3C7A4F;
+    --bad:#B04A3C;
+    --card:#FFFDF8;
+    --serif: Georgia, 'Times New Roman', serif;
+    --sans: 'Segoe UI', system-ui, -apple-system, Arial, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:var(--sans);
+    color:var(--ink);
+    background:
+      repeating-linear-gradient(var(--paper), var(--paper) 34px, var(--rule) 35px);
+    background-attachment:local;
+    line-height:1.5;
+  }
+  .wrap{
+    max-width:1180px;
+    margin:0 auto;
+    padding:32px 24px 100px;
+    display:grid;
+    grid-template-columns:1fr 260px;
+    gap:32px;
+    align-items:start;
+  }
+  header.page-title{
+    grid-column:1/-1;
+    padding-bottom:8px;
+    border-bottom:3px solid var(--ink);
+    margin-bottom:8px;
+  }
+  header.page-title h1{
+    font-family:var(--serif);
+    font-size:2.1rem;
+    margin:0 0 4px;
+    color:var(--ink);
+  }
+  header.page-title p{margin:0;color:var(--ink-soft);font-size:0.98rem;}
+
+  main{min-width:0;}
+
+  .recap{
+    background:var(--card);
+    border:1px solid var(--rule);
+    border-radius:4px;
+    padding:18px 20px 22px;
+    margin-bottom:36px;
+    box-shadow:0 1px 0 var(--rule);
+  }
+  .recap h2{font-family:var(--serif);font-size:1.3rem;margin:0 0 4px;}
+  .recap .hint{color:var(--ink-soft);font-size:0.9rem;margin:0 0 14px;}
+  table.recap-table{width:100%;border-collapse:collapse;}
+  table.recap-table th{
+    text-align:left;font-size:0.78rem;color:var(--ink-soft);
+    border-bottom:1px solid var(--rule);padding:6px 8px;font-weight:600;
+  }
+  table.recap-table td{
+    padding:8px 8px;border-bottom:1px solid var(--rule);vertical-align:middle;font-size:0.95rem;
+  }
+  table.recap-table tr:last-child td{border-bottom:none;}
+  .word-en{font-weight:700;}
+  .ipa{color:var(--ink-soft);font-size:0.9rem;}
+  .play-btn{
+    border:1px solid var(--accent-dark);
+    background:var(--accent);
+    color:#fff;
+    border-radius:50%;
+    width:30px;height:30px;
+    cursor:pointer;
+    font-size:0.95rem;
+    line-height:1;
+    display:inline-flex;align-items:center;justify-content:center;
+  }
+  .play-btn:hover{background:var(--accent-dark);}
+  .play-btn:active{transform:scale(0.94);}
+
+  section.exercise{
+    background:var(--card);
+    border:1px solid var(--rule);
+    border-radius:4px;
+    padding:20px 22px 24px;
+    margin-bottom:30px;
+    box-shadow:0 1px 0 var(--rule);
+  }
+  section.exercise h2{
+    font-family:var(--serif);
+    font-size:1.25rem;
+    margin:0 0 2px;
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+  }
+  section.exercise h2 .num{
+    color:var(--accent-dark);
+    font-family:var(--sans);
+    font-weight:700;
+    font-size:0.95rem;
+  }
+  section.exercise .task-desc{color:var(--ink-soft);font-size:0.92rem;margin:0 0 16px;}
+
+  .item-row{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:10px;
+    padding:9px 0;
+    border-bottom:1px dashed var(--rule);
+  }
+  .item-row:last-of-type{border-bottom:none;}
+  .item-label{flex:1 1 320px;min-width:200px;font-size:0.98rem;}
+  .item-label b{color:var(--ink);}
+  .item-label .small{display:block;color:var(--ink-soft);font-size:0.82rem;margin-top:2px;}
+
+  input.answer{
+    flex:0 0 220px;
+    padding:8px 10px;
+    border:1.5px solid var(--rule);
+    border-radius:3px;
+    font-size:0.95rem;
+    font-family:var(--sans);
+    background:#fff;
+  }
+  input.answer.wide{flex:1 1 320px;}
+  input.answer:focus{outline:none;border-color:var(--accent);}
+  input.answer.correct{border-color:var(--good);background:#EEF6EF;}
+  input.answer.incorrect{border-color:var(--bad);background:#FBEDEB;}
+
+  .tf-buttons{display:flex;gap:6px;}
+  .tf-btn{
+    padding:7px 14px;border:1.5px solid var(--rule);background:#fff;
+    border-radius:3px;cursor:pointer;font-size:0.88rem;font-weight:600;color:var(--ink-soft);
+  }
+  .tf-btn.selected-true{background:var(--good);border-color:var(--good);color:#fff;}
+  .tf-btn.selected-false{background:var(--bad);border-color:var(--bad);color:#fff;}
+  .tf-btn.reveal-correct{outline:2px solid var(--good);}
+
+  .answer-note{
+    flex-basis:100%;
+    font-size:0.85rem;
+    color:var(--accent-dark);
+    display:none;
+    padding-top:2px;
+  }
+  .answer-note.show{display:block;}
+
+  .ex-controls{display:flex;gap:10px;margin-top:16px;align-items:center;flex-wrap:wrap;}
+  button.action{
+    padding:9px 18px;
+    border:none;border-radius:3px;
+    cursor:pointer;font-size:0.9rem;font-weight:600;
+    font-family:var(--sans);
+  }
+  button.check{background:var(--ink);color:#fff;}
+  button.check:hover{background:var(--ink-soft);}
+  button.reveal{background:transparent;color:var(--accent-dark);border:1.5px solid var(--accent-dark);}
+  button.reveal:hover{background:var(--accent);color:#fff;border-color:var(--accent);}
+  .score-tag{font-size:0.88rem;color:var(--ink-soft);margin-left:auto;}
+  .score-tag b{color:var(--ink);}
+
+  aside.sidebar{
+    position:sticky;
+    top:24px;
+  }
+  .sticky-note{
+    background:#FBEFC9;
+    border:1px solid #E2CE8F;
+    border-radius:2px;
+    padding:16px 16px 18px;
+    box-shadow:3px 4px 0 rgba(0,0,0,0.08);
+    transform:rotate(-1deg);
+  }
+  .sticky-note h3{
+    font-family:var(--serif);
+    margin:0 0 4px;
+    font-size:1.05rem;
+    color:#5C4A16;
+  }
+  .sticky-note p.note-hint{margin:0 0 12px;font-size:0.8rem;color:#7A6526;}
+  #problemList{list-style:none;margin:0;padding:0;}
+  #problemList li{
+    padding:6px 4px;
+    border-bottom:1px solid #E2CE8F;
+    font-size:0.92rem;
+    color:#5C4A16;
+    display:flex;
+    justify-content:space-between;
+    gap:6px;
+  }
+  #problemList li:last-child{border-bottom:none;}
+  #problemList .count{
+    font-size:0.72rem;
+    background:#5C4A16;
+    color:#FBEFC9;
+    border-radius:10px;
+    padding:1px 7px;
+    align-self:center;
+  }
+  #problemEmpty{font-size:0.85rem;color:#8A7635;font-style:italic;}
+
+  .audio-note{
+    grid-column:1/-1;
+    background:#EDF1FB;
+    border:1px solid #C7D3EE;
+    border-radius:4px;
+    padding:10px 16px;
+    font-size:0.85rem;
+    color:var(--ink-soft);
+    margin-top:-8px;
+    margin-bottom:8px;
+  }
+
+  @media (max-width:820px){
+    .wrap{grid-template-columns:1fr;}
+    aside.sidebar{position:static;order:-1;}
+    .sticky-note{transform:none;}
+    input.answer{flex:1 1 160px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="page-title">
+    <h1>Character adjectives — практика</h1>
+    <p>Повторение прилагательных характера и 8 письменных упражнений с проверкой. Прописывайте ответы руками — так они лучше запоминаются.</p>
+  </header>
+
+  <div class="audio-note">🔊 Произношение озвучивается голосом <b>Google US English (en-US)</b>, если он доступен в вашем браузере (Chrome — самый надёжный вариант). Нажмите на кружок рядом со словом, чтобы прослушать.</div>
+
+  <main>
+
+    <section class="recap">
+      <h2>Слова для повторения</h2>
+      <p class="hint">Прослушайте произношение, посмотрите транскрипцию и перевод, прежде чем переходить к упражнениям.</p>
+      <table class="recap-table">
+        <thead><tr><th></th><th>Word</th><th>Transcription</th><th>Перевод</th></tr></thead>
+        <tbody id="recapBody"></tbody>
+      </table>
+    </section>
+
+    <!-- 1. Missing letters -->
+    <section class="exercise" id="ex1">
+      <h2><span class="num">1</span> Вставьте пропущенные буквы</h2>
+      <p class="task-desc">Впишите слово целиком по маске и переводу.</p>
+      <div id="ex1-body"></div>
+      <div class="ex-controls">
+        <button class="action check" onclick="checkExercise('ex1')">Проверить</button>
+        <button class="action reveal" onclick="revealExercise('ex1')">Показать ответы</button>
+        <span class="score-tag" id="ex1-score"></span>
+      </div>
+    </section>
+
+    <!-- 2. RU -> EN -->
+    <section class="exercise" id="ex2">
+      <h2><span class="num">2</span> Переведите с русского на английский</h2>
+      <p class="task-desc">Напишите английское прилагательное.</p>
+      <div id="ex2-body"></div>
+      <div class="ex-controls">
+        <button class="action check" onclick="checkExercise('ex2')">Проверить</button>
+        <button class="action reveal" onclick="revealExercise('ex2')">Показать ответы</button>
+        <span class="score-tag" id="ex2-score"></span>
+      </div>
+    </section>
+
+    <!-- 3. Write by sound -->
+    <section class="exercise" id="ex3">
+      <h2><span class="num">3</span> Прослушайте и запишите слово</h2>
+      <p class="task-desc">Нажмите 🔊, прослушайте произношение и напишите слово, которое услышали.</p>
+      <div id="ex3-body"></div>
+      <div class="ex-controls">
+        <button class="action check" onclick="checkExercise('ex3')">Проверить</button>
+        <button class="action reveal" onclick="revealExercise('ex3')">Показать ответы</button>
+        <span class="score-tag" id="ex3-score"></span>
+      </div>
+    </section>
+
+    <!-- 4. Definition -->
+    <section class="exercise" id="ex4">
+      <h2><span class="num">4</span> Дефиниция</h2>
+      <p class="task-desc">Прочитайте определение и напишите нужное слово.</p>
+      <div id="ex4-body"></div>
+      <div class="ex-controls">
+        <button class="action check" onclick="checkExercise('ex4')">Проверить</button>
+        <button class="action reveal" onclick="revealExercise('ex4')">Показать ответы</button>
+        <span class="score-tag" id="ex4-score"></span>
+      </div>
+    </section>
+
+    <!-- 5. Antonym -->
+    <section class="exercise" id="ex5">
+      <h2><span class="num">5</span> Антонимы</h2>
+      <p class="task-desc">Напишите антоним. Используйте только слова из списка вверху страницы.</p>
+      <div id="ex5-body"></div>
+      <div class="ex-controls">
+        <button class="action check" onclick="checkExercise('ex5')">Проверить</button>
+        <button class="action reveal" onclick="revealExercise('ex5')">Показать ответы</button>
+        <span class="score-tag" id="ex5-score"></span>
+      </div>
+    </section>
+
+    <!-- 6. True/False -->
+    <section class="exercise" id="ex6">
+      <h2><span class="num">6</span> True or False</h2>
+      <p class="task-desc">Отметьте, верно (True) или неверно (False) утверждение.</p>
+      <div id="ex6-body"></div>
+      <div class="ex-controls">
+        <button class="action check" onclick="checkExercise('ex6')">Проверить</button>
+        <button class="action reveal" onclick="revealExercise('ex6')">Показать ответы</button>
+        <span class="score-tag" id="ex6-score"></span>
+      </div>
+    </section>
+
+    <!-- 7. Rephrase to negative -->
+    <section class="exercise" id="ex7">
+      <h2><span class="num">7</span> Rephrase — замените на негативную форму</h2>
+      <p class="task-desc">Перепишите предложение целиком, заменив прилагательное на его негативную форму.</p>
+      <div id="ex7-body"></div>
+      <div class="ex-controls">
+        <button class="action check" onclick="checkExercise('ex7')">Проверить</button>
+        <button class="action reveal" onclick="revealExercise('ex7')">Показать ответы</button>
+        <span class="score-tag" id="ex7-score"></span>
+      </div>
+    </section>
+
+    <!-- 8. Use positive or negative form -->
+    <section class="exercise" id="ex8">
+      <h2><span class="num">8</span> Use the positive or negative form of the word in brackets</h2>
+      <p class="task-desc">Впишите пропуск нужной формой слова, данного в скобках (положительной или отрицательной — в зависимости от контекста).</p>
+      <div id="ex8-body"></div>
+      <div class="ex-controls">
+        <button class="action check" onclick="checkExercise('ex8')">Проверить</button>
+        <button class="action reveal" onclick="revealExercise('ex8')">Показать ответы</button>
+        <span class="score-tag" id="ex8-score"></span>
+      </div>
+    </section>
+
+  </main>
+
+  <aside class="sidebar">
+    <div class="sticky-note">
+      <h3>Проблемные слова</h3>
+      <p class="note-hint">Сюда попадают слова, в которых вы ошиблись хотя бы раз.</p>
+      <ul id="problemList"></ul>
+      <p id="problemEmpty">Пока нет ошибок 🙂</p>
+    </div>
+  </aside>
+
+</div>
+
+<script>
+/* ---------------- DATA ---------------- */
+const WORDS = [
+  {en:"affectionate", ipa:"/əˈfekʃənət/", ru:"ласковый, нежный", def:"showing feelings of love and care towards someone", opp:"cold", mask:"aff_ct_on_te"},
+  {en:"ambitious", ipa:"/æmˈbɪʃəs/", ru:"амбициозный, целеустремлённый", def:"having a strong wish to become successful, powerful or rich", opp:"unambitious", mask:"amb_t_ous"},
+  {en:"charming", ipa:"/ˈtʃɑːmɪŋ/", ru:"очаровательный, обаятельный", def:"very pleasant and attractive; easy to like", opp:null, mask:"ch_rm_ng"},
+  {en:"honest", ipa:"/ˈɒnɪst/", ru:"честный", def:"telling the truth and not stealing or cheating", opp:"dishonest", mask:"h_n_st"},
+  {en:"imaginative", ipa:"/ɪˈmædʒɪnətɪv/", ru:"с богатым воображением, изобретательный", def:"good at thinking of new and interesting ideas", opp:"unimaginative", mask:"im_g_n_t_ve"},
+  {en:"independent", ipa:"/ˌɪndɪˈpendənt/", ru:"независимый, самостоятельный", def:"not needing help or money from other people", opp:"dependent", mask:"in_ep_nd_nt"},
+  {en:"mature", ipa:"/məˈtʃʊə/", ru:"зрелый, взрослый по поведению", def:"behaving in a sensible way, like an adult", opp:"immature", mask:"m_t_re"},
+  {en:"patient", ipa:"/ˈpeɪʃənt/", ru:"терпеливый", def:"able to stay calm and wait for a long time without complaining", opp:"impatient", mask:"p_t_ent"},
+  {en:"reliable", ipa:"/rɪˈlaɪəbl/", ru:"надёжный", def:"able to be trusted to do what people expect", opp:"unreliable", mask:"rel_ab_e"},
+  {en:"self-confident", ipa:"/ˌselfˈkɒnfɪdənt/", ru:"уверенный в себе", def:"sure of your own abilities and value", opp:"insecure", mask:"self-conf_d_nt"},
+  {en:"sensible", ipa:"/ˈsensəbl/", ru:"благоразумный, рассудительный", def:"able to make good, practical decisions based on reason", opp:"irresponsible", mask:"sens_bl_"},
+  {en:"sociable", ipa:"/ˈsəʊʃəbl/", ru:"общительный", def:"enjoying being with and talking to other people; friendly", opp:"unsociable", mask:"soc_ab_e"}
+];
+
+const TF_STATEMENTS = [
+  {text:"Affectionate people show love and warmth towards others.", answer:true},
+  {text:"A sociable person prefers to be alone most of the time.", answer:false},
+  {text:"If you are patient, you get angry quickly when you have to wait.", answer:false},
+  {text:"A reliable person can be trusted to do what is expected.", answer:true},
+  {text:"Someone dishonest tells lies and cheats.", answer:true},
+  {text:"An unimaginative person has lots of creative, original ideas.", answer:false},
+  {text:"A mature person behaves in a sensible, adult way.", answer:true},
+  {text:"An independent person always needs help from other people.", answer:false},
+  {text:"A charming person is pleasant and easy to like.", answer:true},
+  {text:"Insecure people feel very sure of their own abilities.", answer:false},
+  {text:"An ambitious person has a strong wish to succeed.", answer:true},
+  {text:"A sensible person makes careless, unwise decisions.", answer:false},
+  {text:"Someone unsociable loves big parties and meeting new people.", answer:false},
+  {text:"An immature person behaves in a childish, not adult way.", answer:true}
+];
+
+const REPHRASE = [
+  {sentence:"She is very affectionate with her cat.", base:"affectionate", target:"cold", full:"She is very cold with her cat."},
+  {sentence:"He is an ambitious young manager.", base:"ambitious", target:"unambitious", full:"He is an unambitious young manager."},
+  {sentence:"My brother is always honest with me.", base:"honest", target:"dishonest", full:"My brother is always dishonest with me."},
+  {sentence:"The designer is extremely imaginative.", base:"imaginative", target:"unimaginative", full:"The designer is extremely unimaginative."},
+  {sentence:"My sister is fully independent now.", base:"independent", target:"dependent", full:"My sister is fully dependent now."},
+  {sentence:"For his age, he seems very mature.", base:"mature", target:"immature", full:"For his age, he seems very immature."},
+  {sentence:"The teacher is patient with beginners.", base:"patient", target:"impatient", full:"The teacher is impatient with beginners."},
+  {sentence:"This old car is surprisingly reliable.", base:"reliable", target:"unreliable", full:"This old car is surprisingly unreliable."},
+  {sentence:"The new intern seems self-confident.", base:"self-confident", target:"insecure", full:"The new intern seems insecure."},
+  {sentence:"Leaving early was a sensible decision.", base:"sensible", target:"irresponsible", full:"Leaving early was an irresponsible decision."},
+  {sentence:"My neighbours are very sociable.", base:"sociable", target:"unsociable", full:"My neighbours are very unsociable."}
+];
+
+const POSNEG = [
+  {sentence:"He always tells the truth, so I think he's ______.", bracket:"HONEST", answer:"honest"},
+  {sentence:"She never tells the truth, she's completely ______.", bracket:"HONEST", answer:"dishonest"},
+  {sentence:"My little brother behaves like a child, he's so ______.", bracket:"MATURE", answer:"immature"},
+  {sentence:"For someone so young, she is remarkably ______.", bracket:"MATURE", answer:"mature"},
+  {sentence:"He hates waiting in queues, he's very ______.", bracket:"PATIENT", answer:"impatient"},
+  {sentence:"The nurse stayed calm all day, she was very ______.", bracket:"PATIENT", answer:"patient"},
+  {sentence:"You can always count on him, he's extremely ______.", bracket:"RELIABLE", answer:"reliable"},
+  {sentence:"The old printer breaks down every week, it's really ______.", bracket:"RELIABLE", answer:"unreliable"},
+  {sentence:"She still lives with her parents and needs their help, she's quite ______.", bracket:"INDEPENDENT", answer:"dependent"},
+  {sentence:"At eighteen, he moved out and supports himself, he's fully ______.", bracket:"INDEPENDENT", answer:"independent"},
+  {sentence:"He never has any new ideas at work, he's rather ______.", bracket:"IMAGINATIVE", answer:"unimaginative"},
+  {sentence:"The artist comes up with brilliant new concepts, she's very ______.", bracket:"IMAGINATIVE", answer:"imaginative"}
+];
+
+/* ---------------- HELPERS ---------------- */
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+function norm(s){
+  return (s||"").toLowerCase().trim().replace(/[.!?]+$/,"").replace(/\s+/g," ");
+}
+
+/* problem words tracker */
+const problemWords = {}; // word -> count
+function markProblem(word){
+  if(!word) return;
+  problemWords[word] = (problemWords[word]||0)+1;
+  renderProblemList();
+}
+function renderProblemList(){
+  const ul = document.getElementById('problemList');
+  const empty = document.getElementById('problemEmpty');
+  const keys = Object.keys(problemWords);
+  ul.innerHTML = "";
+  if(keys.length===0){ empty.style.display='block'; return; }
+  empty.style.display='none';
+  keys.sort((a,b)=>problemWords[b]-problemWords[a]).forEach(w=>{
+    const li = document.createElement('li');
+    li.innerHTML = `<span>${w}</span><span class="count">${problemWords[w]}</span>`;
+    ul.appendChild(li);
+  });
+}
+
+/* speech synthesis */
+let chosenVoice = null;
+function pickVoice(){
+  const voices = window.speechSynthesis ? window.speechSynthesis.getVoices() : [];
+  chosenVoice = voices.find(v=>v.name.includes('Google US English') && v.lang==='en-US')
+    || voices.find(v=>v.name.toLowerCase().includes('google') && v.lang==='en-US')
+    || voices.find(v=>v.lang==='en-US')
+    || voices.find(v=>v.lang && v.lang.startsWith('en'))
+    || null;
+}
+if('speechSynthesis' in window){
+  pickVoice();
+  window.speechSynthesis.onvoiceschanged = pickVoice;
+}
+function speak(word){
+  if(!('speechSynthesis' in window)){
+    alert('Ваш браузер не поддерживает озвучивание речи.');
+    return;
+  }
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(word);
+  u.lang = 'en-US';
+  u.rate = 0.9;
+  if(chosenVoice) u.voice = chosenVoice;
+  window.speechSynthesis.speak(u);
+}
+
+/* ---------------- RENDER: recap table ---------------- */
+function renderRecap(){
+  const body = document.getElementById('recapBody');
+  WORDS.forEach(w=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><button class="play-btn" title="Слушать" onclick="speak('${w.en}')">🔊</button></td>
+      <td class="word-en">${w.en}</td>
+      <td class="ipa">${w.ipa}</td>
+      <td>${w.ru}</td>`;
+    body.appendChild(tr);
+  });
+}
+
+/* ---------------- GENERIC CHECK / REVEAL ---------------- */
+function checkExercise(id){
+  const container = document.getElementById(id);
+  const inputs = container.querySelectorAll('input.answer[data-answer]');
+  let correctCount = 0, total = 0;
+  inputs.forEach(inp=>{
+    total++;
+    const accepted = inp.dataset.answer.split('|').map(norm);
+    const val = norm(inp.value);
+    const isCorrect = accepted.includes(val) && val.length>0;
+    inp.classList.remove('correct','incorrect');
+    if(isCorrect){
+      inp.classList.add('correct');
+      correctCount++;
+    } else {
+      inp.classList.add('incorrect');
+      markProblem(inp.dataset.word || accepted[0]);
+    }
+  });
+  // true/false items
+  const tfRows = container.querySelectorAll('.tf-row');
+  tfRows.forEach(row=>{
+    total++;
+    const correctAns = row.dataset.answer === 'true';
+    const chosen = row.dataset.chosen;
+    const isCorrect = chosen !== undefined && (chosen === row.dataset.answer);
+    if(isCorrect){ correctCount++; }
+    else { markProblem(row.dataset.word); }
+    row.querySelectorAll('.tf-btn').forEach(btn=>btn.classList.remove('reveal-correct'));
+    if(!isCorrect){
+      const btn = row.querySelector(`.tf-btn[data-val="${row.dataset.answer}"]`);
+      if(btn) btn.classList.add('reveal-correct');
+    }
+  });
+  const scoreTag = document.getElementById(id+'-score');
+  if(scoreTag) scoreTag.innerHTML = `Результат: <b>${correctCount} / ${total}</b>`;
+}
+
+function revealExercise(id){
+  const container = document.getElementById(id);
+  container.querySelectorAll('input.answer[data-answer]').forEach(inp=>{
+    const noteId = inp.dataset.noteFor;
+    const answer = inp.dataset.answer.split('|')[0];
+    if(noteId){
+      const note = document.getElementById(noteId);
+      if(note){ note.textContent = 'Ответ: ' + answer; note.classList.add('show'); }
+    } else {
+      inp.placeholder = 'Ответ: ' + answer;
+    }
+  });
+  container.querySelectorAll('.tf-row').forEach(row=>{
+    row.querySelectorAll('.tf-btn').forEach(btn=>btn.classList.remove('reveal-correct'));
+    const btn = row.querySelector(`.tf-btn[data-val="${row.dataset.answer}"]`);
+    if(btn) btn.classList.add('reveal-correct');
+  });
+}
+
+/* ---------------- BUILD EXERCISE 1: missing letters ---------------- */
+function buildEx1(){
+  const body = document.getElementById('ex1-body');
+  shuffle(WORDS).forEach(w=>{
+    const row = document.createElement('div');
+    row.className = 'item-row';
+    row.innerHTML = `
+      <div class="item-label"><b>${w.mask}</b><span class="small">${w.ru}</span></div>
+      <input class="answer" type="text" placeholder="впишите слово" data-answer="${w.en}" data-word="${w.en}">`;
+    body.appendChild(row);
+  });
+}
+
+/* ---------------- BUILD EXERCISE 2: RU -> EN ---------------- */
+function buildEx2(){
+  const body = document.getElementById('ex2-body');
+  shuffle(WORDS).forEach(w=>{
+    const row = document.createElement('div');
+    row.className = 'item-row';
+    row.innerHTML = `
+      <div class="item-label">${w.ru}</div>
+      <input class="answer" type="text" placeholder="English word" data-answer="${w.en}" data-word="${w.en}">`;
+    body.appendChild(row);
+  });
+}
+
+/* ---------------- BUILD EXERCISE 3: write by sound ---------------- */
+function buildEx3(){
+  const body = document.getElementById('ex3-body');
+  shuffle(WORDS).forEach(w=>{
+    const row = document.createElement('div');
+    row.className = 'item-row';
+    row.innerHTML = `
+      <button class="play-btn" title="Слушать" onclick="speak('${w.en}')">🔊</button>
+      <div class="item-label">Прослушайте слово и запишите его</div>
+      <input class="answer" type="text" placeholder="напишите слово" data-answer="${w.en}" data-word="${w.en}">`;
+    body.appendChild(row);
+  });
+}
+
+/* ---------------- BUILD EXERCISE 4: definition ---------------- */
+function buildEx4(){
+  const body = document.getElementById('ex4-body');
+  shuffle(WORDS).forEach(w=>{
+    const row = document.createElement('div');
+    row.className = 'item-row';
+    row.innerHTML = `
+      <div class="item-label">${w.def}</div>
+      <input class="answer" type="text" placeholder="word" data-answer="${w.en}" data-word="${w.en}">`;
+    body.appendChild(row);
+  });
+}
+
+/* ---------------- BUILD EXERCISE 5: antonym ---------------- */
+function buildEx5(){
+  const body = document.getElementById('ex5-body');
+  const withOpp = shuffle(WORDS.filter(w=>w.opp));
+  withOpp.forEach(w=>{
+    const giveOpp = Math.random() < 0.5; // sometimes give the negative, ask for the positive
+    const shown = giveOpp ? w.opp : w.en;
+    const answer = giveOpp ? w.en : w.opp;
+    const row = document.createElement('div');
+    row.className = 'item-row';
+    row.innerHTML = `
+      <div class="item-label">Antonym of <b>${shown}</b></div>
+      <input class="answer" type="text" placeholder="antonym" data-answer="${answer}" data-word="${answer}">`;
+    body.appendChild(row);
+  });
+}
+
+/* ---------------- BUILD EXERCISE 6: true/false ---------------- */
+function buildEx6(){
+  const body = document.getElementById('ex6-body');
+  shuffle(TF_STATEMENTS).forEach((s,idx)=>{
+    const row = document.createElement('div');
+    row.className = 'item-row tf-row';
+    row.dataset.answer = s.answer ? 'true' : 'false';
+    row.dataset.word = s.text.split(' ')[0];
+    row.innerHTML = `
+      <div class="item-label">${s.text}</div>
+      <div class="tf-buttons">
+        <button type="button" class="tf-btn" data-val="true" onclick="selectTF(this,true)">True</button>
+        <button type="button" class="tf-btn" data-val="false" onclick="selectTF(this,false)">False</button>
+      </div>`;
+    body.appendChild(row);
+  });
+}
+function selectTF(btn, valBool){
+  const row = btn.closest('.tf-row');
+  row.dataset.chosen = valBool ? 'true' : 'false';
+  row.querySelectorAll('.tf-btn').forEach(b=>{
+    b.classList.remove('selected-true','selected-false','reveal-correct');
+  });
+  btn.classList.add(valBool ? 'selected-true' : 'selected-false');
+}
+
+/* ---------------- BUILD EXERCISE 7: rephrase to negative ---------------- */
+function buildEx7(){
+  const body = document.getElementById('ex7-body');
+  shuffle(REPHRASE).forEach((r,idx)=>{
+    const noteId = 'ex7-note-'+idx;
+    const row = document.createElement('div');
+    row.className = 'item-row';
+    row.innerHTML = `
+      <div class="item-label">${r.sentence}<span class="small">Переделайте, используя негативную форму слова «${r.base}».</span></div>
+      <input class="answer wide" type="text" placeholder="new sentence" data-answer="${r.target}" data-word="${r.target}" data-note-for="${noteId}">
+      <div class="answer-note" id="${noteId}"></div>`;
+    body.appendChild(row);
+  });
+}
+// override checking for ex7: accept if input contains target word anywhere
+function checkEx7Special(){
+  const container = document.getElementById('ex7');
+  const inputs = container.querySelectorAll('input.answer[data-answer]');
+  let correctCount = 0, total = 0;
+  inputs.forEach(inp=>{
+    total++;
+    const target = norm(inp.dataset.answer);
+    const val = norm(inp.value);
+    const isCorrect = val.length>0 && val.indexOf(target) !== -1;
+    inp.classList.remove('correct','incorrect');
+    if(isCorrect){ inp.classList.add('correct'); correctCount++; }
+    else { inp.classList.add('incorrect'); markProblem(inp.dataset.word); }
+  });
+  const scoreTag = document.getElementById('ex7-score');
+  if(scoreTag) scoreTag.innerHTML = `Результат: <b>${correctCount} / ${total}</b>`;
+}
+function revealEx7Special(){
+  const container = document.getElementById('ex7');
+  const items = shuffledRephraseRef; // full sentences in order rendered
+  const inputs = container.querySelectorAll('input.answer[data-answer]');
+  inputs.forEach((inp)=>{
+    const noteId = inp.dataset.noteFor;
+    const full = rephraseFullByTarget[inp.dataset.word];
+    const note = document.getElementById(noteId);
+    if(note){ note.textContent = 'Ответ: ' + full; note.classList.add('show'); }
+  });
+}
+let rephraseFullByTarget = {};
+
+/* ---------------- BUILD EXERCISE 8: pos/neg in brackets ---------------- */
+function buildEx8(){
+  const body = document.getElementById('ex8-body');
+  shuffle(POSNEG).forEach(p=>{
+    const row = document.createElement('div');
+    row.className = 'item-row';
+    row.innerHTML = `
+      <div class="item-label">${p.sentence}<span class="small">(${p.bracket})</span></div>
+      <input class="answer" type="text" placeholder="form" data-answer="${p.answer}" data-word="${p.answer}">`;
+    body.appendChild(row);
+  });
+}
+
+/* ---------------- INIT ---------------- */
+document.addEventListener('DOMContentLoaded', ()=>{
+  renderRecap();
+  buildEx1();
+  buildEx2();
+  buildEx3();
+  buildEx4();
+  buildEx5();
+  buildEx6();
+  buildEx7();
+  REPHRASE.forEach(r=>{ rephraseFullByTarget[r.target] = r.full; });
+  buildEx8();
+  renderProblemList();
+
+  // patch the generic check/reveal buttons for ex7 to use special logic
+  const ex7 = document.getElementById('ex7');
+  const checkBtn = ex7.querySelector('button.check');
+  const revealBtn = ex7.querySelector('button.reveal');
+  checkBtn.setAttribute('onclick','checkEx7Special()');
+  revealBtn.setAttribute('onclick','revealEx7Special()');
+});
+</script>
+</body>
+</html>
