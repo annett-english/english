@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Already · Just · Yet · For · Since — тренажёр</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#ECE7DC;
+    --paper-deep:#DED6C2;
+    --ink:#262620;
+    --ink-soft:#6B6A5F;
+    --line:#CBC1A6;
+    --teal:#21706B;
+    --teal-deep:#15514D;
+    --mustard:#C99A2E;
+    --rust:#B6502F;
+    --slate:#4B5A63;
+    --green:#3F7D4F;
+    --green-bg:#E4EEE0;
+    --red:#B3402C;
+    --red-bg:#F3E3DD;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Work Sans', sans-serif;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    margin:0 0 .4em 0;
+    letter-spacing:.2px;
+  }
+  .app{
+    display:grid;
+    grid-template-columns:230px 1fr;
+    min-height:100vh;
+  }
+  header.top{
+    grid-column:1 / -1;
+    padding:34px 40px 18px 40px;
+    border-bottom:2px solid var(--ink);
+  }
+  header.top h1{font-size:2.1rem;}
+  header.top p{margin:0;color:var(--ink-soft);max-width:640px;}
+  nav.side{
+    padding:24px 0;
+    border-right:2px solid var(--ink);
+    background:var(--paper-deep);
+  }
+  nav.side button{
+    display:block;
+    width:100%;
+    text-align:left;
+    background:none;
+    border:none;
+    border-left:4px solid transparent;
+    font-family:'Work Sans',sans-serif;
+    font-size:.95rem;
+    padding:12px 20px;
+    cursor:pointer;
+    color:var(--ink);
+  }
+  nav.side button:hover{background:rgba(0,0,0,.04);}
+  nav.side button.active{
+    border-left-color:var(--teal);
+    background:var(--paper);
+    font-weight:600;
+    color:var(--teal-deep);
+  }
+  main{padding:36px 46px 80px 46px;}
+  section.panel{display:none;max-width:820px;}
+  section.panel.active{display:block;}
+  .lead{color:var(--ink-soft);margin-bottom:26px;}
+
+  /* THEORY */
+  .rule-grid{display:flex;flex-wrap:wrap;gap:14px;margin:24px 0 30px 0;}
+  .rule-card{
+    flex:1 1 160px;
+    border:2px solid var(--ink);
+    border-top:6px solid var(--accent,var(--teal));
+    padding:14px 14px 16px 14px;
+    background:var(--paper-deep);
+  }
+  .rule-card h3{font-size:1.2rem;margin-bottom:2px;}
+  .rule-card .tr{color:var(--ink-soft);font-size:.85rem;margin-bottom:8px;}
+  .rule-card p{margin:0 0 6px 0;font-size:.88rem;}
+  .rule-card .ex{font-style:italic;font-size:.85rem;color:var(--teal-deep);}
+  .helper-box{
+    border:2px dashed var(--ink);
+    padding:14px 18px;
+    background:var(--paper);
+    font-size:.95rem;
+    margin-bottom:10px;
+  }
+  .helper-box b{color:var(--rust);}
+
+  /* EXERCISE ITEMS */
+  .item{
+    border-bottom:1px solid var(--line);
+    padding:18px 0;
+  }
+  .item:last-of-type{border-bottom:none;}
+  .item .num{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    color:var(--teal-deep);
+    margin-right:6px;
+  }
+  .item .prompt{margin-bottom:10px;}
+  .options label{
+    display:inline-block;
+    margin:0 14px 6px 0;
+    padding:6px 12px;
+    border:1.5px solid var(--ink);
+    cursor:pointer;
+    background:var(--paper);
+    font-size:.92rem;
+  }
+  .options input{margin-right:6px;}
+  .item input[type=text], .item textarea{
+    width:100%;
+    font-family:'Work Sans',sans-serif;
+    font-size:.95rem;
+    padding:8px 10px;
+    border:1.5px solid var(--ink);
+    background:#fff;
+    color:var(--ink);
+  }
+  .item textarea{min-height:56px;resize:vertical;}
+  .hint{color:var(--ink-soft);font-size:.82rem;margin-top:4px;}
+  .explain{
+    margin-top:10px;
+    padding:10px 14px;
+    border-left:4px solid var(--teal);
+    background:var(--paper-deep);
+    font-size:.88rem;
+    display:none;
+  }
+  .explain.show{display:block;}
+  .item.correct{background:var(--green-bg);}
+  .item.incorrect{background:var(--red-bg);}
+  .item.correct, .item.incorrect{padding-left:10px;padding-right:10px;}
+  .verdict{font-weight:600;font-size:.85rem;margin-top:6px;}
+  .verdict.ok{color:var(--green);}
+  .verdict.bad{color:var(--red);}
+
+  .toolbar{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin:22px 0 6px 0;
+  }
+  button.action{
+    font-family:'Work Sans',sans-serif;
+    font-weight:600;
+    font-size:.9rem;
+    padding:10px 18px;
+    border:2px solid var(--ink);
+    background:var(--ink);
+    color:var(--paper);
+    cursor:pointer;
+  }
+  button.action.secondary{
+    background:var(--paper);
+    color:var(--ink);
+  }
+  button.action:hover{opacity:.85;}
+  .score{font-weight:600;margin-left:6px;}
+
+  .passage{
+    border:2px solid var(--ink);
+    background:var(--paper-deep);
+    padding:18px 20px;
+    font-size:.98rem;
+    margin-bottom:24px;
+  }
+  .passage b{color:var(--teal-deep);}
+
+  .toast{
+    position:fixed;
+    bottom:24px;
+    right:24px;
+    background:var(--ink);
+    color:var(--paper);
+    padding:12px 20px;
+    font-size:.9rem;
+    opacity:0;
+    transform:translateY(10px);
+    transition:opacity .25s, transform .25s;
+    pointer-events:none;
+  }
+  .toast.show{opacity:1;transform:translateY(0);}
+
+  @media(max-width:760px){
+    .app{grid-template-columns:1fr;}
+    nav.side{
+      display:flex;
+      overflow-x:auto;
+      border-right:none;
+      border-bottom:2px solid var(--ink);
+      padding:10px;
+      gap:4px;
+    }
+    nav.side button{
+      white-space:nowrap;
+      border-left:none;
+      border-bottom:4px solid transparent;
+    }
+    nav.side button.active{border-bottom-color:var(--teal);border-left:none;}
+    main{padding:24px 18px 60px 18px;}
+    header.top{padding:22px 18px 14px 18px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header class="top">
+    <h1>Already · Just · Yet · For · Since</h1>
+    <p>Правило, 6 упражнений по 7 заданий в каждом. Проверяйте себя, смотрите объяснения и копируйте свои ответы одной кнопкой.</p>
+  </header>
+
+  <nav class="side" id="nav">
+    <button data-target="theory" class="active">Правило</button>
+    <button data-target="ex1">Упр. 1 — Выбери ответ</button>
+    <button data-target="ex2">Упр. 2 — Заполни пропуски</button>
+    <button data-target="ex3">Упр. 3 — Перефразируй</button>
+    <button data-target="ex4">Упр. 4 — Угадай вопрос</button>
+    <button data-target="ex5">Упр. 5 — Закончи фразу</button>
+    <button data-target="ex6">Упр. 6 — Текст и вопросы</button>
+  </nav>
+
+  <main>
+
+    <!-- THEORY -->
+    <section class="panel active" id="theory">
+      <h2>Как выбрать нужное слово</h2>
+      <div class="helper-box">
+        <b>For</b> отвечает на вопрос «сколько времени?» (период), <b>since</b> — на вопрос «с какого момента?» (точка отсчёта).
+      </div>
+      <div class="helper-box">
+        <b>Already</b> и <b>just</b> — в утвердительных предложениях, между have/has и причастием. <b>Yet</b> — в вопросах и отрицаниях, в конце предложения.
+      </div>
+
+      <div class="rule-grid">
+        <div class="rule-card" style="--accent:var(--teal)">
+          <h3>already</h3>
+          <div class="tr">уже</div>
+          <p>Утвердительные предложения. Действие произошло раньше, чем ожидалось, или это приятная неожиданность. Стоит между have/has и Participle II (иногда в конце фразы для эмфазы).</p>
+          <div class="ex">She has already left the office.</div>
+        </div>
+        <div class="rule-card" style="--accent:var(--mustard)">
+          <h3>just</h3>
+          <div class="tr">только что</div>
+          <p>Утвердительные предложения. Действие завершилось буквально минуту назад. Стоит между have/has и причастием.</p>
+          <div class="ex">We have just arrived at the hotel.</div>
+        </div>
+        <div class="rule-card" style="--accent:var(--rust)">
+          <h3>yet</h3>
+          <div class="tr">ещё (не) / уже</div>
+          <p>Вопросы и отрицания. В вопросе уточняем, случилось ли что-то к текущему моменту; в отрицании — что действие ожидается, но не произошло. Стоит в конце предложения.</p>
+          <div class="ex">Have you called her yet? I haven't called her yet.</div>
+        </div>
+        <div class="rule-card" style="--accent:var(--slate)">
+          <h3>for</h3>
+          <div class="tr">в течение</div>
+          <p>Указывает продолжительность действия — сколько времени оно длится. Сочетается с количеством времени.</p>
+          <div class="ex">I have worked here for five years.</div>
+        </div>
+        <div class="rule-card" style="--accent:var(--teal-deep)">
+          <h3>since</h3>
+          <div class="tr">с (какого-то момента)</div>
+          <p>Указывает начальную точку отсчёта — когда действие началось. Сочетается с датой, моментом или предложением-точкой во времени.</p>
+          <div class="ex">I have worked here since 2019.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- EXERCISE 1: CHOOSE THE CORRECT ANSWER -->
+    <section class="panel" id="ex1">
+      <h2>Упражнение 1 — Choose the correct answer</h2>
+      <p class="lead">Выберите правильный вариант и нажмите «Проверить». Каждый ответ сопровождается объяснением.</p>
+      <div id="ex1-items"></div>
+      <div class="toolbar">
+        <button class="action" onclick="checkChoice('ex1-items')">Проверить</button>
+        <button class="action secondary" onclick="revealAll('ex1-items')">Показать все ответы</button>
+      </div>
+    </section>
+
+    <!-- EXERCISE 2: FILL IN THE GAPS -->
+    <section class="panel" id="ex2">
+      <h2>Упражнение 2 — Fill in the gaps</h2>
+      <p class="lead">Впишите подходящее слово: already, just, yet, for или since.</p>
+      <div id="ex2-items"></div>
+      <div class="toolbar">
+        <button class="action" onclick="checkFill('ex2-items')">Проверить</button>
+        <button class="action secondary" onclick="revealAll('ex2-items')">Показать все ответы</button>
+      </div>
+    </section>
+
+    <!-- EXERCISE 3: REPHRASE -->
+    <section class="panel" id="ex3">
+      <h2>Упражнение 3 — Rephrase</h2>
+      <p class="lead">Перефразируйте предложение, используя указанное слово. Ответы открытые — нажмите «Показать ответ», чтобы сверить свой вариант с примером и объяснением.</p>
+      <div id="ex3-items"></div>
+      <div class="toolbar">
+        <button class="action secondary" onclick="revealAll('ex3-items')">Показать все ответы</button>
+      </div>
+    </section>
+
+    <!-- EXERCISE 4: GUESS THE QUESTION -->
+    <section class="panel" id="ex4">
+      <h2>Упражнение 4 — Guess the question</h2>
+      <p class="lead">По ответу восстановите вопрос, используя already, just, yet, for или since.</p>
+      <div id="ex4-items"></div>
+      <div class="toolbar">
+        <button class="action secondary" onclick="revealAll('ex4-items')">Показать все ответы</button>
+      </div>
+    </section>
+
+    <!-- EXERCISE 5: FINISH THE SENTENCES -->
+    <section class="panel" id="ex5">
+      <h2>Упражнение 5 — Finish the sentences</h2>
+      <p class="lead">Закончите предложения своими идеями. Правильных ответов нет — важно грамотно употребить слово. Все ваши ответы можно скопировать одной кнопкой.</p>
+      <div id="ex5-items"></div>
+      <div class="toolbar">
+        <button class="action" onclick="copyAnswers('ex5-items','Упражнение 5 — мои ответы')">Скопировать все ответы</button>
+      </div>
+    </section>
+
+    <!-- EXERCISE 6: TEXT + QUESTIONS -->
+    <section class="panel" id="ex6">
+      <h2>Упражнение 6 — Text and questions</h2>
+      <p class="lead">Прочитайте текст и составьте 7 вопросов к нему, используя выделенные слова. Готовых правильных ответов нет — только примеры для сверки.</p>
+      <div class="passage">
+        Emma has lived in Manchester <b>since</b> 2019, but she still misses her hometown.
+        She has worked at the same marketing company <b>for</b> almost five years, and she has
+        <b>just</b> been promoted to team leader. Her best friend Olivia has <b>already</b> visited
+        her new flat twice, but Emma's parents haven't seen it <b>yet</b> — they're planning to come
+        next month. <b>Since</b> moving to the city, Emma has made a lot of new friends, though she
+        hasn't found a favourite café <b>yet</b>. Yesterday she finally tried the coffee shop near
+        her office, and she has <b>just</b> decided it's her new favourite place.
+      </div>
+      <div id="ex6-items"></div>
+      <div class="toolbar">
+        <button class="action" onclick="copyAnswers('ex6-items','Упражнение 6 — мои вопросы')">Скопировать все вопросы</button>
+        <button class="action secondary" onclick="revealAll('ex6-items')">Показать примеры вопросов</button>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<div class="toast" id="toast">Скопировано!</div>
+
+<script>
+/* ---------- navigation ---------- */
+const navButtons = document.querySelectorAll('nav.side button');
+navButtons.forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    navButtons.forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('section.panel').forEach(p=>p.classList.remove('active'));
+    document.getElementById(btn.dataset.target).classList.add('active');
+    window.scrollTo({top:0,behavior:'smooth'});
+  });
+});
+
+/* ---------- data ---------- */
+
+const ex1data = [
+ {q:'I have ___ finished my homework, so I can go out now.', options:['already','yet'], correct:'already',
+  explain:'Утвердительное предложение: действие завершилось раньше, чем ожидалось → already, стоит перед причастием.'},
+ {q:'Have you finished your report ___?', options:['yet','already'], correct:'yet',
+  explain:'Нейтральный вопрос о том, случилось ли действие к настоящему моменту → yet, в конце предложения.'},
+ {q:"She has ___ heard the news — I told her five minutes ago.", options:['just','since'], correct:'just',
+  explain:'Действие произошло совсем недавно (пять минут назад) → just, между has и причастием.'},
+ {q:"I haven't seen that film ___.", options:['yet','for'], correct:'yet',
+  explain:'Отрицание с ожиданием, что действие всё же произойдёт → yet, в конце предложения.'},
+ {q:'They have been married ___ 2010.', options:['since','for'], correct:'since',
+  explain:'Указана точка отсчёта — конкретный год → since.'},
+ {q:'We have lived in this house ___ ten years.', options:['for','since'], correct:'for',
+  explain:'Указана продолжительность — количество лет → for.'},
+ {q:"Look! The bus has ___ arrived — let's hurry!", options:['just','yet'], correct:'just',
+  explain:'Действие произошло буквально сейчас, в момент речи → just.'},
+];
+
+const ex2data = [
+ {q:'My sister has ______ passed her driving test — she\'s so happy! <span class="hint">(только что)</span>', answer:'just',
+  explain:'«Только что» — недавно завершённое действие → just, между has и причастием.'},
+ {q:'Has the postman come ______? <span class="hint">(ещё)</span>', answer:'yet',
+  explain:'Вопрос о том, произошло ли действие к текущему моменту → yet, конец предложения.'},
+ {q:"I have known him ______ we were at school together. <span class=\"hint\">(с тех пор как)</span>", answer:'since',
+  explain:'Указана точка отсчёта в прошлом (событие-момент) → since + придаточное предложение.'},
+ {q:'She has worked as a nurse ______ eight years. <span class="hint">(в течение)</span>', answer:'for',
+  explain:'Указана продолжительность — восемь лет → for.'},
+ {q:'We have ______ finished dinner, would you like some dessert? <span class="hint">(уже)</span>', answer:'already',
+  explain:'Утверждение о том, что действие уже произошло → already, перед причастием.'},
+ {q:"I haven't finished the book ______. <span class=\"hint\">(ещё не)</span>", answer:'yet',
+  explain:'Отрицание, действие ожидается в будущем → yet, конец предложения.'},
+ {q:'He has lived in Berlin ______ he was ten years old. <span class="hint">(с тех пор как)</span>', answer:'since',
+  explain:'Точка отсчёта — момент в прошлом («когда ему было 10») → since.'},
+];
+
+const ex3data = [
+ {q:"It started raining two hours ago and it's still raining. <span class=\"hint\">(rephrase with: for)</span>",
+  model:'It has been raining for two hours.',
+  explain:'Действие длится определённый период → for + количество времени, Present Perfect Continuous подчёркивает продолжительность.'},
+ {q:'My parents got married in 1995 and they are still married. <span class="hint">(rephrase with: since)</span>',
+  model:'My parents have been married since 1995.',
+  explain:'Указан момент начала состояния → since + дата.'},
+ {q:'Is your homework finished? I want to know now. <span class="hint">(rephrase with: yet)</span>',
+  model:'Have you finished your homework yet?',
+  explain:'Нейтральный вопрос о завершённости действия → yet в конце вопроса.'},
+ {q:'The film ended a minute ago. <span class="hint">(rephrase with: just)</span>',
+  model:'The film has just ended.',
+  explain:'Действие завершилось совсем недавно → just между has и причастием.'},
+ {q:'I finished this task earlier than I expected. <span class="hint">(rephrase with: already)</span>',
+  model:'I have already finished this task.',
+  explain:'Действие произошло раньше ожидаемого → already перед причастием.'},
+ {q:'We started living here in September and we still live here. <span class="hint">(rephrase with: since)</span>',
+  model:'We have lived here since September.',
+  explain:'Указана точка отсчёта (месяц начала) → since.'},
+ {q:"I haven't received an answer up until now. <span class=\"hint\">(rephrase with: yet)</span>",
+  model:"I haven't received an answer yet.",
+  explain:'Отрицание с ожиданием ответа в будущем → yet в конце предложения.'},
+];
+
+const ex4data = [
+ {a:'Yes, I have already booked the tickets.', model:'Have you already booked the tickets?',
+  explain:'Already в утвердительном ответе → в вопросе тоже уместно already, когда спрашивают с удивлением/интересом о завершённом действии.'},
+ {a:"No, she hasn't finished her project yet.", model:'Has she finished her project yet?',
+  explain:'Отрицательный ответ с yet → вопрос строится с yet в конце.'},
+ {a:'I have lived here for three years.', model:'How long have you lived here?',
+  explain:'В ответе указана продолжительность (for) → вопрос задаётся через How long...?'},
+ {a:'We have known each other since 2018.', model:'How long have you known each other? / Since when have you known each other?',
+  explain:'В ответе указана точка отсчёта (since) → вопрос можно задать через How long или Since when.'},
+ {a:'Yes, he has just left the office.', model:'Has he just left the office?',
+  explain:'Just в ответе → сохраняем just в вопросе, между has и причастием.'},
+ {a:"No, I haven't tried that restaurant yet.", model:'Have you tried that restaurant yet?',
+  explain:'Отрицание с yet → вопрос строится с yet в конце фразы.'},
+ {a:'They have been waiting for two hours.', model:'How long have they been waiting?',
+  explain:'For указывает на продолжительность → вопрос через How long...?'},
+];
+
+const ex5data = [
+ 'I have already ...',
+ "I haven't ... yet.",
+ 'I have just ...',
+ 'I have lived in my city for ...',
+ 'I have known my best friend since ...',
+ 'My family has already ...',
+ "I haven't tried ... yet."
+];
+
+const ex6examples = [
+ 'How long has Emma lived in Manchester?',
+ 'How long has she worked at the marketing company?',
+ 'What has just happened to her at work?',
+ "Has Olivia already visited Emma's new flat?",
+ "Have Emma's parents seen the new flat yet?",
+ 'What has Emma done since moving to the city?',
+ 'Has Emma found a favourite café yet?'
+];
+
+/* ---------- builders ---------- */
+
+function buildEx1(){
+  const c = document.getElementById('ex1-items');
+  ex1data.forEach((d,i)=>{
+    const div = document.createElement('div');
+    div.className='item';
+    div.innerHTML = `
+      <div class="prompt"><span class="num">${i+1}.</span> ${d.q}</div>
+      <div class="options">
+        ${d.options.map(o=>`<label><input type="radio" name="ex1-${i}" value="${o}">${o}</label>`).join('')}
+      </div>
+      <div class="verdict"></div>
+      <div class="explain" data-correct="${d.correct}">${d.explain}</div>
+    `;
+    c.appendChild(div);
+  });
+}
+
+function buildEx2(){
+  const c = document.getElementById('ex2-items');
+  ex2data.forEach((d,i)=>{
+    const div = document.createElement('div');
+    div.className='item';
+    div.innerHTML = `
+      <div class="prompt"><span class="num">${i+1}.</span> ${d.q}</div>
+      <input type="text" placeholder="впишите слово..." data-answer="${d.answer}">
+      <div class="verdict"></div>
+      <div class="explain">Правильный ответ: <b>${d.answer}</b>. ${d.explain}</div>
+    `;
+    c.appendChild(div);
+  });
+}
+
+function buildEx3(){
+  const c = document.getElementById('ex3-items');
+  ex3data.forEach((d,i)=>{
+    const div = document.createElement('div');
+    div.className='item';
+    div.innerHTML = `
+      <div class="prompt"><span class="num">${i+1}.</span> ${d.q}</div>
+      <textarea placeholder="ваш вариант..." data-label="${i+1}"></textarea>
+      <div class="toolbar" style="margin:8px 0 0 0;">
+        <button class="action secondary" onclick="this.parentElement.nextElementSibling.classList.toggle('show')">Показать ответ</button>
+      </div>
+      <div class="explain">Пример: <b>${d.model}</b><br>${d.explain}</div>
+    `;
+    c.appendChild(div);
+  });
+}
+
+function buildEx4(){
+  const c = document.getElementById('ex4-items');
+  ex4data.forEach((d,i)=>{
+    const div = document.createElement('div');
+    div.className='item';
+    div.innerHTML = `
+      <div class="prompt"><span class="num">${i+1}.</span> Answer: <i>"${d.a}"</i></div>
+      <textarea placeholder="ваш вопрос..." data-label="${i+1}"></textarea>
+      <div class="toolbar" style="margin:8px 0 0 0;">
+        <button class="action secondary" onclick="this.parentElement.nextElementSibling.classList.toggle('show')">Показать ответ</button>
+      </div>
+      <div class="explain">Пример: <b>${d.model}</b><br>${d.explain}</div>
+    `;
+    c.appendChild(div);
+  });
+}
+
+function buildEx5(){
+  const c = document.getElementById('ex5-items');
+  ex5data.forEach((s,i)=>{
+    const div = document.createElement('div');
+    div.className='item';
+    div.innerHTML = `
+      <div class="prompt"><span class="num">${i+1}.</span> ${s}</div>
+      <textarea data-label="${i+1}. ${s}"></textarea>
+    `;
+    c.appendChild(div);
+  });
+}
+
+function buildEx6(){
+  const c = document.getElementById('ex6-items');
+  ex6examples.forEach((ex,i)=>{
+    const div = document.createElement('div');
+    div.className='item';
+    div.innerHTML = `
+      <div class="prompt"><span class="num">${i+1}.</span> Вопрос ${i+1}</div>
+      <textarea placeholder="напишите свой вопрос..." data-label="${i+1}"></textarea>
+      <div class="toolbar" style="margin:8px 0 0 0;">
+        <button class="action secondary" onclick="this.parentElement.nextElementSibling.classList.toggle('show')">Пример вопроса</button>
+      </div>
+      <div class="explain">Пример: <b>${ex}</b></div>
+    `;
+    c.appendChild(div);
+  });
+}
+
+buildEx1(); buildEx2(); buildEx3(); buildEx4(); buildEx5(); buildEx6();
+
+/* ---------- checking logic ---------- */
+
+function checkChoice(containerId){
+  const items = document.querySelectorAll('#'+containerId+' .item');
+  items.forEach(item=>{
+    const checked = item.querySelector('input[type=radio]:checked');
+    const explain = item.querySelector('.explain');
+    const verdict = item.querySelector('.verdict');
+    const correct = explain.dataset.correct;
+    item.classList.remove('correct','incorrect');
+    if(!checked){
+      verdict.textContent = 'Выберите вариант.';
+      verdict.className = 'verdict bad';
+      return;
+    }
+    if(checked.value === correct){
+      item.classList.add('correct');
+      verdict.textContent = 'Верно!';
+      verdict.className = 'verdict ok';
+    } else {
+      item.classList.add('incorrect');
+      verdict.textContent = 'Неверно. Правильный ответ: ' + correct;
+      verdict.className = 'verdict bad';
+    }
+    explain.classList.add('show');
+  });
+}
+
+function checkFill(containerId){
+  const items = document.querySelectorAll('#'+containerId+' .item');
+  items.forEach(item=>{
+    const input = item.querySelector('input[type=text]');
+    const explain = item.querySelector('.explain');
+    const verdict = item.querySelector('.verdict');
+    const answer = input.dataset.answer.toLowerCase();
+    const val = input.value.trim().toLowerCase();
+    item.classList.remove('correct','incorrect');
+    if(!val){
+      verdict.textContent = 'Впишите слово.';
+      verdict.className = 'verdict bad';
+      return;
+    }
+    if(val === answer){
+      item.classList.add('correct');
+      verdict.textContent = 'Верно!';
+      verdict.className = 'verdict ok';
+    } else {
+      item.classList.add('incorrect');
+      verdict.textContent = 'Неверно. Правильный ответ: ' + answer;
+      verdict.className = 'verdict bad';
+    }
+    explain.classList.add('show');
+  });
+}
+
+function revealAll(containerId){
+  document.querySelectorAll('#'+containerId+' .explain').forEach(e=>e.classList.add('show'));
+}
+
+/* ---------- copy answers ---------- */
+
+function copyAnswers(containerId, title){
+  const items = document.querySelectorAll('#'+containerId+' .item');
+  let lines = [title, ''];
+  items.forEach(item=>{
+    const field = item.querySelector('textarea, input[type=text]');
+    const promptEl = item.querySelector('.prompt');
+    const promptText = promptEl ? promptEl.textContent.trim() : '';
+    const value = field ? field.value.trim() : '';
+    lines.push(promptText);
+    lines.push(value ? '→ ' + value : '→ (пусто)');
+    lines.push('');
+  });
+  const text = lines.join('\n');
+  navigator.clipboard.writeText(text).then(()=>{
+    showToast();
+  }).catch(()=>{
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast();
+  });
+}
+
+function showToast(){
+  const toast = document.getElementById('toast');
+  toast.classList.add('show');
+  setTimeout(()=>toast.classList.remove('show'), 1800);
+}
+</script>
+
+</body>
+</html>
