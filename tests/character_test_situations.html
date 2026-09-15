@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>What's Your Character? — Situation Test (B1)</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #f4f1ea;
+    color: #2e2a24;
+    margin: 0;
+    padding: 24px;
+    display: flex;
+    justify-content: center;
+  }
+  .wrap { max-width: 720px; width: 100%; }
+  h1 { font-size: 1.6em; margin-bottom: 4px; }
+  .subtitle { color: #6b6355; margin-bottom: 20px; font-size: 0.95em; }
+  .instructions {
+    font-size: 0.95em;
+    line-height: 1.5;
+    background: #eef3ee;
+    border-left: 4px solid #6f9c76;
+    padding: 10px 14px;
+    border-radius: 6px;
+    margin-bottom: 22px;
+  }
+  .question {
+    background: #fff;
+    border-radius: 12px;
+    padding: 18px 22px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .question h3 {
+    margin: 0 0 12px 0;
+    font-size: 1.02em;
+    line-height: 1.4;
+  }
+  .qnum {
+    display: inline-block;
+    background: #6f9c76;
+    color: white;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 24px;
+    font-size: 0.85em;
+    margin-right: 8px;
+  }
+  .option {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    margin-bottom: 4px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .option:hover { background: #f6f3ec; }
+  .option input { margin-top: 3px; accent-color: #6f9c76; }
+  .option label { cursor: pointer; font-size: 0.96em; line-height: 1.4; }
+  button {
+    background: #6f9c76;
+    color: white;
+    border: none;
+    padding: 12px 22px;
+    border-radius: 8px;
+    font-size: 1em;
+    cursor: pointer;
+    margin-top: 6px;
+    transition: background 0.2s;
+  }
+  button:hover { background: #588060; }
+  button.secondary { background: #b98a4a; }
+  button.secondary:hover { background: #96702f; }
+  .warn {
+    color: #a04b4b;
+    font-size: 0.9em;
+    margin-top: 8px;
+    display: none;
+  }
+  #resultCard, #agreeBlock { display: none; }
+  #result { line-height: 1.6; font-size: 1.02em; }
+  #result span.tag {
+    display: inline-block;
+    background: #eef3ee;
+    border: 1px solid #cfe0d1;
+    padding: 2px 9px;
+    border-radius: 14px;
+    margin: 2px 3px;
+    font-size: 0.9em;
+  }
+  .card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .radio-row { display: flex; gap: 22px; margin: 10px 0; flex-wrap: wrap; }
+  .radio-row label { display: flex; align-items: center; gap: 6px; font-size: 0.98em; }
+  textarea {
+    width: 100%;
+    min-height: 70px;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-family: inherit;
+    font-size: 0.95em;
+    resize: vertical;
+  }
+  #copyStatus { font-size: 0.9em; color: #588060; margin-left: 12px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>What's Your Character? 🧭</h1>
+  <div class="subtitle">A situation-based personality test (English level B1)</div>
+
+  <div class="instructions">
+    <b>Instructions:</b> Read each situation carefully. Choose the answer that is closest to what <b>you</b> would really do.
+    There are no right or wrong answers — just answer honestly!
+  </div>
+
+  <form id="quizForm"></form>
+
+  <button onclick="showResult()">Show my result</button>
+  <div class="warn" id="warnMsg">Please answer all the questions first!</div>
+
+  <div class="card" id="resultCard">
+    <h2>Your character description</h2>
+    <div id="result"></div>
+  </div>
+
+  <div class="card" id="agreeBlock">
+    <h2>Do you agree with this result?</h2>
+    <div class="instructions">
+      Read your description again. Do you think it describes you well? Write your opinion below and copy your answers.
+    </div>
+    <div class="radio-row">
+      <label><input type="radio" name="agree" value="Yes, I agree"> Yes, I agree</label>
+      <label><input type="radio" name="agree" value="No, I don't agree"> No, I don't agree</label>
+      <label><input type="radio" name="agree" value="Partly agree"> Partly agree</label>
+    </div>
+    <textarea id="comment" placeholder="Why? Explain your opinion in 2-3 sentences (optional)..."></textarea>
+    <br>
+    <button class="secondary" onclick="copyAnswers()">Copy my answers</button>
+    <span id="copyStatus"></span>
+  </div>
+
+</div>
+
+<script>
+const questions = [
+  {
+    situation: "Your friend cancels plans with you at the last minute — for the third time this month.",
+    options: [
+      { text: "You get upset and give them the silent treatment for a few days.", trait: "moody" },
+      { text: "You calmly ask them why and try to understand.", trait: "patient" },
+      { text: "You get angry and tell them exactly what you think.", trait: "bossy" },
+      { text: "You feel hurt and start thinking it must be your fault.", trait: "insecure" }
+    ]
+  },
+  {
+    situation: "You're working on a group project, and one team member isn't doing their share of the work.",
+    options: [
+      { text: "You quietly do their part too, without saying anything.", trait: "responsible" },
+      { text: "You tell them honestly that this isn't fair.", trait: "honest" },
+      { text: "You don't really care — it's not your problem.", trait: "selfish" },
+      { text: "You start worrying a lot that the whole project will fail.", trait: "anxious" }
+    ]
+  },
+  {
+    situation: "You need to make an important decision, but you're not sure what to do.",
+    options: [
+      { text: "You stick to your first idea, even if everyone disagrees.", trait: "stubborn" },
+      { text: "You ask everyone around you what to do, because you can't decide alone.", trait: "dependent" },
+      { text: "You take your time and think it through carefully.", trait: "mature" },
+      { text: "You get impatient and just pick something quickly.", trait: "impatient" }
+    ]
+  },
+  {
+    situation: "You're invited to a party where you don't know many people.",
+    options: [
+      { text: "You go and talk to everyone — you love meeting new people.", trait: "sociable" },
+      { text: "You'd rather stay home; big groups aren't really for you.", trait: "unsociable" },
+      { text: "You go, and you're warm and friendly to everyone you meet.", trait: "friendly" },
+      { text: "You go, but you stay quiet and keep some distance from others.", trait: "cold" }
+    ]
+  },
+  {
+    situation: "You finish an exam early and have some free time before it ends.",
+    options: [
+      { text: "You imagine funny alternative answers you could have written.", trait: "imaginative" },
+      { text: "You just sit there — you can't think of anything to do.", trait: "unimaginative" },
+      { text: "You check your work carefully, because you like everything to be perfect.", trait: "organized" },
+      { text: "You compare your answers with a classmate, because you want the best grade.", trait: "competitive" }
+    ]
+  },
+  {
+    situation: "You promised to help a friend move house on Saturday.",
+    options: [
+      { text: "You show up right on time and help all day, as promised.", trait: "reliable" },
+      { text: "You forget about it, or cancel without telling them.", trait: "unreliable" },
+      { text: "You never really planned to go, even though you said yes.", trait: "dishonest" },
+      { text: "You go, but you complain that you deserve something in return.", trait: "spoilt" }
+    ]
+  },
+  {
+    situation: "Your room is a mess, and guests are arriving in ten minutes.",
+    options: [
+      { text: "You quickly clean everything — you like things tidy.", trait: "tidy" },
+      { text: "You don't bother; rules about a 'clean house' seem silly to you.", trait: "rebellious" },
+      { text: "You feel a little embarrassed and worry about what they'll think.", trait: "sensitive" },
+      { text: "You don't clean at all — you don't care about impressing anyone.", trait: "unambitious" }
+    ]
+  },
+  {
+    situation: "You lose a game against your friends.",
+    options: [
+      { text: "You congratulate them and ask for a rematch.", trait: "mature" },
+      { text: "You throw the controller/cards and say the game is stupid.", trait: "immature" },
+      { text: "You're disappointed but you don't let it bother you for long.", trait: "patient" },
+      { text: "You feel a bit jealous but keep it to yourself.", trait: "sensitive" }
+    ]
+  }
+];
+
+const form = document.getElementById('quizForm');
+questions.forEach((q, qi) => {
+  const div = document.createElement('div');
+  div.className = 'question';
+  let optionsHtml = '';
+  q.options.forEach((opt, oi) => {
+    optionsHtml += `
+      <div class="option">
+        <input type="radio" name="q${qi}" id="q${qi}o${oi}" value="${opt.trait}">
+        <label for="q${qi}o${oi}">${opt.text}</label>
+      </div>`;
+  });
+  div.innerHTML = `<h3><span class="qnum">${qi + 1}</span>${q.situation}</h3>${optionsHtml}`;
+  form.appendChild(div);
+});
+
+function getAnswers() {
+  const answers = [];
+  for (let i = 0; i < questions.length; i++) {
+    const checked = document.querySelector(`input[name="q${i}"]:checked`);
+    if (!checked) return null;
+    const optText = questions[i].options.find(o => o.trait === checked.value).text;
+    answers.push({ question: questions[i].situation, answer: optText, trait: checked.value });
+  }
+  return answers;
+}
+
+function showResult() {
+  const answers = getAnswers();
+  if (!answers) {
+    document.getElementById('warnMsg').style.display = 'block';
+    return;
+  }
+  document.getElementById('warnMsg').style.display = 'none';
+
+  const traits = [...new Set(answers.map(a => a.trait))];
+  const tags = traits.map(t => `<span class="tag">${t}</span>`).join(' ');
+  const list = traits.length > 1
+    ? traits.slice(0, -1).join(', ') + ' and ' + traits.slice(-1)
+    : traits[0];
+
+  document.getElementById('result').innerHTML =
+    `<p>Based on your answers, your character is: ${tags}</p>
+     <p>This means that, in different situations, you tend to be <b>${list}</b>. ` +
+     `Remember, this is just a short test — real people are complex, and you probably show ` +
+     `different sides of your character depending on the situation and the people around you.</p>`;
+
+  document.getElementById('resultCard').style.display = 'block';
+  document.getElementById('agreeBlock').style.display = 'block';
+  document.getElementById('resultCard').scrollIntoView({ behavior: 'smooth' });
+}
+
+function copyAnswers() {
+  const answers = getAnswers();
+  if (!answers) {
+    document.getElementById('warnMsg').style.display = 'block';
+    return;
+  }
+  const agreeEl = document.querySelector('input[name="agree"]:checked');
+  const agree = agreeEl ? agreeEl.value : '(not answered)';
+  const comment = document.getElementById('comment').value.trim();
+
+  let text = `MY CHARACTER TEST ANSWERS\n--------------------------\n`;
+  answers.forEach((a, i) => {
+    text += `${i + 1}. ${a.question}\n   My answer: ${a.answer}  (trait: ${a.trait})\n`;
+  });
+  text += `\nDo I agree with the result? ${agree}\nComment: ${comment || '(no comment)'}\n`;
+
+  navigator.clipboard.writeText(text).then(() => {
+    document.getElementById('copyStatus').textContent = '✔ Copied!';
+    setTimeout(() => document.getElementById('copyStatus').textContent = '', 2000);
+  }).catch(() => {
+    document.getElementById('copyStatus').textContent = 'Could not copy — please select and copy manually.';
+  });
+}
+</script>
+</body>
+</html>
