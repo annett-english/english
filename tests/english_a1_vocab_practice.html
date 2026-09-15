@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Английский A1 — Личные вещи (Vocabulary Practice)</title>
+<style>
+  :root{
+    --primary:#4361ee;
+    --primary-dark:#2f43c9;
+    --bg:#f5f7fb;
+    --card:#ffffff;
+    --ok:#2e7d32;
+    --ok-bg:#e6f6e6;
+    --bad:#c62828;
+    --bad-bg:#fdeaea;
+    --border:#e1e5ee;
+    --text:#1f2430;
+    --muted:#6b7280;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:'Segoe UI', Roboto, Arial, sans-serif;
+    background:var(--bg); color:var(--text); line-height:1.5;
+  }
+  header.top{
+    background:linear-gradient(135deg,var(--primary),#7048e8);
+    color:#fff; padding:28px 20px 22px;
+  }
+  header.top h1{margin:0 0 6px; font-size:1.6rem;}
+  header.top p{margin:0; opacity:.9; font-size:.95rem;}
+  .layout{
+    display:flex; align-items:flex-start; gap:20px;
+    max-width:1200px; margin:20px auto; padding:0 16px;
+  }
+  aside#sidebar{
+    position:sticky; top:16px; width:230px; flex-shrink:0;
+    background:var(--card); border:1px solid var(--border); border-radius:14px;
+    padding:16px; box-shadow:0 2px 8px rgba(0,0,0,.04);
+  }
+  aside#sidebar h3{margin:0 0 10px; font-size:1rem;}
+  #problem-list{list-style:none; margin:0; padding:0; max-height:400px; overflow-y:auto;}
+  #problem-list li{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:6px 8px; border-radius:8px; margin-bottom:4px; background:var(--bad-bg);
+    font-size:.9rem;
+  }
+  #problem-list li.empty{background:var(--ok-bg); color:var(--ok); justify-content:center;}
+  .pw-word{font-weight:600; text-transform:capitalize;}
+  .pw-count{background:var(--bad); color:#fff; border-radius:10px; padding:0 7px; font-size:.75rem;}
+  #resetMistakes{
+    margin-top:10px; width:100%; background:none; border:1px solid var(--border);
+    border-radius:8px; padding:6px; cursor:pointer; font-size:.8rem; color:var(--muted);
+  }
+  main{flex:1; min-width:0;}
+  section{
+    background:var(--card); border:1px solid var(--border); border-radius:14px;
+    padding:18px 20px; margin-bottom:22px; box-shadow:0 2px 8px rgba(0,0,0,.03);
+  }
+  section h2{margin-top:0; font-size:1.15rem; display:flex; align-items:center; gap:8px;}
+  section .instr{color:var(--muted); font-size:.9rem; margin-bottom:14px;}
+  .audio-check{display:flex; align-items:center; gap:12px; flex-wrap:wrap;}
+  button.btn{
+    background:var(--primary); color:#fff; border:none; border-radius:8px;
+    padding:8px 14px; cursor:pointer; font-size:.9rem; font-weight:600;
+  }
+  button.btn:hover{background:var(--primary-dark);}
+  button.btn.secondary{background:#eef0fb; color:var(--primary);}
+  button.btn.secondary:hover{background:#dfe3f8;}
+  #audio-status{font-size:.9rem; font-weight:600;}
+  .status-ok{color:var(--ok);}
+  .status-bad{color:var(--bad);}
+
+  table.review{width:100%; border-collapse:collapse; font-size:.92rem;}
+  table.review th, table.review td{padding:6px 8px; border-bottom:1px solid var(--border); text-align:left;}
+  table.review th{color:var(--muted); font-weight:600;}
+  .play-btn{
+    background:#eef0fb; border:1px solid var(--border); border-radius:6px;
+    cursor:pointer; padding:3px 8px; font-size:.95rem;
+  }
+  .play-btn:hover{background:#dfe3f8;}
+
+  .items{display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:12px;}
+  .item{
+    border:1px solid var(--border); border-radius:10px; padding:10px 12px;
+    position:relative; background:#fbfcff;
+  }
+  .item-num{position:absolute; top:6px; right:10px; font-size:.75rem; color:var(--muted);}
+  .prompt{margin-bottom:8px; font-size:1rem;}
+  .masked, .scrambled{font-weight:700; letter-spacing:1px; font-size:1.15rem; color:var(--primary-dark);}
+  .ru-hint{color:var(--muted); font-size:.85rem;}
+  .emoji-pic{font-size:2.2rem; display:block; text-align:center; margin-bottom:6px;}
+  .def-text{font-style:italic;}
+  input.answer-input{
+    width:100%; padding:7px 8px; border:1px solid var(--border); border-radius:7px;
+    font-size:.95rem; margin-bottom:4px;
+  }
+  input.answer-input.correct{border-color:var(--ok); background:var(--ok-bg);}
+  input.answer-input.incorrect{border-color:var(--bad); background:var(--bad-bg);}
+  .feedback{font-size:.85rem; font-weight:600;}
+  .feedback.ok{color:var(--ok);}
+  .feedback.bad{color:var(--bad);}
+  .correct-answer{
+    display:none; margin-top:4px; font-size:.85rem; color:var(--ok-bg==null?'':'#000');
+    background:var(--ok-bg); color:var(--ok); padding:3px 6px; border-radius:6px;
+  }
+  .options{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:6px;}
+  .opt-btn{
+    border:1px solid var(--border); background:#fff; border-radius:7px;
+    padding:6px 9px; cursor:pointer; font-size:.88rem;
+  }
+  .opt-btn.selected{background:var(--primary); color:#fff; border-color:var(--primary);}
+  .opt-btn.reveal-correct{outline:2px solid var(--ok);}
+  .ex-controls{display:flex; align-items:center; gap:10px; margin-bottom:14px; flex-wrap:wrap;}
+  .score{font-weight:700; color:var(--primary-dark);}
+
+  .bonus-item{margin-bottom:12px;}
+  .bonus-item strong{text-transform:capitalize;}
+  textarea.sentence{
+    width:100%; margin-top:4px; padding:7px 8px; border:1px solid var(--border);
+    border-radius:7px; font-size:.92rem; font-family:inherit; resize:vertical;
+  }
+  .footer-actions{text-align:center; margin:30px 0 60px;}
+  #toast{
+    position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:#1f2430; color:#fff; padding:10px 18px; border-radius:8px;
+    opacity:0; pointer-events:none; transition:all .25s ease; font-size:.9rem; z-index:99;
+  }
+  #toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+
+  @media (max-width:820px){
+    .layout{flex-direction:column;}
+    aside#sidebar{position:static; width:100%;}
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <h1>🎒 Английский A1 — Мои вещи (Personal Belongings)</h1>
+  <p>Повторение слов + 7 упражнений по 15 заданий. Пишите ответы руками, проверяйте себя и слушайте произношение.</p>
+</header>
+
+<div class="layout">
+  <aside id="sidebar">
+    <h3>⚠️ Проблемные слова</h3>
+    <ul id="problem-list"></ul>
+    <button id="resetMistakes">Сбросить список</button>
+  </aside>
+
+  <main>
+
+    <section id="review">
+      <h2>🔊 1. Повторение слов</h2>
+      <p class="instr">Прослушайте каждое слово (голос Google US English), посмотрите транскрипцию и перевод, повторите вслух.</p>
+      <div class="audio-check">
+        <button class="btn secondary" id="testAudioBtn">🔊 Проверить звук</button>
+        <span id="audio-status">Нажмите кнопку, чтобы проверить, работает ли озвучка.</span>
+      </div>
+      <br>
+      <table class="review">
+        <thead><tr><th>Слово</th><th>Транскрипция</th><th>Перевод</th><th>Звук</th></tr></thead>
+        <tbody id="review-body"></tbody>
+      </table>
+    </section>
+
+    <section id="ex1">
+      <h2>✍️ 2. Вставь пропущенные буквы</h2>
+      <p class="instr">Допишите слово полностью в поле ответа.</p>
+      <div class="ex-controls">
+        <button class="btn" data-check="ex1">Проверить</button>
+        <button class="btn secondary" data-show="ex1">Показать ответы</button>
+        <span class="score">Результат: — / 15</span>
+      </div>
+      <div class="items"></div>
+    </section>
+
+    <section id="ex2">
+      <h2>🔀 3. Собери слово из букв (unscramble)</h2>
+      <p class="instr">Буквы перепутаны — напишите правильное слово.</p>
+      <div class="ex-controls">
+        <button class="btn" data-check="ex2">Проверить</button>
+        <button class="btn secondary" data-show="ex2">Показать ответы</button>
+        <span class="score">Результат: — / 15</span>
+      </div>
+      <div class="items"></div>
+    </section>
+
+    <section id="ex3">
+      <h2>🌐 4. Переведи с русского на английский</h2>
+      <p class="instr">Напишите слово по-английски.</p>
+      <div class="ex-controls">
+        <button class="btn" data-check="ex3">Проверить</button>
+        <button class="btn secondary" data-show="ex3">Показать ответы</button>
+        <span class="score">Результат: — / 15</span>
+      </div>
+      <div class="items"></div>
+    </section>
+
+    <section id="ex4">
+      <h2>🚫 5. One word doesn't belong</h2>
+      <p class="instr">Нажмите на слово, которое лишнее в группе.</p>
+      <div class="ex-controls">
+        <button class="btn" data-check="ex4">Проверить</button>
+        <button class="btn secondary" data-show="ex4">Показать ответы</button>
+        <span class="score">Результат: — / 15</span>
+      </div>
+      <div class="items"></div>
+    </section>
+
+    <section id="ex5">
+      <h2>🎧 6. Напиши слово, которое слышишь (dictation)</h2>
+      <p class="instr">Нажмите на 🔊, прослушайте произношение и напишите слово.</p>
+      <div class="ex-controls">
+        <button class="btn" data-check="ex5">Проверить</button>
+        <button class="btn secondary" data-show="ex5">Показать ответы</button>
+        <span class="score">Результат: — / 15</span>
+      </div>
+      <div class="items"></div>
+    </section>
+
+    <section id="ex6">
+      <h2>📘 7. Угадай слово по определению</h2>
+      <p class="instr">Прочитайте определение на английском и напишите слово.</p>
+      <div class="ex-controls">
+        <button class="btn" data-check="ex6">Проверить</button>
+        <button class="btn secondary" data-show="ex6">Показать ответы</button>
+        <span class="score">Результат: — / 15</span>
+      </div>
+      <div class="items"></div>
+    </section>
+
+    <section id="ex7">
+      <h2>🖼️ 8. Назови слово по картинке</h2>
+      <p class="instr">Посмотрите на эмодзи-картинку и напишите слово по-английски.</p>
+      <div class="ex-controls">
+        <button class="btn" data-check="ex7">Проверить</button>
+        <button class="btn secondary" data-show="ex7">Показать ответы</button>
+        <span class="score">Результат: — / 15</span>
+      </div>
+      <div class="items"></div>
+    </section>
+
+    <section id="bonus">
+      <h2>💬 9. Бонус: составь своё предложение</h2>
+      <p class="instr">Напишите свои предложения с этими словами (не проверяется автоматически, но попадёт в общий отчёт).</p>
+      <div id="bonus-items"></div>
+    </section>
+
+    <div class="footer-actions">
+      <button class="btn" id="copyAllBtn" style="padding:12px 26px; font-size:1rem;">📋 Скопировать все ответы</button>
+    </div>
+
+  </main>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* ================= DATA ================= */
+const WORDS = [
+ {en:"pen", ipa:"/pen/", ru:"ручка", def:"You use it to write in blue or black ink.", emoji:"🖊️"},
+ {en:"lamp", ipa:"/læmp/", ru:"лампа", def:"It gives light in a room.", emoji:"💡"},
+ {en:"ticket", ipa:"/ˈtɪkɪt/", ru:"билет", def:"You need this to travel by bus, train or plane, or to watch a film.", emoji:"🎫"},
+ {en:"bank card", ipa:"/bæŋk kɑːrd/", ru:"банковская карта", def:"You use this plastic card to pay in shops.", emoji:"💳", alts:["credit card","debit card","card"]},
+ {en:"mask", ipa:"/mæsk/", ru:"маска", def:"You wear this over your mouth and nose.", emoji:"😷"},
+ {en:"calendar", ipa:"/ˈkælɪndər/", ru:"календарь", def:"It shows the days, weeks and months of the year.", emoji:"📅"},
+ {en:"a piece of paper", ipa:"/piːs əv ˈpeɪpər/", ru:"листок бумаги", def:"A small flat sheet you can write on.", emoji:"📄", alts:["piece of paper"]},
+ {en:"notebook", ipa:"/ˈnoʊtbʊk/", ru:"тетрадь / блокнот", def:"A small book where you write notes.", emoji:"📓"},
+ {en:"earphones", ipa:"/ˈɪrfoʊnz/", ru:"наушники-вкладыши", def:"Small devices you put in your ears to listen to music.", emoji:"🎵", alts:["earbuds","ear buds"]},
+ {en:"watch", ipa:"/wɑːtʃ/", ru:"наручные часы", def:"You wear this on your wrist to see the time.", emoji:"⌚"},
+ {en:"dictionary", ipa:"/ˈdɪkʃəneri/", ru:"словарь", def:"A book that explains the meaning of words.", emoji:"📖"},
+ {en:"headphones", ipa:"/ˈhedfoʊnz/", ru:"наушники", def:"You put these over your ears to listen to music.", emoji:"🎧"},
+ {en:"purse", ipa:"/pɜːrs/", ru:"дамский кошелёк", def:"A small bag where women keep money and cards.", emoji:"👛"},
+ {en:"scissors", ipa:"/ˈsɪzərz/", ru:"ножницы", def:"You use this tool to cut paper.", emoji:"✂️"},
+ {en:"tablet", ipa:"/ˈtæblɪt/", ru:"планшет", def:"A flat computer you can carry and touch the screen.", emoji:"📱"},
+ {en:"bag", ipa:"/bæg/", ru:"сумка", def:"You carry your things in this.", emoji:"👜"},
+ {en:"photo", ipa:"/ˈfoʊtoʊ/", ru:"фотография", def:"A picture taken with a camera.", emoji:"🖼️"},
+ {en:"umbrella", ipa:"/ʌmˈbrelə/", ru:"зонт", def:"You use this to stay dry when it rains.", emoji:"☂️"},
+ {en:"phone", ipa:"/foʊn/", ru:"телефон", def:"You use this to call and text people.", emoji:"☎️"},
+ {en:"key", ipa:"/kiː/", ru:"ключ", def:"You use this to open or lock a door.", emoji:"🔑"},
+ {en:"identity card", ipa:"/aɪˈdentəti kɑːrd/", ru:"удостоверение личности", def:"A card that shows your name and photo to prove who you are.", emoji:"🪪", alts:["id card","identification card"]},
+ {en:"pencil", ipa:"/ˈpensəl/", ru:"карандаш", def:"You use it to write, and you can erase it.", emoji:"✏️"},
+ {en:"laptop", ipa:"/ˈlæptɑːp/", ru:"ноутбук", def:"A small computer you can carry and open like a book.", emoji:"💻"},
+ {en:"magazine", ipa:"/ˌmægəˈziːn/", ru:"журнал", def:"A thin book with pictures and articles, published every week or month.", emoji:"📰"},
+ {en:"wallet", ipa:"/ˈwɑːlɪt/", ru:"бумажник", def:"A small, usually leather, item where men keep money and cards.", emoji:"💰"},
+ {en:"glasses", ipa:"/ˈglæsɪz/", ru:"очки", def:"You wear these on your face to see better.", emoji:"👓"},
+ {en:"coin", ipa:"/kɔɪn/", ru:"монета", def:"Round metal money.", emoji:"🪙"},
+ {en:"sunglasses", ipa:"/ˈsʌnˌglæsɪz/", ru:"солнцезащитные очки", def:"Dark glasses you wear in bright sun.", emoji:"🕶️"},
+ {en:"newspaper", ipa:"/ˈnuːzpeɪpər/", ru:"газета", def:"Sheets of paper with the news, printed every day.", emoji:"🗞️"},
+ {en:"charger", ipa:"/ˈtʃɑːrdʒər/", ru:"зарядное устройство", def:"You connect this to your phone to give it more battery.", emoji:"🔌"},
+ {en:"file", ipa:"/faɪl/", ru:"папка для документов", def:"A folder where you keep documents.", emoji:"🗂️"},
+ {en:"diary", ipa:"/ˈdaɪəri/", ru:"дневник", def:"A book where you write about your day.", emoji:"📔"},
+ {en:"tissue", ipa:"/ˈtɪʃuː/", ru:"салфетка / платок", def:"Soft paper you use to clean your nose.", emoji:"🧻"},
+ {en:"tidy", ipa:"/ˈtaɪdi/", ru:"аккуратный, убранный", def:"When a room or table is clean and things are in order.", emoji:"🧹"},
+ {en:"untidy", ipa:"/ʌnˈtaɪdi/", ru:"неаккуратный, неубранный", def:"When a room is messy and not organized.", emoji:"🌀"}
+];
+
+const CATEGORIES = {
+  electronics: ["lamp","tablet","laptop","phone","charger","headphones","earphones"],
+  money: ["bank card","wallet","purse","coin","identity card","ticket"],
+  paper: ["notebook","diary","magazine","newspaper","a piece of paper","calendar","dictionary","file"],
+  stationery: ["pen","pencil","scissors"],
+  wearable: ["glasses","sunglasses","watch","mask"],
+  misc: ["umbrella","key","photo","bag","tissue"]
+};
+
+const exerciseTitles = {
+  ex1:"Вставь пропущенные буквы", ex2:"Собери слово из букв", ex3:"Перевод с русского",
+  ex4:"One word doesn't belong", ex5:"Диктант (по звуку)", ex6:"По определению", ex7:"По картинке"
+};
+
+let mistakes = {};
+
+/* ================= HELPERS ================= */
+function shuffle(inputArray){
+  const arr = inputArray.slice();
+  for(let i=arr.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]];
+  }
+  return arr;
+}
+function pickSet(n){ return shuffle(WORDS).slice(0,n); }
+function wordByEn(en){ return WORDS.find(w=>w.en===en); }
+function normalize(s){
+  return (s||'').toString().trim().toLowerCase()
+    .replace(/^(a|an)\s+/,'')
+    .replace(/[.,!?;:]/g,'')
+    .replace(/\s+/g,' ');
+}
+function maskWord(word){
+  const letters = word.split('');
+  const indices = [];
+  letters.forEach((ch,i)=>{ if(ch !== ' ') indices.push(i); });
+  const maskCount = Math.max(1, Math.round(indices.length*0.4));
+  const toMask = shuffle(indices).slice(0, maskCount);
+  return letters.map((ch,i)=> (toMask.includes(i) && ch!==' ') ? '_' : ch).join('');
+}
+function scrambleWord(word){
+  return word.split(' ').map(w=>{
+    if(w.length<=2) return w;
+    let arr, tries=0;
+    do { arr = shuffle(w.split('')).join(''); tries++; }
+    while(arr===w && tries<8);
+    return arr;
+  }).join(' ');
+}
+
+/* ================= AUDIO ================= */
+let voicesCache = [];
+function loadVoices(){ voicesCache = window.speechSynthesis ? speechSynthesis.getVoices() : []; }
+loadVoices();
+if('speechSynthesis' in window){ speechSynthesis.onvoiceschanged = loadVoices; }
+
+function getPreferredVoice(){
+  const voices = voicesCache.length ? voicesCache : (window.speechSynthesis ? speechSynthesis.getVoices() : []);
+  return voices.find(v=>v.name.includes('Google US English'))
+      || voices.find(v=>v.lang==='en-US')
+      || voices[0];
+}
+function speak(text){
+  if(!('speechSynthesis' in window)){
+    toast('⚠️ Браузер не поддерживает озвучку');
+    return;
+  }
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-US';
+  u.rate = 0.9;
+  const v = getPreferredVoice();
+  if(v) u.voice = v;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+}
+function testAudio(){
+  const statusEl = document.getElementById('audio-status');
+  if(!('speechSynthesis' in window)){
+    statusEl.textContent = '⚠️ Ваш браузер не поддерживает синтез речи.';
+    statusEl.className = 'status-bad';
+    return;
+  }
+  statusEl.textContent = '🔊 Проигрывание...';
+  statusEl.className = '';
+  const u = new SpeechSynthesisUtterance('Hello! This is a test.');
+  u.lang = 'en-US';
+  const v = getPreferredVoice();
+  if(v) u.voice = v;
+  u.onend = ()=>{ statusEl.textContent = '✅ Звук работает.'; statusEl.className='status-ok'; };
+  u.onerror = ()=>{ statusEl.textContent = '⚠️ Ошибка воспроизведения звука.'; statusEl.className='status-bad'; };
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+}
+
+/* ================= RENDER: REVIEW TABLE ================= */
+function generateReview(){
+  const tbody = document.getElementById('review-body');
+  tbody.innerHTML = WORDS.map(w=>`
+    <tr>
+      <td>${w.emoji} <strong>${w.en}</strong></td>
+      <td>${w.ipa}</td>
+      <td>${w.ru}</td>
+      <td><button class="play-btn" data-word="${w.en}">🔊</button></td>
+    </tr>`).join('');
+}
+
+/* ================= RENDER: SIMPLE INPUT EXERCISES ================= */
+function renderInputItems(containerId, set, promptFn){
+  const container = document.querySelector('#'+containerId+' .items');
+  container.innerHTML = set.map((w,i)=>{
+    const alts = w.alts ? JSON.stringify(w.alts) : '[]';
+    return `<div class="item" data-word="${w.en}" data-answer="${w.en}" data-alts='${alts}'>
+      <span class="item-num">${i+1}</span>
+      <div class="prompt">${promptFn(w)}</div>
+      <input type="text" class="answer-input" placeholder="напишите слово">
+      <div class="feedback"></div>
+      <div class="correct-answer">✅ Правильный ответ: ${w.en}</div>
+    </div>`;
+  }).join('');
+}
+
+function generateEx1(){ // missing letters
+  renderInputItems('ex1', pickSet(15), w=>`<span class="masked">${maskWord(w.en)}</span> <span class="ru-hint">(${w.ru})</span>`);
+}
+function generateEx2(){ // unscramble
+  renderInputItems('ex2', pickSet(15), w=>`<span class="scrambled">${scrambleWord(w.en)}</span> <span class="ru-hint">(${w.ru})</span>`);
+}
+function generateEx3(){ // ru -> en
+  renderInputItems('ex3', pickSet(15), w=>`<span>${w.ru}</span>`);
+}
+function generateEx5(){ // dictation
+  renderInputItems('ex5', pickSet(15), w=>`<button class="play-btn" data-word="${w.en}">🔊 Слушать</button>`);
+}
+function generateEx6(){ // definition
+  renderInputItems('ex6', pickSet(15), w=>`<span class="def-text">${w.def}</span>`);
+}
+function generateEx7(){ // picture
+  renderInputItems('ex7', pickSet(15), w=>`<span class="emoji-pic">${w.emoji}</span>`);
+}
+
+/* ================= RENDER: ODD ONE OUT (ex4) ================= */
+function generateOddOneOut(n){
+  const catKeys = shuffle(Object.keys(CATEGORIES));
+  const items = [];
+  for(let i=0;i<n;i++){
+    const catKey = catKeys[i % catKeys.length];
+    const catWords = shuffle(CATEGORIES[catKey]).slice(0,3);
+    const otherKeys = catKeys.filter(k=>k!==catKey);
+    const oddCat = otherKeys[Math.floor(Math.random()*otherKeys.length)];
+    const oddWord = shuffle(CATEGORIES[oddCat])[0];
+    const options = shuffle([...catWords, oddWord]);
+    items.push({options, answer: oddWord});
+  }
+  return items;
+}
+function generateEx4(){
+  const set = generateOddOneOut(15);
+  const container = document.querySelector('#ex4 .items');
+  container.innerHTML = set.map((it,i)=>`
+    <div class="item odd-item" data-answer="${it.answer}">
+      <span class="item-num">${i+1}</span>
+      <div class="options">
+        ${it.options.map(o=>`<button class="opt-btn" data-value="${o}">${o}</button>`).join('')}
+      </div>
+      <div class="feedback"></div>
+    </div>`).join('');
+}
+
+/* ================= BONUS ================= */
+function generateBonus(){
+  const set = shuffle(WORDS).slice(0,8);
+  document.getElementById('bonus-items').innerHTML = set.map((w,i)=>`
+    <div class="bonus-item">
+      <strong>${i+1}. ${w.en}</strong> <span class="ru-hint">(${w.ru})</span>
+      <textarea class="sentence" rows="2" placeholder="Write your own sentence with '${w.en}'..."></textarea>
+    </div>`).join('');
+}
+
+/* ================= CHECK / SHOW ================= */
+function trackMistake(word){
+  mistakes[word] = (mistakes[word]||0) + 1;
+  renderSidebar();
+}
+function renderSidebar(){
+  const list = document.getElementById('problem-list');
+  const entries = Object.entries(mistakes).sort((a,b)=>b[1]-a[1]);
+  if(entries.length===0){
+    list.innerHTML = '<li class="empty">Пока нет ошибок 🎉</li>';
+    return;
+  }
+  list.innerHTML = entries.map(([w,c])=>`<li><span class="pw-word">${w}</span><span class="pw-count">${c}</span></li>`).join('');
+}
+
+function checkExercise(exId){
+  const container = document.getElementById(exId);
+  const items = container.querySelectorAll('.item');
+  let correctCount = 0;
+  items.forEach(item=>{
+    const answer = item.dataset.answer;
+    const isOdd = item.classList.contains('odd-item');
+    const fb = item.querySelector('.feedback');
+    let isCorrect = false;
+    let userVal = '';
+    if(isOdd){
+      const sel = item.querySelector('.opt-btn.selected');
+      userVal = sel ? sel.dataset.value : '';
+      isCorrect = !!sel && normalize(sel.dataset.value)===normalize(answer);
+    } else {
+      const alts = item.dataset.alts ? JSON.parse(item.dataset.alts) : [];
+      const input = item.querySelector('.answer-input');
+      userVal = input.value;
+      isCorrect = [answer, ...alts].some(a=>normalize(a)===normalize(userVal));
+      input.classList.toggle('correct', isCorrect);
+      input.classList.toggle('incorrect', !isCorrect && userVal.trim()!=='');
+    }
+    if(isCorrect){
+      correctCount++;
+      fb.textContent = '✅';
+      fb.className = 'feedback ok';
+    } else {
+      fb.textContent = userVal.trim()==='' ? '⬜ нет ответа' : '❌';
+      fb.className = 'feedback bad';
+      trackMistake(item.dataset.word || answer);
+    }
+  });
+  container.querySelector('.score').textContent = `Результат: ${correctCount} / ${items.length}`;
+}
+
+function showAnswers(exId){
+  const container = document.getElementById(exId);
+  container.querySelectorAll('.item').forEach(item=>{
+    if(item.classList.contains('odd-item')){
+      const answer = item.dataset.answer;
+      item.querySelectorAll('.opt-btn').forEach(b=>{
+        if(normalize(b.dataset.value)===normalize(answer)) b.classList.add('reveal-correct');
+      });
+    } else {
+      const span = item.querySelector('.correct-answer');
+      if(span) span.style.display = 'inline-block';
+    }
+  });
+}
+
+/* ================= COPY ALL ANSWERS ================= */
+function gatherAllData(){
+  const lines = [];
+  lines.push('=== Отчёт: Английский A1 — Мои вещи ===');
+  lines.push('Дата: ' + new Date().toLocaleString());
+  ['ex1','ex2','ex3','ex4','ex5','ex6','ex7'].forEach(exId=>{
+    const container = document.getElementById(exId);
+    const scoreText = container.querySelector('.score').textContent;
+    lines.push(`\n--- Упражнение (${exId}): ${exerciseTitles[exId]} | ${scoreText} ---`);
+    container.querySelectorAll('.item').forEach((item,idx)=>{
+      const answer = item.dataset.answer;
+      let userVal;
+      if(item.classList.contains('odd-item')){
+        const sel = item.querySelector('.opt-btn.selected');
+        userVal = sel ? sel.dataset.value : '(не выбрано)';
+      } else {
+        userVal = item.querySelector('.answer-input').value || '(пусто)';
+      }
+      lines.push(`${idx+1}. Ответ студента: "${userVal}"  |  Правильный ответ: "${answer}"`);
+    });
+  });
+  lines.push('\n--- Бонус: собственные предложения ---');
+  document.querySelectorAll('#bonus-items textarea').forEach((ta,idx)=>{
+    lines.push(`${idx+1}. ${ta.value || '(пусто)'}`);
+  });
+  lines.push('\n--- Проблемные слова (ошибки) ---');
+  const entries = Object.entries(mistakes).sort((a,b)=>b[1]-a[1]);
+  if(entries.length===0){
+    lines.push('Ошибок пока нет.');
+  } else {
+    entries.forEach(([w,c])=> lines.push(`${w} — ${c} ошибка(и)`));
+  }
+  return lines.join('\n');
+}
+
+function copyAll(){
+  const text = gatherAllData();
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(()=>toast('✅ Скопировано в буфер обмена!'))
+      .catch(()=>fallbackCopy(text));
+  } else {
+    fallbackCopy(text);
+  }
+}
+function fallbackCopy(text){
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  try{
+    document.execCommand('copy');
+    toast('✅ Скопировано в буфер обмена!');
+  }catch(e){
+    toast('⚠️ Не удалось скопировать. Выделите текст вручную.');
+  }
+  document.body.removeChild(ta);
+}
+
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2500);
+}
+
+/* ================= EVENTS ================= */
+document.addEventListener('click', (e)=>{
+  if(e.target.matches('.play-btn')){
+    speak(e.target.dataset.word);
+  }
+  if(e.target.matches('.opt-btn')){
+    const item = e.target.closest('.item');
+    item.querySelectorAll('.opt-btn').forEach(b=>b.classList.remove('selected'));
+    e.target.classList.add('selected');
+  }
+  if(e.target.matches('[data-check]')){
+    checkExercise(e.target.dataset.check);
+  }
+  if(e.target.matches('[data-show]')){
+    showAnswers(e.target.dataset.show);
+  }
+  if(e.target.id==='testAudioBtn'){
+    testAudio();
+  }
+  if(e.target.id==='copyAllBtn'){
+    copyAll();
+  }
+  if(e.target.id==='resetMistakes'){
+    mistakes = {};
+    renderSidebar();
+    toast('Список ошибок очищен');
+  }
+});
+
+/* ================= INIT ================= */
+function init(){
+  generateReview();
+  generateEx1();
+  generateEx2();
+  generateEx3();
+  generateEx4();
+  generateEx5();
+  generateEx6();
+  generateEx7();
+  generateBonus();
+  renderSidebar();
+}
+init();
+</script>
+</body>
+</html>
