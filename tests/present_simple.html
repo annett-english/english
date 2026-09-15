@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Present Simple — тренажёр</title>
+<style>
+  :root{
+    --paper:#F6F3EC;
+    --paper-line:#DAD3C0;
+    --ink:#22303F;
+    --ink-soft:#5B6B7A;
+    --pencil:#8A7A56;
+    --marker:#C4622D;
+    --marker-soft:#F1DFCF;
+    --good:#3E7A52;
+    --good-bg:#E4F1E7;
+    --bad:#B0433A;
+    --bad-bg:#FBE6E3;
+    --card:#FFFEFB;
+    --rule:#0F3B57;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    background-image:
+      linear-gradient(var(--paper-line) 1px, transparent 1px);
+    background-size: 100% 2.1em;
+    color:var(--ink);
+    font-family: "Iowan Old Style","Palatino Linotype",Georgia,serif;
+    line-height:1.6;
+    padding: 0 0 6em 0;
+  }
+  .wrap{max-width:760px;margin:0 auto;padding:0 1.4em;}
+
+  header.top{
+    max-width:760px;margin:0 auto;padding:2.6em 1.4em 1.4em;
+    border-bottom:3px solid var(--rule);
+  }
+  header.top .kicker{
+    font-family:"Helvetica Neue",Arial,sans-serif;
+    font-size:0.78em;letter-spacing:.02em;color:var(--marker);
+    margin:0 0 .3em 0;font-weight:600;
+  }
+  header.top h1{
+    font-size:2.1em;margin:0 0 .25em 0;font-weight:600;color:var(--rule);
+  }
+  header.top p{margin:0;color:var(--ink-soft);font-size:1.02em;max-width:56ch;}
+
+  .rule-box{
+    margin:1.6em 1.4em 0; max-width:732px; margin-left:auto;margin-right:auto;
+    background:var(--card);
+    border:1px solid var(--paper-line);
+    border-left:5px solid var(--rule);
+    padding:1.1em 1.3em;
+    border-radius:2px;
+  }
+  .rule-box table{border-collapse:collapse;width:100%;font-family:"Helvetica Neue",Arial,sans-serif;font-size:0.86em;}
+  .rule-box th{
+    text-align:left;background:var(--rule);color:#fff;padding:.5em .6em;
+    font-weight:600;
+  }
+  .rule-box td{padding:.5em .6em;border-bottom:1px solid var(--paper-line);vertical-align:top;}
+  .rule-box tr:last-child td{border-bottom:none;}
+  .rule-box .s{color:var(--marker);font-weight:700;}
+
+  section.ex{
+    max-width:732px;margin:2.4em auto 0;padding:0 1.4em;
+  }
+  .ex-head{
+    display:flex;align-items:baseline;gap:.6em;flex-wrap:wrap;
+    border-bottom:2px solid var(--ink);padding-bottom:.35em;margin-bottom:.2em;
+  }
+  .ex-num{
+    font-family:"Helvetica Neue",Arial,sans-serif;
+    font-weight:700;color:var(--marker);font-size:1.05em;
+  }
+  .ex-title{font-size:1.3em;font-weight:600;color:var(--rule);}
+  .ex-sub{
+    font-family:"Helvetica Neue",Arial,sans-serif;font-size:.86em;color:var(--ink-soft);
+    margin:.5em 0 1em 0;
+  }
+  .bank{
+    font-family:"Helvetica Neue",Arial,sans-serif;font-size:.82em;color:var(--ink);
+    background:var(--marker-soft); border:1px dashed var(--marker);
+    padding:.55em .8em; border-radius:3px; margin-bottom:1.1em;
+  }
+
+  ol.items{list-style:none;margin:0;padding:0;counter-reset:item;}
+  li.item{
+    counter-increment:item;
+    padding:.7em 0;
+    border-bottom:1px dotted var(--paper-line);
+    position:relative;
+  }
+  li.item:last-child{border-bottom:none;}
+  .item-row{display:flex;gap:.6em;align-items:flex-start;}
+  .item-num{
+    font-family:"Helvetica Neue",Arial,sans-serif;font-weight:700;color:var(--pencil);
+    min-width:1.4em;padding-top:.32em;font-size:.92em;
+  }
+  .item-body{flex:1;}
+  .prompt{font-size:1.03em;}
+  .prompt .hint{color:var(--ink-soft);font-style:italic;font-size:.92em;}
+  input.blank{
+    font-family:inherit;font-size:1em;color:var(--ink);
+    border:none;border-bottom:2px solid var(--pencil);
+    background:transparent;padding:.05em .2em;
+    min-width:9em; outline:none;
+  }
+  input.blank:focus{border-bottom-color:var(--marker);}
+  input.wide{min-width:22em;max-width:100%;width:70%;}
+  .item-body.correct input.blank{border-bottom-color:var(--good);background:var(--good-bg);}
+  .item-body.incorrect input.blank{border-bottom-color:var(--bad);background:var(--bad-bg);}
+  .feedback{
+    font-family:"Helvetica Neue",Arial,sans-serif;font-size:.85em;
+    margin-top:.35em; display:none; padding:.4em .6em; border-radius:3px;
+  }
+  .item-body.correct .feedback{display:block;background:var(--good-bg);color:var(--good);}
+  .item-body.incorrect .feedback{display:block;background:var(--bad-bg);color:var(--bad);}
+  .item-body.revealed .feedback{display:block;background:#F0EEE6;color:var(--ink-soft);}
+  .feedback b{color:inherit;}
+
+  .ex-controls{
+    display:flex;gap:.7em;margin:1.1em 0 .3em;font-family:"Helvetica Neue",Arial,sans-serif;
+  }
+  button{
+    font-family:"Helvetica Neue",Arial,sans-serif;font-size:.88em;font-weight:600;
+    padding:.55em 1.1em; border-radius:3px; cursor:pointer;
+    border:1.5px solid var(--rule); background:var(--rule); color:#fff;
+    transition:background .15s ease, color .15s ease;
+  }
+  button:hover{background:#0a2c40;}
+  button.ghost{
+    background:transparent;color:var(--rule);
+  }
+  button.ghost:hover{background:var(--rule);color:#fff;}
+  .score{
+    font-family:"Helvetica Neue",Arial,sans-serif;font-size:.86em;color:var(--ink-soft);
+    align-self:center;margin-left:auto;
+  }
+  .score b{color:var(--rule);}
+
+  footer{
+    max-width:732px;margin:3em auto 0;padding:1.4em;text-align:center;
+    color:var(--ink-soft); font-family:"Helvetica Neue",Arial,sans-serif;font-size:.82em;
+  }
+
+  @media (max-width:560px){
+    header.top h1{font-size:1.6em;}
+    .item-row{flex-direction:column;gap:.2em;}
+    input.wide{width:100%;}
+    .rule-box table{font-size:.78em;}
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <p class="kicker">Present Simple · практика</p>
+  <h1>Present Simple: окончание -s</h1>
+  <p>Девять упражнений по 8 заданий на утвердительную, отрицательную и вопросительную форму, а также на правильное добавление -s/-es к глаголу. Заполняй пропуски, жми «Проверить» или «Показать ответы» — под каждым заданием появится объяснение.</p>
+</header>
+
+<div class="rule-box">
+  <table>
+    <thead><tr><th></th><th>+</th><th>−</th><th>?</th><th>Краткий ответ</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>I, you, we, they</td>
+        <td>I / you / we / they <span class="s">run</span></td>
+        <td>I / you / we / they don't run</td>
+        <td>Do you / they run?</td>
+        <td>Yes, I do. / No, I don't.</td>
+      </tr>
+      <tr>
+        <td>He, she, it</td>
+        <td>He / she / it run<span class="s">s</span></td>
+        <td>He / she / it doesn't run</td>
+        <td>Does she run?</td>
+        <td>Yes, he does. / No, he doesn't.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="wrap" style="margin-top:1.4em;">
+  <div class="bank"><b>Слова для упражнений:</b> leave home · have lunch · get up · go to bed · start work · watch TV · finish work · make dinner · get home</div>
+</div>
+
+<div id="exercises"></div>
+
+<footer>Present Simple · -s только один раз в предложении — на глаголе или на does</footer>
+
+<script>
+const DATA = [
+{
+  title: "Fill in the gaps",
+  sub: "Поставь глагол в скобках в нужную форму 3-го лица (he/she/it). Обрати внимание на orthography: -s, -es, -ies.",
+  bank: false,
+  wide: false,
+  items: [
+    {prompt:"She ___ TV every evening. (watch)", answer:["watches"], exp:"Глагол оканчивается на -ch → добавляем -es: watch → watches."},
+    {prompt:"He ___ English every day. (study)", answer:["studies"], exp:"Согласная + y → y меняется на i, добавляем -es: study → studies."},
+    {prompt:"My brother ___ to school by bus. (go)", answer:["goes"], exp:"Глагол оканчивается на -o → добавляем -es: go → goes."},
+    {prompt:"Tom ___ breakfast at 7 am. (have)", answer:["has"], exp:"have — исключение: he/she/it has, а не haves."},
+    {prompt:"It ___ very fast. (fly)", answer:["flies"], exp:"Согласная + y → y меняется на i, добавляем -es: fly → flies."},
+    {prompt:"She ___ her homework after school. (do)", answer:["does"], exp:"do — исключение: he/she/it does /dʌz/."},
+    {prompt:"My mother ___ the dishes after dinner. (wash)", answer:["washes"], exp:"Глагол оканчивается на -sh → добавляем -es: wash → washes."},
+    {prompt:"He ___ football on Sundays. (play)", answer:["plays"], exp:"Гласная + y → просто добавляем -s: play → plays (y не меняется)."}
+  ]
+},
+{
+  title: "+ Positive: mix of subjects",
+  sub: "Поставь глагол в скобках в утвердительную форму present simple. Следи за подлежащим.",
+  items: [
+    {prompt:"I ___ home at 8 o'clock. (leave)", answer:["leave"], exp:"Подлежащее I → базовая форма, без -s."},
+    {prompt:"She ___ home at 8 o'clock. (leave)", answer:["leaves"], exp:"she — 3-е лицо ед. числа → +s: leave → leaves."},
+    {prompt:"They ___ lunch at 1 pm. (have)", answer:["have"], exp:"they → базовая форма have, без изменений."},
+    {prompt:"He ___ lunch at 1 pm. (have)", answer:["has"], exp:"he — 3-е лицо, have — исключение → has."},
+    {prompt:"We ___ at 7 am. (get up)", answer:["get up"], exp:"we → базовая форма get up, без -s."},
+    {prompt:"My sister ___ at 7 am. (get up)", answer:["gets up"], exp:"my sister = she → +s: get up → gets up."},
+    {prompt:"You ___ at 9 am. (start work)", answer:["start work"], exp:"you → базовая форма, без -s."},
+    {prompt:"Mr Brown ___ at 9 am. (start work)", answer:["starts work"], exp:"Mr Brown = he → +s: start → starts work."}
+  ]
+},
+{
+  title: "− Negative: mix of subjects",
+  sub: "Поставь глагол в скобках в отрицательную форму: don't / doesn't + базовая форма глагола.",
+  items: [
+    {prompt:"I ___ TV in the morning. (not watch)", answer:["don't watch","do not watch"], exp:"I → don't + базовая форма глагола: don't watch."},
+    {prompt:"She ___ TV in the morning. (not watch)", answer:["doesn't watch","does not watch"], exp:"she → doesn't + базовая форма (без -s на самом глаголе!): doesn't watch."},
+    {prompt:"They ___ work at 5 pm. (not finish)", answer:["don't finish","do not finish"], exp:"they → don't + базовая форма: don't finish."},
+    {prompt:"He ___ work at 5 pm. (not finish)", answer:["doesn't finish","does not finish"], exp:"he → doesn't finish, -s уходит с doesn't, а не с finish."},
+    {prompt:"We ___ dinner every day. (not make)", answer:["don't make","do not make"], exp:"we → don't make."},
+    {prompt:"My mother ___ dinner every day. (not make)", answer:["doesn't make","does not make"], exp:"my mother = she → doesn't make."},
+    {prompt:"You ___ to bed late. (not go)", answer:["don't go","do not go"], exp:"you → don't go."},
+    {prompt:"The children ___ to bed late. (not go)", answer:["don't go","do not go"], exp:"the children = they (мн. число) → don't go, а не doesn't."}
+  ]
+},
+{
+  title: "? Question: mix of subjects",
+  sub: "Напиши вопрос целиком: Do/Does + подлежащее + базовая форма глагола.",
+  items: [
+    {prompt:"___ home late? (you, get)", answer:["Do you get","do you get"], exp:"you → Do you get...?"},
+    {prompt:"___ home late? (she, get)", answer:["Does she get","does she get"], exp:"she → Does she get...? -s переходит на does, get остаётся базовым."},
+    {prompt:"___ work early? (they, start)", answer:["Do they start","do they start"], exp:"they → Do they start...?"},
+    {prompt:"___ work early? (he, start)", answer:["Does he start","does he start"], exp:"he → Does he start...?"},
+    {prompt:"___ lunch together? (we, have)", answer:["Do we have","do we have"], exp:"we → Do we have...?"},
+    {prompt:"___ lunch together? (Tom, have)", answer:["Does Tom have","does Tom have"], exp:"Tom = he → Does Tom have...?"},
+    {prompt:"___ TV at night? (your parents, watch)", answer:["Do your parents watch","do your parents watch"], exp:"your parents = they → Do your parents watch...?"},
+    {prompt:"___ TV at night? (your sister, watch)", answer:["Does your sister watch","does your sister watch"], exp:"your sister = she → Does your sister watch...?"}
+  ]
+},
+{
+  title: "Mix +/−/? — построй предложение",
+  sub: "По подсказке в скобках (+, −, ?) напиши целое предложение, используя данные слова.",
+  wide:true,
+  items: [
+    {prompt:"she / get up / early (+)", answer:["she gets up early"], exp:"she → +s: She gets up early."},
+    {prompt:"I / go to bed / late (−)", answer:["i don't go to bed late","i do not go to bed late"], exp:"I → don't go to bed late."},
+    {prompt:"he / finish work / at 6 (?)", answer:["does he finish work at 6"], exp:"he → Does he finish work at 6?"},
+    {prompt:"we / make dinner / together (+)", answer:["we make dinner together"], exp:"we → базовая форма: We make dinner together."},
+    {prompt:"Tom / watch TV / every day (−)", answer:["tom doesn't watch tv every day","tom does not watch tv every day"], exp:"Tom = he → Tom doesn't watch TV every day."},
+    {prompt:"they / have lunch / at school (?)", answer:["do they have lunch at school"], exp:"they → Do they have lunch at school?"},
+    {prompt:"my dog / get home / before me (+)", answer:["my dog gets home before me"], exp:"my dog = it → +s: My dog gets home before me."},
+    {prompt:"you / leave home / at 8 (?)", answer:["do you leave home at 8"], exp:"you → Do you leave home at 8?"}
+  ]
+},
+{
+  title: "Find the mistake",
+  sub: "В каждом предложении есть ошибка. Перепиши предложение правильно целиком.",
+  wide:true,
+  items: [
+    {prompt:"She go to school every day.", answer:["she goes to school every day"], exp:"she → нужен -s: goes, а не go."},
+    {prompt:"He don't like coffee.", answer:["he doesn't like coffee"], exp:"he → doesn't, а не don't."},
+    {prompt:"Do she have lunch at 1?", answer:["does she have lunch at 1"], exp:"she → Does, а не Do."},
+    {prompt:"They watches TV every evening.", answer:["they watch tv every evening"], exp:"they → базовая форма watch, без -s."},
+    {prompt:"My brother study English on Mondays.", answer:["my brother studies english on mondays"], exp:"my brother = he → нужен -s: studies."},
+    {prompt:"I doesn't get up early.", answer:["i don't get up early"], exp:"I → don't, а не doesn't."},
+    {prompt:"Does your sister works at a bank?", answer:["does your sister work at a bank"], exp:"после does глагол в базовой форме: work, без -s."},
+    {prompt:"We goes home at 5 pm.", answer:["we go home at 5 pm"], exp:"we → базовая форма go, без -s."}
+  ]
+},
+{
+  title: "Translate",
+  sub: "Переведи предложение на английский, используя слова из банка сверху.",
+  wide:true,
+  items: [
+    {prompt:"Он встаёт в 7 утра.", answer:["he gets up at 7 am","he gets up at 7"], exp:"he → gets up (+s)."},
+    {prompt:"Я не смотрю телевизор по утрам.", answer:["i don't watch tv in the mornings","i don't watch tv in the morning","i do not watch tv in the mornings"], exp:"I → don't watch."},
+    {prompt:"Она уходит из дома в 8 часов.", answer:["she leaves home at 8 o'clock","she leaves home at 8"], exp:"she → leaves (+s)."},
+    {prompt:"Они не заканчивают работу поздно.", answer:["they don't finish work late","they do not finish work late"], exp:"they → don't finish."},
+    {prompt:"Ты ложишься спать рано?", answer:["do you go to bed early"], exp:"you → Do you go to bed early?"},
+    {prompt:"Мой отец начинает работу в 9 утра.", answer:["my father starts work at 9 am","my father starts work at 9"], exp:"my father = he → starts (+s)."},
+    {prompt:"Мы обедаем вместе.", answer:["we have lunch together"], exp:"we → базовая форма have."},
+    {prompt:"Она приходит домой поздно?", answer:["does she get home late"], exp:"she → Does she get home late?"}
+  ]
+},
+{
+  title: "Sentence Builder",
+  sub: "Собери слова в правильное предложение.",
+  wide:true,
+  items: [
+    {prompt:"gets / He / up / early", answer:["he gets up early"], exp:"He gets up early. — подлежащее + глагол+s + обстоятельство."},
+    {prompt:"doesn't / She / TV / watch", answer:["she doesn't watch tv"], exp:"She doesn't watch TV. — she + doesn't + базовая форма."},
+    {prompt:"lunch / Do / have / you", answer:["do you have lunch"], exp:"Do you have lunch? — Do + подлежащее + базовая форма."},
+    {prompt:"work / doesn't / finish / He / at 6", answer:["he doesn't finish work at 6"], exp:"He doesn't finish work at 6."},
+    {prompt:"Does / home / she / leave / at 8", answer:["does she leave home at 8"], exp:"Does she leave home at 8?"},
+    {prompt:"dinner / We / make / together", answer:["we make dinner together"], exp:"We make dinner together."},
+    {prompt:"don't / They / up / get / early", answer:["they don't get up early"], exp:"They don't get up early."},
+    {prompt:"Does / work / he / start / at 9", answer:["does he start work at 9"], exp:"Does he start work at 9?"}
+  ]
+},
+{
+  title: "Change the person",
+  sub: "Перепиши предложение, заменив подлежащее на указанное в скобках.",
+  wide:true,
+  items: [
+    {prompt:"I get up at 7. (She)", answer:["she gets up at 7"], exp:"she → gets up (+s)."},
+    {prompt:"They watch TV every evening. (He)", answer:["he watches tv every evening"], exp:"he → watches (+es, т.к. -ch)."},
+    {prompt:"We don't have lunch at school. (My sister)", answer:["my sister doesn't have lunch at school"], exp:"my sister = she → doesn't have."},
+    {prompt:"Do you finish work at 5? (Tom)", answer:["does tom finish work at 5"], exp:"Tom = he → Does Tom finish...?"},
+    {prompt:"He doesn't go to bed late. (I)", answer:["i don't go to bed late"], exp:"I → don't go."},
+    {prompt:"She makes dinner every day. (My parents)", answer:["my parents make dinner every day"], exp:"my parents = they → базовая форма make, без -s."},
+    {prompt:"Does he leave home early? (they)", answer:["do they leave home early"], exp:"they → Do they leave...?"},
+    {prompt:"I get home at 6. (it — my dog)", answer:["it gets home at 6"], exp:"it → gets (+s)."}
+  ]
+}
+];
+
+function normalize(s){
+  return s.trim().toLowerCase()
+    .replace(/['’]/g,"'")
+    .replace(/[.!?]/g,"")
+    .replace(/\s+/g," ");
+}
+
+function buildExercise(ex, idx){
+  const section = document.createElement("section");
+  section.className = "ex";
+
+  const head = document.createElement("div");
+  head.className = "ex-head";
+  head.innerHTML = `<span class="ex-num">${idx+1}</span><span class="ex-title">${ex.title}</span>`;
+  section.appendChild(head);
+
+  const sub = document.createElement("p");
+  sub.className = "ex-sub";
+  sub.textContent = ex.sub;
+  section.appendChild(sub);
+
+  const ol = document.createElement("ol");
+  ol.className = "items";
+
+  ex.items.forEach((it, i)=>{
+    const li = document.createElement("li");
+    li.className = "item";
+
+    const row = document.createElement("div");
+    row.className = "item-row";
+
+    const num = document.createElement("div");
+    num.className = "item-num";
+    num.textContent = (i+1)+".";
+
+    const body = document.createElement("div");
+    body.className = "item-body";
+
+    const p = document.createElement("div");
+    p.className = "prompt";
+    const parts = it.prompt.split("___");
+    if(parts.length === 2){
+      p.innerHTML = escapeHtml(parts[0]);
+      const input = document.createElement("input");
+      input.type = "text";
+      input.className = "blank" + (ex.wide ? " wide" : "");
+      input.autocomplete = "off";
+      input.spellcheck = false;
+      p.appendChild(input);
+      p.appendChild(document.createTextNode(parts[1]));
+    } else {
+      const input = document.createElement("input");
+      input.type = "text";
+      input.className = "blank wide";
+      input.autocomplete = "off";
+      input.spellcheck = false;
+      p.appendChild(document.createTextNode(it.prompt + "  →  "));
+      p.appendChild(input);
+    }
+
+    const fb = document.createElement("div");
+    fb.className = "feedback";
+
+    body.appendChild(p);
+    body.appendChild(fb);
+    row.appendChild(num);
+    row.appendChild(body);
+    li.appendChild(row);
+    ol.appendChild(li);
+
+    body._item = it;
+    body._input = p.querySelector("input");
+    body._fb = fb;
+  });
+
+  section.appendChild(ol);
+
+  const controls = document.createElement("div");
+  controls.className = "ex-controls";
+  const checkBtn = document.createElement("button");
+  checkBtn.textContent = "Проверить";
+  const showBtn = document.createElement("button");
+  showBtn.className = "ghost";
+  showBtn.textContent = "Показать ответы";
+  const score = document.createElement("span");
+  score.className = "score";
+
+  checkBtn.addEventListener("click", ()=>{
+    let correct = 0;
+    ol.querySelectorAll(".item-body").forEach(body=>{
+      const val = normalize(body._input.value || "");
+      const ok = body._item.answer.some(a => normalize(a) === val);
+      body.classList.remove("correct","incorrect","revealed");
+      if(val === ""){
+        body._fb.textContent = "";
+      } else if(ok){
+        body.classList.add("correct");
+        body._fb.innerHTML = "<b>Верно.</b> " + escapeHtml(body._item.exp);
+        correct++;
+      } else {
+        body.classList.add("incorrect");
+        body._fb.innerHTML = "<b>Неверно.</b> Правильный ответ: <b>" + escapeHtml(body._item.answer[0]) + "</b>. " + escapeHtml(body._item.exp);
+      }
+    });
+    score.innerHTML = "Правильно: <b>"+correct+" / "+ex.items.length+"</b>";
+  });
+
+  showBtn.addEventListener("click", ()=>{
+    ol.querySelectorAll(".item-body").forEach(body=>{
+      body.classList.remove("correct","incorrect");
+      body.classList.add("revealed");
+      body._input.value = body._item.answer[0];
+      body._fb.innerHTML = "<b>Ответ:</b> " + escapeHtml(body._item.answer[0]) + " — " + escapeHtml(body._item.exp);
+    });
+    score.textContent = "";
+  });
+
+  controls.appendChild(checkBtn);
+  controls.appendChild(showBtn);
+  controls.appendChild(score);
+  section.appendChild(controls);
+
+  return section;
+}
+
+function escapeHtml(s){
+  const d = document.createElement("div");
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+const container = document.getElementById("exercises");
+DATA.forEach((ex, idx)=> container.appendChild(buildExercise(ex, idx)));
+</script>
+
+</body>
+</html>
