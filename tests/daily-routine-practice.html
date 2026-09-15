@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daily Routine — практика A1</title>
+<style>
+  :root{
+    --paper:#F5F6F1;
+    --panel:#FFFFFF;
+    --ink:#22303B;
+    --ink-soft:#5B6B75;
+    --teal:#2C6E68;
+    --teal-dark:#1E4F4B;
+    --amber:#D98C2B;
+    --red:#C1443A;
+    --red-bg:#FBEAE8;
+    --green:#3D8B5F;
+    --green-bg:#E9F5EC;
+    --line:#DDE3DD;
+    --mono: "IBM Plex Mono", "Courier New", monospace;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family: "Iowan Old Style","Georgia","Charter",serif;
+    line-height:1.5;
+  }
+  .sans{ font-family:"Helvetica Neue",Arial,sans-serif; }
+  h1,h2,h3{ font-family:"Helvetica Neue",Arial,sans-serif; font-weight:700; letter-spacing:-0.01em; }
+
+  .top{
+    background:var(--teal-dark);
+    color:#F5F6F1;
+    padding:28px 24px 22px;
+  }
+  .top-inner{ max-width:1180px; margin:0 auto; }
+  .top h1{ margin:0 0 6px; font-size:28px; }
+  .top p{ margin:0; color:#CFE3DF; font-family:"Helvetica Neue",Arial,sans-serif; font-size:14.5px; max-width:640px;}
+  .audio-check{
+    margin-top:16px; display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+  }
+  .audio-check button{
+    background:#F5F6F1; color:var(--teal-dark); border:none; border-radius:3px;
+    padding:9px 14px; font-family:"Helvetica Neue",Arial,sans-serif; font-size:13.5px; font-weight:600; cursor:pointer;
+  }
+  .audio-status{ font-family:"Helvetica Neue",Arial,sans-serif; font-size:13px; color:#CFE3DF; }
+  .audio-status.ok{ color:#9BE3B4; }
+  .audio-status.bad{ color:#F1B3AC; }
+
+  .layout{
+    max-width:1180px; margin:0 auto; padding:26px 24px 80px;
+    display:grid; grid-template-columns: 1fr 260px; gap:32px; align-items:start;
+  }
+  main{ min-width:0; }
+
+  .sidebar{
+    position:sticky; top:16px;
+    background:var(--panel); border:1px solid var(--line); border-radius:4px;
+    padding:16px 16px 18px;
+    font-family:"Helvetica Neue",Arial,sans-serif;
+  }
+  .sidebar h3{ margin:0 0 4px; font-size:14.5px; color:var(--teal-dark); }
+  .sidebar .sub{ font-size:12px; color:var(--ink-soft); margin:0 0 12px; }
+  .sidebar table{ width:100%; border-collapse:collapse; font-size:13px; }
+  .sidebar th{ text-align:left; font-size:11px; text-transform:none; color:var(--ink-soft); font-weight:600; border-bottom:1px solid var(--line); padding-bottom:6px; }
+  .sidebar td{ padding:7px 0; border-bottom:1px solid #EEF1EC; vertical-align:top; }
+  .sidebar .empty{ font-size:12.5px; color:var(--ink-soft); padding:8px 0; }
+  .err-count{
+    display:inline-block; min-width:18px; text-align:center; background:var(--red-bg); color:var(--red);
+    border-radius:9px; font-size:11.5px; padding:1px 6px; font-weight:700;
+  }
+
+  section.block{ margin-bottom:44px; }
+
+  .vocab-box{
+    background:var(--panel); border:1px solid var(--line); border-radius:4px; padding:20px 22px 22px;
+  }
+  .vocab-box h2{ font-size:19px; margin:0 0 4px; color:var(--teal-dark); }
+  .vocab-box .lead{ font-family:"Helvetica Neue",Arial,sans-serif; font-size:13.5px; color:var(--ink-soft); margin:0 0 16px; }
+  .vocab-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+  .vocab-item{
+    display:flex; align-items:center; gap:10px; border:1px solid var(--line); border-radius:3px; padding:10px 12px;
+    font-family:"Helvetica Neue",Arial,sans-serif;
+  }
+  .vocab-item button.play{
+    flex:0 0 auto; width:32px; height:32px; border-radius:50%; border:1px solid var(--teal);
+    background:transparent; color:var(--teal); cursor:pointer; font-size:14px; line-height:1;
+  }
+  .vocab-item button.play:hover{ background:var(--teal); color:#fff; }
+  .vocab-text .en{ font-weight:700; font-size:14.5px; }
+  .vocab-text .ipa{ font-family:var(--mono); font-size:12px; color:var(--amber); }
+  .vocab-text .ru{ font-size:12.5px; color:var(--ink-soft); }
+
+  .ex-head{ display:flex; align-items:baseline; gap:12px; margin-bottom:4px; flex-wrap:wrap; }
+  .ex-num{ font-family:"Helvetica Neue",Arial,sans-serif; font-size:12.5px; color:var(--amber); font-weight:700; }
+  .ex-title{ font-size:21px; margin:0; }
+  .ex-instructions{ font-family:"Helvetica Neue",Arial,sans-serif; font-size:13.5px; color:var(--ink-soft); margin:2px 0 16px; }
+
+  .item-list{ display:flex; flex-direction:column; gap:10px; }
+  .item-row{
+    background:var(--panel); border:1px solid var(--line); border-radius:4px;
+    padding:12px 14px; display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+  }
+  .item-idx{ font-family:"Helvetica Neue",Arial,sans-serif; font-size:12px; color:var(--ink-soft); width:18px; flex:0 0 auto;}
+  .item-prompt{ font-family:"Helvetica Neue",Arial,sans-serif; font-size:14.5px; flex:1 1 260px; min-width:200px; }
+  .item-prompt .scrambled{ font-family:var(--mono); letter-spacing:0.02em; font-size:15px; }
+  .item-prompt .masked{ font-family:var(--mono); font-size:15px; }
+  .item-input{
+    font-family:"Helvetica Neue",Arial,sans-serif; font-size:14px; padding:7px 10px; border:1px solid var(--line);
+    border-radius:3px; width:220px; background:#FCFCFA;
+  }
+  .item-input:focus{ outline:2px solid var(--teal); outline-offset:1px; }
+  .item-input.correct{ border-color:var(--green); background:var(--green-bg); }
+  .item-input.incorrect{ border-color:var(--red); background:var(--red-bg); }
+  .item-answer{ font-family:"Helvetica Neue",Arial,sans-serif; font-size:12.5px; color:var(--teal-dark); display:none; }
+  .item-answer.show{ display:inline; }
+  .item-audio-btn{
+    flex:0 0 auto; border:1px solid var(--teal); background:transparent; color:var(--teal); border-radius:50%;
+    width:34px; height:34px; cursor:pointer; font-size:14px;
+  }
+  .item-audio-btn:hover{ background:var(--teal); color:#fff; }
+
+  .to-select{ display:flex; gap:6px; }
+  .to-select button{
+    font-family:"Helvetica Neue",Arial,sans-serif; font-size:13px; padding:6px 12px; border-radius:3px;
+    border:1px solid var(--line); background:#FCFCFA; cursor:pointer;
+  }
+  .to-select button.picked{ background:var(--teal); color:#fff; border-color:var(--teal); }
+  .to-select button.correct{ border-color:var(--green); box-shadow:inset 0 0 0 2px var(--green); }
+  .to-select button.incorrect{ border-color:var(--red); box-shadow:inset 0 0 0 2px var(--red); }
+
+  .cloze-text{
+    font-family:"Helvetica Neue",Arial,sans-serif; font-size:15.5px; line-height:2.05;
+    background:var(--panel); border:1px solid var(--line); border-radius:4px; padding:18px 20px;
+  }
+  .cloze-text input{
+    font-family:"Helvetica Neue",Arial,sans-serif; font-size:14px; width:130px; padding:3px 6px;
+    border:none; border-bottom:2px solid var(--teal); background:transparent; text-align:center;
+  }
+  .cloze-text input.correct{ border-bottom-color:var(--green); background:var(--green-bg); }
+  .cloze-text input.incorrect{ border-bottom-color:var(--red); background:var(--red-bg); }
+  .word-bank{
+    font-family:"Helvetica Neue",Arial,sans-serif; font-size:12.5px; color:var(--ink-soft); margin-top:12px;
+  }
+  .word-bank span{
+    display:inline-block; border:1px solid var(--line); border-radius:12px; padding:3px 10px; margin:3px 4px 0 0;
+  }
+
+  .free-item{
+    background:var(--panel); border:1px solid var(--line); border-radius:4px; padding:12px 14px; margin-bottom:10px;
+  }
+  .free-item label{ display:block; font-family:"Helvetica Neue",Arial,sans-serif; font-size:13.5px; margin-bottom:6px; color:var(--ink); }
+  .free-item label b{ color:var(--teal-dark); }
+  .free-item textarea{
+    width:100%; min-height:44px; font-family:"Helvetica Neue",Arial,sans-serif; font-size:14px;
+    border:1px solid var(--line); border-radius:3px; padding:8px 10px; resize:vertical; background:#FCFCFA;
+  }
+  .free-item textarea:focus{ outline:2px solid var(--teal); outline-offset:1px; }
+
+  .toolbar{ display:flex; gap:10px; margin-top:14px; flex-wrap:wrap; align-items:center; }
+  .btn{
+    font-family:"Helvetica Neue",Arial,sans-serif; font-size:13.5px; font-weight:600; padding:9px 16px;
+    border-radius:3px; border:1px solid var(--teal); background:var(--teal); color:#fff; cursor:pointer;
+  }
+  .btn.secondary{ background:transparent; color:var(--teal-dark); }
+  .btn.ghost{ background:transparent; color:var(--ink-soft); border-color:var(--line); }
+  .btn:hover{ opacity:0.88; }
+  .score{ font-family:"Helvetica Neue",Arial,sans-serif; font-size:13.5px; color:var(--ink-soft); }
+  .copy-msg{ font-family:"Helvetica Neue",Arial,sans-serif; font-size:12.5px; color:var(--green); display:none; }
+  .copy-msg.show{ display:inline; }
+
+  @media (max-width: 880px){
+    .layout{ grid-template-columns:1fr; }
+    .sidebar{ position:static; }
+    .vocab-grid{ grid-template-columns:1fr 1fr; }
+  }
+  @media (max-width: 560px){
+    .vocab-grid{ grid-template-columns:1fr; }
+    .item-input{ width:100%; }
+  }
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="top-inner">
+    <h1>Daily Routine — режим дня</h1>
+    <p>9 фраз, 6 заданий на проверку и 2 задания на письмо. Уровень A1. Прежде чем начать, проверьте звук и повторите слова ниже.</p>
+    <div class="audio-check">
+      <button id="testAudioBtn" class="sans">🔊 Проверить звук</button>
+      <span id="audioStatus" class="audio-status">Нажмите, чтобы проверить, что браузер озвучивает английские слова.</span>
+    </div>
+  </div>
+</div>
+
+<div class="layout">
+  <main>
+
+    <section class="block">
+      <div class="vocab-box">
+        <h2>Слова урока</h2>
+        <p class="lead">Нажмите на 🔊, чтобы услышать произношение (голос Google US English). Прочитайте транскрипцию и перевод.</p>
+        <div class="vocab-grid" id="vocabGrid"></div>
+      </div>
+    </section>
+
+    <section class="block" id="ex1">
+      <div class="ex-head"><span class="ex-num">Задание 1</span><h3 class="ex-title">Вставьте пропущенные буквы</h3></div>
+      <p class="ex-instructions">Прочитайте фразу с пропущенными буквами и впишите её целиком правильно.</p>
+      <div class="item-list" id="ex1-list"></div>
+      <div class="toolbar">
+        <button class="btn" onclick="checkExercise('ex1')">Проверить</button>
+        <button class="btn secondary" onclick="toggleAnswers('ex1')">Показать ответы</button>
+        <span class="score" id="ex1-score"></span>
+      </div>
+    </section>
+
+    <section class="block" id="ex2">
+      <div class="ex-head"><span class="ex-num">Задание 2</span><h3 class="ex-title">Unscramble the word</h3></div>
+      <p class="ex-instructions">Буквы в словах перепутаны. Соберите фразу правильно.</p>
+      <div class="item-list" id="ex2-list"></div>
+      <div class="toolbar">
+        <button class="btn" onclick="checkExercise('ex2')">Проверить</button>
+        <button class="btn secondary" onclick="toggleAnswers('ex2')">Показать ответы</button>
+        <span class="score" id="ex2-score"></span>
+      </div>
+    </section>
+
+    <section class="block" id="ex3">
+      <div class="ex-head"><span class="ex-num">Задание 3</span><h3 class="ex-title">Переведите на английский</h3></div>
+      <p class="ex-instructions">Напишите английскую фразу, которая соответствует русскому переводу.</p>
+      <div class="item-list" id="ex3-list"></div>
+      <div class="toolbar">
+        <button class="btn" onclick="checkExercise('ex3')">Проверить</button>
+        <button class="btn secondary" onclick="toggleAnswers('ex3')">Показать ответы</button>
+        <span class="score" id="ex3-score"></span>
+      </div>
+    </section>
+
+    <section class="block" id="ex4">
+      <div class="ex-head"><span class="ex-num">Задание 4</span><h3 class="ex-title">Напишите фразу на слух</h3></div>
+      <p class="ex-instructions">Нажмите 🔊, прослушайте фразу и запишите её по буквам.</p>
+      <div class="item-list" id="ex4-list"></div>
+      <div class="toolbar">
+        <button class="btn" onclick="checkExercise('ex4')">Проверить</button>
+        <button class="btn secondary" onclick="toggleAnswers('ex4')">Показать ответы</button>
+        <span class="score" id="ex4-score"></span>
+      </div>
+    </section>
+
+    <section class="block" id="ex5">
+      <div class="ex-head"><span class="ex-num">Задание 5</span><h3 class="ex-title">Сочетаемость: to или ничего?</h3></div>
+      <p class="ex-instructions">Выберите, нужен ли предлог <b>to</b> перед словом, или предлог не нужен (—).</p>
+      <div class="item-list" id="ex5-list"></div>
+      <div class="toolbar">
+        <button class="btn" onclick="checkExercise('ex5')">Проверить</button>
+        <button class="btn secondary" onclick="toggleAnswers('ex5')">Показать ответы</button>
+        <span class="score" id="ex5-score"></span>
+      </div>
+    </section>
+
+    <section class="block" id="ex6">
+      <div class="ex-head"><span class="ex-num">Задание 6</span><h3 class="ex-title">Вставьте нужное слово в текст</h3></div>
+      <p class="ex-instructions">Заполните пропуски в рассказе подходящими фразами из банка слов.</p>
+      <div class="cloze-text" id="ex6-text"></div>
+      <div class="word-bank" id="ex6-bank"></div>
+      <div class="toolbar">
+        <button class="btn" onclick="checkExercise('ex6')">Проверить</button>
+        <button class="btn secondary" onclick="toggleAnswers('ex6')">Показать ответы</button>
+        <span class="score" id="ex6-score"></span>
+      </div>
+    </section>
+
+    <section class="block" id="ex7">
+      <div class="ex-head"><span class="ex-num">Задание 7</span><h3 class="ex-title">Закончите предложения своими идеями</h3></div>
+      <p class="ex-instructions">Допишите каждое предложение так, как это верно для вас.</p>
+      <div id="ex7-list"></div>
+      <div class="toolbar">
+        <button class="btn secondary" onclick="copyAnswers('ex7')">Скопировать все ответы</button>
+        <span class="copy-msg" id="ex7-copied">Скопировано!</span>
+      </div>
+    </section>
+
+    <section class="block" id="ex8">
+      <div class="ex-head"><span class="ex-num">Задание 8</span><h3 class="ex-title">Составьте своё предложение</h3></div>
+      <p class="ex-instructions">Напишите собственное предложение с каждой фразой.</p>
+      <div id="ex8-list"></div>
+      <div class="toolbar">
+        <button class="btn secondary" onclick="copyAnswers('ex8')">Скопировать все ответы</button>
+        <span class="copy-msg" id="ex8-copied">Скопировано!</span>
+      </div>
+    </section>
+
+  </main>
+
+  <aside class="sidebar">
+    <h3>Проблемные слова</h3>
+    <p class="sub">Фразы, в которых были ошибки</p>
+    <table>
+      <thead><tr><th>Фраза</th><th style="text-align:right">Ошибки</th></tr></thead>
+      <tbody id="problemBody"></tbody>
+    </table>
+    <p class="empty" id="problemEmpty">Пока ошибок нет — начните выполнять задания.</p>
+  </aside>
+</div>
+
+<script>
+/* ---------------- DATA ---------------- */
+const VOCAB = [
+  {en:"leave home",  ru:"уходить из дома",       ipa:"/liːv hoʊm/"},
+  {en:"have lunch",  ru:"обедать",               ipa:"/hæv lʌntʃ/"},
+  {en:"get up",      ru:"вставать",              ipa:"/ɡet ʌp/"},
+  {en:"go to bed",   ru:"ложиться спать",        ipa:"/ɡoʊ tə bed/"},
+  {en:"start work",  ru:"начинать работу",       ipa:"/stɑːrt wɜːrk/"},
+  {en:"watch TV",    ru:"смотреть телевизор",    ipa:"/wɑːtʃ ˌtiːˈviː/"},
+  {en:"finish work", ru:"заканчивать работу",    ipa:"/ˈfɪnɪʃ wɜːrk/"},
+  {en:"make dinner", ru:"готовить ужин",         ipa:"/meɪk ˈdɪnər/"},
+  {en:"get home",    ru:"приходить домой",       ipa:"/ɡet hoʊm/"}
+];
+
+const mistakes = {}; // en -> count
+
+/* ---------------- SPEECH ---------------- */
+let chosenVoice = null;
+function pickVoice(){
+  const voices = window.speechSynthesis ? speechSynthesis.getVoices() : [];
+  chosenVoice = voices.find(v => v.name === "Google US English" && v.lang === "en-US")
+             || voices.find(v => v.name.includes("Google US English"))
+             || voices.find(v => v.lang === "en-US")
+             || voices.find(v => v.lang && v.lang.startsWith("en"))
+             || null;
+}
+if (window.speechSynthesis){
+  pickVoice();
+  speechSynthesis.onvoiceschanged = pickVoice;
+}
+function speak(text){
+  if (!window.speechSynthesis){
+    alert("Голосовой движок недоступен в этом браузере. Попробуйте открыть страницу в Chrome.");
+    return;
+  }
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = "en-US";
+  u.rate = 0.9;
+  if (chosenVoice) u.voice = chosenVoice;
+  speechSynthesis.speak(u);
+}
+document.getElementById("testAudioBtn").addEventListener("click", () => {
+  const status = document.getElementById("audioStatus");
+  if (!window.speechSynthesis){
+    status.textContent = "Синтез речи не поддерживается этим браузером.";
+    status.className = "audio-status bad";
+    return;
+  }
+  pickVoice();
+  speak("This is a test. Get up, leave home, go to bed.");
+  status.textContent = chosenVoice
+    ? ("Звук работает. Используется голос: " + chosenVoice.name)
+    : "Звук воспроизводится, но голос Google US English не найден — используется голос по умолчанию.";
+  status.className = "audio-status ok";
+});
+
+/* ---------------- PROBLEM WORDS SIDEBAR ---------------- */
+function markMistake(en){
+  mistakes[en] = (mistakes[en] || 0) + 1;
+  renderProblemWords();
+}
+function renderProblemWords(){
+  const body = document.getElementById("problemBody");
+  const empty = document.getElementById("problemEmpty");
+  const entries = Object.entries(mistakes).sort((a,b) => b[1]-a[1]);
+  body.innerHTML = "";
+  if (entries.length === 0){
+    empty.style.display = "block";
+    return;
+  }
+  empty.style.display = "none";
+  entries.forEach(([en,count]) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${en}</td><td style="text-align:right"><span class="err-count">${count}</span></td>`;
+    body.appendChild(tr);
+  });
+}
+
+/* ---------------- VOCAB INTRO ---------------- */
+const vocabGrid = document.getElementById("vocabGrid");
+VOCAB.forEach(v => {
+  const div = document.createElement("div");
+  div.className = "vocab-item";
+  div.innerHTML = `
+    <button class="play" title="Слушать">🔊</button>
+    <div class="vocab-text">
+      <div class="en">${v.en}</div>
+      <div class="ipa">${v.ipa}</div>
+      <div class="ru">${v.ru}</div>
+    </div>`;
+  div.querySelector(".play").addEventListener("click", () => speak(v.en));
+  vocabGrid.appendChild(div);
+});
+
+/* ---------------- HELPERS ---------------- */
+function norm(s){ return s.trim().toLowerCase().replace(/\s+/g," ").replace(/[.,!?]/g,""); }
+
+function buildTextItem(containerId, items, opts){
+  // items: [{idx, promptHtml, answer, audio(optional), leftPad}]
+  const list = document.getElementById(containerId);
+  items.forEach((it, i) => {
+    const row = document.createElement("div");
+    row.className = "item-row";
+    row.dataset.answer = it.answer;
+    row.dataset.phrase = it.phrase;
+    let audioBtn = "";
+    if (it.audio){
+      audioBtn = `<button type="button" class="item-audio-btn" data-say="${it.audio}">🔊</button>`;
+    }
+    row.innerHTML = `
+      <span class="item-idx">${i+1}.</span>
+      ${audioBtn}
+      <span class="item-prompt">${it.promptHtml}</span>
+      <input type="text" class="item-input" placeholder="Ваш ответ" autocomplete="off" spellcheck="false">
+      <span class="item-answer">Ответ: ${it.answer}</span>
+    `;
+    const audioButton = row.querySelector(".item-audio-btn");
+    if (audioButton) audioButton.addEventListener("click", () => speak(audioButton.dataset.say));
+    list.appendChild(row);
+  });
+}
+
+function checkTextExercise(id){
+  const list = document.getElementById(id + "-list");
+  const rows = list.querySelectorAll(".item-row");
+  let correctCount = 0;
+  rows.forEach(row => {
+    const input = row.querySelector(".item-input");
+    const correctAns = norm(row.dataset.answer);
+    const given = norm(input.value);
+    input.classList.remove("correct","incorrect");
+    if (given.length === 0){
+      return;
+    }
+    if (given === correctAns){
+      input.classList.add("correct");
+      correctCount++;
+    } else {
+      input.classList.add("incorrect");
+      markMistake(row.dataset.phrase);
+    }
+  });
+  document.getElementById(id + "-score").textContent = `Правильно: ${correctCount} из ${rows.length}`;
+}
+
+function toggleAnswers(id){
+  let list;
+  if (id === "ex6"){
+    const hint = document.getElementById("ex6-hint");
+    if (hint) hint.classList.toggle("show");
+    return;
+  } else if (id === "ex5"){
+    list = document.getElementById(id + "-list");
+    const groups = list.querySelectorAll(".to-select");
+    groups.forEach(g => {
+      let tag = g.parentElement.querySelector(".item-answer");
+      tag.classList.toggle("show");
+    });
+    return;
+  } else {
+    list = document.getElementById(id + "-list");
+  }
+  const answers = list.querySelectorAll(".item-answer");
+  answers.forEach(a => a.classList.toggle("show"));
+}
+
+/* ---------------- EXERCISE 1: fill missing letters ---------------- */
+const ex1Data = [
+  {phrase:"start work",  promptHtml:'<span class="masked">st_rt w_rk</span>', answer:"start work"},
+  {phrase:"get home",    promptHtml:'<span class="masked">g_t h_me</span>',   answer:"get home"},
+  {phrase:"have lunch",  promptHtml:'<span class="masked">h_ve l_nch</span>', answer:"have lunch"},
+  {phrase:"finish work", promptHtml:'<span class="masked">fin_sh w_rk</span>',answer:"finish work"},
+  {phrase:"leave home",  promptHtml:'<span class="masked">le_ve h_me</span>', answer:"leave home"},
+  {phrase:"go to bed",   promptHtml:'<span class="masked">g_ to b_d</span>',  answer:"go to bed"},
+  {phrase:"make dinner", promptHtml:'<span class="masked">m_ke d_nner</span>',answer:"make dinner"},
+  {phrase:"get up",      promptHtml:'<span class="masked">g_t _p</span>',     answer:"get up"},
+  {phrase:"watch TV",    promptHtml:'<span class="masked">w_tch TV</span>',   answer:"watch TV"}
+];
+buildTextItem("ex1-list", ex1Data);
+
+/* ---------------- EXERCISE 2: unscramble ---------------- */
+const ex2Data = [
+  {phrase:"make dinner", promptHtml:'<span class="scrambled">aekm renndi</span>', answer:"make dinner"},
+  {phrase:"get up",      promptHtml:'<span class="scrambled">tge pu</span>',      answer:"get up"},
+  {phrase:"watch TV",    promptHtml:'<span class="scrambled">tachw TV</span>',    answer:"watch TV"},
+  {phrase:"leave home",  promptHtml:'<span class="scrambled">aleev omhe</span>',  answer:"leave home"},
+  {phrase:"get home",    promptHtml:'<span class="scrambled">tge omhe</span>',    answer:"get home"},
+  {phrase:"start work",  promptHtml:'<span class="scrambled">atrst rkow</span>',  answer:"start work"},
+  {phrase:"have lunch",  promptHtml:'<span class="scrambled">ahve cnluh</span>',  answer:"have lunch"},
+  {phrase:"finish work", promptHtml:'<span class="scrambled">hsinfi kowr</span>', answer:"finish work"},
+  {phrase:"go to bed",   promptHtml:'<span class="scrambled">og to deb</span>',   answer:"go to bed"}
+];
+buildTextItem("ex2-list", ex2Data);
+
+/* ---------------- EXERCISE 3: translation RU -> EN ---------------- */
+const ex3Data = [
+  {phrase:"go to bed",   promptHtml:"ложиться спать",       answer:"go to bed"},
+  {phrase:"leave home",  promptHtml:"уходить из дома",      answer:"leave home"},
+  {phrase:"finish work", promptHtml:"заканчивать работу",   answer:"finish work"},
+  {phrase:"have lunch",  promptHtml:"обедать",              answer:"have lunch"},
+  {phrase:"make dinner", promptHtml:"готовить ужин",        answer:"make dinner"},
+  {phrase:"watch TV",    promptHtml:"смотреть телевизор",   answer:"watch TV"},
+  {phrase:"get up",      promptHtml:"вставать",             answer:"get up"},
+  {phrase:"get home",    promptHtml:"приходить домой",      answer:"get home"},
+  {phrase:"start work",  promptHtml:"начинать работу",      answer:"start work"}
+];
+buildTextItem("ex3-list", ex3Data);
+
+/* ---------------- EXERCISE 4: dictation ---------------- */
+const ex4Data = [
+  {phrase:"get home",    promptHtml:"Нажмите 🔊 и напишите фразу", answer:"get home",    audio:"get home"},
+  {phrase:"go to bed",   promptHtml:"Нажмите 🔊 и напишите фразу", answer:"go to bed",   audio:"go to bed"},
+  {phrase:"make dinner", promptHtml:"Нажмите 🔊 и напишите фразу", answer:"make dinner", audio:"make dinner"},
+  {phrase:"start work",  promptHtml:"Нажмите 🔊 и напишите фразу", answer:"start work",  audio:"start work"},
+  {phrase:"have lunch",  promptHtml:"Нажмите 🔊 и напишите фразу", answer:"have lunch",  audio:"have lunch"},
+  {phrase:"finish work", promptHtml:"Нажмите 🔊 и напишите фразу", answer:"finish work", audio:"finish work"},
+  {phrase:"leave home",  promptHtml:"Нажмите 🔊 и напишите фразу", answer:"leave home",  audio:"leave home"},
+  {phrase:"watch TV",    promptHtml:"Нажмите 🔊 и напишите фразу", answer:"watch TV",    audio:"watch TV"},
+  {phrase:"get up",      promptHtml:"Нажмите 🔊 и напишите фразу", answer:"get up",      audio:"get up"}
+];
+buildTextItem("ex4-list", ex4Data);
+
+/* ---------------- EXERCISE 5: to / nothing ---------------- */
+const ex5Data = [
+  {phrase:"have lunch",  before:"She always ", word:"have lunch",  after:" at 1 pm.",   correct:"—"},
+  {phrase:"go to bed",   before:"We usually go ", word:"bed",       after:" at 10:30 pm.", correct:"to"},
+  {phrase:"start work",  before:"She ", word:"start work",          after:" at 9 o'clock.", correct:"—"},
+  {phrase:"get home",    before:"I get ", word:"home",              after:" before 6 pm.", correct:"—"},
+  {phrase:"get up",      before:"He ", word:"get up",               after:" at 7 am.",   correct:"—"},
+  {phrase:"make dinner", before:"They ", word:"make dinner",        after:" together.",  correct:"—"},
+  {phrase:"finish work", before:"They ", word:"finish work",        after:" at 6 pm.",   correct:"—"},
+  {phrase:"leave home",  before:"I ", word:"leave home",            after:" at 8 am every day.", correct:"—"},
+  {phrase:"go to bed",   before:"My sister goes ", word:"bed",      after:" very late.", correct:"to"}
+];
+(function buildEx5(){
+  const list = document.getElementById("ex5-list");
+  ex5Data.forEach((it, i) => {
+    const row = document.createElement("div");
+    row.className = "item-row";
+    row.dataset.correct = it.correct;
+    row.dataset.phrase = it.phrase;
+    row.innerHTML = `
+      <span class="item-idx">${i+1}.</span>
+      <span class="item-prompt">${it.before}<b>___ ${it.word}</b>${it.after}</span>
+      <div class="to-select">
+        <button type="button" data-val="to">to</button>
+        <button type="button" data-val="—">—</button>
+      </div>
+      <span class="item-answer">Ответ: ${it.correct}</span>
+    `;
+    row.querySelectorAll(".to-select button").forEach(btn => {
+      btn.addEventListener("click", () => {
+        row.querySelectorAll(".to-select button").forEach(b => b.classList.remove("picked"));
+        btn.classList.add("picked");
+        row.dataset.picked = btn.dataset.val;
+      });
+    });
+    list.appendChild(row);
+  });
+})();
+function checkEx5(){
+  const list = document.getElementById("ex5-list");
+  const rows = list.querySelectorAll(".item-row");
+  let correctCount = 0;
+  rows.forEach(row => {
+    const buttons = row.querySelectorAll(".to-select button");
+    buttons.forEach(b => b.classList.remove("correct","incorrect"));
+    const picked = row.dataset.picked;
+    if (!picked) return;
+    const isCorrect = picked === row.dataset.correct;
+    buttons.forEach(b => {
+      if (b.dataset.val === picked){
+        b.classList.add(isCorrect ? "correct" : "incorrect");
+      }
+    });
+    if (isCorrect){ correctCount++; }
+    else { markMistake(row.dataset.phrase); }
+  });
+  document.getElementById("ex5-score").textContent = `Правильно: ${correctCount} из ${rows.length}`;
+}
+
+/* ---------------- EXERCISE 6: cloze paragraph ---------------- */
+const ex6Answers = ["get up","leave home","start work","have lunch","finish work","get home","watch TV","make dinner","go to bed"];
+const ex6Bank = ["make dinner","get up","watch TV","finish work","leave home","go to bed","have lunch","start work","get home"];
+(function buildEx6(){
+  const container = document.getElementById("ex6-text");
+  container.innerHTML = `Every day I <input type="text" data-i="0"> at 7 am. Then I
+    <input type="text" data-i="1"> and go to the office. I
+    <input type="text" data-i="2"> at 9 am. At 1 pm I
+    <input type="text" data-i="3"> with my colleagues. I
+    <input type="text" data-i="4"> at 6 pm and
+    <input type="text" data-i="5"> at 6:30 pm. In the evening I
+    <input type="text" data-i="6"> for a while and then I
+    <input type="text" data-i="7"> for my family. Before I
+    <input type="text" data-i="8">, I read a book.`;
+  const bank = document.getElementById("ex6-bank");
+  bank.innerHTML = "<b>Банк слов:</b> " + ex6Bank.map(w => `<span>${w}</span>`).join("");
+})();
+function checkEx6(){
+  const inputs = document.querySelectorAll("#ex6-text input");
+  let correctCount = 0;
+  inputs.forEach(inp => {
+    inp.classList.remove("correct","incorrect");
+    const idx = parseInt(inp.dataset.i, 10);
+    const correctAns = norm(ex6Answers[idx]);
+    const given = norm(inp.value);
+    if (given.length === 0) return;
+    if (given === correctAns){
+      inp.classList.add("correct");
+      correctCount++;
+    } else {
+      inp.classList.add("incorrect");
+      markMistake(ex6Answers[idx]);
+    }
+  });
+  document.getElementById("ex6-score").textContent = `Правильно: ${correctCount} из ${inputs.length}`;
+}
+// insert hidden answer hints for toggle (append to word bank area)
+(function ex6AnswerHint(){
+  const div = document.createElement("div");
+  div.id = "ex6-hint";
+  div.className = "item-answer";
+  div.style.marginTop = "8px";
+  div.textContent = "Ответы по порядку: " + ex6Answers.join(", ");
+  document.getElementById("ex6-text").after(div);
+})();
+
+/* ---------------- EXERCISE 7: finish sentences ---------------- */
+const ex7Data = [
+  {phrase:"finish work", starter:"After I finish work, I usually…"},
+  {phrase:"have lunch",  starter:"When I have lunch, I like to…"},
+  {phrase:"start work",  starter:"I start work at… because…"},
+  {phrase:"get home",    starter:"When I get home, the first thing I do is…"},
+  {phrase:"leave home",  starter:"Before I leave home, I always…"},
+  {phrase:"watch TV",    starter:"In the evening I watch TV and…"},
+  {phrase:"get up",      starter:"I get up at… every day because…"},
+  {phrase:"make dinner", starter:"When I make dinner, I usually cook…"},
+  {phrase:"go to bed",   starter:"Before I go to bed, I…"}
+];
+(function buildEx7(){
+  const list = document.getElementById("ex7-list");
+  ex7Data.forEach((it,i) => {
+    const div = document.createElement("div");
+    div.className = "free-item";
+    div.innerHTML = `<label>${i+1}. <b>${it.phrase}</b> — ${it.starter}</label>
+      <textarea data-phrase="${it.phrase}" placeholder="Допишите предложение…"></textarea>`;
+    list.appendChild(div);
+  });
+})();
+
+/* ---------------- EXERCISE 8: own sentences ---------------- */
+const ex8Data = ["get up","make dinner","leave home","start work","finish work","go to bed","get home","have lunch","watch TV"];
+(function buildEx8(){
+  const list = document.getElementById("ex8-list");
+  ex8Data.forEach((phrase,i) => {
+    const div = document.createElement("div");
+    div.className = "free-item";
+    div.innerHTML = `<label>${i+1}. Составьте предложение со словом <b>${phrase}</b></label>
+      <textarea data-phrase="${phrase}" placeholder="Ваше предложение…"></textarea>`;
+    list.appendChild(div);
+  });
+})();
+
+/* ---------------- COPY ANSWERS ---------------- */
+function copyAnswers(id){
+  const list = document.getElementById(id + "-list");
+  const textareas = list.querySelectorAll("textarea");
+  let lines = [];
+  textareas.forEach((ta,i) => {
+    const val = ta.value.trim();
+    lines.push(`${i+1}. [${ta.dataset.phrase}] ${val.length ? val : "(нет ответа)"}`);
+  });
+  const text = lines.join("\n");
+  const finish = () => {
+    const msg = document.getElementById(id + "-copied");
+    msg.classList.add("show");
+    setTimeout(() => msg.classList.remove("show"), 2000);
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(finish).catch(() => fallbackCopy(text, finish));
+  } else {
+    fallbackCopy(text, finish);
+  }
+}
+function fallbackCopy(text, cb){
+  const ta = document.createElement("textarea");
+  ta.value = text;
+  ta.style.position = "fixed";
+  ta.style.opacity = "0";
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand("copy"); } catch(e){}
+  document.body.removeChild(ta);
+  cb();
+}
+
+/* ---------------- MASTER CHECK DISPATCH ---------------- */
+function checkExercise(id){
+  if (id === "ex5"){ checkEx5(); return; }
+  if (id === "ex6"){ checkEx6(); return; }
+  checkTextExercise(id);
+}
+
+renderProblemWords();
+</script>
+</body>
+</html>
