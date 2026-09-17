@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Conditionals 1, 2, 3 — B1 Practice</title>
+<style>
+  :root{
+    --bg:#f7f6f2;
+    --card:#ffffff;
+    --text:#232323;
+    --muted:#6b6b6b;
+    --border:#e3e0d8;
+    --accent:#a6572e;
+    --accent-2:#3c6e58;
+    --wrong:#c0463c;
+    --right:#3c6e58;
+    --chip:#efe9dc;
+    --shadow: 0 1px 2px rgba(0,0,0,0.04), 0 6px 20px rgba(0,0,0,0.05);
+    --radius: 14px;
+    --font-serif: Georgia, 'Iowan Old Style', 'Palatino Linotype', serif;
+    --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#1b1a17;
+      --card:#242320;
+      --text:#eee9df;
+      --muted:#a39c8d;
+      --border:#3a372f;
+      --accent:#e0895c;
+      --accent-2:#7cc6a4;
+      --wrong:#e57f76;
+      --right:#7cc6a4;
+      --chip:#312e27;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 6px 20px rgba(0,0,0,0.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#1b1a17;
+    --card:#242320;
+    --text:#eee9df;
+    --muted:#a39c8d;
+    --border:#3a372f;
+    --accent:#e0895c;
+    --accent-2:#7cc6a4;
+    --wrong:#e57f76;
+    --right:#7cc6a4;
+    --chip:#312e27;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 6px 20px rgba(0,0,0,0.35);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:var(--font-sans);
+    line-height:1.5;
+    padding-bottom:60px;
+  }
+  header{
+    padding:36px 20px 22px;
+    text-align:center;
+    border-bottom:1px solid var(--border);
+    background:var(--card);
+  }
+  header h1{
+    font-family:var(--font-serif);
+    font-size:clamp(24px,4vw,34px);
+    margin:0 0 8px;
+    color:var(--text);
+  }
+  header p{
+    color:var(--muted);
+    margin:0;
+    max-width:640px;
+    margin:0 auto;
+    font-size:15px;
+  }
+  .wrap{
+    max-width:900px;
+    margin:0 auto;
+    padding:0 16px;
+  }
+  .rules{
+    margin-top:22px;
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    overflow:hidden;
+  }
+  .rules summary{
+    cursor:pointer;
+    padding:16px 20px;
+    font-weight:600;
+    font-size:15px;
+    list-style:none;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+  .rules summary::-webkit-details-marker{display:none;}
+  .rules summary:after{content:"▾"; color:var(--muted); transition:transform .2s;}
+  .rules[open] summary:after{transform:rotate(180deg);}
+  .rules-body{
+    padding:0 20px 20px;
+    display:grid;
+    gap:14px;
+    grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+  }
+  .rule-card{
+    background:var(--chip);
+    border-radius:10px;
+    padding:14px 16px;
+    font-size:13.5px;
+  }
+  .rule-card b{color:var(--accent);}
+  .rule-card .form{
+    font-family:var(--font-serif);
+    font-style:italic;
+    margin:6px 0;
+    color:var(--text);
+  }
+  nav.tabs{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin:26px 0 18px;
+    justify-content:center;
+  }
+  nav.tabs button{
+    border:1px solid var(--border);
+    background:var(--card);
+    color:var(--text);
+    padding:9px 14px;
+    border-radius:999px;
+    font-size:13.5px;
+    cursor:pointer;
+    transition:all .15s;
+    font-weight:500;
+  }
+  nav.tabs button.active{
+    background:var(--accent);
+    border-color:var(--accent);
+    color:#fff;
+  }
+  section.exercise{display:none;}
+  section.exercise.active{display:block;}
+  .ex-head{
+    margin-bottom:16px;
+  }
+  .ex-head h2{
+    font-family:var(--font-serif);
+    font-size:21px;
+    margin:0 0 4px;
+  }
+  .ex-head p{
+    color:var(--muted);
+    font-size:14px;
+    margin:0;
+  }
+  .item{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:16px 18px;
+    margin-bottom:14px;
+  }
+  .item .qnum{
+    display:inline-block;
+    font-size:12px;
+    color:var(--muted);
+    font-weight:600;
+    margin-bottom:6px;
+    letter-spacing:.03em;
+  }
+  .item .qtext{
+    font-size:15.5px;
+    margin-bottom:12px;
+  }
+  .item .qtext em{color:var(--accent); font-style:normal; font-weight:600;}
+  .options{
+    display:grid;
+    gap:8px;
+  }
+  .opt{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:9px 12px;
+    border:1px solid var(--border);
+    border-radius:9px;
+    cursor:pointer;
+    font-size:14.5px;
+    transition: background .15s, border-color .15s;
+  }
+  .opt:hover{border-color:var(--accent);}
+  .opt input{accent-color:var(--accent);}
+  .opt.correct{border-color:var(--right); background:color-mix(in srgb, var(--right) 12%, transparent);}
+  .opt.incorrect{border-color:var(--wrong); background:color-mix(in srgb, var(--wrong) 12%, transparent);}
+  input[type="text"], textarea{
+    width:100%;
+    font-family:inherit;
+    font-size:14.5px;
+    padding:9px 11px;
+    border-radius:9px;
+    border:1px solid var(--border);
+    background:var(--bg);
+    color:var(--text);
+  }
+  textarea{resize:vertical; min-height:64px;}
+  .feedback{
+    margin-top:10px;
+    padding:10px 12px;
+    border-radius:9px;
+    font-size:13.5px;
+    display:none;
+  }
+  .feedback.show{display:block;}
+  .feedback.ok{background:color-mix(in srgb, var(--right) 14%, transparent); border:1px solid var(--right);}
+  .feedback.bad{background:color-mix(in srgb, var(--wrong) 14%, transparent); border:1px solid var(--wrong);}
+  .feedback .expl{color:var(--text); margin-top:4px; display:block;}
+  .feedback .verdict{font-weight:700;}
+  .feedback.ok .verdict{color:var(--right);}
+  .feedback.bad .verdict{color:var(--wrong);}
+  .answer-reveal{
+    margin-top:10px;
+    padding:10px 12px;
+    border-radius:9px;
+    background:var(--chip);
+    font-size:13.5px;
+    display:none;
+  }
+  .answer-reveal.show{display:block;}
+  .answer-reveal b{color:var(--accent-2);}
+  .controls{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin:18px 0 30px;
+  }
+  button.btn{
+    border:none;
+    padding:11px 18px;
+    border-radius:999px;
+    font-size:14px;
+    font-weight:600;
+    cursor:pointer;
+    transition:opacity .15s, transform .1s;
+  }
+  button.btn:active{transform:scale(0.97);}
+  .btn-primary{background:var(--accent); color:#fff;}
+  .btn-secondary{background:var(--chip); color:var(--text); border:1px solid var(--border);}
+  .btn-copy{background:var(--accent-2); color:#fff;}
+  .score-badge{
+    display:inline-block;
+    padding:6px 12px;
+    border-radius:999px;
+    background:var(--chip);
+    font-size:13px;
+    font-weight:600;
+    margin-left:auto;
+  }
+  .vocab-tag{
+    display:inline-block;
+    font-size:11.5px;
+    color:var(--accent-2);
+    background:color-mix(in srgb, var(--accent-2) 12%, transparent);
+    padding:2px 8px;
+    border-radius:999px;
+    margin-left:6px;
+    vertical-align:middle;
+    font-weight:600;
+  }
+  .toast{
+    position:fixed;
+    bottom:20px;
+    left:50%;
+    transform:translateX(-50%);
+    background:var(--text);
+    color:var(--bg);
+    padding:10px 18px;
+    border-radius:999px;
+    font-size:13.5px;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .25s;
+    z-index:50;
+  }
+  .toast.show{opacity:1;}
+  .rec-panel{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:16px 18px;
+    margin-top:6px;
+    font-size:13.5px;
+  }
+  .rec-panel .rec-row{display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top:8px;}
+  audio{max-width:100%;}
+  .mistake-note{
+    font-size:12.5px;
+    color:var(--muted);
+    margin-top:6px;
+  }
+  select.mistake-select{
+    padding:8px 10px;
+    border-radius:8px;
+    border:1px solid var(--border);
+    background:var(--bg);
+    color:var(--text);
+    font-size:14px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Conditionals 1, 2, 3 — практика (уровень B1)</h1>
+  <p>6 упражнений по 8 заданий. Проверяйте ответы, смотрите объяснения и повторяйте лексику по темам Work, House, Body, Movies, Education.</p>
+</header>
+
+<div class="wrap">
+
+  <details class="rules" open>
+    <summary>📘 Краткое правило (нажмите, чтобы свернуть)</summary>
+    <div class="rules-body">
+      <div class="rule-card">
+        <b>Conditional 1</b> — реальное будущее
+        <div class="form">If + Present Simple, ... will + verb</div>
+        Используем, когда условие вполне реально выполнимо.<br>
+        <i>If she applies for the job, she will get an interview.</i>
+      </div>
+      <div class="rule-card">
+        <b>Conditional 2</b> — нереальное настоящее/будущее
+        <div class="form">If + Past Simple (were для всех лиц), ... would + verb</div>
+        Гипотетическая, маловероятная или воображаемая ситуация сейчас.<br>
+        <i>If I were you, I would resign.</i>
+      </div>
+      <div class="rule-card">
+        <b>Conditional 3</b> — нереальное прошлое
+        <div class="form">If + Past Perfect, ... would have + V3</div>
+        Сожаление или гипотеза о прошлом, которое уже нельзя изменить.<br>
+        <i>If she had studied harder, she would have got a better degree.</i>
+      </div>
+    </div>
+  </details>
+
+  <nav class="tabs" id="tabs"></nav>
+
+  <!-- EXERCISE 1 -->
+  <section class="exercise" id="ex1">
+    <div class="ex-head">
+      <h2>1. Choose the correct answer</h2>
+      <p>Выберите правильную форму глагола / вариант ответа.</p>
+    </div>
+    <div id="ex1-items"></div>
+    <div class="controls">
+      <button class="btn btn-primary" onclick="checkMCQ('ex1')">Проверить ответы</button>
+      <button class="btn btn-secondary" onclick="toggleAnswers('ex1')">Показать / скрыть ответы</button>
+      <span class="score-badge" id="ex1-score"></span>
+    </div>
+  </section>
+
+  <!-- EXERCISE 2 -->
+  <section class="exercise" id="ex2">
+    <div class="ex-head">
+      <h2>2. Find the mistake</h2>
+      <p>В каждом предложении есть одна ошибка (в частях A, B, C или D). Выберите, где она находится.</p>
+    </div>
+    <div id="ex2-items"></div>
+    <div class="controls">
+      <button class="btn btn-primary" onclick="checkMistake()">Проверить ответы</button>
+      <button class="btn btn-secondary" onclick="toggleAnswers('ex2')">Показать / скрыть ответы</button>
+      <span class="score-badge" id="ex2-score"></span>
+    </div>
+  </section>
+
+  <!-- EXERCISE 3 -->
+  <section class="exercise" id="ex3">
+    <div class="ex-head">
+      <h2>3. Fill in the gaps using the correct form</h2>
+      <p>Впишите верную форму глагола в скобках.</p>
+    </div>
+    <div id="ex3-items"></div>
+    <div class="controls">
+      <button class="btn btn-primary" onclick="checkGaps()">Проверить ответы</button>
+      <button class="btn btn-secondary" onclick="toggleAnswers('ex3')">Показать / скрыть ответы</button>
+      <span class="score-badge" id="ex3-score"></span>
+    </div>
+  </section>
+
+  <!-- EXERCISE 4 -->
+  <section class="exercise" id="ex4">
+    <div class="ex-head">
+      <h2>4. Rephrase — перепишите в другом Conditional</h2>
+      <p>Перепишите предложение, изменив тип условного, указанный в задании. Единого "правильного" варианта нет — сравните свой ответ с образцом и объяснением разницы в смысле.</p>
+    </div>
+    <div id="ex4-items"></div>
+    <div class="controls">
+      <button class="btn btn-secondary" onclick="toggleAnswers('ex4')">Показать образцы ответов</button>
+    </div>
+  </section>
+
+  <!-- EXERCISE 5 -->
+  <section class="exercise" id="ex5">
+    <div class="ex-head">
+      <h2>5. Sentence Builder — закончите предложения своими идеями</h2>
+      <p>Допишите предложения, используя свою лексику. Когда закончите — скопируйте все ответы одной кнопкой.</p>
+    </div>
+    <div id="ex5-items"></div>
+    <div class="controls">
+      <button class="btn btn-copy" onclick="copyAll('ex5')">📋 Скопировать все ответы</button>
+    </div>
+  </section>
+
+  <!-- EXERCISE 6 -->
+  <section class="exercise" id="ex6">
+    <div class="ex-head">
+      <h2>6. Answer the questions</h2>
+      <p>Ответьте на вопросы письменно (можно скопировать всё одной кнопкой) — или запишите голосовой ответ ниже и скачайте файл, чтобы отправить.</p>
+    </div>
+    <div id="ex6-items"></div>
+    <div class="controls">
+      <button class="btn btn-copy" onclick="copyAll('ex6')">📋 Скопировать все ответы</button>
+    </div>
+    <div class="rec-panel">
+      <b>🎙 Голосовой ответ (по желанию)</b>
+      <div class="mistake-note">Запишите ответ голосом прямо в браузере, затем скачайте файл и отправьте его вручную (например, в мессенджере). Требуется разрешение на использование микрофона.</div>
+      <div class="rec-row">
+        <button class="btn btn-secondary" id="recBtn" onclick="toggleRecording()">● Начать запись</button>
+        <span id="recStatus" style="color:var(--muted)"></span>
+      </div>
+      <div class="rec-row" id="recPlayback" style="display:none;">
+        <audio id="recAudio" controls></audio>
+        <a class="btn btn-secondary" id="recDownload" download="voice-answer.webm">⬇ Скачать</a>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ---------------- DATA ---------------- */
+
+const ex1Data = [
+  {q:'If she <em>___</em> (apply) for the job, she will get an interview.', opts:['apply','applies','applied','would apply'], correct:1,
+   expl:'Conditional 1 (реальное будущее): If + Present Simple → <b>applies</b>. Условие вполне выполнимо — она может подать заявку (apply for a job) в любой момент.'},
+  {q:'If I were you, I <em>___</em> (resign) right now.', opts:['resign','resigned','will resign','would resign'], correct:3,
+   expl:'Conditional 2: главное предложение — would + V1 → <b>would resign</b>. "If I were you" — классическая гипотетическая конструкция для совета.'},
+  {q:'If he hadn\'t been sacked, he <em>___</em> (not / look) for a new job.', opts:['wouldn\'t look','doesn\'t look','wouldn\'t have looked','isn\'t looking'], correct:2,
+   expl:'Conditional 3: If + Past Perfect (hadn\'t been sacked) → would have + V3 → <b>wouldn\'t have looked</b>. Речь о прошлом, которое уже нельзя изменить.'},
+  {q:'If the house <em>___</em> (be) made of wood, it would burn faster.', opts:['is','were','was going to be','has been'], correct:1,
+   expl:'Conditional 2: правильная (грамматически "книжная") форма для всех лиц — <b>were</b>, даже с "the house". Это гипотетическая ситуация, а не факт.'},
+  {q:'If they <em>___</em> (not/renovate) the attic, water will damage it.', opts:['don\'t renovate','won\'t renovate','didn\'t renovate','haven\'t renovated'], correct:0,
+   expl:'Conditional 1: If + Present Simple → <b>don\'t renovate</b>. Attic (чердак) действительно может протечь, если его не отремонтировать — вполне реальный сценарий.'},
+  {q:'If the film <em>___</em> (not/be based on) a true story, it wouldn\'t be so moving.', opts:['isn\'t based on','weren\'t based on','hadn\'t been based on','won\'t be based on'], correct:1,
+   expl:'Conditional 2: If + Past Simple → <b>weren\'t based on</b>. Мы рассуждаем о гипотетической альтернативе фильму, который on самом деле be based on реальной истории.'},
+  {q:'If she had studied harder, she <em>___</em> (get) a better degree.', opts:['gets','would get','would have got','got'], correct:2,
+   expl:'Conditional 3: would have + V3 → <b>would have got</b>. Про то, какую degree (диплом) она могла бы получить, но не получила.'},
+  {q:'If pupils cheat in exams, they <em>___</em> (be) expelled.', opts:['will be','would be','were','would have been'], correct:0,
+   expl:'Conditional 1: главное предложение will + V1 → <b>will be</b>. Это общее реальное правило: cheat → be expelled (быть исключённым).'}
+];
+
+const ex2Data = [
+  {parts:['If she','will get promoted,','she','will ask for a pay rise.'], mistake:0,
+   fix:'gets', expl:'В придаточном с If нельзя использовать will — нужен Present Simple: <b>If she gets promoted...</b> (get promoted — устойчивое сочетание). Will остаётся только в главном предложении.'},
+  {parts:['If I','was you,','I','would set up my own business.'], mistake:1,
+   fix:'were', expl:'В Conditional 2 в конструкции "If I ___ you" нормативно используется <b>were</b> для всех лиц: If I were you.'},
+  {parts:['If they','hadn\'t cheated,','they','wouldn\'t be expelled last year.'], mistake:2,
+   fix:'wouldn\'t have been', expl:'Указание на прошлое ("last year") + Past Perfect в if-части = Conditional 3, поэтому нужно <b>wouldn\'t have been expelled</b>.'},
+  {parts:['If the roof','wasn\'t leaking,','we','will fix it ourselves.'], mistake:2,
+   fix:'would fix', expl:'If-часть в Past Simple (Conditional 2) требует would в главном предложении: <b>we would fix it ourselves</b>, а не will.'},
+  {parts:['If he','doesn\'t do overtime,','he will not','got promoted.'], mistake:3,
+   fix:'get promoted', expl:'После will (not) всегда идёт базовая форма глагола: <b>he will not get promoted</b>, а не "got".'},
+  {parts:['If the movie','was dubbed into Spanish,','more people','will watch it.'], mistake:3,
+   fix:'would watch it', expl:'If-часть в Past Simple (Conditional 2, "was dubbed") требует would в главном предложении: <b>would watch it</b>.'},
+  {parts:['If she','had applied earlier,','she','will get the job.'], mistake:2,
+   fix:'would have got', expl:'Had applied — Past Perfect, значит это Conditional 3, и в главном предложении нужно would have + V3: <b>would have got the job</b>.'},
+  {parts:['If pupils','misbehave,','the head teacher','would punish them.'], mistake:2,
+   fix:'punishes', expl:'If-часть в Present Simple ("misbehave") — это Conditional 1 (общее правило), поэтому в главном предложении нужен Present Simple: <b>punishes them</b>, а не would.'}
+];
+
+const ex3Data = [
+  {q:'If the company <b>___</b> (advertise) the vacancy, more people would apply.', ans:['advertised'], type:2,
+   expl:'Conditional 2: If + Past Simple → <b>advertised</b>. Гипотетически: компания могла бы разместить объявление о вакансии (advertise the vacancy), и тогда appeared бы больше кандидатов.'},
+  {q:'If I hadn\'t been made redundant, I <b>___</b> (not/move) to the coast.', ans:['wouldn\'t have moved','would not have moved'], type:3,
+   expl:'Conditional 3: <b>wouldn\'t have moved</b>. Be made redundant (быть уволенным по сокращению) в прошлом — уже свершившийся факт, который нельзя изменить.'},
+  {q:'If you work shifts, you <b>___</b> (earn) extra money.', ans:['will earn'], type:1,
+   expl:'Conditional 1: <b>will earn</b>. Work shifts (работать посменно) — реальная возможность заработать больше.'},
+  {q:'If the basement <b>___</b> (not/flood), we would store our furniture there.', ans:['didn\'t flood'], type:2,
+   expl:'Conditional 2: <b>didn\'t flood</b>. Basement (подвал) заливает — это гипотетическая ситуация "что было бы, если бы не заливало".'},
+  {q:'If she <b>___</b> (not/be qualified), she wouldn\'t have been employed.', ans:['hadn\'t been qualified','had not been qualified'], type:3,
+   expl:'Conditional 3: <b>hadn\'t been qualified</b>. Речь о прошлом решении о приёме на работу (be employed), которое уже состоялось.'},
+  {q:'If the film\'s soundtrack <b>___</b> (be) better, critics would have praised it more.', ans:['had been'], type:3,
+   expl:'Conditional 3: <b>had been</b>. Critics (критики) уже высказались о фильме в прошлом — это нельзя изменить, отсюда Past Perfect.'},
+  {q:'If pupils <b>___</b> (behave) well, teachers don\'t punish them.', ans:['behave'], type:1,
+   expl:'Conditional 1 / общее правило: <b>behave</b>. Present Simple в обеих частях описывает постоянно действующее правило в школе.'},
+  {q:'If I retire early, I <b>___</b> (set up) my own business.', ans:['will set up'], type:1,
+   expl:'Conditional 1: <b>will set up</b>. Retire early (рано выйти на пенсию) и set up a business — вполне реальный план на будущее.'}
+];
+
+const ex4Data = [
+  {orig:'If pupils cheat, they get expelled.', instr:'Conditional 1 → Conditional 2', sample:'If pupils cheated, they would get expelled.',
+   expl:'Меняя Present Simple → Past Simple и get → would get, мы превращаем общее реальное правило в гипотетическое рассуждение ("представим, что...").'},
+  {orig:'If I resigned, I would look for a new job immediately.', instr:'Conditional 2 → Conditional 1', sample:'If I resign, I will look for a new job immediately.',
+   expl:'Меняя Past Simple → Present Simple и would → will, ситуация становится более реальной и вероятной — увольнение (resign) действительно может произойти.'},
+  {orig:'If she applies early, she gets the scholarship.', instr:'Conditional 1 → Conditional 3', sample:'If she had applied early, she would have got the scholarship.',
+   expl:'Мы переносим событие в прошлое: возможность уже упущена, поэтому используем Past Perfect и would have + V3 — сожаление об упущенном шансе.'},
+  {orig:'If he hadn\'t retired, he would have kept working.', instr:'Conditional 3 → Conditional 2', sample:'If he didn\'t retire, he would keep working.',
+   expl:'Из нереального прошлого мы переходим в нереальное настоящее: retire early больше не про прошлое решение, а про воображаемую ситуацию сейчас.'},
+  {orig:'If the house were on the coast, it would be more expensive.', instr:'Conditional 2 → Conditional 3', sample:'If the house had been on the coast, it would have been more expensive.',
+   expl:'Добавляем Past Perfect и would have been — теперь речь о конкретном доме, который уже был построен не на побережье (coast), и это нельзя изменить.'},
+  {orig:'If the film is dubbed into English, it will be popular here.', instr:'Conditional 1 → Conditional 2', sample:'If the film were dubbed into English, it would be popular here.',
+   expl:'Меняя is → were и will → would, мы показываем, что дубляж (be dubbed into) фильма на английский — пока лишь гипотеза, а не реальный план.'},
+  {orig:'If she had studied, she would have passed.', instr:'Conditional 3 → Conditional 1', sample:'If she studies, she will pass.',
+   expl:'Мы переносим ситуацию в будущее: экзамен ещё не сдан, поэтому шанс сдать его реален — используем will pass вместо would have passed.'},
+  {orig:'If they advertised the job, more people would apply.', instr:'Conditional 2 → Conditional 1', sample:'If they advertise the job, more people will apply.',
+   expl:'Present Simple + will делают ситуацию с публикацией вакансии (advertise the job) реальным планом, а не гипотезой.'}
+];
+
+const ex5Data = [
+  'If I were the head teacher of my school, ...',
+  'If I had applied for a different job, ...',
+  'If I get promoted next year, ...',
+  'If I hadn\'t been born in my country, ...',
+  'If houses were made from recycled materials, ...',
+  'If I could direct a movie, ...',
+  'If I hadn\'t chosen my current degree/subject, ...',
+  'If pupils were never punished, ...'
+];
+
+const ex6Data = [
+  'What would you do if you were made redundant tomorrow?',
+  'If you could turn any building into your dream house, what would you turn it into?',
+  'What will you do if you get a job offer this year?',
+  'If you hadn\'t studied English, what other language would you have learned?',
+  'What happens if pupils misbehave at your school or workplace?',
+  'If you were a movie director, what genre would you work in?',
+  'What would you do differently if you could retire today?',
+  'If you overheard a colleague being sacked, what would you do?'
+];
+
+/* ---------------- RENDER ---------------- */
+
+const tabsMeta = [
+  {id:'ex1', label:'1. Choose'},
+  {id:'ex2', label:'2. Find mistake'},
+  {id:'ex3', label:'3. Fill gaps'},
+  {id:'ex4', label:'4. Rephrase'},
+  {id:'ex5', label:'5. Sentence builder'},
+  {id:'ex6', label:'6. Questions'}
+];
+
+function initTabs(){
+  const nav = document.getElementById('tabs');
+  tabsMeta.forEach((t,i)=>{
+    const b = document.createElement('button');
+    b.textContent = t.label;
+    b.onclick = ()=>showTab(t.id);
+    b.id = 'tabbtn-'+t.id;
+    if(i===0) b.classList.add('active');
+    nav.appendChild(b);
+  });
+}
+function showTab(id){
+  document.querySelectorAll('section.exercise').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  tabsMeta.forEach(t=>{
+    document.getElementById('tabbtn-'+t.id).classList.toggle('active', t.id===id);
+  });
+}
+
+function renderEx1(){
+  const cont = document.getElementById('ex1-items');
+  ex1Data.forEach((item,i)=>{
+    const div = document.createElement('div');
+    div.className='item';
+    div.innerHTML = `<span class="qnum">Вопрос ${i+1}</span>
+      <div class="qtext">${item.q}</div>
+      <div class="options">
+        ${item.opts.map((o,oi)=>`<label class="opt" data-idx="${oi}">
+            <input type="radio" name="ex1-${i}" value="${oi}"> ${o}
+          </label>`).join('')}
+      </div>
+      <div class="feedback" id="ex1-fb-${i}"></div>
+      <div class="answer-reveal" id="ex1-ans-${i}"><b>Ответ:</b> ${item.opts[item.correct]} — <span>${item.expl}</span></div>`;
+    cont.appendChild(div);
+  });
+}
+
+function renderEx2(){
+  const cont = document.getElementById('ex2-items');
+  const letters=['A','B','C','D'];
+  ex2Data.forEach((item,i)=>{
+    const div = document.createElement('div');
+    div.className='item';
+    const sentence = item.parts.map((p,pi)=>`<b>(${letters[pi]})</b> ${p}`).join(' ');
+    div.innerHTML = `<span class="qnum">Предложение ${i+1}</span>
+      <div class="qtext">${sentence}</div>
+      <select class="mistake-select" id="ex2-sel-${i}">
+        <option value="">— выберите часть с ошибкой —</option>
+        ${letters.map((l,li)=>`<option value="${li}">${l}</option>`).join('')}
+      </select>
+      <div class="feedback" id="ex2-fb-${i}"></div>
+      <div class="answer-reveal" id="ex2-ans-${i}"><b>Ошибка:</b> ${letters[item.mistake]} → должно быть «${item.fix}». <span>${item.expl}</span></div>`;
+    cont.appendChild(div);
+  });
+}
+
+function renderEx3(){
+  const cont = document.getElementById('ex3-items');
+  ex3Data.forEach((item,i)=>{
+    const div = document.createElement('div');
+    div.className='item';
+    div.innerHTML = `<span class="qnum">Вопрос ${i+1}</span>
+      <div class="qtext">${item.q}</div>
+      <input type="text" id="ex3-in-${i}" placeholder="ваш ответ...">
+      <div class="feedback" id="ex3-fb-${i}"></div>
+      <div class="answer-reveal" id="ex3-ans-${i}"><b>Ответ:</b> ${item.ans[0]} — <span>${item.expl}</span></div>`;
+    cont.appendChild(div);
+  });
+}
+
+function renderEx4(){
+  const cont = document.getElementById('ex4-items');
+  ex4Data.forEach((item,i)=>{
+    const div = document.createElement('div');
+    div.className='item';
+    div.innerHTML = `<span class="qnum">Задание ${i+1} <span class="vocab-tag">${item.instr}</span></span>
+      <div class="qtext">${item.orig}</div>
+      <textarea id="ex4-in-${i}" placeholder="перепишите предложение..."></textarea>
+      <div class="answer-reveal" id="ex4-ans-${i}"><b>Пример ответа:</b> ${item.sample}<br><span>${item.expl}</span></div>`;
+    cont.appendChild(div);
+  });
+}
+
+function renderEx5(){
+  const cont = document.getElementById('ex5-items');
+  ex5Data.forEach((q,i)=>{
+    const div = document.createElement('div');
+    div.className='item';
+    div.innerHTML = `<span class="qnum">Предложение ${i+1}</span>
+      <div class="qtext">${q}</div>
+      <textarea id="ex5-in-${i}" placeholder="закончите предложение своей идеей..."></textarea>`;
+    cont.appendChild(div);
+  });
+}
+
+function renderEx6(){
+  const cont = document.getElementById('ex6-items');
+  ex6Data.forEach((q,i)=>{
+    const div = document.createElement('div');
+    div.className='item';
+    div.innerHTML = `<span class="qnum">Вопрос ${i+1}</span>
+      <div class="qtext">${q}</div>
+      <textarea id="ex6-in-${i}" placeholder="ваш ответ..."></textarea>`;
+    cont.appendChild(div);
+  });
+}
+
+/* ---------------- CHECK LOGIC ---------------- */
+
+function checkMCQ(exId){
+  const data = exId==='ex1' ? ex1Data : null;
+  let score=0;
+  data.forEach((item,i)=>{
+    const selected = document.querySelector(`input[name="${exId}-${i}"]:checked`);
+    const fb = document.getElementById(`${exId}-fb-${i}`);
+    const opts = document.querySelectorAll(`#${exId}-items .item:nth-child(${i+1}) .opt`);
+    opts.forEach(o=>o.classList.remove('correct','incorrect'));
+    if(!selected){
+      fb.className='feedback show bad';
+      fb.innerHTML = `<span class="verdict">Не выбрано.</span> <span class="expl">Выберите вариант ответа.</span>`;
+      return;
+    }
+    const val = parseInt(selected.value);
+    const optLabel = selected.closest('.opt');
+    if(val === item.correct){
+      score++;
+      optLabel.classList.add('correct');
+      fb.className='feedback show ok';
+      fb.innerHTML = `<span class="verdict">✓ Верно!</span><span class="expl">${item.expl}</span>`;
+    } else {
+      optLabel.classList.add('incorrect');
+      opts[item.correct].classList.add('correct');
+      fb.className='feedback show bad';
+      fb.innerHTML = `<span class="verdict">✗ Неверно.</span><span class="expl">Правильный ответ: <b>${item.opts[item.correct]}</b>. ${item.expl}</span>`;
+    }
+  });
+  document.getElementById(`${exId}-score`).textContent = `Результат: ${score} / ${data.length}`;
+}
+
+function checkMistake(){
+  let score=0;
+  ex2Data.forEach((item,i)=>{
+    const sel = document.getElementById(`ex2-sel-${i}`);
+    const fb = document.getElementById(`ex2-fb-${i}`);
+    const val = sel.value;
+    if(val===''){
+      fb.className='feedback show bad';
+      fb.innerHTML = `<span class="verdict">Не выбрано.</span>`;
+      return;
+    }
+    const letters=['A','B','C','D'];
+    if(parseInt(val)===item.mistake){
+      score++;
+      fb.className='feedback show ok';
+      fb.innerHTML = `<span class="verdict">✓ Верно!</span><span class="expl">Ошибка в части ${letters[item.mistake]} — должно быть «${item.fix}». ${item.expl}</span>`;
+    } else {
+      fb.className='feedback show bad';
+      fb.innerHTML = `<span class="verdict">✗ Неверно.</span><span class="expl">Ошибка на самом деле в части <b>${letters[item.mistake]}</b> — должно быть «${item.fix}». ${item.expl}</span>`;
+    }
+  });
+  document.getElementById('ex2-score').textContent = `Результат: ${score} / ${ex2Data.length}`;
+}
+
+function normalize(s){
+  return s.trim().toLowerCase().replace(/\s+/g,' ').replace(/['’]/g,"'");
+}
+
+function checkGaps(){
+  let score=0;
+  ex3Data.forEach((item,i)=>{
+    const input = document.getElementById(`ex3-in-${i}`);
+    const fb = document.getElementById(`ex3-fb-${i}`);
+    const val = normalize(input.value);
+    const isCorrect = item.ans.some(a=>normalize(a)===val);
+    if(isCorrect){
+      score++;
+      fb.className='feedback show ok';
+      fb.innerHTML = `<span class="verdict">✓ Верно!</span><span class="expl">${item.expl}</span>`;
+    } else {
+      fb.className='feedback show bad';
+      fb.innerHTML = `<span class="verdict">✗ Неверно.</span><span class="expl">Правильный ответ: <b>${item.ans[0]}</b>. ${item.expl}</span>`;
+    }
+  });
+  document.getElementById('ex3-score').textContent = `Результат: ${score} / ${ex3Data.length}`;
+}
+
+function toggleAnswers(exId){
+  const count = {ex1:ex1Data.length, ex2:ex2Data.length, ex3:ex3Data.length, ex4:ex4Data.length}[exId];
+  for(let i=0;i<count;i++){
+    const el = document.getElementById(`${exId}-ans-${i}`);
+    el.classList.toggle('show');
+  }
+}
+
+/* ---------------- COPY ALL ---------------- */
+
+function copyAll(exId){
+  const data = exId==='ex5' ? ex5Data : ex6Data;
+  let text = '';
+  data.forEach((q,i)=>{
+    const val = document.getElementById(`${exId}-in-${i}`).value.trim();
+    text += `${i+1}. ${q}\n${val ? val : '(нет ответа)'}\n\n`;
+  });
+  navigator.clipboard.writeText(text.trim()).then(()=>{
+    showToast('Ответы скопированы в буфер обмена ✓');
+  }).catch(()=>{
+    showToast('Не удалось скопировать — скопируйте вручную.');
+  });
+}
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+/* ---------------- VOICE RECORDING (optional, browser-only) ---------------- */
+
+let mediaRecorder, audioChunks=[], isRecording=false;
+
+async function toggleRecording(){
+  const btn = document.getElementById('recBtn');
+  const status = document.getElementById('recStatus');
+  if(!isRecording){
+    try{
+      const stream = await navigator.mediaDevices.getUserMedia({audio:true});
+      mediaRecorder = new MediaRecorder(stream);
+      audioChunks = [];
+      mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+      mediaRecorder.onstop = ()=>{
+        const blob = new Blob(audioChunks, {type:'audio/webm'});
+        const url = URL.createObjectURL(blob);
+        document.getElementById('recAudio').src = url;
+        document.getElementById('recDownload').href = url;
+        document.getElementById('recPlayback').style.display='flex';
+        stream.getTracks().forEach(t=>t.stop());
+      };
+      mediaRecorder.start();
+      isRecording=true;
+      btn.textContent='■ Остановить запись';
+      status.textContent='Идёт запись...';
+    }catch(err){
+      status.textContent='Микрофон недоступен в этом браузере/устройстве.';
+    }
+  } else {
+    mediaRecorder.stop();
+    isRecording=false;
+    btn.textContent='● Начать запись';
+    status.textContent='Запись остановлена.';
+  }
+}
+
+/* ---------------- INIT ---------------- */
+
+initTabs();
+renderEx1();
+renderEx2();
+renderEx3();
+renderEx4();
+renderEx5();
+renderEx6();
+showTab('ex1');
+</script>
+</body>
+</html>
