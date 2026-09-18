@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Linking Words — тренажёр</title>
+<style>
+  :root{
+    --paper:#FAF6EE;
+    --paper-line:#E4DCC8;
+    --ink:#2B3A55;
+    --ink-soft:#5B6B85;
+    --accent:#C1662B;
+    --accent-soft:#E9C9A6;
+    --good:#4C7A5E;
+    --good-bg:#E4EFE7;
+    --bad:#B23A2E;
+    --bad-bg:#F6E3DF;
+    --card:#FFFFFF;
+    --shadow: 0 2px 10px rgba(43,58,85,0.08);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      repeating-linear-gradient(var(--paper) 0px, var(--paper) 27px, var(--paper-line) 28px),
+      var(--paper);
+    font-family: "Iowan Old Style","Georgia","Palatino Linotype", serif;
+    color:var(--ink);
+    line-height:1.5;
+  }
+  .app{max-width:1180px;margin:0 auto;padding:28px 20px 80px;}
+  header.top{
+    border-bottom:2px solid var(--ink);
+    padding-bottom:16px;
+    margin-bottom:28px;
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  header.top h1{
+    font-size:2rem;
+    margin:0;
+    letter-spacing:0.2px;
+  }
+  header.top p{
+    margin:4px 0 0;
+    color:var(--ink-soft);
+    font-family:"Trebuchet MS", sans-serif;
+    font-size:0.95rem;
+  }
+  .layout{
+    display:grid;
+    grid-template-columns: 1fr 260px;
+    gap:32px;
+    align-items:start;
+  }
+  @media (max-width: 880px){
+    .layout{grid-template-columns: 1fr;}
+    aside.sidebar{order:-1;}
+  }
+  main{min-width:0;}
+
+  section.card{
+    background:var(--card);
+    border:1px solid var(--paper-line);
+    border-radius:4px;
+    box-shadow:var(--shadow);
+    padding:22px 26px;
+    margin-bottom:28px;
+  }
+  section.card h2{
+    font-size:1.25rem;
+    margin:0 0 4px;
+    color:var(--ink);
+  }
+  .ex-num{
+    font-family:"Trebuchet MS", sans-serif;
+    font-size:0.78rem;
+    color:var(--accent);
+    font-weight:bold;
+    letter-spacing:0.4px;
+  }
+  .ex-instructions{
+    font-family:"Trebuchet MS", sans-serif;
+    font-size:0.92rem;
+    color:var(--ink-soft);
+    margin:2px 0 16px;
+  }
+
+  /* Vocab table */
+  table.vocab{
+    width:100%;
+    border-collapse:collapse;
+    font-family:"Trebuchet MS", sans-serif;
+    font-size:0.95rem;
+  }
+  table.vocab th{
+    text-align:left;
+    border-bottom:2px solid var(--ink);
+    padding:8px 10px;
+    font-size:0.8rem;
+    color:var(--ink-soft);
+  }
+  table.vocab td{
+    padding:9px 10px;
+    border-bottom:1px solid var(--paper-line);
+    vertical-align:middle;
+  }
+  table.vocab td.en{font-family:"Iowan Old Style","Georgia",serif; font-weight:bold;}
+  table.vocab td.ipa{color:var(--ink-soft); font-style:italic;}
+  .speak-btn{
+    border:1px solid var(--ink);
+    background:var(--paper);
+    color:var(--ink);
+    border-radius:50%;
+    width:34px;height:34px;
+    cursor:pointer;
+    font-size:1rem;
+    line-height:1;
+  }
+  .speak-btn:hover{background:var(--accent-soft);}
+  .vocab-actions{margin-top:14px;}
+
+  button.primary{
+    font-family:"Trebuchet MS", sans-serif;
+    background:var(--ink);
+    color:var(--paper);
+    border:none;
+    padding:9px 18px;
+    border-radius:3px;
+    cursor:pointer;
+    font-size:0.9rem;
+    margin-right:8px;
+  }
+  button.primary:hover{background:var(--accent);}
+  button.ghost{
+    font-family:"Trebuchet MS", sans-serif;
+    background:transparent;
+    color:var(--ink);
+    border:1px solid var(--ink);
+    padding:8px 17px;
+    border-radius:3px;
+    cursor:pointer;
+    font-size:0.9rem;
+    margin-right:8px;
+  }
+  button.ghost:hover{background:var(--paper-line);}
+
+  /* Exercise rows */
+  .row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:9px 0;
+    border-bottom:1px dashed var(--paper-line);
+    flex-wrap:wrap;
+  }
+  .row:last-of-type{border-bottom:none;}
+  .row .num{
+    font-family:"Trebuchet MS", sans-serif;
+    color:var(--ink-soft);
+    width:20px;
+    flex:none;
+    font-size:0.85rem;
+  }
+  .row .prompt{
+    flex:1 1 260px;
+    min-width:180px;
+  }
+  .row .prompt .ru{color:var(--ink-soft); font-family:"Trebuchet MS", sans-serif; font-size:0.85rem;}
+  .row .prompt .en-clue{
+    font-size:1.05rem;
+    letter-spacing:1px;
+  }
+  input.answer-input{
+    font-family:"Trebuchet MS", sans-serif;
+    padding:7px 10px;
+    border:1px solid var(--ink-soft);
+    border-radius:3px;
+    font-size:0.95rem;
+    width:220px;
+    max-width:100%;
+    background:#FFFEFB;
+  }
+  input.answer-input:focus{outline:2px solid var(--accent); border-color:var(--accent);}
+  input.answer-input.correct{border-color:var(--good); background:var(--good-bg);}
+  input.answer-input.wrong{border-color:var(--bad); background:var(--bad-bg);}
+
+  .feedback{
+    font-family:"Trebuchet MS", sans-serif;
+    font-size:0.85rem;
+    min-width:120px;
+  }
+  .feedback.ok{color:var(--good);}
+  .feedback.bad{color:var(--bad);}
+  .feedback.shown{color:var(--accent);}
+
+  select.cat-select{
+    font-family:"Trebuchet MS", sans-serif;
+    padding:6px 8px;
+    border:1px solid var(--ink-soft);
+    border-radius:3px;
+    background:#FFFEFB;
+  }
+  select.cat-select.correct{border-color:var(--good); background:var(--good-bg);}
+  select.cat-select.wrong{border-color:var(--bad); background:var(--bad-bg);}
+
+  .footer-row{
+    margin-top:16px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .score{
+    font-family:"Trebuchet MS", sans-serif;
+    font-weight:bold;
+    color:var(--ink);
+  }
+
+  /* dialogue */
+  .dialogue-line{
+    padding:7px 0;
+    font-size:1rem;
+  }
+  .dialogue-line .speaker{
+    font-weight:bold;
+    color:var(--accent);
+    margin-right:6px;
+  }
+  .dialogue-line input.answer-input{width:170px;}
+
+  /* sidebar */
+  aside.sidebar{
+    position:sticky;
+    top:20px;
+  }
+  .sticky-note{
+    background:#FFF7DA;
+    border:1px solid #E3D48F;
+    box-shadow:0 4px 10px rgba(43,58,85,0.12);
+    padding:18px;
+    transform:rotate(-0.6deg);
+    border-radius:2px;
+  }
+  .sticky-note h3{
+    margin:0 0 4px;
+    font-size:1.05rem;
+  }
+  .sticky-note p.hint{
+    font-family:"Trebuchet MS", sans-serif;
+    font-size:0.8rem;
+    color:var(--ink-soft);
+    margin:0 0 12px;
+  }
+  table.problem{
+    width:100%;
+    border-collapse:collapse;
+    font-family:"Trebuchet MS", sans-serif;
+    font-size:0.85rem;
+  }
+  table.problem th{
+    text-align:left;
+    border-bottom:1px solid #C9B970;
+    padding:5px 4px;
+    color:var(--ink-soft);
+    font-weight:normal;
+  }
+  table.problem td{
+    padding:5px 4px;
+    border-bottom:1px dotted #D9CB8E;
+  }
+  table.problem td.count{
+    text-align:right;
+    font-weight:bold;
+    color:var(--accent);
+  }
+  .empty-note{
+    font-family:"Trebuchet MS", sans-serif;
+    font-size:0.85rem;
+    color:var(--ink-soft);
+    font-style:italic;
+  }
+  .clear-problem{
+    margin-top:12px;
+    background:none;
+    border:none;
+    text-decoration:underline;
+    color:var(--ink-soft);
+    font-family:"Trebuchet MS", sans-serif;
+    font-size:0.78rem;
+    cursor:pointer;
+    padding:0;
+  }
+
+  .voice-note{
+    font-family:"Trebuchet MS", sans-serif;
+    font-size:0.78rem;
+    color:var(--ink-soft);
+    margin-top:10px;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="top">
+    <div>
+      <h1>Linking Words &amp; Time Phrases</h1>
+      <p>Тренажёр по словам-связкам для рассказа истории — 7 упражнений, аудио и учёт ошибок</p>
+    </div>
+  </header>
+
+  <div class="layout">
+    <main>
+
+      <section class="card" id="vocabSection">
+        <div class="ex-num">СЛОВАРЬ</div>
+        <h2>Повторим слова</h2>
+        <p class="ex-instructions">Прослушайте произношение (кнопка 🔊), посмотрите перевод и транскрипцию, прежде чем переходить к упражнениям.</p>
+        <table class="vocab">
+          <thead>
+            <tr><th>Слово / фраза</th><th>Транскрипция</th><th>Перевод</th><th></th></tr>
+          </thead>
+          <tbody id="vocabBody"></tbody>
+        </table>
+        <div class="vocab-actions">
+          <button class="ghost" id="playAllVocab">🔊 Прослушать всё по очереди</button>
+        </div>
+        <p class="voice-note">Голос по умолчанию — «Google US English», если он установлен в вашем браузере (обычно доступно в Chrome). Если такого голоса нет, используется другой доступный английский голос.</p>
+      </section>
+
+      <!-- EXERCISE 1 -->
+      <section class="card" id="ex1Section">
+        <div class="ex-num">УПРАЖНЕНИЕ 1</div>
+        <h2>Вставь пропущенные буквы</h2>
+        <p class="ex-instructions">Впиши слово целиком — часть букв уже дана, часть скрыта под «_». Перевод поможет вспомнить слово.</p>
+        <div id="ex1List"></div>
+        <div class="footer-row">
+          <button class="primary" onclick="checkExercise('ex1')">Проверить</button>
+          <button class="ghost" onclick="showAnswers('ex1')">Показать ответы</button>
+          <button class="ghost" onclick="copyAnswers('ex1')">📋 Скопировать мои ответы</button>
+          <span class="score" id="ex1Score"></span>
+        </div>
+      </section>
+
+      <!-- EXERCISE 2 -->
+      <section class="card" id="ex2Section">
+        <div class="ex-num">УПРАЖНЕНИЕ 2</div>
+        <h2>Unscramble the word</h2>
+        <p class="ex-instructions">Буквы в слове перепутаны — восстанови правильный порядок и запиши слово/фразу.</p>
+        <div id="ex2List"></div>
+        <div class="footer-row">
+          <button class="primary" onclick="checkExercise('ex2')">Проверить</button>
+          <button class="ghost" onclick="showAnswers('ex2')">Показать ответы</button>
+          <button class="ghost" onclick="copyAnswers('ex2')">📋 Скопировать мои ответы</button>
+          <span class="score" id="ex2Score"></span>
+        </div>
+      </section>
+
+      <!-- EXERCISE 3 -->
+      <section class="card" id="ex3Section">
+        <div class="ex-num">УПРАЖНЕНИЕ 3</div>
+        <h2>Переведи с русского на английский</h2>
+        <p class="ex-instructions">Напиши английский эквивалент данного русского слова или фразы.</p>
+        <div id="ex3List"></div>
+        <div class="footer-row">
+          <button class="primary" onclick="checkExercise('ex3')">Проверить</button>
+          <button class="ghost" onclick="showAnswers('ex3')">Показать ответы</button>
+          <button class="ghost" onclick="copyAnswers('ex3')">📋 Скопировать мои ответы</button>
+          <span class="score" id="ex3Score"></span>
+        </div>
+      </section>
+
+      <!-- EXERCISE 4 -->
+      <section class="card" id="ex4Section">
+        <div class="ex-num">УПРАЖНЕНИЕ 4</div>
+        <h2>Запиши слово на слух</h2>
+        <p class="ex-instructions">Нажми 🔊, прослушай произношение и запиши слово или фразу так, как ты её услышал(а).</p>
+        <div id="ex4List"></div>
+        <div class="footer-row">
+          <button class="primary" onclick="checkExercise('ex4')">Проверить</button>
+          <button class="ghost" onclick="showAnswers('ex4')">Показать ответы</button>
+          <button class="ghost" onclick="copyAnswers('ex4')">📋 Скопировать мои ответы</button>
+          <span class="score" id="ex4Score"></span>
+        </div>
+      </section>
+
+      <!-- EXERCISE 5 -->
+      <section class="card" id="ex5Section">
+        <div class="ex-num">УПРАЖНЕНИЕ 5</div>
+        <h2>Categorise</h2>
+        <p class="ex-instructions">Выбери, для какой части истории обычно используется это слово: начало (start the story), развитие событий (order events) или конец (end the story).</p>
+        <div id="ex5List"></div>
+        <div class="footer-row">
+          <button class="primary" onclick="checkCategorise()">Проверить</button>
+          <button class="ghost" onclick="showAnswersCategorise()">Показать ответы</button>
+          <span class="score" id="ex5Score"></span>
+        </div>
+      </section>
+
+      <!-- EXERCISE 6 -->
+      <section class="card" id="ex6Section">
+        <div class="ex-num">УПРАЖНЕНИЕ 6</div>
+        <h2>Вставь слово в текст по контексту</h2>
+        <p class="ex-instructions">Прочитай предложение и впиши подходящее слово-связку из словаря выше.</p>
+        <div id="ex6List"></div>
+        <div class="footer-row">
+          <button class="primary" onclick="checkExercise('ex6')">Проверить</button>
+          <button class="ghost" onclick="showAnswers('ex6')">Показать ответы</button>
+          <button class="ghost" onclick="copyAnswers('ex6')">📋 Скопировать мои ответы</button>
+          <span class="score" id="ex6Score"></span>
+        </div>
+      </section>
+
+      <!-- EXERCISE 7 -->
+      <section class="card" id="ex7Section">
+        <div class="ex-num">УПРАЖНЕНИЕ 7</div>
+        <h2>Finish the dialogue</h2>
+        <p class="ex-instructions">Anna рассказывает Ben о своей поездке. Заполни пропуски подходящими словами-связками из словаря.</p>
+        <div id="ex7List"></div>
+        <div class="footer-row">
+          <button class="primary" onclick="checkExercise('ex7')">Проверить</button>
+          <button class="ghost" onclick="showAnswers('ex7')">Показать ответы</button>
+          <button class="ghost" onclick="copyDialogue()">📋 Скопировать весь диалог</button>
+          <span class="score" id="ex7Score"></span>
+        </div>
+      </section>
+
+    </main>
+
+    <aside class="sidebar">
+      <div class="sticky-note">
+        <h3>Проблемные слова</h3>
+        <p class="hint">Здесь копятся слова, в которых была допущена ошибка хотя бы раз.</p>
+        <table class="problem" id="problemTable">
+          <thead><tr><th>Слово</th><th>Перевод</th><th class="count">Ошибок</th></tr></thead>
+          <tbody id="problemBody"></tbody>
+        </table>
+        <p class="empty-note" id="problemEmpty">Пока ошибок нет — отлично!</p>
+        <button class="clear-problem" onclick="clearProblemWords()">очистить список</button>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script>
+/* ---------------------------------------------------------
+   VOCAB DATA
+--------------------------------------------------------- */
+const VOCAB = [
+  {en:"as soon as",          ru:"как только",                    ipa:"/æz suːn æz/"},
+  {en:"although",            ru:"хотя",                          ipa:"/ɔːlˈðoʊ/"},
+  {en:"and then",            ru:"а потом, и затем",              ipa:"/ænd ðen/"},
+  {en:"instead of",          ru:"вместо",                        ipa:"/ɪnˈsted əv/"},
+  {en:"however",             ru:"однако",                        ipa:"/haʊˈevər/"},
+  {en:"eventually",          ru:"в конце концов, в итоге",       ipa:"/ɪˈventʃuəli/"},
+  {en:"a few years later",   ru:"несколько лет спустя",          ipa:"/ə fjuː jɪərz ˈleɪtər/"},
+  {en:"it was only when",    ru:"только когда",                  ipa:"/ɪt wəz ˈoʊnli wen/"},
+  {en:"some years ago",      ru:"несколько лет назад",           ipa:"/sʌm jɪərz əˈɡoʊ/"},
+  {en:"after a while",       ru:"через некоторое время",         ipa:"/ˈæftər ə waɪl/"},
+  {en:"finally",             ru:"наконец",                       ipa:"/ˈfaɪnəli/"},
+  {en:"at last",             ru:"наконец-то",                    ipa:"/æt læst/"},
+  {en:"at first",            ru:"сначала",                       ipa:"/æt fɜːrst/"},
+  {en:"in the end",          ru:"в конце концов",                ipa:"/ɪn ðə end/"},
+  {en:"one day last year",   ru:"однажды в прошлом году",        ipa:"/wʌn deɪ læst jɪər/"}
+];
+
+/* ---------------------------------------------------------
+   SPEECH SYNTHESIS
+--------------------------------------------------------- */
+let voicesCache = [];
+function loadVoices(){ voicesCache = window.speechSynthesis ? speechSynthesis.getVoices() : []; }
+if('speechSynthesis' in window){
+  loadVoices();
+  speechSynthesis.onvoiceschanged = loadVoices;
+}
+function pickVoice(){
+  let v = voicesCache.find(v => /Google US English/i.test(v.name));
+  if(!v) v = voicesCache.find(v => v.lang === "en-US");
+  if(!v) v = voicesCache.find(v => /en/i.test(v.lang));
+  if(!v) v = voicesCache[0];
+  return v;
+}
+function speak(text){
+  if(!('speechSynthesis' in window)){
+    alert("Ваш браузер не поддерживает озвучивание текста.");
+    return;
+  }
+  speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  const v = pickVoice();
+  if(v) utter.voice = v;
+  utter.lang = "en-US";
+  utter.rate = 0.88;
+  speechSynthesis.speak(utter);
+}
+
+/* ---------------------------------------------------------
+   HELPERS
+--------------------------------------------------------- */
+function shuffleArr(a){
+  const arr = a.slice();
+  for(let i = arr.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+function normalize(s){
+  return (s || "").trim().toLowerCase().replace(/\s+/g," ").replace(/[.,!?]/g,"");
+}
+function scrambleToken(tok){
+  if(tok.length < 3) return tok;
+  let letters = tok.split("");
+  let scrambled, attempts = 0;
+  do{
+    scrambled = shuffleArr(letters).join("");
+    attempts++;
+  } while(scrambled.toLowerCase() === tok.toLowerCase() && attempts < 12);
+  return scrambled;
+}
+function scramblePhrase(phrase){
+  return phrase.split(" ").map(scrambleToken).join(" ");
+}
+function gapPhrase(phrase, ratio){
+  const chars = phrase.split("");
+  const letterIdx = [];
+  chars.forEach((c,i) => { if(/[a-zA-Z]/.test(c)) letterIdx.push(i); });
+  const gapCount = Math.max(1, Math.round(letterIdx.length * (ratio || 0.4)));
+  const gapIdxs = shuffleArr(letterIdx).slice(0, gapCount);
+  gapIdxs.forEach(i => chars[i] = "_");
+  return chars.join("");
+}
+function findVocabByEn(en){
+  return VOCAB.find(v => v.en === en);
+}
+
+/* ---------------------------------------------------------
+   MISTAKE TRACKING ("Проблемные слова")
+--------------------------------------------------------- */
+const mistakes = {}; // en -> count
+function recordMistake(en){
+  mistakes[en] = (mistakes[en] || 0) + 1;
+  renderProblemWords();
+}
+function clearProblemWords(){
+  Object.keys(mistakes).forEach(k => delete mistakes[k]);
+  renderProblemWords();
+}
+function renderProblemWords(){
+  const body = document.getElementById("problemBody");
+  const empty = document.getElementById("problemEmpty");
+  const entries = Object.entries(mistakes).sort((a,b) => b[1]-a[1]);
+  body.innerHTML = "";
+  if(entries.length === 0){
+    empty.style.display = "block";
+    return;
+  }
+  empty.style.display = "none";
+  entries.forEach(([en,count]) => {
+    const v = findVocabByEn(en);
+    const tr = document.createElement("tr");
+    const tdEn = document.createElement("td");
+    tdEn.textContent = en;
+    const tdRu = document.createElement("td");
+    tdRu.textContent = v ? v.ru : "";
+    const tdCount = document.createElement("td");
+    tdCount.className = "count";
+    tdCount.textContent = count;
+    tr.appendChild(tdEn); tr.appendChild(tdRu); tr.appendChild(tdCount);
+    body.appendChild(tr);
+  });
+}
+
+/* ---------------------------------------------------------
+   VOCAB TABLE RENDER
+--------------------------------------------------------- */
+function renderVocab(){
+  const body = document.getElementById("vocabBody");
+  body.innerHTML = "";
+  VOCAB.forEach(v => {
+    const tr = document.createElement("tr");
+
+    const tdEn = document.createElement("td"); tdEn.className = "en"; tdEn.textContent = v.en;
+    const tdIpa = document.createElement("td"); tdIpa.className = "ipa"; tdIpa.textContent = v.ipa;
+    const tdRu = document.createElement("td"); tdRu.textContent = v.ru;
+    const tdBtn = document.createElement("td");
+    const btn = document.createElement("button");
+    btn.className = "speak-btn";
+    btn.textContent = "🔊";
+    btn.title = "Прослушать: " + v.en;
+    btn.onclick = () => speak(v.en);
+    tdBtn.appendChild(btn);
+
+    tr.appendChild(tdEn); tr.appendChild(tdIpa); tr.appendChild(tdRu); tr.appendChild(tdBtn);
+    body.appendChild(tr);
+  });
+}
+document.getElementById("playAllVocab").addEventListener("click", () => {
+  let i = 0;
+  const order = shuffleArr(VOCAB);
+  function next(){
+    if(i >= order.length) return;
+    const u = new SpeechSynthesisUtterance(order[i].en);
+    const v = pickVoice();
+    if(v) u.voice = v;
+    u.lang = "en-US";
+    u.rate = 0.88;
+    u.onend = () => { i++; next(); };
+    speechSynthesis.speak(u);
+  }
+  speechSynthesis.cancel();
+  next();
+});
+
+/* ---------------------------------------------------------
+   GENERIC FILL-IN EXERCISE ENGINE (ex1, ex2, ex3, ex4, ex6, ex7)
+--------------------------------------------------------- */
+const state = {}; // exKey -> array of {answer, ...}
+
+function renderSimpleList(exKey, items, rowBuilder){
+  state[exKey] = items;
+  const container = document.getElementById(exKey + "List");
+  container.innerHTML = "";
+  items.forEach((item, idx) => {
+    const row = document.createElement("div");
+    row.className = "row";
+    rowBuilder(row, item, idx);
+    container.appendChild(row);
+  });
+  document.getElementById(exKey + "Score").textContent = "";
+}
+
+function getFeedbackFor(inp){
+  if(inp.id){
+    const fb = document.querySelector("[data-for='" + inp.id + "']");
+    if(fb) return fb;
+  }
+  return inp.parentElement.querySelector(".feedback") || inp.nextElementSibling;
+}
+
+function checkExercise(exKey){
+  const data = state[exKey];
+  const container = document.getElementById(exKey + "List");
+  const inputs = container.querySelectorAll("input.answer-input");
+  let correctCount = 0;
+  inputs.forEach((inp) => {
+    const item = data[Number(inp.dataset.itemIndex)];
+    const answerKey = inp.dataset.answerKey || "answer";
+    const correctVal = normalize(item[answerKey]);
+    const userVal = normalize(inp.value);
+    const feedback = getFeedbackFor(inp);
+    const isCorrect = userVal.length > 0 && userVal === correctVal;
+    if(isCorrect){
+      inp.classList.remove("wrong"); inp.classList.add("correct");
+      if(feedback){ feedback.textContent = "✓"; feedback.className = "feedback ok"; }
+      correctCount++;
+    } else {
+      inp.classList.remove("correct"); inp.classList.add("wrong");
+      if(feedback){ feedback.textContent = "✗ " + item[answerKey]; feedback.className = "feedback bad"; }
+      recordMistake(item.recordAs || item.answer);
+    }
+  });
+  document.getElementById(exKey + "Score").textContent = "Результат: " + correctCount + " из " + inputs.length;
+}
+
+function showAnswers(exKey){
+  const data = state[exKey];
+  const container = document.getElementById(exKey + "List");
+  const inputs = container.querySelectorAll("input.answer-input");
+  inputs.forEach((inp) => {
+    const item = data[Number(inp.dataset.itemIndex)];
+    const answerKey = inp.dataset.answerKey || "answer";
+    const feedback = getFeedbackFor(inp);
+    if(feedback){ feedback.textContent = "Ответ: " + item[answerKey]; feedback.className = "feedback shown"; }
+  });
+}
+
+function copyAnswers(exKey){
+  const container = document.getElementById(exKey + "List");
+  const inputs = container.querySelectorAll("input.answer-input");
+  const lines = [];
+  inputs.forEach((inp, i) => lines.push((i+1) + ". " + (inp.value || ""))); 
+  const text = lines.join("\n");
+  copyToClipboard(text);
+}
+
+function copyToClipboard(text){
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(() => {
+      flashCopied();
+    }).catch(() => fallbackCopy(text));
+  } else {
+    fallbackCopy(text);
+  }
+}
+function fallbackCopy(text){
+  const ta = document.createElement("textarea");
+  ta.value = text;
+  ta.style.position = "fixed";
+  ta.style.opacity = "0";
+  document.body.appendChild(ta);
+  ta.select();
+  try{ document.execCommand("copy"); }catch(e){}
+  document.body.removeChild(ta);
+  flashCopied();
+}
+function flashCopied(){
+  const msg = document.createElement("div");
+  msg.textContent = "Скопировано в буфер обмена";
+  msg.style.position = "fixed";
+  msg.style.bottom = "20px";
+  msg.style.left = "50%";
+  msg.style.transform = "translateX(-50%)";
+  msg.style.background = "#2B3A55";
+  msg.style.color = "#FAF6EE";
+  msg.style.padding = "8px 16px";
+  msg.style.borderRadius = "4px";
+  msg.style.fontFamily = '"Trebuchet MS", sans-serif';
+  msg.style.fontSize = "0.85rem";
+  msg.style.zIndex = 9999;
+  document.body.appendChild(msg);
+  setTimeout(() => msg.remove(), 1600);
+}
+
+/* ---------------------------------------------------------
+   EXERCISE 1 — Fill in missing letters
+--------------------------------------------------------- */
+function buildEx1(){
+  const pool = shuffleArr(VOCAB).slice(0,10);
+  const items = pool.map(v => ({
+    answer: v.en,
+    recordAs: v.en,
+    ru: v.ru,
+    gapped: gapPhrase(v.en, 0.45)
+  }));
+  renderSimpleList("ex1", items, (row, item, idx) => {
+    row.innerHTML =
+      '<div class="num">' + (idx+1) + '.</div>' +
+      '<div class="prompt"><span class="en-clue">' + item.gapped + '</span><br><span class="ru">' + item.ru + '</span></div>';
+    const input = document.createElement("input");
+    input.type = "text";
+    input.className = "answer-input";
+    input.placeholder = "впиши слово";
+    input.dataset.itemIndex = idx;
+    input.id = "ex1_inp_" + idx;
+    row.appendChild(input);
+    const fb = document.createElement("span");
+    fb.className = "feedback";
+    fb.dataset.for = input.id;
+    row.appendChild(fb);
+  });
+}
+
+/* ---------------------------------------------------------
+   EXERCISE 2 — Unscramble
+--------------------------------------------------------- */
+function buildEx2(){
+  const pool = shuffleArr(VOCAB).slice(0,10);
+  const items = pool.map(v => ({
+    answer: v.en,
+    recordAs: v.en,
+    ru: v.ru,
+    scrambled: scramblePhrase(v.en)
+  }));
+  renderSimpleList("ex2", items, (row, item, idx) => {
+    row.innerHTML =
+      '<div class="num">' + (idx+1) + '.</div>' +
+      '<div class="prompt"><span class="en-clue">' + item.scrambled + '</span><br><span class="ru">' + item.ru + '</span></div>';
+    const input = document.createElement("input");
+    input.type = "text";
+    input.className = "answer-input";
+    input.placeholder = "восстанови слово";
+    input.dataset.itemIndex = idx;
+    input.id = "ex2_inp_" + idx;
+    row.appendChild(input);
+    const fb = document.createElement("span");
+    fb.className = "feedback";
+    fb.dataset.for = input.id;
+    row.appendChild(fb);
+  });
+}
+
+/* ---------------------------------------------------------
+   EXERCISE 3 — RU -> EN translation
+--------------------------------------------------------- */
+function buildEx3(){
+  const pool = shuffleArr(VOCAB).slice(0,10);
+  const items = pool.map(v => ({
+    answer: v.en,
+    recordAs: v.en,
+    ru: v.ru
+  }));
+  renderSimpleList("ex3", items, (row, item, idx) => {
+    row.innerHTML =
+      '<div class="num">' + (idx+1) + '.</div>' +
+      '<div class="prompt"><span class="ru" style="font-size:1rem;">' + item.ru + '</span></div>';
+    const input = document.createElement("input");
+    input.type = "text";
+    input.className = "answer-input";
+    input.placeholder = "in English";
+    input.dataset.itemIndex = idx;
+    input.id = "ex3_inp_" + idx;
+    row.appendChild(input);
+    const fb = document.createElement("span");
+    fb.className = "feedback";
+    fb.dataset.for = input.id;
+    row.appendChild(fb);
+  });
+}
+
+/* ---------------------------------------------------------
+   EXERCISE 4 — Write by ear (listening / dictation)
+--------------------------------------------------------- */
+function buildEx4(){
+  const pool = shuffleArr(VOCAB).slice(0,10);
+  const items = pool.map(v => ({
+    answer: v.en,
+    recordAs: v.en,
+    ipa: v.ipa
+  }));
+  renderSimpleList("ex4", items, (row, item, idx) => {
+    row.innerHTML = '<div class="num">' + (idx+1) + '.</div>';
+    const playBtn = document.createElement("button");
+    playBtn.className = "speak-btn";
+    playBtn.textContent = "🔊";
+    playBtn.title = "Прослушать";
+    playBtn.onclick = () => speak(item.answer);
+    const promptDiv = document.createElement("div");
+    promptDiv.className = "prompt";
+    promptDiv.innerHTML = '<span class="ru">нажми и слушай &nbsp;·&nbsp; ' + item.ipa + '</span>';
+    row.appendChild(playBtn);
+    row.appendChild(promptDiv);
+    const input = document.createElement("input");
+    input.type = "text";
+    input.className = "answer-input";
+    input.placeholder = "напиши, что услышал(а)";
+    input.dataset.itemIndex = idx;
+    input.id = "ex4_inp_" + idx;
+    row.appendChild(input);
+    const fb = document.createElement("span");
+    fb.className = "feedback";
+    fb.dataset.for = input.id;
+    row.appendChild(fb);
+  });
+}
+
+/* ---------------------------------------------------------
+   EXERCISE 5 — Categorise
+--------------------------------------------------------- */
+const EX5_DATA = [
+  {en:"at first",        cat:"start"},
+  {en:"some years ago",  cat:"start"},
+  {en:"one day last year", cat:"start"},
+  {en:"and then",        cat:"order"},
+  {en:"however",         cat:"order"},
+  {en:"eventually",      cat:"order"},
+  {en:"although",        cat:"order"},
+  {en:"finally",         cat:"end"},
+  {en:"in the end",      cat:"end"},
+  {en:"at last",         cat:"end"}
+];
+function buildEx5(){
+  const items = shuffleArr(EX5_DATA);
+  state.ex5cat = items;
+  const container = document.getElementById("ex5List");
+  container.innerHTML = "";
+  items.forEach((item, idx) => {
+    const v = findVocabByEn(item.en);
+    const row = document.createElement("div");
+    row.className = "row";
+    row.innerHTML =
+      '<div class="num">' + (idx+1) + '.</div>' +
+      '<div class="prompt"><span class="en-clue">' + item.en + '</span><br><span class="ru">' + (v?v.ru:"") + '</span></div>';
+    const select = document.createElement("select");
+    select.className = "cat-select";
+    select.dataset.itemIndex = idx;
+    select.innerHTML =
+      '<option value="">— выбери —</option>' +
+      '<option value="start">Start the story</option>' +
+      '<option value="order">Order events</option>' +
+      '<option value="end">End the story</option>';
+    row.appendChild(select);
+    const fb = document.createElement("span");
+    fb.className = "feedback";
+    row.appendChild(fb);
+    container.appendChild(row);
+  });
+  document.getElementById("ex5Score").textContent = "";
+}
+function checkCategorise(){
+  const items = state.ex5cat;
+  const container = document.getElementById("ex5List");
+  const selects = container.querySelectorAll("select.cat-select");
+  let correctCount = 0;
+  selects.forEach((sel) => {
+    const item = items[Number(sel.dataset.itemIndex)];
+    const fb = sel.parentElement.querySelector(".feedback");
+    if(sel.value === item.cat){
+      sel.classList.remove("wrong"); sel.classList.add("correct");
+      fb.textContent = "✓"; fb.className = "feedback ok";
+      correctCount++;
+    } else {
+      sel.classList.remove("correct"); sel.classList.add("wrong");
+      const labels = {start:"Start the story", order:"Order events", end:"End the story"};
+      fb.textContent = "✗ " + labels[item.cat];
+      fb.className = "feedback bad";
+      recordMistake(item.en);
+    }
+  });
+  document.getElementById("ex5Score").textContent = "Результат: " + correctCount + " из " + selects.length;
+}
+function showAnswersCategorise(){
+  const items = state.ex5cat;
+  const container = document.getElementById("ex5List");
+  const selects = container.querySelectorAll("select.cat-select");
+  const labels = {start:"Start the story", order:"Order events", end:"End the story"};
+  selects.forEach((sel) => {
+    const item = items[Number(sel.dataset.itemIndex)];
+    sel.value = item.cat;
+    const fb = sel.parentElement.querySelector(".feedback");
+    fb.textContent = "Ответ: " + labels[item.cat];
+    fb.className = "feedback shown";
+  });
+}
+
+/* ---------------------------------------------------------
+   EXERCISE 6 — Insert word into context
+--------------------------------------------------------- */
+const EX6_DATA = [
+  {before:"", en:"as soon as", after:" the rain started, we decided to stay indoors."},
+  {before:"She wanted tea ", en:"instead of", after:" coffee."},
+  {before:"", en:"it was only when", after:" he read the letter that he understood everything."},
+  {before:"", en:"after a while", after:", everyone calmed down and started laughing about it."},
+  {before:"", en:"a few years later", after:", our teacher moved to another city and we lost touch."},
+  {before:"", en:"some years ago", after:", my grandmother lived in a small village near the mountains."},
+  {before:"He said he was fine; ", en:"however", after:", his hands were shaking."},
+  {before:"It took a long time, but ", en:"eventually", after:" she finished the marathon."},
+  {before:"", en:"although", after:" it was raining heavily, the match was not cancelled."},
+  {before:"We tried three times and ", en:"finally", after:" we succeeded."}
+];
+function buildEx6(){
+  const items = shuffleArr(EX6_DATA).map(d => ({
+    answer: d.en, recordAs: d.en, before: d.before, after: d.after
+  }));
+  renderSimpleList("ex6", items, (row, item, idx) => {
+    const numDiv = document.createElement("div");
+    numDiv.className = "num";
+    numDiv.textContent = (idx+1) + ".";
+    const promptDiv = document.createElement("div");
+    promptDiv.className = "prompt";
+    promptDiv.style.flex = "1 1 100%";
+    const before = document.createElement("span");
+    before.textContent = item.before;
+    const input = document.createElement("input");
+    input.type = "text";
+    input.className = "answer-input";
+    input.style.width = "170px";
+    input.placeholder = "……";
+    input.dataset.itemIndex = idx;
+    input.id = "ex6_inp_" + idx;
+    const after = document.createElement("span");
+    after.textContent = item.after;
+    promptDiv.appendChild(before);
+    promptDiv.appendChild(input);
+    promptDiv.appendChild(after);
+    const fb = document.createElement("div");
+    fb.className = "feedback";
+    fb.dataset.for = input.id;
+    fb.style.marginTop = "4px";
+    row.appendChild(numDiv);
+    row.appendChild(promptDiv);
+    row.appendChild(fb);
+  });
+}
+
+/* ---------------------------------------------------------
+   EXERCISE 7 — Finish the dialogue
+--------------------------------------------------------- */
+const EX7_LINES = [
+  {speaker:"Ben",  parts:["Hi Anna! How was your trip to Spain?"]},
+  {speaker:"Anna", parts:["It was amazing, but also a bit crazy!"]},
+  {speaker:"Ben",  parts:["What happened?"]},
+  {speaker:"Anna", parts:["Well, ", {a:"as soon as"}, " we landed, it started raining heavily."]},
+  {speaker:"Ben",  parts:["That is not a great start."]},
+  {speaker:"Anna", parts:["No, but ", {a:"and then"}, " the sun came out and everything looked beautiful."]},
+  {speaker:"Ben",  parts:["That is lucky."]},
+  {speaker:"Anna", parts:["Yes, ", {a:"however"}, ", we lost our hotel booking."]},
+  {speaker:"Ben",  parts:["Oh no, what did you do?"]},
+  {speaker:"Anna", parts:["We called the hotel manager, and ", {a:"eventually"}, " he found us another room."]},
+  {speaker:"Ben",  parts:["Good. Did the trip get better after that?"]},
+  {speaker:"Anna", parts:["Definitely. ", {a:"after a while"}, " we relaxed and started enjoying the beach."]},
+  {speaker:"Ben",  parts:["Did anything else go wrong?"]},
+  {speaker:"Anna", parts:[{a:"it was only when"}, " we tried to leave that we realized our flight was cancelled."]},
+  {speaker:"Ben",  parts:["That sounds stressful."]},
+  {speaker:"Anna", parts:["It was, ", {a:"although"}, " the airline staff were very helpful."]},
+  {speaker:"Ben",  parts:["Did you get home okay?"]},
+  {speaker:"Anna", parts:[{a:"at last"}, ", after a six-hour wait, we got on a new flight."]},
+  {speaker:"Ben",  parts:["So how do you feel about the trip now?"]},
+  {speaker:"Anna", parts:[{a:"finally"}, ", I can laugh about it, and ", {a:"in the end"}, ", it was an adventure I will never forget."]}
+];
+function buildEx7(){
+  const container = document.getElementById("ex7List");
+  container.innerHTML = "";
+  let blankIdx = 0;
+  const blanks = []; // for state.ex7
+  EX7_LINES.forEach((line) => {
+    const div = document.createElement("div");
+    div.className = "dialogue-line";
+    const speakerSpan = document.createElement("span");
+    speakerSpan.className = "speaker";
+    speakerSpan.textContent = line.speaker + ":";
+    div.appendChild(speakerSpan);
+    line.parts.forEach((part) => {
+      if(typeof part === "string"){
+        div.appendChild(document.createTextNode(part));
+      } else {
+        const input = document.createElement("input");
+        input.type = "text";
+        input.className = "answer-input";
+        input.placeholder = "……";
+        input.dataset.itemIndex = blankIdx;
+        input.id = "ex7_inp_" + blankIdx;
+        div.appendChild(input);
+        const fb = document.createElement("span");
+        fb.className = "feedback";
+        fb.dataset.for = input.id;
+        div.appendChild(fb);
+        blanks.push({answer: part.a, recordAs: part.a});
+        blankIdx++;
+      }
+    });
+    container.appendChild(div);
+  });
+  state.ex7 = blanks;
+  document.getElementById("ex7Score").textContent = "";
+}
+function copyDialogue(){
+  const container = document.getElementById("ex7List");
+  const inputs = Array.from(container.querySelectorAll("input.answer-input"));
+  let vals = inputs.map(i => i.value || "……");
+  let vIdx = 0;
+  const lines = EX7_LINES.map(line => {
+    const text = line.parts.map(part => {
+      if(typeof part === "string") return part;
+      const v = vals[vIdx]; vIdx++; return v;
+    }).join("");
+    return line.speaker + ": " + text;
+  });
+  copyToClipboard(lines.join("\n"));
+}
+
+/* ---------------------------------------------------------
+   INIT
+--------------------------------------------------------- */
+function initAll(){
+  renderVocab();
+  buildEx1();
+  buildEx2();
+  buildEx3();
+  buildEx4();
+  buildEx5();
+  buildEx6();
+  buildEx7();
+  renderProblemWords();
+}
+initAll();
+</script>
+</body>
+</html>
