@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>На главной улице — практика слов B1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1F2A3C;
+    --ink-soft:#3A4A63;
+    --paper:#FBF7EF;
+    --card:#FFFFFF;
+    --card-line:#E4DCC9;
+    --gold:#C08A21;
+    --gold-deep:#96690F;
+    --brick:#B14A3D;
+    --green:#3E7A57;
+    --shadow: 0 1px 0 rgba(31,42,60,.06);
+  }
+  :root:not([data-theme="light"]) {
+    @media (prefers-color-scheme: dark){
+      --ink:#EDE7D8; --ink-soft:#C9C1AC; --paper:#161A22; --card:#1E2430;
+      --card-line:#333B4A; --gold:#E0AC3E; --gold-deep:#F0BE5A; --brick:#E17164; --green:#63B98A;
+    }
+  }
+  :root[data-theme="dark"]{
+    --ink:#EDE7D8; --ink-soft:#C9C1AC; --paper:#161A22; --card:#1E2430;
+    --card-line:#333B4A; --gold:#E0AC3E; --gold-deep:#F0BE5A; --brick:#E17164; --green:#63B98A;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:'Inter', system-ui, sans-serif; line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{ font-family:'Fraunces', Georgia, serif; font-weight:600; margin:0; color:var(--ink); }
+  a{color:var(--gold-deep);}
+
+  .awning{
+    background: repeating-linear-gradient(135deg, var(--ink), var(--ink) 28px, var(--ink-soft) 28px, var(--ink-soft) 56px);
+    padding:2.2rem 1.5rem 1.6rem;
+    border-bottom:6px solid var(--gold);
+  }
+  .awning-inner{ max-width:1080px; margin:0 auto; }
+  .awning h1{ color:#FBF7EF; font-size:clamp(1.6rem,3.4vw,2.4rem); }
+  .awning p{ color:#DDD5BE; max-width:60ch; margin-top:.5rem; font-size:.98rem;}
+  .audio-check{
+    margin-top:1.1rem; display:flex; align-items:center; gap:.7rem; flex-wrap:wrap;
+  }
+  .btn{
+    font-family:'Inter',sans-serif; font-weight:600; font-size:.88rem; cursor:pointer;
+    border-radius:7px; border:1.5px solid var(--ink); background:var(--card); color:var(--ink);
+    padding:.5rem .9rem; transition:transform .08s ease, background .15s ease;
+  }
+  .btn:hover{ transform:translateY(-1px); }
+  .btn:active{ transform:translateY(0); }
+  .btn-gold{ background:var(--gold); border-color:var(--gold-deep); color:#241a04; }
+  .btn-outline-light{ background:transparent; border-color:#DDD5BE; color:#FBF7EF; }
+  .btn-outline-light:hover{ background:rgba(255,255,255,.08); }
+  .btn-small{ padding:.32rem .6rem; font-size:.78rem; border-radius:6px; }
+  #voiceStatus{ color:#DDD5BE; font-size:.82rem; }
+
+  .wrap{ max-width:1080px; margin:0 auto; padding:1.8rem 1.5rem 4rem; }
+
+  .vocab-strip{ margin-bottom:2.2rem; }
+  .vocab-strip h2{ font-size:1.25rem; margin-bottom:.2rem; }
+  .vocab-strip .hint{ color:var(--ink-soft); font-size:.9rem; margin-bottom:1rem;}
+  .vocab-grid{
+    display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:.7rem;
+  }
+  .vcard{
+    background:var(--card); border:1px solid var(--card-line); border-radius:10px;
+    padding:.75rem .85rem; box-shadow:var(--shadow);
+  }
+  .vcard .row1{ display:flex; align-items:center; justify-content:space-between; gap:.4rem;}
+  .vcard .en{ font-weight:600; font-size:.98rem; }
+  .vcard .ipa{ color:var(--gold-deep); font-size:.82rem; margin-top:.15rem;}
+  .vcard .ru{ color:var(--ink-soft); font-size:.85rem; margin-top:.3rem; }
+  .play-btn{
+    flex:0 0 auto; width:30px; height:30px; border-radius:50%; border:1.5px solid var(--card-line);
+    background:var(--paper); cursor:pointer; display:flex; align-items:center; justify-content:center;
+    font-size:.85rem; color:var(--ink);
+  }
+  .play-btn:hover{ border-color:var(--gold); }
+
+  .layout{ display:grid; grid-template-columns:1fr 260px; gap:1.8rem; align-items:start; }
+  @media (max-width:820px){ .layout{ grid-template-columns:1fr; } .sidebar{ order:-1; } }
+
+  .sidebar{ position:sticky; top:1rem; display:flex; flex-direction:column; gap:1rem; }
+  .side-card{
+    background:var(--card); border:1px solid var(--card-line); border-radius:10px; padding:1rem;
+    box-shadow:var(--shadow);
+  }
+  .side-card h3{ font-size:1rem; margin-bottom:.5rem; }
+  .side-card .sub{ color:var(--ink-soft); font-size:.82rem; margin-bottom:.6rem; }
+  #problemList{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:.4rem; }
+  #problemList li{
+    font-size:.85rem; border-left:3px solid var(--brick); padding:.25rem .5rem; background:var(--paper);
+    border-radius:0 6px 6px 0;
+  }
+  #problemList .empty{ border-left-color:var(--card-line); color:var(--ink-soft); font-style:italic; }
+  .score-pill{
+    display:inline-block; font-size:.78rem; font-weight:700; padding:.15rem .55rem; border-radius:99px;
+    background:var(--paper); border:1px solid var(--card-line); color:var(--ink-soft);
+  }
+
+  .exercise{
+    background:var(--card); border:1px solid var(--card-line); border-radius:12px;
+    padding:1.3rem 1.4rem 1.5rem; margin-bottom:1.6rem; box-shadow:var(--shadow);
+  }
+  .ex-head{ display:flex; align-items:baseline; justify-content:space-between; gap:1rem; flex-wrap:wrap; margin-bottom:.2rem;}
+  .ex-head h2{ font-size:1.2rem; }
+  .ex-num{ color:var(--gold-deep); font-family:'Fraunces',serif; font-weight:600; }
+  .ex-instructions{ color:var(--ink-soft); font-size:.92rem; margin:.3rem 0 1rem; max-width:70ch; }
+  .ex-actions{ display:flex; gap:.5rem; margin-top:1rem; flex-wrap:wrap; align-items:center; }
+
+  .item-row{
+    display:grid; grid-template-columns:2.2rem 1fr; gap:.6rem; align-items:start;
+    padding:.55rem 0; border-top:1px dashed var(--card-line);
+  }
+  .item-row:first-of-type{ border-top:none; }
+  .item-idx{ color:var(--gold-deep); font-weight:700; padding-top:.4rem; font-family:'Fraunces',serif; }
+  .item-body{ display:flex; flex-direction:column; gap:.35rem; }
+  .item-prompt{ font-size:.96rem; }
+  .item-prompt .scramble{ letter-spacing:.06em; font-weight:700; color:var(--ink); }
+  .item-controls{ display:flex; gap:.5rem; align-items:center; flex-wrap:wrap; }
+  input.answer{
+    font-family:'Inter',sans-serif; font-size:.94rem; padding:.45rem .6rem; border-radius:7px;
+    border:1.5px solid var(--card-line); background:var(--paper); color:var(--ink); min-width:220px; flex:1 1 220px;
+  }
+  input.answer:focus{ outline:none; border-color:var(--gold); }
+  input.answer.ok{ border-color:var(--green); background:color-mix(in srgb, var(--green) 10%, var(--paper)); }
+  input.answer.bad{ border-color:var(--brick); background:color-mix(in srgb, var(--brick) 10%, var(--paper)); }
+  .feedback{ font-size:.82rem; }
+  .feedback.ok{ color:var(--green); }
+  .feedback.bad{ color:var(--brick); }
+
+  /* rank */
+  #rankList{ list-style:none; margin:0; padding:0; }
+  #rankList li{
+    display:flex; align-items:center; gap:.6rem; padding:.5rem .6rem; border:1px solid var(--card-line);
+    border-radius:8px; margin-bottom:.45rem; background:var(--paper);
+  }
+  #rankList .rank-idx{ font-family:'Fraunces',serif; font-weight:700; color:var(--gold-deep); width:1.6rem; }
+  #rankList .rank-label{ flex:1; font-size:.95rem; }
+  .arrow-btn{
+    width:26px; height:26px; border-radius:6px; border:1px solid var(--card-line); background:var(--card);
+    cursor:pointer; font-size:.8rem; line-height:1;
+  }
+  .arrow-btn:hover{ border-color:var(--gold); }
+
+  /* WYR */
+  .wyr-item{ padding:.8rem 0; border-top:1px dashed var(--card-line); }
+  .wyr-item:first-of-type{ border-top:none; }
+  .wyr-q{ font-size:.95rem; margin-bottom:.5rem; }
+  .wyr-options{ display:flex; gap:.5rem; flex-wrap:wrap; margin-bottom:.5rem;}
+  .opt-btn{
+    padding:.4rem .7rem; border-radius:7px; border:1.5px solid var(--card-line); background:var(--paper);
+    cursor:pointer; font-size:.85rem; color:var(--ink);
+  }
+  .opt-btn.selected{ background:var(--gold); border-color:var(--gold-deep); color:#241a04; font-weight:600; }
+  textarea.reason, textarea.sentence{
+    width:100%; font-family:'Inter',sans-serif; font-size:.92rem; padding:.5rem .6rem; border-radius:7px;
+    border:1.5px solid var(--card-line); background:var(--paper); color:var(--ink); resize:vertical; min-height:2.4rem;
+  }
+  textarea.reason:focus, textarea.sentence:focus{ outline:none; border-color:var(--gold); }
+
+  .fs-item{ padding:.7rem 0; border-top:1px dashed var(--card-line); }
+  .fs-item:first-of-type{ border-top:none; }
+  .fs-stub{ font-size:.95rem; margin-bottom:.4rem; }
+
+  .toast{
+    position:fixed; bottom:1.2rem; left:50%; transform:translateX(-50%) translateY(20px);
+    background:var(--ink); color:var(--paper); padding:.6rem 1rem; border-radius:8px; font-size:.88rem;
+    opacity:0; pointer-events:none; transition:opacity .2s ease, transform .2s ease; z-index:50; box-shadow:0 6px 18px rgba(0,0,0,.25);
+  }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+  footer.systemcheck{
+    max-width:1080px; margin:0 auto 3rem; padding:0 1.5rem;
+  }
+  .checkbar{
+    background:var(--card); border:1px solid var(--card-line); border-radius:12px; padding:1.1rem 1.3rem;
+    display:flex; flex-wrap:wrap; gap:.9rem; align-items:center; justify-content:space-between;
+  }
+  .checkbar .txt{ color:var(--ink-soft); font-size:.86rem; max-width:46ch; }
+  .checkbar .btns{ display:flex; gap:.6rem; flex-wrap:wrap; }
+</style>
+</head>
+<body>
+
+<header class="awning">
+  <div class="awning-inner">
+    <h1>На главной улице: магазины и вещи в поездку</h1>
+    <p>Уровень B1. Сначала прослушайте и повторите 10 слов ниже, затем впишите ответы от руки в каждом задании — так слова лучше запоминаются.</p>
+    <div class="audio-check">
+      <button class="btn btn-outline-light" id="voiceTestBtn" type="button">🔊 Проверить звук</button>
+      <span id="voiceStatus">Голос ещё не выбран…</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <section class="vocab-strip">
+    <h2>Слова для повторения</h2>
+    <p class="hint">Нажмите на 🔊, чтобы прослушать произношение (голос Google US English, если доступен в вашем браузере).</p>
+    <div class="vocab-grid" id="vocabGrid"></div>
+  </section>
+
+  <div class="layout">
+    <main>
+
+      <section class="exercise" id="ex1">
+        <div class="ex-head"><h2><span class="ex-num">1.</span> Собери слово</h2><span class="score-pill" id="score1">0 / 10</span></div>
+        <p class="ex-instructions">Буквы каждого слова перемешаны (по словам, через « / », если название из двух слов). Впишите слово правильно.</p>
+        <div id="ex1Items"></div>
+        <div class="ex-actions">
+          <button class="btn btn-gold" onclick="checkExercise(1)">Проверить</button>
+          <button class="btn" onclick="showAnswers(1)">Показать ответы</button>
+        </div>
+      </section>
+
+      <section class="exercise" id="ex2">
+        <div class="ex-head"><h2><span class="ex-num">2.</span> Послушай и напиши</h2><span class="score-pill" id="score2">0 / 10</span></div>
+        <p class="ex-instructions">Нажмите 🔊, прослушайте слово и запишите его по буквам (со статьёй a/an, если нужна).</p>
+        <div id="ex2Items"></div>
+        <div class="ex-actions">
+          <button class="btn btn-gold" onclick="checkExercise(2)">Проверить</button>
+          <button class="btn" onclick="showAnswers(2)">Показать ответы</button>
+        </div>
+      </section>
+
+      <section class="exercise" id="ex3">
+        <div class="ex-head"><h2><span class="ex-num">3.</span> Слово по определению</h2><span class="score-pill" id="score3">0 / 10</span></div>
+        <p class="ex-instructions">Прочитайте определение на английском и напишите нужное слово.</p>
+        <div id="ex3Items"></div>
+        <div class="ex-actions">
+          <button class="btn btn-gold" onclick="checkExercise(3)">Проверить</button>
+          <button class="btn" onclick="showAnswers(3)">Показать ответы</button>
+        </div>
+      </section>
+
+      <section class="exercise" id="ex4">
+        <div class="ex-head"><h2><span class="ex-num">4.</span> Расставь по важности</h2></div>
+        <p class="ex-instructions">Представьте, что вы собираете сумку на двухнедельный отдых у моря. Расставьте вещи от 1 (самое необходимое) до 8 (можно обойтись без этого) стрелками ▲▼. Правильного ответа нет — это ваше мнение.</p>
+        <ol id="rankList"></ol>
+        <div class="ex-actions">
+          <button class="btn" onclick="copyRank()">Скопировать мой рейтинг</button>
+        </div>
+      </section>
+
+      <section class="exercise" id="ex5">
+        <div class="ex-head"><h2><span class="ex-num">5.</span> Would you rather…?</h2></div>
+        <p class="ex-instructions">Выберите вариант и объясните свой выбор одним предложением (because…).</p>
+        <div id="wyrItems"></div>
+        <div class="ex-actions">
+          <button class="btn" onclick="copyWYR()">Скопировать ответы</button>
+        </div>
+      </section>
+
+      <section class="exercise" id="ex6">
+        <div class="ex-head"><h2><span class="ex-num">6.</span> Закончи предложение</h2></div>
+        <p class="ex-instructions">Допишите предложения своими идеями.</p>
+        <div id="fsItems"></div>
+        <div class="ex-actions">
+          <button class="btn" onclick="copyFS()">Скопировать ответы</button>
+        </div>
+      </section>
+
+    </main>
+
+    <aside class="sidebar">
+      <div class="side-card">
+        <h3>Проблемные слова</h3>
+        <p class="sub">Сюда попадают слова, в которых была допущена ошибка в заданиях 1–3.</p>
+        <ul id="problemList"><li class="empty">Пока ошибок нет</li></ul>
+      </div>
+      <div class="side-card">
+        <h3>Итог</h3>
+        <p class="sub">Общий результат по заданиям 1–3.</p>
+        <div id="totalScore" class="score-pill">0 / 30</div>
+      </div>
+      <div class="side-card">
+        <h3>Скопировать всё</h3>
+        <p class="sub">Собрать все письменные ответы студента в одном тексте — для проверки.</p>
+        <button class="btn btn-small" style="width:100%" onclick="copyEverything()">📋 Скопировать всё</button>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<footer class="systemcheck">
+  <div class="checkbar">
+    <div class="txt">Перед тем как раздать ссылку студентам: нажмите «Проверить звук» вверху страницы и убедитесь, что появляется голос. Затем впишите тестовый ответ в любое поле и нажмите «Скопировать всё» — текст должен появиться в буфере обмена.</div>
+    <div class="btns">
+      <button class="btn" onclick="speak('This is a test of the voice.', true)">🔊 Тест голоса</button>
+      <button class="btn btn-gold" onclick="copyEverything()">📋 Скопировать всё</button>
+    </div>
+  </div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ---------- data ---------- */
+const WORDS = [
+  {id:'convenience', article:'a', core:'convenience store', speak:'convenience store', ipa:'/kənˈviːniəns stɔːr/', ru:'магазин у дома', def:'A small local shop that sells everyday items and is open long hours.'},
+  {id:'stationers', article:'a', core:"stationer's", speak:"stationer's", ipa:'/ˈsteɪʃənəz/', ru:'канцелярский магазин', def:'A shop that sells pens, paper and notebooks.'},
+  {id:'jewellers', article:'a', core:"jeweller's", speak:"jeweller's", ipa:'/ˈdʒuːələz/', ru:'ювелирный магазин', def:'A shop that sells rings, necklaces and watches made of gold or silver.'},
+  {id:'hairdressers', article:'a', core:"hairdresser's", speak:"hairdresser's", ipa:'/ˈheədresəz/', ru:'парикмахерская', def:'A place where someone cuts, colours or styles your hair.'},
+  {id:'electronics', article:'an', core:'electronics shop', speak:'electronics shop', ipa:'/ɪˌlekˈtrɒnɪks ʃɒp/', ru:'магазин электроники', def:'A shop that sells phones, laptops and TVs.'},
+  {id:'chemists', article:'a', core:"chemist's", speak:"chemist's", ipa:'/ˈkemɪsts/', ru:'аптека', def:'A shop where you buy medicine and health products.'},
+  {id:'bookshop', article:'a', core:'bookshop', speak:'bookshop', ipa:'/ˈbʊkʃɒp/', ru:'книжный магазин', def:'A shop that sells books.'},
+  {id:'shoeshop', article:'a', core:'shoe shop', speak:'shoe shop', ipa:'/ʃuː ʃɒp/', ru:'обувной магазин', def:'A shop that sells shoes, boots and trainers.'},
+  {id:'newsagents', article:'a', core:"newsagent's", speak:"newsagent's", ipa:'/ˈnjuːzˌeɪdʒənts/', ru:'киоск прессы', def:'A small shop that sells newspapers, magazines and sweets.'},
+  {id:'bakery', article:'a', core:'bakery', speak:'bakery', ipa:'/ˈbeɪkəri/', ru:'пекарня', def:'A shop where bread and cakes are baked and sold.'}
+];
+
+const RANK_ITEMS = [
+  {id:'repellent', label:'insect repellent /ɪnˈsekt rɪˌpelənt/'},
+  {id:'wipes', label:'wet wipes'},
+  {id:'toothbrush', label:'toothbrush'},
+  {id:'speaker', label:'portable speaker'},
+  {id:'headphones', label:'headphones'},
+  {id:'hairdryer', label:'hairdryer'},
+  {id:'flipflops', label:'a pair of flip-flops'},
+  {id:'swimsuit', label:'a swimsuit'}
+];
+
+const WYR = [
+  {q:'Would you rather buy everything at a convenience store or order everything online for a whole year?', a:'shop at a convenience store', b:'order everything online'},
+  {q:"Would you rather get a haircut at a hairdresser's you've never visited, or cut your own hair at home?", a:"visit a new hairdresser's", b:'cut it yourself'},
+  {q:'Would you rather take a portable speaker or headphones on a two-week trip?', a:'take a portable speaker', b:'take headphones'},
+  {q:'Would you rather forget your toothbrush or your hairdryer on holiday?', a:'forget the toothbrush', b:'forget the hairdryer'},
+  {q:'Would you rather spend a free afternoon in a bookshop or in an electronics shop?', a:'a bookshop', b:'an electronics shop'},
+  {q:'Would you rather bring a smartwatch or a tablet on holiday?', a:'bring a smartwatch', b:'bring a tablet'}
+];
+
+const FS = [
+  "If I need to buy medicine quickly, I go to … because …",
+  "The best thing about shopping at a bakery is …",
+  "Before a long trip, I always pack …",
+  "I would never forget to bring … because …",
+  "My favourite shop on the high street is … because …",
+  "If a shop assistant asked me \"Can I help you?\", I would say …"
+];
+
+/* ---------- helpers ---------- */
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+function normalize(s){
+  return s.toLowerCase()
+    .replace(/^(a |an )/,'')
+    .replace(/[’'".,]/g,'')
+    .replace(/\s+/g,' ')
+    .trim();
+}
+function scrambleWord(word){
+  let letters = word.replace(/[^a-zA-Z]/g,'').split('');
+  let out = letters.join('');
+  let tries = 0;
+  while(tries < 8){
+    const shuffled = shuffle(letters);
+    out = shuffled.join('');
+    if(out.toLowerCase() !== letters.join('').toLowerCase()) break;
+    tries++;
+  }
+  return out.toUpperCase();
+}
+function scramblePhrase(phrase){
+  return phrase.split(' ').map(scrambleWord).join(' / ');
+}
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toast._h);
+  toast._h = setTimeout(()=>t.classList.remove('show'), 2200);
+}
+function copyText(text){
+  if(navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(text).then(()=>toast('Скопировано в буфер обмена ✓')).catch(()=>fallbackCopy(text));
+  } else {
+    fallbackCopy(text);
+  }
+}
+function fallbackCopy(text){
+  const ta = document.createElement('textarea');
+  ta.value = text; ta.style.position='fixed'; ta.style.opacity='0';
+  document.body.appendChild(ta); ta.focus(); ta.select();
+  try{ document.execCommand('copy'); toast('Скопировано в буфер обмена ✓'); }
+  catch(e){ toast('Не удалось скопировать — выделите текст вручную'); }
+  document.body.removeChild(ta);
+}
+
+/* ---------- voice / speech ---------- */
+let chosenVoice = null;
+function loadVoice(){
+  const voices = speechSynthesis.getVoices();
+  if(!voices.length) return;
+  chosenVoice = voices.find(v=>v.name.includes('Google US English'))
+    || voices.find(v=>v.lang==='en-US')
+    || voices.find(v=>v.lang && v.lang.startsWith('en'))
+    || voices[0];
+  document.getElementById('voiceStatus').textContent = chosenVoice
+    ? 'Голос: ' + chosenVoice.name
+    : 'Голос не найден — проверьте настройки браузера';
+}
+if('speechSynthesis' in window){
+  speechSynthesis.onvoiceschanged = loadVoice;
+  loadVoice();
+} else {
+  document.getElementById('voiceStatus').textContent = 'Синтез речи не поддерживается в этом браузере';
+}
+function speak(text, isTest){
+  if(!('speechSynthesis' in window)){
+    toast('Синтез речи недоступен в этом браузере');
+    return;
+  }
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  if(chosenVoice) u.voice = chosenVoice;
+  u.lang = (chosenVoice && chosenVoice.lang) || 'en-US';
+  u.rate = 0.92;
+  if(isTest){
+    u.onstart = ()=>toast('Аудио воспроизводится…');
+    u.onerror = ()=>toast('Ошибка воспроизведения звука');
+  }
+  speechSynthesis.speak(u);
+}
+document.getElementById('voiceTestBtn').addEventListener('click', ()=>speak('Hello! This is a sound check.', true));
+
+/* ---------- vocab reminder ---------- */
+const vocabGrid = document.getElementById('vocabGrid');
+WORDS.forEach(w=>{
+  const card = document.createElement('div');
+  card.className = 'vcard';
+  card.innerHTML = `
+    <div class="row1">
+      <div class="en">${w.article} ${w.core}</div>
+      <button class="play-btn" aria-label="listen" onclick="speak('${w.speak.replace(/'/g,"\\'")}')">🔊</button>
+    </div>
+    <div class="ipa">${w.ipa}</div>
+    <div class="ru">${w.ru}</div>`;
+  vocabGrid.appendChild(card);
+});
+
+/* ---------- problem words / scoring ---------- */
+const problemWords = new Set();
+const scores = {1:0,2:0,3:0};
+function renderProblemWords(){
+  const ul = document.getElementById('problemList');
+  if(problemWords.size===0){
+    ul.innerHTML = '<li class="empty">Пока ошибок нет</li>';
+    return;
+  }
+  ul.innerHTML = [...problemWords].map(w=>`<li>${w}</li>`).join('');
+}
+function renderTotal(){
+  document.getElementById('totalScore').textContent = `${scores[1]+scores[2]+scores[3]} / 30`;
+}
+
+/* ---------- generic builder for ex1-3 ---------- */
+function buildExercise(containerId, order, mode){
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+  order.forEach((w, i)=>{
+    const row = document.createElement('div');
+    row.className = 'item-row';
+    row.dataset.wordId = w.id;
+
+    let promptHTML = '';
+    let extraControl = '';
+    if(mode === 'unscramble'){
+      promptHTML = `<span class="scramble">${scramblePhrase(w.core)}</span> <span style="color:var(--ink-soft); font-size:.85rem;">(${w.ru})</span>`;
+    } else if(mode === 'listen'){
+      promptHTML = `Нажмите 🔊 и напишите слово по буквам.`;
+      extraControl = `<button class="play-btn" style="border-radius:8px;width:auto;padding:.3rem .6rem;" onclick="speak('${w.speak.replace(/'/g,"\\'")}')">🔊 Слушать</button>`;
+    } else if(mode === 'definition'){
+      promptHTML = `${w.def}`;
+    }
+
+    row.innerHTML = `
+      <div class="item-idx">${i+1}.</div>
+      <div class="item-body">
+        <div class="item-prompt">${promptHTML}</div>
+        <div class="item-controls">
+          ${extraControl}
+          <input type="text" class="answer" placeholder="напишите слово…" autocomplete="off" spellcheck="false">
+        </div>
+        <div class="feedback"></div>
+      </div>`;
+    container.appendChild(row);
+  });
+}
+
+const order1 = shuffle(WORDS);
+const order2 = shuffle(WORDS);
+const order3 = shuffle(WORDS);
+buildExercise('ex1Items', order1, 'unscramble');
+buildExercise('ex2Items', order2, 'listen');
+buildExercise('ex3Items', order3, 'definition');
+const orders = {1:order1, 2:order2, 3:order3};
+
+function checkExercise(n){
+  const container = document.getElementById('ex'+n+'Items');
+  const order = orders[n];
+  let correctCount = 0;
+  [...container.children].forEach((row, i)=>{
+    const w = order[i];
+    const input = row.querySelector('input.answer');
+    const feedback = row.querySelector('.feedback');
+    const target = normalize(w.article + ' ' + w.core);
+    const given = normalize(input.value);
+    const isCorrect = given.length>0 && given === target;
+    input.classList.remove('ok','bad');
+    if(isCorrect){
+      input.classList.add('ok');
+      feedback.textContent = 'Верно ✓';
+      feedback.className = 'feedback ok';
+      correctCount++;
+      problemWords.delete(`${w.article} ${w.core} — ${w.ru}`);
+    } else {
+      input.classList.add('bad');
+      feedback.textContent = `Правильный ответ: ${w.article} ${w.core}`;
+      feedback.className = 'feedback bad';
+      problemWords.add(`${w.article} ${w.core} — ${w.ru}`);
+    }
+  });
+  scores[n] = correctCount;
+  document.getElementById('score'+n).textContent = `${correctCount} / ${order.length}`;
+  renderProblemWords();
+  renderTotal();
+}
+function showAnswers(n){
+  const container = document.getElementById('ex'+n+'Items');
+  const order = orders[n];
+  [...container.children].forEach((row,i)=>{
+    const w = order[i];
+    row.querySelector('input.answer').value = `${w.article} ${w.core}`;
+    row.querySelector('input.answer').classList.remove('bad');
+    row.querySelector('input.answer').classList.add('ok');
+    row.querySelector('.feedback').textContent = '';
+  });
+}
+
+/* ---------- rank exercise ---------- */
+let rankOrder = shuffle(RANK_ITEMS);
+function renderRank(){
+  const ol = document.getElementById('rankList');
+  ol.innerHTML = '';
+  rankOrder.forEach((item, i)=>{
+    const li = document.createElement('li');
+    li.innerHTML = `
+      <span class="rank-idx">${i+1}</span>
+      <span class="rank-label">${item.label}</span>
+      <button class="arrow-btn" ${i===0?'disabled':''} onclick="moveRank(${i}, -1)">▲</button>
+      <button class="arrow-btn" ${i===rankOrder.length-1?'disabled':''} onclick="moveRank(${i}, 1)">▼</button>`;
+    ol.appendChild(li);
+  });
+}
+function moveRank(i, dir){
+  const j = i + dir;
+  if(j<0 || j>=rankOrder.length) return;
+  [rankOrder[i], rankOrder[j]] = [rankOrder[j], rankOrder[i]];
+  renderRank();
+}
+renderRank();
+function copyRank(){
+  const text = "Мой рейтинг вещей для пляжного отдыха:\n" +
+    rankOrder.map((item,i)=>`${i+1}. ${item.label}`).join('\n');
+  copyText(text);
+}
+
+/* ---------- Would You Rather ---------- */
+const wyrState = WYR.map(()=>({choice:null, reason:''}));
+const wyrContainer = document.getElementById('wyrItems');
+WYR.forEach((item, i)=>{
+  const div = document.createElement('div');
+  div.className = 'wyr-item';
+  div.innerHTML = `
+    <div class="wyr-q">${i+1}. ${item.q}</div>
+    <div class="wyr-options">
+      <button class="opt-btn" data-i="${i}" data-choice="a" onclick="selectWYR(${i},'a')">${item.a}</button>
+      <button class="opt-btn" data-i="${i}" data-choice="b" onclick="selectWYR(${i},'b')">${item.b}</button>
+    </div>
+    <textarea class="reason" placeholder="…because" data-i="${i}"></textarea>`;
+  wyrContainer.appendChild(div);
+});
+wyrContainer.addEventListener('input', e=>{
+  if(e.target.classList.contains('reason')){
+    wyrState[e.target.dataset.i].reason = e.target.value;
+  }
+});
+function selectWYR(i, choice){
+  wyrState[i].choice = choice;
+  document.querySelectorAll(`.opt-btn[data-i="${i}"]`).forEach(b=>{
+    b.classList.toggle('selected', b.dataset.choice === choice);
+  });
+}
+function copyWYR(){
+  const lines = WYR.map((item,i)=>{
+    const st = wyrState[i];
+    const chosen = st.choice==='a' ? item.a : st.choice==='b' ? item.b : '(не выбрано)';
+    const reason = st.reason.trim() || '(без пояснения)';
+    return `${i+1}. ${item.q}\nВыбор: ${chosen}\nПочему: ${reason}`;
+  });
+  copyText(lines.join('\n\n'));
+}
+
+/* ---------- Finish the sentence ---------- */
+const fsState = FS.map(()=>'');
+const fsContainer = document.getElementById('fsItems');
+FS.forEach((stub, i)=>{
+  const div = document.createElement('div');
+  div.className = 'fs-item';
+  div.innerHTML = `
+    <div class="fs-stub">${i+1}. ${stub}</div>
+    <textarea class="sentence" placeholder="ваш ответ…" data-i="${i}"></textarea>`;
+  fsContainer.appendChild(div);
+});
+fsContainer.addEventListener('input', e=>{
+  if(e.target.classList.contains('sentence')){
+    fsState[e.target.dataset.i] = e.target.value;
+  }
+});
+function copyFS(){
+  const lines = FS.map((stub,i)=>`${i+1}. ${stub}\n→ ${fsState[i].trim() || '(нет ответа)'}`);
+  copyText(lines.join('\n\n'));
+}
+
+/* ---------- master copy ---------- */
+function copyEverything(){
+  const parts = [];
+  parts.push('=== ЗАДАНИЕ 1: Собери слово ===');
+  [...document.getElementById('ex1Items').children].forEach((row,i)=>{
+    parts.push(`${i+1}. ${row.querySelector('input.answer').value || '(нет ответа)'}`);
+  });
+  parts.push('\n=== ЗАДАНИЕ 2: Послушай и напиши ===');
+  [...document.getElementById('ex2Items').children].forEach((row,i)=>{
+    parts.push(`${i+1}. ${row.querySelector('input.answer').value || '(нет ответа)'}`);
+  });
+  parts.push('\n=== ЗАДАНИЕ 3: Слово по определению ===');
+  [...document.getElementById('ex3Items').children].forEach((row,i)=>{
+    parts.push(`${i+1}. ${row.querySelector('input.answer').value || '(нет ответа)'}`);
+  });
+  parts.push('\n=== ЗАДАНИЕ 4: Рейтинг вещей ===');
+  rankOrder.forEach((item,i)=>parts.push(`${i+1}. ${item.label}`));
+  parts.push('\n=== ЗАДАНИЕ 5: Would you rather ===');
+  WYR.forEach((item,i)=>{
+    const st = wyrState[i];
+    const chosen = st.choice==='a' ? item.a : st.choice==='b' ? item.b : '(не выбрано)';
+    parts.push(`${i+1}. Выбор: ${chosen} — ${st.reason.trim() || '(без пояснения)'}`);
+  });
+  parts.push('\n=== ЗАДАНИЕ 6: Закончи предложение ===');
+  FS.forEach((stub,i)=>parts.push(`${i+1}. ${fsState[i].trim() || '(нет ответа)'}`));
+  parts.push('\n=== ПРОБЛЕМНЫЕ СЛОВА ===');
+  parts.push(problemWords.size ? [...problemWords].join('; ') : '(нет)');
+  copyText(parts.join('\n'));
+}
+</script>
+</body>
+</html>
