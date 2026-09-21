@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>На моём столе — практика слов A1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Karla:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#f3efe0;
+  --ink-dim:#c9c2ab;
+  --board:#1f2a24;
+  --board-2:#28352d;
+  --board-3:#334339;
+  --line: rgba(243,239,224,0.14);
+  --mustard:#d9a441;
+  --mustard-ink:#3a2c08;
+  --brick:#c1543f;
+  --sage:#7fa17a;
+  --paper:#f6f1e2;
+  --paper-2:#eee6cf;
+  --paper-ink:#26231b;
+  --ok:#4f8f5b;
+  --bad:#c1543f;
+  --radius: 10px;
+  --shadow: 0 10px 24px rgba(0,0,0,0.28);
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  box-sizing: border-box;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ } }
+*{box-sizing:border-box;}
+html{scroll-padding-top: env(safe-area-inset-top, 0px);}
+html,body{height:auto;}
+body{
+  margin:0;
+  background:var(--board);
+  color:var(--ink);
+  font-family:'Karla', -apple-system, sans-serif;
+  line-height:1.5;
+}
+img,svg{max-width:100%;}
+.wrap{max-width:1180px;margin:0 auto;padding:28px 20px 80px;}
+
+/* ---------- HERO ---------- */
+.hero{
+  position:relative;
+  border-bottom:1px solid var(--line);
+  background:
+    radial-gradient(ellipse at 15% 0%, rgba(217,164,65,0.14), transparent 55%),
+    var(--board);
+  padding-bottom: 8px;
+}
+.hero-inner{max-width:1180px;margin:0 auto;padding:40px 20px 28px;}
+.eyebrow-row{display:flex;align-items:center;gap:10px;color:var(--mustard);font-family:'Karla';font-weight:700;font-size:0.85rem;letter-spacing:0.02em;margin-bottom:14px;}
+.eyebrow-row .dot{width:6px;height:6px;border-radius:50%;background:var(--mustard);}
+h1{
+  font-family:'Fraunces', serif;
+  font-weight:600;
+  font-size:clamp(2rem, 5vw, 3.1rem);
+  line-height:1.05;
+  margin:0 0 14px;
+  max-width:14ch;
+}
+h1 em{font-style:italic; color:var(--mustard);}
+.hero p.lead{max-width:56ch;color:var(--ink-dim);font-size:1.05rem;margin:0 0 22px;}
+.hero-meta{display:flex;flex-wrap:wrap;gap:10px;}
+.chip{
+  border:1px solid var(--line);
+  border-radius:100px;
+  padding:7px 14px;
+  font-size:0.85rem;
+  color:var(--ink-dim);
+  background:rgba(255,255,255,0.03);
+}
+
+/* ---------- LAYOUT ---------- */
+.layout{
+  display:grid;
+  grid-template-columns: 1fr 300px;
+  gap:26px;
+  align-items:start;
+  margin-top:34px;
+}
+@media (max-width: 880px){
+  .layout{grid-template-columns:1fr;}
+  aside.sidebar{position:static !important;order:-1;}
+}
+
+/* ---------- CARD / SECTION shells ---------- */
+.card{
+  background:var(--paper);
+  color:var(--paper-ink);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  overflow:hidden;
+}
+section.ex{
+  background:var(--board-2);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  margin-bottom:22px;
+  overflow:hidden;
+}
+.ex-head{
+  padding:20px 22px 14px;
+  border-bottom:1px solid var(--line);
+  display:flex; justify-content:space-between; align-items:flex-start; gap:14px; flex-wrap:wrap;
+}
+.ex-head .num{
+  font-family:'Fraunces', serif;
+  color:var(--mustard);
+  font-size:0.95rem;
+  font-weight:600;
+  display:block;
+  margin-bottom:4px;
+}
+.ex-head h2{
+  font-family:'Fraunces', serif;
+  font-weight:600;
+  font-size:1.4rem;
+  margin:0 0 6px;
+}
+.ex-head p{margin:0; color:var(--ink-dim); font-size:0.95rem; max-width:60ch;}
+.ex-actions{display:flex; gap:8px; flex-wrap:wrap;}
+.ex-body{padding:18px 22px 22px;}
+.ex-score{font-size:0.85rem; color:var(--mustard); font-weight:600; white-space:nowrap;}
+
+/* buttons */
+button{
+  font-family:'Karla', sans-serif;
+  cursor:pointer;
+  border:none;
+  border-radius:8px;
+  font-weight:700;
+  font-size:0.85rem;
+  padding:9px 15px;
+  transition: transform .08s ease, filter .15s ease;
+}
+button:active{transform:translateY(1px);}
+.btn-primary{background:var(--mustard); color:var(--mustard-ink);}
+.btn-primary:hover{filter:brightness(1.06);}
+.btn-ghost{background:transparent; border:1px solid var(--line); color:var(--ink);}
+.btn-ghost:hover{background:rgba(255,255,255,0.06);}
+.btn-sm{padding:6px 11px; font-size:0.78rem; border-radius:7px;}
+.icon-btn{
+  width:34px;height:34px;border-radius:50%;
+  background:var(--board-3); color:var(--ink);
+  display:inline-flex;align-items:center;justify-content:center;
+  border:1px solid var(--line); font-size:15px; flex:none;
+}
+.icon-btn:hover{background:var(--mustard); color:var(--mustard-ink);}
+
+/* ---------- vocab reminder table ---------- */
+.vocab-table{width:100%; border-collapse:collapse;}
+.vocab-table th{
+  text-align:left; font-family:'Karla'; font-weight:700; font-size:0.72rem;
+  letter-spacing:0.03em; color:#7a7360; padding:10px 12px; border-bottom:2px solid var(--paper-2);
+}
+.vocab-table td{padding:10px 12px; border-bottom:1px solid var(--paper-2); vertical-align:middle;}
+.vocab-table tr:last-child td{border-bottom:none;}
+.v-en{font-weight:700;}
+.v-ipa{color:#8a8368; font-size:0.88rem;}
+.v-ru{color:#4b4636;}
+.v-play{
+  width:30px;height:30px;border-radius:50%;background:var(--paper-2);border:none;
+  display:inline-flex;align-items:center;justify-content:center;color:var(--paper-ink);font-size:13px;
+}
+.v-play:hover{background:var(--mustard);}
+.card-head{padding:18px 22px; display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; border-bottom:1px solid var(--paper-2);}
+.card-head h2{font-family:'Fraunces'; font-weight:600; margin:0; font-size:1.3rem;}
+.card-head p{margin:4px 0 0; color:#6f684f; font-size:0.9rem;}
+.table-scroll{overflow-x:auto;}
+.audio-status{font-size:0.78rem; padding:0 22px 14px; color:#8a8368;}
+
+/* ---------- items ---------- */
+.item{
+  display:grid;
+  grid-template-columns: 26px 1fr;
+  gap:10px;
+  padding:12px 0;
+  border-bottom:1px dashed var(--line);
+}
+.item:last-child{border-bottom:none;}
+.item .idx{color:var(--mustard); font-family:'Fraunces'; font-weight:600; font-size:0.95rem; padding-top:6px;}
+.item .prompt{font-size:1rem; margin-bottom:8px;}
+.item .prompt .masked, .item .prompt .scrambled{
+  font-family:'Fraunces', serif; font-size:1.25rem; letter-spacing:0.06em; color:var(--mustard);
+}
+.item .ru-tag{color:var(--ink-dim); font-size:0.85rem;}
+.row-input{display:flex; gap:8px; flex-wrap:wrap; align-items:center;}
+input[type=text]{
+  flex:1; min-width:160px;
+  background:var(--board-3); border:1.5px solid var(--line); color:var(--ink);
+  border-radius:8px; padding:9px 12px; font-size:0.98rem; font-family:'Karla';
+}
+input[type=text]:focus{outline:none; border-color:var(--mustard);}
+input.correct{border-color:var(--ok); background:rgba(79,143,91,0.14);}
+input.wrong{border-color:var(--bad); background:rgba(193,84,63,0.14);}
+.feedback{font-size:0.82rem; margin-top:5px; min-height:1.1em;}
+.feedback.ok{color:#8fce9b;}
+.feedback.bad{color:#e29587;}
+.answer-reveal{font-size:0.82rem; color:var(--mustard); margin-top:4px; display:none;}
+.answer-reveal.show{display:block;}
+.emoji-cue{font-size:2rem; line-height:1;}
+.chips{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px;}
+.chip-word{
+  background:var(--board-3); border:1px solid var(--line); border-radius:100px;
+  padding:5px 12px; font-size:0.88rem; color:var(--mustard);
+}
+textarea{
+  width:100%; min-height:64px; resize:vertical;
+  background:var(--board-3); border:1.5px solid var(--line); color:var(--ink);
+  border-radius:8px; padding:10px 12px; font-size:0.95rem; font-family:'Karla';
+}
+textarea:focus{outline:none; border-color:var(--mustard);}
+.pattern{
+  font-family:'Fraunces'; font-style:italic; color:var(--mustard); font-size:1.05rem;
+  margin-bottom:10px; padding:10px 14px; background:rgba(217,164,65,0.08); border-left:3px solid var(--mustard); border-radius:0 6px 6px 0;
+}
+.drill-item{margin-bottom:18px;}
+.drill-item .label{font-size:0.85rem; color:var(--ink-dim); margin-bottom:6px;}
+
+/* ---------- sidebar ---------- */
+aside.sidebar{position:sticky; top:16px; display:flex; flex-direction:column; gap:18px;}
+.side-card{
+  background:var(--board-2); border:1px solid var(--line); border-radius:var(--radius); padding:18px 18px 20px;
+}
+.side-card h3{font-family:'Fraunces'; font-weight:600; font-size:1.05rem; margin:0 0 4px; display:flex; align-items:center; gap:8px;}
+.side-card .hint{font-size:0.82rem; color:var(--ink-dim); margin:0 0 12px;}
+#problemList{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px; max-height:340px; overflow-y:auto;}
+#problemList li{
+  display:flex; justify-content:space-between; align-items:center; gap:8px;
+  background:rgba(193,84,63,0.12); border:1px solid rgba(193,84,63,0.3);
+  border-radius:8px; padding:7px 10px; font-size:0.86rem;
+}
+#problemList li .cnt{color:var(--brick); font-weight:700; font-size:0.75rem;}
+.empty-note{font-size:0.85rem; color:var(--ink-dim); font-style:italic;}
+.progress-row{display:flex; justify-content:space-between; font-size:0.85rem; margin-top:6px;}
+.progress-bar{height:7px; background:var(--board-3); border-radius:100px; overflow:hidden; margin-top:6px;}
+.progress-fill{height:100%; background:var(--mustard); width:0%; transition:width .3s ease;}
+.clear-btn{margin-top:12px; width:100%;}
+
+footer{text-align:center; color:var(--ink-dim); font-size:0.82rem; padding:20px; border-top:1px solid var(--line); margin-top:10px;}
+
+@media (prefers-reduced-motion: reduce){ *{transition:none !important;} }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow-row"><span class="dot"></span>Уровень A1 · Тема: «На моём столе»</div>
+    <h1>Слова, которые <em>живут</em> на обеденном столе</h1>
+    <p class="lead">Повтори слова вслух, затем пропиши их рукой в десяти разных заданиях: от вставки букв до составления фраз официанта. Ошибки не страшны — они попадут в список «Проблемные слова» справа, чтобы вернуться к ним ещё раз.</p>
+    <div class="hero-meta">
+      <span class="chip">26 слов и фраз</span>
+      <span class="chip">10 заданий · по 10 пунктов</span>
+      <span class="chip">🔊 Озвучка на английском</span>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="layout">
+    <main>
+
+      <!-- ============ VOCAB REMINDER ============ -->
+      <div class="card" style="margin-bottom:26px;">
+        <div class="card-head">
+          <div>
+            <h2>Напоминание слов</h2>
+            <p>Нажми 🔊, чтобы услышать произношение, затем прочитай транскрипцию и перевод.</p>
+          </div>
+          <button class="btn-primary btn-sm" id="playAllBtn">🔊 Прослушать всё</button>
+        </div>
+        <div class="table-scroll">
+          <table class="vocab-table" id="vocabTable">
+            <thead><tr><th></th><th>English</th><th>Транскрипция</th><th>Перевод</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="audio-status" id="audioStatus">Проверка голосового движка…</div>
+      </div>
+
+      <!-- exercise sections get injected here -->
+      <div id="exercises"></div>
+
+    </main>
+
+    <!-- ============ SIDEBAR ============ -->
+    <aside class="sidebar">
+      <div class="side-card">
+        <h3>⚠️ Проблемные слова</h3>
+        <p class="hint">Сюда попадают слова, в которых была хотя бы одна ошибка.</p>
+        <ul id="problemList"></ul>
+        <p class="empty-note" id="emptyNote">Пока ошибок нет — отличное начало!</p>
+        <button class="btn-ghost btn-sm clear-btn" id="clearProblems">Очистить список</button>
+      </div>
+      <div class="side-card">
+        <h3>📊 Прогресс</h3>
+        <div class="progress-row"><span>Проверено ответов</span><span id="totalChecked">0</span></div>
+        <div class="progress-row"><span>Верно</span><span id="totalCorrect">0</span></div>
+        <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<footer>Сделано для практики письма и произношения · слова из темы «Table setting»</footer>
+
+<script>
+/* =========================================================
+   DATA
+   ========================================================= */
+const WORDS = [
+  {en:"spoon", ru:"ложка", ipa:"/spuːn/", emoji:"🥄"},
+  {en:"cup", ru:"чашка", ipa:"/kʌp/", emoji:"☕"},
+  {en:"fork", ru:"вилка", ipa:"/fɔːrk/", emoji:"🍴"},
+  {en:"pastry", ru:"кондитерское изделие", ipa:"/ˈpeɪstri/", emoji:"🥐"},
+  {en:"salt", ru:"соль", ipa:"/sɔːlt/", emoji:"🧂"},
+  {en:"plate", ru:"тарелка (плоская)", ipa:"/pleɪt/", emoji:"🍽️"},
+  {en:"bowl", ru:"чаша, миска", ipa:"/boʊl/", emoji:"🥣"},
+  {en:"glass", ru:"стакан", ipa:"/ɡlæs/", emoji:"🥛"},
+  {en:"pepper", ru:"перец", ipa:"/ˈpepər/"},
+  {en:"napkin", ru:"салфетка", ipa:"/ˈnæpkɪn/"},
+  {en:"sugar", ru:"сахар", ipa:"/ˈʃʊɡər/"},
+  {en:"chopsticks", ru:"палочки для еды", ipa:"/ˈtʃɑːpstɪks/", emoji:"🥢"},
+  {en:"tea spoon", ru:"чайная ложка", ipa:"/ˈtiː spuːn/"},
+  {en:"table spoon", ru:"столовая ложка", ipa:"/ˈteɪbl spuːn/"},
+  {en:"toast", ru:"тост", ipa:"/toʊst/", emoji:"🍞"},
+  {en:"tissues", ru:"бумажные платочки / салфетки", ipa:"/ˈtɪʃuːz/"},
+  {en:"knife", ru:"нож", ipa:"/naɪf/", emoji:"🔪"},
+  {en:"on my table", ru:"на моём столе", ipa:"/ɒn maɪ ˈteɪbl/"},
+  {en:"use", ru:"использовать", ipa:"/juːz/"},
+  {en:"menu", ru:"меню", ipa:"/ˈmenjuː/", emoji:"📜"},
+  {en:"still water", ru:"вода без газа", ipa:"/stɪl ˈwɔːtər/"},
+  {en:"sparkling wine", ru:"игристое вино", ipa:"/ˈspɑːrklɪŋ waɪn/"},
+  {en:"latte", ru:"кофе-латте", ipa:"/ˈlɑːteɪ/"},
+  {en:"espresso", ru:"эспрессо", ipa:"/eˈspresoʊ/"},
+  {en:"mineral water", ru:"минеральная вода", ipa:"/ˈmɪnərəl ˈwɔːtər/"},
+  {en:"order", ru:"заказывать", ipa:"/ˈɔːrdər/"},
+  {en:"I want to order", ru:"я хочу заказать…", ipa:"/aɪ wɒnt tuː ˈɔːrdər/"}
+];
+const byEn = Object.fromEntries(WORDS.map(w=>[w.en,w]));
+
+/* =========================================================
+   SPEECH
+   ========================================================= */
+let voices = [];
+let chosenVoice = null;
+function pickVoice(){
+  voices = window.speechSynthesis ? speechSynthesis.getVoices() : [];
+  const prefs = ["Google US English", "Microsoft Aria Online (Natural)", "Samantha"];
+  chosenVoice = null;
+  for(const p of prefs){
+    const v = voices.find(v=>v.name.includes(p));
+    if(v){ chosenVoice = v; break; }
+  }
+  if(!chosenVoice) chosenVoice = voices.find(v=>v.lang && v.lang.startsWith("en")) || null;
+  const statusEl = document.getElementById("audioStatus");
+  if(!window.speechSynthesis){
+    statusEl.textContent = "⚠️ Этот браузер не поддерживает озвучку слов. Попробуйте открыть страницу в Chrome.";
+  } else if(chosenVoice){
+    statusEl.textContent = "🔊 Голос готов: " + chosenVoice.name + (chosenVoice.name.includes("Google US English") ? " (рекомендованный голос для этого курса)" : " — если хотите точно голос «Google US English», откройте страницу в Chrome.");
+  } else {
+    statusEl.textContent = "🔊 Голосовой движок готов (стандартный голос браузера).";
+  }
+}
+if(window.speechSynthesis){
+  pickVoice();
+  speechSynthesis.onvoiceschanged = pickVoice;
+}
+function speak(text){
+  if(!window.speechSynthesis){ alert("Озвучка не поддерживается в этом браузере."); return; }
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = "en-US";
+  u.rate = 0.92;
+  if(chosenVoice) u.voice = chosenVoice;
+  speechSynthesis.speak(u);
+}
+function speakSequence(list, i){
+  i = i || 0;
+  if(i >= list.length) return;
+  if(!window.speechSynthesis) return;
+  const u = new SpeechSynthesisUtterance(list[i]);
+  u.lang="en-US"; u.rate=0.92;
+  if(chosenVoice) u.voice = chosenVoice;
+  u.onend = ()=> speakSequence(list, i+1);
+  speechSynthesis.speak(u);
+}
+
+/* =========================================================
+   HELPERS
+   ========================================================= */
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+function pick(n, pool){ return shuffle(pool).slice(0, Math.min(n, pool.length)); }
+function normalize(s){
+  return s.toLowerCase().trim()
+    .replace(/^(a|an|the)\s+/,"")
+    .replace(/[.,!?;:]/g,"")
+    .replace(/\s+/g," ");
+}
+function maskWord(word){
+  return word.split("").map((ch,i)=>{
+    if(ch===" ") return " ";
+    if(i===0) return ch;
+    return Math.random() < 0.55 ? "_" : ch;
+  }).join("");
+}
+function scrambleLetters(word){
+  const letters = word.replace(/\s/g,"").split("");
+  let s = shuffle(letters).join("");
+  let tries=0;
+  while(s.toLowerCase()===word.replace(/\s/g,"").toLowerCase() && tries<6){ s = shuffle(letters).join(""); tries++; }
+  return s.toUpperCase().split("").join(" ");
+}
+function scrambleWords(phrase){
+  const parts = phrase.split(" ");
+  let s = shuffle(parts);
+  let tries=0;
+  while(s.join(" ")===phrase && tries<6){ s = shuffle(parts); tries++; }
+  return s;
+}
+
+/* =========================================================
+   STATE: problem words + progress
+   ========================================================= */
+let problemWords = {};
+let stats = {checked:0, correct:0};
+try{
+  const saved = JSON.parse(localStorage.getItem("tablevocab_problems")||"{}");
+  problemWords = saved;
+}catch(e){ problemWords = {}; }
+
+function markResult(enKey, isCorrect){
+  stats.checked++;
+  if(isCorrect) stats.correct++;
+  else{
+    problemWords[enKey] = (problemWords[enKey]||0) + 1;
+    try{ localStorage.setItem("tablevocab_problems", JSON.stringify(problemWords)); }catch(e){}
+  }
+  renderSidebar();
+}
+function renderSidebar(){
+  const ul = document.getElementById("problemList");
+  const empty = document.getElementById("emptyNote");
+  const entries = Object.entries(problemWords).sort((a,b)=>b[1]-a[1]);
+  ul.innerHTML = "";
+  if(entries.length===0){ empty.style.display="block"; }
+  else{
+    empty.style.display="none";
+    entries.forEach(([en,count])=>{
+      const w = byEn[en];
+      const li = document.createElement("li");
+      li.innerHTML = `<span>${en}${w?` <span style="color:var(--ink-dim)">— ${w.ru}</span>`:""}</span><span class="cnt">×${count}</span>`;
+      ul.appendChild(li);
+    });
+  }
+  document.getElementById("totalChecked").textContent = stats.checked;
+  document.getElementById("totalCorrect").textContent = stats.correct;
+  const pct = stats.checked ? Math.round(100*stats.correct/stats.checked) : 0;
+  document.getElementById("progressFill").style.width = pct+"%";
+}
+document.getElementById("clearProblems").addEventListener("click", ()=>{
+  problemWords = {};
+  try{ localStorage.removeItem("tablevocab_problems"); }catch(e){}
+  renderSidebar();
+});
+
+/* =========================================================
+   VOCAB REMINDER TABLE
+   ========================================================= */
+(function buildVocabTable(){
+  const tbody = document.querySelector("#vocabTable tbody");
+  WORDS.forEach(w=>{
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td><button class="v-play" title="Слушать">🔊</button></td>
+      <td class="v-en">${w.en}</td><td class="v-ipa">${w.ipa}</td><td class="v-ru">${w.ru}</td>`;
+    tr.querySelector(".v-play").addEventListener("click", ()=>speak(w.en));
+    tbody.appendChild(tr);
+  });
+})();
+document.getElementById("playAllBtn").addEventListener("click", ()=>{
+  speakSequence(WORDS.map(w=>w.en));
+});
+
+/* =========================================================
+   GENERIC EXERCISE SHELL
+   ========================================================= */
+const exContainer = document.getElementById("exercises");
+let exCounter = 0;
+
+function makeSection(icon, title, desc){
+  exCounter++;
+  const sec = document.createElement("section");
+  sec.className = "ex";
+  sec.innerHTML = `
+    <div class="ex-head">
+      <div>
+        <span class="num">${icon} Задание ${exCounter}</span>
+        <h2>${title}</h2>
+        <p>${desc}</p>
+      </div>
+      <div class="ex-actions">
+        <span class="ex-score" data-score></span>
+        <button class="btn-ghost btn-sm" data-reshuffle>🔀 Другие слова</button>
+        <button class="btn-ghost btn-sm" data-reveal>👁 Показать ответы</button>
+        <button class="btn-primary btn-sm" data-check>✓ Проверить</button>
+      </div>
+    </div>
+    <div class="ex-body" data-body></div>
+  `;
+  exContainer.appendChild(sec);
+  return sec;
+}
+
+/* Typing-style exercise: promptFn(word,index)->HTML for prompt area (above input), answer = word.en (normalized) */
+function renderTypingExercise({icon, title, desc, pool, count, promptFn, placeholder, answerFor}){
+  const sec = makeSection(icon, title, desc);
+  const body = sec.querySelector("[data-body]");
+  answerFor = answerFor || (w=>w.en);
+
+  function draw(){
+    body.innerHTML = "";
+    const items = pick(count, pool);
+    sec._items = items;
+    items.forEach((w, i)=>{
+      const row = document.createElement("div");
+      row.className = "item";
+      row.innerHTML = `
+        <div class="idx">${i+1}.</div>
+        <div>
+          <div class="prompt">${promptFn(w,i)}</div>
+          <div class="row-input">
+            <input type="text" placeholder="${placeholder||'Введите слово по-английски…'}" data-answer>
+            <button class="icon-btn" title="Слушать" data-listen>🔊</button>
+          </div>
+          <div class="feedback" data-feedback></div>
+          <div class="answer-reveal" data-reveal-text>Ответ: <strong>${answerFor(w)}</strong></div>
+        </div>
+      `;
+      row.querySelector("[data-listen]").addEventListener("click", ()=>speak(w.en));
+      row.dataset.enKey = w.en;
+      body.appendChild(row);
+    });
+  }
+  draw();
+
+  sec.querySelector("[data-reshuffle]").addEventListener("click", ()=>{ draw(); sec.querySelector("[data-score]").textContent=""; });
+  sec.querySelector("[data-reveal]").addEventListener("click", (e)=>{
+    const showing = e.target.classList.toggle("active");
+    body.querySelectorAll("[data-reveal-text]").forEach(el=> el.classList.toggle("show", showing));
+    e.target.textContent = showing ? "🙈 Скрыть ответы" : "👁 Показать ответы";
+  });
+  sec.querySelector("[data-check]").addEventListener("click", ()=>{
+    let correct = 0;
+    const rows = body.querySelectorAll(".item");
+    const items = sec._items;
+    rows.forEach((row, i)=>{
+      const w = items[i];
+      const input = row.querySelector("[data-answer]");
+      const fb = row.querySelector("[data-feedback]");
+      const given = normalize(input.value);
+      const target = normalize(answerFor(w));
+      const ok = given.length>0 && given===target;
+      input.classList.remove("correct","wrong");
+      if(ok){
+        input.classList.add("correct");
+        fb.textContent = "Верно!";
+        fb.className = "feedback ok";
+        correct++;
+      } else {
+        input.classList.add("wrong");
+        fb.textContent = given.length===0 ? "Пусто — правильный ответ: " + answerFor(w) : "Правильный ответ: " + answerFor(w);
+        fb.className = "feedback bad";
+      }
+      markResult(w.en, ok);
+    });
+    sec.querySelector("[data-score]").textContent = `${correct} / ${rows.length}`;
+  });
+  return sec;
+}
+
+/* =========================================================
+   EXERCISE 1 — Fill in the missing letters
+   ========================================================= */
+const singleWordPool = WORDS.filter(w=>!w.en.includes(" "));
+renderTypingExercise({
+  icon:"🔤",
+  title:"Вставь пропущенные буквы",
+  desc:"Прочитай слово с пропусками и допиши его целиком в поле ответа.",
+  pool: singleWordPool,
+  count: 10,
+  promptFn: (w)=> `Слово: <span class="masked">${maskWord(w.en)}</span> <span class="ru-tag">— ${w.ru}</span>`,
+  placeholder:"Впиши слово целиком"
+});
+
+/* =========================================================
+   EXERCISE 2 — Unscramble the word
+   ========================================================= */
+renderTypingExercise({
+  icon:"🔀",
+  title:"Собери слово из букв",
+  desc:"Буквы перемешаны — расставь их в правильном порядке и запиши слово.",
+  pool: singleWordPool,
+  count: 10,
+  promptFn: (w)=> `<span class="scrambled">${scrambleLetters(w.en)}</span> <span class="ru-tag">— ${w.ru}</span>`,
+  placeholder:"Впиши правильное слово"
+});
+
+/* =========================================================
+   EXERCISE 3 — Translate RU -> EN
+   ========================================================= */
+renderTypingExercise({
+  icon:"🇷🇺→🇬🇧",
+  title:"Переведи слово",
+  desc:"Прочитай перевод на русском и напиши английское слово или фразу.",
+  pool: WORDS,
+  count: 10,
+  promptFn: (w)=> `«${w.ru}»`,
+  placeholder:"Write in English"
+});
+
+/* =========================================================
+   EXERCISE 4 — Listen and write (dictation)
+   ========================================================= */
+renderTypingExercise({
+  icon:"🎧",
+  title:"Послушай и напиши",
+  desc:"Нажми 🔊, прослушай слово (голос Google US English Natural, если доступен) и запиши его по-английски.",
+  pool: WORDS,
+  count: 10,
+  promptFn: ()=> `Нажми 🔊, чтобы услышать слово, и запиши то, что услышал(а).`,
+  placeholder:"Write what you hear"
+});
+
+/* =========================================================
+   EXERCISE 5 — By picture
+   ========================================================= */
+const emojiPool = WORDS.filter(w=>w.emoji);
+renderTypingExercise({
+  icon:"🖼️",
+  title:"Назови по картинке",
+  desc:"Посмотри на изображение и напиши, как этот предмет называется по-английски.",
+  pool: emojiPool,
+  count: Math.min(10, emojiPool.length),
+  promptFn: (w)=> `<span class="emoji-cue">${w.emoji}</span>`,
+  placeholder:"Впиши слово"
+});
+
+/* =========================================================
+   EXERCISE 6 — Context / mini-situations
+   ========================================================= */
+const contextItems = [
+  {answer:"knife", text:"Excuse me, could I have a ______? I need to cut this steak."},
+  {answer:"sugar", text:"I'd like a cup of tea with milk and two spoons of ______, please."},
+  {answer:"pepper", text:"Can you pass me the ______? My soup needs more flavour."},
+  {answer:"chopsticks", text:"We usually eat noodles with ______ in this restaurant."},
+  {answer:"menu", text:"Could I see the ______? I want to choose my dinner."},
+  {answer:"still water", text:"I'll have ______ — I don't want any gas in my water."},
+  {answer:"toast", text:"For breakfast I always have ______ with butter and jam."},
+  {answer:"pastry", text:"This cake is delicious! Do you have more ______ on the menu?"},
+  {answer:"latte", text:"My coffee is too strong. Can I have a ______ instead of an espresso?"},
+  {answer:"I want to order", text:"Waiter: What would you like to drink?\nYou: ______ a glass of sparkling wine, please."}
+];
+(function(){
+  const sec = makeSection("📝", "Контекст и мини-ситуации", "Прочитай ситуацию и впиши подходящее слово или фразу вместо пропуска.");
+  const body = sec.querySelector("[data-body]");
+  function draw(){
+    body.innerHTML = "";
+    const items = pick(10, contextItems);
+    sec._items = items;
+    items.forEach((it,i)=>{
+      const row = document.createElement("div");
+      row.className = "item";
+      row.innerHTML = `
+        <div class="idx">${i+1}.</div>
+        <div>
+          <div class="prompt">${it.text.replace(/\n/g,"<br>")}</div>
+          <div class="row-input"><input type="text" placeholder="Fill in the blank"></div>
+          <div class="feedback" data-feedback></div>
+          <div class="answer-reveal" data-reveal-text>Ответ: <strong>${it.answer}</strong></div>
+        </div>`;
+      body.appendChild(row);
+    });
+  }
+  draw();
+  sec.querySelector("[data-reshuffle]").addEventListener("click", ()=>{ draw(); sec.querySelector("[data-score]").textContent=""; });
+  sec.querySelector("[data-reveal]").addEventListener("click", (e)=>{
+    const showing = e.target.classList.toggle("active");
+    body.querySelectorAll("[data-reveal-text]").forEach(el=> el.classList.toggle("show", showing));
+    e.target.textContent = showing ? "🙈 Скрыть ответы" : "👁 Показать ответы";
+  });
+  sec.querySelector("[data-check]").addEventListener("click", ()=>{
+    let correct=0;
+    const rows = body.querySelectorAll(".item");
+    rows.forEach((row,i)=>{
+      const it = sec._items[i];
+      const input = row.querySelector("input");
+      const fb = row.querySelector("[data-feedback]");
+      const ok = normalize(input.value) === normalize(it.answer);
+      input.classList.remove("correct","wrong");
+      input.classList.add(ok?"correct":"wrong");
+      fb.className = "feedback " + (ok?"ok":"bad");
+      fb.textContent = ok ? "Верно!" : "Правильный ответ: " + it.answer;
+      if(ok) correct++;
+      markResult(it.answer, ok);
+    });
+    sec.querySelector("[data-score]").textContent = `${correct} / ${rows.length}`;
+  });
+})();
+
+/* =========================================================
+   EXERCISE 7 — Build the chunk
+   ========================================================= */
+const chunkItems = [
+  "still water","sparkling wine","mineral water","on my table","I want to order",
+  "tea spoon","table spoon","a cup of coffee","salt and pepper","knife and fork"
+];
+(function(){
+  const sec = makeSection("🧩", "Собери фразу (Build the chunk)", "Слова перемешаны — прочитай их и напиши фразу целиком в правильном порядке.");
+  const body = sec.querySelector("[data-body]");
+  function draw(){
+    body.innerHTML = "";
+    const items = pick(10, chunkItems);
+    sec._items = items;
+    items.forEach((phrase,i)=>{
+      const scrambled = scrambleWords(phrase);
+      const row = document.createElement("div");
+      row.className = "item";
+      row.innerHTML = `
+        <div class="idx">${i+1}.</div>
+        <div>
+          <div class="chips">${scrambled.map(w=>`<span class="chip-word">${w}</span>`).join("")}</div>
+          <div class="row-input">
+            <input type="text" placeholder="Напиши фразу в правильном порядке">
+            <button class="icon-btn" title="Слушать" data-listen>🔊</button>
+          </div>
+          <div class="feedback" data-feedback></div>
+          <div class="answer-reveal" data-reveal-text>Ответ: <strong>${phrase}</strong></div>
+        </div>`;
+      row.querySelector("[data-listen]").addEventListener("click", ()=>speak(phrase));
+      body.appendChild(row);
+    });
+  }
+  draw();
+  sec.querySelector("[data-reshuffle]").addEventListener("click", ()=>{ draw(); sec.querySelector("[data-score]").textContent=""; });
+  sec.querySelector("[data-reveal]").addEventListener("click", (e)=>{
+    const showing = e.target.classList.toggle("active");
+    body.querySelectorAll("[data-reveal-text]").forEach(el=> el.classList.toggle("show", showing));
+    e.target.textContent = showing ? "🙈 Скрыть ответы" : "👁 Показать ответы";
+  });
+  sec.querySelector("[data-check]").addEventListener("click", ()=>{
+    let correct=0;
+    const rows = body.querySelectorAll(".item");
+    rows.forEach((row,i)=>{
+      const phrase = sec._items[i];
+      const input = row.querySelector("input");
+      const fb = row.querySelector("[data-feedback]");
+      const ok = normalize(input.value) === normalize(phrase);
+      input.classList.remove("correct","wrong");
+      input.classList.add(ok?"correct":"wrong");
+      fb.className = "feedback " + (ok?"ok":"bad");
+      fb.textContent = ok ? "Верно!" : "Правильный ответ: " + phrase;
+      if(ok) correct++;
+      markResult(phrase, ok);
+    });
+    sec.querySelector("[data-score]").textContent = `${correct} / ${rows.length}`;
+  });
+})();
+
+/* =========================================================
+   EXERCISE 8 — Drilling: Repeat & Change
+   ========================================================= */
+(function(){
+  const sec = document.createElement("section");
+  sec.className = "ex";
+  const patterns = [
+    "I want to order a latte, please.",
+    "Could I have a menu? — Of course, here you are.",
+    "On my table there is a plate and a glass.",
+    "Can you pass me the salt, please?",
+    "I'd like still water, not sparkling wine.",
+    "Do you know how to use chopsticks?"
+  ];
+  sec.innerHTML = `
+    <div class="ex-head">
+      <div>
+        <span class="num">🗣️ Задание ${++exCounter}</span>
+        <h2>Дриллинг: Repeat &amp; Change</h2>
+        <p>Прочитай пример вслух, затем напиши свою фразу по этому же образцу, подставив свои слова и идеи. Это открытое задание — правильных вариантов может быть несколько.</p>
+      </div>
+      <div class="ex-actions">
+        <button class="btn-primary btn-sm" id="copyDrill">📋 Скопировать все ответы</button>
+      </div>
+    </div>
+    <div class="ex-body">
+      ${patterns.map((p,i)=>`
+        <div class="drill-item">
+          <div class="pattern">“${p}”</div>
+          <div class="label">Твой вариант ${i+1} (измени слово/идею, оставив структуру фразы):</div>
+          <textarea data-drill="${i}" placeholder="Напиши свою фразу здесь…"></textarea>
+        </div>
+      `).join("")}
+    </div>
+  `;
+  exContainer.appendChild(sec);
+  sec.querySelector("#copyDrill").addEventListener("click", async ()=>{
+    const areas = sec.querySelectorAll("[data-drill]");
+    let text = "Repeat & Change — мои варианты:\n\n";
+    areas.forEach((ta,i)=>{
+      text += `${i+1}. Образец: ${patterns[i]}\n   Мой вариант: ${ta.value.trim() || "(пусто)"}\n\n`;
+    });
+    try{
+      await navigator.clipboard.writeText(text);
+      const btn = sec.querySelector("#copyDrill");
+      const old = btn.textContent;
+      btn.textContent = "✓ Скопировано!";
+      setTimeout(()=> btn.textContent = old, 1600);
+    }catch(e){
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      try{ document.execCommand("copy"); }catch(e2){}
+      document.body.removeChild(ta);
+      alert("Ответы скопированы (резервный способ).");
+    }
+  });
+})();
+
+/* =========================================================
+   EXERCISE 9 — Retrieval: write as many words as you remember
+   ========================================================= */
+(function(){
+  const sec = document.createElement("section");
+  sec.className = "ex";
+  sec.innerHTML = `
+    <div class="ex-head">
+      <div>
+        <span class="num">🧠 Задание ${++exCounter}</span>
+        <h2>Вспомни как можно больше слов</h2>
+        <p>Не подглядывая наверх, напиши в поле ниже все английские слова из сегодняшнего списка, которые вспомнишь. Разделяй их запятой или новой строкой.</p>
+      </div>
+      <div class="ex-actions">
+        <span class="ex-score" id="retrieveScore"></span>
+        <button class="btn-primary btn-sm" id="checkRetrieve">✓ Проверить</button>
+      </div>
+    </div>
+    <div class="ex-body">
+      <textarea id="retrieveInput" style="min-height:120px" placeholder="spoon, cup, fork ..."></textarea>
+      <div id="retrieveResult" style="margin-top:14px;"></div>
+    </div>
+  `;
+  exContainer.appendChild(sec);
+  sec.querySelector("#checkRetrieve").addEventListener("click", ()=>{
+    const raw = sec.querySelector("#retrieveInput").value;
+    const given = raw.split(/[,\n]/).map(s=>normalize(s)).filter(Boolean);
+    const allEn = WORDS.map(w=>normalize(w.en));
+    const foundSet = new Set();
+    given.forEach(g=>{ if(allEn.includes(g)) foundSet.add(g); });
+    const missed = WORDS.filter(w=>!foundSet.has(normalize(w.en)));
+    sec.querySelector("#retrieveScore").textContent = `${foundSet.size} / ${WORDS.length}`;
+    const resultEl = sec.querySelector("#retrieveResult");
+    resultEl.innerHTML = `
+      <div class="feedback ok" style="margin-bottom:8px;">✓ Вспомнено верно: ${foundSet.size} из ${WORDS.length}</div>
+      ${missed.length ? `<div class="hint" style="color:var(--ink-dim); font-size:0.88rem; margin-bottom:6px;">Не хватило в памяти:</div>
+      <div class="chips">${missed.map(w=>`<span class="chip-word">${w.en} — ${w.ru}</span>`).join("")}</div>` : `<div class="hint" style="color:var(--ink-dim);">Все слова вспомнены! 🎉</div>`}
+    `;
+    missed.forEach(w=> markResult(w.en, false));
+    stats.checked += 0; // retrieval doesn't double count per-item checks beyond misses above
+    renderSidebar();
+  });
+})();
+
+/* =========================================================
+   EXERCISE 10 — Focus on your 3 trickiest words
+   ========================================================= */
+(function(){
+  const sec = document.createElement("section");
+  sec.className = "ex";
+  sec.innerHTML = `
+    <div class="ex-head">
+      <div>
+        <span class="num">⭐ Задание ${++exCounter}</span>
+        <h2>3 самых сложных слова</h2>
+        <p>Отметь ровно 3 слова, в которых ты меньше всего уверен(а). Для них появятся дополнительные короткие задания — перевод, произношение по буквам и фраза с этим словом.</p>
+      </div>
+      <div class="ex-actions">
+        <button class="btn-primary btn-sm" id="genFocus">Сгенерировать задания</button>
+      </div>
+    </div>
+    <div class="ex-body">
+      <div class="chips" id="pickList"></div>
+      <div id="focusArea" style="margin-top:16px;"></div>
+    </div>
+  `;
+  exContainer.appendChild(sec);
+  const pickList = sec.querySelector("#pickList");
+  const focusArea = sec.querySelector("#focusArea");
+  let selected = new Set();
+
+  function drawPicks(){
+    // prioritise words already in problem list, then fill with the rest
+    const problemEns = Object.keys(problemWords);
+    const rest = WORDS.map(w=>w.en).filter(en=>!problemEns.includes(en));
+    const order = [...shuffle(problemEns), ...shuffle(rest)];
+    pickList.innerHTML = "";
+    order.forEach(en=>{
+      const w = byEn[en];
+      if(!w) return;
+      const b = document.createElement("button");
+      b.type="button";
+      b.className = "chip-word";
+      b.style.cursor = "pointer";
+      b.style.border = "1px solid var(--line)";
+      b.textContent = `${w.en} — ${w.ru}`;
+      b.addEventListener("click", ()=>{
+        if(selected.has(en)){ selected.delete(en); b.style.background=""; b.style.color="var(--mustard)"; }
+        else{
+          if(selected.size>=3){ return; }
+          selected.add(en); b.style.background="var(--mustard)"; b.style.color="var(--mustard-ink)";
+        }
+      });
+      pickList.appendChild(b);
+    });
+  }
+  drawPicks();
+
+  sec.querySelector("#genFocus").addEventListener("click", ()=>{
+    if(selected.size!==3){ alert("Выбери ровно 3 слова (сейчас выбрано: " + selected.size + ")."); return; }
+    const words = [...selected].map(en=>byEn[en]);
+    focusArea.innerHTML = "";
+    words.forEach((w,i)=>{
+      const block = document.createElement("div");
+      block.className = "item";
+      block.innerHTML = `
+        <div class="idx">${i+1}.</div>
+        <div>
+          <div class="prompt"><strong>${w.en}</strong> <span class="ru-tag">— ${w.ru} ${w.ipa}</span>
+            <button class="icon-btn" style="width:26px;height:26px;font-size:12px;vertical-align:middle;" data-listen>🔊</button>
+          </div>
+          <div class="row-input"><input type="text" placeholder="1) Напиши слово по памяти, не подглядывая" data-a1></div>
+          <div class="row-input" style="margin-top:8px;"><input type="text" placeholder="2) Напиши короткое предложение с этим словом" data-a2></div>
+          <div class="feedback" data-fb1></div>
+        </div>`;
+      block.querySelector("[data-listen]").addEventListener("click", ()=>speak(w.en));
+      focusArea.appendChild(block);
+    });
+    const checkBtn = document.createElement("button");
+    checkBtn.className = "btn-primary btn-sm";
+    checkBtn.style.marginTop = "10px";
+    checkBtn.textContent = "✓ Проверить написание";
+    checkBtn.addEventListener("click", ()=>{
+      focusArea.querySelectorAll(".item").forEach((block,i)=>{
+        const w = words[i];
+        const input = block.querySelector("[data-a1]");
+        const fb = block.querySelector("[data-fb1]");
+        const ok = normalize(input.value)===normalize(w.en);
+        input.classList.remove("correct","wrong");
+        input.classList.add(ok?"correct":"wrong");
+        fb.className = "feedback " + (ok?"ok":"bad");
+        fb.textContent = ok ? "Верно! Отличная память." : "Верный вариант: " + w.en;
+        markResult(w.en, ok);
+      });
+    });
+    focusArea.appendChild(checkBtn);
+  });
+})();
+
+/* init sidebar */
+renderSidebar();
+</script>
+</body>
+</html>
