@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Personality Adjectives — тренажёр</title>
+<style>
+:root{
+  --bg:#f6f5f2;
+  --bg-panel:#ffffff;
+  --text:#232323;
+  --text-dim:#6b6b6b;
+  --accent:#a8543e;
+  --accent-soft:#f1e3dd;
+  --border:#e4ddd3;
+  --ok:#2f7d4f;
+  --ok-bg:#e6f3ea;
+  --bad:#b0392f;
+  --bad-bg:#fbe7e4;
+  --input-bg:#fbfaf8;
+  --shadow: 0 1px 3px rgba(0,0,0,.06), 0 8px 24px rgba(0,0,0,.04);
+  --radius: 14px;
+  font-size: 16px;
+}
+:root:not([data-theme="light"]){
+  @media (prefers-color-scheme: dark){
+    --bg:#1b1a18;
+    --bg-panel:#242220;
+    --text:#f1ede6;
+    --text-dim:#a79f93;
+    --accent:#e08a6d;
+    --accent-soft:#3a2a23;
+    --border:#3a352f;
+    --ok:#7bd39c;
+    --ok-bg:#1e3325;
+    --bad:#f0938a;
+    --bad-bg:#3a2320;
+    --input-bg:#2b2926;
+    --shadow: 0 1px 3px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.25);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#1b1a18;
+  --bg-panel:#242220;
+  --text:#f1ede6;
+  --text-dim:#a79f93;
+  --accent:#e08a6d;
+  --accent-soft:#3a2a23;
+  --border:#3a352f;
+  --ok:#7bd39c;
+  --ok-bg:#1e3325;
+  --bad:#f0938a;
+  --bad-bg:#3a2320;
+  --input-bg:#2b2926;
+  --shadow: 0 1px 3px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.25);
+}
+*{box-sizing:border-box;}
+html{scroll-padding-top: calc(70px + env(safe-area-inset-top,0px));}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family: Georgia, 'Times New Roman', 'Noto Serif', serif;
+  padding-top: env(safe-area-inset-top,0px);
+  padding-bottom: env(safe-area-inset-bottom,0px);
+  line-height:1.5;
+}
+header{
+  position:sticky; top:0; z-index:20;
+  padding: calc(14px + env(safe-area-inset-top,0px)) 18px 14px;
+  background: var(--bg-panel);
+  border-bottom:1px solid var(--border);
+  display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
+}
+header h1{font-size:1.15rem; margin:0; font-weight:600;}
+header .tag{font-family: -apple-system, system-ui, sans-serif; font-size:.72rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:.06em;}
+.header-actions{display:flex; gap:8px; align-items:center; font-family:-apple-system, system-ui, sans-serif;}
+button{
+  font-family: -apple-system, system-ui, sans-serif;
+  cursor:pointer;
+  border:1px solid var(--border);
+  background:var(--bg-panel);
+  color:var(--text);
+  border-radius:999px;
+  padding:8px 16px;
+  font-size:.82rem;
+  transition: transform .1s ease, background .15s ease;
+}
+button:hover{background:var(--accent-soft);}
+button:active{transform:scale(.97);}
+button.primary{background:var(--accent); color:#fff; border-color:var(--accent);}
+button.primary:hover{filter:brightness(1.05);}
+button.ghost{background:transparent;}
+button.small{padding:5px 11px; font-size:.74rem;}
+.layout{
+  display:grid;
+  grid-template-columns: minmax(0,1fr) 260px;
+  gap:20px;
+  max-width:1180px;
+  margin:0 auto;
+  padding:20px 18px 80px;
+  align-items:start;
+}
+@media (max-width: 860px){
+  .layout{grid-template-columns: 1fr;}
+  aside{order:-1;}
+}
+main{min-width:0;}
+section{
+  background:var(--bg-panel);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:22px 22px 26px;
+  margin-bottom:22px;
+  box-shadow:var(--shadow);
+}
+section h2{
+  font-size:1.05rem; margin:0 0 4px;
+  display:flex; align-items:center; gap:10px;
+}
+section h2 .num{
+  font-family:-apple-system, system-ui, sans-serif;
+  font-size:.72rem; background:var(--accent); color:#fff;
+  width:22px; height:22px; border-radius:50%;
+  display:inline-flex; align-items:center; justify-content:center; flex-shrink:0;
+}
+.subtitle{font-family:-apple-system, system-ui, sans-serif; color:var(--text-dim); font-size:.82rem; margin:0 0 16px;}
+.wordgrid{
+  display:grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px,1fr));
+  gap:10px;
+}
+.wordcard{
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:10px 12px;
+  background:var(--input-bg);
+  display:flex; flex-direction:column; gap:2px;
+}
+.wordcard .row1{display:flex; align-items:baseline; justify-content:space-between; gap:6px;}
+.wordcard .en{font-weight:700;}
+.wordcard .ipa{font-family:-apple-system, system-ui, sans-serif; color:var(--text-dim); font-size:.78rem;}
+.wordcard .ru{font-family:-apple-system, system-ui, sans-serif; font-size:.86rem; color:var(--text-dim);}
+.speak-btn{
+  border:none; background:var(--accent-soft); color:var(--accent);
+  width:26px; height:26px; border-radius:50%; font-size:.85rem;
+  display:inline-flex; align-items:center; justify-content:center; flex-shrink:0;
+}
+.item{
+  border-top:1px dashed var(--border);
+  padding:14px 0;
+  display:flex; flex-direction:column; gap:8px;
+}
+.item:first-of-type{border-top:none;}
+.item .qline{display:flex; align-items:flex-start; gap:8px; font-size:.98rem;}
+.item .qnum{font-family:-apple-system, system-ui, sans-serif; color:var(--text-dim); font-size:.78rem; min-width:20px; padding-top:3px;}
+.item mark{background:var(--accent-soft); color:var(--accent); padding:1px 4px; border-radius:5px; font-style:italic;}
+.answer-row{display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-left:28px;}
+input[type=text]{
+  font-family: Georgia, serif;
+  font-size:.95rem;
+  padding:7px 10px;
+  border:1px solid var(--border);
+  border-radius:8px;
+  background:var(--input-bg);
+  color:var(--text);
+  min-width:180px;
+  flex:1 1 180px;
+}
+input[type=text]:focus{outline:2px solid var(--accent); outline-offset:1px;}
+.feedback{font-family:-apple-system, system-ui, sans-serif; font-size:.78rem; padding:3px 10px; border-radius:999px; display:none; white-space:nowrap;}
+.feedback.ok{display:inline-block; background:var(--ok-bg); color:var(--ok);}
+.feedback.bad{display:inline-block; background:var(--bad-bg); color:var(--bad);}
+.reveal{font-family:-apple-system, system-ui, sans-serif; font-size:.8rem; color:var(--accent); margin-left:28px; display:none;}
+select{
+  font-family:-apple-system, system-ui, sans-serif;
+  padding:6px 8px; border-radius:8px; border:1px solid var(--border);
+  background:var(--input-bg); color:var(--text); font-size:.85rem;
+}
+.sort-table{width:100%; border-collapse:collapse; margin-top:6px; font-family:-apple-system, system-ui, sans-serif; font-size:.88rem;}
+.sort-table td{padding:8px 6px; border-top:1px solid var(--border);}
+.sort-table td.wcell{font-family:Georgia, serif; font-weight:700; font-size:.95rem;}
+.diff-pair{border-top:1px dashed var(--border); padding:14px 0;}
+.diff-pair:first-of-type{border-top:none;}
+.diff-pair .words{font-weight:700; margin-bottom:6px;}
+textarea.diff-answer{
+  width:100%; min-height:54px; font-family:Georgia,serif; font-size:.9rem;
+  border:1px solid var(--border); border-radius:8px; padding:8px 10px;
+  background:var(--input-bg); color:var(--text); resize:vertical;
+}
+.model{
+  display:none; margin-top:8px; padding:10px 12px; background:var(--accent-soft);
+  border-radius:8px; font-family:-apple-system, system-ui, sans-serif; font-size:.83rem; color:var(--text);
+}
+.selfmark{margin-top:8px; display:flex; gap:8px; font-family:-apple-system, system-ui, sans-serif;}
+.toolbar{display:flex; gap:8px; flex-wrap:wrap; margin-top:14px;}
+.score-badge{font-family:-apple-system, system-ui, sans-serif; font-size:.82rem; color:var(--text-dim); margin-left:auto;}
+aside{
+  background:var(--bg-panel); border:1px solid var(--border); border-radius:var(--radius);
+  padding:16px 16px 18px; box-shadow:var(--shadow);
+  position:sticky; top:calc(78px + env(safe-area-inset-top,0px));
+  font-family:-apple-system, system-ui, sans-serif;
+}
+aside h3{font-size:.92rem; margin:0 0 4px;}
+aside .hint{font-size:.76rem; color:var(--text-dim); margin:0 0 12px;}
+#problemTable{width:100%; border-collapse:collapse; font-size:.83rem;}
+#problemTable th{text-align:left; color:var(--text-dim); font-weight:600; font-size:.72rem; text-transform:uppercase; letter-spacing:.04em; padding-bottom:6px; border-bottom:1px solid var(--border);}
+#problemTable td{padding:6px 0; border-bottom:1px solid var(--border);}
+#problemTable td.cnt{text-align:right; color:var(--bad); font-weight:700;}
+.empty-note{font-size:.8rem; color:var(--text-dim); font-style:italic;}
+#audioStatus{font-family:-apple-system, system-ui, sans-serif; font-size:.83rem; margin-top:10px; padding:9px 12px; border-radius:8px; background:var(--input-bg); border:1px solid var(--border);}
+#exportBox{width:100%; min-height:160px; font-family: ui-monospace, Menlo, monospace; font-size:.78rem; border:1px solid var(--border); border-radius:8px; padding:10px; background:var(--input-bg); color:var(--text); margin-top:10px;}
+footer{text-align:center; font-family:-apple-system, system-ui, sans-serif; color:var(--text-dim); font-size:.74rem; padding:20px 0 calc(20px + env(safe-area-inset-bottom,0px));}
+.copy-flash{color:var(--ok); font-size:.78rem; font-family:-apple-system, system-ui, sans-serif; margin-left:8px; display:none;}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>🗣️ Personality Adjectives</h1>
+    <div class="tag">Тренажёр • черты характера</div>
+  </div>
+  <div class="header-actions">
+    <button class="small" id="testAudioBtn">🔊 Проверить звук</button>
+    <button class="small ghost" id="resetStatsBtn">Сбросить статистику</button>
+  </div>
+</header>
+
+<div class="layout">
+<main>
+
+  <section id="intro">
+    <h2><span class="num">0</span> Повторение слов</h2>
+    <p class="subtitle">Нажмите на 🔊, чтобы прослушать произношение (голос Google US English, если доступен в браузере). Прочитайте транскрипцию и перевод, прежде чем переходить к упражнениям.</p>
+    <div class="wordgrid" id="wordGrid"></div>
+  </section>
+
+  <section id="ex1">
+    <h2><span class="num">1</span> Distribute the words</h2>
+    <p class="subtitle">Распределите слова по значению: positive / negative / neutral (характеристика зависит от ситуации). Правильные ответы не показаны заранее — сверьте себя кнопкой «Проверить».</p>
+    <table class="sort-table" id="sortTable"></table>
+    <div class="toolbar">
+      <button class="primary" data-check="ex1">Проверить</button>
+      <button class="ghost small" data-reveal="ex1">Показать ответы</button>
+      <span class="score-badge" id="score-ex1"></span>
+    </div>
+  </section>
+
+  <section id="ex2">
+    <h2><span class="num">2</span> Write the antonym</h2>
+    <p class="subtitle">В задании даны слова БЕЗ приставки — образуйте антоним, добавив приставку (un-/im-/dis-/in-). В списке слов только 8 таких «чистых» пар, поэтому упражнение состоит из 8 пунктов.</p>
+    <div id="ex2list"></div>
+    <div class="toolbar">
+      <button class="primary" data-check="ex2">Проверить</button>
+      <button class="ghost small" data-reveal="ex2">Показать ответы</button>
+      <span class="score-badge" id="score-ex2"></span>
+    </div>
+  </section>
+
+  <section id="ex3">
+    <h2><span class="num">3</span> Replace the highlighted word</h2>
+    <p class="subtitle">Замените выделенную часть предложения одним словом-прилагательным из списка.</p>
+    <div id="ex3list"></div>
+    <div class="toolbar">
+      <button class="primary" data-check="ex3">Проверить</button>
+      <button class="ghost small" data-reveal="ex3">Показать ответы</button>
+      <span class="score-badge" id="score-ex3"></span>
+    </div>
+  </section>
+
+  <section id="ex4">
+    <h2><span class="num">4</span> Complete the mini-situations</h2>
+    <p class="subtitle">Допишите подходящее прилагательное, чтобы завершить мини-ситуацию.</p>
+    <div id="ex4list"></div>
+    <div class="toolbar">
+      <button class="primary" data-check="ex4">Проверить</button>
+      <button class="ghost small" data-reveal="ex4">Показать ответы</button>
+      <span class="score-badge" id="score-ex4"></span>
+    </div>
+  </section>
+
+  <section id="ex5">
+    <h2><span class="num">5</span> Explain the difference</h2>
+    <p class="subtitle">Объясните своими словами (по-русски или по-английски), в чём разница между парой слов. Это открытое задание — после ответа откройте эталон и отметьте, справились ли вы.</p>
+    <div id="ex5list"></div>
+  </section>
+
+  <section id="final">
+    <h2>✅ Финальная проверка</h2>
+    <p class="subtitle">1) Убедитесь, что звук работает. 2) Соберите и скопируйте свои ответы — учитель сможет их проверить.</p>
+    <div id="audioStatus">Звук ещё не проверялся.</div>
+    <div class="toolbar">
+      <button class="primary" id="collectBtn">📋 Собрать все ответы</button>
+      <button class="ghost small" id="copyBtn">Скопировать</button>
+      <span class="copy-flash" id="copyFlash">Скопировано!</span>
+    </div>
+    <textarea id="exportBox" readonly placeholder="Ответы появятся здесь после нажатия «Собрать все ответы»…"></textarea>
+  </section>
+
+</main>
+
+<aside>
+  <h3>⚠️ Проблемные слова</h3>
+  <p class="hint">Сюда попадают слова, в которых вы ошиблись хотя бы раз, отсортированные по числу ошибок.</p>
+  <table id="problemTable"><thead><tr><th>Слово</th><th style="text-align:right">Ошибок</th></tr></thead><tbody></tbody></table>
+  <p class="empty-note" id="problemEmpty">Пока ошибок нет — отлично!</p>
+</aside>
+</div>
+
+<footer>Ваши ответы автоматически сохраняются в этом браузере (localStorage), пока вы не нажмёте «Сбросить статистику».</footer>
+
+<script>
+(function(){
+"use strict";
+
+/* ---------- data ---------- */
+var WORDS = [
+ ["sociable","/ˈsəʊʃəbl/","общительный"],
+ ["sensible","/ˈsensəbl/","благоразумный"],
+ ["independent","/ˌɪndɪˈpendənt/","независимый"],
+ ["mature","/məˈtʃʊə/","зрелый"],
+ ["dependent","/dɪˈpendənt/","зависимый"],
+ ["impatient","/ɪmˈpeɪʃnt/","нетерпеливый"],
+ ["immature","/ˌɪməˈtʃʊə/","незрелый"],
+ ["unsociable","/ʌnˈsəʊʃəbl/","необщительный"],
+ ["cold","/kəʊld/","холодный (по характеру)"],
+ ["imaginative","/ɪˈmædʒɪnətɪv/","с богатым воображением"],
+ ["rebellious","/rɪˈbeljəs/","бунтарский"],
+ ["honest","/ˈɒnɪst/","честный"],
+ ["unreliable","/ˌʌnrɪˈlaɪəbl/","ненадёжный"],
+ ["patient","/ˈpeɪʃnt/","терпеливый"],
+ ["dishonest","/dɪsˈɒnɪst/","нечестный"],
+ ["insecure","/ˌɪnsɪˈkjʊə/","неуверенный в себе"],
+ ["unambitious","/ˌʌnæmˈbɪʃəs/","не амбициозный"],
+ ["charming","/ˈtʃɑːmɪŋ/","обаятельный"],
+ ["ambitious","/æmˈbɪʃəs/","амбициозный"],
+ ["affectionate","/əˈfekʃənət/","ласковый"],
+ ["unimaginative","/ˌʌnɪˈmædʒɪnətɪv/","лишённый воображения"],
+ ["reliable","/rɪˈlaɪəbl/","надёжный"],
+ ["selfish","/ˈselfɪʃ/","эгоистичный"],
+ ["moody","/ˈmuːdi/","капризный, переменчивый"],
+ ["anxious","/ˈæŋkʃəs/","тревожный"],
+ ["competitive","/kəmˈpetətɪv/","соревновательный"],
+ ["self-confident","/ˌself ˈkɒnfɪdənt/","уверенный в себе"],
+ ["spoilt","/spɔɪlt/","избалованный"],
+ ["stubborn","/ˈstʌbən/","упрямый"],
+ ["sensitive","/ˈsensɪtɪv/","чувствительный"],
+ ["bossy","/ˈbɒsi/","командующий"]
+];
+
+var EX1 = [
+ ["honest","positive"],["dishonest","negative"],["sociable","positive"],
+ ["unreliable","negative"],["imaginative","positive"],["moody","negative"],
+ ["charming","positive"],["stubborn","negative"],["ambitious","neutral"],["sensitive","neutral"]
+];
+
+/* Только слова БЕЗ приставки в задании — ответ образуется добавлением приставки (un-/im-/dis-/in-) */
+var EX2 = [
+ {w:"sociable", a:["unsociable"]},
+ {w:"dependent", a:["independent"]},
+ {w:"mature", a:["immature"]},
+ {w:"honest", a:["dishonest"]},
+ {w:"imaginative", a:["unimaginative"]},
+ {w:"reliable", a:["unreliable"]},
+ {w:"ambitious", a:["unambitious"]},
+ {w:"patient", a:["impatient"]}
+];
+
+var EX3 = [
+ {s:"She always listens carefully and <mark>never loses her temper</mark> with the kids.", a:["patient"]},
+ {s:"He <mark>loves meeting new people and chatting for hours</mark>.", a:["sociable"]},
+ {s:"My grandmother <mark>always hugs us and tells us she loves us</mark>.", a:["affectionate"]},
+ {s:"He <mark>never lies</mark>, even when the truth is uncomfortable.", a:["honest"]},
+ {s:"She <mark>behaves like a real adult</mark>, even though she's only twelve.", a:["mature"]},
+ {s:"He always <mark>tells everyone exactly what to do</mark>.", a:["bossy"]},
+ {s:"Her <mark>feelings get hurt very easily</mark> by criticism.", a:["sensitive"]},
+ {s:"His <mark>mood changes without any warning</mark>, from happy to angry.", a:["moody"]},
+ {s:"She's <mark>constantly worried something bad will happen</mark>.", a:["anxious"]},
+ {s:"He always <mark>wants to win and compares himself with others</mark>.", a:["competitive"]}
+];
+
+var EX4 = [
+ {s:"Jack never shares his toys and only thinks about what he wants. He's very ______.", a:["selfish"]},
+ {s:"Emma can't decide anything without asking her mum first. She's quite ______.", a:["dependent"]},
+ {s:"Tom refuses to change his opinion even when everyone disagrees. He's really ______.", a:["stubborn"]},
+ {s:"Lily gets everything she asks for and cries if she doesn't. She's a bit ______.", a:["spoilt"]},
+ {s:"Ben believes he can do anything and isn't afraid to try new things. He's very ______.", a:["self-confident"]},
+ {s:"Sara doesn't trust her own judgement and always needs reassurance. She's rather ______.", a:["insecure"]},
+ {s:"Alex never breaks his promises, so everyone counts on him. He's very ______.", a:["reliable"]},
+ {s:"Kate loves painting strange, dreamy pictures full of fantasy creatures. She's really ______.", a:["imaginative"]},
+ {s:"Max wants to become the CEO of a big company one day. He's very ______.", a:["ambitious"]},
+ {s:"Nina keeps to herself and doesn't enjoy parties or socialising. She's quite ______.", a:["unsociable"]}
+];
+
+var EX5 = [
+ {p:"sensible — sensitive", m:"sensible = благоразумный, принимает разумные решения; sensitive = чувствительный, легко ранимый эмоционально."},
+ {p:"mature — sensible", m:"mature = зрелый, ведёт себя как взрослый; sensible = благоразумный, принимает логичные решения (не обязательно про возраст)."},
+ {p:"reliable — dependent", m:"reliable (=dependable) = надёжный, на него можно положиться; dependent = зависимый от кого-то, не может действовать сам."},
+ {p:"ambitious — competitive", m:"ambitious = стремится к успеху/целям; competitive = стремится побеждать и сравнивает себя с другими."},
+ {p:"patient — sensitive", m:"patient = терпеливый, спокойно ждёт; sensitive = чувствительный, легко расстраивается."},
+ {p:"moody — anxious", m:"moody = настроение резко меняется; anxious = постоянно тревожится, переживает."},
+ {p:"selfish — spoilt", m:"selfish = думает только о себе; spoilt = избалован(а), привык(ла) получать всё, что хочет."},
+ {p:"stubborn — bossy", m:"stubborn = упрямый, не меняет мнения; bossy = любит командовать другими."},
+ {p:"charming — affectionate", m:"charming = обаятельный, приятный в общении; affectionate = ласковый, показывает любовь открыто."},
+ {p:"self-confident — insecure", m:"self-confident = уверен(а) в себе; insecure = не уверен(а) в себе, сомневается."}
+];
+
+/* ---------- utils ---------- */
+function shuffle(arr){
+  var a = arr.slice();
+  for(var i=a.length-1;i>0;i--){
+    var j = Math.floor(Math.random()*(i+1));
+    var t=a[i]; a[i]=a[j]; a[j]=t;
+  }
+  return a;
+}
+function norm(s){
+  return (s||"").trim().toLowerCase().replace(/\s+/g," ").replace(/-/g," ");
+}
+function el(tag, cls, html){
+  var e = document.createElement(tag);
+  if(cls) e.className = cls;
+  if(html!==undefined) e.innerHTML = html;
+  return e;
+}
+
+/* ---------- storage ---------- */
+var ANSWER_KEY = "adjTrainer_answers_v1";
+var STAT_KEY = "adjTrainer_problemWords_v1";
+
+function loadAnswers(){
+  try{
+    var raw = localStorage.getItem(ANSWER_KEY);
+    return raw ? JSON.parse(raw) : {};
+  }catch(e){ return {}; }
+}
+function saveAnswer(id, val){
+  try{
+    var all = loadAnswers();
+    all[id] = val;
+    localStorage.setItem(ANSWER_KEY, JSON.stringify(all));
+  }catch(e){ /* storage unavailable, continue silently */ }
+}
+function loadStats(){
+  try{
+    var raw = localStorage.getItem(STAT_KEY);
+    return raw ? JSON.parse(raw) : {};
+  }catch(e){ return {}; }
+}
+function saveStats(stats){
+  try{ localStorage.setItem(STAT_KEY, JSON.stringify(stats)); }catch(e){}
+}
+function markWrong(word){
+  var stats = loadStats();
+  stats[word] = (stats[word]||0) + 1;
+  saveStats(stats);
+  renderProblemWords();
+}
+function renderProblemWords(){
+  var stats = loadStats();
+  var entries = Object.keys(stats).map(function(k){return [k, stats[k]];})
+                 .filter(function(e){return e[1]>0;})
+                 .sort(function(a,b){return b[1]-a[1];});
+  var tbody = document.querySelector("#problemTable tbody");
+  tbody.innerHTML = "";
+  var emptyNote = document.getElementById("problemEmpty");
+  if(entries.length === 0){
+    emptyNote.style.display = "block";
+    document.getElementById("problemTable").style.display = "none";
+  }else{
+    emptyNote.style.display = "none";
+    document.getElementById("problemTable").style.display = "table";
+    entries.forEach(function(e){
+      var tr = el("tr");
+      tr.appendChild(el("td","",e[0]));
+      var td = el("td","cnt", String(e[1]));
+      tr.appendChild(td);
+      tbody.appendChild(tr);
+    });
+  }
+}
+
+/* ---------- audio ---------- */
+var voicesReady = false;
+var chosenVoice = null;
+function pickVoice(){
+  if(!('speechSynthesis' in window)) return null;
+  var voices = speechSynthesis.getVoices();
+  if(!voices.length) return null;
+  voicesReady = true;
+  chosenVoice = voices.find(function(v){return /Google US English/i.test(v.name);})
+             || voices.find(function(v){return v.lang === 'en-US';})
+             || voices.find(function(v){return /en/i.test(v.lang);})
+             || voices[0];
+  return chosenVoice;
+}
+if('speechSynthesis' in window){
+  pickVoice();
+  speechSynthesis.onvoiceschanged = pickVoice;
+}
+function speak(text, cb){
+  if(!('speechSynthesis' in window)){
+    if(cb) cb({ok:false, msg:"Speech Synthesis не поддерживается этим браузером."});
+    return;
+  }
+  var v = chosenVoice || pickVoice();
+  var u = new SpeechSynthesisUtterance(text);
+  u.lang = "en-US";
+  if(v) u.voice = v;
+  u.rate = 0.95;
+  var started = false;
+  u.onstart = function(){ started = true; if(cb) cb({ok:true, msg:"Воспроизведение началось. Голос: " + (v ? v.name : "по умолчанию") + "."}); };
+  u.onerror = function(){ if(cb) cb({ok:false, msg:"Ошибка воспроизведения."}); };
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+  setTimeout(function(){
+    if(!started && cb) cb({ok:false, msg:"Звук не запустился (возможно, автоплей заблокирован — попробуйте ещё раз после клика)."});
+  }, 900);
+}
+
+/* ---------- render: intro word grid ---------- */
+var wordGrid = document.getElementById("wordGrid");
+WORDS.forEach(function(w){
+  var card = el("div","wordcard");
+  var row1 = el("div","row1");
+  var enSpan = el("span","en", w[0]);
+  var btn = el("button","speak-btn","🔊");
+  btn.type = "button";
+  btn.addEventListener("click", function(){ speak(w[0]); });
+  row1.appendChild(enSpan);
+  row1.appendChild(btn);
+  card.appendChild(row1);
+  card.appendChild(el("div","ipa", w[1]));
+  card.appendChild(el("div","ru", w[2]));
+  wordGrid.appendChild(card);
+});
+
+/* ---------- render: ex1 sort table ---------- */
+var sortItems = shuffle(EX1);
+var sortTable = document.getElementById("sortTable");
+sortItems.forEach(function(item, idx){
+  var tr = el("tr");
+  var td1 = el("td","wcell", item[0]);
+  var td2 = el("td");
+  var sel = el("select");
+  sel.id = "ex1_" + idx;
+  sel.dataset.answer = item[1];
+  sel.dataset.word = item[0];
+  ["— выбрать —","positive","negative","neutral"].forEach(function(opt){
+    var o = document.createElement("option");
+    o.value = (opt.indexOf("—")===0) ? "" : opt;
+    o.textContent = opt;
+    sel.appendChild(o);
+  });
+  var saved = loadAnswers()[sel.id];
+  if(saved) sel.value = saved;
+  sel.addEventListener("change", function(){ saveAnswer(sel.id, sel.value); });
+  td2.appendChild(sel);
+  var td3 = el("td");
+  var fb = el("span","feedback"); fb.id = "fb_ex1_" + idx;
+  td3.appendChild(fb);
+  tr.appendChild(td1); tr.appendChild(td2); tr.appendChild(td3);
+  sortTable.appendChild(tr);
+});
+
+/* ---------- generic render for fill-in exercises ---------- */
+function renderFillExercise(containerId, items, prefix, sentenceKey){
+  var container = document.getElementById(containerId);
+  var shuffled = shuffle(items);
+  shuffled.forEach(function(item, idx){
+    /* noop marker for readability */
+    var id = prefix + "_" + idx;
+    var wrap = el("div","item");
+    var qline = el("div","qline");
+    qline.appendChild(el("span","qnum",(idx+1)+"."));
+    var qtext = el("span","", item[sentenceKey] || item.w);
+    qline.appendChild(qtext);
+    wrap.appendChild(qline);
+    var arow = el("div","answer-row");
+    var input = document.createElement("input");
+    input.type = "text";
+    input.id = id;
+    input.placeholder = "введите слово…";
+    var saved = loadAnswers()[id];
+    if(saved) input.value = saved;
+    input.addEventListener("input", function(){ saveAnswer(id, input.value); });
+    input.dataset.answers = JSON.stringify(item.a);
+    input.dataset.target = item.a[0];
+    arow.appendChild(input);
+    var fb = el("span","feedback"); fb.id = "fb_" + id;
+    arow.appendChild(fb);
+    wrap.appendChild(arow);
+    var rev = el("div","reveal"); rev.id = "rev_" + id;
+    rev.textContent = "Ответ: " + item.a.join(" / ");
+    wrap.appendChild(rev);
+    container.appendChild(wrap);
+  });
+  return shuffled;
+}
+var EX2_DATA = renderFillExercise("ex2list", EX2, "ex2");
+var EX3_DATA = renderFillExercise("ex3list", EX3, "ex3", "s");
+var EX4_DATA = renderFillExercise("ex4list", EX4, "ex4", "s");
+
+/* ---------- render ex5 (open-ended) ---------- */
+var ex5list = document.getElementById("ex5list");
+var ex5shuffled = shuffle(EX5);
+ex5shuffled.forEach(function(item, idx){
+  var id = "ex5_" + idx;
+  var wrap = el("div","diff-pair");
+  wrap.appendChild(el("div","words", (idx+1) + ". " + item.p));
+  var ta = document.createElement("textarea");
+  ta.className = "diff-answer";
+  ta.id = id;
+  ta.placeholder = "Объясните разницу своими словами…";
+  var saved = loadAnswers()[id];
+  if(saved) ta.value = saved;
+  ta.addEventListener("input", function(){ saveAnswer(id, ta.value); });
+  wrap.appendChild(ta);
+  var model = el("div","model", item.m);
+  model.id = "model_" + id;
+  wrap.appendChild(model);
+  var row = el("div","selfmark");
+  var showBtn = el("button","small ghost","Показать эталон");
+  showBtn.type = "button";
+  showBtn.addEventListener("click", function(){
+    model.style.display = model.style.display === "block" ? "none" : "block";
+  });
+  var okBtn = el("button","small","✔ Знал(а)");
+  okBtn.type = "button";
+  var pair = item.p;
+  okBtn.addEventListener("click", function(){ okBtn.style.background="var(--ok-bg)"; okBtn.style.color="var(--ok)"; });
+  var noBtn = el("button","small","✘ Не знал(а)");
+  noBtn.type = "button";
+  noBtn.addEventListener("click", function(){
+    noBtn.style.background="var(--bad-bg)"; noBtn.style.color="var(--bad)";
+    pair.split(" — ").forEach(function(w){ markWrong(w.trim()); });
+  });
+  row.appendChild(showBtn); row.appendChild(okBtn); row.appendChild(noBtn);
+  wrap.appendChild(row);
+  ex5list.appendChild(wrap);
+});
+
+/* ---------- checking ---------- */
+function checkEx1(){
+  var correct = 0;
+  sortItems.forEach(function(item, idx){
+    var sel = document.getElementById("ex1_" + idx);
+    var fb = document.getElementById("fb_ex1_" + idx);
+    if(!sel.value){ fb.className="feedback bad"; fb.textContent="выберите категорию"; fb.style.display="inline-block"; return; }
+    if(sel.value === sel.dataset.answer){
+      correct++; fb.className="feedback ok"; fb.textContent="верно";
+    }else{
+      fb.className="feedback bad"; fb.textContent="неверно";
+      markWrong(sel.dataset.word);
+    }
+    fb.style.display = "inline-block";
+  });
+  document.getElementById("score-ex1").textContent = correct + " / " + sortItems.length;
+}
+function revealEx1(){
+  sortItems.forEach(function(item, idx){
+    document.getElementById("ex1_" + idx).value = item[1];
+    saveAnswer("ex1_"+idx, item[1]);
+  });
+}
+function checkFill(prefix, count){
+  var correct = 0;
+  for(var i=0;i<count;i++){
+    var id = prefix + "_" + i;
+    var input = document.getElementById(id);
+    var fb = document.getElementById("fb_" + id);
+    var answers = JSON.parse(input.dataset.answers);
+    var ok = answers.some(function(a){ return norm(a) === norm(input.value); });
+    if(ok){
+      correct++; fb.className="feedback ok"; fb.textContent="верно";
+    }else{
+      fb.className="feedback bad"; fb.textContent="неверно";
+      markWrong(input.dataset.target);
+    }
+    fb.style.display = "inline-block";
+  }
+  document.getElementById("score-" + prefix).textContent = correct + " / " + count;
+}
+function revealFill(prefix, count){
+  for(var i=0;i<count;i++){
+    var id = prefix + "_" + i;
+    var input = document.getElementById(id);
+    var rev = document.getElementById("rev_" + id);
+    rev.style.display = "block";
+  }
+}
+
+document.querySelectorAll("[data-check]").forEach(function(btn){
+  btn.addEventListener("click", function(){
+    var target = btn.dataset.check;
+    if(target === "ex1") checkEx1();
+    else if(target === "ex2") checkFill("ex2", EX2.length);
+    else if(target === "ex3") checkFill("ex3", EX3.length);
+    else if(target === "ex4") checkFill("ex4", EX4.length);
+  });
+});
+document.querySelectorAll("[data-reveal]").forEach(function(btn){
+  btn.addEventListener("click", function(){
+    var target = btn.dataset.reveal;
+    if(target === "ex1") revealEx1();
+    else if(target === "ex2") revealFill("ex2", EX2.length);
+    else if(target === "ex3") revealFill("ex3", EX3.length);
+    else if(target === "ex4") revealFill("ex4", EX4.length);
+  });
+});
+
+/* ---------- reset stats ---------- */
+document.getElementById("resetStatsBtn").addEventListener("click", function(){
+  try{ localStorage.removeItem(STAT_KEY); }catch(e){}
+  renderProblemWords();
+});
+
+/* ---------- audio test ---------- */
+document.getElementById("testAudioBtn").addEventListener("click", function(){
+  var status = document.getElementById("audioStatus");
+  status.textContent = "Проверка звука…";
+  speak("This is an audio test. Can you hear me?", function(res){
+    status.textContent = (res.ok ? "✅ " : "❌ ") + res.msg;
+  });
+});
+
+/* ---------- collect & copy answers ---------- */
+function collectReport(){
+  var lines = [];
+  lines.push("ОТЧЁТ: Personality Adjectives — " + new Date().toLocaleString());
+  lines.push("");
+  lines.push("1) Distribute the words");
+  sortItems.forEach(function(item, idx){
+    var v = document.getElementById("ex1_"+idx).value || "(пусто)";
+    lines.push("  " + item[0] + " -> " + v);
+  });
+  function dump(title, items, prefix, key){
+    lines.push(""); lines.push(title);
+    items.forEach(function(item, idx){
+      var id = prefix+"_"+idx;
+      var v = document.getElementById(id).value || "(пусто)";
+      lines.push("  " + (idx+1) + ". " + (item[key]||item.w).replace(/<[^>]+>/g,"") + "  =>  " + v);
+    });
+  }
+  dump("2) Write the antonym", EX2_DATA, "ex2", "w");
+  dump("3) Replace the highlighted word", EX3_DATA, "ex3", "s");
+  dump("4) Complete the mini-situations", EX4_DATA, "ex4", "s");
+  lines.push(""); lines.push("5) Explain the difference");
+  ex5shuffled.forEach(function(item, idx){
+    var id = "ex5_"+idx;
+    var v = document.getElementById(id).value || "(пусто)";
+    lines.push("  " + item.p + "  =>  " + v);
+  });
+  var stats = loadStats();
+  var probWords = Object.keys(stats).filter(function(k){return stats[k]>0;}).sort(function(a,b){return stats[b]-stats[a];});
+  lines.push(""); lines.push("Проблемные слова: " + (probWords.length ? probWords.map(function(w){return w+" ("+stats[w]+")";}).join(", ") : "нет"));
+  return lines.join("\n");
+}
+document.getElementById("collectBtn").addEventListener("click", function(){
+  var box = document.getElementById("exportBox");
+  box.value = collectReport();
+});
+document.getElementById("copyBtn").addEventListener("click", function(){
+  var box = document.getElementById("exportBox");
+  if(!box.value){ box.value = collectReport(); }
+  var flash = document.getElementById("copyFlash");
+  function showFlash(){ flash.style.display="inline"; setTimeout(function(){flash.style.display="none";}, 1500); }
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(box.value).then(showFlash).catch(function(){
+      box.select(); try{ document.execCommand("copy"); showFlash(); }catch(e){}
+    });
+  }else{
+    box.select();
+    try{ document.execCommand("copy"); showFlash(); }catch(e){}
+  }
+});
+
+/* ---------- init ---------- */
+renderProblemWords();
+})();
+</script>
+</body>
+</html>
