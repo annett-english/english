@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Character Traits — тренажёр слов</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#FAF6EE;
+  --paper-line:#e7dcc4;
+  --ink:#26241f;
+  --ink-soft:#635d51;
+  --rule:#ddd0ae;
+  --accent:#2f6f76;
+  --accent-dark:#1f4d52;
+  --accent-ink:#ffffff;
+  --good:#3f7a45;
+  --good-bg:#e7f2e6;
+  --bad:#b5462f;
+  --bad-bg:#fbe9e4;
+  --sticky:#f7e598;
+  --sticky-ink:#4a3f10;
+  --card:#ffffff;
+  --shadow: 0 2px 10px rgba(38,36,31,.08);
+  --radius: 10px;
+}
+:root[data-theme="dark"]{
+  --paper:#1c1a17;
+  --paper-line:#332e24;
+  --ink:#efe9dc;
+  --ink-soft:#b9b0a0;
+  --rule:#463f2f;
+  --accent:#5fb6bd;
+  --accent-dark:#8fd0d5;
+  --accent-ink:#0e2426;
+  --good:#7bc383;
+  --good-bg:#1e2b1e;
+  --bad:#e08469;
+  --bad-bg:#332019;
+  --sticky:#5c521f;
+  --sticky-ink:#f7e598;
+  --card:#242019;
+  --shadow: 0 2px 10px rgba(0,0,0,.35);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#1c1a17;
+    --paper-line:#332e24;
+    --ink:#efe9dc;
+    --ink-soft:#b9b0a0;
+    --rule:#463f2f;
+    --accent:#5fb6bd;
+    --accent-dark:#8fd0d5;
+    --accent-ink:#0e2426;
+    --good:#7bc383;
+    --good-bg:#1e2b1e;
+    --bad:#e08469;
+    --bad-bg:#332019;
+    --sticky:#5c521f;
+    --sticky-ink:#f7e598;
+    --card:#242019;
+    --shadow: 0 2px 10px rgba(0,0,0,.35);
+  }
+}
+*{box-sizing:border-box;}
+html{scroll-padding-top: calc(env(safe-area-inset-top,0px) + 70px);}
+html,body{height:100%;}
+body{
+  margin:0;
+  background:var(--paper);
+  background-image: repeating-linear-gradient(var(--paper) 0 38px, var(--paper-line) 38px 39px);
+  color:var(--ink);
+  font-family:'Inter', system-ui, sans-serif;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  line-height:1.5;
+}
+h1,h2,h3,.hand{font-family:'Caveat','Inter',cursive; font-weight:700;}
+a{color:var(--accent-dark);}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px 60px;}
+header.top{
+  position:sticky; top:0; z-index:20;
+  background:var(--paper);
+  border-bottom:2px solid var(--rule);
+  padding-top:calc(env(safe-area-inset-top,0px) + 14px);
+}
+header.top .inner{max-width:1180px;margin:0 auto;padding:0 20px 12px;display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px;}
+header.top h1{font-size:2.3rem;margin:0;line-height:1;color:var(--accent-dark);}
+header.top p.sub{margin:2px 0 0;color:var(--ink-soft);font-size:.95rem;}
+.audio-check{display:flex;align-items:center;gap:8px;font-size:.85rem;}
+button{
+  font-family:inherit; font-size:.95rem; cursor:pointer;
+  border-radius:8px; border:2px solid var(--ink);
+  background:var(--card); color:var(--ink);
+  padding:7px 14px; transition:transform .08s ease, background .15s ease;
+}
+button:hover{transform:translateY(-1px);}
+button:active{transform:translateY(0);}
+button:focus-visible, input:focus-visible, [tabindex]:focus-visible{outline:3px solid var(--accent); outline-offset:2px;}
+button.primary{background:var(--accent); border-color:var(--accent-dark); color:var(--accent-ink); font-weight:600;}
+button.ghost{border-color:var(--rule); background:transparent; color:var(--ink-soft);}
+button.small{padding:4px 9px; font-size:.82rem; border-radius:6px;}
+button:disabled{opacity:.45; cursor:not-allowed; transform:none;}
+.status-ok{color:var(--good); font-weight:600;}
+.status-bad{color:var(--bad); font-weight:600;}
+
+nav.tabs{
+  display:flex; gap:6px; overflow-x:auto; padding:10px 20px 0; max-width:1180px; margin:0 auto;
+  -webkit-overflow-scrolling:touch; scrollbar-width:thin;
+}
+nav.tabs button{
+  white-space:nowrap; background:transparent; border:2px solid transparent; border-bottom:2px solid var(--rule);
+  border-radius:8px 8px 0 0; color:var(--ink-soft); font-weight:500;
+}
+nav.tabs button.active{ color:var(--accent-dark); border-color:var(--rule); border-bottom-color:var(--paper); background:var(--card); font-weight:700;}
+
+.layout{display:grid; grid-template-columns: 1fr 260px; gap:26px; align-items:start; margin-top:22px;}
+@media (max-width:880px){ .layout{grid-template-columns: 1fr;} .sidebar{order:2;} }
+
+section.panel{display:none;}
+section.panel.active{display:block; animation: fadeIn .25s ease;}
+@media (prefers-reduced-motion: reduce){ section.panel.active{animation:none;} }
+@keyframes fadeIn{from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);}}
+
+.card{background:var(--card); border:2px solid var(--ink); border-radius:var(--radius); box-shadow:var(--shadow); padding:18px 20px; margin-bottom:18px;}
+.card h2{margin:0 0 4px; font-size:1.7rem; color:var(--accent-dark);}
+.card p.help{margin:0 0 14px; color:var(--ink-soft); font-size:.92rem;}
+
+/* vocab list */
+.vocab-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:10px;}
+.vocab-item{border:1.5px solid var(--rule); border-radius:8px; padding:10px 12px; display:flex; flex-direction:column; gap:3px; background:var(--paper);}
+.vocab-item .row1{display:flex; align-items:center; justify-content:space-between; gap:6px;}
+.vocab-item .word{font-weight:700; font-size:1.05rem;}
+.vocab-item .ipa{color:var(--accent-dark); font-size:.88rem;}
+.vocab-item .ru{color:var(--ink-soft); font-size:.9rem;}
+.speak-btn{border-radius:50%; width:32px; height:32px; padding:0; display:flex; align-items:center; justify-content:center; flex:none; border-color:var(--rule); font-size:1rem;}
+
+/* items */
+.item{border-top:1px dashed var(--rule); padding:14px 0;}
+.item:first-of-type{border-top:none; padding-top:4px;}
+.item .qnum{font-weight:700; color:var(--accent-dark); margin-right:6px;}
+.item input[type=text]{
+  font-family:inherit; font-size:1rem; padding:7px 10px; border-radius:7px; border:1.5px solid var(--rule);
+  background:var(--paper); color:var(--ink); min-width:180px;
+}
+.item input[type=text].correct{border-color:var(--good); background:var(--good-bg);}
+.item input[type=text].incorrect{border-color:var(--bad); background:var(--bad-bg);}
+.feedback-icon{font-weight:700; margin-left:6px;}
+.feedback-icon.good{color:var(--good);}
+.feedback-icon.bad{color:var(--bad);}
+.answer-reveal{margin-left:8px; font-size:.88rem; color:var(--ink-soft); font-style:italic;}
+
+.tf-row{display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;}
+.tf-buttons{display:flex; gap:6px;}
+.tf-buttons button.chosen-true.correctSel{background:var(--good-bg); border-color:var(--good);}
+.tf-buttons button.chosen-false.correctSel{background:var(--good-bg); border-color:var(--good);}
+.tf-buttons button.wrongSel{background:var(--bad-bg); border-color:var(--bad);}
+
+.mcq-options{display:flex; flex-wrap:wrap; gap:7px; margin-top:8px;}
+.mcq-options button{border-color:var(--rule);}
+.mcq-options button.selected{border-color:var(--accent); background:var(--accent); color:var(--accent-ink);}
+.mcq-options button.correctReveal{border-color:var(--good); background:var(--good-bg); color:var(--ink);}
+.mcq-options button.wrongReveal{border-color:var(--bad); background:var(--bad-bg); color:var(--ink);}
+
+.syll-row{display:flex; gap:6px; flex-wrap:wrap; margin-top:6px;}
+.syll-btn{border-color:var(--rule); font-size:1.1rem; padding:6px 12px;}
+.syll-btn.selected{background:var(--accent); border-color:var(--accent-dark); color:var(--accent-ink);}
+.syll-btn.correctReveal{background:var(--good-bg); border-color:var(--good);}
+.syll-btn.wrongReveal{background:var(--bad-bg); border-color:var(--bad);}
+
+.dialogue-box{background:var(--paper); border:1.5px solid var(--rule); border-radius:8px; padding:10px 14px; margin-top:6px;}
+.dialogue-box .line{margin:4px 0;}
+.dialogue-box .who{font-weight:700; margin-right:4px;}
+
+.score-row{display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-top:14px; border-top:2px solid var(--rule); padding-top:12px;}
+.score-row .actions{display:flex; gap:8px; flex-wrap:wrap;}
+.result-msg{font-weight:700;}
+
+/* sidebar */
+.sidebar{position:sticky; top:150px;}
+.sticky-note{
+  background:var(--sticky); color:var(--sticky-ink); border-radius:2px;
+  padding:14px 16px; box-shadow:var(--shadow); transform:rotate(-1.2deg);
+  border:1px solid rgba(0,0,0,.08);
+}
+.sticky-note h3{margin:0 0 8px; font-size:1.4rem;}
+.sticky-note table{width:100%; border-collapse:collapse; font-size:.88rem;}
+.sticky-note td{padding:3px 2px; border-bottom:1px dashed rgba(0,0,0,.15);}
+.sticky-note .empty{font-size:.85rem; opacity:.75; font-style:italic;}
+.sticky-note .cnt{font-weight:700; text-align:right;}
+.sidebar .clear-btn{margin-top:10px;}
+
+textarea{
+  width:100%; min-height:120px; font-family:inherit; font-size:1rem; padding:10px;
+  border-radius:8px; border:1.5px solid var(--rule); background:var(--paper); color:var(--ink); resize:vertical;
+}
+.checkbox-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:6px; margin:10px 0;}
+.checkbox-grid label{display:flex; align-items:center; gap:6px; font-size:.92rem; border:1px solid var(--rule); border-radius:6px; padding:5px 8px; background:var(--paper);}
+.checkbox-grid input:disabled + span{opacity:.4;}
+.mini-task{border:1.5px solid var(--rule); border-radius:8px; padding:12px 14px; margin-top:12px; background:var(--paper);}
+.mini-task h4{margin:0 0 6px; font-size:1.15rem; color:var(--accent-dark);}
+footer{text-align:center; color:var(--ink-soft); font-size:.85rem; padding:20px 0 10px;}
+.hidden{display:none !important;}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="inner">
+    <div>
+      <h1>Character Traits</h1>
+      <p class="sub">черты характера — слушай, пиши, проверяй себя</p>
+    </div>
+    <div class="audio-check">
+      <button id="testAudioBtn" class="ghost">🔊 Проверить звук</button>
+      <span id="audioStatus" style="color:var(--ink-soft);">не проверено</span>
+    </div>
+  </div>
+</header>
+
+<nav class="tabs" id="tabs"></nav>
+
+<div class="wrap">
+  <div class="layout">
+    <div class="content" id="content"></div>
+    <aside class="sidebar">
+      <div class="sticky-note">
+        <h3>📌 Проблемные слова</h3>
+        <div id="problemWordsBox"><p class="empty">Пока ошибок нет — отлично!</p></div>
+        <button id="clearProblemBtn" class="small ghost clear-btn hidden">Очистить список</button>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<footer>Тренажёр слов · сделано для практики character traits</footer>
+
+<script>
+/* ============ DATA ============ */
+const VOCAB = [
+ {w:"affectionate", ipa:"/əˈfekʃənət/", ru:"ласковый, нежный"},
+ {w:"ambitious", ipa:"/æmˈbɪʃəs/", ru:"амбициозный"},
+ {w:"anxious", ipa:"/ˈæŋkʃəs/", ru:"тревожный"},
+ {w:"bossy", ipa:"/ˈbɒsi/", ru:"любящий командовать, властный"},
+ {w:"charming", ipa:"/ˈtʃɑːmɪŋ/", ru:"обаятельный, очаровательный"},
+ {w:"competitive", ipa:"/kəmˈpetətɪv/", ru:"любящий соперничество"},
+ {w:"honest", ipa:"/ˈɒnɪst/", ru:"честный"},
+ {w:"imaginative", ipa:"/ɪˈmædʒɪnətɪv/", ru:"с богатым воображением"},
+ {w:"independent", ipa:"/ˌɪndɪˈpendənt/", ru:"независимый"},
+ {w:"insecure", ipa:"/ˌɪnsɪˈkjʊə(r)/", ru:"неуверенный в себе"},
+ {w:"mature", ipa:"/məˈtʃʊə(r)/", ru:"зрелый"},
+ {w:"moody", ipa:"/ˈmuːdi/", ru:"с переменчивым настроением"},
+ {w:"patient", ipa:"/ˈpeɪʃnt/", ru:"терпеливый"},
+ {w:"rebellious", ipa:"/rɪˈbeljəs/", ru:"бунтарский, непослушный"},
+ {w:"reliable", ipa:"/rɪˈlaɪəbl/", ru:"надёжный; верный"},
+ {w:"self-confident", ipa:"/ˌself ˈkɒnfɪdənt/", ru:"уверенный в себе"},
+ {w:"selfish", ipa:"/ˈselfɪʃ/", ru:"эгоистичный"},
+ {w:"sensible", ipa:"/ˈsensəbl/", ru:"здравомыслящий"},
+ {w:"sensitive", ipa:"/ˈsensətɪv/", ru:"чувствительный"},
+ {w:"sociable", ipa:"/ˈsəʊʃəbl/", ru:"общительный"},
+ {w:"spoilt", ipa:"/spɔɪlt/", ru:"избалованный"},
+ {w:"stubborn", ipa:"/ˈstʌbən/", ru:"упрямый"},
+ {w:"unimaginative", ipa:"/ˌʌnɪˈmædʒɪnətɪv/", ru:"без воображения"},
+ {w:"unfriendly", ipa:"/ʌnˈfrendli/", ru:"недружелюбный"},
+ {w:"untidy", ipa:"/ʌnˈtaɪdi/", ru:"неопрятный"},
+ {w:"unsociable", ipa:"/ʌnˈsəʊʃəbl/", ru:"необщительный"},
+ {w:"irresponsible", ipa:"/ˌɪrɪˈspɒnsəbl/", ru:"безответственный"},
+ {w:"dishonest", ipa:"/dɪsˈɒnɪst/", ru:"нечестный"},
+ {w:"unreliable", ipa:"/ˌʌnrɪˈlaɪəbl/", ru:"ненадёжный"},
+ {w:"disorganized", ipa:"/dɪsˈɔːgənaɪzd/", ru:"неорганизованный"},
+ {w:"immature", ipa:"/ˌɪməˈtʃʊə(r)/", ru:"незрелый, юный"},
+ {w:"insensitive", ipa:"/ɪnˈsensətɪv/", ru:"нечувствительный"},
+ {w:"unselfish", ipa:"/ʌnˈselfɪʃ/", ru:"неэгоистичный, бескорыстный"},
+ {w:"impatient", ipa:"/ɪmˈpeɪʃnt/", ru:"нетерпеливый"},
+ {w:"generous", ipa:"/ˈdʒenərəs/", ru:"щедрый"},
+ {w:"mean", ipa:"/miːn/", ru:"жадный"},
+ {w:"shy", ipa:"/ʃaɪ/", ru:"застенчивый"},
+ {w:"unambitious", ipa:"/ˌʌnæmˈbɪʃəs/", ru:"неамбициозный"}
+];
+const vocabMap = {};
+VOCAB.forEach(v=>vocabMap[v.w]=v);
+
+const EX1_WORDS = ["honest","moody","patient","stubborn","generous","mean","shy","sensitive","selfish","charming"];
+
+const EX2_STRESS = [
+ {w:"affectionate", syll:["af","fec","tion","ate"], stress:2},
+ {w:"ambitious", syll:["am","bi","tious"], stress:2},
+ {w:"competitive", syll:["com","pet","i","tive"], stress:2},
+ {w:"independent", syll:["in","de","pen","dent"], stress:3},
+ {w:"insecure", syll:["in","se","cure"], stress:3},
+ {w:"reliable", syll:["re","li","a","ble"], stress:2},
+ {w:"sociable", syll:["so","cia","ble"], stress:1},
+ {w:"unfriendly", syll:["un","friend","ly"], stress:2},
+ {w:"imaginative", syll:["i","mag","i","na","tive"], stress:2},
+ {w:"irresponsible", syll:["ir","re","spon","si","ble"], stress:3}
+];
+
+const EX3_TF = [
+ {w:"reliable", text:"«Reliable» значит, что человеку всегда можно доверять и на него можно положиться.", answer:true},
+ {w:"selfish", text:"«Selfish» описывает человека, который всегда думает в первую очередь о других людях.", answer:false},
+ {w:"stubborn", text:"«Stubborn» значит, что человек легко меняет своё мнение под влиянием других.", answer:false},
+ {w:"generous", text:"«Generous» описывает человека, который любит делиться и помогать другим.", answer:true},
+ {w:"untidy", text:"«Untidy» значит очень аккуратный и организованный.", answer:false},
+ {w:"sensitive", text:"«Sensitive» значит, что человек быстро замечает и остро реагирует на чувства других.", answer:true},
+ {w:"mature", text:"«Mature» описывает поведение, типичное для маленького ребёнка.", answer:false},
+ {w:"honest", text:"«Honest» значит, что человек всегда говорит правду.", answer:true},
+ {w:"sociable", text:"«Sociable» значит, что человек избегает людей и предпочитает быть один.", answer:false},
+ {w:"patient", text:"«Patient» значит уметь спокойно ждать, не раздражаясь.", answer:true}
+];
+
+const EX4_MCQ = [
+ {w:"selfish", sentence:"She never shares her toys with anyone; she's so ___.", options:["selfish","generous","patient","honest"]},
+ {w:"honest", sentence:"He always tells the truth, even when it's difficult. He's very ___.", options:["dishonest","honest","moody","shy"]},
+ {w:"moody", sentence:"My little brother is happy one minute and sad the next. He's ___.", options:["moody","mature","reliable","sensible"]},
+ {w:"reliable", sentence:"She always finishes her homework early and helps others. She's very ___.", options:["irresponsible","reliable","spoilt","stubborn"]},
+ {w:"stubborn", sentence:"He never listens to advice and always does things his own way. He's ___.", options:["sociable","affectionate","insecure","stubborn"]},
+ {w:"generous", sentence:"My grandma gives presents to everyone and never asks for anything back. She's ___.", options:["mean","bossy","anxious","generous"]},
+ {w:"anxious", sentence:"He gets nervous and worried before every exam. He's quite ___.", options:["self-confident","charming","patient","anxious"]},
+ {w:"unsociable", sentence:"The new student doesn't talk to anyone and prefers being alone. She's ___.", options:["sociable","competitive","imaginative","unsociable"]},
+ {w:"competitive", sentence:"He always wants to win every game and hates losing. He's very ___.", options:["unambitious","insensitive","unselfish","competitive"]},
+ {w:"bossy", sentence:"She always tells her friends what to do and likes controlling everything. She's ___.", options:["shy","immature","sensitive","bossy"]}
+];
+
+const EX5_DIALOGUE = [
+ {w:"honest", accept:["honest"], a:"I never cheat, even when it's easy to get away with it.", b:"You're such a(n) ___ person!"},
+ {w:"generous", accept:["generous","unselfish"], a:"I always let my sister have the last cookie, even when I want it too.", b:"You're so ___!"},
+ {w:"imaginative", accept:["imaginative"], a:"I made up a whole story about a dragon who runs a bakery.", b:"You're so ___!"},
+ {w:"patient", accept:["patient"], a:"I waited two hours in line without complaining once.", b:"You're so ___!"},
+ {w:"rebellious", accept:["rebellious"], a:"I skipped class again just because the teacher told us not to.", b:"You're so ___!"},
+ {w:"insecure", accept:["insecure"], a:"I keep asking my friends if they really like me.", b:"You're a bit ___, aren't you?"},
+ {w:"sensible", accept:["sensible"], a:"I always think carefully before I spend my money.", b:"You're very ___!"},
+ {w:"spoilt", accept:["spoilt","spoiled"], a:"My parents buy me everything I ask for, and I never say thank you.", b:"You're so ___!"},
+ {w:"independent", accept:["independent"], a:"I moved to a new city and set up my whole life without any help.", b:"You're so ___!"},
+ {w:"charming", accept:["charming"], a:"Everyone at the party wanted to talk to you all night.", b:"You're so ___!"}
+];
+
+/* ============ HELPERS ============ */
+function shuffle(arr){
+  const a=arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+function norm(s){ return (s||"").toString().trim().toLowerCase().replace(/[.!?,;]+$/,""); }
+function escapeHtml(s){ return s.replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+
+/* problem words tracker */
+const problemWords = {};
+function recordMistake(word){
+  problemWords[word] = (problemWords[word]||0)+1;
+  renderProblemWords();
+}
+function renderProblemWords(){
+  const box = document.getElementById('problemWordsBox');
+  const entries = Object.entries(problemWords).sort((a,b)=>b[1]-a[1]);
+  const clearBtn = document.getElementById('clearProblemBtn');
+  if(entries.length===0){
+    box.innerHTML = '<p class="empty">Пока ошибок нет — отлично!</p>';
+    clearBtn.classList.add('hidden');
+    return;
+  }
+  clearBtn.classList.remove('hidden');
+  let rows = entries.map(([w,c])=>`<tr><td>${escapeHtml(w)}</td><td class="cnt">×${c}</td></tr>`).join('');
+  box.innerHTML = `<table><tbody>${rows}</tbody></table>`;
+}
+document.getElementById('clearProblemBtn').addEventListener('click', ()=>{
+  Object.keys(problemWords).forEach(k=>delete problemWords[k]);
+  renderProblemWords();
+});
+
+/* clipboard */
+function copyText(text, btn){
+  const done = (ok)=>{
+    if(!btn) return;
+    const old = btn.textContent;
+    btn.textContent = ok ? '✓ Скопировано' : '⚠ Не удалось';
+    setTimeout(()=>btn.textContent=old, 1600);
+  };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(()=>done(true)).catch(()=>fallbackCopy(text,done));
+  } else {
+    fallbackCopy(text,done);
+  }
+}
+function fallbackCopy(text,done){
+  try{
+    const ta=document.createElement('textarea');
+    ta.value=text; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.focus(); ta.select();
+    const ok=document.execCommand('copy');
+    document.body.removeChild(ta);
+    done(ok);
+  }catch(e){ done(false); }
+}
+
+/* ============ AUDIO ============ */
+let voices = [];
+let chosenVoice = null;
+function loadVoices(){
+  voices = window.speechSynthesis ? window.speechSynthesis.getVoices() : [];
+  if(voices.length){
+    chosenVoice = voices.find(v=>/google/i.test(v.name) && /us/i.test(v.name) && /natural/i.test(v.name))
+      || voices.find(v=>/google/i.test(v.name) && /us english/i.test(v.name))
+      || voices.find(v=>/natural/i.test(v.name) && /en-US/i.test(v.lang))
+      || voices.find(v=>v.lang==='en-US')
+      || voices.find(v=>/^en/i.test(v.lang))
+      || null;
+  }
+}
+if('speechSynthesis' in window){
+  loadVoices();
+  window.speechSynthesis.onvoiceschanged = loadVoices;
+}
+function speak(text){
+  if(!('speechSynthesis' in window)){
+    alert('Синтез речи не поддерживается в этом браузере.');
+    return;
+  }
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-US';
+  u.rate = 0.88;
+  if(chosenVoice) u.voice = chosenVoice;
+  window.speechSynthesis.speak(u);
+}
+document.getElementById('testAudioBtn').addEventListener('click', ()=>{
+  const statusEl = document.getElementById('audioStatus');
+  if(!('speechSynthesis' in window)){
+    statusEl.textContent = '❌ синтез речи недоступен';
+    statusEl.className = 'status-bad';
+    return;
+  }
+  loadVoices();
+  statusEl.textContent = chosenVoice ? ('✅ работает (' + chosenVoice.name + ')') : '⚠️ работает, но голос "Google US English" не найден — используется голос по умолчанию';
+  statusEl.className = chosenVoice ? 'status-ok' : 'status-bad';
+  speak('This is a test. Can you hear me clearly?');
+});
+function speakBtnHtml(word, extraClass){
+  return `<button class="speak-btn ${extraClass||''}" title="Слушать" onclick="speak('${word.replace(/'/g,"\\'")}')">🔊</button>`;
+}
+
+/* ============ TABS ============ */
+const TABS = [
+  {id:'vocab', label:'Слова'},
+  {id:'ex1', label:'Упр. 1 · Диктант'},
+  {id:'ex2', label:'Упр. 2 · Ударение'},
+  {id:'ex3', label:'Упр. 3 · True/False'},
+  {id:'ex4', label:'Упр. 4 · Выбери слово'},
+  {id:'ex5', label:'Упр. 5 · Диалоги'},
+  {id:'retrieval', label:'Вспомни слова'},
+  {id:'weak', label:'Сложные слова'}
+];
+const tabsNav = document.getElementById('tabs');
+TABS.forEach((t,i)=>{
+  const b=document.createElement('button');
+  b.textContent=t.label;
+  b.dataset.tab=t.id;
+  if(i===0) b.classList.add('active');
+  b.addEventListener('click', ()=>showTab(t.id));
+  tabsNav.appendChild(b);
+});
+function showTab(id){
+  document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.toggle('active', b.dataset.tab===id));
+  document.querySelectorAll('section.panel').forEach(s=>s.classList.toggle('active', s.id==='panel-'+id));
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+const content = document.getElementById('content');
+TABS.forEach(t=>{
+  const s=document.createElement('section');
+  s.className='panel'+(t.id==='vocab'?' active':'');
+  s.id='panel-'+t.id;
+  content.appendChild(s);
+});
+
+/* ============ VOCAB TAB ============ */
+function renderVocab(){
+  const el = document.getElementById('panel-vocab');
+  const items = VOCAB.map(v=>`
+    <div class="vocab-item">
+      <div class="row1">
+        <span class="word">${v.w}</span>
+        ${speakBtnHtml(v.w)}
+      </div>
+      <span class="ipa">${v.ipa}</span>
+      <span class="ru">${v.ru}</span>
+    </div>`).join('');
+  el.innerHTML = `
+    <div class="card">
+      <h2>Повторение слов</h2>
+      <p class="help">Нажимай 🔊, чтобы услышать произношение (голос «Google US English Natural», если доступен в браузере), и повторяй слово вслух перед началом упражнений.</p>
+      <div class="vocab-grid">${items}</div>
+    </div>`;
+}
+
+/* ============ EX1: dictation from transcription ============ */
+function renderEx1(){
+  const el = document.getElementById('panel-ex1');
+  const order = shuffle(EX1_WORDS);
+  const rows = order.map((w,i)=>{
+    const v = vocabMap[w];
+    return `
+    <div class="item" data-word="${w}">
+      <div class="tf-row">
+        <div><span class="qnum">${i+1}.</span> ${v.ipa} <span style="color:var(--ink-soft)">— ${v.ru}</span> ${speakBtnHtml(w)}</div>
+        <div>
+          <input type="text" class="ex1-input" placeholder="напиши слово..." autocomplete="off" autocapitalize="off" spellcheck="false">
+          <span class="feedback-icon"></span>
+          <span class="answer-reveal"></span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  el.innerHTML = `
+    <div class="card">
+      <h2>Упражнение 1. Read the transcription and write the word</h2>
+      <p class="help">Слушай слово, смотри на транскрипцию и перевод — напиши слово по-английски.</p>
+      ${rows}
+      <div class="score-row">
+        <div class="actions">
+          <button class="primary" onclick="checkEx1()">Проверить</button>
+          <button class="ghost" onclick="revealEx1()">Показать ответы</button>
+          <button class="ghost" onclick="copyEx1()">📋 Скопировать мои ответы</button>
+        </div>
+        <div class="result-msg" id="ex1-result"></div>
+      </div>
+    </div>`;
+  el.dataset.order = JSON.stringify(order);
+}
+function checkEx1(){
+  const el = document.getElementById('panel-ex1');
+  const order = JSON.parse(el.dataset.order);
+  const items = el.querySelectorAll('.item');
+  let score=0;
+  items.forEach((item,i)=>{
+    const w = order[i];
+    const input = item.querySelector('.ex1-input');
+    const icon = item.querySelector('.feedback-icon');
+    const ok = norm(input.value)===norm(w);
+    input.classList.remove('correct','incorrect');
+    input.classList.add(ok?'correct':'incorrect');
+    icon.textContent = ok ? '✓' : '✗';
+    icon.className = 'feedback-icon ' + (ok?'good':'bad');
+    if(ok) score++; else recordMistake(w);
+  });
+  document.getElementById('ex1-result').textContent = `Результат: ${score}/${items.length}`;
+}
+function revealEx1(){
+  const el = document.getElementById('panel-ex1');
+  const order = JSON.parse(el.dataset.order);
+  el.querySelectorAll('.item').forEach((item,i)=>{
+    item.querySelector('.answer-reveal').textContent = 'ответ: ' + order[i];
+  });
+}
+function copyEx1(){
+  const el = document.getElementById('panel-ex1');
+  const order = JSON.parse(el.dataset.order);
+  const items = el.querySelectorAll('.item');
+  let lines = ['Упражнение 1 — Read the transcription and write the word'];
+  items.forEach((item,i)=>{
+    const v = vocabMap[order[i]];
+    const val = item.querySelector('.ex1-input').value || '(пусто)';
+    lines.push(`${i+1}. ${v.ipa} (${v.ru}) → ${val}`);
+  });
+  copyText(lines.join('\n'), event.currentTarget);
+}
+
+/* ============ EX2: predict the stress ============ */
+function renderEx2(){
+  const el = document.getElementById('panel-ex2');
+  const order = shuffle(EX2_STRESS.map((_,i)=>i));
+  const rows = order.map((idx,i)=>{
+    const item = EX2_STRESS[idx];
+    const sylls = item.syll.map((s,si)=>`<button type="button" class="syll-btn" data-si="${si}" onclick="pickStress(this,${i})">${s}</button>`).join('');
+    return `
+    <div class="item" data-idx="${idx}">
+      <div><span class="qnum">${i+1}.</span> В каком слоге ударение? ${speakBtnHtml(item.w)}</div>
+      <div class="syll-row">${sylls}</div>
+      <span class="answer-reveal"></span>
+    </div>`;
+  }).join('');
+  el.innerHTML = `
+    <div class="card">
+      <h2>Упражнение 2. Predict the stress</h2>
+      <p class="help">Послушай слово и нажми на слог, на который падает ударение.</p>
+      ${rows}
+      <div class="score-row">
+        <div class="actions">
+          <button class="primary" onclick="checkEx2()">Проверить</button>
+          <button class="ghost" onclick="revealEx2()">Показать ответы</button>
+        </div>
+        <div class="result-msg" id="ex2-result"></div>
+      </div>
+    </div>`;
+  el.dataset.order = JSON.stringify(order);
+}
+function pickStress(btn, i){
+  const row = btn.closest('.item').querySelectorAll('.syll-btn');
+  row.forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+function checkEx2(){
+  const el = document.getElementById('panel-ex2');
+  const order = JSON.parse(el.dataset.order);
+  const items = el.querySelectorAll('.item');
+  let score=0;
+  items.forEach((item,i)=>{
+    const data = EX2_STRESS[order[i]];
+    const selected = item.querySelector('.syll-btn.selected');
+    const si = selected ? parseInt(selected.dataset.si) : -1;
+    const ok = si === data.stress;
+    if(ok) score++; else recordMistake(data.w);
+    item.querySelectorAll('.syll-btn').forEach(b=>{
+      b.classList.remove('correctReveal','wrongReveal');
+      if(parseInt(b.dataset.si)===data.stress) b.classList.add('correctReveal');
+      else if(b===selected) b.classList.add('wrongReveal');
+    });
+  });
+  document.getElementById('ex2-result').textContent = `Результат: ${score}/${items.length}`;
+}
+function revealEx2(){
+  const el = document.getElementById('panel-ex2');
+  const order = JSON.parse(el.dataset.order);
+  el.querySelectorAll('.item').forEach((item,i)=>{
+    const data = EX2_STRESS[order[i]];
+    item.querySelector('.answer-reveal').textContent = 'ударение: ' + data.syll[data.stress];
+    item.querySelectorAll('.syll-btn').forEach(b=>{
+      if(parseInt(b.dataset.si)===data.stress) b.classList.add('correctReveal');
+    });
+  });
+}
+
+/* ============ EX3: true/false ============ */
+function renderEx3(){
+  const el = document.getElementById('panel-ex3');
+  const order = shuffle(EX3_TF.map((_,i)=>i));
+  const rows = order.map((idx,i)=>{
+    const it = EX3_TF[idx];
+    return `
+    <div class="item" data-idx="${idx}">
+      <div class="tf-row">
+        <div><span class="qnum">${i+1}.</span> ${it.text}</div>
+        <div class="tf-buttons">
+          <button type="button" onclick="pickTF(this,true)">True</button>
+          <button type="button" onclick="pickTF(this,false)">False</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  el.innerHTML = `
+    <div class="card">
+      <h2>Упражнение 3. True or False</h2>
+      <p class="help">Прочитай утверждение о значении слова и реши, верно оно или нет.</p>
+      ${rows}
+      <div class="score-row">
+        <div class="actions">
+          <button class="primary" onclick="checkEx3()">Проверить</button>
+          <button class="ghost" onclick="revealEx3()">Показать ответы</button>
+        </div>
+        <div class="result-msg" id="ex3-result"></div>
+      </div>
+    </div>`;
+  el.dataset.order = JSON.stringify(order);
+}
+function pickTF(btn, val){
+  const row = btn.closest('.tf-buttons').querySelectorAll('button');
+  row.forEach(b=>{ b.classList.remove('selected'); b.dataset.chosen=''; });
+  btn.classList.add('selected');
+  btn.dataset.chosen = val ? 'true' : 'false';
+}
+function checkEx3(){
+  const el = document.getElementById('panel-ex3');
+  const order = JSON.parse(el.dataset.order);
+  const items = el.querySelectorAll('.item');
+  let score=0;
+  items.forEach((item,i)=>{
+    const data = EX3_TF[order[i]];
+    const chosenBtn = item.querySelector('.tf-buttons button.selected');
+    const chosen = chosenBtn ? chosenBtn.dataset.chosen==='true' : null;
+    const ok = chosen === data.answer;
+    if(ok) score++; else recordMistake(data.w);
+    item.querySelectorAll('.tf-buttons button').forEach(b=>{
+      b.classList.remove('correctSel','wrongSel');
+      const isTrueBtn = b.textContent==='True';
+      if(isTrueBtn===data.answer) b.classList.add('correctSel');
+      else if(b===chosenBtn) b.classList.add('wrongSel');
+    });
+  });
+  document.getElementById('ex3-result').textContent = `Результат: ${score}/${items.length}`;
+}
+function revealEx3(){
+  const el = document.getElementById('panel-ex3');
+  const order = JSON.parse(el.dataset.order);
+  el.querySelectorAll('.item').forEach((item,i)=>{
+    const data = EX3_TF[order[i]];
+    item.querySelectorAll('.tf-buttons button').forEach(b=>{
+      const isTrueBtn = b.textContent==='True';
+      if(isTrueBtn===data.answer) b.classList.add('correctSel');
+    });
+  });
+}
+
+/* ============ EX4: choose the best word ============ */
+function renderEx4(){
+  const el = document.getElementById('panel-ex4');
+  const order = shuffle(EX4_MCQ.map((_,i)=>i));
+  const rows = order.map((idx,i)=>{
+    const it = EX4_MCQ[idx];
+    const opts = shuffle(it.options);
+    const optBtns = opts.map(o=>`<button type="button" data-word="${o}" onclick="pickMCQ(this)">${o}</button>`).join('');
+    return `
+    <div class="item" data-idx="${idx}">
+      <div><span class="qnum">${i+1}.</span> ${it.sentence}</div>
+      <div class="mcq-options">${optBtns}</div>
+    </div>`;
+  }).join('');
+  el.innerHTML = `
+    <div class="card">
+      <h2>Упражнение 4. Choose the best word</h2>
+      <p class="help">Выбери слово, которое лучше всего подходит по смыслу.</p>
+      ${rows}
+      <div class="score-row">
+        <div class="actions">
+          <button class="primary" onclick="checkEx4()">Проверить</button>
+          <button class="ghost" onclick="revealEx4()">Показать ответы</button>
+        </div>
+        <div class="result-msg" id="ex4-result"></div>
+      </div>
+    </div>`;
+  el.dataset.order = JSON.stringify(order);
+}
+function pickMCQ(btn){
+  btn.closest('.mcq-options').querySelectorAll('button').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+function checkEx4(){
+  const el = document.getElementById('panel-ex4');
+  const order = JSON.parse(el.dataset.order);
+  const items = el.querySelectorAll('.item');
+  let score=0;
+  items.forEach((item,i)=>{
+    const data = EX4_MCQ[order[i]];
+    const selBtn = item.querySelector('.mcq-options button.selected');
+    const ok = selBtn && selBtn.dataset.word===data.w;
+    if(ok) score++; else recordMistake(data.w);
+    item.querySelectorAll('.mcq-options button').forEach(b=>{
+      b.classList.remove('correctReveal','wrongReveal');
+      if(b.dataset.word===data.w) b.classList.add('correctReveal');
+      else if(b===selBtn) b.classList.add('wrongReveal');
+    });
+  });
+  document.getElementById('ex4-result').textContent = `Результат: ${score}/${items.length}`;
+}
+function revealEx4(){
+  const el = document.getElementById('panel-ex4');
+  const order = JSON.parse(el.dataset.order);
+  el.querySelectorAll('.item').forEach((item,i)=>{
+    const data = EX4_MCQ[order[i]];
+    item.querySelectorAll('.mcq-options button').forEach(b=>{
+      if(b.dataset.word===data.w) b.classList.add('correctReveal');
+    });
+  });
+}
+
+/* ============ EX5: finish the dialogue ============ */
+function renderEx5(){
+  const el = document.getElementById('panel-ex5');
+  const order = shuffle(EX5_DIALOGUE.map((_,i)=>i));
+  const rows = order.map((idx,i)=>{
+    const it = EX5_DIALOGUE[idx];
+    const bLine = it.b.replace('___', '<input type="text" class="ex5-input" autocomplete="off" spellcheck="false" style="width:140px;">');
+    return `
+    <div class="item" data-idx="${idx}">
+      <div class="qnum">${i+1}.</div>
+      <div class="dialogue-box">
+        <div class="line"><span class="who">A:</span>${it.a}</div>
+        <div class="line"><span class="who">B:</span>${bLine} <span class="feedback-icon"></span> <span class="answer-reveal"></span></div>
+      </div>
+    </div>`;
+  }).join('');
+  el.innerHTML = `
+    <div class="card">
+      <h2>Упражнение 5. Finish the dialogue</h2>
+      <p class="help">Дополни реплику B подходящим словом-чертой характера, реагируя на слова A.</p>
+      ${rows}
+      <div class="score-row">
+        <div class="actions">
+          <button class="primary" onclick="checkEx5()">Проверить</button>
+          <button class="ghost" onclick="revealEx5()">Показать ответы</button>
+          <button class="ghost" onclick="copyEx5()">📋 Скопировать все диалоги одной кнопкой</button>
+        </div>
+        <div class="result-msg" id="ex5-result"></div>
+      </div>
+    </div>`;
+  el.dataset.order = JSON.stringify(order);
+}
+function checkEx5(){
+  const el = document.getElementById('panel-ex5');
+  const order = JSON.parse(el.dataset.order);
+  const items = el.querySelectorAll('.item');
+  let score=0;
+  items.forEach((item,i)=>{
+    const data = EX5_DIALOGUE[order[i]];
+    const input = item.querySelector('.ex5-input');
+    const icon = item.querySelector('.feedback-icon');
+    const ok = data.accept.some(a=>norm(a)===norm(input.value));
+    input.classList.remove('correct','incorrect');
+    input.classList.add(ok?'correct':'incorrect');
+    icon.textContent = ok?'✓':'✗';
+    icon.className = 'feedback-icon '+(ok?'good':'bad');
+    if(ok) score++; else recordMistake(data.w);
+  });
+  document.getElementById('ex5-result').textContent = `Результат: ${score}/${items.length}`;
+}
+function revealEx5(){
+  const el = document.getElementById('panel-ex5');
+  const order = JSON.parse(el.dataset.order);
+  el.querySelectorAll('.item').forEach((item,i)=>{
+    item.querySelector('.answer-reveal').textContent = 'ответ: ' + EX5_DIALOGUE[order[i]].w;
+  });
+}
+function copyEx5(){
+  const el = document.getElementById('panel-ex5');
+  const order = JSON.parse(el.dataset.order);
+  const items = el.querySelectorAll('.item');
+  let lines = ['Упражнение 5 — Finish the dialogue'];
+  items.forEach((item,i)=>{
+    const data = EX5_DIALOGUE[order[i]];
+    const val = item.querySelector('.ex5-input').value || '_____';
+    lines.push(`${i+1}. A: ${data.a}`);
+    lines.push(`   B: ${data.b.replace('___', val)}`);
+  });
+  copyText(lines.join('\n'), event.currentTarget);
+}
+
+/* ============ RETRIEVAL: write as many words as you remember ============ */
+function renderRetrieval(){
+  const el = document.getElementById('panel-retrieval');
+  el.innerHTML = `
+    <div class="card">
+      <h2>Write as many words as you remember</h2>
+      <p class="help">Не подглядывай в список слов! Напиши все слова, которые помнишь, через запятую или с новой строки.</p>
+      <textarea id="retrievalArea" placeholder="honest, generous, moody ..."></textarea>
+      <div class="score-row">
+        <div class="actions">
+          <button class="primary" onclick="checkRetrieval()">Проверить</button>
+          <button class="ghost" onclick="copyRetrieval()">📋 Скопировать мой ответ</button>
+        </div>
+        <div class="result-msg" id="retrieval-result"></div>
+      </div>
+      <div id="retrieval-list" style="margin-top:10px;"></div>
+    </div>`;
+}
+function checkRetrieval(){
+  const raw = document.getElementById('retrievalArea').value;
+  const said = raw.split(/[,;\n]+/).map(s=>norm(s)).filter(Boolean);
+  const uniqueSaid = [...new Set(said)];
+  const allWords = VOCAB.map(v=>v.w.toLowerCase());
+  const matched = uniqueSaid.filter(s=>allWords.includes(s));
+  const wrong = uniqueSaid.filter(s=>!allWords.includes(s));
+  document.getElementById('retrieval-result').textContent = `Вспомнено верно: ${matched.length} из ${VOCAB.length} слов`;
+  let html = '';
+  if(matched.length){
+    html += '<p><strong>Верно:</strong> ' + matched.map(m=>`<span style="color:var(--good)">${m}</span>`).join(', ') + '</p>';
+  }
+  if(wrong.length){
+    html += '<p><strong>Не найдено в списке (проверь написание):</strong> ' + wrong.map(m=>`<span style="color:var(--bad)">${escapeHtml(m)}</span>`).join(', ') + '</p>';
+  }
+  document.getElementById('retrieval-list').innerHTML = html;
+}
+function copyRetrieval(){
+  const raw = document.getElementById('retrievalArea').value;
+  copyText('Write as many words as you remember\n' + raw, event.currentTarget);
+}
+
+/* ============ WEAK WORDS: choose 3 least confident ============ */
+let weakSelected = [];
+function renderWeak(){
+  const el = document.getElementById('panel-weak');
+  const boxes = VOCAB.map(v=>`
+    <label>
+      <input type="checkbox" value="${v.w}" onchange="onWeakToggle(this)">
+      <span>${v.w}</span>
+    </label>`).join('');
+  el.innerHTML = `
+    <div class="card">
+      <h2>Choose 3 words you are least confident about</h2>
+      <p class="help">Отметь ровно 3 слова, в которых меньше всего уверен(а) — для них появятся дополнительные мини-задания.</p>
+      <div class="checkbox-grid" id="weakGrid">${boxes}</div>
+      <button class="primary" id="genPracticeBtn" onclick="generateWeakPractice()" disabled>Создать практику (выбери 3 слова)</button>
+      <div id="weakPractice"></div>
+    </div>`;
+  weakSelected = [];
+}
+function onWeakToggle(cb){
+  if(cb.checked){
+    if(weakSelected.length>=3){ cb.checked=false; return; }
+    weakSelected.push(cb.value);
+  } else {
+    weakSelected = weakSelected.filter(w=>w!==cb.value);
+  }
+  const grid = document.getElementById('weakGrid');
+  const full = weakSelected.length>=3;
+  grid.querySelectorAll('input[type=checkbox]').forEach(box=>{
+    box.disabled = full && !box.checked;
+  });
+  const btn = document.getElementById('genPracticeBtn');
+  btn.disabled = weakSelected.length!==3;
+  btn.textContent = weakSelected.length===3 ? 'Создать практику' : `Создать практику (выбрано ${weakSelected.length}/3)`;
+}
+function generateWeakPractice(){
+  const box = document.getElementById('weakPractice');
+  box.innerHTML = weakSelected.map((w,i)=>{
+    const v = vocabMap[w];
+    return `
+    <div class="mini-task" data-word="${w}">
+      <h4>${i+1}. ${w} ${speakBtnHtml(w)}</h4>
+      <p style="margin:4px 0;"><strong>a)</strong> Напиши перевод на русский:
+        <input type="text" class="weak-ru-input" placeholder="перевод..." autocomplete="off">
+        <button class="small ghost" onclick="checkWeakRu(this,'${w}')">Проверить</button>
+        <span class="feedback-icon"></span>
+      </p>
+      <p style="margin:4px 0;"><strong>b)</strong> Переведи на английский «${v.ru}»:
+        <input type="text" class="weak-en-input" placeholder="слово..." autocomplete="off">
+        <button class="small ghost" onclick="checkWeakEn(this,'${w}')">Проверить</button>
+        <span class="feedback-icon"></span>
+      </p>
+      <p style="margin:4px 0;"><strong>c)</strong> Составь своё предложение с этим словом:
+        <textarea class="weak-sentence" placeholder="My sentence..." style="min-height:50px;"></textarea>
+      </p>
+    </div>`;
+  }).join('');
+}
+function checkWeakRu(btn, w){
+  const wrap = btn.closest('p');
+  const input = wrap.querySelector('.weak-ru-input');
+  const icon = wrap.querySelector('.feedback-icon');
+  const ru = vocabMap[w].ru.toLowerCase();
+  const val = norm(input.value);
+  const ok = val.length>2 && ru.includes(val.split(',')[0].trim());
+  icon.textContent = ok?'✓':'✗ (' + vocabMap[w].ru + ')';
+  icon.className = 'feedback-icon '+(ok?'good':'bad');
+  if(!ok) recordMistake(w);
+}
+function checkWeakEn(btn, w){
+  const wrap = btn.closest('p');
+  const input = wrap.querySelector('.weak-en-input');
+  const icon = wrap.querySelector('.feedback-icon');
+  const ok = norm(input.value)===norm(w);
+  icon.textContent = ok?'✓':'✗ (' + w + ')';
+  icon.className = 'feedback-icon '+(ok?'good':'bad');
+  if(!ok) recordMistake(w);
+}
+
+/* ============ INIT ============ */
+renderVocab();
+renderEx1();
+renderEx2();
+renderEx3();
+renderEx4();
+renderEx5();
+renderRetrieval();
+renderWeak();
+</script>
+</body>
+</html>
