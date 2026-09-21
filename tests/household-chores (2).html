@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Household Chores — тренажёр</title>
+<style>
+:root{
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  --bg:#f6f4ef; --bg2:#ffffff; --text:#1d1d1f; --muted:#6b6b70;
+  --accent:#c65d3b; --accent2:#3b7a5a; --border:#e4ddd0; --danger:#b3423a;
+  --ok:#3b7a5a; --chip:#efe6d6; --input-bg:#fffdf9;
+}
+html{ scroll-padding-top: env(safe-area-inset-top, 0px); height:100%; }
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#17161a; --bg2:#201f24; --text:#f2efe9; --muted:#a6a3a0;
+    --accent:#e08a63; --accent2:#6fbf94; --border:#3a3841; --danger:#e2837a;
+    --ok:#6fbf94; --chip:#2c2a31; --input-bg:#26242b;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#17161a; --bg2:#201f24; --text:#f2efe9; --muted:#a6a3a0;
+  --accent:#e08a63; --accent2:#6fbf94; --border:#3a3841; --danger:#e2837a;
+  --ok:#6fbf94; --chip:#2c2a31; --input-bg:#26242b;
+}
+*{ box-sizing:border-box; }
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  line-height:1.5;
+}
+.wrap{ max-width:1180px; margin:0 auto; padding:20px 16px 80px; }
+header.top{ text-align:center; margin-bottom:18px; }
+header.top h1{ font-size:clamp(22px,4vw,32px); margin:0 0 6px; }
+header.top p{ color:var(--muted); margin:0; }
+
+.layout{ display:grid; grid-template-columns: 1fr 260px; gap:20px; align-items:start; }
+@media (max-width:820px){ .layout{ grid-template-columns:1fr; } .sidebar{ order:-1; } }
+
+.card{
+  background:var(--bg2); border:1px solid var(--border); border-radius:14px;
+  padding:18px; margin-bottom:20px;
+}
+.card h2{ margin:0 0 4px; font-size:18px; }
+.card .sub{ color:var(--muted); font-size:14px; margin-bottom:14px; }
+
+.sidebar .card{ position:sticky; top:12px; }
+#problemTable{ width:100%; border-collapse:collapse; font-size:13px; }
+#problemTable th, #problemTable td{ text-align:left; padding:5px 4px; border-bottom:1px solid var(--border); }
+#problemEmpty{ color:var(--muted); font-size:13px; }
+
+table.vocab{ width:100%; border-collapse:collapse; font-size:14px; }
+table.vocab th, table.vocab td{ text-align:left; padding:8px 6px; border-bottom:1px solid var(--border); vertical-align:middle; }
+table.vocab th{ color:var(--muted); font-weight:600; font-size:12px; text-transform:uppercase; letter-spacing:.03em; }
+.ipa{ color:var(--muted); font-size:13px; }
+.playBtn, .btn{
+  border:1px solid var(--border); background:var(--chip); color:var(--text);
+  border-radius:8px; padding:6px 10px; cursor:pointer; font-size:14px;
+}
+.playBtn:hover, .btn:hover{ filter:brightness(0.95); }
+.btn.primary{ background:var(--accent); border-color:var(--accent); color:#fff; }
+.btn.secondary{ background:var(--accent2); border-color:var(--accent2); color:#fff; }
+.btn.small{ padding:4px 8px; font-size:12px; }
+.btn:disabled{ opacity:.5; cursor:default; }
+
+.item{ border:1px solid var(--border); border-radius:10px; padding:12px; margin-bottom:10px; background:var(--input-bg); }
+.item .qhead{ display:flex; justify-content:space-between; gap:8px; align-items:flex-start; margin-bottom:8px; flex-wrap:wrap; }
+.item .num{ color:var(--muted); font-size:12px; }
+.item .prompt{ font-size:16px; font-weight:600; }
+.item .emoji{ font-size:28px; }
+.row{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+input[type=text], textarea, select{
+  background:var(--input-bg); border:1px solid var(--border); color:var(--text);
+  border-radius:8px; padding:8px 10px; font-size:14px; width:100%; max-width:340px;
+}
+textarea{ max-width:100%; min-height:90px; font-family:inherit; }
+.feedback{ font-size:13px; margin-top:6px; min-height:18px; }
+.feedback.ok{ color:var(--ok); }
+.feedback.bad{ color:var(--danger); }
+.answerReveal{ font-size:13px; color:var(--accent); margin-top:4px; display:none; }
+.scramble-letters{ font-size:20px; letter-spacing:3px; font-weight:700; background:var(--chip); padding:6px 12px; border-radius:8px; display:inline-block; }
+.scoreLine{ font-size:14px; margin-top:10px; color:var(--muted); }
+.checkboxRow{ display:flex; align-items:center; gap:6px; margin:4px 0; font-size:14px; }
+.checkboxGrid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:4px; margin-bottom:12px; }
+.pill{ display:inline-block; background:var(--chip); border-radius:999px; padding:2px 10px; font-size:12px; margin:2px; }
+.footerBar{ display:flex; gap:10px; flex-wrap:wrap; margin-top:16px; }
+#audioStatus{ font-size:13px; margin-top:8px; }
+.matchedWord{ color:var(--ok); font-weight:600; }
+hr.sep{ border:none; border-top:1px dashed var(--border); margin:14px 0; }
+.smallnote{ font-size:12px; color:var(--muted); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <h1>🧹 Household Chores — интерактивный тренажёр</h1>
+  <p>Домашние обязанности: слушай, пиши от руки (на клавиатуре), проверяй себя.</p>
+</header>
+
+<div class="layout">
+  <main>
+
+    <!-- VOCAB REVIEW -->
+    <section class="card">
+      <h2>📖 Повторение слов</h2>
+      <div class="sub">Нажми 🔊, чтобы прослушать произношение (голос Google US English, если доступен), затем повтори вслух.</div>
+      <div class="row" style="margin-bottom:10px;">
+        <button class="btn primary" id="playAllBtn">🔊 Прослушать всё подряд</button>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="vocab">
+          <thead><tr><th></th><th>English</th><th>Транскрипция</th><th>Перевод</th></tr></thead>
+          <tbody id="vocabBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- EX 1 -->
+    <section class="card" id="ex1">
+      <h2>1️⃣ Unscramble the word</h2>
+      <div class="sub">Собери слово из перемешанных букв. Пиши ответ в поле.</div>
+      <div id="ex1items"></div>
+      <div class="footerBar">
+        <button class="btn primary" onclick="checkAll('ex1')">Проверить все</button>
+        <button class="btn" onclick="revealAll('ex1')">Показать ответы</button>
+      </div>
+      <div class="scoreLine" id="ex1score"></div>
+    </section>
+
+    <!-- EX 2 -->
+    <section class="card" id="ex2">
+      <h2>2️⃣ Write the word by sound (dictation)</h2>
+      <div class="sub">Нажми 🔊, послушай фразу и напиши её по-английски.</div>
+      <div id="ex2items"></div>
+      <div class="footerBar">
+        <button class="btn primary" onclick="checkAll('ex2')">Проверить все</button>
+        <button class="btn" onclick="revealAll('ex2')">Показать ответы</button>
+      </div>
+      <div class="scoreLine" id="ex2score"></div>
+    </section>
+
+    <!-- EX 3 -->
+    <section class="card" id="ex3">
+      <h2>3️⃣ Sort by form (категория)</h2>
+      <div class="sub">Выбери, к какой группе относится фраза: Уборка / Кухня и еда / Стирка и одежда.</div>
+      <div id="ex3items"></div>
+      <div class="footerBar">
+        <button class="btn primary" onclick="checkAll('ex3')">Проверить все</button>
+        <button class="btn" onclick="revealAll('ex3')">Показать ответы</button>
+      </div>
+      <div class="scoreLine" id="ex3score"></div>
+    </section>
+
+    <!-- EX 4 -->
+    <section class="card" id="ex4">
+      <h2>4️⃣ По картинке (эмодзи)</h2>
+      <div class="sub">Посмотри на эмодзи-подсказку и напиши фразу по-английски.</div>
+      <div id="ex4items"></div>
+      <div class="footerBar">
+        <button class="btn primary" onclick="checkAll('ex4')">Проверить все</button>
+        <button class="btn" onclick="revealAll('ex4')">Показать ответы</button>
+      </div>
+      <div class="scoreLine" id="ex4score"></div>
+    </section>
+
+    <!-- EX 5 -->
+    <section class="card" id="ex5">
+      <h2>5️⃣ Rephrase</h2>
+      <div class="sub">Перефразируй фразу, используя слово из списка (синоним/другую конструкцию).</div>
+      <div id="ex5items"></div>
+      <div class="footerBar">
+        <button class="btn primary" onclick="checkAll('ex5')">Проверить все</button>
+        <button class="btn" onclick="revealAll('ex5')">Показать ответы</button>
+      </div>
+      <div class="scoreLine" id="ex5score"></div>
+    </section>
+
+    <!-- EX 6 -->
+    <section class="card" id="ex6">
+      <h2>6️⃣ Write as many words as you remember</h2>
+      <div class="sub">Не подглядывая наверх, напиши как можно больше фраз по-английски (через запятую или с новой строки). Минимум 8.</div>
+      <textarea id="recallInput" placeholder="clean the floor, do the laundry, ..."></textarea>
+      <div class="footerBar">
+        <button class="btn primary" onclick="checkRecall()">Проверить</button>
+      </div>
+      <div class="scoreLine" id="ex6score"></div>
+      <div id="ex6matched"></div>
+    </section>
+
+    <!-- EX 7 -->
+    <section class="card" id="ex7">
+      <h2>7️⃣ Твои 3 самых сложных слова</h2>
+      <div class="sub">Выбери 3 слова, в которых ты меньше всего уверен(а) — или нажми кнопку, чтобы взять их автоматически из твоих ошибок.</div>
+      <div class="row" style="margin-bottom:10px;">
+        <button class="btn" onclick="autoPickProblem()">⚡ Взять автоматически из ошибок</button>
+        <button class="btn secondary" onclick="generateEx7()">Собрать задания для выбранных</button>
+      </div>
+      <div class="checkboxGrid" id="ex7checklist"></div>
+      <div id="ex7generated"></div>
+    </section>
+
+    <!-- AUDIO TEST -->
+    <section class="card">
+      <h2>🔈 Проверка звука и сохранение ответов</h2>
+      <div class="sub">Проверь, что аудио работает на этом устройстве, и сохрани/скопируй свои ответы.</div>
+      <div class="row">
+        <button class="btn" onclick="testAudio()">Проверить озвучку</button>
+        <button class="btn" onclick="copyAllAnswers()">📋 Скопировать все мои ответы</button>
+        <button class="btn" onclick="resetAll()">♻️ Сбросить всё</button>
+      </div>
+      <div id="audioStatus"></div>
+      <div class="smallnote">Ответы автоматически сохраняются в этом браузере (localStorage) и восстанавливаются при следующем открытии страницы.</div>
+    </section>
+
+  </main>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="card">
+      <h2>⚠️ Проблемные слова</h2>
+      <div class="sub">Сюда попадают слова, в которых ты ошибся(лась).</div>
+      <div id="problemEmpty">Пока ошибок нет 🎉</div>
+      <table id="problemTable" style="display:none;">
+        <thead><tr><th>EN</th><th>RU</th><th>Ошибок</th></tr></thead>
+        <tbody id="problemBody"></tbody>
+      </table>
+      <div class="footerBar" style="margin-top:10px;">
+        <button class="btn small" onclick="clearProblems()">Очистить список</button>
+      </div>
+    </div>
+  </aside>
+</div>
+
+</div>
+
+<script>
+/* ============ DATA ============ */
+const VOCAB = [
+ {id:"clean-floor", en:"clean the floor", ru:"чистить (мыть) пол", ipa:"/kliːn ðə flɔːr/", cat:"Уборка", emoji:"🧽🪣", kw:"floor", alt:["clean the floor","mop the floor"]},
+ {id:"dust-furniture", en:"dust the furniture", ru:"вытирать пыль с мебели", ipa:"/dʌst ðə ˈfɜːrnɪtʃər/", cat:"Уборка", emoji:"🪶🪑", kw:"furniture", alt:["dust the furniture"]},
+ {id:"make-bed", en:"make the bed", ru:"заправлять постель", ipa:"/meɪk ðə bed/", cat:"Уборка", emoji:"🛏️", kw:"bed", alt:["make the bed"]},
+ {id:"tidy-room", en:"tidy your room", ru:"убираться в комнате", ipa:"/ˈtaɪdi jʊr ruːm/", cat:"Уборка", emoji:"🧸🧹", kw:"tidy", alt:["tidy your room","tidy up your room"]},
+ {id:"vacuum", en:"do the vacuuming", ru:"пылесосить", ipa:"/duː ðə ˈvækjuːɪŋ/", cat:"Уборка", emoji:"🌀🧹", kw:"vacuum", alt:["do the vacuuming","vacuum","do the hoovering","hoover"]},
+ {id:"load-dishwasher", en:"load the dishwasher", ru:"загружать посудомоечную машину", ipa:"/loʊd ðə ˈdɪʃwɒʃər/", cat:"Кухня и еда", emoji:"🍽️📥", kw:"dishwasher", alt:["load the dishwasher"]},
+ {id:"unload-washing", en:"unload the washing machine", ru:"разгружать стиральную машину", ipa:"/ʌnˈloʊd ðə ˈwɒʃɪŋ məˈʃiːn/", cat:"Стирка и одежда", emoji:"🧺📤", kw:"laundry", alt:["unload the washing machine","unload the dishwasher"]},
+ {id:"put-away-clothes", en:"put away your clothes", ru:"убирать одежду", ipa:"/pʊt əˈweɪ jʊr kloʊðz/", cat:"Стирка и одежда", emoji:"👕🗄️", kw:"clothes", alt:["put away your clothes"]},
+ {id:"do-laundry", en:"do the laundry", ru:"заниматься стиркой", ipa:"/duː ðə ˈlɔːndri/", cat:"Стирка и одежда", emoji:"🧺🧼", kw:"laundry", alt:["do the laundry","do the washing"]},
+ {id:"do-shopping", en:"do the shopping", ru:"делать покупки", ipa:"/duː ðə ˈʃɒpɪŋ/", cat:"Кухня и еда", emoji:"🛒", kw:"shopping", alt:["do the shopping","go shopping"]},
+ {id:"lay-table", en:"lay the table", ru:"накрывать на стол", ipa:"/leɪ ðə ˈteɪbl/", cat:"Кухня и еда", emoji:"🍽️🕯️", kw:"table", alt:["lay the table","set the table"]},
+ {id:"clear-table", en:"clear the table", ru:"убирать со стола", ipa:"/klɪr ðə ˈteɪbl/", cat:"Кухня и еда", emoji:"🍽️🚮", kw:"table", alt:["clear the table"]},
+ {id:"pick-up-clothes", en:"pick up dirty clothes from the floor", ru:"подбирать грязную одежду с пола", ipa:"/pɪk ʌp ˈdɜːrti kloʊðz/", cat:"Стирка и одежда", emoji:"🧦🧤", kw:"clothes", alt:["pick up dirty clothes from the floor","pick up dirty clothes"]},
+ {id:"ironing", en:"do the ironing", ru:"гладить бельё", ipa:"/duː ðə ˈaɪərnɪŋ/", cat:"Стирка и одежда", emoji:"♨️👔", kw:"iron", alt:["do the ironing","iron the clothes","iron"]},
+ {id:"washing-up", en:"do the washing-up", ru:"мыть посуду", ipa:"/duː ðə ˈwɒʃɪŋ ʌp/", cat:"Кухня и еда", emoji:"🍽️🧼", kw:"dishes", alt:["do the washing-up","wash the dishes"]},
+ {id:"make-dinner", en:"make dinner", ru:"готовить ужин", ipa:"/meɪk ˈdɪnər/", cat:"Кухня и еда", emoji:"🍳🕕", kw:"dinner", alt:["make dinner","make lunch","make breakfast"]},
+ {id:"prepare-food", en:"prepare food", ru:"готовить еду", ipa:"/prɪˈper fuːd/", cat:"Кухня и еда", emoji:"🥘🔪", kw:"food", alt:["prepare food"]},
+ {id:"take-out-rubbish", en:"take out the rubbish", ru:"выносить мусор", ipa:"/teɪk aʊt ðə ˈrʌbɪʃ/", cat:"Уборка", emoji:"🗑️🚶", kw:"rubbish", alt:["take out the rubbish","take out the trash","take out the garbage"]},
+ {id:"throw-away-rubbish", en:"throw away rubbish", ru:"выкидывать мусор", ipa:"/θroʊ əˈweɪ ˈrʌbɪʃ/", cat:"Уборка", emoji:"🗑️➡️", kw:"rubbish", alt:["throw away rubbish","throw away the rubbish"]},
+ {id:"robot-vacuum", en:"robot vacuum cleaner", ru:"робот-пылесос", ipa:"/ˈroʊbɒt ˈvækjuːəm ˈkliːnər/", cat:"Уборка", emoji:"🤖🧹", kw:"robot", alt:["robot vacuum cleaner","robot vac"]},
+ {id:"tidy-adj", en:"tidy", ru:"опрятный / чистый", ipa:"/ˈtaɪdi/", cat:"Уборка", emoji:"✨", kw:"tidy", alt:["tidy"]},
+ {id:"untidy-adj", en:"untidy", ru:"неопрятный / грязный", ipa:"/ʌnˈtaɪdi/", cat:"Уборка", emoji:"🌀🧦", kw:"untidy", alt:["untidy","messy"]},
+];
+
+const CATEGORIES = ["Уборка","Кухня и еда","Стирка и одежда"];
+
+const UNSCRAMBLE_POOL = [
+ {word:"dust", ru:"пыль"},{word:"vacuum", ru:"пылесосить"},{word:"iron", ru:"гладить"},
+ {word:"laundry", ru:"стирка"},{word:"tidy", ru:"опрятный"},{word:"rubbish", ru:"мусор"},
+ {word:"dishwasher", ru:"посудомоечная машина"},{word:"furniture", ru:"мебель"},
+ {word:"table", ru:"стол"},{word:"clothes", ru:"одежда"},
+];
+
+const REPHRASE_POOL = [
+ {prompt:"wash the dishes by hand", targetId:"washing-up"},
+ {prompt:"vacuum the carpet", targetId:"vacuum"},
+ {prompt:"iron the shirt", targetId:"ironing"},
+ {prompt:"buy groceries", targetId:"do-shopping"},
+ {prompt:"set the table for dinner", targetId:"lay-table"},
+ {prompt:"put the rubbish in the bin outside", targetId:"take-out-rubbish"},
+ {prompt:"make your room neat", targetId:"tidy-room"},
+ {prompt:"clean off the table after eating", targetId:"clear-table"},
+];
+
+/* ============ STATE / PERSISTENCE ============ */
+let ANSWERS = {};
+let PROBLEMS = {}; // id -> count
+try{ ANSWERS = JSON.parse(localStorage.getItem('hw_answers')||'{}'); }catch(e){ ANSWERS = {}; }
+try{ PROBLEMS = JSON.parse(localStorage.getItem('hw_problems')||'{}'); }catch(e){ PROBLEMS = {}; }
+
+function saveAnswers(){ try{ localStorage.setItem('hw_answers', JSON.stringify(ANSWERS)); }catch(e){} }
+function saveProblems(){ try{ localStorage.setItem('hw_problems', JSON.stringify(PROBLEMS)); }catch(e){} }
+
+function vocabById(id){ return VOCAB.find(v=>v.id===id); }
+
+function addProblem(id){
+  PROBLEMS[id] = (PROBLEMS[id]||0)+1;
+  saveProblems();
+  renderProblems();
+}
+function clearProblems(){ PROBLEMS = {}; saveProblems(); renderProblems(); }
+function renderProblems(){
+  const ids = Object.keys(PROBLEMS).filter(id=>PROBLEMS[id]>0).sort((a,b)=>PROBLEMS[b]-PROBLEMS[a]);
+  const empty = document.getElementById('problemEmpty');
+  const table = document.getElementById('problemTable');
+  const body = document.getElementById('problemBody');
+  if(ids.length===0){ empty.style.display='block'; table.style.display='none'; return; }
+  empty.style.display='none'; table.style.display='table';
+  body.innerHTML = ids.map(id=>{
+    const v = vocabById(id); if(!v) return '';
+    return `<tr><td>${v.en}</td><td>${v.ru}</td><td>${PROBLEMS[id]}</td></tr>`;
+  }).join('');
+}
+
+/* ============ UTILS ============ */
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+function pick(arr,n){ return shuffle(arr).slice(0,n); }
+function normalize(s){
+  return (s||'').toLowerCase().trim().replace(/[.,!?;:"'’]/g,'').replace(/\s+/g,' ');
+}
+function normalizeLoose(s){
+  return normalize(s).split(' ').filter(w=>!['the','a','your','up','away','out'].includes(w)).sort().join(' ');
+}
+function matchesAny(input, accepted){
+  const n = normalize(input);
+  if(accepted.some(a=>normalize(a)===n)) return true;
+  const nl = normalizeLoose(input);
+  return accepted.some(a=>normalizeLoose(a)===nl);
+}
+function scrambleWord(word){
+  let letters;
+  do{
+    letters = shuffle(word.split(''));
+  }while(letters.join('')===word && word.length>1);
+  return letters.join(' ').toUpperCase();
+}
+
+/* ============ TTS ============ */
+let VOICES = [];
+function loadVoices(){ VOICES = window.speechSynthesis ? window.speechSynthesis.getVoices() : []; }
+if('speechSynthesis' in window){
+  loadVoices();
+  window.speechSynthesis.onvoiceschanged = loadVoices;
+}
+function pickVoice(){
+  if(!VOICES || VOICES.length===0) return null;
+  let v = VOICES.find(v=>/google us english/i.test(v.name));
+  if(!v) v = VOICES.find(v=>/en-US/i.test(v.lang) && /google/i.test(v.name));
+  if(!v) v = VOICES.find(v=>/en-US/i.test(v.lang));
+  if(!v) v = VOICES.find(v=>/^en/i.test(v.lang));
+  return v || null;
+}
+function speak(text){
+  if(!('speechSynthesis' in window)){
+    alert('Синтез речи не поддерживается в этом браузере.');
+    return;
+  }
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  const v = pickVoice();
+  if(v) u.voice = v;
+  u.lang = 'en-US';
+  u.rate = 0.92;
+  window.speechSynthesis.speak(u);
+}
+
+/* ============ GENERIC ITEM CHECK ============ */
+function makeInputKey(exId, itemId){ return exId+':'+itemId; }
+
+function restoreValue(key){ return ANSWERS[key] || ''; }
+
+function bindAutosave(inputEl, key){
+  inputEl.addEventListener('input', ()=>{
+    ANSWERS[key] = inputEl.value;
+    saveAnswers();
+  });
+}
+
+function checkOne(exId, itemId, accepted, vocabIdForTracking){
+  const inputEl = document.getElementById('inp-'+exId+'-'+itemId);
+  const fb = document.getElementById('fb-'+exId+'-'+itemId);
+  if(!inputEl) return false;
+  const ok = matchesAny(inputEl.value, accepted);
+  if(ok){
+    fb.textContent = '✅ Верно!';
+    fb.className = 'feedback ok';
+  } else {
+    fb.textContent = '❌ Пока не так. Правильный ответ можно посмотреть кнопкой ниже.';
+    fb.className = 'feedback bad';
+    if(vocabIdForTracking) addProblem(vocabIdForTracking);
+  }
+  return ok;
+}
+
+function checkAll(exId){
+  const items = document.querySelectorAll('#'+exId+'items .item');
+  let correct = 0;
+  items.forEach(el=>{
+    const itemId = el.dataset.itemId;
+    const accepted = JSON.parse(el.dataset.accepted);
+    const vId = el.dataset.vocabId || null;
+    if(checkOne(exId, itemId, accepted, vId)) correct++;
+  });
+  document.getElementById(exId+'score').textContent = `Результат: ${correct} / ${items.length}`;
+}
+
+function revealAll(exId){
+  document.querySelectorAll('#'+exId+'items .item .answerReveal').forEach(el=>{
+    el.style.display = 'block';
+  });
+}
+
+/* ============ EXERCISE 1: UNSCRAMBLE ============ */
+function renderEx1(){
+  const chosen = pick(UNSCRAMBLE_POOL, 8);
+  const container = document.getElementById('ex1items');
+  container.innerHTML = chosen.map((w,i)=>{
+    const itemId = 'u'+i+'-'+w.word;
+    const key = makeInputKey('ex1', itemId);
+    return `
+    <div class="item" data-item-id="${itemId}" data-accepted='${JSON.stringify([w.word])}'>
+      <div class="qhead">
+        <div class="num">№${i+1} · ${w.ru}</div>
+      </div>
+      <div class="scramble-letters">${scrambleWord(w.word)}</div>
+      <div class="row" style="margin-top:8px;">
+        <input type="text" id="inp-ex1-${itemId}" placeholder="напиши слово..." value="${restoreValue(key)}">
+      </div>
+      <div class="feedback" id="fb-ex1-${itemId}"></div>
+      <div class="answerReveal">Ответ: <b>${w.word}</b></div>
+    </div>`;
+  }).join('');
+  chosen.forEach((w,i)=>{
+    const itemId = 'u'+i+'-'+w.word;
+    const key = makeInputKey('ex1', itemId);
+    bindAutosave(document.getElementById('inp-ex1-'+itemId), key);
+  });
+}
+
+/* ============ EXERCISE 2: DICTATION ============ */
+function renderEx2(){
+  const chosen = pick(VOCAB, 8);
+  const container = document.getElementById('ex2items');
+  container.innerHTML = chosen.map((v,i)=>{
+    const itemId = v.id;
+    const key = makeInputKey('ex2', itemId);
+    return `
+    <div class="item" data-item-id="${itemId}" data-accepted='${JSON.stringify(v.alt)}' data-vocab-id="${v.id}">
+      <div class="qhead">
+        <div class="num">№${i+1} · ${v.ru}</div>
+        <button class="playBtn" onclick="speak('${v.en.replace(/'/g,"\\'")}')">🔊 Слушать</button>
+      </div>
+      <input type="text" id="inp-ex2-${itemId}" placeholder="напиши фразу по-английски..." value="${restoreValue(key)}">
+      <div class="feedback" id="fb-ex2-${itemId}"></div>
+      <div class="answerReveal">Ответ: <b>${v.en}</b> ${v.ipa}</div>
+    </div>`;
+  }).join('');
+  chosen.forEach(v=>{
+    const key = makeInputKey('ex2', v.id);
+    bindAutosave(document.getElementById('inp-ex2-'+v.id), key);
+  });
+}
+
+/* ============ EXERCISE 3: SORT BY CATEGORY ============ */
+function renderEx3(){
+  const chosen = pick(VOCAB.filter(v=>v.id!=='tidy-adj'&&v.id!=='untidy-adj'), 8);
+  const container = document.getElementById('ex3items');
+  container.innerHTML = chosen.map((v,i)=>{
+    const itemId = v.id;
+    const key = makeInputKey('ex3', itemId);
+    const saved = restoreValue(key);
+    const opts = CATEGORIES.map(c=>`<option value="${c}" ${saved===c?'selected':''}>${c}</option>`).join('');
+    return `
+    <div class="item" data-item-id="${itemId}" data-accepted='${JSON.stringify([v.cat])}' data-vocab-id="${v.id}">
+      <div class="qhead">
+        <div class="prompt">${v.en}</div>
+        <button class="playBtn" onclick="speak('${v.en.replace(/'/g,"\\'")}')">🔊</button>
+      </div>
+      <div class="num">${v.ru}</div>
+      <div class="row" style="margin-top:8px;">
+        <select id="inp-ex3-${itemId}"><option value="">— выбери категорию —</option>${opts}</select>
+      </div>
+      <div class="feedback" id="fb-ex3-${itemId}"></div>
+      <div class="answerReveal">Категория: <b>${v.cat}</b></div>
+    </div>`;
+  }).join('');
+  chosen.forEach(v=>{
+    const key = makeInputKey('ex3', v.id);
+    const el = document.getElementById('inp-ex3-'+v.id);
+    el.addEventListener('change', ()=>{ ANSWERS[key]=el.value; saveAnswers(); });
+  });
+}
+// override checkOne usage for select-based exercise 3 via generic matchesAny (works fine since value is exact word)
+
+/* ============ EXERCISE 4: BY PICTURE ============ */
+function renderEx4(){
+  const chosen = pick(VOCAB, 8);
+  const container = document.getElementById('ex4items');
+  container.innerHTML = chosen.map((v,i)=>{
+    const itemId = v.id;
+    const key = makeInputKey('ex4', itemId);
+    return `
+    <div class="item" data-item-id="${itemId}" data-accepted='${JSON.stringify(v.alt)}' data-vocab-id="${v.id}">
+      <div class="qhead">
+        <div class="emoji">${v.emoji}</div>
+        <div class="num">№${i+1}</div>
+      </div>
+      <input type="text" id="inp-ex4-${itemId}" placeholder="напиши фразу по-английски..." value="${restoreValue(key)}">
+      <div class="feedback" id="fb-ex4-${itemId}"></div>
+      <div class="answerReveal">Ответ: <b>${v.en}</b> — ${v.ru}</div>
+    </div>`;
+  }).join('');
+  chosen.forEach(v=>{
+    const key = makeInputKey('ex4', v.id);
+    bindAutosave(document.getElementById('inp-ex4-'+v.id), key);
+  });
+}
+
+/* ============ EXERCISE 5: REPHRASE ============ */
+function renderEx5(){
+  const chosen = shuffle(REPHRASE_POOL).slice(0,8);
+  const container = document.getElementById('ex5items');
+  container.innerHTML = chosen.map((r,i)=>{
+    const v = vocabById(r.targetId);
+    const itemId = 'r'+i+'-'+r.targetId;
+    const key = makeInputKey('ex5', itemId);
+    return `
+    <div class="item" data-item-id="${itemId}" data-accepted='${JSON.stringify(v.alt)}' data-vocab-id="${v.id}">
+      <div class="qhead">
+        <div class="prompt">"${r.prompt}"</div>
+      </div>
+      <div class="num">Напиши другими словами (используй фразу из списка выше)</div>
+      <input type="text" id="inp-ex5-${itemId}" placeholder="напиши по-английски..." value="${restoreValue(key)}">
+      <div class="feedback" id="fb-ex5-${itemId}"></div>
+      <div class="answerReveal">Например: <b>${v.en}</b></div>
+    </div>`;
+  }).join('');
+  chosen.forEach((r,i)=>{
+    const itemId = 'r'+i+'-'+r.targetId;
+    const key = makeInputKey('ex5', itemId);
+    bindAutosave(document.getElementById('inp-ex5-'+itemId), key);
+  });
+}
+
+/* ============ EXERCISE 6: RECALL ============ */
+function checkRecall(){
+  const ta = document.getElementById('recallInput');
+  ANSWERS['ex6:recall'] = ta.value; saveAnswers();
+  const parts = ta.value.split(/[,\n]/).map(s=>normalize(s)).filter(Boolean);
+  const matchedIds = new Set();
+  parts.forEach(p=>{
+    VOCAB.forEach(v=>{
+      if(v.alt.some(a=>normalize(a)===p)) matchedIds.add(v.id);
+    });
+  });
+  document.getElementById('ex6score').textContent = `Найдено правильных фраз: ${matchedIds.size} (написано записей: ${parts.length})`;
+  document.getElementById('ex6matched').innerHTML = 'Совпало: ' + [...matchedIds].map(id=>`<span class="pill matchedWord">${vocabById(id).en}</span>`).join(' ') || '';
+}
+
+/* ============ EXERCISE 7: PROBLEM WORDS ============ */
+function renderEx7Checklist(){
+  const box = document.getElementById('ex7checklist');
+  box.innerHTML = VOCAB.map(v=>`
+    <label class="checkboxRow">
+      <input type="checkbox" class="ex7cb" value="${v.id}"> ${v.en} <span class="smallnote">(${v.ru})</span>
+    </label>`).join('');
+}
+function autoPickProblem(){
+  const ids = Object.keys(PROBLEMS).sort((a,b)=>PROBLEMS[b]-PROBLEMS[a]).slice(0,3);
+  let chosen = ids;
+  if(chosen.length<3){
+    const extra = shuffle(VOCAB.map(v=>v.id).filter(id=>!chosen.includes(id))).slice(0,3-chosen.length);
+    chosen = chosen.concat(extra);
+  }
+  document.querySelectorAll('.ex7cb').forEach(cb=>{ cb.checked = chosen.includes(cb.value); });
+}
+function generateEx7(){
+  const checked = [...document.querySelectorAll('.ex7cb:checked')].map(cb=>cb.value);
+  if(checked.length===0){ alert('Выбери хотя бы одно слово (лучше 3).'); return; }
+  const container = document.getElementById('ex7generated');
+  container.innerHTML = checked.map((id,i)=>{
+    const v = vocabById(id);
+    const scrambled = scrambleWord(v.kw);
+    return `
+    <div class="item" data-item-id="p${i}-${id}">
+      <div class="prompt">${v.en} <span class="smallnote">(${v.ru})</span></div>
+      <hr class="sep">
+      <div class="row">
+        <div style="flex:1; min-width:220px;">
+          <div class="num">a) Переведи на русский</div>
+          <input type="text" id="inp-p7a-${id}" placeholder="перевод..." value="${restoreValue('ex7a:'+id)}">
+          <div class="feedback" id="fb-p7a-${id}"></div>
+        </div>
+        <div style="flex:1; min-width:220px;">
+          <div class="num">b) Собери слово: <span class="scramble-letters">${scrambled}</span></div>
+          <input type="text" id="inp-p7b-${id}" placeholder="${v.kw.length} букв..." value="${restoreValue('ex7b:'+id)}">
+          <div class="feedback" id="fb-p7b-${id}"></div>
+        </div>
+        <div style="flex:1; min-width:220px;">
+          <div class="num">c) Послушай и напиши <button class="playBtn small" onclick="speak('${v.en.replace(/'/g,"\\'")}')">🔊</button></div>
+          <input type="text" id="inp-p7c-${id}" placeholder="напиши фразу..." value="${restoreValue('ex7c:'+id)}">
+          <div class="feedback" id="fb-p7c-${id}"></div>
+        </div>
+      </div>
+      <div class="footerBar">
+        <button class="btn small" onclick="checkP7('${id}')">Проверить это слово</button>
+      </div>
+    </div>`;
+  }).join('');
+  checked.forEach(id=>{
+    bindAutosave(document.getElementById('inp-p7a-'+id), 'ex7a:'+id);
+    bindAutosave(document.getElementById('inp-p7b-'+id), 'ex7b:'+id);
+    bindAutosave(document.getElementById('inp-p7c-'+id), 'ex7c:'+id);
+  });
+}
+function checkP7(id){
+  const v = vocabById(id);
+  const a = document.getElementById('inp-p7a-'+id);
+  const b = document.getElementById('inp-p7b-'+id);
+  const c = document.getElementById('inp-p7c-'+id);
+  const fa = document.getElementById('fb-p7a-'+id);
+  const fb = document.getElementById('fb-p7b-'+id);
+  const fc = document.getElementById('fb-p7c-'+id);
+  const okA = normalizeLoose(a.value) && v.ru.toLowerCase().includes(normalize(a.value).split(' ')[0]||'§');
+  fa.textContent = okA ? '✅' : '❌ смотри перевод сверху в таблице';
+  fa.className = 'feedback ' + (okA?'ok':'bad');
+  const okB = normalize(b.value) === v.kw;
+  fb.textContent = okB ? '✅' : ('❌ ответ: '+v.kw);
+  fb.className = 'feedback ' + (okB?'ok':'bad');
+  const okC = matchesAny(c.value, v.alt);
+  fc.textContent = okC ? '✅' : ('❌ ответ: '+v.en);
+  fc.className = 'feedback ' + (okC?'ok':'bad');
+  if(!okA || !okB || !okC) addProblem(id);
+}
+
+/* ============ VOCAB TABLE ============ */
+function renderVocabTable(){
+  const body = document.getElementById('vocabBody');
+  body.innerHTML = VOCAB.map(v=>`
+    <tr>
+      <td><button class="playBtn" onclick="speak('${v.en.replace(/'/g,"\\'")}')">🔊</button></td>
+      <td>${v.en}</td>
+      <td class="ipa">${v.ipa}</td>
+      <td>${v.ru}</td>
+    </tr>`).join('');
+}
+document.getElementById('playAllBtn').addEventListener('click', ()=>{
+  let i = 0;
+  function next(){
+    if(i>=VOCAB.length) return;
+    const u = new SpeechSynthesisUtterance(VOCAB[i].en);
+    const v = pickVoice(); if(v) u.voice = v;
+    u.lang='en-US'; u.rate=0.92;
+    u.onend = ()=>{ i++; setTimeout(next, 350); };
+    window.speechSynthesis.speak(u);
+  }
+  window.speechSynthesis.cancel();
+  next();
+});
+
+/* ============ AUDIO TEST ============ */
+function testAudio(){
+  const status = document.getElementById('audioStatus');
+  if(!('speechSynthesis' in window)){
+    status.innerHTML = '❌ Этот браузер не поддерживает синтез речи (speechSynthesis).';
+    return;
+  }
+  loadVoices();
+  const v = pickVoice();
+  status.innerHTML = `Голосов найдено: ${VOICES.length}. Используется: <b>${v ? v.name+' ('+v.lang+')' : 'голос по умолчанию'}</b>. Сейчас прозвучит тестовая фраза...`;
+  const u = new SpeechSynthesisUtterance('This is an audio test. Do the vacuuming.');
+  if(v) u.voice = v;
+  u.lang='en-US';
+  u.onend = ()=>{ status.innerHTML += '<br>✅ Аудио проиграно успешно.'; };
+  u.onerror = ()=>{ status.innerHTML += '<br>❌ Ошибка воспроизведения.'; };
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(u);
+}
+
+/* ============ COPY / RESET ============ */
+async function copyAllAnswers(){
+  let lines = ['=== Household Chores — ответы студента ===', new Date().toLocaleString()];
+  Object.keys(ANSWERS).sort().forEach(k=>{
+    if(ANSWERS[k] && ANSWERS[k].trim()) lines.push(`${k}: ${ANSWERS[k]}`);
+  });
+  lines.push('', '=== Проблемные слова ===');
+  Object.keys(PROBLEMS).forEach(id=>{
+    const v = vocabById(id);
+    if(v) lines.push(`${v.en} (${v.ru}) — ошибок: ${PROBLEMS[id]}`);
+  });
+  const text = lines.join('\n');
+  try{
+    await navigator.clipboard.writeText(text);
+    alert('Ответы скопированы в буфер обмена!');
+  }catch(e){
+    const ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    try{ document.execCommand('copy'); alert('Ответы скопированы в буфер обмена!'); }
+    catch(e2){ alert('Не удалось скопировать автоматически. Вот текст:\n\n'+text); }
+    document.body.removeChild(ta);
+  }
+}
+function resetAll(){
+  if(!confirm('Точно сбросить все ответы и список ошибок?')) return;
+  ANSWERS = {}; PROBLEMS = {};
+  saveAnswers(); saveProblems();
+  location.reload();
+}
+
+/* ============ INIT ============ */
+renderVocabTable();
+renderEx1();
+renderEx2();
+renderEx3();
+renderEx4();
+renderEx5();
+document.getElementById('recallInput').value = restoreValue2('ex6:recall');
+function restoreValue2(key){ return ANSWERS[key]||''; }
+renderEx7Checklist();
+renderProblems();
+
+// patch checkOne for select elements (ex3) - matchesAny already handles exact string compare fine.
+</script>
+</body>
+</html>
