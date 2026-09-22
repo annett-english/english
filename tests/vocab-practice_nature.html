@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Nature &amp; Weather — тренажёр слов</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --sky:#2f6f8f;
+    --sky-deep:#204d63;
+    --grass:#4c7c4a;
+    --sun:#dd9a2e;
+    --clay:#a85338;
+    --cream:#f7f4ec;
+    --card:#ffffff;
+    --ink:#242220;
+    --ink-soft:#5c584f;
+    --line:#e4ddcd;
+    --good:#3f7d4d;
+    --good-bg:#e7f2e5;
+    --bad:#b3402f;
+    --bad-bg:#fbe9e3;
+    --radius:14px;
+    --shadow:0 1px 2px rgba(36,34,32,.06), 0 6px 18px rgba(36,34,32,.06);
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    box-sizing:border-box;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --cream:#1c1a17; --card:#262320; --ink:#f1ede4; --ink-soft:#bdb6a6;
+      --line:#3a352c; --good-bg:#1e3122; --bad-bg:#3a2119;
+    }
+  }
+  :root[data-theme="dark"]{
+    --cream:#1c1a17; --card:#262320; --ink:#f1ede4; --ink-soft:#bdb6a6;
+    --line:#3a352c; --good-bg:#1e3122; --bad-bg:#3a2119;
+  }
+  html{scroll-padding-top: env(safe-area-inset-top, 0px);}
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--cream); color:var(--ink);
+    font-family:'Inter',system-ui,-apple-system,sans-serif;
+    line-height:1.5;
+  }
+  h1,h2,h3{font-family:'Fraunces',Georgia,serif; margin:0 0 .3em; color:var(--ink); font-weight:600;}
+  .wrap{max-width:1160px; margin:0 auto; padding:28px 20px 90px;}
+  .layout{display:grid; grid-template-columns: 1fr 300px; gap:28px; align-items:start;}
+  @media (max-width:880px){ .layout{grid-template-columns:1fr;} .sidebar{order:-1;} }
+
+  header.hero{
+    background:linear-gradient(135deg,var(--sky) 0%, var(--sky-deep) 70%);
+    color:#fdfaf2; border-radius:20px; padding:34px 30px; margin-bottom:26px;
+    position:relative; overflow:hidden;
+  }
+  header.hero::after{
+    content:""; position:absolute; right:-40px; bottom:-60px; width:220px; height:220px;
+    border-radius:50%; background:radial-gradient(circle, rgba(221,154,46,.35), transparent 70%);
+  }
+  header.hero h1{color:#fff; font-size:clamp(28px,4vw,40px); position:relative;}
+  header.hero p{color:#e4eef2; max-width:60ch; margin:0; position:relative; font-size:15.5px;}
+  .hero-controls{display:flex; gap:10px; margin-top:18px; flex-wrap:wrap; position:relative;}
+
+  button{font-family:inherit; cursor:pointer; border:none;}
+  .pill-btn{
+    background:rgba(255,255,255,.14); color:#fdfaf2; border:1px solid rgba(255,255,255,.35);
+    padding:9px 16px; border-radius:999px; font-size:13.5px; font-weight:500;
+  }
+  .pill-btn:hover{background:rgba(255,255,255,.24);}
+
+  section.block{background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+    padding:24px 24px 26px; margin-bottom:22px; box-shadow:var(--shadow);}
+  .block-head{display:flex; align-items:baseline; gap:10px; margin-bottom:6px; flex-wrap:wrap;}
+  .block-head .num{font-family:'Fraunces',serif; font-size:15px; color:var(--clay); font-weight:600;}
+  .block-sub{color:var(--ink-soft); font-size:14px; margin-bottom:18px;}
+
+  /* vocab intro cards */
+  .vocab-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:10px;}
+  .vcard{border:1px solid var(--line); border-radius:10px; padding:11px 12px; background:var(--cream);}
+  .vcard .en{font-weight:600; font-size:15px;}
+  .vcard .ipa{color:var(--ink-soft); font-size:12.5px; font-family:'Inter',sans-serif;}
+  .vcard .ru{color:var(--clay); font-size:13.5px; margin-top:2px;}
+  .vcard .speak{margin-top:7px; display:inline-flex; align-items:center; gap:5px;
+    background:transparent; border:1px solid var(--sky); color:var(--sky); border-radius:8px;
+    padding:4px 9px; font-size:12.5px;}
+  :root[data-theme="dark"] .vcard .speak, @media (prefers-color-scheme:dark){.vcard .speak{color:#8fc7de;border-color:#8fc7de;}}
+  .vcard .speak:hover{background:var(--sky); color:#fff;}
+  .tag{display:inline-block; font-size:10.5px; letter-spacing:.02em; padding:2px 7px; border-radius:6px; margin-left:6px; vertical-align:middle;}
+  .tag.nature{background:#e6efe1; color:var(--grass);}
+  .tag.weather{background:#fbeed9; color:var(--sun);}
+
+  /* exercise items */
+  .item{display:flex; gap:12px; padding:14px 0; border-bottom:1px solid var(--line);}
+  .item:last-child{border-bottom:none;}
+  .item-num{width:24px; height:24px; border-radius:50%; background:var(--sky); color:#fff;
+    display:flex; align-items:center; justify-content:center; font-size:12.5px; font-weight:600; flex-shrink:0; margin-top:2px;}
+  .item-body{flex:1; min-width:0;}
+  .item-prompt{font-size:15px; margin-bottom:9px;}
+  .item-prompt .blank{border-bottom:2px dotted var(--clay); padding:0 4px;}
+  .item-prompt .scramble-letters{font-family:'Fraunces',serif; font-weight:600; letter-spacing:.14em;
+    font-size:19px; color:var(--clay);}
+  .item-prompt .hint{color:var(--ink-soft); font-size:13px; font-style:italic;}
+  .answer-row{display:flex; gap:8px; flex-wrap:wrap; align-items:center;}
+  .answer-input{border:1.5px solid var(--line); border-radius:9px; padding:8px 11px; font-size:14.5px;
+    width:200px; max-width:100%; background:var(--card); color:var(--ink);}
+  .answer-input:focus{outline:none; border-color:var(--sky);}
+  .btn-check{background:var(--grass); color:#fff; padding:8px 14px; border-radius:9px; font-size:13.5px; font-weight:600;}
+  .btn-check:hover{filter:brightness(1.08);}
+  .btn-show{background:transparent; color:var(--ink-soft); text-decoration:underline; font-size:13px; padding:6px 2px;}
+  .btn-audio{background:transparent; border:1px solid var(--sky); color:var(--sky); border-radius:8px; padding:6px 11px; font-size:13px; margin-right:2px;}
+  .feedback{margin-top:7px; font-size:13.5px; min-height:18px; font-weight:500;}
+  .feedback.ok{color:var(--good);}
+  .feedback.no{color:var(--bad);}
+
+  /* stress exercise */
+  .stress-item{padding:14px 0; border-bottom:1px solid var(--line);}
+  .stress-item:last-child{border-bottom:none;}
+  .syll-row{display:flex; gap:7px; margin:8px 0; flex-wrap:wrap;}
+  .syll-btn{border:1.5px solid var(--line); background:var(--cream); border-radius:9px;
+    padding:8px 14px; font-family:'Fraunces',serif; font-size:16px; color:var(--ink);}
+  .syll-btn:hover{border-color:var(--sky);}
+  .syll-btn.chosen{border-color:var(--sky); background:var(--sky); color:#fff;}
+  .syll-btn.correct{border-color:var(--good); background:var(--good-bg); color:var(--good);}
+  .syll-btn.wrong{border-color:var(--bad); background:var(--bad-bg); color:var(--bad);}
+
+  /* rank exercise */
+  .rank-group{margin-bottom:18px;}
+  .rank-group h4{margin:0 0 4px; font-size:14.5px; font-family:'Inter'; font-weight:600;}
+  .rank-note{color:var(--ink-soft); font-size:12.5px; margin-bottom:10px;}
+  .rank-row{display:flex; align-items:center; gap:10px; padding:6px 0;}
+  .rank-row .rword{width:150px; font-size:14.5px;}
+  .rank-row input{width:52px; border:1.5px solid var(--line); border-radius:8px; padding:6px 8px; text-align:center; background:var(--card); color:var(--ink);}
+
+  /* chunk word bank */
+  .bank{display:flex; flex-wrap:wrap; gap:7px; margin-bottom:16px;}
+  .bank span{background:var(--cream); border:1px solid var(--line); border-radius:999px; padding:5px 12px; font-size:13px; color:var(--clay);}
+
+  /* sidebar */
+  .sidebar{position:sticky; top:16px;}
+  .side-card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:18px; box-shadow:var(--shadow); margin-bottom:16px;}
+  .side-card h3{font-size:16px;}
+  .pw-table{width:100%; border-collapse:collapse; font-size:13.5px;}
+  .pw-table th{text-align:left; color:var(--ink-soft); font-weight:600; font-size:11.5px; text-transform:none; padding-bottom:6px; border-bottom:1px solid var(--line);}
+  .pw-table td{padding:6px 0; border-bottom:1px solid var(--line); vertical-align:middle;}
+  .pw-table td.en{font-weight:600;}
+  .pw-table td.cnt{color:var(--bad); text-align:right; font-weight:600;}
+  .pw-empty{color:var(--ink-soft); font-size:13.5px; font-style:italic;}
+  .pw-clear{margin-top:10px; font-size:12.5px; color:var(--ink-soft); text-decoration:underline; background:none;}
+  .rm-x{background:none; color:var(--ink-soft); font-size:12px; padding:0 4px;}
+
+  .log-toggle{font-size:12.5px; color:var(--ink-soft); text-decoration:underline; background:none; padding:0;}
+  #logBox{font-size:12px; color:var(--ink-soft); max-height:160px; overflow:auto; margin-top:8px; display:none; border-top:1px solid var(--line); padding-top:8px;}
+  #logBox div{padding:2px 0;}
+
+  .retrieval-ta{width:100%; min-height:100px; border:1.5px solid var(--line); border-radius:10px; padding:10px 12px;
+    font-family:'Inter',sans-serif; font-size:14.5px; background:var(--cream); color:var(--ink); resize:vertical;}
+  .lc-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:6px 14px; margin:12px 0;}
+  .lc-grid label{font-size:13.5px; display:flex; gap:7px; align-items:center;}
+
+  footer{text-align:center; color:var(--ink-soft); font-size:12.5px; margin-top:10px;}
+  .score-box{margin-top:12px; padding:12px 14px; border-radius:10px; background:var(--cream); font-size:14px; display:none;}
+
+  :focus-visible{outline:2px solid var(--sky); outline-offset:2px;}
+  @media (prefers-reduced-motion:reduce){ *{transition:none !important;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <h1>Горы, реки и погода</h1>
+    <p>Тренажёр слов уровня A1–A2: природа и погода. Прослушайте слова, впишите ответы от руки и проверьте себя — ошибки сами соберутся в табличку сбоку.</p>
+    <div class="hero-controls">
+      <button class="pill-btn" onclick="testAudio()">🔊 Проверить звук</button>
+      <button class="pill-btn" onclick="toggleTheme()">🌗 Тема</button>
+      <button class="pill-btn" onclick="clearAllProgress()">↺ Сбросить прогресс</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <main>
+
+      <section class="block" id="introBlock">
+        <div class="block-head"><h2>Слова урока</h2></div>
+        <p class="block-sub">Нажмите 🔊, чтобы услышать слово, затем повторите вслух. Артикль (a / an / the) дан только для справки — в заданиях его вписывать не нужно.</p>
+        <div class="vocab-grid" id="vocabGrid"></div>
+      </section>
+
+      <section class="block" id="ex1">
+        <div class="block-head"><span class="num">Упражнение 1</span><h2>Unscramble the word</h2></div>
+        <p class="block-sub">Буквы перемешаны — соберите слово. Перевод подскажет, какое слово нужно.</p>
+        <div id="ex1list"></div>
+      </section>
+
+      <section class="block" id="ex2">
+        <div class="block-head"><span class="num">Упражнение 2</span><h2>Listen &amp; write</h2></div>
+        <p class="block-sub">Нажмите 🔊 и запишите услышанное слово по буквам.</p>
+        <div id="ex2list"></div>
+      </section>
+
+      <section class="block" id="ex3">
+        <div class="block-head"><span class="num">Упражнение 3</span><h2>Predict the stress</h2></div>
+        <p class="block-sub">Кликните по слогу, на который падает ударение.</p>
+        <div id="ex3list"></div>
+      </section>
+
+      <section class="block" id="ex4">
+        <div class="block-head"><span class="num">Упражнение 4</span><h2>Guess the word</h2></div>
+        <p class="block-sub">Прочитайте загадку-подсказку и впишите слово.</p>
+        <div id="ex4list"></div>
+      </section>
+
+      <section class="block" id="ex5">
+        <div class="block-head"><span class="num">Упражнение 5</span><h2>Definition → word</h2></div>
+        <p class="block-sub">По определению впишите нужное слово.</p>
+        <div id="ex5list"></div>
+      </section>
+
+      <section class="block" id="ex6">
+        <div class="block-head"><span class="num">Упражнение 6</span><h2>Build the chunk</h2></div>
+        <p class="block-sub">Заполните пропуск подходящим словом из банка ниже.</p>
+        <div class="bank" id="ex6bank"></div>
+        <div id="ex6list"></div>
+      </section>
+
+      <section class="block" id="ex7">
+        <div class="block-head"><span class="num">Упражнение 7</span><h2>Complete the mini-situations</h2></div>
+        <p class="block-sub">Допишите слово, подходящее по смыслу ситуации.</p>
+        <div id="ex7list"></div>
+      </section>
+
+      <section class="block" id="ex8">
+        <div class="block-head"><span class="num">Упражнение 8</span><h2>Rank them</h2></div>
+        <p class="block-sub">Расставьте цифры от 1 (меньше/ниже) до конца по возрастанию.</p>
+        <div class="rank-group" id="rankA"></div>
+        <div class="rank-group" id="rankB"></div>
+      </section>
+
+      <section class="block" id="retrievalBlock">
+        <div class="block-head"><h2>Финальная тренировка</h2></div>
+        <p class="block-sub"><strong>Write as many words as you remember.</strong> Впишите все слова урока, которые вспомните (через запятую или с новой строки).</p>
+        <textarea class="retrieval-ta" id="retrievalInput" placeholder="mountain, sky, volcano ..."></textarea>
+        <div class="answer-row" style="margin-top:10px;">
+          <button class="btn-check" onclick="checkRetrieval()">Проверить</button>
+          <button class="btn-show" onclick="revealAllWords()">Показать все слова</button>
+        </div>
+        <div class="score-box" id="retrievalScore"></div>
+
+        <div style="margin-top:26px;">
+          <p class="block-sub" style="margin-bottom:8px;"><strong>Choose 3 words you are least confident about</strong> — для них сгенерируется короткий мини-тест.</p>
+          <div class="lc-grid" id="lcGrid"></div>
+          <button class="btn-check" onclick="buildLCTest()">Создать мини-тест</button>
+          <div id="lcTestArea" style="margin-top:14px;"></div>
+        </div>
+      </section>
+
+    </main>
+
+    <aside class="sidebar">
+      <div class="side-card">
+        <h3>⚠️ Проблемные слова</h3>
+        <table class="pw-table" id="pwTable" style="display:none;">
+          <thead><tr><th>Слово</th><th>Перевод</th><th>Ошибок</th><th></th></tr></thead>
+          <tbody id="pwBody"></tbody>
+        </table>
+        <div class="pw-empty" id="pwEmpty">Пока нет ошибок — отлично!</div>
+        <button class="pw-clear" onclick="clearProblemWords()">Очистить список</button>
+      </div>
+      <div class="side-card">
+        <h3 style="font-size:14px;">Журнал ответов</h3>
+        <button class="log-toggle" onclick="toggleLog()">показать / скрыть</button>
+        <div id="logBox"></div>
+      </div>
+    </aside>
+  </div>
+
+  <footer>Ваши ответы и ошибки сохраняются в этом браузере автоматически.</footer>
+</div>
+
+<script>
+/* ---------------------------------------------------------- DATA ---------------------------------------------------------- */
+const ALL_WORDS = [
+  {en:'mountain', alt:['mountains'], ru:'горы', ipa:'ˈmaʊntɪn(z)', audio:'mountains', cat:'nature'},
+  {en:'sky', alt:[], ru:'небо', ipa:'skaɪ', audio:'the sky', cat:'nature'},
+  {en:'volcano', alt:[], ru:'вулкан', ipa:'vɒlˈkeɪnoʊ', audio:'a volcano', cat:'nature'},
+  {en:'grass', alt:[], ru:'трава', ipa:'ɡræs', audio:'grass', cat:'nature'},
+  {en:'field', alt:[], ru:'поле', ipa:'fiːld', audio:'a field', cat:'nature'},
+  {en:'hill', alt:[], ru:'холм', ipa:'hɪl', audio:'a hill', cat:'nature'},
+  {en:'river', alt:[], ru:'река', ipa:'ˈrɪvər', audio:'a river', cat:'nature'},
+  {en:'lake', alt:[], ru:'озеро', ipa:'leɪk', audio:'a lake', cat:'nature'},
+  {en:'sea', alt:[], ru:'море', ipa:'siː', audio:'a sea', cat:'nature'},
+  {en:'forest', alt:[], ru:'лес', ipa:'ˈfɒrɪst', audio:'a forest', cat:'nature'},
+  {en:'waterfall', alt:[], ru:'водопад', ipa:'ˈwɔːtərfɔːl', audio:'a waterfall', cat:'nature'},
+  {en:'ocean', alt:[], ru:'океан', ipa:'ˈoʊʃən', audio:'an ocean', cat:'nature'},
+  {en:'cave', alt:[], ru:'пещера', ipa:'keɪv', audio:'a cave', cat:'nature'},
+  {en:'tree', alt:[], ru:'дерево', ipa:'triː', audio:'a tree', cat:'nature'},
+  {en:'desert', alt:[], ru:'пустыня', ipa:'ˈdezərt', audio:'a desert', cat:'nature'},
+  {en:'warm', alt:[], ru:'тёплый', ipa:'wɔːrm', audio:'warm', cat:'weather'},
+  {en:'cloudy', alt:[], ru:'облачно', ipa:'ˈklaʊdi', audio:'cloudy', cat:'weather'},
+  {en:'raining', alt:['rainy'], ru:'идёт дождь', ipa:'ˈreɪnɪŋ', audio:'raining', cat:'weather'},
+  {en:'windy', alt:[], ru:'ветрено', ipa:'ˈwɪndi', audio:'windy', cat:'weather'},
+  {en:'foggy', alt:[], ru:'туманно', ipa:'ˈfɒɡi', audio:'foggy', cat:'weather'},
+  {en:'wet', alt:[], ru:'мокрый, сырой', ipa:'wet', audio:'wet', cat:'weather'},
+  {en:'snowing', alt:['snowy'], ru:'идёт снег', ipa:'ˈsnoʊɪŋ', audio:'snowing', cat:'weather'},
+  {en:'sunny', alt:[], ru:'солнечно', ipa:'ˈsʌni', audio:'sunny', cat:'weather'},
+  {en:'hot', alt:[], ru:'жарко', ipa:'hɒt', audio:'hot', cat:'weather'},
+  {en:'cold', alt:[], ru:'холодно', ipa:'kəʊld', audio:'cold', cat:'weather'},
+  {en:'cool', alt:[], ru:'прохладно', ipa:'kuːl', audio:'cool', cat:'weather'},
+  {en:'dry', alt:[], ru:'сухо', ipa:'draɪ', audio:'dry', cat:'weather'},
+];
+const WORD_MAP = {}; ALL_WORDS.forEach(w=>WORD_MAP[w.en]=w);
+
+/* ------------------------------------------------------- UTILITIES -------------------------------------------------------- */
+function shuffle(arr){
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+function scrambleWord(w){
+  let letters=w.split(''); let s;
+  let tries=0;
+  do{ s=shuffle(letters).join(''); tries++; } while((s===w) && tries<20);
+  return s.toUpperCase().split('').join(' ');
+}
+function normalize(s){
+  return (s||'').trim().toLowerCase().replace(/^(a |an |the )/,'').replace(/[^a-z]/g,'');
+}
+
+/* --------------------------------------------------------- AUDIO ------------------------------------------------------------ */
+let cachedVoice=null;
+function pickVoice(){
+  if(!('speechSynthesis' in window)) return null;
+  const voices=speechSynthesis.getVoices();
+  if(!voices.length) return null;
+  return voices.find(v=>v.name.includes('Google US English')) ||
+         voices.find(v=>v.lang==='en-US') ||
+         voices.find(v=>v.lang && v.lang.startsWith('en')) ||
+         voices[0];
+}
+if('speechSynthesis' in window){
+  speechSynthesis.onvoiceschanged = ()=>{ cachedVoice = pickVoice(); };
+  cachedVoice = pickVoice();
+}
+function speak(text){
+  if(!('speechSynthesis' in window)){
+    alert('Синтез речи не поддерживается в этом браузере. Попробуйте открыть страницу в Chrome.');
+    return;
+  }
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang='en-US'; u.rate=0.88; u.pitch=1;
+  const v = cachedVoice || pickVoice();
+  if(v) u.voice=v;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+}
+function testAudio(){ speak('Hello! Audio is working.'); }
+
+/* ---------------------------------------------------- STORAGE (per-viewer) -------------------------------------------------- */
+function safeGet(key, fallback){
+  try{ const v=localStorage.getItem(key); return v?JSON.parse(v):fallback; }catch(e){ return fallback; }
+}
+function safeSet(key, val){
+  try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){ /* storage unavailable */ }
+}
+function loadProblemWords(){ return safeGet('vocab_problemWords', {}); }
+function saveProblemWords(pw){ safeSet('vocab_problemWords', pw); }
+function loadLog(){ return safeGet('vocab_answerLog', []); }
+function pushLog(entry){
+  const log=loadLog();
+  log.push(entry);
+  if(log.length>300) log.shift();
+  safeSet('vocab_answerLog', log);
+  renderLog();
+}
+
+function addMistake(word){
+  if(!word) return;
+  const pw=loadProblemWords();
+  const info = WORD_MAP[word];
+  if(!pw[word]) pw[word]={ru: info?info.ru:'', count:0};
+  pw[word].count++;
+  saveProblemWords(pw);
+  renderProblemWords();
+}
+function renderProblemWords(){
+  const pw=loadProblemWords();
+  const words=Object.keys(pw);
+  const table=document.getElementById('pwTable');
+  const body=document.getElementById('pwBody');
+  const empty=document.getElementById('pwEmpty');
+  if(!words.length){ table.style.display='none'; empty.style.display='block'; return; }
+  table.style.display='table'; empty.style.display='none';
+  words.sort((a,b)=>pw[b].count-pw[a].count);
+  body.innerHTML = words.map(w=>`
+    <tr>
+      <td class="en">${w}</td>
+      <td>${pw[w].ru}</td>
+      <td class="cnt">${pw[w].count}</td>
+      <td><button class="rm-x" onclick="removeProblemWord('${w}')" title="убрать">✕</button></td>
+    </tr>`).join('');
+}
+function removeProblemWord(w){
+  const pw=loadProblemWords(); delete pw[w]; saveProblemWords(pw); renderProblemWords();
+}
+function clearProblemWords(){
+  saveProblemWords({}); renderProblemWords();
+}
+function toggleLog(){
+  const box=document.getElementById('logBox');
+  box.style.display = box.style.display==='block' ? 'none':'block';
+}
+function renderLog(){
+  const log=loadLog();
+  const box=document.getElementById('logBox');
+  if(!log.length){ box.innerHTML='<div class="pw-empty">Ответов пока нет.</div>'; return; }
+  box.innerHTML = log.slice(-25).reverse().map(e=>
+    `<div>${e.correct?'✅':'❌'} <strong>${e.exercise}</strong> · вы написали «${e.value}» ${e.correct?'':'· верно: '+e.answer}</div>`
+  ).join('');
+}
+function clearAllProgress(){
+  if(!confirm('Сбросить весь прогресс (ошибки и журнал ответов) в этом браузере?')) return;
+  try{ localStorage.removeItem('vocab_problemWords'); localStorage.removeItem('vocab_answerLog'); localStorage.removeItem('vocab_lc'); }catch(e){}
+  renderProblemWords(); renderLog();
+  document.querySelectorAll('.answer-input').forEach(i=>i.value='');
+  document.querySelectorAll('.feedback').forEach(f=>{f.textContent=''; f.className='feedback';});
+  document.querySelectorAll('.syll-btn').forEach(b=>b.classList.remove('chosen','correct','wrong'));
+}
+
+function toggleTheme(){
+  const root=document.documentElement;
+  const cur=root.getAttribute('data-theme');
+  root.setAttribute('data-theme', cur==='dark'?'light':'dark');
+}
+
+/* ------------------------------------------------------ GENERIC CHECKER ------------------------------------------------------ */
+const ITEM_REGISTRY = {}; // inputId -> {answers:[], display, word, exerciseLabel}
+let uid=0;
+function nextId(prefix){ uid++; return prefix+'_'+uid; }
+
+function buildTypeItem(exListEl, exerciseLabel, idx, opts){
+  // opts: {promptHTML, answers[], display, word, audioText}
+  const inputId = nextId('inp');
+  ITEM_REGISTRY[inputId] = {answers: opts.answers.map(normalize), display: opts.display, word: opts.word, exerciseLabel};
+  const row = document.createElement('div');
+  row.className='item';
+  row.innerHTML = `
+    <div class="item-num">${idx+1}</div>
+    <div class="item-body">
+      <div class="item-prompt">${opts.promptHTML}</div>
+      <div class="answer-row">
+        ${opts.audioText?`<button class="btn-audio" onclick="speak('${opts.audioText.replace(/'/g,"\\'")}')">🔊 Слушать</button>`:''}
+        <input type="text" class="answer-input" id="${inputId}" placeholder="введите слово..." autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter'){checkItem('${inputId}');}">
+        <button class="btn-check" onclick="checkItem('${inputId}')">Проверить</button>
+        <button class="btn-show" onclick="showAnswer('${inputId}')">Показать ответ</button>
+      </div>
+      <div class="feedback" id="${inputId}_fb"></div>
+    </div>`;
+  exListEl.appendChild(row);
+}
+function checkItem(inputId){
+  const reg = ITEM_REGISTRY[inputId];
+  if(!reg) return;
+  const input = document.getElementById(inputId);
+  const fb = document.getElementById(inputId+'_fb');
+  const val = input.value;
+  const ok = reg.answers.includes(normalize(val));
+  fb.textContent = ok ? '✅ Верно!' : '❌ Пока не то — попробуйте ещё раз.';
+  fb.className = 'feedback ' + (ok?'ok':'no');
+  if(!ok) addMistake(reg.word);
+  pushLog({exercise: reg.exerciseLabel, value: val||'(пусто)', correct: ok, answer: reg.display});
+}
+function showAnswer(inputId){
+  const reg = ITEM_REGISTRY[inputId];
+  const fb = document.getElementById(inputId+'_fb');
+  fb.textContent = 'Ответ: ' + reg.display;
+  fb.className = 'feedback';
+}
+
+/* -------------------------------------------------------- RENDER INTRO --------------------------------------------------------- */
+function renderIntro(){
+  const grid=document.getElementById('vocabGrid');
+  grid.innerHTML = ALL_WORDS.map(w=>`
+    <div class="vcard">
+      <div class="en">${w.en}<span class="tag ${w.cat}">${w.cat==='nature'?'природа':'погода'}</span></div>
+      <div class="ipa">/${w.ipa}/</div>
+      <div class="ru">${w.ru}</div>
+      <button class="speak" onclick="speak('${w.audio.replace(/'/g,"\\'")}')">🔊 Слушать</button>
+    </div>`).join('');
+}
+
+/* ------------------------------------------------------- EXERCISE 1: UNSCRAMBLE ------------------------------------------------ */
+function renderEx1(){
+  const words = shuffle(['mountain','volcano','waterfall','forest','desert','cloudy','foggy','snowing']);
+  const list = document.getElementById('ex1list');
+  words.forEach((w,idx)=>{
+    const info=WORD_MAP[w];
+    buildTypeItem(list, 'Ex1 Unscramble', idx, {
+      promptHTML: `<span class="scramble-letters">${scrambleWord(w)}</span><br><span class="hint">перевод: ${info.ru}</span>`,
+      answers: [w, ...info.alt],
+      display: w,
+      word: w
+    });
+  });
+}
+
+/* -------------------------------------------------------- EXERCISE 2: LISTEN & WRITE -------------------------------------------- */
+function renderEx2(){
+  const words = shuffle(['river','lake','sea','ocean','windy','sunny','dry','wet']);
+  const list = document.getElementById('ex2list');
+  words.forEach((w,idx)=>{
+    const info=WORD_MAP[w];
+    buildTypeItem(list, 'Ex2 Listen&Write', idx, {
+      promptHTML: `<span class="hint">Нажмите «Слушать» и запишите слово по буквам. Перевод: ${info.ru}</span>`,
+      answers: [w, ...info.alt],
+      display: w,
+      word: w,
+      audioText: info.audio
+    });
+  });
+}
+
+/* --------------------------------------------------------- EXERCISE 3: STRESS ---------------------------------------------------- */
+const STRESS_ITEMS = [
+  {word:'mountain', syll:['moun','tain'], stress:0},
+  {word:'volcano', syll:['vol','ca','no'], stress:1},
+  {word:'desert', syll:['des','ert'], stress:0},
+  {word:'ocean', syll:['o','cean'], stress:0},
+  {word:'forest', syll:['for','est'], stress:0},
+  {word:'waterfall', syll:['wa','ter','fall'], stress:0},
+  {word:'cloudy', syll:['cloud','y'], stress:0},
+  {word:'windy', syll:['wind','y'], stress:0},
+];
+function renderEx3(){
+  const items = shuffle(STRESS_ITEMS);
+  const list = document.getElementById('ex3list');
+  list.innerHTML='';
+  items.forEach((it,idx)=>{
+    const info = WORD_MAP[it.word];
+    const div = document.createElement('div');
+    div.className='stress-item';
+    const btnsId = 'stress_'+idx;
+    div.innerHTML = `
+      <div class="item-prompt"><strong>${it.word}</strong> <span class="hint">(${info?info.ru:''})</span></div>
+      <div class="syll-row" id="${btnsId}">
+        ${it.syll.map((s,si)=>`<button class="syll-btn" onclick="checkStress('${btnsId}', ${si}, ${it.stress})">${s}</button>`).join('')}
+      </div>
+      <div class="feedback" id="${btnsId}_fb"></div>`;
+    list.appendChild(div);
+  });
+}
+function checkStress(rowId, chosen, correct){
+  const row = document.getElementById(rowId);
+  const btns = row.querySelectorAll('.syll-btn');
+  btns.forEach((b,i)=>{
+    b.classList.remove('chosen');
+    if(i===chosen) b.classList.add('chosen');
+  });
+  const fb = document.getElementById(rowId+'_fb');
+  const ok = chosen===correct;
+  if(ok){
+    btns[chosen].classList.add('correct');
+    fb.textContent='✅ Верно!'; fb.className='feedback ok';
+  }else{
+    btns[chosen].classList.add('wrong');
+    btns[correct].classList.add('correct');
+    fb.textContent='❌ Ударение падает на другой слог.'; fb.className='feedback no';
+    const wordGuess = row.closest('.stress-item').querySelector('strong').textContent;
+    addMistake(wordGuess);
+  }
+  pushLog({exercise:'Ex3 Stress', value:'слог '+(chosen+1), correct: ok, answer:'слог '+(correct+1)});
+}
+
+/* --------------------------------------------------------- EXERCISE 4: GUESS THE WORD --------------------------------------------- */
+const RIDDLES = [
+  {word:'volcano', text:'I am a huge mass of rock. Sometimes I explode and spit fire and ash into the sky.'},
+  {word:'sky', text:'I am blue on a sunny day and grey when it rains. You always look up to see me.'},
+  {word:'forest', text:'I am full of trees, and many animals live inside me.'},
+  {word:'waterfall', text:'Water falls down from a high place — that is me!'},
+  {word:'desert', text:'I am hot, dry and full of sand. Camels can live in me.'},
+  {word:'grass', text:'I am small and green, and I grow under your feet in the park.'},
+  {word:'hill', text:'I am not as big as a mountain, but bigger than a field.'},
+  {word:'ocean', text:'Ships sail across me for many days. I am bigger than a sea.'},
+];
+function renderEx4(){
+  const items = shuffle(RIDDLES);
+  const list = document.getElementById('ex4list');
+  items.forEach((it,idx)=>{
+    const info=WORD_MAP[it.word];
+    buildTypeItem(list, 'Ex4 Guess', idx, {
+      promptHTML: `“${it.text}”`,
+      answers: [it.word, ...(info?info.alt:[])],
+      display: it.word,
+      word: it.word
+    });
+  });
+}
+
+/* --------------------------------------------------------- EXERCISE 5: DEFINITION ----------------------------------------------- */
+const DEFINITIONS = [
+  {word:'lake', text:'A large area of water that is surrounded by land.'},
+  {word:'river', text:'A long stream of water that flows across land into a sea or a lake.'},
+  {word:'sea', text:'A large body of salt water, smaller than an ocean.'},
+  {word:'cave', text:'An empty space inside a mountain or under the ground.'},
+  {word:'tree', text:'A tall plant with a wooden trunk, branches and leaves.'},
+  {word:'field', text:'An open area of land used for growing crops or keeping animals.'},
+  {word:'sunny', text:'The kind of weather when the sun is shining brightly.'},
+  {word:'raining', text:'The kind of weather when drops of water fall from the clouds.'},
+];
+function renderEx5(){
+  const items = shuffle(DEFINITIONS);
+  const list = document.getElementById('ex5list');
+  items.forEach((it,idx)=>{
+    const info=WORD_MAP[it.word];
+    buildTypeItem(list, 'Ex5 Definition', idx, {
+      promptHTML: it.text,
+      answers: [it.word, ...(info?info.alt:[])],
+      display: it.word,
+      word: it.word
+    });
+  });
+}
+
+/* --------------------------------------------------------- EXERCISE 6: BUILD THE CHUNK ------------------------------------------- */
+const CHUNKS = [
+  {word:'sunny', text:'___ weather is perfect for a picnic.'},
+  {word:'foggy', text:'It was a ___ morning — we could hardly see the road.'},
+  {word:'warm', text:'She made some ___ soup on a cold evening.'},
+  {word:'windy', text:'It is so ___ today — hold on to your hat!'},
+  {word:'wet', text:'The ground was ___ after the rain.'},
+  {word:'dry', text:'The air in the desert is always very ___.'},
+  {word:'cool', text:'It was a ___ autumn day, not too hot and not too cold.'},
+  {word:'cloudy', text:'The sky is grey and ___ this morning.'},
+];
+function renderEx6(){
+  const bankWords = shuffle(CHUNKS.map(c=>c.word));
+  document.getElementById('ex6bank').innerHTML = bankWords.map(w=>`<span>${w}</span>`).join('');
+  const items = shuffle(CHUNKS);
+  const list = document.getElementById('ex6list');
+  items.forEach((it,idx)=>{
+    buildTypeItem(list, 'Ex6 Chunk', idx, {
+      promptHTML: it.text.replace('___','<span class="blank">______</span>'),
+      answers: [it.word],
+      display: it.word,
+      word: it.word
+    });
+  });
+}
+
+/* --------------------------------------------------------- EXERCISE 7: MINI-SITUATIONS ------------------------------------------- */
+const SITUATIONS = [
+  {word:'mountain', alt:['mountains'], text:'We climbed to the top of the ___ and saw the whole city below.'},
+  {word:'lake', text:'The children are swimming in the ___ near our house.'},
+  {word:'river', text:'We went fishing in the ___ that runs through the village.'},
+  {word:'cave', text:'Bears sometimes sleep in a ___ during the winter.'},
+  {word:'field', text:'The farmer grows wheat in this ___.'},
+  {word:'tree', text:'Birds built a nest high up in the ___.'},
+  {word:'volcano', text:'The ___ erupted and covered the village in ash.'},
+  {word:'ocean', text:'Ships crossed the ___ for many days before reaching land.'},
+];
+function renderEx7(){
+  const items = shuffle(SITUATIONS);
+  const list = document.getElementById('ex7list');
+  items.forEach((it,idx)=>{
+    buildTypeItem(list, 'Ex7 Situations', idx, {
+      promptHTML: it.text.replace('___','<span class="blank">______</span>'),
+      answers: [it.word, ...(it.alt||[])],
+      display: it.word,
+      word: it.word
+    });
+  });
+}
+
+/* --------------------------------------------------------- EXERCISE 8: RANK THEM ------------------------------------------------- */
+function renderRankGroup(containerId, title, note, correctOrder){
+  const el = document.getElementById(containerId);
+  const shuffled = shuffle(correctOrder);
+  const rowsId = containerId+'_rows';
+  el.innerHTML = `
+    <h4>${title}</h4>
+    <p class="rank-note">${note}</p>
+    <div id="${rowsId}">
+      ${shuffled.map(w=>`
+        <div class="rank-row">
+          <span class="rword">${w}</span>
+          <input type="number" min="1" max="${correctOrder.length}" data-word="${w}">
+        </div>`).join('')}
+    </div>
+    <div class="answer-row" style="margin-top:6px;">
+      <button class="btn-check" onclick="checkRank('${rowsId}', ${JSON.stringify(correctOrder)}, '${containerId}')">Проверить</button>
+      <button class="btn-show" onclick="showRankAnswer('${containerId}', ${JSON.stringify(correctOrder)})">Показать ответ</button>
+    </div>
+    <div class="feedback" id="${containerId}_fb"></div>`;
+}
+function checkRank(rowsId, correctOrder, containerId){
+  const rows = document.querySelectorAll('#'+rowsId+' input');
+  let ok=true;
+  rows.forEach(inp=>{
+    const w = inp.dataset.word;
+    const shouldBe = correctOrder.indexOf(w)+1;
+    if(parseInt(inp.value,10)!==shouldBe){ ok=false; }
+  });
+  const fb = document.getElementById(containerId+'_fb');
+  fb.textContent = ok ? '✅ Верно!' : '❌ Порядок не совсем такой — попробуйте ещё раз.';
+  fb.className='feedback '+(ok?'ok':'no');
+  if(!ok) correctOrder.forEach(w=>addMistake(w));
+  pushLog({exercise:'Ex8 Rank ('+containerId+')', value:'ранжирование', correct: ok, answer: correctOrder.join(' → ')});
+}
+function showRankAnswer(containerId, correctOrder){
+  document.getElementById(containerId+'_fb').textContent = 'Порядок: ' + correctOrder.join(' → ');
+}
+function renderEx8(){
+  renderRankGroup('rankA', 'От меньшего водоёма к большему', 'river → lake → sea → ocean', ['river','lake','sea','ocean']);
+  renderRankGroup('rankB', 'От низкого рельефа к высокому', 'field → hill → mountain → volcano (условно, для практики)', ['field','hill','mountain','volcano']);
+}
+
+/* ------------------------------------------------------- RETRIEVAL + LEAST CONFIDENT --------------------------------------------- */
+function checkRetrieval(){
+  const raw = document.getElementById('retrievalInput').value;
+  const tokens = raw.split(/[,;\n]+/).map(normalize).filter(Boolean);
+  const found = new Set();
+  tokens.forEach(t=>{
+    ALL_WORDS.forEach(w=>{
+      if(normalize(w.en)===t || w.alt.map(normalize).includes(t)) found.add(w.en);
+    });
+  });
+  const box = document.getElementById('retrievalScore');
+  box.style.display='block';
+  box.innerHTML = `Вы вспомнили <strong>${found.size} из ${ALL_WORDS.length}</strong> слов.` +
+    (found.size ? `<br><span class="hint">Найдено: ${[...found].join(', ')}</span>` : '');
+  pushLog({exercise:'Retrieval', value: raw||'(пусто)', correct: found.size>0, answer: found.size+' / '+ALL_WORDS.length});
+}
+function revealAllWords(){
+  const box = document.getElementById('retrievalScore');
+  box.style.display='block';
+  box.innerHTML = 'Все слова урока: ' + ALL_WORDS.map(w=>w.en).join(', ');
+}
+
+function renderLCGrid(){
+  const grid = document.getElementById('lcGrid');
+  grid.innerHTML = ALL_WORDS.map(w=>`
+    <label><input type="checkbox" value="${w.en}" class="lc-check"> ${w.en} <span class="hint">(${w.ru})</span></label>`).join('');
+  grid.addEventListener('change', ()=>{
+    const checked = grid.querySelectorAll('.lc-check:checked');
+    if(checked.length>3){ checked[0].checked=false; }
+  });
+}
+function buildLCTest(){
+  const checked = [...document.querySelectorAll('.lc-check:checked')].map(c=>c.value);
+  const area = document.getElementById('lcTestArea');
+  if(!checked.length){ area.innerHTML='<p class="hint">Отметьте до 3 слов галочками выше.</p>'; return; }
+  safeSet('vocab_lc', checked);
+  area.innerHTML = '<h4 style="margin-bottom:6px;">Мини-тест по выбранным словам</h4>';
+  const list = document.createElement('div');
+  area.appendChild(list);
+  checked.forEach((w,idx)=>{
+    const info=WORD_MAP[w];
+    // alternate between unscramble and definition-style clue for variety
+    if(idx%2===0){
+      buildTypeItem(list, 'LC-test', idx, {
+        promptHTML: `<span class="scramble-letters">${scrambleWord(w)}</span><br><span class="hint">перевод: ${info.ru}</span>`,
+        answers: [w, ...info.alt], display:w, word:w
+      });
+    } else {
+      buildTypeItem(list, 'LC-test', idx, {
+        promptHTML: `<span class="hint">Нажмите «Слушать» и впишите слово (${info.ru}).</span>`,
+        answers: [w, ...info.alt], display:w, word:w, audioText: info.audio
+      });
+    }
+  });
+}
+
+/* ------------------------------------------------------------ INIT ------------------------------------------------------------ */
+function init(){
+  renderIntro();
+  renderEx1(); renderEx2(); renderEx3(); renderEx4();
+  renderEx5(); renderEx6(); renderEx7(); renderEx8();
+  renderLCGrid();
+  renderProblemWords();
+  renderLog();
+}
+init();
+</script>
+</body>
+</html>
