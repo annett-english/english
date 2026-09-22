@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Money Talk — Tips, Bills & Salary</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F6F4EE;
+    --panel:#FFFFFF;
+    --ink:#22291F;
+    --ink-soft:#5B5F52;
+    --teal:#1F6F5C;
+    --teal-dark:#123D33;
+    --gold:#B8863B;
+    --gold-soft:#EFE3C8;
+    --border:#DED8C6;
+    --error:#B23A2E;
+    --error-bg:#FBEAE7;
+    --success:#276B45;
+    --success-bg:#E7F1E9;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Source Sans 3",sans-serif;
+    line-height:1.5;
+    padding-bottom:80px;
+  }
+  h1,h2,h3,.display{font-family:"Fraunces",serif;}
+  .hero{
+    background:var(--teal-dark);
+    color:#F3EFE2;
+    padding:44px 24px 38px;
+  }
+  .hero-inner{max-width:1040px;margin:0 auto;}
+  .hero h1{
+    font-size:clamp(28px,4vw,42px);
+    font-weight:600;
+    margin:0 0 10px;
+    letter-spacing:-0.01em;
+  }
+  .hero p{
+    max-width:640px;
+    color:#D9D3BE;
+    font-size:16px;
+    margin:0 0 18px;
+  }
+  .audio-check{
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+    background:rgba(255,255,255,0.08);
+    border:1px solid rgba(255,255,255,0.25);
+    border-radius:8px;
+    padding:10px 14px;
+    font-size:14px;
+  }
+  .audio-check button{
+    background:var(--gold);
+    color:#2A200E;
+    border:none;
+    border-radius:6px;
+    padding:7px 12px;
+    font-weight:600;
+    cursor:pointer;
+    font-size:14px;
+  }
+  .audio-check button:hover{filter:brightness(1.06);}
+  #audioStatus{color:#D9D3BE;}
+  #audioStatus.ok{color:#9FD9B4;}
+  #audioStatus.bad{color:#E9A79A;}
+
+  .page{
+    max-width:1040px;
+    margin:0 auto;
+    padding:28px 24px 0;
+    display:flex;
+    gap:28px;
+    align-items:flex-start;
+  }
+  main{flex:1;min-width:0;}
+  .sidebar{
+    width:250px;
+    flex-shrink:0;
+    position:sticky;
+    top:20px;
+  }
+  @media (max-width:860px){
+    .page{flex-direction:column;}
+    .sidebar{width:100%;position:static;}
+  }
+
+  .card{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:22px 24px;
+    margin-bottom:24px;
+  }
+  section.card h2{
+    font-size:21px;
+    font-weight:600;
+    margin:0 0 4px;
+    color:var(--teal-dark);
+  }
+  .ex-sub{
+    color:var(--ink-soft);
+    font-size:14px;
+    margin:0 0 16px;
+  }
+
+  /* Vocab intro */
+  .vocab-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+    gap:12px;
+  }
+  .vocab-item{
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:12px 14px;
+    background:#FBFAF6;
+  }
+  .vocab-word{font-family:"Fraunces",serif;font-size:19px;font-weight:600;color:var(--teal-dark);}
+  .vocab-ipa{color:var(--gold);font-size:14px;margin-left:6px;}
+  .vocab-ru{color:var(--ink-soft);font-size:14px;margin:3px 0 8px;}
+  .listen-btn{
+    background:var(--teal);
+    color:#fff;
+    border:none;
+    border-radius:6px;
+    padding:6px 11px;
+    font-size:13px;
+    cursor:pointer;
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+  }
+  .listen-btn:hover{background:var(--teal-dark);}
+
+  /* Exercise items */
+  .item{
+    padding:13px 0;
+    border-bottom:1px solid var(--border);
+  }
+  .item:last-child{border-bottom:none;}
+  .item-num{color:var(--gold);font-weight:700;margin-right:6px;}
+  .item-text{margin-bottom:8px;}
+  .item input[type=text]{
+    width:100%;
+    max-width:340px;
+    padding:8px 10px;
+    border:1px solid var(--border);
+    border-radius:6px;
+    font-size:15px;
+    font-family:inherit;
+    background:#fff;
+  }
+  .item input[type=text]:focus{outline:2px solid var(--teal);outline-offset:1px;}
+  .item input.correct{border-color:var(--success);background:var(--success-bg);}
+  .item input.incorrect{border-color:var(--error);background:var(--error-bg);}
+  .feedback-icon{margin-left:8px;font-weight:600;font-size:14px;}
+  .feedback-icon.ok{color:var(--success);}
+  .feedback-icon.bad{color:var(--error);}
+  .answer-reveal{
+    display:none;
+    margin-top:6px;
+    font-size:13.5px;
+    color:var(--teal-dark);
+    background:var(--gold-soft);
+    padding:4px 9px;
+    border-radius:5px;
+  }
+  .answer-reveal.show{display:inline-block;}
+
+  .mcq-options{display:flex;gap:8px;flex-wrap:wrap;}
+  .mcq-btn{
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:6px;
+    padding:7px 13px;
+    cursor:pointer;
+    font-size:14.5px;
+    font-family:inherit;
+  }
+  .mcq-btn:hover{border-color:var(--teal);}
+  .mcq-btn.selected{border-color:var(--teal);background:#EAF4F1;}
+  .mcq-btn.correct{border-color:var(--success);background:var(--success-bg);color:var(--success);}
+  .mcq-btn.incorrect{border-color:var(--error);background:var(--error-bg);color:var(--error);}
+
+  select.match-select{
+    padding:7px 9px;
+    border:1px solid var(--border);
+    border-radius:6px;
+    font-size:14.5px;
+    font-family:inherit;
+    background:#fff;
+  }
+  select.match-select.correct{border-color:var(--success);}
+  select.match-select.incorrect{border-color:var(--error);}
+
+  .btn-row{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;align-items:center;}
+  .btn{
+    border:none;
+    border-radius:7px;
+    padding:9px 16px;
+    font-size:14.5px;
+    font-weight:600;
+    cursor:pointer;
+    font-family:inherit;
+  }
+  .btn-primary{background:var(--teal);color:#fff;}
+  .btn-primary:hover{background:var(--teal-dark);}
+  .btn-ghost{background:transparent;color:var(--teal-dark);border:1px solid var(--border);}
+  .btn-ghost:hover{border-color:var(--teal);}
+  .score-tag{
+    font-size:14px;
+    color:var(--ink-soft);
+    margin-left:auto;
+  }
+  .score-tag b{color:var(--teal-dark);}
+
+  textarea{
+    width:100%;
+    min-height:64px;
+    padding:9px 11px;
+    border:1px solid var(--border);
+    border-radius:7px;
+    font-family:inherit;
+    font-size:14.5px;
+    resize:vertical;
+    background:#fff;
+  }
+  textarea:focus{outline:2px solid var(--teal);outline-offset:1px;}
+
+  .drill-cue{
+    display:inline-block;
+    background:var(--gold-soft);
+    color:var(--teal-dark);
+    padding:3px 9px;
+    border-radius:5px;
+    font-weight:600;
+    font-size:13.5px;
+    margin-bottom:6px;
+  }
+
+  /* Sidebar */
+  .sidebar .card{padding:16px 16px 18px;}
+  .sidebar h3{
+    font-family:"Fraunces",serif;
+    font-size:16px;
+    margin:0 0 4px;
+    color:var(--teal-dark);
+  }
+  .sidebar .ex-sub{font-size:12.5px;margin-bottom:10px;}
+  table.problem-table{width:100%;border-collapse:collapse;font-size:13.5px;}
+  table.problem-table th{
+    text-align:left;
+    color:var(--ink-soft);
+    font-weight:600;
+    padding-bottom:6px;
+    border-bottom:1px solid var(--border);
+  }
+  table.problem-table td{
+    padding:6px 0;
+    border-bottom:1px solid var(--border);
+  }
+  .mistake-count{
+    display:inline-block;
+    background:var(--error-bg);
+    color:var(--error);
+    border-radius:10px;
+    padding:1px 8px;
+    font-weight:700;
+    font-size:12.5px;
+  }
+  .empty-note{color:var(--ink-soft);font-size:13px;font-style:italic;}
+  .sidebar-total{
+    margin-top:14px;
+    padding-top:12px;
+    border-top:1px solid var(--border);
+    font-size:13.5px;
+    color:var(--ink-soft);
+  }
+
+  .word-check{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    border:1px solid var(--border);
+    border-radius:20px;
+    padding:5px 12px 5px 6px;
+    margin:4px 6px 4px 0;
+    font-size:14px;
+    cursor:pointer;
+    background:#fff;
+  }
+  .word-check input{margin:0;}
+  .word-check.checked{border-color:var(--teal);background:#EAF4F1;}
+  .word-check.disabled{opacity:0.35;cursor:not-allowed;}
+
+  #genTasks{margin-top:16px;}
+  .gen-block{
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:12px 14px;
+    margin-bottom:12px;
+    background:#FBFAF6;
+  }
+  .gen-block h4{margin:0 0 8px;font-family:"Fraunces",serif;font-size:16px;color:var(--teal-dark);}
+  .gen-block label{display:block;font-size:13px;color:var(--ink-soft);margin:8px 0 4px;}
+
+  .toast{
+    position:fixed;
+    bottom:22px;
+    left:50%;
+    transform:translateX(-50%);
+    background:var(--teal-dark);
+    color:#fff;
+    padding:11px 20px;
+    border-radius:8px;
+    font-size:14.5px;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity 0.25s ease;
+    z-index:50;
+    box-shadow:0 6px 18px rgba(0,0,0,0.18);
+  }
+  .toast.show{opacity:1;}
+
+  .footer-bar{
+    max-width:1040px;
+    margin:8px auto 0;
+    padding:0 24px;
+    display:flex;
+    justify-content:center;
+  }
+  .master-copy{
+    background:var(--gold);
+    color:#2A200E;
+    border:none;
+    border-radius:9px;
+    padding:13px 26px;
+    font-weight:700;
+    font-size:15.5px;
+    cursor:pointer;
+    box-shadow:0 4px 14px rgba(184,134,59,0.35);
+  }
+  .master-copy:hover{filter:brightness(1.05);}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <h1>Money Talk: Tips, Bills & Salary</h1>
+    <p>Практика лексики уровня A1–A2 по теме денег: tip, salary, bill, rent, insurance, earn, pay. Слушайте, пишите руками, проверяйте себя.</p>
+    <div class="audio-check">
+      <span id="audioStatus">Проверьте, что звук работает →</span>
+      <button onclick="testAudio()">🔊 Проверить аудио</button>
+    </div>
+  </div>
+</div>
+
+<div class="page">
+  <main>
+
+    <!-- VOCAB INTRO -->
+    <section class="card">
+      <h2>Слова урока</h2>
+      <p class="ex-sub">Нажмите 🔊, послушайте произношение (голос Google US English), повторите вслух, затем переходите к упражнениям.</p>
+      <div class="vocab-grid" id="vocabGrid"></div>
+    </section>
+
+    <!-- EX 1: UNSCRAMBLE -->
+    <section class="card" id="ex1">
+      <h2>1. Unscramble the word</h2>
+      <p class="ex-sub">Составьте слово из перемешанных букв.</p>
+      <div id="ex1-items"></div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="checkExercise('ex1')">Проверить</button>
+        <button class="btn btn-ghost" onclick="showAnswers('ex1')">Показать ответы</button>
+        <span class="score-tag" id="ex1-score"></span>
+      </div>
+    </section>
+
+    <!-- EX 2: TRANSLATE -->
+    <section class="card" id="ex2">
+      <h2>2. Translate into English</h2>
+      <p class="ex-sub">Переведите словосочетание с русского на английский.</p>
+      <div id="ex2-items"></div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="checkExercise('ex2')">Проверить</button>
+        <button class="btn btn-ghost" onclick="showAnswers('ex2')">Показать ответы</button>
+        <span class="score-tag" id="ex2-score"></span>
+      </div>
+    </section>
+
+    <!-- EX 3: DICTATION -->
+    <section class="card" id="ex3">
+      <h2>3. Listen & write</h2>
+      <p class="ex-sub">Нажмите 🔊, прослушайте фразу и запишите её по звуку.</p>
+      <div id="ex3-items"></div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="checkExercise('ex3')">Проверить</button>
+        <button class="btn btn-ghost" onclick="showAnswers('ex3')">Показать ответы</button>
+        <span class="score-tag" id="ex3-score"></span>
+      </div>
+    </section>
+
+    <!-- EX 4: COLLOCATIONS -->
+    <section class="card" id="ex4">
+      <h2>4. Complete the collocation</h2>
+      <p class="ex-sub">Вставьте пропущенное слово, чтобы получилось верное словосочетание.</p>
+      <div id="ex4-items"></div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="checkExercise('ex4')">Проверить</button>
+        <button class="btn btn-ghost" onclick="showAnswers('ex4')">Показать ответы</button>
+        <span class="score-tag" id="ex4-score"></span>
+      </div>
+    </section>
+
+    <!-- EX 5: VERB TENSES -->
+    <section class="card" id="ex5">
+      <h2>5. Put the verb in the correct form</h2>
+      <p class="ex-sub">Раскройте скобки, используя нужное время.</p>
+      <div id="ex5-items"></div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="checkExercise('ex5')">Проверить</button>
+        <button class="btn btn-ghost" onclick="showAnswers('ex5')">Показать ответы</button>
+        <span class="score-tag" id="ex5-score"></span>
+      </div>
+    </section>
+
+    <!-- EX 6: MATCH HALVES -->
+    <section class="card" id="ex6">
+      <h2>6. Match the two halves</h2>
+      <p class="ex-sub">Выберите подходящее окончание для каждого слова из списка.</p>
+      <div id="ex6-items"></div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="checkExercise('ex6')">Проверить</button>
+        <button class="btn btn-ghost" onclick="showAnswers('ex6')">Показать ответы</button>
+        <span class="score-tag" id="ex6-score"></span>
+      </div>
+    </section>
+
+    <!-- EX 7: WHICH WORD FITS -->
+    <section class="card" id="ex7">
+      <h2>7. Which word fits?</h2>
+      <p class="ex-sub">Выберите слово, которое подходит по смыслу.</p>
+      <div id="ex7-items"></div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="checkExercise('ex7')">Проверить</button>
+        <button class="btn btn-ghost" onclick="showAnswers('ex7')">Показать ответы</button>
+        <span class="score-tag" id="ex7-score"></span>
+      </div>
+    </section>
+
+    <!-- EXTRA A: MINI SITUATIONS -->
+    <section class="card" id="exA">
+      <h2>Complete the mini-situations</h2>
+      <p class="ex-sub">Своими словами закончите ситуации (1–2 предложения). Готовых ответов нет — это ваша идея.</p>
+      <div id="exA-items"></div>
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="copySection('exA')">📋 Скопировать мои ответы</button>
+      </div>
+    </section>
+
+    <!-- EXTRA B: REPEAT & CHANGE -->
+    <section class="card" id="exB">
+      <h2>Drill: Repeat & Change</h2>
+      <p class="ex-sub">Модель: <em>«I usually pay my bills online.»</em> — замените ключевое слово на слово-подсказку и напишите своё предложение по образцу.</p>
+      <div id="exB-items"></div>
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="copySection('exB')">📋 Скопировать мои ответы</button>
+      </div>
+    </section>
+
+    <!-- EXTRA C: RETRIEVAL -->
+    <section class="card" id="exC">
+      <h2>Write as many words as you remember</h2>
+      <p class="ex-sub">Не подглядывая в начало страницы, напишите через запятую все слова урока, которые вспомните.</p>
+      <textarea id="retrieveBox" placeholder="tip, salary, ..."></textarea>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="checkRetrieval()">Проверить</button>
+        <span class="score-tag" id="retrieveScore"></span>
+      </div>
+      <div id="retrieveResult" style="margin-top:10px;font-size:14px;"></div>
+    </section>
+
+    <!-- EXTRA D: 3 LEAST CONFIDENT WORDS -->
+    <section class="card" id="exD">
+      <h2>Choose 3 words you are least confident with</h2>
+      <p class="ex-sub">Отметьте до 3 слов, в которых вы не уверены, и нажмите «Сгенерировать задания».</p>
+      <div id="wordChecks"></div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="generateTasks()">Сгенерировать задания</button>
+        <button class="btn btn-ghost" onclick="copySection('genTasks')">📋 Скопировать мои ответы</button>
+      </div>
+      <div id="genTasks"></div>
+    </section>
+
+  </main>
+
+  <aside class="sidebar">
+    <div class="card">
+      <h3>⚠️ Проблемные слова</h3>
+      <p class="ex-sub">Слова, в которых вы ошиблись, появятся здесь автоматически.</p>
+      <table class="problem-table" id="problemTable" style="display:none;">
+        <thead><tr><th>Слово</th><th>Ошибок</th></tr></thead>
+        <tbody id="problemBody"></tbody>
+      </table>
+      <p class="empty-note" id="problemEmpty">Пока нет ошибок — так держать!</p>
+      <div class="sidebar-total" id="sidebarTotal"></div>
+    </div>
+  </aside>
+</div>
+
+<div class="footer-bar">
+  <button class="master-copy" onclick="copyAllAnswers()">📋 Скопировать ВСЕ мои ответы (для отправки преподавателю)</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* =========================================================
+   VOICE / AUDIO
+   ========================================================= */
+let chosenVoice = null;
+function pickVoice(){
+  const voices = speechSynthesis.getVoices();
+  chosenVoice =
+    voices.find(v => v.name.includes('Google US English')) ||
+    voices.find(v => v.lang === 'en-US') ||
+    voices.find(v => v.lang && v.lang.startsWith('en')) ||
+    null;
+}
+if ('speechSynthesis' in window){
+  pickVoice();
+  speechSynthesis.onvoiceschanged = pickVoice;
+}
+function speak(text){
+  if (!('speechSynthesis' in window)){
+    toast('Ваш браузер не поддерживает озвучку. Попробуйте Chrome.');
+    return;
+  }
+  if (!chosenVoice) pickVoice();
+  const u = new SpeechSynthesisUtterance(text);
+  if (chosenVoice) u.voice = chosenVoice;
+  u.lang = 'en-US';
+  u.rate = 0.92;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+}
+function testAudio(){
+  const status = document.getElementById('audioStatus');
+  if (!('speechSynthesis' in window)){
+    status.textContent = '❌ Озвучка не поддерживается этим браузером.';
+    status.className = 'bad';
+    return;
+  }
+  status.textContent = '⏳ Проверяем...';
+  status.className = '';
+  const u = new SpeechSynthesisUtterance('This is an audio test. Can you hear me?');
+  if (chosenVoice) u.voice = chosenVoice;
+  u.lang = 'en-US';
+  u.onend = () => {
+    status.textContent = chosenVoice
+      ? '✅ Аудио работает (голос: ' + chosenVoice.name + ')'
+      : '✅ Аудио работает (стандартный голос — Google US English не найден, но звук идёт)';
+    status.className = 'ok';
+  };
+  u.onerror = () => {
+    status.textContent = '❌ Ошибка воспроизведения. Проверьте звук устройства.';
+    status.className = 'bad';
+  };
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+}
+
+/* =========================================================
+   DATA
+   ========================================================= */
+const VOCAB = [
+  {word:'tip', ipa:'/tɪp/', ru:'чаевые'},
+  {word:'salary', ipa:'/ˈsæləri/', ru:'зарплата'},
+  {word:'bill', ipa:'/bɪl/', ru:'счёт'},
+  {word:'rent', ipa:'/rent/', ru:'аренда / квартплата'},
+  {word:'insurance', ipa:'/ɪnˈʃʊərəns/', ru:'страховка'},
+  {word:'earn', ipa:'/ɜːrn/', ru:'зарабатывать'},
+  {word:'pay', ipa:'/peɪ/', ru:'платить'}
+];
+
+const EX1 = [ // unscramble
+  {scrambled:'PTI', answer:'tip', word:'tip'},
+  {scrambled:'ALYRSA', answer:'salary', word:'salary'},
+  {scrambled:'LLBI', answer:'bill', word:'bill'},
+  {scrambled:'TENR', answer:'rent', word:'rent'},
+  {scrambled:'RACENUSIN', answer:'insurance', word:'insurance'},
+  {scrambled:'RANE', answer:'earn', word:'earn'},
+  {scrambled:'YAP', answer:'pay', word:'pay'},
+  {scrambled:'NOMEY', answer:'money', word:'money'}
+];
+
+const EX2 = [ // translate ru -> en
+  {ru:'хорошая зарплата', answer:'a good salary', word:'salary'},
+  {ru:'оплачивать счёт за воду', answer:'pay a water bill', word:'bill'},
+  {ru:'оставить чаевые', answer:'leave a tip', word:'tip'},
+  {ru:'оформить страховку', answer:'get insurance', word:'insurance'},
+  {ru:'платить за аренду', answer:'pay rent', word:'rent'},
+  {ru:'много зарабатывать', answer:'earn a lot of money', word:'earn'},
+  {ru:'страховка автомобиля', answer:'car insurance', word:'insurance'},
+  {ru:'высокая зарплата', answer:'a high salary', word:'salary'}
+];
+
+const EX3 = [ // dictation
+  {say:'pay the bills', answer:'pay the bills', word:'bill'},
+  {say:'a small tip', answer:'a small tip', word:'tip'},
+  {say:'health insurance', answer:'health insurance', word:'insurance'},
+  {say:'a low salary', answer:'a low salary', word:'salary'},
+  {say:'pay the rent', answer:'pay the rent', word:'rent'},
+  {say:'earn extra money', answer:'earn extra money', word:'earn'},
+  {say:'give someone a tip', answer:'give someone a tip', word:'tip'}
+];
+
+const EX4 = [ // collocation gap fill
+  {before:'Can you', blankHint:'pay', after:'the electricity bill today?', answer:'pay', word:'bill'},
+  {before:'She always leaves a big', blankHint:'', after:'at restaurants.', answer:'tip', word:'tip'},
+  {before:'I need to buy travel', blankHint:'', after:'before my trip.', answer:'insurance', word:'insurance'},
+  {before:'He', blankHint:'', after:'a very high salary at his new job.', answer:'earns', word:'salary'},
+  {before:'We pay €800 in', blankHint:'', after:'every month.', answer:'rent', word:'rent'},
+  {before:'Do you have health', blankHint:'', after:'?', answer:'insurance', word:'insurance'},
+  {before:'My brother pays his', blankHint:'', after:'online every month.', answer:'bills', word:'bill'},
+  {before:'Waiters give good service, so people', blankHint:'', after:'them a tip.', answer:'give', word:'tip'}
+];
+
+const EX5 = [ // verb tenses
+  {before:'She', verb:'earn', tense:'Present Simple', after:'a good salary every month.', answer:'earns', word:'earn'},
+  {before:'They', verb:'pay', tense:'Past Simple', after:'the rent yesterday.', answer:'paid', word:'pay'},
+  {before:'I', verb:'get', tense:'Future Simple', after:'my salary next Friday.', answer:'will get', word:'salary'},
+  {before:'We', verb:'pay', tense:'Present Continuous', after:'our bills online right now.', answer:'are paying', word:'bill'},
+  {before:'He', verb:'earn', tense:'Past Simple', after:'a lot of money last year.', answer:'earned', word:'earn'},
+  {before:'She', verb:"not / pay", tense:'Present Perfect', after:'the electricity bill yet.', answer:"hasn't paid", word:'bill'},
+  {before:'I always', verb:'leave', tense:'Present Simple', after:'a tip at restaurants.', answer:'leave', word:'tip'}
+];
+
+const EX6 = [ // match halves
+  {start:'pay', answer:'the rent'},
+  {start:'leave', answer:'a big tip'},
+  {start:'buy', answer:'travel insurance'},
+  {start:'earn', answer:'extra money'},
+  {start:'get', answer:'a high salary'},
+  {start:'have', answer:'health insurance'},
+  {start:'give', answer:'someone a tip'}
+];
+const EX6_OPTIONS = ['the rent','a big tip','travel insurance','extra money','a high salary','health insurance','someone a tip'];
+
+const EX7 = [ // which word fits (context MCQ)
+  {sentence:'I always ___ a tip when the service is good.', options:['leave','pay','have'], answer:'leave', word:'tip'},
+  {sentence:'My father ___ a good salary at his company.', options:['earns','pays','leaves'], answer:'earns', word:'salary'},
+  {sentence:'We need to ___ the water bill before Friday.', options:['pay','earn','give'], answer:'pay', word:'bill'},
+  {sentence:'Every month I ___ €700 in rent.', options:['pay','earn','buy'], answer:'pay', word:'rent'},
+  {sentence:"It's important to ___ health insurance when you travel.", options:['have','leave','earn'], answer:'have', word:'insurance'},
+  {sentence:'He wants to ___ extra money on weekends.', options:['earn','pay','give'], answer:'earn', word:'earn'},
+  {sentence:'Could you ___ me a small tip, please?', options:['give','pay','buy'], answer:'give', word:'tip'},
+  {sentence:'She decided to ___ car insurance last week.', options:['buy','leave','earn'], answer:'buy', word:'insurance'}
+];
+
+const MINI_SITUATIONS = [
+  'You got your salary today. What will you do with the money?',
+  'Your friend paid for dinner. What do you say when you leave a tip?',
+  "You need to pay your bills but you don't have enough money. What do you do?",
+  'Explain in your own words why insurance is important.',
+  'Describe how you usually pay your rent (cash, online, bank transfer...).',
+  'Give one piece of advice to someone who wants to earn extra money.'
+];
+
+const DRILL_CUES = ['rent','a tip','the water bill','insurance','a good salary','extra money'];
+
+/* =========================================================
+   RENDER: VOCAB INTRO
+   ========================================================= */
+function renderVocab(){
+  const grid = document.getElementById('vocabGrid');
+  VOCAB.forEach(v => {
+    const div = document.createElement('div');
+    div.className = 'vocab-item';
+    div.innerHTML = `
+      <span class="vocab-word">${v.word}</span><span class="vocab-ipa">${v.ipa}</span>
+      <div class="vocab-ru">${v.ru}</div>
+      <button class="listen-btn" onclick="speak('${v.word}')">🔊 Слушать</button>`;
+    grid.appendChild(div);
+  });
+}
+renderVocab();
+
+/* =========================================================
+   MISTAKE TRACKING
+   ========================================================= */
+const problemWords = {};
+function trackMistake(word){
+  if (!word) return;
+  problemWords[word] = (problemWords[word] || 0) + 1;
+  renderProblemTable();
+}
+function renderProblemTable(){
+  const table = document.getElementById('problemTable');
+  const body = document.getElementById('problemBody');
+  const empty = document.getElementById('problemEmpty');
+  const words = Object.keys(problemWords);
+  if (words.length === 0){
+    table.style.display = 'none';
+    empty.style.display = 'block';
+    document.getElementById('sidebarTotal').textContent = '';
+    return;
+  }
+  table.style.display = 'table';
+  empty.style.display = 'none';
+  words.sort((a,b) => problemWords[b] - problemWords[a]);
+  body.innerHTML = words.map(w =>
+    `<tr><td>${w}</td><td><span class="mistake-count">${problemWords[w]}</span></td></tr>`
+  ).join('');
+  const total = words.reduce((s,w) => s + problemWords[w], 0);
+  document.getElementById('sidebarTotal').textContent = `Всего ошибок: ${total}`;
+}
+
+/* =========================================================
+   GENERIC TEXT-INPUT EXERCISE RENDER / CHECK
+   ========================================================= */
+function normalize(s){
+  return s.trim().toLowerCase().replace(/\s+/g,' ').replace(/['’]/g,"'");
+}
+
+function renderEx1(){
+  const c = document.getElementById('ex1-items');
+  EX1.forEach((it,i) => {
+    const row = document.createElement('div');
+    row.className = 'item';
+    row.innerHTML = `
+      <div class="item-text"><span class="item-num">${i+1}.</span>
+        Letters: <b style="letter-spacing:2px;">${it.scrambled}</b></div>
+      <input type="text" class="answer-field" data-answer="${it.answer}" data-word="${it.word}" placeholder="Ваш ответ">
+      <span class="feedback-icon"></span>
+      <div class="answer-reveal">Ответ: ${it.answer}</div>`;
+    c.appendChild(row);
+  });
+}
+
+function renderEx2(){
+  const c = document.getElementById('ex2-items');
+  EX2.forEach((it,i) => {
+    const row = document.createElement('div');
+    row.className = 'item';
+    row.innerHTML = `
+      <div class="item-text"><span class="item-num">${i+1}.</span>${it.ru}</div>
+      <input type="text" class="answer-field" data-answer="${it.answer}" data-word="${it.word}" placeholder="Your answer in English">
+      <span class="feedback-icon"></span>
+      <div class="answer-reveal">Ответ: ${it.answer}</div>`;
+    c.appendChild(row);
+  });
+}
+
+function renderEx3(){
+  const c = document.getElementById('ex3-items');
+  EX3.forEach((it,i) => {
+    const row = document.createElement('div');
+    row.className = 'item';
+    row.innerHTML = `
+      <div class="item-text"><span class="item-num">${i+1}.</span>
+        <button class="listen-btn" onclick="speak('${it.say}')">🔊 Слушать</button></div>
+      <input type="text" class="answer-field" data-answer="${it.answer}" data-word="${it.word}" placeholder="Запишите фразу, которую услышали">
+      <span class="feedback-icon"></span>
+      <div class="answer-reveal">Ответ: ${it.answer}</div>`;
+    c.appendChild(row);
+  });
+}
+
+function renderEx4(){
+  const c = document.getElementById('ex4-items');
+  EX4.forEach((it,i) => {
+    const row = document.createElement('div');
+    row.className = 'item';
+    row.innerHTML = `
+      <div class="item-text"><span class="item-num">${i+1}.</span>
+        ${it.before} <input type="text" style="width:120px;display:inline-block;" class="answer-field" data-answer="${it.answer}" data-word="${it.word}"> ${it.after}</div>
+      <span class="feedback-icon"></span>
+      <div class="answer-reveal">Ответ: ${it.answer}</div>`;
+    c.appendChild(row);
+  });
+}
+
+function renderEx5(){
+  const c = document.getElementById('ex5-items');
+  EX5.forEach((it,i) => {
+    const row = document.createElement('div');
+    row.className = 'item';
+    row.innerHTML = `
+      <div class="item-text"><span class="item-num">${i+1}.</span>
+        <span class="drill-cue">${it.tense}</span><br>
+        ${it.before} <input type="text" style="width:150px;display:inline-block;" class="answer-field" data-answer="${it.answer}" data-word="${it.word}"> (${it.verb}) ${it.after}</div>
+      <span class="feedback-icon"></span>
+      <div class="answer-reveal">Ответ: ${it.answer}</div>`;
+    c.appendChild(row);
+  });
+}
+
+function renderEx6(){
+  const c = document.getElementById('ex6-items');
+  EX6.forEach((it,i) => {
+    const opts = ['<option value="">— choose —</option>'].concat(
+      EX6_OPTIONS.map(o => `<option value="${o}">${o}</option>`)
+    ).join('');
+    const row = document.createElement('div');
+    row.className = 'item';
+    row.innerHTML = `
+      <div class="item-text"><span class="item-num">${i+1}.</span><b>${it.start}</b> ...</div>
+      <select class="match-select answer-field" data-answer="${it.answer}" data-word="${it.start}">${opts}</select>
+      <span class="feedback-icon"></span>
+      <div class="answer-reveal">Ответ: ${it.start} → ${it.answer}</div>`;
+    c.appendChild(row);
+  });
+}
+
+function renderEx7(){
+  const c = document.getElementById('ex7-items');
+  EX7.forEach((it,i) => {
+    const opts = it.options.map(o =>
+      `<button type="button" class="mcq-btn" data-value="${o}" onclick="selectMcq(this)">${o}</button>`
+    ).join('');
+    const row = document.createElement('div');
+    row.className = 'item';
+    row.innerHTML = `
+      <div class="item-text"><span class="item-num">${i+1}.</span>${it.sentence}</div>
+      <div class="mcq-options answer-field" data-answer="${it.answer}" data-word="${it.word}">${opts}</div>
+      <span class="feedback-icon"></span>
+      <div class="answer-reveal">Ответ: ${it.answer}</div>`;
+    c.appendChild(row);
+  });
+}
+function selectMcq(btn){
+  const group = btn.parentElement;
+  [...group.children].forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  group.dataset.selected = btn.dataset.value;
+}
+
+renderEx1(); renderEx2(); renderEx3(); renderEx4(); renderEx5(); renderEx6(); renderEx7();
+
+/* =========================================================
+   CHECK / SHOW ANSWERS
+   ========================================================= */
+function checkExercise(id){
+  const container = document.getElementById(id + '-items');
+  const fields = container.querySelectorAll('.answer-field');
+  let correct = 0, total = fields.length;
+
+  fields.forEach(f => {
+    const answer = normalize(f.dataset.answer);
+    const word = f.dataset.word;
+    let userVal, isMcq = false;
+
+    if (f.tagName === 'INPUT'){
+      userVal = normalize(f.value);
+    } else if (f.tagName === 'SELECT'){
+      userVal = normalize(f.value);
+    } else { // mcq div
+      isMcq = true;
+      userVal = normalize(f.dataset.selected || '');
+    }
+
+    const ok = userVal !== '' && userVal === answer;
+    const item = f.closest('.item');
+
+    if (isMcq){
+      [...f.children].forEach(b => {
+        b.classList.remove('correct','incorrect');
+        if (normalize(b.dataset.value) === answer) b.classList.add('correct');
+        else if (b.classList.contains('selected') && !ok) b.classList.add('incorrect');
+      });
+    } else {
+      f.classList.remove('correct','incorrect');
+      f.classList.add(ok ? 'correct' : 'incorrect');
+    }
+
+    const icon = item.querySelector('.feedback-icon');
+    if (ok){
+      icon.textContent = '✓';
+      icon.className = 'feedback-icon ok';
+      correct++;
+    } else {
+      icon.textContent = '✗';
+      icon.className = 'feedback-icon bad';
+      trackMistake(word);
+    }
+  });
+
+  document.getElementById(id + '-score').innerHTML = `Результат: <b>${correct} / ${total}</b>`;
+}
+
+function showAnswers(id){
+  const container = document.getElementById(id + '-items');
+  container.querySelectorAll('.answer-reveal').forEach(r => r.classList.add('show'));
+}
+
+/* =========================================================
+   RETRIEVAL CHECK
+   ========================================================= */
+function checkRetrieval(){
+  const raw = document.getElementById('retrieveBox').value;
+  const given = raw.split(/[,;\n]/).map(w => normalize(w)).filter(Boolean);
+  const target = VOCAB.map(v => v.word);
+  const found = target.filter(w => given.includes(w));
+  const missing = target.filter(w => !given.includes(w));
+  document.getElementById('retrieveScore').innerHTML = `Вспомнили: <b>${found.length} / ${target.length}</b>`;
+  document.getElementById('retrieveResult').innerHTML = missing.length
+    ? `Пока не вспомнили: <b>${missing.join(', ')}</b>`
+    : 'Отлично! Вы вспомнили все слова 🎉';
+  missing.forEach(w => trackMistake(w));
+}
+
+/* =========================================================
+   MINI SITUATIONS + DRILL RENDER
+   ========================================================= */
+function renderMiniSituations(){
+  const c = document.getElementById('exA-items');
+  MINI_SITUATIONS.forEach((q,i) => {
+    const row = document.createElement('div');
+    row.className = 'item';
+    row.innerHTML = `
+      <div class="item-text"><span class="item-num">${i+1}.</span>${q}</div>
+      <textarea class="answer-field" data-label="Mini-situation ${i+1}: ${q}" placeholder="Write 1–2 sentences..."></textarea>`;
+    c.appendChild(row);
+  });
+}
+function renderDrill(){
+  const c = document.getElementById('exB-items');
+  DRILL_CUES.forEach((cue,i) => {
+    const row = document.createElement('div');
+    row.className = 'item';
+    row.innerHTML = `
+      <div class="item-text"><span class="item-num">${i+1}.</span>
+        Cue: <span class="drill-cue">${cue}</span></div>
+      <textarea class="answer-field" data-label="Drill ${i+1} (${cue})" placeholder="Write your own sentence using this cue..."></textarea>`;
+    c.appendChild(row);
+  });
+}
+renderMiniSituations();
+renderDrill();
+
+/* =========================================================
+   3 LEAST CONFIDENT WORDS
+   ========================================================= */
+function renderWordChecks(){
+  const c = document.getElementById('wordChecks');
+  VOCAB.forEach(v => {
+    const label = document.createElement('label');
+    label.className = 'word-check';
+    label.innerHTML = `<input type="checkbox" value="${v.word}" onchange="onWordCheck()"> ${v.word}`;
+    c.appendChild(label);
+  });
+}
+renderWordChecks();
+
+function onWordCheck(){
+  const boxes = [...document.querySelectorAll('#wordChecks input[type=checkbox]')];
+  const checked = boxes.filter(b => b.checked);
+  boxes.forEach(b => {
+    const label = b.parentElement;
+    label.classList.toggle('checked', b.checked);
+    if (checked.length >= 3 && !b.checked){
+      b.disabled = true;
+      label.classList.add('disabled');
+    } else {
+      b.disabled = false;
+      label.classList.remove('disabled');
+    }
+  });
+}
+
+function scramble(word){
+  const map = {tip:'PTI', salary:'ALYRSA', bill:'LLBI', rent:'TENR', insurance:'RACENUSIN', earn:'RANE', pay:'YAP'};
+  return map[word] || word.split('').reverse().join('').toUpperCase();
+}
+
+function generateTasks(){
+  const boxes = [...document.querySelectorAll('#wordChecks input[type=checkbox]:checked')];
+  const container = document.getElementById('genTasks');
+  container.innerHTML = '';
+  if (boxes.length === 0){
+    container.innerHTML = '<p class="empty-note">Отметьте хотя бы одно слово выше.</p>';
+    return;
+  }
+  boxes.forEach(b => {
+    const word = b.value;
+    const v = VOCAB.find(x => x.word === word);
+    const block = document.createElement('div');
+    block.className = 'gen-block';
+    block.innerHTML = `
+      <h4>${word} <button class="listen-btn" onclick="speak('${word}')">🔊</button></h4>
+      <label>1. Перевод слова «${word}»:</label>
+      <input type="text" class="answer-field" data-label="${word} — translation">
+      <label>2. Составьте своё предложение со словом «${word}»:</label>
+      <textarea class="answer-field" data-label="${word} — my sentence" placeholder="Write your sentence..."></textarea>
+      <label>3. Unscramble: <b style="letter-spacing:2px;">${scramble(word)}</b></label>
+      <input type="text" class="answer-field" data-label="${word} — unscramble" placeholder="Write the word">
+    `;
+    container.appendChild(block);
+  });
+}
+
+/* =========================================================
+   COPY FUNCTIONS
+   ========================================================= */
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+function copyToClipboard(text){
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(
+      () => toast('Скопировано в буфер обмена ✅'),
+      () => fallbackCopy(text)
+    );
+  } else {
+    fallbackCopy(text);
+  }
+}
+function fallbackCopy(text){
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); toast('Скопировано в буфер обмена ✅'); }
+  catch(e){ toast('Не удалось скопировать автоматически, скопируйте вручную.'); }
+  document.body.removeChild(ta);
+}
+
+function copySection(id){
+  const container = document.getElementById(id);
+  const fields = container.querySelectorAll('textarea.answer-field, input.answer-field');
+  if (fields.length === 0){
+    toast('Нет полей для копирования в этом разделе.');
+    return;
+  }
+  let lines = [];
+  fields.forEach((f,i) => {
+    const label = f.dataset.label || ('Ответ ' + (i+1));
+    lines.push(`${label}: ${f.value || '(пусто)'}`);
+  });
+  copyToClipboard(lines.join('\n'));
+}
+
+function copyAllAnswers(){
+  let lines = ['=== MONEY TALK — ответы студента ==='];
+  document.querySelectorAll('section.card').forEach(sec => {
+    const h = sec.querySelector('h2');
+    if (!h) return;
+    const inputs = sec.querySelectorAll('input.answer-field, textarea.answer-field, select.answer-field, div.answer-field');
+    if (inputs.length === 0) return;
+    lines.push('\n--- ' + h.textContent.trim() + ' ---');
+    inputs.forEach((f,i) => {
+      let val;
+      if (f.tagName === 'DIV') val = f.dataset.selected || '(не выбрано)';
+      else val = f.value || '(пусто)';
+      const label = f.dataset.label || ('Вопрос ' + (i+1));
+      lines.push(`${label}: ${val}`);
+    });
+  });
+  const rb = document.getElementById('retrieveBox');
+  if (rb && rb.value.trim()){
+    lines.push('\n--- Write as many words as you remember ---');
+    lines.push(rb.value.trim());
+  }
+  copyToClipboard(lines.join('\n'));
+}
+</script>
+</body>
+</html>
