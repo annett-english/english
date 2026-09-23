@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Vocabulary Practice: Food & Feelings</title>
+<style>
+:root{--bg:#faf7f2;--card:#fff;--ink:#2b2620;--accent:#c8622d;--accent2:#5a7d5a;--line:#e5ddd0;--bad:#c94f4f;--good:#4f8f5f;
+padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#1c1a17;--card:#28241f;--ink:#eee6da;--line:#3a352d;}}
+:root[data-theme="dark"]{--bg:#1c1a17;--card:#28241f;--ink:#eee6da;--line:#3a352d;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Georgia,'Times New Roman',serif;line-height:1.5;padding:16px}
+h1{font-size:1.4rem;margin:0 0 4px}
+h2{font-size:1.1rem;color:var(--accent);border-bottom:2px solid var(--line);padding-bottom:4px;margin-top:28px}
+.sub{color:#8a8072;font-size:.9rem;margin-bottom:16px}
+.layout{display:grid;grid-template-columns:1fr;gap:20px;max-width:1100px;margin:0 auto}
+@media(min-width:900px){.layout{grid-template-columns:3fr 1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:14px}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+td,th{padding:6px 4px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+button{font-family:inherit;background:var(--accent);color:#fff;border:none;border-radius:6px;padding:6px 12px;cursor:pointer;font-size:.9rem}
+button.sec{background:var(--accent2)}
+button.ghost{background:transparent;color:var(--accent);border:1px solid var(--accent);padding:5px 10px}
+button:active{opacity:.8}
+input[type=text]{font-family:inherit;padding:6px 8px;border:1px solid var(--line);border-radius:6px;width:180px;background:var(--bg);color:var(--ink)}
+.item{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:8px 0;border-bottom:1px dashed var(--line)}
+.item:last-child{border-bottom:none}
+.def{flex:1;min-width:180px;font-style:italic;color:var(--ink)}
+.feedback{font-weight:bold;min-width:22px}
+.feedback.ok{color:var(--good)}
+.feedback.bad{color:var(--bad)}
+.answer{font-size:.85rem;color:#8a8072;display:none}
+.sidebar h2{margin-top:0}
+#probTable td{font-size:.85rem}
+.small{font-size:.85rem;color:#8a8072}
+.blank{border-bottom:2px solid var(--accent)}
+textarea{width:100%;min-height:90px;font-family:inherit;padding:8px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink)}
+.pill{display:inline-block;background:var(--line);border-radius:12px;padding:2px 10px;margin:2px;font-size:.85rem}
+.status{font-size:.8rem;color:#8a8072}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.tr{font-size:.85rem;color:#8a8072;font-style:italic}
+</style>
+</head>
+<body>
+<div class="layout">
+<div>
+<h1>🍽️ Food Vocabulary — практика</h1>
+<div class="sub">Прописывайте слова руками, проверяйте себя, слушайте произношение.</div>
+
+<div class="card" id="reviewCard">
+<h2>Повторение слов</h2>
+<div class="status" id="voiceStatus">Проверка голоса...</div>
+<table><thead><tr><th>Word</th><th>Транскр.</th><th>Перевод</th><th>Пример</th><th></th></tr></thead>
+<tbody id="reviewBody"></tbody></table>
+</div>
+
+<div class="card" id="ex1Card">
+<h2>Упр.1 · Guess the word (по определению)</h2>
+<div id="ex1List"></div>
+<div class="actions"><button onclick="checkAll(1)">Проверить всё</button><button class="ghost" onclick="toggleAnswers(1)">Показать/скрыть ответы</button></div>
+</div>
+
+<div class="card" id="ex2Card">
+<h2>Упр.2 · Вставьте слово по контексту</h2>
+<div id="ex2List"></div>
+<div class="actions"><button onclick="checkAll(2)">Проверить всё</button><button class="ghost" onclick="toggleAnswers(2)">Показать/скрыть ответы</button></div>
+</div>
+
+<div class="card" id="ex3Card">
+<h2>Упр.3 · Retrieve: напишите слова, которые помните</h2>
+<div class="small">Введите через запятую или с новой строки все английские слова из списка, какие вспомните.</div>
+<textarea id="ex3input" placeholder="patty, cutlet, ..."></textarea>
+<div class="actions"><button onclick="checkEx3()">Проверить</button><button class="ghost" onclick="toggleAnswers(3)">Показать все слова</button></div>
+<div id="ex3result"></div>
+</div>
+
+<div class="card" id="ex4Card">
+<h2>Упр.4 · Выберите 3 слова, в которых вы уверены меньше всего</h2>
+<div id="ex4choice"></div>
+<div class="actions"><button onclick="startEx4()">Начать мини-тест</button></div>
+<div id="ex4quiz"></div>
+</div>
+
+<div class="card">
+<div class="actions"><button class="sec" onclick="exportAnswers()">Скопировать все мои ответы</button><span class="status" id="exportStatus"></span></div>
+</div>
+</div>
+
+<div class="sidebar">
+<div class="card">
+<h2>⚠️ Проблемные слова</h2>
+<table><thead><tr><th>Слово</th><th>Ошибок</th></tr></thead><tbody id="probTable"><tr><td colspan="2" class="small">Пока нет ошибок</td></tr></tbody></table>
+</div>
+</div>
+</div>
+
+<script>
+const WORDS=[
+{en:"patty",alt:["a patty","patties","the patty"],ru:"котлета, плоская котлета",tr:"/ˈpæt.i/",ex:"I ordered a beef ___ with some lettuce.",exTr:"Я заказал(а) говяжью котлету с листьями салата.",def:"a small, flat, round piece of minced meat, fish or vegetables, often used in a burger"},
+{en:"cutlet",alt:["cutlets","a cutlet","the cutlet"],ru:"котлета",tr:"/ˈkʌt.lət/",ex:"She made chicken ___s for dinner.",exTr:"Она приготовила куриные котлеты на ужин.",def:"a small piece of meat, often coated and fried, thin and flat in shape"},
+{en:"lettuce",alt:["some lettuce","the lettuce"],ru:"салат-латук, листья салата",tr:"/ˈlet.ɪs/",ex:"I usually add ___ to my sandwiches.",exTr:"Я обычно добавляю листья салата в свои бутерброды.",def:"a leafy green vegetable often eaten raw in salads and sandwiches"},
+{en:"bowl",alt:["a bowl","bowls","the bowl"],ru:"миска, пиала",tr:"/boʊl/",ex:"I had a ___ of soup for lunch.",exTr:"Я съел(а) миску супа на обед.",def:"a round, deep dish used for holding food such as soup or cereal"},
+{en:"tangerine",alt:["a tangerine","tangerines","the tangerine"],ru:"мандарин",tr:"/ˌtæn.dʒəˈriːn/",ex:"I had a ___ for a snack.",exTr:"Я съел(а) мандарин на перекус.",def:"a small, sweet, orange citrus fruit with skin that is easy to peel"},
+{en:"cream cheese",alt:["creamcheese","cream-cheese","the cream cheese"],ru:"сливочный сыр, крем-сыр",tr:"/kriːm tʃiːz/",ex:"I like ___ on toast.",exTr:"Я люблю сливочный сыр на тостах.",def:"a soft, mild, spreadable white cheese, often eaten on bread or toast"},
+{en:"instant noodles",alt:["instant noodle","noodles","the instant noodles","instant ramen"],ru:"лапша быстрого приготовления",tr:"/ˈɪn.stənt ˈnuː.dəlz/",ex:"I sometimes eat ___ when I don't have time to cook.",exTr:"Я иногда ем лапшу быстрого приготовления, когда у меня нет времени готовить.",def:"a quick, pre-cooked type of noodles you prepare by adding hot water"},
+{en:"miss",alt:["miss sb","miss someone","missing","to miss"],ru:"скучать по кому-либо",tr:"/mɪs/",ex:"I really ___ my family when I'm abroad.",exTr:"Я очень скучаю по своей семье, когда нахожусь за границей.",def:"to feel sad because someone you care about is not with you"},
+{en:"kefir",alt:["the kefir","some kefir"],ru:"кефир",tr:"/kəˈfɪr/",ex:"I usually drink ___ in the evening.",exTr:"Я обычно пью кефир вечером.",def:"a fermented, slightly sour milk drink, similar to yogurt but thinner"},
+{en:"dried chicken",alt:["dried chicken meat","the dried chicken"],ru:"сушёная курица",tr:"/draɪd ˈtʃɪk.ɪn/",ex:"I bought some dried ___ as a snack.",exTr:"Я купил(а) сушёную курицу в качестве перекуса.",def:"chicken meat that has been dehydrated, often eaten as a dry snack"}
+];
+function shuffle(a){let r=[...a];for(let i=r.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[r[i],r[j]]=[r[j],r[i]];}return r;}
+let voice=null;
+function pickVoice(){
+ const vs=speechSynthesis.getVoices();
+ voice=vs.find(v=>/Google US English/i.test(v.name))||vs.find(v=>v.lang==="en-US")||vs[0]||null;
+ document.getElementById('voiceStatus').textContent=voice?("🔊 Голос: "+voice.name):"⚠️ Голоса пока не загружены — нажмите Play ещё раз.";
+}
+speechSynthesis.onvoiceschanged=pickVoice; pickVoice();
+function speak(t){
+ if(!('speechSynthesis' in window)){document.getElementById('voiceStatus').textContent="⚠️ Синтез речи не поддерживается браузером.";return;}
+ const u=new SpeechSynthesisUtterance(t);
+ if(voice)u.voice=voice; u.lang="en-US";u.rate=0.95;
+ speechSynthesis.cancel();speechSynthesis.speak(u);
+}
+const problems={};
+function markProblem(w){problems[w]=(problems[w]||0)+1;renderProblems();}
+function renderProblems(){
+ const b=document.getElementById('probTable');
+ const keys=Object.keys(problems);
+ if(!keys.length){b.innerHTML='<tr><td colspan="2" class="small">Пока нет ошибок</td></tr>';return;}
+ b.innerHTML=keys.sort((a,b2)=>problems[b2]-problems[a]).map(k=>`<tr><td>${k}</td><td>${problems[k]}</td></tr>`).join('');
+}
+function norm(s){return s.trim().toLowerCase().replace(/[.,!?]/g,'').replace(/\s+/g,' ').replace(/^(a|an|the|some)\s+/,'').replace(/s$/,'');}
+function matches(w,val){const v=norm(val);if(!v)return false;return v===norm(w.en)||w.alt.some(a=>norm(a)===v);}
+
+// review table
+document.getElementById('reviewBody').innerHTML=WORDS.map((w,i)=>
+`<tr><td><b>${w.en}</b></td><td class="tr">${w.tr}</td><td>${w.ru}</td><td class="small">${w.ex.replace('___','<u>'+w.en+'</u>')}<br><span class="tr">${w.exTr}</span></td><td><button class="ghost" onclick="speak('${w.en.replace("'","\\'")}')">▶️</button></td></tr>`
+).join('');
+
+// Ex1 guess by definition
+const ex1order=shuffle(WORDS);
+document.getElementById('ex1List').innerHTML=ex1order.map((w,i)=>
+`<div class="item" data-i="${i}"><span class="def">${w.def}</span><input type="text" id="e1_${i}" placeholder="write the word"><button class="ghost" onclick="checkOne(1,${i})">✔</button><span class="feedback" id="e1f_${i}"></span><span class="answer" id="e1a_${i}">${w.en}</span></div>`
+).join('');
+
+// Ex2 fill gaps (shuffled independently)
+const ex2order=shuffle(WORDS);
+document.getElementById('ex2List').innerHTML=ex2order.map((w,i)=>
+`<div class="item" data-i="${i}"><span>${w.ex.replace('___','<span class="blank">______</span>')}</span><input type="text" id="e2_${i}" placeholder="word"><button class="ghost" onclick="checkOne(2,${i})">✔</button><span class="feedback" id="e2f_${i}"></span><span class="answer" id="e2a_${i}">${w.en} — ${w.exTr}</span></div>`
+).join('');
+
+function checkOne(ex,i){
+ const list=ex===1?ex1order:ex2order;
+ const w=list[i];
+ const val=document.getElementById(`e${ex}_${i}`).value;
+ const fb=document.getElementById(`e${ex}f_${i}`);
+ if(matches(w,val)){fb.textContent="✅";fb.className="feedback ok";}
+ else{fb.textContent="❌";fb.className="feedback bad";markProblem(w.en);}
+}
+function checkAll(ex){const n=ex===1?ex1order.length:ex2order.length;for(let i=0;i<n;i++)checkOne(ex,i);}
+function toggleAnswers(ex){
+ if(ex===3){document.getElementById('ex3result').innerHTML='<div class="small">Все слова: '+WORDS.map(w=>w.en).join(', ')+'</div>';return;}
+ const n=ex===1?ex1order.length:ex2order.length;
+ for(let i=0;i<n;i++){const a=document.getElementById(`e${ex}a_${i}`);a.style.display=a.style.display==='inline'?'none':'inline';}
+}
+
+function checkEx3(){
+ const raw=document.getElementById('ex3input').value;
+ const given=raw.split(/[,\n]/).map(s=>norm(s)).filter(Boolean);
+ const found=new Set(); const missed=[];
+ WORDS.forEach(w=>{ if(given.some(g=>g===norm(w.en)||w.alt.some(a=>norm(a)===g))) found.add(w.en); });
+ WORDS.forEach(w=>{if(!found.has(w.en))missed.push(w.en);});
+ document.getElementById('ex3result').innerHTML=
+ `<p>Вспомнили: <b>${found.size}/${WORDS.length}</b></p><p class="small">Не хватило: ${missed.join(', ')||'—'}</p>`;
+ missed.forEach(m=>markProblem(m));
+}
+
+// Ex4
+document.getElementById('ex4choice').innerHTML=WORDS.map((w,i)=>
+`<label class="pill"><input type="checkbox" class="ex4cb" value="${i}" onchange="limitEx4()"> ${w.en}</label>`).join('');
+function limitEx4(){
+ const cbs=[...document.querySelectorAll('.ex4cb')];
+ const checked=cbs.filter(c=>c.checked);
+ if(checked.length>3){checked[0].checked=false;}
+}
+function startEx4(){
+ const idx=[...document.querySelectorAll('.ex4cb')].filter(c=>c.checked).map(c=>+c.value);
+ if(!idx.length){document.getElementById('ex4quiz').innerHTML='<p class="small">Выберите хотя бы одно слово.</p>';return;}
+ document.getElementById('ex4quiz').innerHTML=idx.map((i,k)=>{
+   const w=WORDS[i];
+   return `<div class="item"><span>${w.ru}</span><input type="text" id="e4_${k}" data-i="${i}" placeholder="English word"><button class="ghost" onclick="speak('${w.en.replace("'","\\'")}')">▶️</button><button class="ghost" onclick="checkEx4(${k})">✔</button><span class="feedback" id="e4f_${k}"></span></div>`;
+ }).join('');
+}
+function checkEx4(k){
+ const inp=document.getElementById(`e4_${k}`);
+ const w=WORDS[+inp.dataset.i];
+ const fb=document.getElementById(`e4f_${k}`);
+ if(matches(w,inp.value)){fb.textContent="✅";fb.className="feedback ok";}
+ else{fb.textContent="❌ ("+w.en+")";fb.className="feedback bad";markProblem(w.en);}
+}
+
+function exportAnswers(){
+ const data={ex1:{},ex2:{},ex3:document.getElementById('ex3input').value,ex4:{}};
+ ex1order.forEach((w,i)=>data.ex1[w.en]=document.getElementById(`e1_${i}`).value);
+ ex2order.forEach((w,i)=>data.ex2[w.en]=document.getElementById(`e2_${i}`).value);
+ document.querySelectorAll('#ex4quiz input[type=text]').forEach((el,k)=>data.ex4[k]=el.value);
+ const text=JSON.stringify(data,null,2);
+ navigator.clipboard.writeText(text).then(()=>{
+  document.getElementById('exportStatus').textContent="✅ Ответы скопированы в буфер обмена";
+ }).catch(()=>{document.getElementById('exportStatus').textContent="Не удалось скопировать — скопируйте вручную: "+text.slice(0,60)+"...";});
+}
+</script>
+</body>
+</html>
