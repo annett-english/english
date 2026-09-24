@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Shops · B1 practice</title>
+<style>
+:root{
+  --ink:#20262b; --paper:#f7f4ee; --card:#ffffff; --line:#dcd5c6;
+  --accent:#8a5a3b; --accent2:#3f6e5c; --bad:#b5453a; --good:#3f7d4f;
+  --muted:#7a7266;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){--ink:#eee7da;--paper:#1c1a16;--card:#26231d;--line:#3a352a;--muted:#a89f8f;}
+}
+:root[data-theme="dark"]{--ink:#eee7da;--paper:#1c1a16;--card:#26231d;--line:#3a352a;--muted:#a89f8f;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:Georgia,'Iowan Old Style',serif;line-height:1.5;padding:24px 16px 80px}
+h1{font-size:1.7rem;margin:0 0 4px;font-weight:700}
+.sub{color:var(--muted);font-family:Verdana,sans-serif;font-size:.85rem;margin-bottom:20px}
+.layout{display:flex;gap:24px;max-width:1100px;margin:0 auto;align-items:flex-start;flex-wrap:wrap}
+main{flex:1;min-width:280px}
+aside{width:230px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;position:sticky;top:16px;font-family:Verdana,sans-serif;font-size:.8rem}
+aside h3{margin:0 0 8px;font-size:.85rem;font-family:Georgia,serif}
+#problemList{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+#problemList li{background:rgba(181,69,58,.12);border-radius:6px;padding:5px 8px}
+.empty{color:var(--muted)}
+section.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin-bottom:22px}
+section.card h2{font-size:1.15rem;margin:0 0 4px}
+.hint{color:var(--muted);font-family:Verdana,sans-serif;font-size:.78rem;margin-bottom:14px}
+.wordrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:6px 0;border-bottom:1px dashed var(--line);font-family:Verdana,sans-serif;font-size:.87rem}
+.wordrow:last-child{border-bottom:none}
+.wordrow b{font-family:Georgia,serif;min-width:150px}
+.tr{color:var(--accent)}
+.ru{color:var(--muted)}
+button{cursor:pointer;font-family:Verdana,sans-serif}
+.spk{background:var(--accent2);color:#fff;border:none;border-radius:50%;width:28px;height:28px;font-size:.9rem}
+.item{border-top:1px solid var(--line);padding:12px 0;display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-family:Verdana,sans-serif;font-size:.88rem}
+.item:first-of-type{border-top:none}
+.item input[type=text], .item textarea{flex:1;min-width:160px;padding:7px 9px;border:1px solid var(--line);border-radius:6px;background:var(--paper);color:var(--ink);font-family:Verdana,sans-serif}
+.item textarea{min-height:44px;resize:vertical}
+.num{color:var(--muted);width:22px}
+.scramble{letter-spacing:2px;font-weight:700;color:var(--accent)}
+.def{font-style:italic}
+.result{font-size:1.1rem;width:20px;text-align:center}
+.ok{color:var(--good)} .no{color:var(--bad)}
+.check,.showall,.copyall,.speakBtn{background:var(--accent);color:#fff;border:none;border-radius:6px;padding:8px 14px;font-size:.85rem;margin-top:8px;margin-right:8px}
+.showall{background:var(--muted)}
+.copyall{background:var(--accent2)}
+.stressBtns button{background:var(--card);border:1px solid var(--line);color:var(--ink);border-radius:6px;padding:4px 9px;margin-right:4px}
+.stressBtns button.sel{background:var(--accent);color:#fff;border-color:var(--accent)}
+.answerShown{color:var(--good);font-weight:700;margin-left:6px}
+.dialog{display:block;width:100%}
+.emoji{font-size:1.6rem}
+#recallArea{width:100%;min-height:90px;border:1px solid var(--line);border-radius:8px;padding:10px;background:var(--paper);color:var(--ink);font-family:Verdana,sans-serif}
+#recallResult{font-family:Verdana,sans-serif;font-size:.85rem;margin-top:8px}
+.chooseWords label{display:inline-flex;gap:5px;align-items:center;background:var(--paper);border:1px solid var(--line);padding:4px 9px;border-radius:6px;margin:3px;font-family:Verdana,sans-serif;font-size:.82rem}
+#weakOut{margin-top:12px}
+footer{max-width:1100px;margin:20px auto 0;font-family:Verdana,sans-serif;font-size:.75rem;color:var(--muted)}
+</style>
+</head>
+<body>
+<div style="max-width:1100px;margin:0 auto 6px">
+<h1>Shops &amp; Services — B1</h1>
+<div class="sub">travel agent's · stationer's · newsagent's · hairdresser's · jeweller's · fishmonger's · greengrocer's · dry-cleaner's · chemist's · estate agent's · butcher's · baker's · barber's</div>
+</div>
+
+<div class="layout">
+<main>
+
+<section class="card">
+<h2>1. Слова и произношение</h2>
+<div class="hint">Нажмите 🔊, чтобы прослушать (голос Google US English, если доступен).</div>
+<div id="wordList"></div>
+</section>
+
+<section class="card">
+<h2>2. Unscramble the word</h2>
+<div class="hint">Соберите слово из букв.</div>
+<div id="ex1"></div>
+<button class="check" onclick="checkAll('ex1')">Проверить</button>
+<button class="showall" onclick="showAll('ex1')">Показать ответы</button>
+</section>
+
+<section class="card">
+<h2>3. Listen and write (dictation)</h2>
+<div class="hint">Нажмите 🔊 и впишите услышанное слово/словосочетание.</div>
+<div id="ex2"></div>
+<button class="check" onclick="checkAll('ex2')">Проверить</button>
+<button class="showall" onclick="showAll('ex2')">Показать ответы</button>
+</section>
+
+<section class="card">
+<h2>4. Definitions</h2>
+<div class="hint">Прочитайте определение и напишите слово.</div>
+<div id="ex4"></div>
+<button class="check" onclick="checkAll('ex4')">Проверить</button>
+<button class="showall" onclick="showAll('ex4')">Показать ответы</button>
+</section>
+
+<section class="card">
+<h2>5. Составьте предложение по картинке</h2>
+<div class="hint">Используйте слово, подходящее эмодзи.</div>
+<div id="ex5"></div>
+<button class="copyall" onclick="copyAll('ex5')">Скопировать все ответы</button>
+</section>
+
+<section class="card">
+<h2>6. Finish the dialogue</h2>
+<div id="ex6"></div>
+<button class="check" onclick="checkAll('ex6')">Проверить</button>
+<button class="showall" onclick="showAll('ex6')">Показать ответы</button>
+</section>
+
+<section class="card">
+<h2>7. Write your own sentence</h2>
+<div id="ex7"></div>
+<button class="copyall" onclick="copyAll('ex7')">Скопировать все предложения</button>
+</section>
+
+<section class="card">
+<h2>8. Write as many words as you remember</h2>
+<div class="hint">Впишите слова через запятую или с новой строки, затем нажмите «Проверить».</div>
+<textarea id="recallArea" placeholder="hairdresser's, chemist's ..."></textarea><br>
+<button class="check" onclick="checkRecall()">Проверить</button>
+<div id="recallResult"></div>
+</section>
+
+<section class="card">
+<h2>9. Выберите 3 слова, которые знаете хуже всего</h2>
+<div class="chooseWords" id="chooseWords"></div>
+<button class="check" onclick="makeWeakDrill()">Создать тренировку</button>
+<div id="weakOut"></div>
+</section>
+
+</main>
+
+<aside>
+<h3>⚠ Проблемные слова</h3>
+<ul id="problemList"><li class="empty">Пока нет ошибок</li></ul>
+</aside>
+</div>
+
+<footer>Аудио: Web Speech API (голос браузера). Если звук не работает — проверьте, что звук устройства включён; голоса Google доступны обычно в Chrome.</footer>
+
+<script>
+const DATA=[
+{w:"travel agent's",ru:"турагентство",ipa:"/ˈtrævəl ˌeɪdʒənts/",syll:["TRA","vel","a","gent's"],stress:1,def:"a shop where you can book holidays, flights and hotels",emoji:"🧳✈️"},
+{w:"stationer's",ru:"канцелярский магазин",ipa:"/ˈsteɪʃənəz/",syll:["STA","tio","ner's"],stress:1,def:"a shop that sells paper, pens and office supplies",emoji:"📎📓"},
+{w:"newsagent's",ru:"газетный киоск",ipa:"/ˈnjuːzeɪdʒənts/",syll:["NEWS","a","gent's"],stress:1,def:"a small shop that sells newspapers, magazines and sweets",emoji:"📰🍬"},
+{w:"hairdresser's",ru:"парикмахерская",ipa:"/ˈheədresəz/",syll:["HAIR","dress","er's"],stress:1,def:"a place where you go to have your hair cut or styled",emoji:"💇‍♀️"},
+{w:"jeweller's",ru:"ювелирный магазин",ipa:"/ˈdʒuːələz/",syll:["JEW","el","ler's"],stress:1,def:"a shop that sells rings, necklaces and watches",emoji:"💍"},
+{w:"fishmonger's",ru:"рыбный магазин",ipa:"/ˈfɪʃmʌŋɡəz/",syll:["FISH","mon","ger's"],stress:1,def:"a shop that sells fresh fish and seafood",emoji:"🐟"},
+{w:"greengrocer's",ru:"овощной магазин",ipa:"/ˈɡriːnɡrəʊsəz/",syll:["GREEN","gro","cer's"],stress:1,def:"a shop that sells fresh fruit and vegetables",emoji:"🥦🥕"},
+{w:"dry-cleaner's",ru:"химчистка",ipa:"/ˌdraɪˈkliːnəz/",syll:["dry","CLEAN","er's"],stress:2,def:"a shop where clothes are cleaned using chemicals, not water",emoji:"🧥"},
+{w:"chemist's",ru:"аптека",ipa:"/ˈkemɪsts/",syll:["CHEM","ist's"],stress:1,def:"a shop where you buy medicine and toiletries",emoji:"💊"},
+{w:"estate agent's",ru:"агентство недвижимости",ipa:"/ɪˈsteɪt ˌeɪdʒənts/",syll:["es","TATE","a","gent's"],stress:2,def:"an office that helps people buy, sell or rent houses",emoji:"🏠🔑"},
+{w:"butcher's",ru:"мясная лавка",ipa:"/ˈbʊtʃəz/",syll:["BUTCH","er's"],stress:1,def:"a shop that sells meat",emoji:"🥩"},
+{w:"baker's",ru:"булочная",ipa:"/ˈbeɪkəz/",syll:["BAK","er's"],stress:1,def:"a shop that sells bread and cakes",emoji:"🍞"},
+{w:"barber's",ru:"мужская парикмахерская",ipa:"/ˈbɑːbəz/",syll:["BAR","ber's"],stress:1,def:"a place where men go to have their hair cut",emoji:"✂️👨"}
+];
+const DIALOGUES=[
+["I need a newspaper and some chewing gum.","Let's stop at the ___.","newsagent's"],
+["This suit is really dirty, can you clean it?","Take it to the ___.","dry-cleaner's"],
+["My hair is too long.","You should visit the ___.","hairdresser's"],
+["We want to buy a house near the park.","Ask the ___ for details.","estate agent's"],
+["I have a terrible headache.","There's a ___ around the corner.","chemist's"],
+["I need fresh salmon for dinner.","The ___ has great fish today.","fishmonger's"],
+["Could you cut my beard, please?","Sure, come to the ___.","barber's"],
+["We need carrots and potatoes.","Let's go to the ___.","greengrocer's"]
+];
+let voice=null;
+function pickVoice(){
+  const vs=speechSynthesis.getVoices();
+  voice=vs.find(v=>/Google US English/i.test(v.name)) || vs.find(v=>v.lang==='en-US') || vs[0];
+}
+speechSynthesis.onvoiceschanged=pickVoice; pickVoice();
+function speak(t){
+  try{ speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(t); u.lang='en-US'; if(voice) u.voice=voice;
+    speechSynthesis.speak(u);
+  }catch(e){ alert('Аудио недоступно в этом браузере.'); }
+}
+function norm(s){return s.toLowerCase().replace(/[’']/g,"'").replace(/\s+/g,' ').trim();}
+function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function scrambleLetters(w){
+  const core=w.replace(/'s|-/g,'').replace(/\s/g,'');
+  let arr=core.split(''); let s;
+  do{s=shuffle(arr).join('');}while(s===core);
+  return s.toUpperCase();
+}
+let problems=new Set();
+try{ const saved=JSON.parse(localStorage.getItem('shopsProblems')||'[]'); problems=new Set(saved);}catch(e){}
+function markProblem(word){ problems.add(word); try{localStorage.setItem('shopsProblems',JSON.stringify([...problems]));}catch(e){} renderProblems(); }
+function renderProblems(){
+  const ul=document.getElementById('problemList');
+  if(problems.size===0){ul.innerHTML='<li class="empty">Пока нет ошибок</li>';return;}
+  ul.innerHTML=[...problems].map(w=>'<li>'+w+'</li>').join('');
+}
+
+// 1. word list
+document.getElementById('wordList').innerHTML = DATA.map(d=>
+ `<div class="wordrow"><button class="spk" onclick="speak(&quot;${d.w.replace(/"/g,'')}&quot;)">🔊</button><b>${d.w}</b><span class="tr">${d.ipa}</span><span class="ru">— ${d.ru}</span></div>`
+).join('');
+
+// generic builder for text-input exercises
+function buildTextExercise(containerId, items, renderLeft){
+  // items: [{prompt, answer, extra}]
+  const shuffled=shuffle(items);
+  const el=document.getElementById(containerId);
+  el.innerHTML=shuffled.map((it,i)=>
+   `<div class="item" data-answer="${norm(it.answer)}" data-word="${it.word}">
+      <span class="num">${i+1}.</span>${renderLeft(it)}
+      <input type="text" placeholder="ваш ответ">
+      <span class="result"></span>
+    </div>`).join('');
+}
+function checkAll(containerId){
+  document.querySelectorAll('#'+containerId+' .item').forEach(it=>{
+    const input=it.querySelector('input'); const res=it.querySelector('.result');
+    const ok = norm(input.value)===it.dataset.answer;
+    res.textContent= ok?'✔':'✘'; res.className='result '+(ok?'ok':'no');
+    if(!ok) markProblem(it.dataset.word);
+  });
+}
+function showAll(containerId){
+  document.querySelectorAll('#'+containerId+' .item').forEach(it=>{
+    const input=it.querySelector('input')||it.querySelector('textarea');
+    if(!input.nextElementSibling || !input.nextElementSibling.classList.contains('answerShown')){
+      const span=document.createElement('span'); span.className='answerShown'; span.textContent='→ '+it.dataset.answer;
+      it.appendChild(span);
+    }
+  });
+}
+
+// Ex1 unscramble
+buildTextExercise('ex1', DATA.map(d=>({word:d.w,answer:d.w,scr:scrambleLetters(d.w)})),
+  it=>`<span class="scramble">${it.scr}</span>`);
+
+// Ex2 dictation
+buildTextExercise('ex2', DATA.map(d=>({word:d.w,answer:d.w})),
+  it=>`<button class="spk" onclick="speak(&quot;${it.word.replace(/"/g,'')}&quot;)">🔊</button>`);
+
+// Ex4 definitions
+buildTextExercise('ex4', DATA.map(d=>({word:d.w,answer:d.w,def:d.def})),
+  it=>`<span class="def">${it.def}</span>`);
+
+// Ex5 picture -> sentence (8 items)
+const picWords=shuffle(DATA).slice(0,8);
+document.getElementById('ex5').innerHTML = picWords.map((d,i)=>
+ `<div class="item" data-word="${d.w}"><span class="num">${i+1}.</span><span class="emoji">${d.emoji}</span>
+  <textarea placeholder="Write a sentence using '${d.w}'"></textarea></div>`).join('');
+
+// Ex6 dialogues (8 items)
+const dlgShuffled=shuffle(DIALOGUES);
+document.getElementById('ex6').innerHTML = dlgShuffled.map((d,i)=>
+ `<div class="item" data-answer="${norm(d[2])}" data-word="${d[2]}">
+   <span class="num">${i+1}.</span>
+   <span class="dialog">A: ${d[0]}<br>B: ${d[1]}</span>
+   <input type="text" placeholder="fill the gap"><span class="result"></span></div>`).join('');
+
+// Ex7 own sentences (8 items, different subset order)
+const ownWords=shuffle(DATA).slice(0,8);
+document.getElementById('ex7').innerHTML = ownWords.map((d,i)=>
+ `<div class="item" data-word="${d.w}"><span class="num">${i+1}.</span><b style="min-width:140px">${d.w}</b>
+  <textarea placeholder="Your sentence..."></textarea></div>`).join('');
+
+function copyAll(containerId){
+  const texts=[...document.querySelectorAll('#'+containerId+' textarea')].map((t,i)=>(i+1)+'. '+(t.value||'—')).join('\n');
+  navigator.clipboard.writeText(texts).then(()=>alert('Скопировано!')).catch(()=>alert('Не удалось скопировать — скопируйте вручную.'));
+}
+
+// Ex9 recall
+function checkRecall(){
+  const val=document.getElementById('recallArea').value;
+  const said=new Set(val.split(/[,\n]/).map(norm).filter(Boolean));
+  let found=[];
+  DATA.forEach(d=>{ if(said.has(norm(d.w))) found.push(d.w); else markProblem(d.w); });
+  document.getElementById('recallResult').innerHTML =
+    `Вспомнили: <b>${found.length} / ${DATA.length}</b><br>Пропущено: ${DATA.filter(d=>!found.includes(d.w)).map(d=>d.w).join(', ')||'—'}`;
+}
+
+// Ex10 weak words
+document.getElementById('chooseWords').innerHTML = DATA.map(d=>
+ `<label><input type="checkbox" value="${d.w}" onchange="limitThree(this)"> ${d.w}</label>`).join('');
+function limitThree(cb){
+  const checked=[...document.querySelectorAll('#chooseWords input:checked')];
+  if(checked.length>3){ cb.checked=false; alert('Выберите ровно 3 слова.'); }
+}
+function makeWeakDrill(){
+  const checked=[...document.querySelectorAll('#chooseWords input:checked')].map(c=>c.value);
+  if(checked.length!==3){ alert('Выберите ровно 3 слова.'); return; }
+  const items=checked.map(w=>DATA.find(d=>d.w===w));
+  document.getElementById('weakOut').innerHTML = `<h3 style="font-family:Verdana,sans-serif;font-size:.9rem">Тренировка</h3>` +
+   items.map((d,i)=>`<div class="item" data-answer="${norm(d.w)}" data-word="${d.w}">
+     <span class="num">${i+1}.</span>
+     <button class="spk" onclick="speak(&quot;${d.w.replace(/"/g,'')}&quot;)">🔊</button>
+     <span class="scramble">${scrambleLetters(d.w)}</span>
+     <input type="text" placeholder="write the word"><span class="result"></span></div>`).join('') +
+   `<button class="check" onclick="checkAll('weakOut')">Проверить</button>`;
+}
+renderProblems();
+</script>
+</body>
+</html>
