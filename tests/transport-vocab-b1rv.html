@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Транспорт и дорога — тренажёр B1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --asphalt-1:#1B1D21;
+    --asphalt-2:#24272D;
+    --asphalt-3:#2F333B;
+    --line:#3B4048;
+    --paint-yellow:#F5C33B;
+    --paint-yellow-dim:#B4922A;
+    --text-hi:#F3F1E9;
+    --text-lo:#A8ADB6;
+    --go:#4CAF6D;
+    --stop:#E15B4B;
+    --shadow: 0 10px 30px rgba(0,0,0,.35);
+    box-sizing:border-box;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  html{scroll-padding-top:env(safe-area-inset-top,0px);}
+  *,*::before,*::after{box-sizing:inherit;}
+  body{
+    margin:0;
+    background:var(--asphalt-1);
+    background-image:
+      radial-gradient(ellipse at top, rgba(245,195,59,0.05), transparent 55%);
+    color:var(--text-hi);
+    font-family:'Inter',system-ui,sans-serif;
+    line-height:1.55;
+  }
+  a{color:var(--paint-yellow);}
+  .roadline{
+    height:10px;
+    background-image: repeating-linear-gradient(90deg, var(--paint-yellow) 0 34px, transparent 34px 60px);
+    background-color: #2A2D33;
+    opacity:.9;
+  }
+  header.hero{
+    padding:44px 20px 34px;
+    background:linear-gradient(180deg, var(--asphalt-2), var(--asphalt-1));
+    border-bottom:1px solid var(--line);
+  }
+  .hero-inner{max-width:760px;margin:0 auto;}
+  .kicker{
+    font-family:'Oswald',sans-serif;
+    font-weight:500;
+    letter-spacing:.02em;
+    color:var(--paint-yellow);
+    font-size:15px;
+    margin:0 0 6px;
+  }
+  h1{
+    font-family:'Oswald',sans-serif;
+    font-weight:700;
+    font-size:clamp(28px,5vw,42px);
+    margin:0 0 12px;
+    letter-spacing:.01em;
+  }
+  .hero p{color:var(--text-lo);font-size:16px;max-width:60ch;margin:0;}
+  main{
+    max-width:1040px;
+    margin:0 auto;
+    padding:28px 20px 90px;
+    display:grid;
+    grid-template-columns: minmax(0,1fr) 260px;
+    gap:28px;
+    align-items:start;
+  }
+  .content{min-width:0;}
+  aside.sidebar{
+    position:sticky;
+    top:16px;
+    background:var(--asphalt-2);
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:16px;
+  }
+  aside.sidebar h2{
+    font-family:'Oswald',sans-serif;
+    font-size:16px;
+    margin:0 0 4px;
+    color:var(--paint-yellow);
+  }
+  aside.sidebar .hint{font-size:13px;color:var(--text-lo);margin:0 0 12px;}
+  #problem-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;}
+  #problem-list li{
+    display:flex;justify-content:space-between;gap:8px;
+    font-size:14px;
+    border-bottom:1px dashed var(--line);
+    padding-bottom:6px;
+  }
+  #problem-list .w-en{font-weight:600;}
+  #problem-list .w-ru{color:var(--text-lo);font-size:12.5px;display:block;}
+  #problem-list .count{
+    background:var(--stop);
+    color:#fff;
+    border-radius:20px;
+    min-width:22px;height:22px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:12px;font-weight:700;flex:none;
+  }
+  #problem-empty{color:var(--text-lo);font-size:13.5px;}
+
+  section{margin:0 0 44px;}
+  .sec-head{display:flex;align-items:baseline;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
+  .sec-head h2{
+    font-family:'Oswald',sans-serif;
+    font-size:22px;font-weight:600;margin:0;
+  }
+  .sec-sub{color:var(--text-lo);font-size:14.5px;margin:2px 0 16px;max-width:70ch;}
+
+  /* vocab table */
+  .vocab-grid{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:8px;
+  }
+  .vocab-row{
+    display:grid;
+    grid-template-columns:44px 1.4fr 1fr 2fr;
+    gap:10px;
+    align-items:center;
+    background:var(--asphalt-2);
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:10px 12px;
+  }
+  .vocab-row .en{font-weight:600;}
+  .vocab-row .ipa{color:var(--paint-yellow-dim);font-size:13px;}
+  .vocab-row .ru{color:var(--text-lo);}
+  .vocab-row .ex{font-size:13.5px;color:var(--text-lo);font-style:italic;}
+  button.btn-audio{
+    width:34px;height:34px;border-radius:50%;
+    border:1px solid var(--line);
+    background:var(--asphalt-3);
+    color:var(--paint-yellow);
+    cursor:pointer;font-size:15px;
+    display:flex;align-items:center;justify-content:center;
+    flex:none;
+  }
+  button.btn-audio:hover{border-color:var(--paint-yellow);}
+  button.btn-audio:focus-visible, .answer-input:focus-visible, input:focus-visible, .choice-label:focus-within{
+    outline:2px solid var(--paint-yellow); outline-offset:2px;
+  }
+
+  /* exercise rows */
+  .qrow{
+    display:grid;
+    grid-template-columns:28px 1fr;
+    gap:10px 12px;
+    padding:14px 0;
+    border-bottom:1px solid var(--line);
+  }
+  .qnum{
+    font-family:'Oswald',sans-serif;
+    color:var(--paint-yellow-dim);
+    font-weight:600;
+  }
+  .qtext{grid-column:2;font-size:15.5px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .answer-input{
+    grid-column:2;
+    margin-top:6px;
+    width:100%;
+    max-width:480px;
+    background:var(--asphalt-3);
+    border:1px solid var(--line);
+    color:var(--text-hi);
+    padding:9px 11px;
+    border-radius:4px;
+    font-size:15px;
+    font-family:inherit;
+  }
+  .answer-input.correct{border-color:var(--go);box-shadow:0 0 0 1px var(--go) inset;}
+  .answer-input.wrong{border-color:var(--stop);box-shadow:0 0 0 1px var(--stop) inset;}
+  .feedback{grid-column:2;font-size:13.5px;margin-top:4px;min-height:1.2em;}
+  .feedback.ok{color:var(--go);}
+  .feedback.bad{color:var(--stop);}
+  .feedback.reveal{color:var(--paint-yellow);}
+
+  .choices{grid-column:2;display:flex;flex-direction:column;gap:8px;margin-top:6px;}
+  .choice-label{
+    display:flex;gap:10px;align-items:flex-start;
+    background:var(--asphalt-3);
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:9px 12px;
+    cursor:pointer;
+    font-size:15px;
+  }
+  .choice-label input{margin-top:4px;flex:none;}
+  .choice-label.correct{border-color:var(--go);}
+  .choice-label.wrong{border-color:var(--stop);}
+
+  .row-actions{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0 4px;}
+  button.btn{
+    font-family:'Oswald',sans-serif;
+    font-weight:500;
+    letter-spacing:.01em;
+    background:var(--paint-yellow);
+    color:#22201a;
+    border:none;
+    padding:10px 18px;
+    border-radius:3px;
+    cursor:pointer;
+    font-size:14.5px;
+  }
+  button.btn.secondary{
+    background:transparent;
+    color:var(--text-hi);
+    border:1px solid var(--line);
+  }
+  button.btn:hover{filter:brightness(1.08);}
+  .score-line{font-size:14px;color:var(--text-lo);margin-top:8px;min-height:1.2em;}
+
+  /* least confident */
+  .word-picker{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
+    gap:8px;
+    margin-bottom:16px;
+  }
+  .word-picker label{
+    display:flex;gap:8px;align-items:center;
+    background:var(--asphalt-2);
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:8px 10px;
+    font-size:13.5px;
+    cursor:pointer;
+  }
+  .word-picker input:disabled + span{opacity:.35;}
+  #own-practice{display:none;margin-top:18px;}
+  #own-practice .card{
+    background:var(--asphalt-2);
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:14px 16px;
+    margin-bottom:12px;
+  }
+
+  /* audio + export footer */
+  .check-box{
+    background:var(--asphalt-2);
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:18px;
+  }
+  .check-box .status{font-size:14px;color:var(--text-lo);margin-top:10px;min-height:1.3em;}
+  textarea#export-area{
+    width:100%;min-height:140px;
+    background:var(--asphalt-3);
+    color:var(--text-hi);
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:10px;
+    font-family:ui-monospace,Consolas,monospace;
+    font-size:12.5px;
+    margin-top:12px;
+  }
+
+  @media (max-width:820px){
+    main{grid-template-columns:1fr;}
+    aside.sidebar{position:static;order:-1;}
+    .vocab-row{grid-template-columns:36px 1fr;grid-template-areas:"a en" "b ru" "c ex";}
+    .vocab-row .ipa{grid-column:2;}
+  }
+</style>
+</head>
+<body>
+
+<div class="roadline"></div>
+<header class="hero">
+  <div class="hero-inner">
+    <p class="kicker">Transport &amp; Traffic · Уровень B1</p>
+    <h1>Транспорт и дорожное движение</h1>
+    <p>28 слов и выражений по теме транспорта. Послушай, впиши руками, проверь себя — ошибки сами соберутся в список справа.</p>
+  </div>
+</header>
+<div class="roadline"></div>
+
+<main>
+  <div class="content">
+
+    <section id="vocab-section">
+      <div class="sec-head"><h2>Повторение слов</h2></div>
+      <p class="sec-sub">Нажми на 🔊, чтобы услышать произношение (используется голос Google US English, если он доступен в браузере).</p>
+      <div class="vocab-grid" id="vocab-grid"></div>
+    </section>
+
+    <section id="ex2">
+      <div class="sec-head"><h2>Упражнение 1 · Вставь слово по контексту</h2></div>
+      <p class="sec-sub">Впиши подходящее слово или выражение вместо ___.</p>
+      <div id="ex2-list"></div>
+      <div class="row-actions">
+        <button class="btn" data-check="ex2">Проверить</button>
+        <button class="btn secondary" data-show="ex2">Показать ответы</button>
+      </div>
+      <div class="score-line" id="ex2-score"></div>
+    </section>
+
+    <section id="ex3">
+      <div class="sec-head"><h2>Упражнение 2 · Which sentence sounds natural?</h2></div>
+      <p class="sec-sub">Выбери вариант, который звучит естественно для носителя языка.</p>
+      <div id="ex3-list"></div>
+      <div class="row-actions">
+        <button class="btn" data-check="ex3">Проверить</button>
+        <button class="btn secondary" data-show="ex3">Показать ответы</button>
+      </div>
+      <div class="score-line" id="ex3-score"></div>
+    </section>
+
+    <section id="ex4">
+      <div class="sec-head"><h2>Упражнение 3 · Which answer is impossible?</h2></div>
+      <p class="sec-sub">В каждом предложении выбери вариант, который сюда НЕ подходит.</p>
+      <div id="ex4-list"></div>
+      <div class="row-actions">
+        <button class="btn" data-check="ex4">Проверить</button>
+        <button class="btn secondary" data-show="ex4">Показать ответы</button>
+      </div>
+      <div class="score-line" id="ex4-score"></div>
+    </section>
+
+    <section id="ex5">
+      <div class="sec-head"><h2>Упражнение 4 · Complete the mini-situations</h2></div>
+      <p class="sec-sub">Прочитай ситуацию и допиши нужное слово или выражение.</p>
+      <div id="ex5-list"></div>
+      <div class="row-actions">
+        <button class="btn" data-check="ex5">Проверить</button>
+        <button class="btn secondary" data-show="ex5">Показать ответы</button>
+      </div>
+      <div class="score-line" id="ex5-score"></div>
+    </section>
+
+    <section id="ex6">
+      <div class="sec-head"><h2>Твои 3 слова</h2></div>
+      <p class="sec-sub">Отметь до трёх слов, в которых ты чувствуешь себя менее всего уверенно — соберём для них отдельную тренировку.</p>
+      <div class="word-picker" id="word-picker"></div>
+      <div class="row-actions">
+        <button class="btn" id="build-practice">Собрать тренировку</button>
+      </div>
+      <div id="own-practice"></div>
+    </section>
+
+    <section id="ex7">
+      <div class="sec-head"><h2>Проверка перед финишем</h2></div>
+      <div class="check-box">
+        <p style="margin:0 0 4px;font-size:14.5px;">1. Аудио — нажми и убедись, что голос звучит:</p>
+        <button class="btn secondary" id="audio-check">🔊 Проверить голос</button>
+        <div class="status" id="audio-status">Ещё не проверено.</div>
+        <p style="margin:18px 0 4px;font-size:14.5px;">2. Твои ответы сохраняются автоматически в этом браузере. Чтобы отправить их преподавателю — скопируй текст ниже:</p>
+        <button class="btn secondary" id="export-btn">Собрать мои ответы</button>
+        <div class="status" id="export-status"></div>
+        <textarea id="export-area" readonly placeholder="Нажми «Собрать мои ответы», чтобы увидеть текст здесь…"></textarea>
+        <button class="btn secondary" id="copy-btn" style="margin-top:10px;">Скопировать</button>
+      </div>
+    </section>
+
+  </div>
+
+  <aside class="sidebar">
+    <h2>Проблемные слова</h2>
+    <p class="hint">Сюда попадают слова, в которых ты ошибся хотя бы раз.</p>
+    <p id="problem-empty">Пока пусто — начни выполнять упражнения.</p>
+    <ul id="problem-list"></ul>
+  </aside>
+</main>
+
+<script>
+/* ---------------- DATA ---------------- */
+const VOCAB = [
+ {id:'motorbike', en:'motorbike', ipa:'/ˈməʊtəbaɪk/', ru:'мотоцикл', example:'He rides a motorbike to work every day.'},
+ {id:'underground', en:'the Underground / subway', ipa:'/ˈʌndəɡraʊnd/', ru:'метро', example:'We took the Underground in London.'},
+ {id:'scooter', en:'scooter', ipa:'/ˈskuːtər/', ru:'скутер, самокат', example:'The boy rides a scooter to school.'},
+ {id:'lorry', en:'lorry / truck', ipa:'/ˈlɒri/', ru:'грузовик', example:'A lorry is carrying goods along the motorway.'},
+ {id:'train', en:'train', ipa:'/treɪn/', ru:'поезд', example:'The train is late again this morning.'},
+ {id:'shuttlebus', en:'shuttle bus', ipa:'/ˈʃʌtl bʌs/', ru:'маршрутка, автобус-экспресс', example:'We took a shuttle bus to the airport.'},
+ {id:'coach', en:'coach', ipa:'/kəʊtʃ/', ru:'междугородний автобус', example:'We went to Paris by coach.'},
+ {id:'van', en:'van', ipa:'/væn/', ru:'фургон', example:'The van delivers food to shops every morning.'},
+ {id:'ferry', en:'ferry', ipa:'/ˈferi/', ru:'паром', example:'We crossed the river by ferry.'},
+ {id:'motorway', en:'motorway / freeway', ipa:'/ˈməʊtəweɪ/', ru:'автомагистраль', example:'They drove fast on the motorway.'},
+ {id:'tram', en:'tram', ipa:'/træm/', ru:'трамвай', example:'I often take the tram to the city centre.'},
+ {id:'seatbelt', en:'seatbelt', ipa:'/ˈsiːtbelt/', ru:'ремень безопасности', example:'Always wear a seatbelt in the car.'},
+ {id:'trolleybus', en:'trolley bus', ipa:'/ˈtrɒli bʌs/', ru:'троллейбус', example:'There is a trolley bus stop here.'},
+ {id:'speedcamera', en:'speed camera', ipa:'/spiːd ˈkæmrə/', ru:'камера контроля скорости', example:'The speed camera caught the car doing ninety.'},
+ {id:'zebracrossing', en:'zebra crossing', ipa:'/ˈzebrə ˈkrɒsɪŋ/', ru:'пешеходный переход', example:'Cross the road at the zebra crossing.'},
+ {id:'roadworks', en:'road works', ipa:'/rəʊd wɜːks/', ru:'дорожные работы', example:'There are road works near my house.'},
+ {id:'parkingfine', en:'parking fine', ipa:'/ˈpɑːkɪŋ faɪn/', ru:'штраф за парковку', example:'He got a parking fine outside the shop.'},
+ {id:'rushhour', en:'rush hour', ipa:'/rʌʃ ˈaʊə/', ru:'час пик', example:'The traffic is terrible during rush hour.'},
+ {id:'trafficjam', en:'traffic jam', ipa:'/ˈtræfɪk dʒæm/', ru:'пробка', example:'We were stuck in a traffic jam for an hour.'},
+ {id:'cyclelane', en:'cycle lane', ipa:'/ˈsaɪkl leɪn/', ru:'велосипедная дорожка', example:'There is a new cycle lane in the city.'},
+ {id:'pedestrianzone', en:'pedestrian zone', ipa:'/pəˈdestriən zəʊn/', ru:'пешеходная зона', example:'Cars are not allowed in the pedestrian zone.'},
+ {id:'trafficlights', en:'traffic lights', ipa:'/ˈtræfɪk laɪts/', ru:'светофор', example:'Stop at the traffic lights.'},
+ {id:'speedlimit', en:'speed limit', ipa:'/spiːd ˈlɪmɪt/', ru:'ограничение скорости', example:'The speed limit is fifty kilometres per hour here.'},
+ {id:'taxirank', en:'taxi rank', ipa:'/ˈtæksi ræŋk/', ru:'стоянка такси', example:'The taxi rank is near the station.'},
+ {id:'carcrash', en:'car crash', ipa:'/kɑː kræʃ/', ru:'автомобильная авария', example:'He was in a car crash last year.'},
+ {id:'petrolstation', en:'petrol station', ipa:'/ˈpetrəl ˈsteɪʃn/', ru:'бензоколонка, заправка', example:'We stopped at the petrol station to fill up.'},
+ {id:'pedestrian', en:'pedestrian', ipa:'/pəˈdestriən/', ru:'пешеход', example:'Many pedestrians are in the city centre.'},
+ {id:'wearseatbelt', en:'wear a seatbelt', ipa:'/weər ə ˈsiːtbelt/', ru:'пристёгивать ремень безопасности', example:'He always wears a seatbelt.'}
+];
+const byId = id => VOCAB.find(v=>v.id===id);
+
+const EX2 = [
+ {prompt:"In London, people often take the ___ to get around quickly.", answers:['underground','the underground','subway'], wordId:'underground'},
+ {prompt:"The council built a new ___ so pedestrians could cross safely.", answers:['zebra crossing'], wordId:'zebracrossing'},
+ {prompt:"During ___, the roads are always packed with cars.", answers:['rush hour'], wordId:'rushhour'},
+ {prompt:"My brother rides his ___ to work every day.", answers:['motorbike'], wordId:'motorbike'},
+ {prompt:"We went from London to Edinburgh by ___ instead of train.", answers:['coach'], wordId:'coach'},
+ {prompt:"The delivery ___ blocked the entrance to the shop.", answers:['van'], wordId:'van'},
+ {prompt:"You'll get a ___ if you park here without paying.", answers:['parking fine'], wordId:'parkingfine'},
+ {prompt:"There's a ___ near my flat, so I never worry about running out of petrol.", answers:['petrol station'], wordId:'petrolstation'},
+ {prompt:"The city centre is a ___, so no cars are allowed.", answers:['pedestrian zone'], wordId:'pedestrianzone'},
+ {prompt:"He crossed the river on the old ___ instead of using the bridge.", answers:['ferry'], wordId:'ferry'}
+];
+
+const EX3 = [
+ {natural:"I take the tram to work.", unnatural:"I drive the tram to work.", wordId:'tram'},
+ {natural:"He crossed at the zebra crossing.", unnatural:"He crossed at the zebra pass.", wordId:'zebracrossing'},
+ {natural:"She always wears her seatbelt.", unnatural:"She always puts her seatbelt.", wordId:'seatbelt'},
+ {natural:"We were caught by a speed camera.", unnatural:"We were caught by a speed photo.", wordId:'speedcamera'},
+ {natural:"The taxi rank is outside the station.", unnatural:"The taxi row is outside the station.", wordId:'taxirank'},
+ {natural:"There's a cycle lane along the river.", unnatural:"There's a cycle road along the river.", wordId:'cyclelane'},
+ {natural:"Petrol stations sell fuel and snacks.", unnatural:"Petrol stops sell fuel and snacks.", wordId:'petrolstation'},
+ {natural:"The lorry driver stopped for a break.", unnatural:"The lorry man stopped for a break.", wordId:'lorry'},
+ {natural:"The pedestrian zone is full of cafes.", unnatural:"The pedestrian area zone is full of cafes.", wordId:'pedestrianzone'},
+ {natural:"He got a parking fine yesterday.", unnatural:"He got a parking punishment yesterday.", wordId:'parkingfine'}
+];
+
+const EX4 = [
+ {prompt:"The ___ was full of cars.", options:["traffic jam","motorway","seatbelt"], impossible:"seatbelt", wordId:'seatbelt'},
+ {prompt:"He parked his ___ outside the shop.", options:["van","lorry","zebra crossing"], impossible:"zebra crossing", wordId:'zebracrossing'},
+ {prompt:"There was a bad ___ on the motorway this morning.", options:["car crash","traffic jam","speed limit"], impossible:"speed limit", wordId:'speedlimit'},
+ {prompt:"She waited for the ___ at the stop.", options:["tram","coach","parking fine"], impossible:"parking fine", wordId:'parkingfine'},
+ {prompt:"Drivers must obey the ___ on this road.", options:["speed limit","traffic lights","rush hour"], impossible:"rush hour", wordId:'rushhour'},
+ {prompt:"We queued for a long time at the ___.", options:["petrol station","taxi rank","seatbelt"], impossible:"seatbelt", wordId:'seatbelt'},
+ {prompt:"The city built a new ___ for cyclists.", options:["cycle lane","pedestrian zone","speed camera"], impossible:"speed camera", wordId:'speedcamera'},
+ {prompt:"He crossed the road at the ___.", options:["zebra crossing","traffic lights","parking fine"], impossible:"parking fine", wordId:'parkingfine'},
+ {prompt:"The ___ picked up goods from the factory.", options:["lorry","van","traffic jam"], impossible:"traffic jam", wordId:'trafficjam'},
+ {prompt:"You can catch the ___ across the river.", options:["ferry","tram","motorway"], impossible:"motorway", wordId:'motorway'}
+];
+
+const EX5 = [
+ {prompt:"You're late for work because every road is blocked with cars. You say: 'I'm stuck in a ___.'", answers:['traffic jam'], wordId:'trafficjam'},
+ {prompt:"A friend asks how you got to the airport quickly. You say: 'We took the ___.'", answers:['shuttle bus'], wordId:'shuttlebus'},
+ {prompt:"A police officer stops your car because you forgot something important. He says: 'Please put on your ___.'", answers:['seatbelt'], wordId:'seatbelt'},
+ {prompt:"You want to cross a busy street safely. You look for the ___.", answers:['zebra crossing'], wordId:'zebracrossing'},
+ {prompt:"Your car is almost out of fuel. You need to find a ___.", answers:['petrol station'], wordId:'petrolstation'},
+ {prompt:"You need a taxi quickly. You go to the ___ outside the station.", answers:['taxi rank'], wordId:'taxirank'},
+ {prompt:"The council is repairing the road, so traffic is slow. You explain: 'There are ___ ahead.'", answers:['road works'], wordId:'roadworks'},
+ {prompt:"You parked in the wrong place and now there's a ticket on your car. You got a ___.", answers:['parking fine'], wordId:'parkingfine'},
+ {prompt:"Every morning between 8 and 9, the roads are packed. This is called ___.", answers:['rush hour'], wordId:'rushhour'},
+ {prompt:"You want to travel by boat across the sea to another country. You take a ___.", answers:['ferry'], wordId:'ferry'}
+];
+
+/* ---------------- STORAGE ---------------- */
+const STORE_KEY = 'transportVocabB1_v1';
+let progress = {mistakes:{}, answers:{}};
+try{
+  const raw = localStorage.getItem(STORE_KEY);
+  if(raw) progress = JSON.parse(raw);
+  if(!progress.mistakes) progress.mistakes = {};
+  if(!progress.answers) progress.answers = {};
+}catch(e){ console.warn('localStorage недоступен', e); }
+
+function saveProgress(){
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify(progress)); }catch(e){}
+}
+function addMistake(wordId){
+  if(!wordId) return;
+  progress.mistakes[wordId] = (progress.mistakes[wordId]||0)+1;
+  saveProgress();
+  renderSidebar();
+}
+function saveAnswer(key, idx, value){
+  if(!progress.answers[key]) progress.answers[key] = {};
+  progress.answers[key][idx] = value;
+  saveProgress();
+}
+
+function renderSidebar(){
+  const list = document.getElementById('problem-list');
+  const empty = document.getElementById('problem-empty');
+  const entries = Object.entries(progress.mistakes).sort((a,b)=>b[1]-a[1]);
+  if(entries.length===0){
+    empty.style.display='block';
+    list.innerHTML='';
+    return;
+  }
+  empty.style.display='none';
+  list.innerHTML = entries.map(([id,count])=>{
+    const w = byId(id);
+    if(!w) return '';
+    return `<li><span><span class="w-en">${escapeHtml(w.en)}</span><span class="w-ru">${escapeHtml(w.ru)}</span></span><span class="count">${count}</span></li>`;
+  }).join('');
+}
+
+/* ---------------- HELPERS ---------------- */
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function normalize(s){
+  return String(s).toLowerCase().trim()
+    .replace(/[.,!?;:'"’]/g,'')
+    .replace(/^(the|a|an)\s+/,'')
+    .replace(/\s+/g,' ');
+}
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+/* ---------------- SPEECH ---------------- */
+let voices = [];
+function loadVoices(){
+  try{ voices = window.speechSynthesis ? window.speechSynthesis.getVoices() : []; }catch(e){ voices=[]; }
+}
+if('speechSynthesis' in window){
+  window.speechSynthesis.onvoiceschanged = loadVoices;
+  loadVoices();
+}
+function pickVoice(){
+  return voices.find(v=>/Google US English/i.test(v.name))
+      || voices.find(v=>v.lang==='en-US')
+      || voices.find(v=>/^en/i.test(v.lang))
+      || voices[0] || null;
+}
+function speak(text){
+  try{
+    if(!('speechSynthesis' in window)) throw new Error('no tts');
+    const u = new SpeechSynthesisUtterance(text);
+    const v = pickVoice();
+    if(v) u.voice = v;
+    u.lang = 'en-US';
+    u.rate = 0.95;
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(u);
+    return true;
+  }catch(e){
+    console.warn(e);
+    return false;
+  }
+}
+document.addEventListener('click', e=>{
+  const btn = e.target.closest('.btn-audio');
+  if(btn){ speak(btn.dataset.audio); }
+});
+
+/* ---------------- RENDER: VOCAB ---------------- */
+function renderVocab(){
+  const grid = document.getElementById('vocab-grid');
+  grid.innerHTML = VOCAB.map(w=>`
+    <div class="vocab-row">
+      <button class="btn-audio" data-audio="${escapeHtml(w.example)}" aria-label="Слушать ${escapeHtml(w.en)}">🔊</button>
+      <div><div class="en">${escapeHtml(w.en)}</div><div class="ipa">${escapeHtml(w.ipa)}</div></div>
+      <div class="ru">${escapeHtml(w.ru)}</div>
+      <div class="ex">${escapeHtml(w.example)}</div>
+    </div>
+  `).join('');
+}
+
+/* ---------------- GENERIC EXERCISE ENGINE ---------------- */
+// type-in exercises: EX1 (sentence answers=[sentence]), EX2, EX5 (answers array)
+function buildTypeIn(items){
+  return items.map(it=> it.answers ? it : {...it, answers:[it.sentence]} );
+}
+const EXDATA = {
+  ex2: {type:'typein', items: EX2, order:null},
+  ex5: {type:'typein', items: EX5, order:null},
+  ex3: {type:'choice2', items: EX3, order:null},
+  ex4: {type:'choice3', items: EX4, order:null}
+};
+
+function renderTypeIn(key){
+  const data = EXDATA[key];
+  data.order = shuffle(data.items.map((_,i)=>i));
+  const container = document.getElementById(key+'-list');
+  container.innerHTML = data.order.map((idx,pos)=>{
+    const it = data.items[idx];
+    const audioBtn = it.audio ? `<button class="btn-audio" data-audio="${escapeHtml(it.audio)}" aria-label="Слушать">🔊</button>` : '';
+    const promptText = it.audio ? 'Прослушай и запиши предложение:' : it.prompt;
+    return `<div class="qrow">
+      <div class="qnum">${pos+1}</div>
+      <div class="qtext">${escapeHtml(promptText)} ${audioBtn}</div>
+      <input type="text" class="answer-input" data-key="${key}" data-idx="${idx}" placeholder="напиши здесь…">
+      <div class="feedback" data-fb="${key}-${idx}"></div>
+    </div>`;
+  }).join('');
+  // restore saved answers
+  container.querySelectorAll('.answer-input').forEach(inp=>{
+    const idx = inp.dataset.idx;
+    const saved = progress.answers[key] && progress.answers[key][idx];
+    if(saved) inp.value = saved;
+    inp.addEventListener('input', ()=> saveAnswer(key, idx, inp.value));
+  });
+}
+
+function renderChoice2(key){
+  const data = EXDATA[key];
+  data.order = shuffle(data.items.map((_,i)=>i));
+  const container = document.getElementById(key+'-list');
+  container.innerHTML = data.order.map((idx,pos)=>{
+    const it = data.items[idx];
+    const opts = shuffle([{text:it.natural, correct:true},{text:it.unnatural, correct:false}]);
+    const optsHtml = opts.map((o,oi)=>`
+      <label class="choice-label" data-correct="${o.correct}">
+        <input type="radio" name="${key}-${idx}" value="${oi}">
+        <span>${escapeHtml(o.text)}</span>
+      </label>`).join('');
+    return `<div class="qrow">
+      <div class="qnum">${pos+1}</div>
+      <div class="choices" data-group="${key}-${idx}">${optsHtml}</div>
+      <div class="feedback" data-fb="${key}-${idx}" style="grid-column:2;"></div>
+    </div>`;
+  }).join('');
+  restoreChoiceAnswers(key);
+}
+
+function renderChoice3(key){
+  const data = EXDATA[key];
+  data.order = shuffle(data.items.map((_,i)=>i));
+  const container = document.getElementById(key+'-list');
+  container.innerHTML = data.order.map((idx,pos)=>{
+    const it = data.items[idx];
+    const opts = shuffle(it.options.map(o=>({text:o, correct:o===it.impossible})));
+    const optsHtml = opts.map((o,oi)=>`
+      <label class="choice-label" data-correct="${o.correct}">
+        <input type="radio" name="${key}-${idx}" value="${oi}">
+        <span>${escapeHtml(o.text)}</span>
+      </label>`).join('');
+    return `<div class="qrow">
+      <div class="qnum">${pos+1}</div>
+      <div class="qtext" style="grid-column:2;">${escapeHtml(it.prompt)}</div>
+      <div class="choices" data-group="${key}-${idx}">${optsHtml}</div>
+      <div class="feedback" data-fb="${key}-${idx}" style="grid-column:2;"></div>
+    </div>`;
+  }).join('');
+  restoreChoiceAnswers(key);
+}
+
+function restoreChoiceAnswers(key){
+  const container = document.getElementById(key+'-list');
+  container.querySelectorAll('input[type=radio]').forEach(r=>{
+    const groupKey = r.name;
+    const saved = progress.answers[key] && progress.answers[key][groupKey];
+    if(saved !== undefined && String(saved)===r.value) r.checked = true;
+    r.addEventListener('change', ()=> saveAnswer(key, groupKey, r.value));
+  });
+}
+
+function checkExercise(key){
+  const data = EXDATA[key];
+  let correctCount = 0, total = 0;
+  if(data.type==='typein'){
+    const container = document.getElementById(key+'-list');
+    container.querySelectorAll('.answer-input').forEach(inp=>{
+      total++;
+      const idx = inp.dataset.idx;
+      const it = data.items[idx];
+      const fb = container.querySelector(`[data-fb="${key}-${idx}"]`);
+      const ok = it.answers.some(a=>normalize(a)===normalize(inp.value));
+      inp.classList.remove('correct','wrong');
+      if(inp.value.trim()===''){
+        fb.textContent = 'Пустой ответ';
+        fb.className = 'feedback bad';
+        inp.classList.add('wrong');
+        addMistake(it.wordId);
+      } else if(ok){
+        correctCount++;
+        inp.classList.add('correct');
+        fb.textContent = '✓ верно';
+        fb.className = 'feedback ok';
+      } else {
+        inp.classList.add('wrong');
+        fb.textContent = '✗ неверно';
+        fb.className = 'feedback bad';
+        addMistake(it.wordId);
+      }
+    });
+  } else {
+    const container = document.getElementById(key+'-list');
+    data.order.forEach(idx=>{
+      total++;
+      const it = data.items[idx];
+      const group = container.querySelector(`[data-group="${key}-${idx}"]`);
+      const selected = group.querySelector('input[type=radio]:checked');
+      const fb = container.querySelector(`[data-fb="${key}-${idx}"]`);
+      group.querySelectorAll('.choice-label').forEach(l=>l.classList.remove('correct','wrong'));
+      if(!selected){
+        fb.textContent = 'Ответ не выбран';
+        fb.className = 'feedback bad';
+        addMistake(it.wordId);
+        return;
+      }
+      const label = selected.closest('.choice-label');
+      const isCorrect = label.dataset.correct === 'true';
+      if(isCorrect){
+        correctCount++;
+        label.classList.add('correct');
+        fb.textContent = '✓ верно';
+        fb.className = 'feedback ok';
+      } else {
+        label.classList.add('wrong');
+        group.querySelectorAll('.choice-label').forEach(l=>{ if(l.dataset.correct==='true') l.classList.add('correct'); });
+        fb.textContent = '✗ неверно';
+        fb.className = 'feedback bad';
+        addMistake(it.wordId);
+      }
+    });
+  }
+  document.getElementById(key+'-score').textContent = `Результат: ${correctCount} из ${total}`;
+}
+
+function showAnswers(key){
+  const data = EXDATA[key];
+  const container = document.getElementById(key+'-list');
+  if(data.type==='typein'){
+    container.querySelectorAll('.answer-input').forEach(inp=>{
+      const idx = inp.dataset.idx;
+      const it = data.items[idx];
+      const fb = container.querySelector(`[data-fb="${key}-${idx}"]`);
+      fb.textContent = 'Правильный ответ: ' + it.answers[0];
+      fb.className = 'feedback reveal';
+    });
+  } else {
+    data.order.forEach(idx=>{
+      const group = container.querySelector(`[data-group="${key}-${idx}"]`);
+      const fb = container.querySelector(`[data-fb="${key}-${idx}"]`);
+      const correctLabel = [...group.querySelectorAll('.choice-label')].find(l=>l.dataset.correct==='true');
+      group.querySelectorAll('.choice-label').forEach(l=>l.classList.remove('correct','wrong'));
+      if(correctLabel){
+        correctLabel.classList.add('correct');
+        fb.textContent = 'Правильный ответ: ' + correctLabel.querySelector('span').textContent;
+        fb.className = 'feedback reveal';
+      }
+    });
+  }
+}
+
+document.addEventListener('click', e=>{
+  const c = e.target.closest('[data-check]');
+  if(c){ checkExercise(c.dataset.check); }
+  const s = e.target.closest('[data-show]');
+  if(s){ showAnswers(s.dataset.show); }
+});
+
+/* ---------------- LEAST CONFIDENT WORDS ---------------- */
+function renderWordPicker(){
+  const wrap = document.getElementById('word-picker');
+  wrap.innerHTML = VOCAB.map(w=>`
+    <label>
+      <input type="checkbox" class="pick-word" value="${w.id}">
+      <span>${escapeHtml(w.en)} — ${escapeHtml(w.ru)}</span>
+    </label>
+  `).join('');
+  wrap.addEventListener('change', ()=>{
+    const checked = wrap.querySelectorAll('.pick-word:checked');
+    const unchecked = wrap.querySelectorAll('.pick-word:not(:checked)');
+    unchecked.forEach(cb=> cb.disabled = checked.length>=3);
+  });
+}
+
+document.getElementById('build-practice').addEventListener('click', ()=>{
+  const ids = [...document.querySelectorAll('.pick-word:checked')].map(cb=>cb.value);
+  const box = document.getElementById('own-practice');
+  if(ids.length===0){
+    box.style.display='block';
+    box.innerHTML = '<p style="color:var(--text-lo)">Отметь хотя бы одно слово выше.</p>';
+    return;
+  }
+  box.style.display='block';
+  box.innerHTML = ids.map(id=>{
+    const w = byId(id);
+    const masked = w.example.replace(new RegExp(w.en.split(' ')[0].split('/')[0],'i'), '___');
+    return `<div class="card">
+      <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;">
+        <div><strong>${escapeHtml(w.en)}</strong> <span style="color:var(--paint-yellow-dim)">${escapeHtml(w.ipa)}</span><br><span style="color:var(--text-lo)">${escapeHtml(w.ru)}</span></div>
+        <button class="btn-audio" data-audio="${escapeHtml(w.example)}">🔊</button>
+      </div>
+      <p style="margin:10px 0 6px;">${escapeHtml(masked)}</p>
+      <input type="text" class="answer-input" placeholder="впиши слово…" data-key="own" data-idx="${id}">
+      <p style="margin:10px 0 0;color:var(--text-lo);font-size:13.5px;">Напиши своё предложение с этим словом:</p>
+      <input type="text" class="answer-input" placeholder="твоё предложение…" data-key="own-sentence" data-idx="${id}">
+    </div>`;
+  }).join('');
+  box.querySelectorAll('.answer-input').forEach(inp=>{
+    inp.addEventListener('input', ()=> saveAnswer(inp.dataset.key, inp.dataset.idx, inp.value));
+    const saved = progress.answers[inp.dataset.key] && progress.answers[inp.dataset.key][inp.dataset.idx];
+    if(saved) inp.value = saved;
+  });
+});
+
+/* ---------------- AUDIO CHECK ---------------- */
+document.getElementById('audio-check').addEventListener('click', ()=>{
+  const status = document.getElementById('audio-status');
+  const ok = speak('This is a test. Can you hear the voice clearly?');
+  const v = pickVoice();
+  if(ok){
+    status.textContent = v ? `Играет голос: ${v.name}` : 'Звук запущен, но голос определить не удалось.';
+  } else {
+    status.textContent = 'Синтез речи недоступен в этом браузере. Попробуй Chrome на компьютере.';
+  }
+});
+
+/* ---------------- EXPORT / COPY ---------------- */
+document.getElementById('export-btn').addEventListener('click', ()=>{
+  let lines = ['Транспорт и дорога B1 — ответы студента', new Date().toLocaleString('ru-RU'), ''];
+  const labels = {ex2:'Упражнение 1 (контекст)', ex3:'Упражнение 2 (natural)', ex4:'Упражнение 3 (impossible)', ex5:'Упражнение 4 (ситуации)', own:'Свои сложные слова', 'own-sentence':'Свои предложения'};
+  Object.keys(progress.answers).forEach(key=>{
+    lines.push('== ' + (labels[key]||key) + ' ==');
+    Object.entries(progress.answers[key]).forEach(([idx,val])=>{
+      if(val) lines.push(`  ${idx}: ${val}`);
+    });
+    lines.push('');
+  });
+  lines.push('Проблемные слова:');
+  Object.entries(progress.mistakes).sort((a,b)=>b[1]-a[1]).forEach(([id,count])=>{
+    const w = byId(id);
+    if(w) lines.push(`  ${w.en} (${w.ru}) — ошибок: ${count}`);
+  });
+  const text = lines.join('\n');
+  document.getElementById('export-area').value = text;
+  document.getElementById('export-status').textContent = 'Готово — текст ниже.';
+});
+
+document.getElementById('copy-btn').addEventListener('click', async ()=>{
+  const area = document.getElementById('export-area');
+  const status = document.getElementById('export-status');
+  if(!area.value){ status.textContent = 'Сначала нажми «Собрать мои ответы».'; return; }
+  try{
+    await navigator.clipboard.writeText(area.value);
+    status.textContent = 'Скопировано в буфер обмена!';
+  }catch(e){
+    area.focus();
+    area.select();
+    try{
+      document.execCommand('copy');
+      status.textContent = 'Скопировано (через выделение)!';
+    }catch(e2){
+      status.textContent = 'Не удалось скопировать автоматически — выдели текст вручную и скопируй (Ctrl/Cmd+C).';
+    }
+  }
+});
+
+/* ---------------- INIT ---------------- */
+renderVocab();
+renderSidebar();
+renderWordPicker();
+renderTypeIn('ex2');
+renderChoice2('ex3');
+renderChoice3('ex4');
+renderTypeIn('ex5');
+</script>
+</body>
+</html>
