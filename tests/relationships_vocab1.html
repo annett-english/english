@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Relationships Vocabulary — тренажёр</title>
+<style>
+  :root{
+    --bg:#f5f3ff; --card:#ffffff; --ink:#1f1b2e; --muted:#6b6480;
+    --accent:#6d4de6; --accent2:#22b8a4; --bad:#e5484d; --good:#2f9e57;
+    --border:#e5e1f5; --chip:#ede9fe;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#151221; --card:#1e1a30; --ink:#eee9ff; --muted:#a49bc9;
+      --border:#33294f; --chip:#2c2450;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#151221; --card:#1e1a30; --ink:#eee9ff; --muted:#a49bc9;
+    --border:#33294f; --chip:#2c2450;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+  body{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);}
+  .wrap{max-width:1200px;margin:0 auto;padding:20px 16px 60px;}
+  header{margin-bottom:18px;}
+  h1{font-size:1.5rem;margin:0 0 4px;}
+  .sub{color:var(--muted);font-size:.92rem;margin:0;}
+  .layout{display:flex;gap:20px;align-items:flex-start;}
+  .main{flex:1 1 640px;min-width:0;}
+  .side{flex:0 0 250px;position:sticky;top:12px;}
+  @media (max-width:860px){.layout{flex-direction:column;}.side{position:static;width:100%;}}
+
+  .card{background:var(--card);border:1px solid var(--border);border-radius:14px;
+    padding:18px;margin-bottom:20px;box-shadow:0 1px 3px rgba(0,0,0,.04);}
+  .card h2{font-size:1.1rem;margin:0 0 4px;}
+  .hint{color:var(--muted);font-size:.85rem;margin:0 0 14px;}
+
+  table.words{width:100%;border-collapse:collapse;font-size:.92rem;}
+  table.words th,table.words td{text-align:left;padding:7px 6px;border-bottom:1px solid var(--border);}
+  table.words th{color:var(--muted);font-weight:600;font-size:.78rem;text-transform:uppercase;letter-spacing:.03em;}
+  .ipa{color:var(--accent);font-family:"Times New Roman",serif;}
+  .spk{border:none;background:var(--chip);color:var(--accent);width:30px;height:30px;border-radius:50%;
+    cursor:pointer;font-size:.95rem;line-height:1;}
+  .spk:hover{filter:brightness(0.95);}
+
+  .item{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:8px 0;border-bottom:1px dashed var(--border);}
+  .item:last-child{border-bottom:none;}
+  .item .prompt{flex:1 1 260px;font-size:.95rem;}
+  .item .prompt b{color:var(--accent);}
+  .item input[type=text]{flex:1 1 200px;padding:8px 10px;border-radius:8px;border:1px solid var(--border);
+    background:var(--bg);color:var(--ink);font-size:.95rem;}
+  .item input.ok{border-color:var(--good);background:rgba(47,158,87,.08);}
+  .item input.bad{border-color:var(--bad);background:rgba(229,72,77,.08);}
+  .fb{font-size:.85rem;min-width:150px;}
+  .fb.ok{color:var(--good);}
+  .fb.bad{color:var(--bad);}
+
+  .btnrow{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
+  button.act{border:none;border-radius:8px;padding:9px 14px;font-size:.88rem;cursor:pointer;font-weight:600;}
+  button.check{background:var(--accent);color:#fff;}
+  button.show{background:var(--chip);color:var(--accent);}
+  button.copy{background:var(--accent2);color:#fff;}
+  button.reset{background:transparent;color:var(--muted);border:1px solid var(--border);}
+  button.act:hover{filter:brightness(0.95);}
+  .score{font-size:.85rem;color:var(--muted);align-self:center;margin-left:auto;}
+
+  .story p{line-height:2.3;font-size:.98rem;}
+  .story input{width:150px;padding:5px 8px;border-radius:6px;border:1px solid var(--border);
+    background:var(--bg);color:var(--ink);font-size:.9rem;text-align:center;}
+  .bank{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0;}
+  .bank span{background:var(--chip);color:var(--accent);padding:4px 9px;border-radius:20px;font-size:.8rem;}
+
+  .side .card{margin-bottom:14px;}
+  #problemTable{width:100%;border-collapse:collapse;font-size:.85rem;}
+  #problemTable th,#problemTable td{padding:5px;border-bottom:1px solid var(--border);text-align:left;}
+  #problemTable td.cnt{color:var(--bad);font-weight:700;text-align:center;}
+  .empty{color:var(--muted);font-size:.85rem;}
+
+  textarea{width:100%;min-height:90px;border-radius:8px;border:1px solid var(--border);
+    background:var(--bg);color:var(--ink);padding:10px;font-size:.9rem;font-family:inherit;resize:vertical;}
+
+  .pick{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;}
+  .pick label{display:flex;align-items:center;gap:6px;background:var(--chip);padding:6px 10px;border-radius:8px;font-size:.85rem;cursor:pointer;}
+
+  .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;
+    padding:10px 18px;border-radius:10px;font-size:.88rem;opacity:0;pointer-events:none;transition:opacity .25s;z-index:99;}
+  .toast.show{opacity:1;}
+
+  .audiotest{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  #voiceInfo{font-size:.8rem;color:var(--muted);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>💬 Relationships Vocabulary</h1>
+    <p class="sub">Слова о людях и отношениях — повторение, прослушивание и практика письма от руки (печатью).</p>
+  </header>
+
+  <div class="layout">
+    <div class="main">
+
+      <!-- INTRO / VOCAB TABLE -->
+      <div class="card">
+        <h2>📖 Повторение слов</h2>
+        <p class="hint">Нажми 🔊, чтобы прослушать произношение (голос Google US English, если доступен в браузере — Chrome).</p>
+        <div class="audiotest">
+          <button class="act check" id="testAudioBtn" type="button">🔊 Проверить, работает ли звук</button>
+          <label for="voiceSelect" style="font-size:.85rem;color:var(--muted);">Голос:</label>
+          <select id="voiceSelect" style="padding:6px 8px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--ink);max-width:260px;"></select>
+          <span id="voiceInfo">выбираем голос…</span>
+        </div>
+        <br>
+        <table class="words">
+          <tr><th></th><th>Word</th><th>Transcription</th><th>Перевод</th></tr>
+        </table>
+      </div>
+
+      <!-- EX 1 -->
+      <div class="card" id="ex1"></div>
+      <!-- EX 2 -->
+      <div class="card" id="ex2"></div>
+      <!-- EX 4 -->
+      <div class="card" id="ex4"></div>
+
+      <!-- EX 5: context text -->
+      <div class="card" id="ex5"></div>
+
+      <!-- OWN SENTENCES -->
+      <div class="card">
+        <h2>✍️ Напиши свои предложения</h2>
+        <p class="hint">Выбери любые 3 слова из списка и составь с ними предложения.</p>
+        <div id="ownSentences"></div>
+        <div class="btnrow">
+          <button class="act copy" id="copyOwnBtn" type="button">📋 Скопировать все предложения</button>
+        </div>
+      </div>
+
+      <!-- RECALL -->
+      <div class="card">
+        <h2>🧠 Retrieve: вспомни как можно больше слов</h2>
+        <p class="hint">Не подглядывая наверх, напиши через запятую все слова, которые помнишь.</p>
+        <textarea id="recallBox" placeholder="classmate, colleague, ..."></textarea>
+        <div class="btnrow">
+          <button class="act check" id="recallCheckBtn" type="button">Проверить</button>
+          <button class="act copy" id="recallCopyBtn" type="button">📋 Скопировать</button>
+        </div>
+        <p id="recallResult" class="hint"></p>
+      </div>
+
+      <!-- LEAST CONFIDENT -->
+      <div class="card">
+        <h2>🎯 3 слова, в которых ты меньше всего уверен(а)</h2>
+        <p class="hint">Отметь ровно 3 слова — для них появятся два мини-задания.</p>
+        <div class="pick" id="pickWords"></div>
+        <div id="leastTasks"></div>
+      </div>
+
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="side">
+      <div class="card">
+        <h2>⚠️ Проблемные слова</h2>
+        <p class="hint">Слова, в которых были ошибки, появятся тут автоматически.</p>
+        <table id="problemTable">
+          <tr><th>Слово</th><th>Ошибок</th></tr>
+        </table>
+        <p class="empty" id="noProblems">Пока ошибок нет 🎉</p>
+      </div>
+      <div class="card">
+        <h2>📋 Итог</h2>
+        <p class="hint">Скопировать все ключи правильных ответов (для проверки).</p>
+        <button class="act copy" id="copyAllKeysBtn" type="button" style="width:100%">Скопировать все ответы (ключ)</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ---------------- DATA ---------------- */
+const WORDS = [
+  {id:"classmate",   en:"classmate",   ipa:"/ˈklɑːsmeɪt/",     ru:"одноклассник / одногруппник", def:"a person who is in the same class as you at school, college or university"},
+  {id:"fiance",      en:"fiancé",      ipa:"/fiˈɒnseɪ/",       ru:"жених (мужчина, помолвлен)",   def:"a man who is engaged to be married", alt:["fiance"]},
+  {id:"fiancee",     en:"fiancée",     ipa:"/fiˈɒnseɪ/",       ru:"невеста (женщина, помолвлена)",def:"a woman who is engaged to be married", alt:["fiancee"]},
+  {id:"closefriend", en:"close friend",ipa:"/kləʊs frend/",    ru:"близкий друг",                 def:"someone you know very well, trust and feel completely comfortable with"},
+  {id:"colleague",   en:"colleague",   ipa:"/ˈkɒliːɡ/",        ru:"коллега",                       def:"a person you work with, especially in a profession or office"},
+  {id:"flatmate",    en:"flatmate",    ipa:"/ˈflætmeɪt/",      ru:"сосед(-ка) по квартире",        def:"a person you share a flat or apartment with"},
+  {id:"couple",      en:"couple",      ipa:"/ˈkʌpl/",          ru:"пара (двое в отношениях)",      def:"two people who are romantically involved or married"},
+  {id:"partner",     en:"partner",     ipa:"/ˈpɑːtnə(r)/",     ru:"партнёр / партнёрша",           def:"a person someone lives with and has a romantic relationship with, without necessarily being married"},
+  {id:"expartner",   en:"ex-partner",  ipa:"/ˈeks ˌpɑːtnə(r)/",ru:"бывший / бывшая",               def:"someone who used to be your boyfriend, girlfriend, husband or wife", alt:["ex","ex partner"]}
+];
+const byId = id => WORDS.find(w=>w.id===id);
+function checkAnswer(userVal, w){
+  const v = userVal.trim().toLowerCase().replace(/^é|é$/,"e");
+  const norm = s => s.toLowerCase().replace(/é/g,"e").replace(/-/g," ").trim();
+  const accepted = [w.en, ...(w.alt||[])].map(norm);
+  return accepted.includes(norm(v));
+}
+
+/* ---------------- SPEECH ---------------- */
+let chosenVoice = null;
+let allEnglishVoices = [];
+const voiceSelect = document.getElementById("voiceSelect");
+
+function pickVoice(){
+  const voices = speechSynthesis.getVoices();
+  if(!voices.length) return; // voices not loaded yet, will retry on voiceschanged
+
+  allEnglishVoices = voices.filter(v => /^en/i.test(v.lang));
+  if(!allEnglishVoices.length) allEnglishVoices = voices; // fallback: show everything
+
+  // sort so exact "Google US English" is first, then other Google/en-US voices
+  allEnglishVoices.sort((a,b)=>{
+    const score = v => (/^Google US English$/i.test(v.name) ? 0 :
+                         /Google US English/i.test(v.name) ? 1 :
+                         v.lang === "en-US" ? 2 : 3);
+    return score(a) - score(b);
+  });
+
+  // populate dropdown once
+  if(voiceSelect.options.length === 0){
+    allEnglishVoices.forEach((v,i)=>{
+      const opt = document.createElement("option");
+      opt.value = i;
+      opt.textContent = `${v.name} (${v.lang})`;
+      voiceSelect.appendChild(opt);
+    });
+    voiceSelect.addEventListener("change", ()=>{
+      chosenVoice = allEnglishVoices[+voiceSelect.value] || null;
+      document.getElementById("voiceInfo").textContent = chosenVoice ? ("голос: " + chosenVoice.name) : "";
+    });
+  }
+
+  // auto-select: exact "Google US English" if present, else the first in sorted list
+  const exact = allEnglishVoices.find(v => /^Google US English$/i.test(v.name));
+  chosenVoice = exact || allEnglishVoices[0] || null;
+  if(chosenVoice){
+    const idx = allEnglishVoices.indexOf(chosenVoice);
+    voiceSelect.value = idx;
+  }
+
+  const info = document.getElementById("voiceInfo");
+  if(exact) info.textContent = "голос: " + exact.name + " ✓";
+  else if(chosenVoice) info.textContent = "точный голос «Google US English» не найден в этом браузере — выбран: " + chosenVoice.name + " (можно выбрать другой в списке)";
+  else info.textContent = "английские голоса не найдены — попробуйте открыть страницу в Chrome";
+}
+
+if ('speechSynthesis' in window){
+  speechSynthesis.onvoiceschanged = pickVoice;
+  pickVoice();
+  setTimeout(pickVoice, 300); // some browsers load voices with a delay
+} else {
+  document.getElementById("voiceInfo").textContent = "Speech Synthesis не поддерживается в этом браузере";
+}
+
+function speak(text){
+  if(!('speechSynthesis' in window)){ toast("Синтез речи недоступен в этом браузере"); return; }
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = chosenVoice ? chosenVoice.lang : "en-US";
+  u.rate = 0.92;
+  if(chosenVoice) u.voice = chosenVoice;
+  speechSynthesis.speak(u);
+}
+document.getElementById("testAudioBtn").addEventListener("click", ()=>{
+  speak("Hello! This is a test. Can you hear me clearly?");
+});
+
+/* ---------------- TOAST ---------------- */
+function toast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"), 1800);
+}
+function copyText(text){
+  navigator.clipboard && navigator.clipboard.writeText ?
+    navigator.clipboard.writeText(text).then(()=>toast("Скопировано в буфер обмена")) :
+    (()=>{ const ta=document.createElement("textarea"); ta.value=text; document.body.appendChild(ta);
+           ta.select(); document.execCommand("copy"); document.body.removeChild(ta); toast("Скопировано"); })();
+}
+
+/* ---------------- PROBLEM WORDS ---------------- */
+const mistakes = {}; // id -> count
+function registerMistake(id){
+  mistakes[id] = (mistakes[id]||0)+1;
+  renderProblems();
+}
+function renderProblems(){
+  const table = document.getElementById("problemTable");
+  const rows = Object.entries(mistakes).sort((a,b)=>b[1]-a[1]);
+  table.querySelectorAll("tr:not(:first-child)").forEach(r=>r.remove());
+  rows.forEach(([id,count])=>{
+    const w = byId(id); if(!w) return;
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${w.en}</td><td class="cnt">${count}</td>`;
+    table.appendChild(tr);
+  });
+  document.getElementById("noProblems").style.display = rows.length ? "none" : "block";
+}
+
+/* ---------------- VOCAB TABLE ---------------- */
+(function renderVocabTable(){
+  const table = document.querySelector("table.words");
+  WORDS.forEach(w=>{
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td><button class="spk" type="button">🔊</button></td>
+      <td><b>${w.en}</b></td><td class="ipa">${w.ipa}</td><td>${w.ru}</td>`;
+    tr.querySelector(".spk").addEventListener("click", ()=>speak(w.en));
+    table.appendChild(tr);
+  });
+})();
+
+/* ---------------- GENERIC EXERCISE RENDERER ---------------- */
+/* item: {word:id, display:string (prompt html), answerLabel?:string, speakWord?:bool} */
+function renderExercise(containerId, title, hint, items, opts={}){
+  const el = document.getElementById(containerId);
+  el.innerHTML = `<h2>${title}</h2><p class="hint">${hint}</p>`;
+  const list = document.createElement("div");
+  items.forEach((it, idx)=>{
+    const row = document.createElement("div");
+    row.className = "item";
+    row.innerHTML = `
+      <div class="prompt">${idx+1}. ${it.display} ${opts.speakWord ? `<button class="spk" type="button" data-idx="${idx}">🔊</button>` : ""}</div>
+      <input type="text" data-idx="${idx}" placeholder="напиши ответ…">
+      <span class="fb" data-idx="${idx}"></span>
+    `;
+    list.appendChild(row);
+  });
+  el.appendChild(list);
+  if(opts.speakWord){
+    list.querySelectorAll(".spk").forEach(btn=>{
+      btn.addEventListener("click", ()=> speak(byId(items[+btn.dataset.idx].word).en));
+    });
+  }
+  const btnrow = document.createElement("div");
+  btnrow.className = "btnrow";
+  btnrow.innerHTML = `
+    <button class="act check">✅ Проверить</button>
+    <button class="act show">👁 Показать ответы</button>
+    <button class="act copy">📋 Скопировать мои ответы</button>
+    <button class="act reset">↺ Сброс</button>
+    <span class="score"></span>
+  `;
+  el.appendChild(btnrow);
+
+  const inputs = () => Array.from(list.querySelectorAll("input"));
+
+  btnrow.querySelector(".check").addEventListener("click", ()=>{
+    let correct = 0;
+    inputs().forEach((inp, idx)=>{
+      const w = byId(items[idx].word);
+      const fb = list.querySelector(`.fb[data-idx="${idx}"]`);
+      const ok = checkAnswer(inp.value, w);
+      inp.classList.remove("ok","bad");
+      if(inp.value.trim()===""){ fb.textContent=""; fb.className="fb"; return; }
+      if(ok){ inp.classList.add("ok"); fb.textContent="верно ✓"; fb.className="fb ok"; correct++; }
+      else { inp.classList.add("bad"); fb.textContent="неверно ✗"; fb.className="fb bad"; registerMistake(w.id); }
+    });
+    btnrow.querySelector(".score").textContent = `${correct} / ${items.length} правильно`;
+  });
+
+  btnrow.querySelector(".show").addEventListener("click", ()=>{
+    inputs().forEach((inp, idx)=>{
+      const w = byId(items[idx].word);
+      const fb = list.querySelector(`.fb[data-idx="${idx}"]`);
+      fb.textContent = "ответ: " + w.en;
+      fb.className = "fb";
+      fb.style.color = "var(--accent)";
+    });
+  });
+
+  btnrow.querySelector(".copy").addEventListener("click", ()=>{
+    const text = inputs().map((inp,idx)=>`${idx+1}. ${items[idx].display.replace(/<[^>]+>/g,"")} → ${inp.value || "(пусто)"}`).join("\n");
+    copyText(text);
+  });
+
+  btnrow.querySelector(".reset").addEventListener("click", ()=>{
+    inputs().forEach(inp=>{inp.value=""; inp.classList.remove("ok","bad");});
+    list.querySelectorAll(".fb").forEach(f=>{f.textContent=""; f.className="fb";});
+    btnrow.querySelector(".score").textContent = "";
+  });
+
+  return items;
+}
+
+/* ---------------- EXERCISE DATA (mixed order across exercises) ---------------- */
+// Ex1: fill in missing letters
+const ex1Items = [
+  {word:"colleague",   display:"c_ll_ague"},
+  {word:"expartner",   display:"ex-p_rtner"},
+  {word:"closefriend", display:"cl_se fri_nd"},
+  {word:"fiancee",     display:"fianc_e <i>(женщина)</i>"},
+  {word:"classmate",   display:"cl_ssmate"},
+  {word:"couple",      display:"co_ple"},
+  {word:"flatmate",    display:"flatm_te"},
+  {word:"partner",     display:"pa_tner"}
+];
+renderExercise("ex1", "1️⃣ Вставь пропущенные буквы", "Впиши слово целиком в поле ответа.", ex1Items);
+
+// Ex2: translate RU -> EN
+const ex2Items = [
+  {word:"fiance",      display:"жених"},
+  {word:"flatmate",    display:"сосед по квартире"},
+  {word:"colleague",   display:"коллега"},
+  {word:"expartner",   display:"бывший / бывшая"},
+  {word:"fiancee",     display:"невеста"},
+  {word:"partner",     display:"партнёр"},
+  {word:"classmate",   display:"одноклассник"},
+  {word:"closefriend", display:"близкий друг"}
+];
+renderExercise("ex2", "2️⃣ Переведи с русского на английский", "Напиши английское слово или выражение.", ex2Items);
+
+// Ex4: definitions -> word
+const ex4Items = [
+  {word:"couple",      display:byId("couple").def},
+  {word:"classmate",   display:byId("classmate").def},
+  {word:"flatmate",    display:byId("flatmate").def},
+  {word:"expartner",   display:byId("expartner").def},
+  {word:"colleague",   display:byId("colleague").def},
+  {word:"closefriend", display:byId("closefriend").def},
+  {word:"fiancee",     display:byId("fiancee").def},
+  {word:"partner",     display:byId("partner").def}
+];
+renderExercise("ex4", "3️⃣ Определение → напиши слово", "По английскому определению напиши, о каком слове идёт речь.", ex4Items);
+
+/* ---------------- EX 5: fill words into text by context ---------------- */
+(function renderEx5(){
+  const el = document.getElementById("ex5");
+  const blanks = [
+    {word:"classmate"},{word:"colleague"},{word:"closefriend"},{word:"flatmate"},
+    {word:"partner"},{word:"fiance"},{word:"expartner"},{word:"couple"}
+  ];
+  el.innerHTML = `
+    <h2>4️⃣ Вставь слова в текст по контексту</h2>
+    <p class="hint">Заполни пропуски (1–8) словами из списка ниже. Одно слово — лишнее.</p>
+    <div class="bank">${WORDS.map(w=>`<span>${w.en}</span>`).join("")}</div>
+    <div class="story"><p>
+      My name is Anna. At university my best (1)<input type="text" data-idx="0"> was Tom — we studied together every day.
+      After graduation I started working in an office, where I met my (2)<input type="text" data-idx="1"> James; we worked on the same team for three years.
+      Later James introduced me to his sister Mia, who quickly became my (3)<input type="text" data-idx="2"> — we talk about everything and trust each other completely.
+      When I moved to London, I shared an apartment with a girl called Sophie, my (4)<input type="text" data-idx="3">, and we still live together now.
+      Two years ago I met Daniel, and now he is my (5)<input type="text" data-idx="4">; we've been together for a while but aren't married yet.
+      Actually, last month he proposed, so now he's my (6)<input type="text" data-idx="5">!
+      Before Daniel, I was with Mark for two years, but we broke up, so now he is just my (7)<input type="text" data-idx="6">.
+      Daniel and I are often invited to parties as a (8)<input type="text" data-idx="7"> — everyone says we look great together.
+    </p></div>
+    <div class="btnrow">
+      <button class="act check">✅ Проверить</button>
+      <button class="act show">👁 Показать ответы</button>
+      <button class="act copy">📋 Скопировать мои ответы</button>
+      <button class="act reset">↺ Сброс</button>
+      <span class="score"></span>
+    </div>
+  `;
+  const inputs = () => Array.from(el.querySelectorAll(".story input"));
+  el.querySelector(".check").addEventListener("click", ()=>{
+    let correct = 0;
+    inputs().forEach((inp, idx)=>{
+      const w = byId(blanks[idx].word);
+      inp.classList.remove("ok","bad");
+      if(inp.value.trim()==="") return;
+      if(checkAnswer(inp.value, w)){ inp.classList.add("ok"); correct++; }
+      else { inp.classList.add("bad"); registerMistake(w.id); }
+    });
+    el.querySelector(".score").textContent = `${correct} / ${blanks.length} правильно`;
+  });
+  el.querySelector(".show").addEventListener("click", ()=>{
+    inputs().forEach((inp, idx)=>{ inp.value = byId(blanks[idx].word).en; inp.classList.remove("ok","bad"); });
+  });
+  el.querySelector(".copy").addEventListener("click", ()=>{
+    const text = inputs().map((inp,idx)=>`Пропуск ${idx+1}: ${inp.value || "(пусто)"}`).join("\n");
+    copyText(text);
+  });
+  el.querySelector(".reset").addEventListener("click", ()=>{
+    inputs().forEach(inp=>{inp.value=""; inp.classList.remove("ok","bad");});
+    el.querySelector(".score").textContent = "";
+  });
+})();
+
+/* ---------------- OWN SENTENCES ---------------- */
+(function renderOwnSentences(){
+  const el = document.getElementById("ownSentences");
+  const picks = [WORDS[3], WORDS[7], WORDS[8]]; // close friend, partner, ex-partner (default suggestion)
+  picks.forEach((w,idx)=>{
+    const div = document.createElement("div");
+    div.className = "item";
+    div.innerHTML = `<div class="prompt">Предложение со словом <b>${w.en}</b>:</div>
+      <input type="text" data-idx="${idx}" placeholder="Напиши предложение…" style="flex:1 1 100%;">`;
+    el.appendChild(div);
+  });
+})();
+document.getElementById("copyOwnBtn").addEventListener("click", ()=>{
+  const inputs = document.querySelectorAll("#ownSentences input");
+  const text = Array.from(inputs).map((inp,idx)=>`${idx+1}. ${inp.value || "(пусто)"}`).join("\n");
+  copyText(text);
+});
+
+/* ---------------- RECALL ---------------- */
+document.getElementById("recallCheckBtn").addEventListener("click", ()=>{
+  const raw = document.getElementById("recallBox").value.toLowerCase();
+  const found = WORDS.filter(w => raw.includes(w.en.toLowerCase()) || (w.alt||[]).some(a=>raw.includes(a)));
+  const missed = WORDS.filter(w=>!found.includes(w));
+  document.getElementById("recallResult").innerHTML =
+    `Вспомнил(а): <b>${found.length}/${WORDS.length}</b>. ` +
+    (missed.length ? `Забытые слова: ${missed.map(w=>w.en).join(", ")}.` : "Все слова вспомнены! 🎉");
+});
+document.getElementById("recallCopyBtn").addEventListener("click", ()=>{
+  copyText(document.getElementById("recallBox").value);
+});
+
+/* ---------------- LEAST CONFIDENT WORDS ---------------- */
+(function renderPick(){
+  const el = document.getElementById("pickWords");
+  WORDS.forEach(w=>{
+    const label = document.createElement("label");
+    label.innerHTML = `<input type="checkbox" value="${w.id}"> ${w.en}`;
+    el.appendChild(label);
+  });
+  el.addEventListener("change", ()=>{
+    const checked = Array.from(el.querySelectorAll("input:checked"));
+    if(checked.length > 3){
+      checked[checked.length-1].checked = false;
+      toast("Можно выбрать максимум 3 слова");
+      return;
+    }
+    if(checked.length === 3) buildLeastTasks(checked.map(c=>c.value));
+    else document.getElementById("leastTasks").innerHTML = "";
+  });
+})();
+function buildLeastTasks(ids){
+  const el = document.getElementById("leastTasks");
+  const words = ids.map(byId);
+  el.innerHTML = `
+    <h3 style="font-size:1rem;">Задание A — перевод</h3>
+    ${words.map((w,i)=>`<div class="item"><div class="prompt">${i+1}. Переведи: <b>${w.ru}</b></div>
+      <input type="text" data-a="${i}" placeholder="английское слово"></div>`).join("")}
+    <h3 style="font-size:1rem;margin-top:10px;">Задание B — составь предложение</h3>
+    ${words.map((w,i)=>`<div class="item"><div class="prompt">${i+1}. Предложение со словом <b>${w.en}</b>:</div>
+      <input type="text" data-b="${i}" style="flex:1 1 100%;" placeholder="Напиши предложение…"></div>`).join("")}
+    <div class="btnrow">
+      <button class="act check" id="leastCheckBtn">✅ Проверить задание A</button>
+      <button class="act copy" id="leastCopyBtn">📋 Скопировать всё</button>
+    </div>
+  `;
+  document.getElementById("leastCheckBtn").addEventListener("click", ()=>{
+    words.forEach((w,i)=>{
+      const inp = el.querySelector(`input[data-a="${i}"]`);
+      inp.classList.remove("ok","bad");
+      if(checkAnswer(inp.value, w)) inp.classList.add("ok");
+      else { inp.classList.add("bad"); registerMistake(w.id); }
+    });
+  });
+  document.getElementById("leastCopyBtn").addEventListener("click", ()=>{
+    let text = "Перевод:\n";
+    words.forEach((w,i)=>{ text += `${w.ru} → ${el.querySelector(`input[data-a="${i}"]`).value || "(пусто)"}\n`; });
+    text += "\nПредложения:\n";
+    words.forEach((w,i)=>{ text += `${w.en}: ${el.querySelector(`input[data-b="${i}"]`).value || "(пусто)"}\n`; });
+    copyText(text);
+  });
+}
+
+/* ---------------- GLOBAL: copy full answer key ---------------- */
+document.getElementById("copyAllKeysBtn").addEventListener("click", ()=>{
+  let text = "ОТВЕТЫ (ключ)\n\n1. Пропущенные буквы:\n" + ex1Items.map((it,i)=>`${i+1}. ${byId(it.word).en}`).join("\n");
+  text += "\n\n2. Перевод:\n" + ex2Items.map((it,i)=>`${i+1}. ${it.display} → ${byId(it.word).en}`).join("\n");
+  text += "\n\n3. Определения:\n" + ex4Items.map((it,i)=>`${i+1}. ${byId(it.word).en}`).join("\n");
+  text += "\n\n4. Текст по контексту:\n" + ["classmate","colleague","closefriend","flatmate","partner","fiance","expartner","couple"]
+    .map((id,i)=>`${i+1}. ${byId(id).en}`).join("\n");
+  copyText(text);
+});
+</script>
+</body>
+</html>
