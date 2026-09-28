@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>however · also · that's why · because of · except</title>
+<style>
+:root{--bg:#f6f7fb;--card:#fff;--tx:#1d2433;--mut:#667085;--ac:#4f46e5;--ok:#15803d;--bad:#b91c1c;--bd:#e3e6ee;--soft:#eef0ff;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12141c;--card:#1b1e29;--tx:#e8eaf2;--mut:#98a0b3;--ac:#8b85ff;--ok:#4ade80;--bad:#f87171;--bd:#2c3040;--soft:#252a45}}
+:root[data-theme="dark"]{--bg:#12141c;--card:#1b1e29;--tx:#e8eaf2;--mut:#98a0b3;--ac:#8b85ff;--ok:#4ade80;--bad:#f87171;--bd:#2c3040;--soft:#252a45}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:1060px;margin:0 auto;padding:16px;display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:16px}
+aside{position:sticky;top:12px;align-self:start}
+@media(max-width:800px){.wrap{grid-template-columns:1fr}aside{order:-1;position:static}}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:16px;margin-bottom:16px}
+h1{font-size:1.4rem;margin:0 0 4px}h2{font-size:1.1rem;margin:0 0 4px}h3{font-size:1rem;margin:0 0 8px}
+.mut{color:var(--mut);font-size:.9rem;margin:0 0 10px}
+table{width:100%;border-collapse:collapse}td,th{padding:6px 4px;border-bottom:1px solid var(--bd);text-align:left;font-size:.92rem;vertical-align:top}
+.scroll{overflow-x:auto}
+button,select{font:inherit;border-radius:9px;border:1px solid var(--bd);background:var(--card);color:var(--tx);padding:6px 12px;cursor:pointer}
+button.p{background:var(--ac);border-color:var(--ac);color:#fff}
+button.sp{padding:2px 8px}
+input[type=text]{font:inherit;width:100%;padding:8px 10px;border:1px solid var(--bd);border-radius:9px;background:var(--bg);color:var(--tx);box-sizing:border-box}
+.it{padding:8px 0;border-bottom:1px dashed var(--bd)}
+.q{margin-bottom:5px}
+.res{font-weight:600;margin-left:6px}.ok{color:var(--ok)}.bad{color:var(--bad)}
+.ans{display:none;font-size:.9rem;color:var(--ok);margin-top:4px}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}
+.opts{background:var(--soft);border-radius:10px;padding:8px 12px;margin-bottom:8px;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:2px 12px}
+.m{display:flex;gap:8px;align-items:center}.m input{width:54px;text-align:center;text-transform:uppercase}
+textarea{width:100%;min-height:120px;box-sizing:border-box;font:13px/1.4 ui-monospace,Menlo,monospace;background:var(--bg);color:var(--tx);border:1px solid var(--bd);border-radius:9px;padding:8px}
+.st{font-size:.85rem;color:var(--mut)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<main>
+<div class="card">
+<h1>Linking words · A1–A2</h1>
+<p class="mut">Повторите слова, нажмите 🔊 и послушайте. Потом выполните упражнения — вводите ответы руками.</p>
+<div class="row" style="margin:0 0 10px">
+<button class="p" id="playAll">🔊 Прослушать все слова</button>
+<select id="voiceSel" aria-label="Голос"></select>
+</div>
+<div class="st" id="voiceSt"></div>
+<div class="scroll"><table id="wt"><thead><tr><th></th><th>Слово</th><th>Перевод</th><th>Транскрипция</th><th>Пример</th></tr></thead><tbody></tbody></table></div>
+</div>
+<div id="exs"></div>
+<div class="card">
+<h2>Готово? Скопируйте ответы</h2>
+<p class="mut">Все ваши ответы, результаты проверки и проблемные слова — одной кнопкой.</p>
+<div class="row" style="margin:0 0 8px"><input type="text" id="nm" placeholder="Ваше имя" style="max-width:260px"><button class="p" id="copyAll">📋 Скопировать все ответы</button><span class="st" id="cpSt"></span></div>
+<textarea id="out" readonly placeholder="Здесь появится текст для копирования (если браузер не даёт копировать сам — выделите и скопируйте вручную)"></textarea>
+<hr style="border:0;border-top:1px solid var(--bd);margin:14px 0">
+<div class="row" style="margin:0"><button id="audChk">🔈 Проверить аудио</button><span class="st" id="audSt"></span></div>
+</div>
+</main>
+<aside>
+<div class="card"><h3>⚠️ Проблемные слова</h3>
+<p class="mut">Слова, в которых была ошибка.</p>
+<table id="pt"><tbody></tbody></table></div>
+</aside>
+</div>
+<script>
+const W=[
+{w:"however",ru:"однако",tr:"/haʊˈɛvər/",ex:"I like tea. However, I drink coffee."},
+{w:"also",ru:"также, тоже",tr:"/ˈɔlsoʊ/",ex:"She also plays the guitar."},
+{w:"that's why",ru:"вот почему",tr:"/ðæts ˈwaɪ/",ex:"I was ill. That's why I stayed home."},
+{w:"because of",ru:"из-за",tr:"/bɪˈkɔz ʌv/",ex:"We stayed in because of the rain."},
+{w:"except",ru:"кроме",tr:"/ɪkˈsɛpt/",ex:"Everyone came except Tom."}];
+const RU={};W.forEach(x=>RU[x.w]=x.ru);
+const EX=[
+{id:1,type:"t",title:"Перевод с русского на английский",desc:"Переведите предложения целиком.",items:[
+{q:"Мы остались дома из-за дождя.",w:"because of",a:["We stayed at home because of the rain","We stayed home because of the rain","We stayed at home because of rain"]},
+{q:"Я люблю кофе, однако я пью чай.",w:"however",a:["I like coffee however I drink tea","I love coffee however I drink tea","I like coffee however I am drinking tea"]},
+{q:"Все пришли, кроме Тома.",w:"except",a:["Everyone came except Tom","Everybody came except Tom","All came except Tom","All of them came except Tom"]},
+{q:"Она говорит по-английски, а также по-французски.",w:"also",a:["She speaks English and also French","She speaks English and also speaks French","She speaks English and she also speaks French"]},
+{q:"Я очень устал, вот почему я иду спать.",w:"that's why",a:["I am very tired that is why I am going to sleep","I am very tired that is why I am going to bed","I am very tired that is why I go to sleep","I am very tired that is why I go to bed"]},
+{q:"Мы опоздали из-за пробки.",w:"because of",a:["We were late because of the traffic","We were late because of traffic","We were late because of the traffic jam","We were late because of a traffic jam"]}]},
+{id:2,type:"m",title:"Соединить половинки",desc:"Впишите букву (A–F) подходящего окончания.",opts:["Anna.","she is always ready to help.","the rain.","he sometimes forgets his homework.","bananas.","I was late for work."],items:[
+{q:"We didn't go out because of …",w:"because of",k:"C"},
+{q:"He is a good student, however …",w:"however",k:"D"},
+{q:"I like all fruit except …",w:"except",k:"E"},
+{q:"She is very kind. She is also …  (Also, …)",w:"also",k:"B",alt:"She is very kind. Also, …"},
+{q:"I missed the bus, that's why …",w:"that's why",k:"F"},
+{q:"Everyone is here, except …",w:"except",k:"A"}]},
+{id:3,type:"t",title:"Rephrase — перепишите с новым словом",desc:"Объедините предложения, используя слово в скобках.",items:[
+{q:"We didn't go out. It was raining. (because of)",w:"because of",a:["We did not go out because of the rain","We did not go out because of rain","We did not go outside because of the rain"]},
+{q:"Everyone likes pizza. Sam doesn't like it. (except)",w:"except",a:["Everyone likes pizza except Sam","Everybody likes pizza except Sam","All like pizza except Sam"]},
+{q:"I was ill, so I stayed at home. (that's why)",w:"that's why",a:["I was ill that is why I stayed at home","I was ill that is why I stayed home"]},
+{q:"She plays the piano. She plays the guitar too. (also)",w:"also",a:["She plays the piano and also the guitar","She plays the piano and also plays the guitar","She plays the piano and she also plays the guitar","She plays the piano she also plays the guitar"]},
+{q:"The test was difficult, but I passed it. (however)",w:"however",a:["The test was difficult however I passed it","The test was difficult however I passed"]},
+{q:"All the shops were closed. One café was open. (except)",w:"except",a:["All the shops were closed except one cafe","All the shops were closed except one café","All the shops were closed except for one cafe","All the shops were closed except for one café"]}]},
+{id:4,type:"o",title:"Закончите предложения своими идеями",desc:"Придумайте своё окончание (минимум 3 слова). Здесь нет одного правильного ответа.",items:[
+{q:"I like English, however",w:"however",ex:"it is difficult sometimes."},
+{q:"I can't go out today because of",w:"because of",ex:"my homework."},
+{q:"I was very tired, that's why",w:"that's why",ex:"I went to bed early."},
+{q:"I eat everything except",w:"except",ex:"fish."},
+{q:"My friend is funny. He also",w:"also",ex:"plays football."},
+{q:"I go to school every day except",w:"except",ex:"Sunday."}]}];
+const $=s=>document.querySelector(s);
+const norm=s=>s.toLowerCase().replace(/[’`]/g,"'").replace(/\bthats\b|that's/g,"that is").replace(/n't/g," not").replace(/'m\b/g," am").replace(/'re\b/g," are").replace(/[^a-zé0-9\s]/g," ").replace(/\s+/g," ").trim();
+/* voices */
+let voice=null,voices=[];
+function pick(){
+ if(!("speechSynthesis" in window)){$("#voiceSt").textContent="⚠️ Этот браузер не поддерживает озвучку.";return}
+ voices=speechSynthesis.getVoices().filter(v=>/^en/i.test(v.lang));
+ const s=$("#voiceSel");const cur=s.value;s.innerHTML=voices.map((v,i)=>`<option value="${i}">${v.name} (${v.lang})</option>`).join("");
+ voice=voices.find(v=>/Google US English/i.test(v.name))||voices.find(v=>/Samantha/i.test(v.name))||voices.find(v=>v.lang==="en-US")||voices[0]||null;
+ if(voice)s.value=voices.indexOf(voice);
+ const pref=/Google US English|Samantha/i.test(voice?voice.name:"");
+ $("#voiceSt").textContent=voice?(pref?"✅ Голос: "+voice.name:"ℹ️ Google US English / Samantha не найдены — используется "+voice.name+". Можно выбрать другой в списке."):"⚠️ Английские голоса не найдены в системе.";
+}
+if("speechSynthesis" in window){pick();speechSynthesis.onvoiceschanged=pick}
+$("#voiceSel").onchange=e=>{voice=voices[+e.target.value]};
+function say(t,cb){
+ if(!("speechSynthesis" in window))return;
+ const u=new SpeechSynthesisUtterance(t);u.lang="en-US";u.rate=.85;if(voice)u.voice=voice;
+ if(cb)u.onend=cb;speechSynthesis.speak(u);
+}
+function sayNow(t){if("speechSynthesis" in window){speechSynthesis.cancel();say(t)}}
+/* words */
+$("#wt tbody").innerHTML=W.map(x=>`<tr><td><button class="sp" data-say="${x.w}" aria-label="Слушать ${x.w}">🔊</button></td><td><b>${x.w}</b></td><td>${x.ru}</td><td>${x.tr}</td><td>${x.ex} <button class="sp" data-say="${x.ex}" aria-label="Слушать пример">🔊</button></td></tr>`).join("");
+document.addEventListener("click",e=>{const b=e.target.closest("[data-say]");if(b)sayNow(b.dataset.say)});
+$("#playAll").onclick=()=>{if(!("speechSynthesis" in window))return;speechSynthesis.cancel();W.forEach(x=>say(x.w+"."))};
+/* exercises */
+const L="ABCDEF";
+EX.forEach(ex=>{
+ const s=document.createElement("section");s.className="card";
+ let h=`<h2>Упр. ${ex.id}. ${ex.title}</h2><p class="mut">${ex.desc}</p>`;
+ if(ex.type==="m")h+=`<div class="opts">${ex.opts.map((o,i)=>`<div><b>${L[i]}</b> … ${o}</div>`).join("")}</div>`;
+ ex.items.forEach((it,i)=>{
+  const inp=ex.type==="m"?`<div class="m"><input type="text" maxlength="1" id="i${ex.id}_${i}" autocomplete="off" aria-label="Буква"></div>`:`<input type="text" id="i${ex.id}_${i}" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="${ex.type==="o"?"…продолжите предложение":"Ваш ответ"}">`;
+  h+=`<div class="it"><div class="q"><b>${i+1}.</b> ${it.q}<span class="res" id="r${ex.id}_${i}"></span></div>${inp}<div class="ans" id="a${ex.id}_${i}"></div></div>`;
+ });
+ h+=`<div class="row"><button class="p" data-chk="${ex.id}">Проверить</button><button data-show="${ex.id}">Показать ответы</button></div>`;
+ s.innerHTML=h;$("#exs").appendChild(s);
+});
+const exById=id=>EX.find(e=>e.id==id);
+const okAns=(ex,it,v)=>ex.type==="m"?v.toUpperCase()===it.k:ex.type==="o"?v.split(/\s+/).filter(Boolean).length>=3:it.a.map(norm).includes(norm(v));
+const modelAns=(ex,it)=>ex.type==="m"?it.k+" — "+ex.opts[L.indexOf(it.k)]:ex.type==="o"?"Например: "+it.q+" "+it.ex:it.a[0]+".";
+function check(id){
+ const ex=exById(id);
+ ex.items.forEach((it,i)=>{
+  const v=$(`#i${id}_${i}`).value.trim(),r=$(`#r${id}_${i}`);
+  if(!v){r.textContent="";r.className="res";it.st="";return}
+  const ok=okAns(ex,it,v);it.st=ok?"✓":"✗";
+  if(!ok)it.ever=true;
+  r.textContent=ok?"✓":(ex.type==="o"?"✗ допишите (3+ слова)":"✗");r.className="res "+(ok?"ok":"bad");
+ });
+ problems();
+}
+function problems(){
+ const c={};EX.forEach(ex=>ex.items.forEach(it=>{if(it.ever)c[it.w]=(c[it.w]||0)+1}));
+ const k=Object.keys(c);
+ $("#pt tbody").innerHTML=k.length?k.map(w=>`<tr><td><button class="sp" data-say="${w}">🔊</button></td><td><b>${w}</b><br><span class="mut">${RU[w]}</span></td><td class="bad">×${c[w]}</td></tr>`).join(""):`<tr><td class="mut">Пока ошибок нет 🎉</td></tr>`;
+}
+problems();
+document.addEventListener("click",e=>{
+ const c=e.target.closest("[data-chk]"),s=e.target.closest("[data-show]");
+ if(c)check(c.dataset.chk);
+ if(s){const ex=exById(s.dataset.show);ex.items.forEach((it,i)=>{const a=$(`#a${ex.id}_${i}`);a.textContent="✔ "+modelAns(ex,it);a.style.display="block"})}
+});
+/* copy */
+function build(){
+ let t=`Имя: ${$("#nm").value||"—"}\nLinking words: however / also / that's why / because of / except\n`;
+ EX.forEach(ex=>{
+  t+=`\nУпр. ${ex.id}. ${ex.title}\n`;
+  ex.items.forEach((it,i)=>{
+   const v=$(`#i${ex.id}_${i}`).value.trim();
+   t+=`${i+1}. ${it.q}\n   → ${v||"(нет ответа)"}${it.st?"  ["+it.st+"]":""}\n`;
+  });
+ });
+ const c={};EX.forEach(ex=>ex.items.forEach(it=>{if(it.ever)c[it.w]=(c[it.w]||0)+1}));
+ t+="\nПроблемные слова: "+(Object.keys(c).length?Object.keys(c).map(w=>`${w} (${RU[w]}) ×${c[w]}`).join(", "):"нет");
+ return t;
+}
+$("#copyAll").onclick=async()=>{
+ const t=build(),o=$("#out");o.value=t;let ok=false;
+ try{await navigator.clipboard.writeText(t);ok=true}catch(e){try{o.select();ok=document.execCommand("copy")}catch(_){}}
+ $("#cpSt").textContent=ok?"✅ Скопировано!":"Не удалось скопировать автоматически — выделите текст ниже и скопируйте вручную.";
+};
+/* audio check */
+$("#audChk").onclick=()=>{
+ const st=$("#audSt");
+ if(!("speechSynthesis" in window)){st.textContent="❌ Озвучка не поддерживается в этом браузере. Попробуйте Chrome или Safari.";return}
+ speechSynthesis.cancel();
+ const u=new SpeechSynthesisUtterance("Audio check. However, also, that's why, because of, except.");
+ u.lang="en-US";u.rate=.85;if(voice)u.voice=voice;
+ u.onstart=()=>st.textContent="🔊 Играет… Слышите? Голос: "+(voice?voice.name:"по умолчанию");
+ u.onend=()=>st.textContent="✅ Аудио работает. Голос: "+(voice?voice.name:"по умолчанию")+". Если не слышно — проверьте громкость и беззвучный режим.";
+ u.onerror=()=>st.textContent="❌ Ошибка озвучки. Выберите другой голос в списке вверху.";
+ speechSynthesis.speak(u);
+ setTimeout(()=>{if(!speechSynthesis.speaking&&!/✅|❌/.test(st.textContent))st.textContent="⚠️ Звук не запустился — выберите другой голос вверху страницы."},2500);
+};
+</script>
+</body>
+</html>
