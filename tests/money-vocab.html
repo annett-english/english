@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8"><title>Money vocabulary practice</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root{--bg:#f7f6f2;--card:#fff;--tx:#1d2330;--mu:#667;--ac:#2a6df4;--ok:#1a9b57;--no:#d33a3a;--bd:#dcdad2;--mk:#ffe58a;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14171f;--card:#1e222c;--tx:#e8eaf0;--mu:#99a;--bd:#333846;--ac:#6ea0ff;--mk:#6b5b12}}
+:root[data-theme="dark"]{--bg:#14171f;--card:#1e222c;--tx:#e8eaf0;--mu:#99a;--bd:#333846;--ac:#6ea0ff;--mk:#6b5b12}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{display:flex;gap:16px;max-width:1100px;margin:0 auto;padding:12px;align-items:flex-start}
+main{flex:1;min-width:0}aside{width:250px;position:sticky;top:env(safe-area-inset-top,0px);background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:10px;font-size:14px;max-height:90vh;overflow:auto}
+@media(max-width:820px){.wrap{flex-direction:column-reverse}aside{width:auto;position:static;max-height:none;align-self:stretch}}
+section{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px;margin-bottom:14px}
+h1{font-size:22px;margin:.2em 0}h2{font-size:18px;margin:0 0 4px}h3{margin:0 0 6px;font-size:15px}
+.d{color:var(--mu);font-size:14px;margin:0 0 8px}
+.it{display:flex;gap:8px;padding:8px 6px;border-bottom:1px solid var(--bd);align-items:flex-start;flex-wrap:wrap}
+.it.ok{background:color-mix(in srgb,var(--ok) 14%,transparent)}.it.no{background:color-mix(in srgb,var(--no) 14%,transparent)}
+.n{color:var(--mu);width:22px}.b{flex:1;min-width:200px}.q small{color:var(--mu)}
+.r{width:20px;font-weight:700}.it.ok .r{color:var(--ok)}.it.no .r{color:var(--no)}
+.ans{display:block;color:var(--ok);font-size:14px;margin-top:2px}
+input[type=text],select,textarea{font:inherit;color:var(--tx);background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:6px 8px;width:100%;max-width:420px;margin-top:4px}
+textarea{max-width:none;min-height:56px}
+button{font:inherit;cursor:pointer;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:8px;padding:4px 10px}
+button.p{background:var(--ac);color:#fff;border-color:var(--ac)}
+.chip{margin:3px 4px 0 0}.line{min-height:34px;border-bottom:2px dashed var(--bd);margin-top:4px}
+mark{background:var(--mk);color:inherit;padding:0 3px;border-radius:4px}
+table{border-collapse:collapse;width:100%;font-size:14px}td{padding:4px 6px;border-bottom:1px solid var(--bd);vertical-align:top}tr.h td{background:var(--bg)}
+.bar{display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap}.sc{font-weight:700}
+label.c{display:inline-block;margin:3px 8px 3px 0;font-size:14px}
+</style></head><body>
+<div class="wrap"><main id="m"></main>
+<aside><h3>Проблемные слова</h3><table id="pt"></table><p class="d" id="pe">Пока ошибок нет 🎉</p><button id="clr">Очистить</button></aside></div>
+<script>
+const $=s=>document.querySelector(s),norm=s=>s.toLowerCase().replace(/[’']/g,"'").replace(/[.,!?]/g,'').replace(/\s+/g,' ').trim();
+const shuf=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+const strip=h=>{const d=document.createElement('div');d.innerHTML=h;return d.textContent.trim()};
+const D=[["pay off a mortgage","выплатить ипотеку","We hope to [pay off] our mortgage early.","Мы надеемся выплатить ипотеку досрочно.","finish"],
+["earn a salary","зарабатывать зарплату","He [earns] a decent salary.","Он получает достойную зарплату.","wins"],
+["receive a salary","получать зарплату","Employees [receive] their salary at the end of the month.","Сотрудники получают зарплату в конце месяца.","catch"],
+["increase a salary","повысить зарплату","The company [increased] my salary this year.","Компания повысила мне зарплату в этом году.","made"],
+["get a loan","получить кредит","She [got] a loan from the bank.","Она получила кредит в банке.","bought"],
+["pay off a loan","выплатить кредит","I'm trying to [pay off] my loan as quickly as possible.","Я стараюсь выплатить кредит как можно быстрее.","close"],
+["apply for a loan","подать заявку на кредит","He [applied for] a loan to buy a new car.","Он подал заявку на кредит, чтобы купить машину.","did"],
+["have insurance","иметь страховку","Do you [have] travel insurance?","У тебя есть туристическая страховка?","own"],
+["get insurance","оформить страховку","We need to [get] travel insurance before the trip.","Нам нужно оформить страховку перед поездкой.","take"],
+["make a contactless payment","совершить бесконтактную оплату","You can [make] a contactless payment here.","Здесь можно совершить бесконтактную оплату.","do"],
+["accept contactless payments","принимать бесконтактные платежи","This shop [accepts] contactless payments.","Этот магазин принимает бесконтактные платежи.","gets"],
+["pay tax","платить налоги","Everyone has to [pay] tax.","Все должны платить налоги.","give"],
+["reduce tax","снизить сумму налога","Some people use legal ways to [reduce] their tax bill.","Некоторые используют законные способы уменьшить налоги.","lose"],
+["make a budget","составить бюджет","We [made] a budget before moving into our new flat.","Мы составили бюджет перед переездом.","did"],
+["stick to a budget","придерживаться бюджета","It's difficult to [stick to] a budget sometimes.","Иногда трудно придерживаться бюджета.","hold"],
+["plan a budget","планировать бюджет","We need to [plan] a budget for our holiday.","Нам нужно спланировать бюджет на отпуск.","do"]
+].map(([e,r,s,sr,w])=>({e,r,s,sr,w,R:s.match(/\[(.+?)\]/)[1]}));
+const N=[["mortgage","/ˈmɔːrɡɪdʒ/","ипотека"],["salary","/ˈsæləri/","зарплата"],["loan","/loʊn/","заём, кредит"],["insurance","/ɪnˈʃʊrəns/","страховка"],["contactless payment","/ˈkɑːntæktləs ˈpeɪmənt/","бесконтактная оплата"],["tax","/tæks/","налог"],["budget","/ˈbʌdʒɪt/","бюджет"]];
+const VS=['pay off','apply for','stick to','earn','receive','increase','get','have','make','accept','pay','reduce','plan'];
+/* audio */
+let voice=null;
+function pick(){if(!window.speechSynthesis)return;const v=speechSynthesis.getVoices();voice=v.find(x=>/Google US English/i.test(x.name))||v.find(x=>/Samantha/i.test(x.name))||v.find(x=>x.lang==='en-US')||v.find(x=>/^en/.test(x.lang))||null;const e=$('#vs');if(e)e.textContent=voice?'Голос: '+voice.name:'Английский голос не найден — используется голос по умолчанию'}
+if(window.speechSynthesis)speechSynthesis.onvoiceschanged=pick;
+function say(t,r=.9,q=false){if(!window.speechSynthesis){alert('Браузер не поддерживает озвучку');return}if(!q)speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='en-US';if(voice)u.voice=voice;u.rate=r;speechSynthesis.speak(u)}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-say]');if(b)say(b.dataset.say,+b.dataset.rate||.9)});
+const sp=(t,r)=>`<button title="Слушать" data-say="${t}" ${r?`data-rate="${r}"`:''}>${r?'🐢':'🔊'}</button>`;
+async function cp(t,b){try{await navigator.clipboard.writeText(t)}catch(_){const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy')}catch(__){}a.remove()}const o=b.textContent;b.textContent='Скопировано ✓';setTimeout(()=>b.textContent=o,1600)}
+/* problems */
+const probs=new Map();
+function prob(){const t=$('#pt');t.innerHTML=[...probs].map(([p,c])=>`<tr><td><b>${p.e}</b> ${sp(p.e)}<br><small>${p.r}</small></td><td>×${c}</td></tr>`).join('');$('#pe').style.display=probs.size?'none':''}
+$('#clr').onclick=()=>{probs.clear();prob()};
+/* exercises */
+const EX=[
+{t:'1. Какой глагол? (таблица: глагол + существительное)',d:'Choose the verb that goes with the noun.',f:p=>{const v=VS.find(v=>p.e.startsWith(v+' '));return{k:'sel',q:`<b>___ ${p.e.slice(v.length+1)}</b> — <small>${p.r}</small>`,a:v,d:p.e,o:shuf([v,...shuf(VS.filter(x=>x!=v)).slice(0,4)])}}},
+{t:'2. Перевод с русского на английский',d:'Translate the phrase.',f:p=>({k:'in',q:p.r,a:p.e,d:p.e})},
+{t:'3. Допиши недостающую часть',d:'Complete the missing part of the expression.',f:(p,n)=>{const w=p.e.split(' ');return n%2?{k:'in',q:`<small>${p.r}</small><br><b>… ${w.slice(1).join(' ')}</b>`,a:w[0],d:p.e}:{k:'in',q:`<small>${p.r}</small><br><b>${w[0]} …</b>`,a:w.slice(1).join(' '),d:p.e}}},
+{t:'4. Напиши выражение по звуку',d:'Listen (🔊 normal, 🐢 slow) and type what you hear.',f:p=>({k:'in',aud:p.e,q:'Listen and write:',a:p.e,d:p.e})},
+{t:'5. Контекст: вставь пропущенное слово',d:'Fill the gap with the correct verb form (hint: first letter).',f:p=>({k:'in',q:`${p.s.replace(/\[.+?\]/,'<b>_____</b>')} <small>(${p.R[0]}…)</small><br><small>${p.sr}</small>`,a:p.R,d:p.s.replace(/[\[\]]/g,'')})},
+{t:'6. Replace the highlighted word',d:'The highlighted word is wrong. Write the correct one.',f:p=>({k:'in',q:`${p.s.replace(/\[.+?\]/,'<mark>'+p.w+'</mark>')}<br><small>${p.sr}</small>`,a:p.R,d:p.s.replace(/[\[\]]/g,'')})},
+{t:'7. Build the chunk',d:'Tap the words in the right order.',f:p=>({k:'chunk',q:p.r,a:p.e,d:p.e})}];
+function build(i){const X=EX[i],box=$('#ex'+i+' .items');box.innerHTML='';X.items=[];$('#sc'+i).textContent='';
+shuf(D).slice(0,10).forEach((p,n)=>{const c=X.f(p,n),el=document.createElement('div');el.className='it';
+el.innerHTML=`<span class="n">${n+1}.</span><div class="b"><div class="q">${c.q}</div><span class="ans"></span></div><span class="r"></span>`;
+const b=el.querySelector('.b');let get;
+if(c.aud){const s=document.createElement('span');s.innerHTML=sp(c.aud)+' '+sp(c.aud,.55);b.querySelector('.q').append(s)}
+if(c.k=='in'){const x=document.createElement('input');x.type='text';x.autocomplete='off';x.autocapitalize='off';x.spellcheck=false;b.append(x);get=()=>x.value}
+else if(c.k=='sel'){const x=document.createElement('select');x.innerHTML='<option value="">— choose —</option>'+c.o.map(o=>`<option>${o}</option>`).join('');b.append(x);get=()=>x.value}
+else{let pool=shuf(c.a.split(' ')),bt=[];const ln=document.createElement('div'),pl=document.createElement('div');ln.className='line';
+const mk=(w,f)=>{const q=document.createElement('button');q.className='chip';q.textContent=w;q.onclick=f;return q};
+const dr=()=>{ln.innerHTML='';pl.innerHTML='';bt.forEach((w,j)=>ln.append(mk(w,()=>{pool.push(...bt.splice(j,1));dr()})));pool.forEach((w,j)=>pl.append(mk(w,()=>{bt.push(...pool.splice(j,1));dr()})))};dr();b.append(ln,pl);get=()=>bt.join(' ')}
+box.append(el);X.items.push({el,get,a:c.a,d:c.d,p,q:c.q,r:el.querySelector('.r'),an:el.querySelector('.ans')})})}
+function chk(i){let ok=0;EX[i].items.forEach(it=>{const g=norm(it.get()),good=g===norm(it.a);it.el.className='it '+(good?'ok':'no');it.r.textContent=good?'✓':'✗';if(good)ok++;else probs.set(it.p,(probs.get(it.p)||0)+1)});$('#sc'+i).textContent=ok+'/10';prob()}
+function shw(i){EX[i].items.forEach(it=>it.an.textContent='✔ '+it.d)}
+/* reminder */
+const rem=`<section><h1>💰 Money vocabulary</h1><p class="d">Сначала повтори слова: нажми 🔊 и <b>прослушай</b> каждое слово и выражение (голос Google US English / Samantha, если есть в браузере).</p>
+<div class="bar"><button class="p" id="all">▶ Прослушать все</button><button id="tv">🔊 Тест звука</button><span class="d" id="vs"></span></div>
+<table>${N.map(n=>`<tr class="h"><td colspan="3"><b>${n[0]}</b> <span style="color:var(--ac)">${n[1]}</span> — ${n[2]} ${sp(n[0])}</td></tr>`+D.filter(p=>p.e.includes(n[0])).map(p=>`<tr><td>${p.e} ${sp(p.e)}</td><td>${p.r}</td><td><small>${p.s.replace(/[\[\]]/g,'')}</small></td></tr>`).join('')).join('')}</table></section>`;
+/* free tasks */
+const FR=[{id:'wyr',t:'8. Would you rather…?',d:'Choose and explain why (2–3 sentences). Use the vocabulary.',q:["Would you rather pay off your mortgage early or get a higher salary?","Would you rather pay no tax or have free health insurance?","Would you rather stick to a strict budget or spend freely and get a loan?","Would you rather make only contactless payments or only pay in cash?","Would you rather earn a high salary in a job you hate or a low salary in a job you love?"]},
+{id:'fin',t:'9. Finish the sentences with your own ideas',d:'Complete each sentence.',q:["If I got a big loan, I would …","I would apply for a loan if …","The best way to reduce tax is …","When I make a budget, I always …","I'd like my salary to increase because …"]}];
+const fr=f=>`<section id="${f.id}"><h2>${f.t}</h2><p class="d">${f.d}</p>${f.q.map((q,i)=>`<div class="it"><span class="n">${i+1}.</span><div class="b"><div>${q}</div><textarea></textarea></div></div>`).join('')}<div class="bar"><button class="p" onclick="cp(fx('${f.id}'),this)">📋 Скопировать все ответы</button></div></section>`;
+function fx(id){const f=FR.find(x=>x.id==id);return f.t+'\n'+[...document.querySelectorAll('#'+id+' .it')].map((e,i)=>`${i+1}. ${f.q[i]}\n   → ${e.querySelector('textarea').value||'—'}`).join('\n')}
+const ret=`<section id="rs"><h2>10. Write as many words as you remember</h2><p class="d">Без подсказок напиши все слова и выражения из темы (retrieve). Потом проверь.</p><textarea id="rt" style="min-height:110px"></textarea><div class="bar"><button class="p" onclick="rc()">Проверить</button></div><p id="rr"></p></section>`;
+const ALL=[...D.map(p=>p.e),...N.map(n=>n[0])];
+function rc(){const t=norm($('#rt').value),g=ALL.filter(w=>t.includes(norm(w)));$('#rr').innerHTML=`Вспомнил(а): <b>${g.length}/${ALL.length}</b><br>Пропущено: ${ALL.filter(w=>!g.includes(w)).join(', ')||'—'}`}
+const L=[...D.map(p=>({e:p.e,r:p.r})),...N.map(n=>({e:n[0],r:n[2]}))];
+const lcs=`<section id="ls"><h2>11. Choose 3 words you are least confident about</h2><p class="d">Выбери ровно 3 слова — появятся задания на них.</p>${L.map((w,i)=>`<label class="c"><input type="checkbox" value="${i}"> ${w.e}</label>`).join('')}<div class="bar"><button class="p" id="mk3">Создать задания</button></div><div id="l3"></div></section>`;
+let lc=[];
+function l3(){const s=[...document.querySelectorAll('#ls input:checked')].map(x=>L[x.value]);if(s.length!=3){alert('Выбери ровно 3 слова');return}
+lc=[];$('#l3').innerHTML='';s.forEach((w,i)=>{const d=document.createElement('div');d.className='it';d.innerHTML=`<div class="b"><b>${i+1}. ${w.e}</b> ${sp(w.e)}<br>a) Translate: <i>${w.r}</i><br><input type="text" autocomplete="off" autocapitalize="off"> <span class="r"></span><br>b) Write your own sentence:<textarea></textarea>c) Ask your partner a question with it:<textarea></textarea></div>`;$('#l3').append(d);const[x]=d.querySelectorAll('input'),[t1,t2]=d.querySelectorAll('textarea');lc.push({w,x,t1,t2,r:d.querySelector('.r')})});
+const b=document.createElement('button');b.className='p';b.textContent='Проверить переводы';b.onclick=()=>lc.forEach(o=>{const g=norm(o.x.value)===norm(o.w.e);o.r.textContent=g?'✓':'✗ '+o.w.e});$('#l3').append(b)}
+/* copy everything */
+function every(){let o='Money vocabulary — мои ответы\n';EX.forEach(X=>{o+=`\n## ${X.t}\n`;X.items.forEach((it,n)=>{const u=it.get()||'—',g=norm(it.get())===norm(it.a);o+=`${n+1}. ${strip(it.q)} → ${u} ${g?'✓':'✗ (correct: '+it.d+')'}\n`})});
+FR.forEach(f=>o+='\n## '+fx(f.id)+'\n');o+='\n## 10. Retrieve\n'+($('#rt').value||'—')+'\n';
+if(lc.length){o+='\n## 11. Least confident\n';lc.forEach(c=>o+=`${c.w.e}: translation → ${c.x.value||'—'}; sentence → ${c.t1.value||'—'}; question → ${c.t2.value||'—'}\n`)}
+o+='\n## Problem words\n'+([...probs].map(([p,c])=>`${p.e} ×${c}`).join(', ')||'—');return o}
+$('#m').innerHTML=rem+EX.map((X,i)=>`<section id="ex${i}"><h2>${X.t}</h2><p class="d">${X.d}</p><div class="items"></div><div class="bar"><button class="p" onclick="chk(${i})">Проверить</button><button onclick="shw(${i})">Показать ответы</button><button onclick="build(${i})">Заново (новый микс)</button><span class="sc" id="sc${i}"></span></div></section>`).join('')+FR.map(fr).join('')+ret+lcs+`<section><button class="p" onclick="cp(every(),this)">📋 Скопировать ВСЕ мои ответы</button></section>`;
+EX.forEach((_,i)=>build(i));pick();
+$('#tv').onclick=()=>say('Mortgage, salary, loan, insurance. Audio works!');
+$('#all').onclick=()=>{speechSynthesis.cancel();N.forEach(n=>{say(n[0],.85,true);D.filter(p=>p.e.includes(n[0])).forEach(p=>say(p.e,.85,true))})};
+$('#mk3').onclick=l3;
+document.querySelectorAll('#ls input').forEach(x=>x.onchange=()=>{if(document.querySelectorAll('#ls input:checked').length>3)x.checked=false});
+</script></body></html>
