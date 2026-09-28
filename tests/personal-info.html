@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Personal information: тренажёр</title>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f2f5fb;--card:#fff;--ink:#17244f;--mut:#5b6689;--line:#d5dcee;--ok:#1b8a5a;--bad:#d4303f;--acc:#2b4bd6;color-scheme:light dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1530;--card:#182044;--ink:#e8ecff;--mut:#9aa6d4;--line:#2b3566;--ok:#4cd39a;--bad:#ff6b78;--acc:#8ea2ff}}
+:root[data-theme="dark"]{--bg:#0f1530;--card:#182044;--ink:#e8ecff;--mut:#9aa6d4;--line:#2b3566;--ok:#4cd39a;--bad:#ff6b78;--acc:#8ea2ff}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.5 Manrope,system-ui,sans-serif}
+body::before{content:"";position:fixed;inset:0;z-index:-1;opacity:.4;background:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:26px 26px}
+.wrap{max-width:1080px;margin:0 auto;padding:20px 16px 60px}
+h1{font:700 clamp(2.2rem,6vw,3.4rem)/1 Caveat,cursive;margin:8px 0 4px;color:var(--bad)}
+h2{font:700 1.7rem/1.1 Caveat,cursive;margin:0 0 4px}
+.sub{color:var(--mut);margin:0 0 16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:16px 18px;margin-bottom:18px}
+.grid{display:grid;grid-template-columns:1fr 230px;gap:18px;align-items:start}
+@media(max-width:820px){.grid{grid-template-columns:1fr}}
+aside{position:sticky;top:12px}
+table{border-collapse:collapse;width:100%}td{padding:5px 8px;border-bottom:1px solid var(--line)}
+.ipa{color:var(--mut);font-family:system-ui,sans-serif}
+button,select{font:600 .9rem Manrope,sans-serif;color:var(--ink)}
+button{cursor:pointer;background:var(--card);border:1.5px solid var(--ink);border-radius:5px;padding:6px 12px}
+button:hover{background:var(--acc);color:#fff;border-color:var(--acc)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.play{padding:2px 8px}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+#st{font-size:.88rem;margin-top:8px}#st.w{color:var(--bad)}#st.g{color:var(--ok)}
+ol.rows{list-style:none;padding:0;margin:10px 0;counter-reset:n}
+.row{counter-increment:n;display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 10px;padding:8px 0;border-bottom:1px dashed var(--line)}
+.row::before{content:counter(n)".";color:var(--mut);width:1.5em}
+.lead{font-weight:600}.lead.big{font:700 1.6rem Caveat,cursive;letter-spacing:.12em}
+input,select.m{font:500 1.5rem Caveat,cursive;color:var(--ink);background:transparent;border:0;border-bottom:2px solid var(--ink);min-width:200px;flex:1;max-width:340px;padding:0 4px}
+select.m{font-size:1.15rem;font-family:Manrope,sans-serif;background:var(--card);border:1.5px solid var(--ink);border-radius:5px}
+.ok{border-color:var(--ok)!important;color:var(--ok)}.bad{border-color:var(--bad)!important;color:var(--bad)}
+.hint{color:var(--mut);font-size:.85rem}.ans{color:var(--ok);font:700 1.3rem Caveat,cursive;flex-basis:100%;padding-left:1.9em}
+.sc{font-weight:800;margin-left:6px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}.chip{border-color:var(--bad);color:var(--bad);padding:2px 8px}
+.chip b{margin-left:4px}
+#pw:empty::before{content:"Пока пусто. Слова с ошибками появятся здесь.";color:var(--mut);font-size:.85rem}
+.me{display:grid;grid-template-columns:auto 1fr;gap:8px 12px;align-items:baseline;margin:10px 0}
+.me input,.me select{max-width:none}
+</style></head><body><div class="wrap">
+<h1>Personal information</h1>
+<p class="sub">Вопросы и ответы о себе: пиши от руки, проверяй, копируй результат.</p>
+
+<div class="card"><h2>Слова и голос</h2>
+<div class="bar"><select id="vs" aria-label="Голос"></select>
+<label><input type="checkbox" id="slow" style="min-width:0;flex:none"> медленно</label>
+<button id="test">Проверить звук</button><button id="all">Слушать все слова</button></div>
+<div id="st"></div>
+<p class="hint">Задание: прослушай каждое слово (голос Google US English или Samantha) и повтори вслух.</p>
+<table id="vt"></table></div>
+
+<div class="grid"><main id="ex"></main>
+<aside class="card"><h2>Проблемные слова</h2><div id="pw" class="chips"></div>
+<div class="bar"><button id="clr">Очистить</button></div></aside></div>
+
+<div class="card"><h2>Всё вместе</h2><p class="hint">Копирует задания, твои ответы, правильные ответы и результат.</p>
+<div class="bar"><button id="copy">Копировать все ответы</button><span id="cm" class="hint"></span></div></div>
+</div>
+<script>
+const $=s=>document.querySelector(s);
+const norm=s=>(s||'').toLowerCase().replace(/ё/g,'е').replace(/[^\p{L}\p{N}\s]/gu,'').replace(/\s+/g,' ').trim();
+const expand=a=>a.split('|').flatMap(x=>{const r=[x];if(/what's/i.test(x))r.push(x.replace(/what's/i,'what is'));if(/^i'm/i.test(x))r.push(x.replace(/^i'm/i,'I am'));return r});
+const esc=s=>s.replace(/"/g,'&quot;');
+const W=[['name','/neɪm/','имя'],['surname','/ˈsɜːneɪm/','фамилия'],['age','/eɪdʒ/','возраст'],['address','/əˈdres/','адрес'],['postcode','/ˈpəʊstkəʊd/','почтовый индекс'],['phone number','/ˈfəʊn ˌnʌmbə/','номер телефона'],['spell','/spel/','писать по буквам'],['from','/frɒm/','из, откуда'],['married','/ˈmærid/','женат / замужем'],['single','/ˈsɪŋɡl/','холост / не замужем'],['divorced','/dɪˈvɔːst/','разведён / разведена']];
+$('#vt').innerHTML=W.map(w=>`<tr><td><b>${w[0]}</b></td><td class="ipa">${w[1]}</td><td>${w[2]}</td><td><button class="play" data-s="${w[0]}" aria-label="Слушать ${w[0]}">🔊</button></td></tr>`).join('');
+const scr=w=>{let a=w.replace(/ /g,'').split(''),r;do{r=a.slice().sort(()=>Math.random()-.5)}while(r.join('')==a.join('')&&a.length>2);return r.join(' ')};
+const mk={
+scr:([a,h])=>({l:`<span class="lead big">${scr(a)}</span>`,a,h}),
+gap:([l,a,h])=>({l,a,h}),
+lis:([a])=>({l:`<button class="play" data-s="${esc(a)}" aria-label="Слушать">🔊</button><button class="play" data-s="${esc(a)}" data-slow="1" aria-label="Медленно">🐢</button>`,a,h:'напиши то, что услышал'}),
+ctx:([q,a])=>({l:`«${q}» → `,a,h:'напиши вопрос'}),
+mis:([w,a])=>({l:w,a,h:'исправь ошибку'}),
+dia:([pre,a,h,post])=>({l:pre,a,h,p:post}),
+tr:([w,a,h])=>({l:w,a,h})};
+const EX=[
+{t:'Unscramble the word',d:'Поставь буквы в правильном порядке.',k:'scr',it:[['postcode','почтовый индекс'],['surname','фамилия'],['divorced','разведён'],['address','адрес'],['married','женат'],['telephone','телефон'],['single','холост'],['spell','писать по буквам']]},
+{t:'Complete the missing part',d:'Допиши недостающую часть.',k:'gap',it:[["What's your phone ___?",'number'],['Where are you ___?','from'],["What's your post___?",'code'],['How ___ are you?','old'],['How do you ___ it?','spell'],["What's your ___? — Brown.",'surname'],["What's your ad___?",'dress|address'],['She has a husband. She is ___.','married']]},
+{t:'Listen and write',d:'Нажми 🔊 и напиши выражение (🐢 — медленно).',k:'lis',it:[['How old are you?'],["What's your surname?"],['Where are you from?'],["What's your address?"],['How do you spell it?'],["What's your phone number?"],["What's your postcode?"],['She is divorced.']]},
+{t:'Context: write the question',d:'Напиши правильный вопрос к ответу.',k:'ctx',it:[['Baker.',"What's your surname?"],['07700 900123.',"What's your phone number?"],["I'm 25.",'How old are you?'],['Kate.',"What's your name?"],['KR1 4AB.',"What's your postcode?"],['K-A-T-E.','How do you spell it?'],["I'm from Spain.",'Where are you from?'],['5 High Street.',"What's your address?"]]},
+{t:'Match the halves',d:'Соедини половинки выражений.',k:'mat',it:[["What's your post",'code?'],['How old','are you?'],["What's your phone",'number?'],['How do you','spell it?'],["What's your sur",'name?'],['Where are you','from?'],["What's your ad",'dress?'],["What's your",'name?']]},
+{t:'Find the mistake',d:'Найди ошибку и напиши предложение правильно.',k:'mis',it:[["What's you name?","What's your name?"],['Where you are from?','Where are you from?'],['How old you are?','How old are you?'],["What's your surename?","What's your surname?"],['How do you spelling it?','How do you spell it?'],['What your phone number?',"What's your phone number?"],["What's your adress?","What's your address?"],["I'm twenty year old.","I'm twenty years old."]]},
+{t:'Finish the dialogue',d:'Допиши реплику (подсказка в скобках).',k:'dia',it:[['A: Hello! ',"what's your name",'спроси имя',' — B: My name\'s Tom.'],['A: Nice to meet you. What\'s your surname? — B: ',"baker|my surname is baker|my surnames baker|its baker",'Baker'],['A: ','how do you spell it','спроси, как пишется',' — B: B-A-K-E-R.'],['A: How old are you? — B: ',"im 32|i am 32|32|im 32 years old|im thirty two",'32'],['A: ','where are you from','спроси откуда',' — B: I\'m from Manchester.'],["A: What's your address? — B: ",'14 park road|its 14 park road|my address is 14 park road','14 Park Road'],['A: ',"what's your postcode",'спроси индекс',' — B: It\'s M1 5BD.'],["A: What's your phone number? — B: ",'07700 900123|its 07700 900123|my phone number is 07700 900123','07700 900123']]},
+{t:'About me',d:'Заполни информацию о себе.',k:'me'},
+{t:'Words 1: English → русский',d:'Напиши перевод слова.',k:'tr',it:[['divorced','разведен|разведена|разведенный'],['single','холост|не женат|не замужем|холостой|свободен'],['married','женат|замужем|женатый'],['surname','фамилия'],['address','адрес'],['postcode','индекс|почтовый индекс'],['phone number','номер телефона|телефон'],['spell','писать по буквам|произносить по буквам']]},
+{t:'Words 2: русский → English',d:'Напиши слово по-английски.',k:'tr',it:[['холост / не замужем','single'],['разведён','divorced'],['женат / замужем','married'],['имя','name'],['возраст','age'],['номер телефона','phone number|telephone number'],['почтовый индекс','postcode'],['писать по буквам','spell']]}];
+const ME=[['Name','name'],['Surname','surname'],['Age','age'],['I am from','from'],['Address','address'],['Postcode','postcode'],['Phone number','phone']];
+const R=[];
+const sh=a=>a.slice().sort(()=>Math.random()-.5);
+EX.forEach((e,i)=>{
+const s=document.createElement('section');s.className='card';R[i]=[];
+let h=`<h2>Ex. ${i+1}. ${e.t}</h2><p class="sub">${e.d}</p>`;
+if(e.k=='me'){h+='<div class="me">'+ME.map(m=>`<label for="m${m[1]}">${m[0]}:</label><input id="m${m[1]}" autocomplete="off">`).join('')+`<label for="mst">Status:</label><select class="m" id="mst"><option value="">— choose —</option><option>single</option><option>married</option><option>divorced</option></select></div>`;}
+else{h+='<ol class="rows">'+e.it.map((x,j)=>{
+if(e.k=='mat'){const o=sh(e.it.map(y=>y[1]));return `<li class="row"><span class="lead">${x[0]}</span><select class="m" id="e${i}_${j}"><option value="">— choose —</option>${o.map(z=>`<option>${z}</option>`).join('')}</select><span class="ans" hidden></span></li>`}
+const q=mk[e.k](x);R[i][j]=q;
+return `<li class="row"><span class="lead">${q.l}</span><input id="e${i}_${j}" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="ответ ${j+1}"><span class="lead">${q.p||''}</span>${q.h?`<span class="hint">(${q.h})</span>`:''}<span class="ans" hidden></span></li>`}).join('')+'</ol>';}
+h+=`<div class="bar"><button data-c="${i}">Проверить</button>${e.k=='me'?'':`<button data-a="${i}">Показать ответы</button>`}<button data-r="${i}">Сбросить</button><span class="sc" id="sc${i}"></span></div>`;
+s.innerHTML=h;$('#ex').appendChild(s)});
+const PW={};
+function drawPW(){$('#pw').innerHTML=Object.entries(PW).sort((a,b)=>b[1]-a[1]).map(([w,n])=>`<button class="chip" data-s="${esc(w)}">${w}<b>×${n}</b></button>`).join('')}
+function answerOf(i,j){const e=EX[i];return e.k=='mat'?e.it[j][0]+' '+e.it[j][1]:expand(R[i][j].a)[0]}
+function val(i,j){const el=$(`#e${i}_${j}`);return el?el.value.trim():''}
+function isOk(i,j){const e=EX[i],v=val(i,j);if(e.k=='mat')return v==e.it[j][1];return expand(R[i][j].a).some(a=>norm(a)==norm(v))}
+function check(i){const e=EX[i];let ok=0;
+if(e.k=='me'){let n=0;[...ME.map(m=>'m'+m[1]),'mst'].forEach(id=>{const el=$('#'+id),f=!!el.value.trim();el.classList.toggle('ok',f);el.classList.toggle('bad',!f);n+=f});$('#sc'+i).textContent=n+'/8 заполнено';return}
+e.it.forEach((x,j)=>{const el=$(`#e${i}_${j}`),v=val(i,j),g=isOk(i,j);el.classList.toggle('ok',g);el.classList.toggle('bad',!g&&!!v);if(!v)el.classList.remove('ok','bad');
+if(g)ok++;else if(v){const cor=norm(e.k=='mat'?x[0]+' '+x[1]:expand(R[i][j].a)[0]).split(' '),got=norm(v).split(' ');cor.forEach(w=>{if(w.length>1&&!got.includes(w)&&/[a-z]/.test(w))PW[w]=(PW[w]||0)+1})}});
+$('#sc'+i).textContent=ok+'/8';drawPW()}
+function showAns(i){const e=EX[i];$('#ex').children[i].querySelectorAll('.ans').forEach((a,j)=>{a.hidden=!a.hidden;a.textContent=a.hidden?'':'✔ '+answerOf(i,j)})}
+function reset(i){const s=$('#ex').children[i];s.querySelectorAll('input,select').forEach(x=>{x.value='';x.classList.remove('ok','bad')});s.querySelectorAll('.ans').forEach(a=>{a.hidden=true;a.textContent=''});$('#sc'+i).textContent=''}
+document.addEventListener('click',ev=>{const b=ev.target.closest('button');if(!b)return;const d=b.dataset;
+if(d.c!==undefined)check(+d.c);else if(d.a!==undefined)showAns(+d.a);else if(d.r!==undefined)reset(+d.r);else if(d.s!==undefined)speak(d.s,d.slow)});
+$('#clr').onclick=()=>{for(const k in PW)delete PW[k];drawPW()};
+/* audio */
+let vs=[];const st=(t,c)=>{const s=$('#st');s.textContent=t;s.className=c||''};
+function loadV(){vs=speechSynthesis.getVoices().filter(v=>/^en/i.test(v.lang));const sel=$('#vs');
+const pref=vs.find(v=>/google us english/i.test(v.name))||vs.find(v=>/samantha/i.test(v.name))||vs.find(v=>v.lang=='en-US')||vs[0];
+sel.innerHTML=vs.map((v,i)=>`<option value="${i}">${v.name} (${v.lang})</option>`).join('');
+if(pref){sel.value=vs.indexOf(pref);st('Голос: '+pref.name+(/google us english|samantha/i.test(pref.name)?' ✔':' (Google US English / Samantha не найден, выбери другой в списке)'),/google us english|samantha/i.test(pref.name)?'g':'w')}
+else st('Английские голоса не найдены. Открой страницу в Chrome или Safari.','w')}
+function speak(t,slow){if(!('speechSynthesis' in window)){st('Браузер не поддерживает озвучку.','w');return}
+speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t),v=vs[+$('#vs').value];if(v)u.voice=v;u.lang=v?v.lang:'en-US';u.rate=(slow||$('#slow').checked)?.6:.9;
+u.onerror=e=>{if(!/interrupted|canceled/.test(e.error))st('Ошибка аудио: '+e.error+'. Проверь звук и выбери другой голос.','w')};speechSynthesis.speak(u)}
+if('speechSynthesis' in window){loadV();speechSynthesis.onvoiceschanged=loadV}else st('Браузер не поддерживает озвучку.','w');
+$('#test').onclick=()=>{speak("Audio test. What's your name?");const v=vs[+$('#vs').value];if(v)st('Играет: '+v.name+'. Если звука нет, проверь громкость или выбери другой голос.','g')};
+$('#all').onclick=()=>{let k=0;const go=()=>{if(k>=W.length)return;const u=new SpeechSynthesisUtterance(W[k++][0]),v=vs[+$('#vs').value];if(v)u.voice=v;u.lang='en-US';u.rate=$('#slow').checked?.6:.9;u.onend=()=>setTimeout(go,400);speechSynthesis.speak(u)};speechSynthesis.cancel();go()};
+/* copy */
+$('#copy').onclick=async()=>{let o='Personal information: результаты\n';
+EX.forEach((e,i)=>{o+=`\nExercise ${i+1}. ${e.t}\n`;
+if(e.k=='me'){ME.forEach(m=>o+=`${m[0]}: ${$('#m'+m[1]).value.trim()||'—'}\n`);o+=`Status: ${$('#mst').value||'—'}\n`;return}
+e.it.forEach((x,j)=>{const q=e.k=='mat'?{l:x[0]+' ...'}:R[i][j],lead=q.l.replace(/<[^>]+>/g,'').trim()||(e.k=='lis'?'[audio] '+q.a:'');
+o+=`${j+1}. ${e.k=='lis'?'[audio]':lead+(q.p?' ___ '+q.p:'')} | Student: ${val(i,j)||'—'} | Correct: ${answerOf(i,j)} | ${val(i,j)?(isOk(i,j)?'OK':'MISTAKE'):'not answered'}\n`})});
+const p=Object.entries(PW).map(([w,n])=>w+' ×'+n).join(', ');o+=`\nProblem words: ${p||'none'}\n`;
+try{await navigator.clipboard.writeText(o)}catch(_){const t=document.createElement('textarea');t.value=o;document.body.appendChild(t);t.select();try{document.execCommand('copy')}catch(__){}t.remove()}
+$('#cm').textContent='Скопировано ✔'};
+</script></body></html>
