@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Shops A2 — Повторение</title>
+<style>
+:root{--bg:#f6f7fb;--card:#fff;--tx:#1d2433;--mu:#667;--ac:#3b6cf6;--ok:#1a9b55;--no:#d83b4b;--bd:#dfe3ee;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12151d;--card:#1b2030;--tx:#e8ebf5;--mu:#9aa3b8;--ac:#7c9bff;--ok:#44c986;--no:#ff6b7b;--bd:#2c3348}}
+:root[data-theme="dark"]{--bg:#12151d;--card:#1b2030;--tx:#e8ebf5;--mu:#9aa3b8;--ac:#7c9bff;--ok:#44c986;--no:#ff6b7b;--bd:#2c3348}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:1000px;margin:auto;padding:16px;display:grid;grid-template-columns:1fr 220px;gap:16px}
+@media(max-width:800px){.wrap{grid-template-columns:1fr}aside{order:-1;position:static!important}}
+h1{margin:0 0 4px;font-size:24px}h2{margin:0 0 8px;font-size:19px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:16px;margin-bottom:16px}
+aside{position:sticky;top:calc(12px + env(safe-area-inset-top,0px));align-self:start}
+button{font:inherit;cursor:pointer;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:9px;padding:6px 12px}
+button.p{background:var(--ac);color:#fff;border-color:var(--ac)}
+input[type=text],select{font:inherit;color:var(--tx);background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:6px 9px;max-width:100%}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.it{padding:8px 0;border-bottom:1px dashed var(--bd);display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.it .q{flex:1 1 220px}
+.m{font-weight:700;min-width:1.2em}.ok{color:var(--ok)}.no{color:var(--no)}
+.an{display:none;color:var(--ok);font-size:14px}.an.s{display:inline}
+.sc,.mu{color:var(--mu);font-size:14px}
+.tag{display:inline-block;background:var(--bg);border:1px solid var(--bd);border-radius:999px;padding:1px 9px;margin:2px;font-size:13px;cursor:pointer}
+.bank{background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:6px 10px;margin-bottom:6px;font-size:14px}
+.let{font-size:20px;letter-spacing:.15em;font-weight:700}
+</style></head><body>
+<div class="wrap"><main>
+<h1>🔁 Shops · Повторение (A2)</h1>
+<div class="mu" id="vs"></div>
+<div id="exs"></div>
+<div class="card"><h2>📋 Скопировать всё</h2><div class="row"><button class="p" onclick="copyAll()">Скопировать все ответы студента</button><span id="cm" class="sc"></span></div></div>
+</main>
+<aside><div class="card"><h2>⚠️ Проблемные слова</h2><div id="pw" class="mu">Пока ошибок нет 🎉</div>
+<button style="margin-top:8px" onclick="PW={};drawPW()">Очистить</button></div></aside></div>
+<script>
+const $=s=>document.querySelector(s);
+const norm=s=>s.toLowerCase().replace(/[’']/g,'').replace(/\s+/g,' ').trim();
+let PW={},voice=null;
+function pick(){const v=speechSynthesis.getVoices();voice=v.find(x=>/Google US English/i.test(x.name))||v.find(x=>/Samantha/i.test(x.name))||v.find(x=>x.lang==='en-US')||v.find(x=>x.lang.startsWith('en'))||null;
+$('#vs').textContent=voice?'Голос: '+voice.name+(/Google US|Samantha/i.test(voice.name)?' ✓':' (Google US English / Samantha не найден)'):'Голос не найден: откройте в Chrome/Safari.'}
+if('speechSynthesis'in window){pick();speechSynthesis.onvoiceschanged=pick}
+function speak(t){if(!('speechSynthesis'in window)){alert('Озвучка не поддерживается');return}speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);if(voice)u.voice=voice;u.lang='en-US';u.rate=.85;speechSynthesis.speak(u)}
+function drawPW(){const e=Object.entries(PW).sort((a,b)=>b[1]-a[1]);$('#pw').innerHTML=e.length?e.map(([k,n])=>`<span class="tag" onclick="speak(this.dataset.w)" data-w="${k}">🔊 ${k} ×${n}</span>`).join(''):'Пока ошибок нет 🎉'}
+const mk=(c,wr,p)=>{const o=[...wr];o.splice(p,0,c);return o};
+// scramble (deterministic)
+const scr=w=>{const l=norm(w).replace(/ /g,'').split('');let a=l.slice(),s=7;for(let i=a.length-1;i>0;i--){s=(s*31+i*17)%97;const j=s%(i+1);[a[i],a[j]]=[a[j],a[i]]}if(a.join('')===l.join(''))a.reverse();return a.join(' ').toUpperCase()};
+const S1=[["some tomatoes","greengrocer's"],["a novel","bookshop"],["aspirin","pharmacy"],["a steak","butcher's"],["a laptop","electronics shop"],["a football","sports shop"],["a loaf of bread","baker's"],["a dirty coat to clean","dry cleaner's"]];
+const S2=[["кафе","cafe"],["супермаркет","supermarket"],["булочная","baker's"],["парикмахерская","hairdresser's"],["мясной магазин","butcher's"],["аптека","pharmacy"],["овощной магазин","greengrocer's"],["книжный магазин","bookshop"]];
+const S3=[["I need a haircut. I'll call the ___.","hairdresser's"],["My jacket is dirty. I'll take it to the ___.","dry cleaner's"],["I bought a new dress at the ___.","clothes shop"],["There are many floors and departments in that ___.","department store"],["I buy my weekly food shopping at the ___.","supermarket"],["I need football boots. Let's go to the ___.","sports shop"],["These sandals are too small. Let me look in the ___.","shoe shop"],["Let's have a coffee at the ___.","cafe"]];
+const S4=[["I'd like a kilo of apples, please.","greengrocer's",["baker's","bookshop"],2],["Can I have a large loaf, please?","baker's",["butcher's","cafe"],0],["I need something for my headache.","pharmacy",["hairdresser's","supermarket"],1],["Do you have this phone in black?","electronics shop",["shoe shop","dry cleaner's"],1],["Two lamb chops, please.","butcher's",["greengrocer's","sports shop"],2],["Just a trim, please.","hairdresser's",["clothes shop","cafe"],0]];
+const SEL='— выбери —';
+const EX=[
+{t:'1. Where can you buy it?',n:'Где это можно купить? Напиши место.',items:[3,0,6,1,5,2,7,4].map(i=>({q:`You need <b>${S1[i][0]}</b>. Go to the …`,a:[norm(S1[i][1])],s:S1[i][1],w:S1[i][1]}))},
+{t:'2. Unscramble the word',n:'Составь слово из букв. Подсказка — перевод.',items:[4,1,6,0,7,3,5,2].map(i=>({q:`<span class="let">${scr(S2[i][1])}</span> <span class="mu">(${S2[i][0]})</span>`,a:[norm(S2[i][1])],s:S2[i][1],w:S2[i][1]}))},
+{t:'3. Fill in the gaps',n:'Слова: cafe · clothes shop · department store · dry cleaner\'s · hairdresser\'s · shoe shop · sports shop · supermarket',items:[5,2,7,0,3,6,1,4].map(i=>({q:S3[i][0],a:[norm(S3[i][1])],s:S3[i][1],w:S3[i][1]}))},
+{t:'4. Listen and choose',n:'Нажми 🔊 и выбери, где происходит разговор.',items:[3,0,5,2,4,1].map(i=>{const [q,c,w,p]=S4[i];return{au:q,k:'sel',o:[SEL,...mk(c,w,p)],a:[norm(c)],s:c+'  ("'+q+'")',w:c,q:''}})}
+];
+function build(){EX.forEach(ex=>{const c=document.createElement('div');c.className='card';
+c.innerHTML=`<h2>${ex.t}</h2><div class="${ex.t[0]==='3'?'bank':'mu'}" style="margin-bottom:6px">${ex.n}</div><div class="its"></div><div class="row" style="margin-top:10px"><button class="p">✔ Проверить</button><button>👁 Показать ответы</button><button>↺ Сбросить</button><span class="sc"></span></div>`;
+const its=c.querySelector('.its');
+ex.items.forEach((it,n)=>{const d=document.createElement('div');d.className='it';
+let h=`<span class="sc">${n+1}.</span>`;if(it.au)h+=`<button data-au>🔊</button>`;h+=`<span class="q">${it.q}</span>`;
+h+=it.k==='sel'?`<select>${it.o.map(o=>`<option>${o}</option>`).join('')}</select>`:`<input type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="…">`;
+h+=`<span class="m"></span><span class="an">${it.s}</span>`;d.innerHTML=h;its.appendChild(d);
+it.el=d;it.inp=d.querySelector('input,select');it.mk=d.querySelector('.m');it.counted=false;it.good=undefined;
+const rs=()=>{it.counted=false;it.mk.textContent=''};it.inp.oninput=rs;it.inp.onchange=rs;
+it.inp.onkeydown=e=>{if(e.key==='Enter')chk(ex)};const b=d.querySelector('[data-au]');if(b)b.onclick=()=>speak(it.au)});
+const [bc,bs,br]=c.querySelectorAll('button:not([data-au])');ex.sc=c.querySelector('.sc');
+bc.onclick=()=>chk(ex);bs.onclick=()=>ex.items.forEach(i=>i.el.querySelector('.an').classList.add('s'));
+br.onclick=()=>{ex.items.forEach(i=>{i.inp.value=i.k==='sel'?SEL:'';i.mk.textContent='';i.good=undefined;i.counted=false;i.el.querySelector('.an').classList.remove('s')});ex.sc.textContent=''};
+$('#exs').appendChild(c)})}
+function chk(ex){let ok=0;ex.items.forEach(it=>{const v=norm(it.inp.value),e=!v||v===norm(SEL);const g=it.a.includes(v);it.good=e?undefined:g;
+it.mk.textContent=e?'…':g?'✓':'✗';it.mk.className='m '+(g?'ok':'no');
+if(g)ok++;else if(!e&&!it.counted){it.counted=true;PW[it.w]=(PW[it.w]||0)+1}});
+ex.sc.textContent=`Результат: ${ok} / ${ex.items.length}`;drawPW()}
+function copyTxt(t,el){const done=()=>{el.textContent='✅ Скопировано!';setTimeout(()=>el.textContent='',2500)};
+const fb=()=>{const a=document.createElement('textarea');a.value=t;a.style.cssText='position:fixed;opacity:0';document.body.appendChild(a);a.select();try{document.execCommand('copy');done()}catch(e){prompt('Скопируйте вручную:',t)}a.remove()};
+if(navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(t).then(done,fb);else fb()}
+function copyAll(){let t='SHOPS A2 — Повторение — ответы студента\n';EX.forEach(ex=>{t+=`\n${ex.t}\n`;ex.items.forEach((it,n)=>{const q=(it.q.replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim())||('(audio) '+it.au);
+const v=it.inp.value.trim();const st=it.good===undefined?' [не проверено]':it.good?' ✓':' ✗';
+t+=`${n+1}. ${q} → ${v&&v!==SEL?v:'—'}${st} | правильно: ${it.s}\n`})});
+const pw=Object.entries(PW).map(([k,n])=>`${k} ×${n}`).join(', ');t+=`\nПроблемные слова: ${pw||'нет'}\n`;copyTxt(t,$('#cm'))}
+build();
+</script></body></html>
