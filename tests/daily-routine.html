@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Daily Routine — тренажёр</title>
+<style>
+:root{--bg:#f7f6f2;--card:#fff;--tx:#1f2328;--mu:#6b7280;--ac:#2f6fed;--ok:#1a8f4c;--bad:#d33a3a;--bd:#e3e1da;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15171a;--card:#1f2226;--tx:#e8e8e6;--mu:#9aa0a6;--ac:#6b9bff;--ok:#4cc585;--bad:#f07272;--bd:#33373c}}
+:root[data-theme="dark"]{--bg:#15171a;--card:#1f2226;--tx:#e8e8e6;--mu:#9aa0a6;--ac:#6b9bff;--ok:#4cc585;--bad:#f07272;--bd:#33373c}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+.w{max-width:1100px;margin:0 auto;padding:16px;display:grid;gap:16px}
+@media(min-width:900px){.w{grid-template-columns:1fr 240px}}
+aside{order:-1}@media(min-width:900px){aside{order:0;position:sticky;top:16px;align-self:start}}
+section,aside>div{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:16px;margin-bottom:16px}
+h1{margin:0 0 4px;font-size:24px}h2{margin:0 0 4px;font-size:19px}.h{color:var(--mu);margin:0 0 12px;font-size:14px}
+table{width:100%;border-collapse:collapse}td{padding:5px 6px;border-bottom:1px solid var(--bd)}.ip{color:var(--mu);font-family:monospace}
+button,select{font:inherit;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:8px;padding:5px 11px;cursor:pointer}
+button.pr{background:var(--ac);color:#fff;border-color:var(--ac)}
+input.ans,textarea{font:inherit;border:1px solid var(--bd);background:var(--bg);color:var(--tx);border-radius:8px;padding:5px 9px;min-width:0}
+ol{padding-left:24px;margin:0}li{margin:8px 0}li .p{display:inline-block;min-width:150px;margin-right:8px}
+li input.ans{width:min(260px,100%)}.st{line-height:2.4}.st input.ans{width:130px}
+.m{font-family:monospace;letter-spacing:2px;font-size:18px}.big{font-size:30px}
+.it.ok input,.it.ok .tg{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,transparent)}
+.it.bad input,.it.bad .tg{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 14%,transparent)}
+.fb{font-size:14px;margin-left:6px}.ok .fb{color:var(--ok)}.bad .fb{color:var(--bad)}.fb.s{color:var(--ac)}
+.btns{margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}.sc{color:var(--mu)}
+.build{display:inline-block;vertical-align:top;width:min(520px,100%)}.tg{min-height:38px;border:1px dashed var(--bd);border-radius:8px;padding:3px;display:flex;flex-wrap:wrap;gap:4px}
+.pool{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}.tk{padding:3px 9px}
+.bank{background:var(--bg);border-radius:8px;padding:8px;font-weight:600}
+.pw{font-size:14px}.pw div{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--bd)}
+.chip{margin:3px}.chip.on{background:var(--ac);color:#fff}textarea{width:100%;min-height:90px}
+</style></head><body>
+<div class="w"><main>
+<section id="intro"><h1>🏠 Daily Routine</h1>
+<p class="h">Сначала повтори слова и прослушай их. Голос: <select id="vs"></select> <button onclick="say('Hello! Take a shower, and have a good day.')">🔊 Проверить звук</button> <span id="vn" class="sc"></span></p>
+<table id="vt"></table>
+<div class="btns"><button class="pr" onclick="all()">▶ Прослушать все слова</button><span class="sc">Рекомендуемый голос: Google US English / Samantha</span></div></section>
+<div id="exs"></div>
+<section><h2>8. Write as many words as you remember</h2><p class="h">Закрой список выше и впиши все выражения, которые помнишь (по одному в строке).</p>
+<textarea id="rt" placeholder="get up&#10;take a shower&#10;..."></textarea>
+<div class="btns"><button class="pr" onclick="ret()">Проверить</button><button onclick="ret(1)">Показать ответы</button></div><p id="rr"></p></section>
+<section><h2>9. Choose 3 words you are least confident with</h2><p class="h">Выбери 3 выражения — для них появятся дополнительные задания.</p>
+<div id="chips"></div><div id="ch3"></div></section>
+<section><h2>Мои ответы</h2><p class="h">Скопируй все свои ответы (с правильными вариантами) и отправь преподавателю.</p>
+<div class="btns"><button class="pr" onclick="copyAll()">📋 Скопировать мои ответы</button><span id="cp" class="sc"></span></div></section>
+</main>
+<aside><div><h2>Проблемные слова</h2><p class="h">Слова, где была ошибка</p><div class="pw" id="pw"></div><div class="btns"><button onclick="P={};sv();rp()">Очистить</button></div></div></aside></div>
+<script>
+const V=[["work from home","работать из дома","/wɜːrk frʌm hoʊm/","works from home","💻🏠"],["get up","вставать","/ɡet ʌp/","gets up","🛏️"],["get dressed","одеваться","/ɡet drest/","gets dressed","👕"],["leave home","выходить из дома","/liːv hoʊm/","leaves home","🚪"],["brush my teeth","чистить зубы","/brʌʃ maɪ tiːθ/","brushes her teeth","🪥"],["tidy my room","убирать комнату","/ˈtaɪdi maɪ ruːm/","tidies her room","🧹"],["have breakfast","завтракать","/hæv ˈbrekfəst/","has breakfast","🍳"],["go to bed","ложиться спать","/ɡoʊ tə bed/","goes to bed","🛌"],["take a shower","принимать душ","/teɪk ə ˈʃaʊər/","takes a shower","🚿"],["go for a walk","ходить на прогулку","/ɡoʊ fɔːr ə wɔːk/","goes for a walk","🚶"],["check my phone","проверять телефон","/tʃek maɪ foʊn/","checks her phone","📱"],["wake up","просыпаться","/weɪk ʌp/","wakes up","⏰"]].map(a=>({en:a[0],ru:a[1],ip:a[2],f:a[3],e:a[4]}));
+const $=s=>document.querySelector(s),N=V.length,ix=e=>V.findIndex(v=>v.en==e);
+const rng=s=>()=>(s=s*16807%2147483647)/2147483647;
+const shuf=(a,s)=>{a=[...a];const r=rng(s*97+13);for(let i=a.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const pick=s=>shuf([...Array(N).keys()],s).slice(0,10);
+const alt=(i,a)=>V[i].en=="take a shower"?[a,a.replace("take","have")]:[a];
+const norm=s=>s.toLowerCase().replace(/[’']/g,"'").replace(/[.,!?]/g,"").replace(/\s+/g," ").trim();
+/* ---- audio ---- */
+let voice=null;
+function pv(){const vs=speechSynthesis.getVoices().filter(v=>/^en/i.test(v.lang));const s=$("#vs");const cur=voice&&voice.name;
+ voice=vs.find(v=>v.name==cur)||vs.find(v=>/Google US English/i.test(v.name))||vs.find(v=>/Samantha/i.test(v.name))||vs.find(v=>v.lang=="en-US")||vs[0]||null;
+ s.innerHTML=vs.map(v=>`<option ${voice&&v.name==voice.name?"selected":""}>${v.name}</option>`).join("");
+ $("#vn").textContent=voice?"":"⚠ английский голос не найден в браузере"}
+function say(t,r=.9,cb){if(!("speechSynthesis" in window)){alert("Озвучка не поддерживается. Откройте в Chrome или Safari.");return}
+ speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);if(voice)u.voice=voice;u.lang="en-US";u.rate=r;if(cb)u.onend=cb;speechSynthesis.speak(u)}
+if("speechSynthesis" in window){speechSynthesis.onvoiceschanged=pv;pv()}
+$("#vs").onchange=e=>{voice=speechSynthesis.getVoices().find(v=>v.name==e.target.value);say("Take a shower")};
+function all(i=0){if(i<N)say(V[i].en,.85,()=>setTimeout(()=>all(i+1),500))}
+$("#vt").innerHTML=V.map((v,i)=>`<tr><td><b>${v.en}</b></td><td class=ip>${v.ip}</td><td>${v.ru}</td><td><button onclick="say(V[${i}].en)">🔊</button></td></tr>`).join("");
+/* ---- problem words ---- */
+let P={};try{P=JSON.parse(localStorage.getItem("pw")||"{}")}catch(e){}
+function sv(){try{localStorage.setItem("pw",JSON.stringify(P))}catch(e){}}
+function rp(){const k=Object.keys(P).filter(k=>P[k]>0).sort((a,b)=>P[b]-P[a]);
+ $("#pw").innerHTML=k.length?k.map(i=>`<div><span>${V[i].en} <span class=ip>×${P[i]}</span></span><button onclick="say(V[${i}].en)">🔊</button></div>`).join(""):"<span class=sc>Пока ошибок нет 👍</span>"}
+function bump(k){P[k]=(P[k]||0)+1;sv();rp()}rp();
+/* ---- exercises ---- */
+const EX=[];
+EX.push({t:"Вставь пропущенные буквы",d:"Впиши выражение целиком.",items:pick(1).map(i=>{const r=rng(i+5),e=V[i].en;const m=[...e].map((c,j)=>c==" "||j==0||e[j-1]==" "||r()>.45?c:"_").join("").replace(/ /g,"  ");return{k:i,p:`<b class=m>${m}</b> — ${V[i].ru}`,a:alt(i,e)}})});
+EX.push({t:"Переведи с русского на английский",d:"Напиши выражение по-английски.",items:pick(2).map(i=>({k:i,p:V[i].ru,a:alt(i,V[i].en)}))});
+EX.push({t:"Прослушай и запиши",d:"Нажми 🔊 (🐢 — медленно), напиши, что услышал. После проверки появится произношение.",items:pick(3).map(i=>({k:i,p:`<button onclick="say('${V[i].en}')">🔊</button> <button onclick="say('${V[i].en}',.5)">🐢</button>`,a:alt(i,V[i].en),ip:V[i].ip}))});
+EX.push({t:"Present Simple: he / she",d:"Измени предложение. Пиши только глагольную часть: I wake up → She wakes up.",strip:1,items:pick(4).map(i=>({k:i,p:`I ${V[i].en}. → She / He …`,a:[V[i].f,V[i].f.replace("her","his")]}))});
+EX.push({t:"Что на картинке?",d:"Напиши выражение по картинке.",items:pick(5).map(i=>({k:i,p:`<span class=big>${V[i].e}</span>`,a:alt(i,V[i].en)}))});
+const S=[["Saturday. I ","wake up"],[" at 8 and ","check my phone"],[" for five minutes. Then I ","get up"],[" and ","take a shower"],[". After that I ","brush my teeth"],[" and ","get dressed"],[". I ","have breakfast"],[" at nine. Then I ","tidy my room"],[" and ","go for a walk"],[". In the evening I ","go to bed"]];
+EX.push({t:"Вставь слова в текст",d:"Впиши подходящее выражение в каждый пропуск.",story:1,tail:" early.",bank:shuf(S.map(s=>s[1]),6).join(" · "),items:S.map(s=>({k:ix(s[1]),p:s[0],a:[s[1]]}))});
+const B=[["I wake up at seven every day.","wake up"],["She gets dressed after breakfast.","get dressed"],["We work from home on Fridays.","work from home"],["He leaves home at eight.","leave home"],["They go for a walk in the park.","go for a walk"],["I brush my teeth twice a day.","brush my teeth"],["She tidies her room on Saturdays.","tidy my room"],["I usually have breakfast at home.","have breakfast"],["He takes a shower in the morning.","take a shower"],["I check my phone before I go to bed.","check my phone"]];
+EX.push({t:"Build the chunk",d:"Нажимай на слова, чтобы собрать предложение. Нажми на слово в рамке — оно вернётся обратно.",items:shuf(B,7).map((b,n)=>({k:ix(b[1]),p:"",a:[b[0]],b:shuf(b[0].replace(/\./,"").split(" "),n+20)}))});
+function render(i){const E=EX[i],sec=$("#e"+i);let h=`<h2>${i+1}. ${E.t}</h2><p class=h>${E.d}</p>`;
+ if(E.bank)h+=`<p class=bank>${E.bank}</p>`;h+=E.story?"<div class=st>":"<ol>";
+ E.items.forEach((it,j)=>{const inp=it.b?`<div class="ans build"><div class=tg></div><div class=pool>${it.b.map(w=>`<button class=tk>${w}</button>`).join("")}</div></div>`:`<input class=ans autocomplete=off autocapitalize=none spellcheck=false>`;
+  h+=E.story?`<span class=it data-j=${j}>${it.p}${inp}<span class=fb></span></span>`:`<li class=it data-j=${j}><span class=p>${it.p}</span>${inp}<span class=fb></span></li>`});
+ h+=E.story?`${E.tail}</div>`:"</ol>";
+ h+=`<div class=btns><button class=pr onclick=chk(${i})>Проверить</button><button onclick=sol(${i})>Показать ответы</button><button onclick=render(${i})>Заново</button><span class=sc id=sc${i}></span></div>`;
+ sec.innerHTML=h}
+function val(i,j){const a=$("#e"+i).querySelectorAll(".it")[j].querySelector(".ans");const v=a.tagName=="INPUT"?a.value:(a.dataset.v||"");return v}
+function ok(i,j){const E=EX[i],it=E.items[j];let v=norm(val(i,j));if(E.strip)v=v.replace(/^(he|she|he\/she) /,"");return it.a.map(norm).includes(v)}
+function chk(i){const E=EX[i];let n=0;E.items.forEach((it,j)=>{const el=$("#e"+i).querySelectorAll(".it")[j],g=ok(i,j);el.classList.remove("ok","bad");el.classList.add(g?"ok":"bad");
+ const f=el.querySelector(".fb");f.className="fb";f.textContent=g?"✓"+(it.ip?" "+it.ip:""):"✗"+(it.ip?" "+it.ip:"");if(g)n++;else bump(it.k)});
+ $("#sc"+i).textContent=`Результат: ${n}/${E.items.length}`}
+function sol(i){EX[i].items.forEach((it,j)=>{const f=$("#e"+i).querySelectorAll(".it")[j].querySelector(".fb");f.className="fb s";f.textContent="→ "+it.a[0]+(it.ip?" "+it.ip:"")})}
+$("#exs").innerHTML=EX.map((_,i)=>`<section id=e${i}></section>`).join("");EX.forEach((_,i)=>render(i));
+$("#exs").addEventListener("click",e=>{const t=e.target;if(!t.classList.contains("tk"))return;const b=t.closest(".build"),tg=b.querySelector(".tg"),po=b.querySelector(".pool");
+ (t.parentNode==po?tg:po).appendChild(t);b.dataset.v=[...tg.children].map(x=>x.textContent).join(" ")});
+/* ---- 8 retrieve ---- */
+function ret(show){const t=norm($("#rt").value.replace(/\n/g," ")),miss=[];let n=0;
+ V.forEach((v,i)=>{if(t.includes(norm(v.en)))n++;else{miss.push(v.en);if(!show)bump(i)}});
+ $("#rr").innerHTML=show?"<b>Все слова:</b> "+V.map(v=>v.en).join(", "):`Вспомнил(а): <b>${n}/${N}</b>. ${miss.length?"Забыты: "+miss.join(", "):"Отлично! 🎉"}`}
+/* ---- 9 least confident ---- */
+let sel=[];
+function chips(){$("#chips").innerHTML=V.map((v,i)=>`<button class="chip ${sel.includes(i)?"on":""}" onclick=tog(${i})>${v.en}</button>`).join("");
+ $("#ch3").innerHTML=sel.map(i=>`<div style="border-top:1px solid var(--bd);padding:10px 0"><b>${V[i].en}</b> <button onclick="say(V[${i}].en)">🔊</button> <span class=ip>${V[i].ip}</span>
+ <p>1) «${V[i].ru}» по-английски: <input class=ans id=c1_${i}> <button onclick="c3(${i})">✓</button> <span id=cf${i}></span></p>
+ <p>2) Напиши своё предложение в Present Simple (he / she): <input class=ans id=c2_${i} style="width:min(360px,100%)"></p>
+ <p class=sc>Подсказка: ${V[i].f}</p></div>`).join("")}
+function tog(i){sel.includes(i)?sel=sel.filter(x=>x!=i):sel.length<3&&sel.push(i);chips()}
+function c3(i){const g=alt(i,V[i].en).map(norm).includes(norm($("#c1_"+i).value));$("#cf"+i).textContent=g?"✓":"✗ "+V[i].en;if(!g)bump(i)}
+chips();
+/* ---- copy ---- */
+function copyAll(){let o="Daily Routine — мои ответы\n";
+ EX.forEach((E,i)=>{o+=`\n${i+1}. ${E.t}\n`;E.items.forEach((it,j)=>{const pr=$("#e"+i).querySelectorAll(".it")[j].querySelector(".p");const q=pr?pr.textContent.trim():(E.story?"("+(j+1)+")":"");
+  o+=`${j+1}) ${q?q+" | ":""}ответ: ${val(i,j)||"—"} | правильно: ${it.a[0]} | ${ok(i,j)?"✓":"✗"}\n`})});
+ o+=`\n8. Retrieve:\n${$("#rt").value||"—"}\n\n9. Least confident: ${sel.map(i=>V[i].en).join(", ")||"—"}\n`;
+ sel.forEach(i=>{o+=`- ${V[i].en}: ${$("#c1_"+i).value||"—"} | ${$("#c2_"+i).value||"—"}\n`});
+ const k=Object.keys(P).filter(k=>P[k]>0);o+=`\nПроблемные слова: ${k.map(i=>V[i].en+" ×"+P[i]).join(", ")||"нет"}\n`;
+ const done=()=>$("#cp").textContent="Скопировано ✓";
+ if(navigator.clipboard)navigator.clipboard.writeText(o).then(done,()=>fb());else fb();
+ function fb(){const t=document.createElement("textarea");t.value=o;document.body.appendChild(t);t.select();try{document.execCommand("copy");done()}catch(e){$("#cp").textContent="Не удалось скопировать"}t.remove()}}
+</script></body></html>
