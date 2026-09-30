@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Shops A2 — тренажёр</title>
+<style>
+:root{--bg:#f6f7fb;--card:#fff;--tx:#1d2433;--mu:#667;--ac:#3b6cf6;--ok:#1a9b55;--no:#d83b4b;--bd:#dfe3ee;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12151d;--card:#1b2030;--tx:#e8ebf5;--mu:#9aa3b8;--ac:#7c9bff;--ok:#44c986;--no:#ff6b7b;--bd:#2c3348}}
+:root[data-theme="dark"]{--bg:#12151d;--card:#1b2030;--tx:#e8ebf5;--mu:#9aa3b8;--ac:#7c9bff;--ok:#44c986;--no:#ff6b7b;--bd:#2c3348}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:1100px;margin:auto;padding:16px;display:grid;grid-template-columns:1fr 240px;gap:16px}
+@media(max-width:800px){.wrap{grid-template-columns:1fr}aside{order:-1;position:static!important}}
+h1{margin:0 0 4px;font-size:24px}h2{margin:0 0 10px;font-size:19px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:16px;margin-bottom:16px}
+aside{position:sticky;top:calc(12px + env(safe-area-inset-top,0px));align-self:start}
+button{font:inherit;cursor:pointer;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:9px;padding:6px 12px}
+button.p{background:var(--ac);color:#fff;border-color:var(--ac)}
+input[type=text],select,textarea{font:inherit;color:var(--tx);background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:6px 9px;max-width:100%}
+textarea{width:100%;min-height:56px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+table{border-collapse:collapse;width:100%}td,th{padding:5px 6px;border-bottom:1px solid var(--bd);text-align:left;font-size:14px}
+.it{padding:8px 0;border-bottom:1px dashed var(--bd);display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.it .q{flex:1 1 220px}.emo{font-size:38px;line-height:1}
+.m{font-weight:700;min-width:1.2em}.ok{color:var(--ok)}.no{color:var(--no)}
+.an{display:none;color:var(--ok);font-size:14px}.an.s{display:inline}
+.sc{color:var(--mu);font-size:14px}.mu{color:var(--mu);font-size:14px}
+.tag{display:inline-block;background:var(--bg);border:1px solid var(--bd);border-radius:999px;padding:1px 9px;margin:2px;font-size:13px;cursor:pointer}
+.opt{display:block;width:100%;text-align:left;margin:5px 0}.opt.ok{border-color:var(--ok)}.opt.no{border-color:var(--no)}
+.tableWrap{overflow-x:auto}
+</style></head><body>
+<div class="wrap"><main>
+<h1>🛍️ Shops &amp; Shopping · A2</h1>
+<div class="mu" id="vs">Голос: проверяем…</div>
+<div class="card" id="rev"></div>
+<div id="exs"></div>
+<div class="card" id="quiz"></div>
+<div class="card"><h2>📋 Скопировать всё</h2>
+<div class="row"><button class="p" onclick="copyAll()">Скопировать все ответы студента</button><span id="cm" class="sc"></span></div></div>
+</main>
+<aside><div class="card"><h2>⚠️ Проблемные слова</h2><div id="pw" class="mu">Пока ошибок нет 🎉</div>
+<button style="margin-top:8px" onclick="PW={};drawPW()">Очистить</button></div></aside></div>
+<script>
+const W=[
+["pharmacy/chemist's","аптека","/ˈfɑːrməsi/ · /ˈkemɪsts/","💊","a shop where you buy medicine"],
+["greengrocer's","овощной/фруктовый магазин","/ˈɡriːnɡroʊsərz/","🥦","a shop that sells fresh fruit and vegetables"],
+["stationer's/newsagent's","канцтовары / газетный киоск","/ˈsteɪʃənərz/ · /ˈnjuːzeɪdʒənts/","📰","a shop that sells paper, pens and envelopes"],
+["cafe","кафе","/kæˈfeɪ/","☕"],
+["department store","универмаг","/dɪˈpɑːrtmənt stɔːr/","🏬","a big shop with many different sections"],
+["hairdresser's","парикмахерская","/ˈherdresərz/","💇","a place where you get a haircut"],
+["bookshop","книжный магазин","/ˈbʊkʃɑːp/","📚"],
+["electronics shop","магазин электроники","/ɪˌlekˈtrɑːnɪks ʃɑːp/","💻"],
+["clothes shop","магазин одежды","/kloʊðz ʃɑːp/","👕"],
+["baker's","булочная","/ˈbeɪkərz/","🥖","a shop that sells bread and cakes"],
+["butcher's","мясной магазин","/ˈbʊtʃərz/","🥩","a shop that sells meat"],
+["shoe shop","обувной магазин","/ʃuː ʃɑːp/","👟"],
+["supermarket","супермаркет","/ˈsuːpərmɑːrkɪt/","🛒"],
+["dry cleaner's","химчистка","/ˌdraɪ ˈkliːnərz/","🧺","a shop that cleans your clothes with special chemicals"],
+["sports shop","спортивный магазин","/spɔːrts ʃɑːp/","⚽"]];
+const $=s=>document.querySelector(s);
+const norm=s=>s.toLowerCase().replace(/[’']/g,'').replace(/\s+/g,' ').trim();
+const acc=en=>en.split('/').map(norm);
+const say=en=>en.replace('/',' or ').replace(/'s/g,'s');
+const perm=(n,st,off)=>Array.from({length:n},(_,i)=>(i*st+off)%n);
+let PW={},voice=null;
+function pick(){const v=speechSynthesis.getVoices();voice=v.find(x=>/Google US English/i.test(x.name))||v.find(x=>/Samantha/i.test(x.name))||v.find(x=>x.lang==='en-US')||v.find(x=>x.lang.startsWith('en'))||null;
+$('#vs').textContent=voice?'Голос: '+voice.name+(/Google US|Samantha/i.test(voice.name)?' ✓':' (Google US English / Samantha не найден — используется доступный)'):'Голос не найден: откройте в Chrome/Safari.';}
+if('speechSynthesis'in window){pick();speechSynthesis.onvoiceschanged=pick}
+function speak(t){if(!('speechSynthesis'in window)){alert('Озвучка не поддерживается в этом браузере');return}
+speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);if(voice)u.voice=voice;u.lang='en-US';u.rate=.85;speechSynthesis.speak(u)}
+function drawPW(){const e=Object.entries(PW).sort((a,b)=>b[1]-a[1]);
+$('#pw').innerHTML=e.length?'<table>'+e.map(([k,n])=>`<tr><td><span class="tag" onclick="speak('${say(W[k][0])}')">🔊 ${W[k][0]}</span></td><td>${W[k][1]}</td><td>×${n}</td></tr>`).join('')+'</table>':'Пока ошибок нет 🎉'}
+// Review
+$('#rev').innerHTML=`<h2>📖 Напоминание слов</h2><div class="row" style="margin-bottom:8px"><button class="p" onclick="playAll()">🔊 Прослушать все слова</button><span class="sc">Нажми на слово, чтобы послушать</span></div><div class="tableWrap"><table><tr><th></th><th>English</th><th>Транскрипция</th><th>Перевод</th></tr>${W.map(w=>`<tr><td>${w[3]}</td><td><button onclick="speak('${say(w[0])}')">🔊 ${w[0]}</button></td><td>${w[2]}</td><td>${w[1]}</td></tr>`).join('')}</table></div>`;
+let playing=false;
+function playAll(){if(playing){speechSynthesis.cancel();playing=false;return}playing=true;let i=0;
+(function n(){if(!playing||i>=W.length){playing=false;return}const u=new SpeechSynthesisUtterance(say(W[i++][0]));if(voice)u.voice=voice;u.lang='en-US';u.rate=.8;u.onend=()=>setTimeout(n,500);speechSynthesis.speak(u)})()}
+// Exercises
+const TF=[["Bakers sell bread and cakes.",1],["A greengrocer's sells fresh meat.",0],["You can get a haircut at the electronics shop.",0],["A department store has many different departments.",1],["A dry cleaner's sells books.",0],["You can buy football boots at a sports shop.",1],["A supermarket sells food and drinks.",1],["A bookshop is a place to buy shoes.",0]];
+const mk=(c,wr,p)=>{const o=[...wr];o.splice(p,0,c);return o};
+const DL=[["Where can I buy aspirin?","At the chemist's, next to the bank.",["At the butcher's, please.","It costs five pounds."],1],
+["I'd like a loaf of bread, please.","Sure. Would you like it sliced?",["Yes, sit down. How short?","Try them on in the fitting room."],0],
+["Do you have this shirt in a larger size?","I'm sorry, we only have medium.",["We sell fresh fish.","Yes, you can sit here."],2],
+["How much are these running shoes?","They're 45 pounds.",["I'm a vegetarian.","At half past six."],2],
+["I'd like a haircut, please.","Of course. Take a seat.",["It's in the fridge.","You can pay by card."],0],
+["Can I have two coffees and a cake?","Sure. Anything else?",["They're at the pharmacy.","No, I don't play tennis."],1],
+["Excuse me, where's the electronics shop?","It's on the second floor of the department store.",["I'd like a kilo of apples.","It's very delicious."],2],
+["I need to clean my coat.","Take it to the dry cleaner's.",["Take it to the greengrocer's.","Take it to the bookshop."],0]];
+const SE=["I go to the chemist's when…","My favourite shop is … because …","At the baker's I usually buy …","I never go to the butcher's because …","In a department store you can …","I'd like to buy … at the sports shop.","The best café in my town is …","When I need new shoes, I …"];
+const SEM=["I go to the chemist's when I have a headache.","My favourite shop is the bookshop because I love reading.","At the baker's I usually buy fresh rolls.","I never go to the butcher's because I'm vegetarian.","In a department store you can buy clothes, shoes and toys.","I'd like to buy a new football at the sports shop.","The best café in my town is near the park.","When I need new shoes, I go to the shoe shop in the mall."];
+const tfO=['— выбери —','True','False'];
+const EX=[
+{id:'tr',t:'1. Переведи с русского на английский',n:'Напиши слово или выражение по-английски',items:perm(15,2,1).map(i=>({q:`<b>${W[i][1]}</b>`,a:acc(W[i][0]),s:W[i][0],w:i}))},
+{id:'di',t:'2. Напиши услышанное (аудио)',n:'Нажми 🔊 и напиши то, что слышишь',items:perm(15,7,4).map(i=>({q:'',au:say(W[i][0]),a:acc(W[i][0]),s:W[i][0]+'  '+W[i][2],w:i}))},
+{id:'df',t:'3. Definitions',n:'Какое место описывает определение? Слова: pharmacy, greengrocer\'s, stationer\'s, department store, hairdresser\'s, baker\'s, butcher\'s, dry cleaner\'s',items:[0,1,2,4,5,9,10,13].map((_,k)=>[0,1,2,4,5,9,10,13][(k*3+2)%8]).map(i=>({q:`“${W[i][4]}”`,a:acc(W[i][0]),s:W[i][0],w:i}))},
+{id:'pi',t:'4. Что на картинке?',n:'Напиши название места',items:perm(15,4,1).slice(0,8).map(i=>({q:`<span class="emo">${W[i][3]}</span>`,a:acc(W[i][0]),s:W[i][0],w:i}))},
+{id:'tf',t:'5. True / False',n:'',items:TF.map(([q,v])=>({k:'sel',q,o:tfO,a:[v?'true':'false'],s:v?'True':'False'}))},
+{id:'dl',t:'6. Finish the dialogue',n:'Выбери подходящий ответ',items:DL.map(([q,c,w,p])=>({k:'sel',q:`<b>A:</b> ${q}<br><b>B:</b> …`,o:['— выбери —',...mk(c,w,p)],a:[norm(c)],s:c}))},
+{id:'se',t:'7. Закончи предложения своими идеями',n:'Пиши свои варианты — проверки нет, смотри примеры',items:SE.map((q,i)=>({k:'free',q,s:SEM[i]}))}];
+const ST={};
+function build(){const box=$('#exs');EX.forEach(ex=>{
+const c=document.createElement('div');c.className='card';c.innerHTML=`<h2>${ex.t}</h2><div class="mu" style="margin-bottom:6px">${ex.n}</div><div class="its"></div><div class="row" style="margin-top:10px"><button class="p">✔ Проверить</button><button>👁 Показать ответы</button><button>↺ Сбросить</button><button style="display:none">📋 Копировать</button><span class="sc"></span></div>`;
+const its=c.querySelector('.its');
+ex.items.forEach((it,n)=>{const d=document.createElement('div');d.className='it';
+let h=`<span class="sc">${n+1}.</span>`;if(it.au)h+=`<button data-au>🔊</button>`;
+h+=`<span class="q">${it.q}</span>`;
+if(it.k==='sel')h+=`<select>${it.o.map(o=>`<option value="${o.replace(/"/g,'&quot;')}">${o}</option>`).join('')}</select>`;
+else if(it.k==='free')h+=`<textarea placeholder="Your idea…"></textarea>`;
+else h+=`<input type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="…">`;
+h+=`<span class="m"></span><span class="an">${it.s}</span>`;d.innerHTML=h;its.appendChild(d);it.el=d;it.inp=d.querySelector('input,select,textarea');it.mk=d.querySelector('.m');it.counted=false;
+it.inp.addEventListener('input',()=>{it.counted=false;it.mk.textContent=''});it.inp.addEventListener('change',()=>{it.counted=false;it.mk.textContent=''});
+const b=d.querySelector('[data-au]');if(b)b.onclick=()=>speak(it.au);
+if(it.k==='sel'&&it.o.length)it.inp.addEventListener('keydown',()=>{});
+it.inp.addEventListener('keydown',e=>{if(e.key==='Enter'&&it.k!=='free')checkEx(ex)})});
+const [bc,bs,br,bp]=c.querySelectorAll('button:not([data-au])');
+ex.sc=c.querySelector('.sc');bc.onclick=()=>checkEx(ex);bs.onclick=()=>ex.items.forEach(i=>i.el.querySelector('.an').classList.add('s'));
+br.onclick=()=>{ex.items.forEach(i=>{i.inp.value=i.k==='sel'?i.o[0]:'';i.mk.textContent='';i.el.querySelector('.an').classList.remove('s');i.counted=false});ex.sc.textContent=''};
+if(ex.id==='se'){bc.style.display='none';bp.style.display='';bp.onclick=()=>copyTxt(ex.items.map((i,n)=>`${i.q} ${i.inp.value.trim()}`).join('\n'),ex.sc)}
+box.appendChild(c)})}
+function checkEx(ex){let ok=0;ex.items.forEach(it=>{const v=norm(it.inp.value);
+const good=it.k==='sel'?it.a.includes(v):it.a.includes(v);it.good=good;
+it.mk.textContent=!v||v.startsWith('— выбери')?'…':good?'✓':'✗';it.mk.className='m '+(good?'ok':'no');
+if(good)ok++;else if(v&&!v.startsWith('— выбери')&&!it.counted){it.counted=true;if(it.w!==undefined){PW[it.w]=(PW[it.w]||0)+1}}});
+ex.sc.textContent=`Результат: ${ok} / ${ex.items.length}`;drawPW()}
+// Quiz
+const QZ=[["Where do you buy medicine?","Pharmacy",["Baker's","Bookshop","Shoe shop"]],["Where can you buy a loaf of bread?","Baker's",["Butcher's","Pharmacy","Hairdresser's"]],["Where do you get a haircut?","Hairdresser's",["Dry cleaner's","Cafe","Greengrocer's"]],["Where do you buy apples and carrots?","Greengrocer's",["Butcher's","Stationer's","Shoe shop"]],["Where do you buy pens and paper?","Stationer's",["Baker's","Sports shop","Cafe"]],["Where do you buy steak?","Butcher's",["Bookshop","Clothes shop","Greengrocer's"]],["Where do you buy novels?","Bookshop",["Electronics shop","Baker's","Dry cleaner's"]],["Where do you buy a laptop?","Electronics shop",["Clothes shop","Butcher's","Cafe"]],["Where do you take a dirty jacket?","Dry cleaner's",["Bookshop","Baker's","Sports shop"]],["Where do you buy football boots?","Sports shop",["Bookshop","Baker's","Pharmacy"]],["Which shop sells food, drinks and things for the home under one roof?","Supermarket",["Stationer's","Shoe shop","Hairdresser's"]],["Where can you drink coffee and eat a sandwich?","Cafe",["Pharmacy","Bookshop","Butcher's"]],["Which is the British word for 'pharmacy'?","Chemist's",["Newsagent's","Baker's","Greengrocer's"]],["Where do you buy a pair of sandals?","Shoe shop",["Bakery","Pharmacy","Cafe"]],["Which place has many departments?","Department store",["Shoe shop","Baker's","Cafe"]]];
+const POS=[2,0,3,1,1,3,0,2,3,1,0,2,1,3,0],PR=[100,200,300,500,'1 000','2 000','4 000','8 000','16 000','32 000','64 000','125 000','250 000','500 000','1 000 000'];
+let qi=0,typeMode=false,used5050=false,over=false;
+function qz(msg){const q=QZ[qi];const Q=$('#quiz');
+if(over||qi>=15){Q.innerHTML=`<h2>🎩 Кто хочет стать миллионером?</h2><p><b>${msg}</b></p><button class="p" onclick="qi=0;over=false;used5050=false;qz()">Играть снова</button>`;return}
+const o=mk(q[1],q[2],POS[qi]);
+Q.innerHTML=`<h2>🎩 Кто хочет стать миллионером?</h2><div class="row" style="margin-bottom:8px"><label><input type="checkbox" ${typeMode?'checked':''} onchange="typeMode=this.checked;qz()"> Писать ответ самому</label>${typeMode?'':`<button ${used5050?'disabled':''} onclick="f5050()">50:50</button>`}<span class="sc">Вопрос ${qi+1}/15 · ${PR[qi]} ₽</span></div>${msg?`<p class="${msg[0]==='✓'?'ok':'no'}"><b>${msg}</b></p>`:''}<p><b>${q[0]}</b></p><div id="qo">${typeMode?`<div class="row"><input type="text" id="qt" placeholder="Your answer…" autocapitalize="off"><button class="p" onclick="ans($('#qt').value)">Ответить</button></div>`:o.map(x=>`<button class="opt" data-v="${x.replace(/"/g,'&quot;')}">${'ABCD'[o.indexOf(x)]}. ${x}</button>`).join('')}</div>`;
+Q.querySelectorAll('.opt').forEach(b=>b.onclick=()=>ans(b.dataset.v));
+const t=$('#qt');if(t)t.onkeydown=e=>{if(e.key==='Enter')ans(t.value)}}
+function f5050(){used5050=true;const q=QZ[qi];let k=0;document.querySelectorAll('.opt').forEach(b=>{if(b.dataset.v!==q[1]&&k<2){b.style.visibility='hidden';k++}});document.querySelectorAll('#quiz button')[0]}
+function ans(v){const q=QZ[qi];if(norm(v)===norm(q[1])){qi++;qz(qi>=15?'🏆 Поздравляем! Вы выиграли 1 000 000 ₽!':'✓ Верно!')}else{over=true;const w=W.findIndex(x=>acc(x[0]).includes(norm(q[1])));if(w>=0){PW[w]=(PW[w]||0)+1;drawPW()}window.lastQ=qi;qz(`✗ Неверно. Правильный ответ: ${q[1]}. Вы дошли до вопроса ${qi+1}.`)}}
+// Copy
+function copyTxt(t,el){const done=()=>{if(el){el.textContent='✅ Скопировано!';setTimeout(()=>el.textContent='',2500)}};
+if(navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(t).then(done,()=>fb());else fb();
+function fb(){const a=document.createElement('textarea');a.value=t;a.style.cssText='position:fixed;opacity:0';document.body.appendChild(a);a.select();try{document.execCommand('copy');done()}catch(e){prompt('Скопируйте вручную:',t)}a.remove()}}
+function copyAll(){let t='SHOPS A2 — ответы студента\n';EX.forEach(ex=>{t+=`\n${ex.t}\n`;ex.items.forEach((it,n)=>{const v=it.inp.value.trim()||'—';const q=it.q.replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim()||('(audio) '+it.au);
+const st=it.k==='free'?'':(it.good===undefined?' [не проверено]':it.good?' ✓':' ✗');
+t+=`${n+1}. ${q} → ${v}${st}${it.k==='free'?'':` | правильно: ${it.s}`}\n`})});
+const pw=Object.entries(PW).map(([k,n])=>`${W[k][0]} ×${n}`).join(', ');t+=`\nПроблемные слова: ${pw||'нет'}\nQuiz: дошёл до вопроса ${Math.min(qi+1,15)}/15\n`;copyTxt(t,$('#cm'))}
+build();qz();
+</script></body></html>
