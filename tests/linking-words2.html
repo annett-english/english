@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Linking words — тренажёр</title>
+<style>
+:root{--bg:#f4f6f3;--card:#fff;--tx:#1d2a26;--mut:#5d6b66;--ac:#1f6f5c;--acbg:#e3f1ec;--ok:#2b8a3e;--okbg:#e6f5ea;--bad:#c92a2a;--badbg:#fdeaea;--bd:#d5ddd8;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121917;--card:#1b2522;--tx:#e6efeb;--mut:#9bada6;--ac:#5cc2a4;--acbg:#21382f;--ok:#69db7c;--okbg:#1d3324;--bad:#ff8787;--badbg:#3a2022;--bd:#2f3d38}}
+:root[data-theme="dark"]{--bg:#121917;--card:#1b2522;--tx:#e6efeb;--mut:#9bada6;--ac:#5cc2a4;--acbg:#21382f;--ok:#69db7c;--okbg:#1d3324;--bad:#ff8787;--badbg:#3a2022;--bd:#2f3d38}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 Georgia,"Times New Roman",serif}
+button,input,textarea{font:inherit;color:inherit}
+.wrap{max-width:1040px;margin:0 auto;padding:16px;display:grid;grid-template-columns:minmax(0,1fr) 230px;gap:16px;align-items:start}
+aside{position:sticky;top:12px}
+@media(max-width:820px){.wrap{grid-template-columns:1fr}aside{position:static;order:-1}}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:16px;margin-bottom:16px}
+h1{font-size:1.7rem;margin:4px 0 2px}h2{font-size:1.15rem;margin:0 0 4px}
+.hint,.mut{color:var(--mut);font-size:.92rem;margin:0 0 10px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}.chip{background:var(--acbg);border:1px solid var(--ac);border-radius:16px;padding:2px 12px;font-weight:bold}
+.vg{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px}
+.v{border:1px solid var(--bd);border-radius:8px;padding:8px 10px;display:flex;justify-content:space-between;gap:6px;align-items:center}
+.v b{display:block}.v i{color:var(--ac);font-style:normal;font-size:.9rem}.v span{display:block;color:var(--mut);font-size:.88rem}
+button{cursor:pointer;background:var(--card);border:1px solid var(--bd);border-radius:8px;padding:6px 12px}
+button:hover{border-color:var(--ac)}button:focus-visible,input:focus-visible{outline:2px solid var(--ac);outline-offset:1px}
+.pri{background:var(--ac);color:var(--bg);border-color:var(--ac);font-weight:bold}
+.sp{padding:2px 8px}
+.row{display:flex;gap:8px;padding:7px 0;border-top:1px dashed var(--bd)}.row:first-of-type{border-top:0}
+.n{color:var(--mut);min-width:1.6em}.c{flex:1;min-width:0}
+.orig{color:var(--mut);font-size:.9rem;margin-bottom:3px}
+.in{width:10.5em;max-width:100%;border:0;border-bottom:2px solid var(--ac);background:var(--acbg);padding:2px 6px;border-radius:4px 4px 0 0;margin:0 3px}
+.in.ok,.out.ok{border-color:var(--ok);background:var(--okbg)}.in.bad,.out.bad{border-color:var(--bad);background:var(--badbg)}
+.txt{line-height:2.3}
+.out,.pool{display:flex;flex-wrap:wrap;gap:6px;min-height:40px;padding:5px;border:2px dashed var(--bd);border-radius:8px;margin-bottom:6px}
+.pool{border:0;padding:0;min-height:0}.out{border-style:solid;border-color:var(--ac)}
+.tile{background:var(--acbg);border-color:var(--ac)}
+.bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px}.sc{margin-left:auto;font-weight:bold}
+table{width:100%;border-collapse:collapse;font-size:.92rem}td,th{text-align:left;padding:4px 2px;border-bottom:1px solid var(--bd)}td:last-child{text-align:right;color:var(--bad);font-weight:bold}
+textarea{width:100%;min-height:200px;margin-top:10px;background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:8px}
+.nm{border:1px solid var(--bd);border-radius:6px;padding:4px 8px;background:var(--bg)}
+</style></head><body>
+<main class="wrap"><div>
+<div class="card"><h1>Linking words</h1><p class="hint">Впиши слова руками. После каждого упражнения нажми «Проверить» или «Показать ответы».</p>
+<div class="chips" id="chips"></div>
+<p class="mut">1. Повтори слова и послушай каждое: нажми 🔊 или «Прослушать все».</p>
+<div class="vg" id="vg"></div>
+<div class="bar"><button class="pri" onclick="sayAll()">🔊 Прослушать все</button><span class="mut" id="vs"></span></div></div>
+<div id="ex"></div>
+<div class="card"><h2>Итог и проверка звука</h2><p class="hint">Проверь, что аудио работает, затем скопируй свои ответы и отправь преподавателю.</p>
+<div class="bar"><input class="nm" id="nm" placeholder="Твоё имя"><button onclick="testAudio()">🔊 Проверить звук</button><span id="tm" class="mut"></span></div>
+<div class="bar"><button class="pri" onclick="copyRep()">📋 Собрать и скопировать мои ответы</button><span id="cm" class="mut"></span></div>
+<textarea id="rep" hidden readonly></textarea></div>
+</div>
+<aside><div class="card"><h2>Проблемные слова</h2><p class="hint">Слова, в которых была ошибка.</p><table id="pt"></table></div></aside></main>
+<script>
+const W=[["on the one hand","/ɑn ðə wʌn hænd/","с одной стороны"],["finally / in the end","/ˈfaɪnəli/ · /ɪn ði ɛnd/","наконец / в конце концов"],["on the other hand","/ɑn ði ˈʌðər hænd/","с другой стороны"],["first / firstly","/fɜrst/ · /ˈfɜrstli/","во-первых / сначала"],["while","/waɪl/","в то время как; пока"],["also","/ˈɔlsoʊ/","также"],["but","/bʌt/","но"],["although","/ɔlˈðoʊ/","хотя"],["so","/soʊ/","поэтому; так что"],["because","/bɪˈkɔz/","потому что"]];
+const G=(w,b,a,ans,o)=>({w,b,a,ans:ans.split('|'),o});
+const T=["Choosing where to study was hard. ",", I made a list of possible cities. ",", Krakow is beautiful and cheap. ",", it is often crowded. "," I prefer quiet places, I decided to go there. My sister studies in Warsaw, "," I will study in Krakow. I chose it "," the university has an excellent reputation. It is "," close to my grandparents' house. The flat is small, "," it is cosy. I signed the contract, "," now I am packing. ",", I can say it was the right choice."];
+const A4=[[3,'first|firstly'],[0,'on the one hand'],[2,'on the other hand'],[7,'although'],[4,'while'],[9,'because'],[5,'also'],[6,'but'],[8,'so'],[1,'finally|in the end']];
+const E=[
+{t:'Упр. 1 · Context — допиши недостающее слово',h:'Прочитай контекст и впиши подходящее слово.',ty:'g',it:[
+G(9,'Anna stayed home ',' she had a terrible cold.','because'),
+G(0,'',', living in the city is exciting. On the other hand, it is noisy.','on the one hand'),
+G(6,'I wanted to call you, ',' my phone was dead.','but'),
+G(3,'How to make tea: ',', boil some water. Then add the tea bag.','first|firstly'),
+G(7,'',' it was late, we decided to watch another film.','although'),
+G(1,'We waited for two hours. ',', the bus arrived.','finally|in the end'),
+G(8,'It was raining heavily, ',' we stayed inside.','so'),
+G(4,'Tom was cooking dinner ',' his sister was setting the table.','while'),
+G(2,'Buying a car is convenient. ',', it is expensive.','on the other hand'),
+G(5,'She speaks English and French. She can ',' speak a little Polish.','also')]},
+{t:'Упр. 2 · Rephrase — перефразируй',h:'Перепиши предложение так, чтобы смысл остался тем же. Впиши пропущенное слово.',ty:'g',it:[
+G(7,'',' he was tired, he kept working.','although','He was tired, but he kept working.'),
+G(8,'She was hungry, ',' she made a sandwich.','so','She was hungry, therefore she made a sandwich.'),
+G(3,'',', read the question.','first|firstly','The first thing to do is read the question.'),
+G(2,'Flying is fast. ',', it is bad for the environment.','on the other hand','Flying is fast. However, it is bad for the environment.'),
+G(9,'The school was closed ',' it was snowing.','because','Due to the snow, the school was closed.'),
+G(5,'She plays the piano. She ',' plays the guitar.','also','She plays the piano and the guitar too.'),
+G(4,'I read a book ',' my brother played games.','while','I read a book, and at the same time my brother played games.'),
+G(1,'',', the film began.','finally|in the end','After a long time, the film began.'),
+G(6,'He is rich, ',' he is not happy.','but','He is rich; however, he is not happy.'),
+G(0,'',', the job pays well. On the other hand, the hours are long.','on the one hand','The job pays well, but the hours are long.')]},
+{t:'Упр. 3 · Build the chunk — собери предложение',h:'Нажимай на части по порядку. Нажми на часть в строке ответа, чтобы убрать её.',ty:'b',it:[
+[4,['While','I was cooking,','my dad','was reading','the news.']],
+[1,['We searched for hours.','Finally,','we','found','the keys.']],
+[0,['On the one hand,','it is cheap;','on the other hand,','it is slow.']],
+[8,['It was cold,','so','I','wore','a coat.']],
+[6,['I like coffee,','but','I','prefer','tea.']],
+[5,['She is clever','and','also','very','kind.']],
+[9,['He missed the bus','because','he','woke up','late.']],
+[3,['First,','wash','your','hands','carefully.']],
+[7,['Although','he was tired,','he','finished','the work.']],
+[2,['The hotel is lovely.','On the other hand,','it','is','very expensive.']]]},
+{t:'Упр. 4 · Вставь слово в текст',h:'Впиши в каждый пропуск подходящее слово. Слова не повторяются.',ty:'t',it:A4.map((a,i)=>G(a[0],T[i],T[i+1],a[1]))}
+];
+const norm=s=>s.toLowerCase().replace(/[^a-z' ]/g,' ').replace(/\s+/g,' ').trim();
+const h=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e};
+const items=E.map(()=>[]),P={},sc=[];
+const tail=s=>s.trim().split(' ').slice(-4).join(' ')+' ',head=s=>' '+s.trim().split(' ').slice(0,4).join(' ');
+function gap(d,ei,i){const inp=h('input','in');inp.placeholder='…';inp.autocomplete='off';inp.autocapitalize='off';inp.spellcheck=false;
+ const t=E[ei].ty==='t';
+ const it={w:d.w,el:inp,get:()=>inp.value,ok:v=>d.ans.includes(norm(v)),best:()=>d.ans[0],setv:v=>inp.value=v,clear:()=>{inp.value=''},
+ full:v=>t?'…'+tail(d.b)+'['+(v||'___')+']'+head(d.a)+'…':d.b+(v||'___')+d.a};
+ inp.oninput=()=>{it.last=undefined;inp.className='in'};items[ei][i]=it;return inp}
+function build(d,ei,i){const w=d[0],ch=d[1],ref=ch.join(' '),idx=ch.map((_,k)=>k);
+ const out=h('div','out'),pool=h('div','pool');let ord=idx.slice(),sel=[];
+ do{ord.sort(()=>Math.random()-.5)}while(ord.join()===idx.join());
+ const tile=k=>{const b=h('button','tile',ch[k]);b.onclick=()=>{sel.includes(k)?sel=sel.filter(x=>x!==k):sel.push(k);it.last=undefined;out.className='out';draw()};return b};
+ const draw=()=>{out.replaceChildren(...sel.map(tile));pool.replaceChildren(...ord.filter(k=>!sel.includes(k)).map(tile))};
+ const it={w,el:out,get:()=>sel.map(k=>ch[k]).join(' '),ok:v=>v===ref,best:()=>ref,setv:()=>{sel=idx.slice();draw()},clear:()=>{sel=[];draw()},full:v=>v||'(пусто)'};
+ items[ei][i]=it;draw();const x=h('div');x.append(out,pool);return x}
+const mark=(it,c)=>{it.el.classList.remove('ok','bad');if(c)it.el.classList.add(c)};
+function check(ei){let n=0;items[ei].forEach((it,i)=>{const v=it.last!==undefined?it.last:it.get();it.last=v;const ok=it.ok(v);mark(it,ok?'ok':'bad');
+ if(ok)n++;else(P[it.w]=P[it.w]||new Set()).add(ei+'-'+i)});sc[ei].textContent=n+' / 10';renderP()}
+function show(ei){items[ei].forEach(it=>{if(it.last===undefined)it.last=it.get();it.setv(it.best());mark(it)})}
+function reset(ei){items[ei].forEach((it,i)=>{it.clear();it.last=undefined;mark(it);Object.values(P).forEach(s=>s.delete(ei+'-'+i))});sc[ei].textContent='';renderP()}
+function renderP(){const t=document.getElementById('pt');const r=Object.keys(P).filter(k=>P[k].size).sort((a,b)=>P[b].size-P[a].size);
+ t.replaceChildren();if(!r.length){const c=h('td','','Пока пусто 🎉'),tr=h('tr');tr.append(c);t.append(tr);return}
+ r.forEach(k=>{const tr=h('tr'),a=h('td'),b=h('td','',P[k].size);a.innerHTML='<b></b><div class="mut"></div>';a.firstChild.textContent=W[k][0];a.lastChild.textContent=W[k][2];tr.append(a,b);t.append(tr)})}
+E.forEach((e,ei)=>{const s=h('section','card');s.append(h('h2','',e.t),h('p','hint',e.h));const box=h('div');
+ if(e.ty==='t'){const p=h('p','txt');e.it.forEach((d,i)=>{p.append(e.it[i].b);p.append(gap(d,ei,i))});p.append(T[10]);box.append(p)}
+ else e.it.forEach((d,i)=>{const r=h('div','row');r.append(h('span','n',(i+1)+'.'));const c=h('div','c');
+  if(e.ty==='g'){if(d.o)c.append(h('div','orig','↪ '+d.o));const l=h('div');l.append(d.b,gap(d,ei,i),d.a);c.append(l)}else c.append(build(d,ei,i));
+  r.append(c);box.append(r)});
+ const bar=h('div','bar'),b1=h('button','pri','Проверить'),b2=h('button','','Показать ответы'),b3=h('button','','Сбросить'),s1=h('span','sc');
+ b1.onclick=()=>check(ei);b2.onclick=()=>show(ei);b3.onclick=()=>reset(ei);sc[ei]=s1;bar.append(b1,b2,b3,s1);s.append(box,bar);document.getElementById('ex').append(s)});
+renderP();
+/* audio */
+const synth=window.speechSynthesis;let voice=null;
+function pick(){const v=synth.getVoices();return v.find(x=>/Google US English/i.test(x.name))||v.find(x=>/Samantha/i.test(x.name))||v.find(x=>x.lang==='en-US'||x.lang==='en_US')||v.find(x=>/^en/i.test(x.lang))}
+function loadV(){if(!synth){vs.textContent='⚠️ Браузер не поддерживает озвучку';return}voice=pick();
+ vs.textContent=voice?'Голос: '+voice.name+' ('+voice.lang+')'+(/Google US English|Samantha/i.test(voice.name)?' ✓':' — нужный голос не найден, взят ближайший'):'⚠️ Английский голос не найден, будет голос по умолчанию'}
+const vs=document.getElementById('vs');
+if(synth){loadV();synth.onvoiceschanged=loadV}else loadV();
+const utt=t=>{const u=new SpeechSynthesisUtterance(t);u.lang='en-US';u.rate=.85;if(voice)u.voice=voice;return u};
+const txt=i=>W[i][0].replace(' / ',', ');
+function say(t,cb){if(!synth)return;synth.cancel();const u=utt(t);u.onstart=()=>cb&&cb(true);u.onerror=e=>cb&&cb(false,e.error);synth.speak(u)}
+function sayAll(){if(!synth)return;synth.cancel();W.forEach((_,i)=>synth.speak(utt(txt(i))))}
+const ch=document.getElementById('chips');W.forEach((w,i)=>ch.append(h('span','chip',(i+1)+'. '+w[0])));
+const vg=document.getElementById('vg');
+W.forEach((w,i)=>{const d=h('div','v'),l=h('div');l.append(h('b','',w[0]),h('i','',w[1]),h('span','',w[2]));const b=h('button','sp','🔊');b.title='Прослушать';b.onclick=()=>say(txt(i));d.append(l,b);vg.append(d)});
+function testAudio(){const m=document.getElementById('tm');if(!synth){m.textContent='❌ Озвучка не поддерживается. Открой страницу в Chrome или Safari.';return}
+ m.textContent='Проверяю…';let ok=false;
+ say('Although it was late, we finally found the answer.',(g,err)=>{ok=g;m.textContent=g?'✅ Аудио работает. '+vs.textContent:'❌ Ошибка: '+err});
+ setTimeout(()=>{if(!ok&&m.textContent==='Проверяю…')m.textContent='❌ Звук не запустился. Проверь громкость и режим без звука, попробуй Chrome или Safari.'},3000)}
+/* report */
+function report(){const nm=document.getElementById('nm').value.trim();let tot=0,s='Linking words — результаты\nИмя: '+(nm||'—')+'\nДата: '+new Date().toLocaleDateString('ru-RU')+'\n';const mis={};
+ E.forEach((e,ei)=>{let n=0,l='';items[ei].forEach((it,i)=>{const v=it.last!==undefined?it.last:it.get();const ok=it.ok(v);if(ok)n++;else mis[it.w]=(mis[it.w]||0)+1;
+  l+=(i+1)+'. '+it.full(v)+(ok?'  ✓':'  ✗ → '+it.full(it.best()))+'\n'});tot+=n;s+='\n'+e.t+': '+n+'/10\n'+l});
+ s+='\nИтого: '+tot+'/40\n';const pr=Object.keys(mis).sort((a,b)=>mis[b]-mis[a]).map(k=>W[k][0]+' ×'+mis[k]);
+ return s+'Проблемные слова: '+(pr.join(', ')||'нет')}
+function copyRep(){const r=document.getElementById('rep'),m=document.getElementById('cm');r.value=report();r.hidden=false;let ok=false;
+ const done=()=>m.textContent='Скопировано ✓';
+ const fb=()=>{r.select();try{ok=document.execCommand('copy')}catch(e){}m.textContent=ok?'Скопировано ✓':'Выдели текст ниже и скопируй вручную'};
+ if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(r.value).then(done,fb);else fb()}
+</script></body></html>
