@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Food Vocabulary Trainer</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800&display=swap">
+<style>
+:root{--bg:#eef5f1;--card:#fff;--tx:#10302a;--mut:#5b7a72;--ac:#0f766e;--acb:#d5efea;--hl:#f5c542;--ok:#15803d;--okb:#dcfce7;--bad:#b91c1c;--badb:#fee2e2;--bd:#d3e2dc;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d1f1b;--card:#14302a;--tx:#e6f3ef;--mut:#8fb3a9;--ac:#4fd1c1;--acb:#1b4a42;--ok:#6ee7a0;--okb:#14452c;--bad:#fca5a5;--badb:#4a1b1b;--bd:#27493f}}
+:root[data-theme="dark"]{--bg:#0d1f1b;--card:#14302a;--tx:#e6f3ef;--mut:#8fb3a9;--ac:#4fd1c1;--acb:#1b4a42;--ok:#6ee7a0;--okb:#14452c;--bad:#fca5a5;--badb:#4a1b1b;--bd:#27493f}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:400 16px/1.5 Nunito,system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:1080px;margin:0 auto;padding:16px;display:grid;grid-template-columns:1fr 240px;gap:16px;align-items:start}
+main{min-width:0}
+h1{font-size:1.7rem;margin:4px 0 2px;font-weight:800}
+h2{font-size:1.15rem;margin:0 0 8px;font-weight:800}
+.sub{color:var(--mut);margin:0 0 12px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px;margin-bottom:14px}
+aside{position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px)}
+button,select,input{font:inherit;color:inherit}
+button{cursor:pointer;border:1px solid var(--bd);background:var(--card);border-radius:10px;padding:8px 14px;font-weight:600}
+button:hover{border-color:var(--ac)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--hl);outline-offset:1px}
+.pri{background:var(--ac);border-color:var(--ac);color:#fff}
+:root[data-theme="dark"] .pri{color:#06201b}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .pri{color:#06201b}}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:8px}
+.voice{font-size:.85rem;color:var(--mut)}
+.words{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px;margin-top:10px}
+.w{display:flex;gap:8px;align-items:center;border:1px solid var(--bd);border-radius:10px;padding:6px 8px}
+.w b{display:block;line-height:1.2}.w i{color:var(--mut);font-size:.82rem;font-style:normal;display:block}.w span{font-size:.9rem;display:block;line-height:1.2}
+.w.new{border-color:var(--hl);border-width:2px}
+.ic{padding:4px 8px;flex:none}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.tabs button[aria-selected=true]{background:var(--ac);color:#fff;border-color:var(--ac)}
+:root[data-theme="dark"] .tabs button[aria-selected=true]{color:#06201b}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .tabs button[aria-selected=true]{color:#06201b}}
+.ex{display:none}.ex.on{display:block}
+.row{display:grid;grid-template-columns:1fr 1fr 28px;gap:8px;align-items:center;padding:8px 6px;border-bottom:1px solid var(--bd);border-radius:8px}
+.row .q{display:flex;gap:8px;align-items:baseline}
+.n{color:var(--mut);font-weight:800;min-width:1.2em}
+.pat{font-family:ui-monospace,Menlo,monospace;letter-spacing:.08em;color:var(--ac);font-weight:700}
+.a{display:flex;gap:6px}
+input[type=text],select{width:100%;padding:8px 10px;border:2px solid var(--bd);border-radius:10px;background:var(--bg)}
+.row.ok{background:var(--okb)}.row.bad{background:var(--badb)}.row.shown{background:var(--acb)}
+.ok .fb{color:var(--ok)}.bad .fb{color:var(--bad)}.fb{font-weight:800;text-align:center}
+.score{font-weight:800;margin-left:6px}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
+.opt{text-align:left;padding:12px}
+.opt.ok{background:var(--okb);border-color:var(--ok)}.opt.bad{background:var(--badb);border-color:var(--bad)}.opt.off{visibility:hidden}
+.qt{font-size:1.15rem;font-weight:800}
+.ladder{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px}
+.ladder span{font-size:.72rem;padding:2px 6px;border-radius:6px;background:var(--acb)}
+.ladder .cur{background:var(--hl);color:#10302a;font-weight:800}.ladder .done{background:var(--ok);color:#fff}
+.prize{font-size:1.4rem;font-weight:800}
+#plist{list-style:none;margin:0;padding:0;font-size:.9rem}
+#plist li{display:flex;gap:6px;align-items:center;padding:4px 0;border-bottom:1px dashed var(--bd)}
+#plist em{font-style:normal;color:var(--bad);font-weight:800;margin-left:auto}
+.mut{color:var(--mut);font-size:.9rem}
+.name{padding:6px 10px;border:2px solid var(--bd);border-radius:10px;background:var(--bg)}
+#toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);transform:translateX(-50%);background:var(--tx);color:var(--bg);padding:10px 16px;border-radius:10px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:9}
+#toast.on{opacity:1}
+@media(max-width:820px){.wrap{grid-template-columns:1fr}aside{position:static;order:-1}.row{grid-template-columns:1fr 1fr 24px}.opts{grid-template-columns:1fr}}
+@media(max-width:520px){.row{grid-template-columns:1fr}.row .fb{text-align:left}}
+</style></head><body>
+<div class="wrap">
+<main>
+<h1>Food: слова и практика</h1>
+<p class="sub">Повтори слова, послушай произношение и выполни 4 упражнения.</p>
+
+<section class="card">
+ <h2>Повторение слов</h2>
+ <div class="bar">
+  <button class="pri" id="playAll">▶ Прослушать все слова</button>
+  <button id="stopAll">■ Стоп</button>
+  <button id="testAudio">🔊 Проверить звук</button>
+ </div>
+ <p class="voice" id="voiceInfo">Голос: ищем…</p>
+ <p class="mut">Нажми 🔊 рядом со словом, чтобы услышать его. Жёлтая рамка — новые слова.</p>
+ <div class="words" id="words"></div>
+</section>
+
+<div class="tabs" role="tablist" id="tabs"></div>
+
+<section class="card ex on" id="e1">
+ <h2>1. Переведи на английский</h2><p class="mut">Впиши английское слово для каждого русского.</p>
+ <div id="e1-list"></div>
+ <div class="bar"><button class="pri" data-chk="e1">Проверить</button><button data-show="e1">Показать ответы</button><button data-new="e1">Новый набор</button><span class="score" id="e1-score"></span></div>
+</section>
+
+<section class="card ex" id="e2">
+ <h2>2. Sort: распредели по группам</h2><p class="mut">Выбери группу для каждого слова.</p>
+ <div id="e2-list"></div>
+ <div class="bar"><button class="pri" data-chk="e2">Проверить</button><button data-show="e2">Показать ответы</button><button data-new="e2">Новый набор</button><span class="score" id="e2-score"></span></div>
+</section>
+
+<section class="card ex" id="e3">
+ <h2>3. Guess the word</h2><p class="mut">Прочитай подсказку и впиши слово. Первая буква уже есть.</p>
+ <div id="e3-list"></div>
+ <div class="bar"><button class="pri" data-chk="e3">Проверить</button><button data-show="e3">Показать ответы</button><button data-new="e3">Новый набор</button><span class="score" id="e3-score"></span></div>
+</section>
+
+<section class="card ex" id="e4">
+ <h2>4. Хочешь стать миллионером?</h2>
+ <div class="ladder" id="ladder"></div>
+ <div id="qbox"></div>
+</section>
+
+<section class="card">
+ <h2>Результаты для учителя</h2>
+ <div class="bar"><input class="name" id="sname" placeholder="Имя студента" aria-label="Имя студента"><button class="pri" id="copyRes">Скопировать мои ответы</button></div>
+ <p class="mut">Кнопка копирует ответы студента, отметки верно/неверно и проблемные слова — можно вставить в чат.</p>
+</section>
+</main>
+
+<aside>
+ <div class="card">
+  <h2>Проблемные слова</h2>
+  <ul id="plist"></ul>
+  <p class="mut" id="pempty">Пока ошибок нет.</p>
+  <div class="bar"><button id="pclear">Очистить</button></div>
+ </div>
+</aside>
+</div>
+<div id="toast" role="status"></div>
+
+<script>
+const raw=`lobster|лобстер, омар|ˈlɑːbstər|s
+prawn / shrimp|креветка|prɔːn / ʃrɪmp|s
+salmon|лосось|ˈsæmən|s
+squid|кальмар|skwɪd|s
+octopus|осьминог|ˈɑːktəpəs|s
+avocado|авокадо|ˌævəˈkɑːdoʊ|f
+beetroot|свекла|ˈbiːtruːt|v
+cabbage|капуста белокочанная|ˈkæbɪdʒ|v
+pear|груша|per|f
+melon|дыня|ˈmelən|f
+watermelon|арбуз|ˈwɔːtərˌmelən|f
+red pepper|красный перец|red ˈpepər|v
+peach|персик|piːtʃ|f
+green beans|зеленая фасоль|ɡriːn biːnz|v
+crab|краб|kræb|s
+mussels|мидии, моллюски|ˈmʌslz|s
+tuna|тунец|ˈtuːnə|s
+beef|говядина|biːf|m
+pork|свинина|pɔːrk|m
+duck|утка|dʌk|m
+lamb|ягненок|læm|m
+turkey|индейка|ˈtɜːrki|m
+aubergine / eggplant|баклажан|ˈoʊbərʒiːn / ˈeɡplænt|v
+courgette / zucchini|кабачок, цукини|kʊrˈʒet / zuːˈkiːni|v
+raspberries|малина|ˈræzˌberiz|f
+grapes|виноград|ɡreɪps|f
+greens|зелень|ɡriːnz|v
+boiled|отварной|bɔɪld|c
+grilled|приготовленный на гриле|ɡrɪld|c
+baked|запеченный|beɪkt|c
+steamed|приготовленный на пару|stiːmd|c
+roast|жареный, запеченный (в духовке, с корочкой)|roʊst|c
+fried|жареный на сковороде (в масле)|fraɪd|c
+seafood|морепродукты|ˈsiːfuːd|o
+poultry|мясо птицы / птица|ˈpoʊltri|o
+lettuce|салат-латук, листья салата|ˈletɪs|v
+salad|салат (как блюдо)|ˈsæləd|o
+persimmon|хурма|pərˈsɪmən|f
+mashed potatoes|картофельное пюре|mæʃt pəˈteɪtoʊz|o`;
+const NEW=['lettuce','salad','persimmon','mashed potatoes'];
+const W=raw.split('\n').map((l,i)=>{const[en,ru,ipa,cat]=l.split('|');return{i,en,ru,ipa,cat,alts:en.split('/').map(s=>s.trim().toLowerCase()),main:en.split('/')[0].trim()}});
+const CL={lobster:'A big sea animal with claws. It turns red when cooked.',salmon:'A pink fish that swims up rivers.',squid:'A sea animal with ten arms, often fried in rings.',octopus:'A sea animal with eight arms.',avocado:'A green fruit used to make guacamole.',beetroot:'A dark red vegetable used in borscht.',cabbage:'A round green vegetable with many leaves.',pear:'A sweet fruit that is narrow at the top.',watermelon:'A big green fruit, red inside, with black seeds.',peach:'A soft round fruit with fuzzy skin.',tuna:'A big fish that is often sold in cans.',duck:'A bird that swims and says "quack".',lamb:'Meat from a young sheep.',turkey:'A big bird that people eat at Thanksgiving.',grapes:'Small fruits that grow in bunches. Wine is made from them.',raspberries:'Small red berries.',mussels:'Shellfish with a dark blue shell.',persimmon:'An orange fruit, sweet and soft when ripe.',crab:'A sea animal that walks sideways.'};
+const CATS={v:'Vegetables (овощи)',f:'Fruit & berries (фрукты)',m:'Meat & poultry (мясо)',s:'Seafood (морепродукты)'};
+const $=id=>document.getElementById(id);
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+const norm=s=>s.toLowerCase().replace(/[^a-z ]/g,'').replace(/\s+/g,' ').trim();
+const toast=t=>{const e=$('toast');e.textContent=t;e.classList.add('on');setTimeout(()=>e.classList.remove('on'),2200)};
+
+/* ---------- audio ---------- */
+let voice=null,stopFlag=false;
+function pickVoice(){
+ const vs=speechSynthesis.getVoices();
+ voice=vs.find(v=>/Google US English/i.test(v.name))||vs.find(v=>/Samantha/i.test(v.name))||vs.find(v=>v.lang==='en-US')||vs.find(v=>/^en/i.test(v.lang))||null;
+ $('voiceInfo').textContent=voice?'Голос: '+voice.name+' ('+voice.lang+')':'Голос: стандартный английский (Google US English / Samantha не найдены на этом устройстве)';
+}
+function speak(t,cb){
+ if(!('speechSynthesis' in window)){toast('Озвучка не поддерживается в этом браузере');cb&&cb();return}
+ speechSynthesis.cancel();
+ const u=new SpeechSynthesisUtterance(t);u.lang='en-US';u.rate=.9;if(voice)u.voice=voice;
+ u.onend=u.onerror=()=>cb&&cb();speechSynthesis.speak(u);
+}
+const say=w=>speak(w.en.replace(/\s*\/\s*/g,', '));
+if('speechSynthesis' in window){pickVoice();speechSynthesis.onvoiceschanged=pickVoice}else $('voiceInfo').textContent='Озвучка не поддерживается в этом браузере';
+$('testAudio').onclick=()=>speak('Hello! I love eating seafood.');
+$('stopAll').onclick=()=>{stopFlag=true;speechSynthesis.cancel()};
+$('playAll').onclick=()=>{stopFlag=false;let k=0;const nx=()=>{if(stopFlag||k>=W.length)return;const w=W[k++];say2(w,nx)};nx()};
+function say2(w,cb){speak(w.en.replace(/\s*\/\s*/g,', '),()=>setTimeout(cb,350))}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-say]');if(b)say(W[b.dataset.say])});
+
+/* ---------- word list ---------- */
+$('words').innerHTML=W.map(w=>`<div class="w${NEW.includes(w.en)?' new':''}"><button class="ic" data-say="${w.i}" aria-label="Слушать ${w.en}">🔊</button><div><b>${w.en}</b><i>/${w.ipa}/</i><span>${w.ru}</span></div></div>`).join('');
+
+/* ---------- problem words ---------- */
+let P={};try{P=JSON.parse(localStorage.getItem('prob')||'{}')}catch(e){}
+function renderP(){
+ const k=Object.keys(P).filter(x=>P[x]>0).sort((a,b)=>P[b]-P[a]);
+ $('plist').innerHTML=k.map(en=>{const w=W.find(x=>x.en===en);return w?`<li><button class="ic" data-say="${w.i}">🔊</button><span>${w.main}</span><em>×${P[en]}</em></li>`:''}).join('');
+ $('pempty').style.display=k.length?'none':'block';
+}
+function prob(w){P[w.en]=(P[w.en]||0)+1;try{localStorage.setItem('prob',JSON.stringify(P))}catch(e){}renderP()}
+$('pclear').onclick=()=>{P={};try{localStorage.removeItem('prob')}catch(e){}renderP()};
+renderP();
+
+/* ---------- tabs ---------- */
+const TT=['1. Перевод','2. Sort','3. Guess','4. Миллионер'];
+$('tabs').innerHTML=TT.map((t,i)=>`<button role="tab" aria-selected="${i==0}" data-tab="${i+1}">${t}</button>`).join('');
+$('tabs').onclick=e=>{const b=e.target.closest('[data-tab]');if(!b)return;
+ document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-selected',x===b));
+ document.querySelectorAll('.ex').forEach(x=>x.classList.toggle('on',x.id==='e'+b.dataset.tab))};
+
+/* ---------- typed exercises (1 and 3) ---------- */
+const T={};
+function buildTyped(id,items){
+ T[id]={items,res:[]};
+ $(id+'-list').innerHTML=items.map((it,i)=>`<div class="row"><div class="q"><span class="n">${i+1}</span><div>${it.html}</div></div><div class="a"><input type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="English word" aria-label="Ответ ${i+1}"></div><div class="fb"></div></div>`).join('');
+ $(id+'-score').textContent='';
+}
+function newE1(){buildTyped('e1',shuffle(W).slice(0,8).map(w=>({w,html:`<b>${w.ru}</b>`,text:w.ru})))}
+function pat(w){return w.main.split(' ').map(p=>p[0]+' '+'_ '.repeat(p.length-1).trim()).join('   ')}
+function newE3(){const pool=W.filter(w=>CL[w.main]);buildTyped('e3',shuffle(pool).slice(0,8).map(w=>({w,html:`${CL[w.main]}<div class="pat">${pat(w)}</div>`,text:CL[w.main]})))}
+function checkTyped(id){
+ const rows=[...$(id+'-list').children];let c=0;
+ rows.forEach((r,i)=>{const it=T[id].items[i],inp=r.querySelector('input'),v=inp.value.trim();
+  const ok=it.w.alts.includes(norm(v));if(ok)c++;
+  r.className='row '+(ok?'ok':'bad');r.querySelector('.fb').textContent=ok?'✓':'✗';
+  if(!ok&&!r._p){r._p=1;prob(it.w)}
+  T[id].res[i]={q:it.text,a:v,ok,right:it.w.en}});
+ $(id+'-score').textContent=`Верно: ${c} из ${rows.length}`;
+}
+function showTyped(id){
+ [...$(id+'-list').children].forEach((r,i)=>{const it=T[id].items[i];const inp=r.querySelector('input');inp.value=it.w.en;inp.disabled=true;r.className='row shown';r.querySelector('.fb').innerHTML=`<button class="ic" data-say="${it.w.i}">🔊</button>`;
+  T[id].res[i]={q:it.text,a:'(показан ответ)',ok:false,right:it.w.en}});
+}
+
+/* ---------- sort (2) ---------- */
+function newE2(){
+ const items=[];Object.keys(CATS).forEach(c=>items.push(...shuffle(W.filter(w=>w.cat===c)).slice(0,2)));
+ T.e2={items:shuffle(items),res:[]};
+ const opts=Object.entries(CATS).map(([k,v])=>`<option value="${k}">${v}</option>`).join('');
+ $('e2-list').innerHTML=T.e2.items.map((w,i)=>`<div class="row"><div class="q"><span class="n">${i+1}</span><b>${w.main}</b><button class="ic" data-say="${w.i}" aria-label="Слушать">🔊</button></div><div class="a"><select aria-label="Группа ${i+1}"><option value="">— выбери —</option>${shuffleOpts(opts)}</select></div><div class="fb"></div></div>`).join('');
+ $('e2-score').textContent='';
+}
+const shuffleOpts=o=>o;
+function checkSort(){
+ let c=0;[...$('e2-list').children].forEach((r,i)=>{const w=T.e2.items[i],s=r.querySelector('select'),ok=s.value===w.cat;if(ok)c++;
+  r.className='row '+(ok?'ok':'bad');r.querySelector('.fb').textContent=ok?'✓':'✗';
+  if(!ok&&!r._p){r._p=1;prob(w)}
+  T.e2.res[i]={q:w.main,a:s.value?CATS[s.value]:'',ok,right:CATS[w.cat]}});
+ $('e2-score').textContent=`Верно: ${c} из 8`;
+}
+function showSort(){[...$('e2-list').children].forEach((r,i)=>{const w=T.e2.items[i],s=r.querySelector('select');s.value=w.cat;s.disabled=true;r.className='row shown';T.e2.res[i]={q:w.main,a:'(показан ответ)',ok:false,right:CATS[w.cat]}})}
+
+document.addEventListener('click',e=>{
+ const c=e.target.closest('[data-chk]'),s=e.target.closest('[data-show]'),n=e.target.closest('[data-new]');
+ if(c){c.dataset.chk==='e2'?checkSort():checkTyped(c.dataset.chk)}
+ if(s){s.dataset.show==='e2'?showSort():showTyped(s.dataset.show)}
+ if(n){({e1:newE1,e2:newE2,e3:newE3})[n.dataset.new]()}
+});
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.matches('.row input')){const inputs=[...e.target.closest('.card').querySelectorAll('.row input')];const k=inputs.indexOf(e.target);(inputs[k+1]||e.target).focus()}});
+
+/* ---------- millionaire (4) ---------- */
+const PR=[100,200,300,500,1000,2000,4000,8000,16000,32000,64000,125000,250000,500000,1000000];
+const fmt=n=>n.toLocaleString('ru-RU')+' $';
+let Q={qs:[],k:0,locked:false,over:false,log:[],fifty:true};
+function others(w,n,same){let p=W.filter(x=>x!==w&&x.main!==w.main&&(same?x.cat===w.cat:true));if(p.length<n)p=W.filter(x=>x!==w);return shuffle(p).slice(0,n)}
+function mk(text,w,correct,wrong){return{text,w,opts:shuffle([{t:correct,c:true},...wrong.map(t=>({t,c:false}))])}}
+function newQuiz(){
+ const a=shuffle(W),t1=a.slice(0,8),t2=a.slice(8,13),qs=[];
+ t1.forEach(w=>qs.push(mk(`Как по-английски: «${w.ru}»?`,w,w.main,others(w,3,true).map(x=>x.main))));
+ t2.forEach(w=>qs.push(mk(`Что значит «${w.main}»?`,w,w.ru,others(w,3,true).map(x=>x.ru))));
+ [['s','Which of these is seafood?'],['m','Which of these is meat or poultry?']].forEach(([c,t])=>{
+  const w=shuffle(W.filter(x=>x.cat===c))[0];
+  qs.push(mk(t,w,w.main,shuffle(W.filter(x=>x.cat==='v'||x.cat==='f')).slice(0,3).map(x=>x.main)))});
+ Q={qs:shuffle(qs),k:0,locked:false,over:false,log:[],fifty:true,won:false};
+ renderQ();
+}
+function renderLadder(){$('ladder').innerHTML=PR.map((p,i)=>`<span class="${i<Q.k?'done':i===Q.k&&!Q.over?'cur':''}">${i+1}: ${fmt(p)}</span>`).join('')}
+function renderQ(){
+ renderLadder();const b=$('qbox');
+ if(Q.over){const safe=Q.k>=10?PR[9]:Q.k>=5?PR[4]:0;
+  b.innerHTML=`<p class="prize">${Q.won?'🏆 Миллион! Все 15 ответов верные':'Игра окончена'}</p><p>${Q.won?'':`Верных ответов: ${Q.k} из 15. Несгораемая сумма: ${fmt(safe)}.`}</p><div class="bar"><button class="pri" id="again">Играть снова</button></div>`;
+  $('again').onclick=newQuiz;return}
+ const q=Q.qs[Q.k];
+ b.innerHTML=`<p class="mut">Вопрос ${Q.k+1} из 15 · на кону ${fmt(PR[Q.k])}</p><p class="qt">${q.text}</p><div class="opts">${q.opts.map((o,i)=>`<button class="opt" data-o="${i}"><b>${'ABCD'[i]}.</b> ${o.t}</button>`).join('')}</div><div class="bar"><button id="f50" ${Q.fifty?'':'disabled'}>50:50</button><button data-say="${q.w.i}" id="hear">🔊 Слово</button><span class="score" id="qmsg"></span></div>`;
+ Q.locked=false;
+ $('f50').onclick=()=>{Q.fifty=false;$('f50').disabled=true;const wr=[...document.querySelectorAll('.opt')].filter((x,i)=>!q.opts[i].c);shuffle(wr).slice(0,2).forEach(x=>x.classList.add('off'))};
+ document.querySelectorAll('.opt').forEach(btn=>btn.onclick=()=>answer(+btn.dataset.o,btn));
+}
+function answer(i,btn){
+ if(Q.locked)return;Q.locked=true;const q=Q.qs[Q.k],ok=q.opts[i].c;
+ Q.log.push({q:q.text,a:q.opts[i].t,ok,right:q.opts.find(o=>o.c).t});
+ document.querySelectorAll('.opt').forEach((x,j)=>{if(q.opts[j].c)x.classList.add('ok')});
+ if(ok){Q.k++;if(Q.k===15){Q.over=Q.won=true;setTimeout(renderQ,1200);return}
+  $('qmsg').innerHTML='✓ Верно! <button class="pri" id="nx">Дальше</button>';$('nx').onclick=renderQ;renderLadder()}
+ else{btn.classList.add('bad');prob(q.w);Q.over=true;$('qmsg').innerHTML='✗ Неверно. <button class="pri" id="nx">Дальше</button>';$('nx').onclick=renderQ}
+}
+
+/* ---------- copy results ---------- */
+function resultsText(){
+ const L=[],name=$('sname').value.trim();
+ L.push('Food vocabulary — результаты'+(name?': '+name:''));
+ [['e1','1. Перевод'],['e2','2. Sort'],['e3','3. Guess the word']].forEach(([id,t])=>{
+  const r=(T[id].res||[]).filter(Boolean);L.push('',t);
+  if(!r.length){L.push('не проверено');return}
+  L.push('Верно: '+r.filter(x=>x.ok).length+' из '+T[id].items.length);
+  r.forEach((x,i)=>L.push(`${i+1}) ${x.q} → ${x.a||'—'} ${x.ok?'✓':'✗ (правильно: '+x.right+')'}`));
+ });
+ L.push('','4. Миллионер');
+ if(!Q.log.length)L.push('не играл(а)');else{L.push('Верных ответов: '+Q.log.filter(x=>x.ok).length+' из '+Q.log.length+' заданных');Q.log.forEach((x,i)=>L.push(`${i+1}) ${x.q} → ${x.a} ${x.ok?'✓':'✗ (правильно: '+x.right+')'}`))}
+ const pk=Object.keys(P).filter(k=>P[k]>0);
+ L.push('','Проблемные слова: '+(pk.length?pk.map(k=>k.split('/')[0].trim()+' ×'+P[k]).join(', '):'нет'));
+ return L.join('\n');
+}
+$('copyRes').onclick=async()=>{
+ const t=resultsText();let done=false;
+ try{await navigator.clipboard.writeText(t);done=true}catch(e){}
+ if(!done){const a=document.createElement('textarea');a.value=t;a.style.cssText='position:fixed;opacity:0';document.body.appendChild(a);a.select();try{done=document.execCommand('copy')}catch(e){}a.remove()}
+ toast(done?'Скопировано! Вставьте в чат':'Не удалось скопировать — выделите текст вручную');
+};
+
+newE1();newE2();newE3();newQuiz();
+</script></body></html>
