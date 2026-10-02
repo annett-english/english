@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Refund, Charge & Damage — тренажёр</title>
+<style>
+:root{--bg:#f4f6fb;--cd:#fff;--tx:#1d2433;--mu:#667085;--ac:#4f46e5;--ok:#16a34a;--bad:#dc2626;--bd:#e1e5ef;--ch:#eef0ff;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1219;--cd:#181c27;--tx:#e8ebf3;--mu:#98a2b3;--ac:#8b85ff;--bd:#2a3042;--ch:#232845}}
+:root[data-theme="dark"]{--bg:#0f1219;--cd:#181c27;--tx:#e8ebf3;--mu:#98a2b3;--ac:#8b85ff;--bd:#2a3042;--ch:#232845}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{display:grid;grid-template-columns:1fr 230px;gap:16px;max-width:1100px;margin:auto;padding:16px}
+@media(max-width:820px){.wrap{grid-template-columns:1fr}aside{order:-1;position:static!important}}
+aside{position:sticky;top:12px;align-self:start}
+.card{background:var(--cd);border:1px solid var(--bd);border-radius:14px;padding:16px;margin-bottom:16px;overflow-x:auto}
+h1{font-size:1.5rem;margin:.2rem 0}h2{font-size:1.1rem;margin:0 0 4px}.d{color:var(--mu);margin:0 0 10px;font-size:.92rem}
+table{border-collapse:collapse;width:100%;font-size:.9rem}td,th{padding:6px 8px;border-bottom:1px solid var(--bd);text-align:left;vertical-align:top}
+.tag{font-size:.7rem;padding:1px 6px;border-radius:9px;background:var(--ch);color:var(--ac);margin-left:4px}
+.ipa{font-family:"Segoe UI",Arial,sans-serif;color:var(--mu);white-space:nowrap}
+button{font:inherit;cursor:pointer;border:1px solid var(--bd);background:var(--cd);color:var(--tx);border-radius:8px;padding:5px 12px}
+button.p{background:var(--ac);color:#fff;border-color:var(--ac)}
+button.pl,.eye{padding:2px 8px;margin-right:4px}.eye{border:0;background:none;opacity:.6}
+input,textarea,select{font:inherit;color:var(--tx);background:var(--bg);border:1.5px solid var(--bd);border-radius:7px;padding:3px 8px;min-width:120px;max-width:100%}
+textarea{width:100%;min-height:90px}
+input.ok{border-color:var(--ok);background:rgba(22,163,74,.12)}input.bad{border-color:var(--bad);background:rgba(220,38,38,.1)}
+.it{display:block;margin:9px 0}.txt{line-height:2.2}.txt .it{display:inline;margin:0}
+.rv{color:var(--ok);font-size:.88rem;margin-left:6px}
+.chip{display:inline-block;background:var(--ch);color:var(--ac);border-radius:12px;padding:1px 10px;margin:2px;font-size:.88rem}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}.sc{font-weight:600}
+.opt{display:block;width:100%;text-align:left;margin:6px 0;padding:9px 12px}.opt.g{background:rgba(22,163,74,.2);border-color:var(--ok)}.opt.b{background:rgba(220,38,38,.15);border-color:var(--bad)}
+.wc{border:1px dashed var(--bd);border-radius:10px;padding:10px;margin:8px 0}
+#vs{font-size:.8rem;color:var(--mu)}
+</style></head><body>
+<div class="wrap"><main>
+<h1>🛍️ Refund · Charge · Damage</h1>
+<p class="d">Сначала повторите выражения (нажмите ▶), затем пройдите упражнения 1–7 и сыграйте в «Миллионера».</p>
+
+<div class="card"><h2>📖 Напоминание</h2>
+<p class="d">🎧 Прослушайте каждое выражение. <select id="vsel" onchange="setV(this.value)" style="max-width:260px"></select> <span id="vs"></span> <button class="pl" onclick="say('Hello! Let us practise getting a refund.')">🔊 тест звука</button></p>
+<table id="tb"></table></div>
+<div id="ex"></div>
+
+<div class="card" id="e7"><h2>7 · Вспомнить и укрепить слабые места</h2>
+<p class="d"><b>A.</b> Write as many expressions as you remember (без подсказок, по одному на строку).</p>
+<textarea id="rc" placeholder="get a refund&#10;..."></textarea>
+<div class="bar"><button class="p" onclick="rcChk()">Проверить</button><span class="sc" id="rcs"></span></div><div id="rcm"></div>
+<p class="d" style="margin-top:14px"><b>B.</b> Choose 3 words you are least confident about — и сделайте с ними задания.</p>
+<div id="wsel"></div>
+<div class="bar"><button class="p" onclick="wkGen()">Создать задания</button><button onclick="wkAuto()">Взять из «Проблемных слов»</button></div>
+<div id="wk"></div></div>
+
+<div class="card"><h2>💰 Кто хочет стать миллионером? (15 вопросов)</h2>
+<p class="d">Режим: <select id="qmode" onchange="qm=this.value;qNew()"><option value="c">с вариантами ответов</option><option value="t">нужно самому написать</option></select> <button onclick="qNew()">Заново</button></p>
+<div id="qz"></div></div>
+
+<div class="bar" style="margin-bottom:30px"><button class="p" onclick="cpy()">📋 Скопировать мои ответы</button><span id="cf" class="sc"></span></div>
+</main>
+<aside><div class="card"><h2>⚠️ Проблемные слова</h2><p class="d">Сюда попадают выражения, в которых была ошибка.</p><div id="pl"></div><div class="bar"><button onclick="probs={};rp()">Очистить</button></div></div></aside></div>
+
+<script>
+const $=s=>document.querySelector(s);
+const norm=s=>s.toLowerCase().replace(/[’‘]/g,"'").replace(/[.,!?;:"]/g,"").replace(/\s+/g," ").trim();
+const sh=a=>a.slice().sort(()=>Math.random()-.5);
+const E=[
+["get a refund","получить возврат денег","/ɡɛt ə ˈriːfʌnd/",0],
+["ask for a refund","попросить вернуть деньги","/æsk fɔr ə ˈriːfʌnd/",1],
+["take sth back (take it back)","вернуть (в магазин) — с местоимением и с предметом","/teɪk ɪt ˈbæk/",0],
+["take back sth","вернуть — только с предметом: take back the dress","/teɪk ˈbæk ðə drɛs/",0],
+["be damaged by…","быть повреждённым чем-то","/bi ˈdæmɪdʒd baɪ/",0],
+["exchange sth for sth","обменять одно на другое","/ɪksˈtʃeɪndʒ … fɔr …/",0],
+["be charged + amount","с вас взяли сумму: I was charged $20","/bi tʃɑrdʒd/",0],
+["be charged for sth","с вас взяли деньги за что-то","/bi tʃɑrdʒd fɔr/",0],
+["be charged twice","с вас списали дважды","/bi tʃɑrdʒd twaɪs/",0],
+["charge sb $10 for sth","взять с кого-то $10 за что-то","/tʃɑrdʒ ˈsʌmwʌn tɛn ˈdɑlərz/",1],
+["exchange money","обменять валюту","/ɪksˈtʃeɪndʒ ˈmʌni/",1],
+["change money","1) обменять валюту 2) разменять / поменять купюру","/tʃeɪndʒ ˈmʌni/",1],
+["do damage","нанести ущерб","/du ˈdæmɪdʒ/",1],
+["cause damage","причинить ущерб","/kɔz ˈdæmɪdʒ/",1],
+["serious / severe damage","серьёзный ущерб","/ˈsɪriəs, sɪˈvɪr ˈdæmɪdʒ/",1],
+["minor damage","незначительные повреждения","/ˈmaɪnər ˈdæmɪdʒ/",1]];
+const R=[/get a refund/,/ask for a refund/,/take (it|them|\w+) back|take sth back/,/take back/,/damaged by/,/exchange .*for/,/charged (\$|\d|an? amount|amount)/,/charged for/,/charged twice/,/charge (sb|me|him|her|them|you|us)\b/,/exchange money/,/change money/,/do damage/,/cause damage/,/(serious|severe) damage/,/minor damage/];
+const sayOf=e=>e.replace(/\(.*?\)/g,'').replace(/sth/g,'something').replace(/sb/g,'somebody').replace('+ amount','').replace('$10','ten dollars').replace('…','').replace(' / ',' or ').replace(/\s+/g,' ').trim();
+
+/* ---- audio ---- */
+let V=null;
+function pick(){const vs=speechSynthesis.getVoices().filter(v=>/^en/i.test(v.lang));const rank=v=>/Google US English.*natural/i.test(v.name)?0:/Samantha/i.test(v.name)?1:/Google US English/i.test(v.name)?2:/natural/i.test(v.name)&&/en[-_]US/i.test(v.lang)?3:/en[-_]US/i.test(v.lang)?4:5;
+ vs.sort((x,y)=>rank(x)-rank(y));const cur=V&&V.name;window.VL=vs;V=vs.find(v=>v.name===cur)||vs[0]||null;
+ $('#vsel').innerHTML=vs.map((v,i)=>`<option value="${i}">${v.name} (${v.lang})</option>`).join('');if(V)$('#vsel').value=vs.indexOf(V);
+ $('#vs').textContent=V?'':'(английский голос не найден)'}
+function setV(i){V=VL[i];say('Hello! Let us practise getting a refund.')}
+function say(t,slow){if(!('speechSynthesis' in window)){alert('Озвучка не поддерживается этим браузером');return}speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='en-US';if(V)u.voice=V;u.rate=slow?.6:.9;speechSynthesis.speak(u)}
+if('speechSynthesis' in window){pick();speechSynthesis.onvoiceschanged=pick}else $('#vs').textContent='(озвучка недоступна)';
+
+/* ---- problem words ---- */
+let probs={};
+function addP(k){probs[k]=(probs[k]||0)+1;rp()}
+function rp(){const k=Object.keys(probs);$('#pl').innerHTML=k.length?k.map(x=>`<span class="chip">${x} ×${probs[x]}</span>`).join(''):'<i>Пока пусто 🎉</i>'}rp();
+
+/* ---- word table ---- */
+$('#tb').innerHTML='<tr><th>Выражение</th><th>Перевод</th><th>Транскрипция (US)</th><th></th></tr>'+E.map((e,i)=>`<tr><td><b>${e[0]}</b><span class="tag">${e[3]?'доп.':'основа'}</span></td><td>${e[1]}</td><td class="ipa">${e[2]}</td><td><button class="pl" onclick="say(sayOf(E[${i}][0]))">▶</button></td></tr>`).join('');
+
+/* ---- exercises 1-6 ---- */
+const X=[
+{t:"1 · Дописать недостающую часть",d:"Впишите пропущенное слово.",it:[
+["I want to ___ a refund for this broken lamp.","get","get a refund"],
+["I'd like to ask for a ___, please.","refund","ask for a refund"],
+["The shoes don't fit. Can I take ___ back?","it|them|this|these","take sth back"],
+["She took ___ the faulty phone yesterday.","back","take back sth"],
+["The laptop was damaged ___ water.","by","be damaged by"],
+["Can I exchange this jacket ___ a bigger size?","for","exchange sth for sth"],
+["I ___ charged twice for the same coffee.","was|got","be charged twice"],
+["We were ___ $50 for room service.","charged","be charged + amount"]]},
+{t:"2 · Прописать выражение по звуку",au:1,d:"Нажмите ▶ (🐢 — медленно), послушайте и напишите фразу целиком.",it:[
+["","exchange this for a smaller size","exchange sth for sth"],
+["","I was charged twice|I got charged twice","be charged twice"],
+["","The storm caused serious damage","serious / severe damage"],
+["","Take it back to the shop","take sth back"],
+["","Ask for a refund","ask for a refund"],
+["","It's only minor damage|It is only minor damage","minor damage"],
+["","I need to exchange money at the airport","exchange money"],
+["","They charged me ten dollars for it|They charged me $10 for it|They charged me 10 dollars for it","charge sb $10 for sth"]]},
+{t:"3 · Сочетаемость",d:"Впишите слово, которое сочетается с остальными.",it:[
+["do ___ — нанести ущерб","damage","do damage"],
+["___ damage — причинить ущерб","cause","cause damage"],
+["a ___ damage — серьёзный ущерб (2 варианта)","serious|severe","serious / severe damage"],
+["minor ___ — незначительные повреждения","damage","minor damage"],
+["charge sb $10 ___ sth","for","charge sb $10 for sth"],
+["___ money — обменять валюту (2 варианта)","exchange|change","exchange money"],
+["get a ___ — получить возврат денег","refund","get a refund"],
+["be ___ twice — с вас списали дважды","charged","be charged twice"]]},
+{t:"4 · Вставить слова в текст по контексту",text:1,d:"Вставьте слова из рамки в текст (форму менять не нужно, кроме случаев, где это очевидно по смыслу).",
+bank:["damaged","charged","for","take","exchange","got","damage","minor"],it:[
+["Last week I bought a lamp online, but the box was ___ by the rain.","damaged","be damaged by"],
+["I was also ___ twice for the delivery.","charged","be charged twice"],
+["I called the shop and asked ___ a refund.","for","ask for a refund"],
+["They said I could ___ it back to the store.","take|bring","take sth back"],
+["I wanted to ___ the lamp for a new one.","exchange","exchange sth for sth"],
+["In the end, I ___ a refund in three days.","got|received","get a refund"],
+["The storm that night did serious ___ in our town.","damage","do damage"],
+["Luckily, our house had only ___ damage.","minor","minor damage"]]},
+{t:"5 · Complete the mini-situations",d:"Прочитайте ситуацию и впишите нужное слово.",it:[
+["✈️ You need dollars at the airport. You go to the desk to ___ money.","exchange|change","exchange money"],
+["📱 Your bank app shows two payments for one coffee. You were ___ twice.","charged","be charged twice"],
+["🚌 You need coins for the bus. “Could you ___ this $20 bill?”","change|break","change money"],
+["👟 Wrong shoe size. “Can I ___ them for a size 42?”","exchange","exchange sth for sth"],
+["🏨 You never used the minibar. “Why was I ___ $40 for it?”","charged","be charged + amount"],
+["🏊 Your phone fell in the pool. It was badly ___ by water.","damaged","be damaged by"],
+["🚗 A tiny scratch on your car: it's only ___ damage.","minor","minor damage"],
+["🛍️ Clerk: “You can return it, and we'll give you a full ___.”","refund","get a refund"]]},
+{t:"6 · Finish the dialogue",d:"Допишите реплику — пропуск может быть из 1–2 слов.",it:[
+["A: I'd like to ___ a refund for these headphones.","ask for|get","get a refund"],
+["A: They don't work.<br>B: Would you like to ___ them for a new pair?","exchange","exchange sth for sth"],
+["A: Can I bring them back?<br>B: Yes, you can take them ___ within 14 days.","back","take sth back"],
+["A: Why did the bank take $20 twice?<br>B: You ___ charged twice, I'm sorry.","were|got","be charged twice"],
+["A: How much did they charge you?<br>B: They ___ $10 for the shipping.","charged me","charge sb $10 for sth"],
+["A: Was the parcel OK?<br>B: No, it was ___ by the rain.","damaged","be damaged by"],
+["A: Is the damage serious?<br>B: No, it's only ___ damage.","minor","minor damage"],
+["A: I need to ___ before my trip.<br>B: Go to the exchange office.","change money|exchange money|change currency|exchange currency","exchange money"]]}];
+
+const ing=(xi,i)=>$(`[data-x="${xi}"][data-i="${i}"]`);
+const good=(it,v)=>!!norm(v)&&it[1].split('|').some(a=>norm(a)===norm(v));
+$('#ex').innerHTML=X.map((x,xi)=>{
+ const rows=x.it.map((it,i)=>{
+  const inp=`<input data-x="${xi}" data-i="${i}" autocomplete="off" autocapitalize="off" spellcheck="false"${x.au?' style="width:min(380px,70vw)"':''}>`;
+  const eye=`<button class="eye" title="Показать ответ" onclick="rv(${xi},${i})">👁</button><span class="rv" id="r${xi}_${i}" hidden>✔ ${it[1].split('|').join(' / ')}</span>`;
+  const body=x.au?`<button class="pl" onclick="sy(${xi},${i})">▶</button><button class="pl" onclick="sy(${xi},${i},1)">🐢</button>`+inp:it[0].replace('___',inp);
+  return `<div class="it"><b>${i+1}.</b> ${body}${eye}</div>`}).join('');
+ return `<div class="card"><h2>${x.t}</h2><p class="d">${x.d}</p>${x.bank?'<div>'+sh(x.bank).map(w=>`<span class="chip">${w}</span>`).join('')+'</div>':''}<div class="${x.text?'txt':''}">${rows}</div>
+ <div class="bar"><button class="p" onclick="chk(${xi})">Проверить</button><button onclick="showAll(${xi})">Показать ответы</button><button onclick="clr(${xi})">Очистить</button><span class="sc" id="sc${xi}"></span></div></div>`}).join('');
+function sy(xi,i,s){say(X[xi].it[i][1].split('|')[0],s)}
+function rv(xi,i){const e=$('#r'+xi+'_'+i);e.hidden=!e.hidden}
+function showAll(xi){const h=$('#r'+xi+'_0').hidden;X[xi].it.forEach((_,i)=>$('#r'+xi+'_'+i).hidden=!h)}
+function clr(xi){X[xi].it.forEach((it,i)=>{const n=ing(xi,i);n.value='';n.className='';it.w=0;$('#r'+xi+'_'+i).hidden=true});$('#sc'+xi).textContent=''}
+function chk(xi){let ok=0;X[xi].it.forEach((it,i)=>{const n=ing(xi,i),g=good(it,n.value);n.className=n.value.trim()?(g?'ok':'bad'):'';if(g){ok++;it.w=0}else if(n.value.trim()&&!it.w){it.w=1;addP(it[2])}});
+ $('#sc'+xi).textContent=`Результат: ${ok}/${X[xi].it.length}`+(ok==8?' 🎉':'')}
+
+/* ---- exercise 7 ---- */
+function rcChk(){const t=norm($('#rc').value.replace(/\n/g,' '));const f=R.map(r=>r.test(t));const n=f.filter(Boolean).length;
+ $('#rcs').textContent=`Вспомнили: ${n}/${E.length}`;
+ $('#rcm').innerHTML=n<E.length?'<p class="d">Не вспомнили:</p>'+f.map((x,i)=>x?'':`<span class="chip">${E[i][0]} <a href="#" onclick="say(sayOf(E[${i}][0]));return false">🔊</a></span>`).join(''):'<p>🎉 Всё вспомнили!</p>';
+ f.forEach((x,i)=>{if(!x&&t)addP(E[i][0])})}
+$('#wsel').innerHTML=[0,1,2].map(j=>`<select class="ws">${E.map((e,i)=>`<option value="${i}"${i==[1,9,13][j]?' selected':''}>${e[0]}</option>`).join('')}</select> `).join('');
+function wkAuto(){const k=Object.keys(probs).sort((a,b)=>probs[b]-probs[a]).slice(0,3);if(!k.length){alert('Пока нет ошибок — выберите слова вручную');return}
+ const ss=document.querySelectorAll('.ws');k.forEach((x,j)=>{const n=E.findIndex(e=>e[0]===x||e[0].startsWith(x));if(n>=0)ss[j].value=n});wkGen()}
+function wkGen(){const idx=[...document.querySelectorAll('.ws')].map(s=>+s.value);
+ $('#wk').innerHTML=idx.map(n=>`<div class="wc"><b>${E[n][0]}</b> — ${E[n][1]} <button class="pl" onclick="say(sayOf(E[${n}][0]))">▶</button>
+ <div class="it">1) Напишите выражение по переводу: <input class="w" data-n="${n}" autocomplete="off" spellcheck="false"></div>
+ <div class="it">2) Составьте своё предложение с ним: <input class="w" data-n="${n}" style="width:95%" autocomplete="off" spellcheck="false"></div><span class="rv" hidden>Образец: ${E[n][0]}</span></div>`).join('')+'<div class="bar"><button class="p" onclick="wkChk()">Проверить</button></div>'}
+function wkChk(){document.querySelectorAll('.wc').forEach(c=>{c.querySelector('.rv').hidden=false;c.querySelectorAll('input').forEach(i=>{const n=+i.dataset.n,g=R[n].test(norm(i.value));i.className=i.value.trim()?(g?'ok':'bad'):'';if(!g&&i.value.trim())addP(E[n][0])})})}
+
+/* ---- millionaire ---- */
+const AM=[100,200,300,500,1000,2000,4000,8000,16000,32000,64000,125000,250000,500000,1000000];
+const Q=[
+["I want to ___ a refund.","get","take","do","make"],
+["Can I take it ___?","back","off","out","up"],
+["The car was ___ by the storm.","damaged","damage","damaging","damages"],
+["I'd like to exchange this shirt ___ a larger one.","for","with","to","on"],
+["We ___ $30 for parking.","were charged","charged","were charging","charge"],
+["Как сказать «нанести ущерб»?","do damage","make damage","give damage","put damage"],
+["Что значит «причинить ущерб»?","cause damage","make damage","get damage","have damage"],
+["«Незначительные повреждения» — это…","minor damage","little damages","low damage","short damage"],
+["I was charged ___ for the same ticket.","twice","two","second","double times"],
+["The bank ___ me $5 for the transfer.","charged","paid","cost","gave"],
+["Where can I ___ money? (обменять валюту)","exchange","spend","borrow","keep"],
+["Which is NOT correct?","take back it","take it back","take back the dress","take the dress back",1],
+["Can you ___ this $50 bill? (разменять)","change","take","ask","do"],
+["The fire did severe ___ to the building.","damage","damages","damaged","damaging"],
+["Choose the correct sentence.","They charged me $10 for the delivery.","They charged me $10 to the delivery.","They charged $10 me for delivery.","They charged for me $10 delivery.",1]];
+let qi=0,qm='c',ord=[],done=0;
+const sf=()=>qi>=10?32000:qi>=5?1000:0;
+function qNew(){qi=0;qn()}
+function qn(){const q=Q[qi];done=0;ord=sh(q.slice(1,5));const typ=qm==='t'&&!q[5];
+ $('#qz').innerHTML=`<p class="sc">Вопрос ${qi+1}/15 · 💰 ${AM[qi].toLocaleString('ru')} · 🛡 ${sf().toLocaleString('ru')}</p><p><b>${q[0].replace('___','_____')}</b></p>`+
+ (typ?`<input id="qt" style="width:min(320px,100%)" autocomplete="off" spellcheck="false"> <button class="p" onclick="qa($('#qt').value)">Ответить</button>`:ord.map((o,i)=>`<button class="opt" id="o${i}" onclick="qa(ord[${i}])">${'ABCD'[i]}. ${o}</button>`).join('')+(qm==='c'?'<button onclick="q55()" id="b55">50:50</button>':''))+'<div id="qf"></div>'}
+function q55(){const q=Q[qi];let n=0;ord.forEach((o,i)=>{if(o!==q[1]&&n<2){$('#o'+i).hidden=true;n++}});$('#b55').hidden=true}
+function qa(a){if(done)return;const q=Q[qi];if(!a.trim())return;done=1;const g=norm(a)===norm(q[1]);
+ ord.forEach((o,i)=>{const b=$('#o'+i);if(b){if(o===q[1])b.classList.add('g');else if(o===a)b.classList.add('b')}});
+ if(g){$('#qf').innerHTML=qi==14?'<p class="sc">🏆 МИЛЛИОН! Поздравляем!</p><button class="p" onclick="qNew()">Играть снова</button>':'<p class="sc" style="color:var(--ok)">✅ Верно!</p><button class="p" onclick="qi++;qn()">Следующий вопрос</button>'}
+ else{addP('quiz: '+q[1]);$('#qf').innerHTML=`<p class="sc" style="color:var(--bad)">❌ Правильный ответ: ${q[1]}</p><p>Вы уходите с суммой 💰 ${sf().toLocaleString('ru')}</p><button class="p" onclick="qNew()">Играть снова</button>`}}
+qNew();
+
+/* ---- copy ---- */
+function flash(){$('#cf').textContent='✔ Скопировано!';setTimeout(()=>$('#cf').textContent='',2500)}
+function fb(s){const t=document.createElement('textarea');t.value=s;document.body.appendChild(t);t.select();try{document.execCommand('copy')}catch(e){}t.remove();flash()}
+function cpy(){let s='Мои ответы\n';X.forEach((x,xi)=>{s+='\n'+x.t+'\n';x.it.forEach((it,i)=>{const v=ing(xi,i).value.trim();s+=`${i+1}. ${v||'—'} ${v?(good(it,v)?'✓':'✗ → '+it[1].split('|')[0]):''}\n`})});
+ s+='\n7 · Recall:\n'+$('#rc').value+'\n\nПроблемные слова: '+(Object.keys(probs).join(', ')||'нет');
+ try{navigator.clipboard.writeText(s).then(flash,()=>fb(s))}catch(e){fb(s)}}
+</script></body></html>
