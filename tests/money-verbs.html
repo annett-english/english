@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Money verbs · тренажёр</title>
+<style>
+:root{--bg:#faf8f4;--fg:#1f2430;--card:#fff;--mut:#6b7280;--ac:#0f766e;--ok:#15803d;--bad:#b91c1c;--bd:#e5e1d8;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14171c;--fg:#e8e6e1;--card:#1c2027;--mut:#9aa0aa;--ac:#2dd4bf;--ok:#4ade80;--bad:#f87171;--bd:#2c323b}}
+:root[data-theme="dark"]{--bg:#14171c;--fg:#e8e6e1;--card:#1c2027;--mut:#9aa0aa;--ac:#2dd4bf;--ok:#4ade80;--bad:#f87171;--bd:#2c323b}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+header{padding:16px 16px 0;max-width:1100px;margin:auto}
+h1{margin:0 0 8px;font-size:1.5rem}h2{font-size:1.15rem;margin:0 0 6px}
+.wrap{display:grid;grid-template-columns:1fr 240px;gap:16px;max-width:1100px;margin:auto;padding:12px 16px 40px}
+@media(max-width:800px){.wrap{grid-template-columns:1fr}aside{order:-1}}
+section,aside .box{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px;margin-bottom:14px}
+aside .box{position:sticky;top:12px}
+button{font:inherit;cursor:pointer;border:1px solid var(--ac);background:transparent;color:var(--ac);border-radius:8px;padding:5px 12px;margin:2px 4px 2px 0}
+button.p{background:var(--ac);color:var(--bg)}button:disabled{opacity:.45;cursor:default}
+input,select{font:inherit;color:var(--fg);background:var(--bg);border:1px solid var(--bd);border-radius:6px;padding:3px 8px}
+input.s{width:6em}input.m{width:11em}input.l{width:100%;margin-top:4px}
+ol{padding-left:22px}li{margin:10px 0}
+li.ok input,li.ok select{border-color:var(--ok)}li.no input,li.no select{border-color:var(--bad)}
+.fb{font-size:.9rem;min-height:1.2em}.ok .fb{color:var(--ok)}.no .fb{color:var(--bad)}
+.g,.mut{color:var(--mut);font-size:.9rem}
+table{border-collapse:collapse;width:100%;font-size:.92rem}td,th{border-bottom:1px solid var(--bd);padding:4px 6px;text-align:left}
+.sc{overflow-x:auto}
+.opts button{display:block;width:100%;text-align:left;margin:6px 0;padding:9px 12px}
+.opts button.ok{background:var(--ok);color:#fff;border-color:var(--ok)}.opts button.no{background:var(--bad);color:#fff;border-color:var(--bad)}
+.ladder{font-weight:600}
+textarea{width:100%;height:120px;font:13px monospace;background:var(--bg);color:var(--fg);border:1px solid var(--bd);border-radius:8px}
+</style></head><body>
+<header><h1>💶 Money verbs &amp; prepositions</h1>
+<div><button id="tst">🔊 Проверить звук</button><button id="all">▶ Прослушать все</button><span class="mut" id="vi"></span></div></header>
+<div class="wrap"><main>
+<section><h2>Повторите: слова и предлоги</h2>
+<p class="mut">Нажмите 🔊 и повторите вслух. Голос: Google US English / Samantha (если есть в браузере).</p>
+<div class="sc"><table id="intro"></table></div></section>
+<div id="exs"></div>
+<section id="quiz"></section>
+<section><h2>Результаты для преподавателя</h2>
+<input id="nm" placeholder="Имя студента"> <button class="p" id="cpb">Скопировать мои ответы</button> <span class="mut" id="cps"></span>
+<textarea id="cp" readonly placeholder="Здесь появится текст с вашими ответами и правильными вариантами"></textarea></section>
+</main>
+<aside><div class="box"><h2>Проблемные слова</h2><table id="pw"><tr><td class="mut">Пока ошибок нет 🎉</td></tr></table></div></aside></div>
+<script>
+const $=s=>document.querySelector(s);
+const norm=s=>(s||"").toLowerCase().replace(/[’`]/g,"'").replace(/[.!?,;]/g,"").replace(/\s+/g," ").trim();
+const W=[["borrow money from sb","занимать деньги у кого-либо","/ˈbɑːroʊ/"],["lend money to sb / lend sb money","одалживать деньги кому-либо","/lend/"],["invest in sth","инвестировать во что-либо","/ɪnˈvest/"],["charge sb for sth","брать плату за что-либо","/tʃɑːrdʒ/"],["spend money on sth","тратить деньги на что-либо","/spend/"],["pay for dinner","платить за ужин","/peɪ/"],["pay off a loan / mortgage","выплатить кредит / ипотеку","/peɪ ɔːf/"],["apply for a loan","подать заявку на кредит","/əˈplaɪ/"],["get into debt","влезть в долги","/det/"],["owe sb money","быть должным кому-либо","/oʊ/"],["waste money on sth","тратить деньги впустую","/weɪst/"],["raise money for charity","собирать деньги на благотворительность","/reɪz/"],["inherit money from sb","унаследовать деньги от кого-либо","/ɪnˈherɪt/"],["grow up","вырасти, повзрослеть","/groʊ ʌp/"],["except for","кроме, за исключением","/ɪkˈsept/"],["can't afford sth","не мочь себе позволить","/əˈfɔːrd/"]];
+const sp=t=>t.replace(/\bsb\b/g,"somebody").replace(/\bsth\b/g,"something").replace(/ \/ /g,", ");
+$("#intro").innerHTML="<tr><th></th><th>Фраза</th><th>Перевод</th><th>Транскрипция</th></tr>"+W.map(w=>`<tr><td><button data-s="${sp(w[0])}">🔊</button></td><td><b>${w[0]}</b></td><td>${w[1]}</td><td>${w[2]}</td></tr>`).join("");
+/* audio */
+let V=null;
+function pick(){if(!("speechSynthesis" in window)){$("#vi").textContent="Озвучка не поддерживается этим браузером";return}
+const vs=speechSynthesis.getVoices();V=vs.find(v=>/google us english/i.test(v.name))||vs.find(v=>/samantha/i.test(v.name))||vs.find(v=>v.lang==="en-US")||vs.find(v=>/^en/i.test(v.lang))||null;
+$("#vi").textContent=V?"Голос: "+V.name:"Голос по умолчанию (en-US)"}
+function say(t,keep){if(!("speechSynthesis" in window)){alert("Озвучка недоступна в этом браузере");return}
+if(!keep)speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang="en-US";u.rate=.9;if(V)u.voice=V;speechSynthesis.speak(u)}
+if("speechSynthesis" in window){pick();speechSynthesis.onvoiceschanged=pick}else pick();
+document.addEventListener("click",e=>{const b=e.target.closest("[data-s]");if(b)say(b.dataset.s)});
+$("#tst").onclick=()=>{pick();say("Audio test. I borrowed some money from my sister.")};
+$("#all").onclick=()=>{speechSynthesis.cancel();W.forEach(w=>say(sp(w[0]),1))};
+/* exercises */
+const bad={},log={};
+function showPW(){const c={};Object.values(bad).forEach(w=>c[w]=(c[w]||0)+1);const k=Object.keys(c);
+$("#pw").innerHTML=k.length?"<tr><th>Слово</th><th>Ошибок</th></tr>"+k.map(w=>`<tr><td>${w} <button data-s="${w}" style="padding:0 6px">🔊</button></td><td>${c[w]}</td></tr>`).join(""):'<tr><td class="mut">Пока ошибок нет 🎉</td></tr>'}
+const EX=[
+{id:1,title:"1. Вставьте пропущенный предлог",cls:"s",items:[
+{t:"I borrowed some money ___ my sister.",a:["from"],w:"borrow from"},
+{t:"I want to invest ___ property.",a:["in"],w:"invest in"},
+{t:"They charged me €10 ___ the service.",a:["for"],w:"charge for"},
+{t:"I spend too much money ___ clothes.",a:["on"],w:"spend on"},
+{t:"We hope to pay ___ our mortgage early.",a:["off"],w:"pay off"},
+{t:"She lent some money ___ her friend.",a:["to"],w:"lend to"},
+{t:"He got ___ debt after losing his job.",a:["into"],w:"get into debt"},
+{t:"He applied ___ a loan to buy a car.",a:["for"],w:"apply for"}]},
+{id:2,title:"2. Сочетаемость: соедините начало и конец фразы (выберите букву)",m:1,items:[
+["borrow money","from my sister","borrow from"],["invest","in property","invest in"],["apply for","a loan","apply for"],["get into","debt","get into debt"],["spend money","on clothes","spend on"],["charge me €10","for the service","charge for"],["pay off","a mortgage","pay off"],["lend money","to a friend","lend to"]]},
+{id:3,title:"3. Поставьте глагол в нужное время",cls:"m",items:[
+{t:"Yesterday I ___ €20 from my brother.",g:"borrow — past simple",a:["borrowed"],w:"borrow from"},
+{t:"I ___ all my money on clothes.",g:"spend — present perfect",a:["have spent","'ve spent"],w:"spend on"},
+{t:"She ___ me some money last week.",g:"lend — past simple",a:["lent"],w:"lend to"},
+{t:"He ___ in property right now.",g:"invest — present continuous",a:["is investing","'s investing"],w:"invest in"},
+{t:"I think we ___ our loan next year.",g:"pay off — future (will)",a:["will pay off","'ll pay off"],w:"pay off"},
+{t:"She ___ in a small town.",g:"grow up — past simple",a:["grew up"],w:"grow up"},
+{t:"He ___ me €50 last year.",g:"owe — past simple",a:["owed"],w:"owe"},
+{t:"They ___ after the crisis.",g:"get into debt — past simple",a:["got into debt"],w:"get into debt"}]},
+{id:4,title:"4. Rephrase: перепишите предложение с данным словом",cls:"l",items:[
+{t:"I can’t buy a new car. (afford)",a:["I can't afford a new car","I cannot afford a new car"],w:"afford"},
+{t:"The shop asked me to pay €10 for delivery. (charge)",a:["The shop charged me €10 for delivery"],w:"charge for"},
+{t:"I must give my brother €50. (owe)",a:["I owe my brother €50"],w:"owe"},
+{t:"I want to put my money into property. (invest)",a:["I want to invest in property"],w:"invest in"},
+{t:"He took some money from his sister for a while. (borrow)",a:["He borrowed some money from his sister","He borrowed money from his sister"],w:"borrow from"},
+{t:"She lent some money to her friend. (lend … friend)",a:["She lent her friend some money","She lent her friend money"],w:"lend to"},
+{t:"Everyone came, but John didn’t. (except)",a:["Everyone came except John","Everyone came except for John"],w:"except for"}]}];
+const perm=[3,0,6,2,7,1,5,4],LET="ABCDEFGH",E2=EX[1];
+E2.right=perm.map(i=>E2.items[i][1]);
+E2.items=E2.items.map((it,i)=>({l:it[0],r:it[1],w:it[2],L:LET[perm.indexOf(i)]}));
+$("#exs").innerHTML=EX.map(ex=>{let h=`<section id="x${ex.id}"><h2>${ex.title}</h2>`;
+if(ex.m)h+=`<div class="mut">`+ex.right.map((r,j)=>`<b>${LET[j]}</b> ${r}`).join(" &nbsp;·&nbsp; ")+`</div>`;
+h+="<ol>"+ex.items.map((it,i)=>{const id=`e${ex.id}_${i}`;let b;
+if(ex.m)b=`${it.l} … <select id="${id}"><option value="">—</option>${[...LET.slice(0,8)].map(c=>`<option>${c}</option>`).join("")}</select>`;
+else{const inp=`<input id="${id}" class="${ex.cls}" autocomplete="off" autocapitalize="off" spellcheck="false">`;b=it.t.includes("___")?it.t.replace("___",inp):`<div>${it.t}</div>${inp}`;if(it.g)b+=` <span class="g">(${it.g})</span>`}
+return `<li id="l${id}">${b}<div class="fb" id="f${id}"></div></li>`}).join("")+"</ol>";
+return h+`<button class="p" data-c="${ex.id}">Проверить</button><button data-v="${ex.id}">Показать ответы</button><button data-r="${ex.id}">Сбросить</button> <span class="mut" id="s${ex.id}"></span></section>`}).join("");
+const ans=(ex,it)=>ex.m?`${it.L} — ${it.r}`:it.a[0];
+function run(ex,reveal){let n=0;ex.items.forEach((it,i)=>{const id=`e${ex.id}_${i}`,el=$("#"+id),li=$("#l"+id),u=el.value;
+const ok=ex.m?u===it.L:ex.items[i].a.some(a=>norm(a)===norm(u));
+const k=`${ex.id}-${i}`;log[k]={ex:ex.title,u,c:ans(ex,it),ok,shown:!!reveal};
+if(reveal){li.className=ok?"ok":"";$("#f"+id).innerHTML=(ok?"✓ ":"Ответ: ")+ans(ex,it);if(!ok&&u)bad[k]=it.w;return}
+if(!u){li.className="";$("#f"+id).textContent="";return}
+li.className=ok?"ok":"no";$("#f"+id).textContent=ok?"✓ верно":"✗ попробуйте ещё";if(ok){n++;delete bad[k]}else bad[k]=it.w});
+if(!reveal)$("#s"+ex.id).textContent=`Верно: ${n} из ${ex.items.length}`;showPW()}
+document.addEventListener("click",e=>{const t=e.target;
+if(t.dataset.c)run(EX[t.dataset.c-1]);if(t.dataset.v)run(EX[t.dataset.v-1],1);
+if(t.dataset.r){const ex=EX[t.dataset.r-1];ex.items.forEach((it,i)=>{const id=`e${ex.id}_${i}`;$("#"+id).value="";$("#l"+id).className="";$("#f"+id).textContent="";delete log[`${ex.id}-${i}`]});$("#s"+ex.id).textContent=""}});
+/* millionaire */
+const Q=[["I want to invest ___ property.",["on","in","for","at"],1,"invest in"],
+["They ___ me €10 for the service.",["paid","spent","earned","charged"],3,"charge for"],
+["Don’t ___ money on things you don’t need.",["waste","earn","inherit","raise"],0,"waste money"],
+["I can’t ___ a new car.",["be worth","cost","afford","charge"],2,"afford"],
+["I borrowed money ___ my sister.",["from","to","for","of"],0,"borrow from"],
+["He ___ some money from his grandfather.",["earned","raised","lent","inherited"],3,"inherit"],
+["She lent some money ___ her friend.",["for","at","to","from"],2,"lend to"],
+["We hope to pay ___ our mortgage early.",["in","up","on","off"],3,"pay off"],
+["The dress ___ €100.",["cost","charged","spent","paid"],0,"cost"],
+["I grew ___ in a small town.",["out","off","up","on"],2,"grow up"],
+["Everyone came ___ John.",["unless","except for","expect","besides of"],1,"except for"],
+["I spend too much money ___ clothes.",["for","to","in","on"],3,"spend on"],
+["He ___ into debt after losing his job.",["got","made","took","put"],0,"get into debt"],
+["I ___ my brother €50.",["lend","borrow","owe","charge"],2,"owe"],
+["They are ___ money for charity.",["rising","raising","arising","earning"],1,"raise money"]];
+const P=[100,200,300,500,1000,2000,4000,8000,16000,32000,64000,125000,250000,500000,1000000];
+let qi=0,ll=false,qlog=[];
+function rq(){const q=$("#quiz");
+if(qi>=Q.length){q.innerHTML=`<h2>🏆 Вы выиграли миллион! (€1 000 000)</h2><button class="p" onclick="qi=0;ll=false;qlog=[];rq()">Играть снова</button>`;return}
+const [t,o,a]=Q[qi];
+q.innerHTML=`<h2>🎰 Кто хочет стать миллионером? <span class="mut">вопрос ${qi+1}/15</span></h2><p class="ladder">На кону: €${P[qi].toLocaleString("ru")} · Несгораемая сумма: €${qi>=10?"32 000":qi>=5?"1 000":"0"}</p><p><b>${t}</b></p><div class="opts">${o.map((x,i)=>`<button data-o="${i}">${"ABCD"[i]}. ${x}</button>`).join("")}</div><button id="fif" ${ll?"disabled":""}>50:50</button><span id="qm"></span>`;
+$("#fif").onclick=()=>{ll=true;$("#fif").disabled=true;let w=[0,1,2,3].filter(i=>i!==a).sort(()=>Math.random()-.5).slice(0,2);w.forEach(i=>{const b=q.querySelector(`[data-o="${i}"]`);b.disabled=true;b.style.visibility="hidden"})};
+q.querySelectorAll("[data-o]").forEach(b=>b.onclick=()=>{const c=+b.dataset.o,ok=c===a;q.querySelectorAll("[data-o]").forEach(x=>x.disabled=true);
+q.querySelector(`[data-o="${a}"]`).classList.add("ok");qlog.push({t,u:o[c],c:o[a],ok});
+if(ok){delete bad["q"+qi];$("#qm").innerHTML=` <button class="p" id="nx">Дальше →</button>`;$("#nx").onclick=()=>{qi++;rq()}}
+else{b.classList.add("no");bad["q"+qi]=Q[qi][3];$("#qm").innerHTML=` <b style="color:var(--bad)">Неверно. Ваш выигрыш: €${(qi>=10?32000:qi>=5?1000:0).toLocaleString("ru")}</b> <button class="p" onclick="qi=0;ll=false;rq()">Начать заново</button>`}
+showPW()})}
+rq();
+/* copy */
+$("#cpb").onclick=()=>{let s=`Студент: ${$("#nm").value||"—"}\nДата: ${new Date().toLocaleString("ru")}\n`;
+EX.forEach(ex=>{s+=`\n${ex.title}\n`;ex.items.forEach((it,i)=>{const r=log[`${ex.id}-${i}`];s+=`${i+1}. ${r&&r.u?r.u:"—"}  |  правильно: ${ans(ex,it)}  |  ${r&&r.u?(r.ok?"верно":"ошибка"):"не заполнено"}\n`})});
+s+="\nКто хочет стать миллионером\n"+(qlog.length?qlog.map((r,i)=>`${i+1}. ${r.t} → ${r.u}  |  правильно: ${r.c}  |  ${r.ok?"верно":"ошибка"}`).join("\n"):"не играл(а)");
+const pw=[...new Set(Object.values(bad))];s+="\n\nПроблемные слова: "+(pw.join(", ")||"нет");
+const ta=$("#cp");ta.value=s;ta.select();let ok=false;
+const done=()=>$("#cps").textContent="✓ Скопировано — вставьте преподавателю";
+const fb=()=>{try{ok=document.execCommand("copy")}catch(e){}$("#cps").textContent=ok?"✓ Скопировано — вставьте преподавателю":"Выделите текст ниже и скопируйте вручную"};
+try{navigator.clipboard.writeText(s).then(done,fb)}catch(e){fb()}};
+</script></body></html>
