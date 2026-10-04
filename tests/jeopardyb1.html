@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Jeopardy B1 Review</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#eef1f8;--fg:#14213d;--tile:#1f3a8a;--tile-fg:#ffd54a;--head:#14213d;--head-fg:#fff;--card:#fff;--used:#cbd2e3;--ok:#1a9a4a;--bad:#d63b3b}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0c1224;--fg:#e9edf8;--tile:#1f3a8a;--tile-fg:#ffd54a;--head:#2c4fc2;--head-fg:#fff;--card:#1a2340;--used:#1a2036}}
+:root[data-theme="dark"]{--bg:#0c1224;--fg:#e9edf8;--head:#2c4fc2;--card:#1a2340;--used:#1a2036}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif;padding:12px}
+h1{text-align:center;margin:4px 0 10px;font-size:1.4rem}
+.teams{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:12px}
+.team{background:var(--card);border:3px solid transparent;border-radius:10px;padding:6px 12px;cursor:pointer;min-width:120px;text-align:center}
+.team.on{border-color:var(--tile-fg);box-shadow:0 0 0 2px var(--tile)}
+.team input{width:100%;border:0;background:transparent;color:var(--fg);text-align:center;font-weight:600;font-size:.95rem}
+.team b{font-size:1.5rem;display:block}
+.board{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;max-width:1000px;margin:0 auto}
+.cat{background:var(--head);color:var(--head-fg);font-weight:700;text-align:center;padding:10px 4px;border-radius:6px;font-size:clamp(.7rem,2.2vw,1rem);display:flex;align-items:center;justify-content:center;text-transform:uppercase}
+.tile{background:var(--tile);color:var(--tile-fg);border:0;border-radius:6px;font-weight:800;font-size:clamp(1rem,3.5vw,1.9rem);aspect-ratio:1.3;cursor:pointer}
+.tile:hover{filter:brightness(1.2)}
+.tile.used{background:var(--used);color:transparent;cursor:default;filter:none}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.65);display:none;align-items:center;justify-content:center;padding:16px;z-index:5}
+.modal.show{display:flex}
+.box{background:var(--card);border-radius:14px;padding:22px;max-width:640px;width:100%;text-align:center}
+.box small{opacity:.7;text-transform:uppercase;letter-spacing:.05em}
+.clue{font-size:clamp(1.15rem,3.6vw,1.7rem);margin:14px 0}
+.ans{font-size:1.5rem;font-weight:800;color:var(--ok);min-height:3.2rem;margin:8px 0}
+.ans span{display:block;font-size:1rem;color:var(--fg);opacity:.75;font-weight:400}
+.btns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+button.b{border:0;border-radius:8px;padding:10px 18px;font-size:1rem;font-weight:700;color:#fff;cursor:pointer;background:var(--tile)}
+.b.ok{background:var(--ok)}.b.bad{background:var(--bad)}.b.gray{background:#6b7280}
+.foot{text-align:center;margin-top:12px}
+</style>
+</head>
+<body>
+<h1>🎯 Jeopardy · B1 Review</h1>
+<div class="teams" id="teams"></div>
+<div class="board" id="board"></div>
+<div class="foot"><button class="b gray" onclick="location.reload()">Новая игра</button></div>
+<div class="modal" id="modal"><div class="box">
+<small id="mcat"></small>
+<div class="clue" id="mclue"></div>
+<div class="ans" id="mans"></div>
+<div class="btns" id="mbtns"></div>
+</div></div>
+<script>
+const DATA=[
+{c:"🍽️ Food",q:[
+["A red sauce you eat with fries.","ketchup","кетчуп"],
+["Small round fruit that grows in bunches and is used to make wine.","grapes","виноград"],
+["Cooked in the oven, like potatoes or fish.","baked","запечённый"],
+["Phrasal verb: to eat or drink less of something, e.g. sugar.","cut down on","сократить употребление"],
+["A protein in bread and pasta that some people can't eat (intolerance).","gluten","глютен"]]},
+{c:"👪 Family",q:[
+["Your mother's mother.","grandmother","бабушка"],
+["Your brother's daughter.","niece","племянница"],
+["Your wife's mother.","mother-in-law","тёща / свекровь"],
+["Parents, children, grandparents, aunts, uncles and cousins together.","extended family","расширенная семья"],
+["Your stepmother's son from her first marriage.","stepbrother","сводный брат"]]},
+{c:"👤 Adjectives",q:[
+["Someone who always tells the truth.","honest","честный"],
+["Someone who hates waiting for things.","impatient","нетерпеливый"],
+["A child who gets everything they want and behaves badly.","spoilt","избалованный"],
+["Someone who likes telling other people what to do.","bossy","властный"],
+["Someone who doesn't obey rules or authority.","rebellious","бунтарский, непокорный"]]},
+{c:"💰 Money",q:[
+["To get money by working.","earn","зарабатывать"],
+["To give someone money that they must return later.","lend","одалживать (кому-то)"],
+["To put money in property or a company to make more money.","invest","инвестировать"],
+["To receive money from a relative after they die.","inherit","унаследовать"],
+["To start owing money that you cannot pay back (two words + into).","get into debt","влезть в долги"]]},
+{c:"🎲 Mix",q:[
+["Body parts that you build at the gym.","muscles","мышцы"],
+["State verb: \"The bag ___ five kilos.\"","weigh","весить"],
+["State verb: to be the owner of something.","own","владеть"],
+["State verb: \"This drink ___ a lot of sugar.\" (has inside)","contain","содержать"],
+["To stop something from working normally: \"Lack of sleep can ___ our body's rhythms.\"","disrupt","нарушать"]]}
+];
+const teams=[{n:"Команда 1",s:0},{n:"Команда 2",s:0},{n:"Команда 3",s:0}];
+let cur=0,active=null;
+const $=id=>document.getElementById(id);
+function drawTeams(){
+ $("teams").innerHTML="";
+ teams.forEach((t,i)=>{
+  const d=document.createElement("div");d.className="team"+(i===cur?" on":"");
+  d.innerHTML='<input value="'+t.n+'"><b>'+t.s+'</b>';
+  d.onclick=()=>{cur=i;drawTeams()};
+  d.querySelector("input").oninput=e=>t.n=e.target.value;
+  $("teams").appendChild(d);
+ });
+}
+function drawBoard(){
+ const b=$("board");
+ DATA.forEach(c=>{const h=document.createElement("div");h.className="cat";h.textContent=c.c;b.appendChild(h)});
+ for(let r=0;r<5;r++)DATA.forEach((c,ci)=>{
+  const t=document.createElement("button");t.className="tile";t.textContent=(r+1)*100;
+  t.onclick=()=>open(ci,r,t);b.appendChild(t);
+ });
+}
+function open(ci,r,t){
+ if(t.classList.contains("used"))return;
+ active={ci,r,t};const q=DATA[ci].q[r];
+ $("mcat").textContent=DATA[ci].c+" · "+(r+1)*100;
+ $("mclue").textContent=q[0];$("mans").innerHTML="";
+ $("mbtns").innerHTML='<button class="b" id="show">Показать ответ</button><button class="b gray" id="back">Закрыть</button>';
+ $("show").onclick=reveal;$("back").onclick=()=>$("modal").classList.remove("show");
+ $("modal").classList.add("show");
+}
+function reveal(){
+ const q=DATA[active.ci].q[active.r],p=(active.r+1)*100;
+ $("mans").innerHTML=q[1]+"<span>"+q[2]+"</span>";
+ $("mbtns").innerHTML='<button class="b ok" id="ok">✓ Верно (+'+p+')</button><button class="b bad" id="no">✗ Неверно (−'+p+')</button><button class="b gray" id="sk">Без очков</button>';
+ const fin=d=>{teams[cur].s+=d;active.t.classList.add("used");$("modal").classList.remove("show");drawTeams()};
+ $("ok").onclick=()=>fin(p);$("no").onclick=()=>fin(-p);$("sk").onclick=()=>fin(0);
+}
+drawTeams();drawBoard();
+</script>
+</body>
+</html>
