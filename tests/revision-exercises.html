@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Повторение: English exercises</title>
+<style>
+:root{--bg:#f6f7f4;--card:#fff;--ink:#1d2a33;--mute:#5d6b75;--line:#d6dcd8;--acc:#0e6b66;--ok:#1f7a3d;--okbg:#e4f4e8;--bad:#b3261e;--badbg:#fbe6e4}
+@media(prefers-color-scheme:dark){:root{--bg:#141a1d;--card:#1c2428;--ink:#e6ecef;--mute:#9aa8b0;--line:#33424a;--acc:#5fc6bd;--ok:#7fd69a;--okbg:#1b3324;--bad:#ff8f86;--badbg:#3a1f1d}}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.55 Georgia,"Times New Roman",serif}
+main{max-width:760px;margin:0 auto;padding:20px 16px 60px}
+h1{font-size:1.7rem;margin:.2em 0 .1em}
+h2{font-size:1.2rem;margin:0 0 .2em}
+p{margin:.2em 0}
+.mute{color:var(--mute);font-size:.92rem}
+.top{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px;margin:14px 0}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+button,input{font:inherit}
+button{cursor:pointer;border:1px solid var(--acc);background:transparent;color:var(--acc);border-radius:8px;padding:6px 12px;font-size:.95rem}
+button.pri{background:var(--acc);color:var(--bg)}
+button:hover{opacity:.85}
+button:focus-visible,input:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+input.name{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:8px;padding:6px 10px;width:220px}
+section{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px;margin:18px 0}
+.bank{margin:8px 0;padding:8px 10px;background:var(--bg);border-radius:8px;font-style:italic}
+ol{padding-left:0;margin:12px 0;list-style:none;counter-reset:n}
+li{counter-increment:n;padding:9px 0 9px 30px;border-top:1px solid var(--line);position:relative}
+li::before{content:counter(n)".";position:absolute;left:0;color:var(--mute)}
+li.ok .box{background:var(--okbg)}
+li.bad .box{background:var(--badbg)}
+.box{display:inline;border-radius:6px}
+input.b{border:0;border-bottom:2px solid var(--acc);background:transparent;color:var(--ink);padding:1px 4px;min-width:90px;text-align:center}
+input.b.s{min-width:48px;width:56px}
+li.ok input.b{border-color:var(--ok)}
+li.bad input.b{border-color:var(--bad)}
+.sp{margin-left:8px;padding:0 8px;font-size:.9rem}
+.fb{display:block;font-size:.92rem;margin-top:3px;min-height:0}
+.fb.ans{color:var(--acc)}
+.fb.w{color:var(--bad)}
+.score{font-weight:bold;margin-left:4px}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:8px;font-size:.95rem;opacity:0;pointer-events:none;transition:opacity .2s}
+.toast.on{opacity:1}
+@media(prefers-reduced-motion:reduce){.toast{transition:none}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<main>
+<h1>Повторение: English review</h1>
+<p class="mute">Впишите ответы руками, нажмите «Проверить». «Показать ответы» не стирает ваши варианты.</p>
+
+<div class="top">
+  <label>Имя: <input class="name" id="who" placeholder="Ваше имя"></label>
+  <div class="row">
+    <button id="tst">🔊 Проверить звук</button>
+    <button id="cpall" class="pri">Скопировать все мои ответы</button>
+    <span id="astat" class="mute"></span>
+  </div>
+  <p class="mute" style="margin-top:8px">Кнопка 🔊 у каждого пункта читает вопрос вслух; после «Показать ответы» читает и правильный вариант.</p>
+</div>
+
+<div id="app"></div>
+<div class="toast" id="toast" role="status"></div>
+</main>
+
+<script>
+const US=[['parking lot','car park'],['stingy','mean'],['fall','autumn'],['gas','petrol'],['stand in line','queue'],['yard','garden'],['closet','wardrobe'],['sidewalk','pavement'],['truck','lorry'],['faucet','tap']];
+const GB=[['My brother is so ___ (mean). He never buys anyone a coffee.','stingy'],['We had to ___ (queue) for an hour.','stand in line'],['A ___ (lorry) blocked the road.','truck'],["Don't walk in the road, use the ___ (pavement).",'sidewalk'],['The kids are playing in the ___ (garden).','yard'],['I hung my coat in the ___ (wardrobe).','closet'],['The leaves turn yellow in ___ (autumn).','fall'],['We need to buy some ___ (petrol).','gas'],['Turn off the ___ (tap) when you brush your teeth.','faucet'],['Park in the ___ (car park) behind the shop.','parking lot']];
+const BDH=[['She ___ working late tonight.','is','a'],['We ___ a great time at the party.','had','m'],['___ you like pizza?','Do','a'],['They ___ not at home yesterday.','were','m'],['I ___ my homework every evening.','do','m'],['He ___ not finished the report yet.','has','a'],['What ___ you doing now?','are','a'],['She ___ a beautiful voice.','has','m'],['___ he win the match last week?','Did','a'],['The wedding ___ held in June.','was','a']];
+const WED=[['Last Christmas Mark proposed, and they got ___.','engaged'],['They are going to get ___ in June.','married'],['They sent out 100 ___ a month before the wedding.','invitations'],['The ___ gave a very funny speech.','best man'],['The three ___ wore pink dresses.','bridesmaids'],['More than 100 ___ came to the ceremony.','guests'],['After the ceremony there was a ___ at a restaurant.','reception'],['Several ___ danced after the bride and groom.','couples']];
+const EX=[
+ {t:'Упражнение 1. American → British',d:'Напишите британский вариант слова.',
+  items:US.map(([u,b])=>({text:u+' → ___',say:u,a:[b],full:u+'. British: '+b,gb:b}))},
+ {t:'Упражнение 2. British → American',d:'Замените слово в скобках на американский вариант.',
+  items:GB.map(([s,a])=>({text:s,a:[a]}))},
+ {t:'Упражнение 3. BE, DO, HAVE',d:'Впишите форму be / do / have и укажите роль: M — main (основной), A — auxiliary (вспомогательный).',
+  items:BDH.map(([s,a,r])=>({text:s+'|  Роль (M/A): ___',a:[a,r==='m'?'m|main':'a|auxiliary|aux'],small:[1]}))},
+ {t:'Упражнение 4. Wedding vocabulary',d:'Вставьте слово из рамки.',bank:'engaged · best man · married · couples · bridesmaids · guests · invitations · reception',
+  items:WED.map(([s,a])=>({text:s,a:[a]}))},
+ {t:'Упражнение 5. Third conditional: скобки',d:'Поставьте глаголы в нужную форму (если глагол отрицательный — пишите не, например hadn’t missed).',
+  items:[
+  ['If I ___ (know) about the party, I ___ (come).','had known','would have come'],
+  ['If she ___ (not miss) the bus, she ___ (not be) late.','had not missed|hadn’t missed','would not have been'],
+  ['We ___ (win) the game if we ___ (play) better.','would have won','had played'],
+  ['If they ___ (invite) us, we ___ (go) to the wedding.','had invited','would have gone'],
+  ['What ___ you ___ (do) if you ___ (not pass) the exam?','would','have done','had not passed'],
+  ['He ___ (not break) his leg if he ___ (be) more careful.','would not have broken','had been'],
+  ['If it ___ (not rain), we ___ (go) to the beach.','had not rained','would have gone'],
+  ['She ___ (pass) the exam if she ___ (study) harder.','would have passed','had studied']
+  ].map(([s,...a])=>({text:s,a}))},
+ {t:'Упражнение 6. Third conditional: перепишите',d:'Перепишите предложение, начав с If. Пишите целое предложение.',
+  items:[
+  ["I didn't study, so I failed the test.",'If I had studied, I would not have failed the test.|If I had studied, I would have passed the test.'],
+  ["She didn't take an umbrella, so she got wet.",'If she had taken an umbrella, she would not have got wet.|If she had taken an umbrella, she would not have gotten wet.'],
+  ["They didn't book a hotel, so they had nowhere to sleep.",'If they had booked a hotel, they would have had somewhere to sleep.|If they had booked a hotel, they would have had a place to sleep.'],
+  ["We didn't have a map, so we got lost.",'If we had had a map, we would not have got lost.|If we had had a map, we would not have gotten lost.'],
+  ['He drove too fast, so he had an accident.','If he had not driven so fast, he would not have had an accident.|If he had not driven too fast, he would not have had an accident.'],
+  ['I forgot her birthday, so she was upset.','If I had not forgotten her birthday, she would not have been upset.'],
+  ['We missed the train, so we were late.','If we had not missed the train, we would not have been late.'],
+  ["She didn't eat breakfast, so she felt hungry.",'If she had eaten breakfast, she would not have felt hungry.']
+  ].map(([s,a])=>({text:s+'|<br>___',a:[a],wide:true,say:s,full:a.split('|')[0],ph:'If …'}))}
+];
+
+const norm=s=>s.toLowerCase().replace(/[’‘]/g,"'").replace(/n't/g,' not').replace(/[^a-z' ]/g,' ').replace(/\s+/g,' ').trim();
+const good=(v,a)=>a.split('|').some(x=>norm(x)===norm(v));
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const st=EX.map(e=>({shown:false}));
+
+function build(){
+  const app=$('#app');
+  EX.forEach((ex,ei)=>{
+    const sec=document.createElement('section');sec.dataset.e=ei;
+    let h=`<h2>${ex.t}</h2><p class="mute">${ex.d}</p>`;
+    if(ex.bank)h+=`<div class="bank">${ex.bank}</div>`;
+    h+='<ol>';
+    ex.items.forEach((it,ii)=>{
+      let b=0;
+      const html=it.text.replace(/___/g,()=>{
+        const k=b++,sm=it.small&&it.small.includes(k);
+        return `<input class="b${sm?' s':''}" data-b="${k}" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="ответ ${ii+1}.${k+1}"${it.wide?' style="width:100%;margin-top:4px;text-align:left"':''}${it.ph?` placeholder="${it.ph}"`:''}>`;
+      }).split('|').join('');
+      h+=`<li data-i="${ii}"><span class="box">${html}</span><button class="sp" title="Прослушать" aria-label="Прослушать">🔊</button><span class="fb"></span></li>`;
+    });
+    h+=`</ol><div class="row"><button class="pri" data-act="check">Проверить</button><button data-act="show">Показать ответы</button><button data-act="reset">Сбросить</button><button data-act="copy">Скопировать мои ответы</button><span class="score"></span></div>`;
+    sec.innerHTML=h;app.appendChild(sec);
+  });
+}
+
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('on'),2200)}
+
+/* ---------- audio ---------- */
+let voices=[];
+function loadVoices(){if('speechSynthesis' in window)voices=speechSynthesis.getVoices()}
+if('speechSynthesis' in window){loadVoices();speechSynthesis.onvoiceschanged=loadVoices}
+function voiceFor(l){const k=l.toLowerCase();return voices.find(v=>v.lang.replace('_','-').toLowerCase()===k)||voices.find(v=>v.lang.toLowerCase().startsWith('en'))||null}
+function speak(parts,cb){
+  if(!('speechSynthesis' in window)){toast('Озвучка не поддерживается этим браузером');return false}
+  speechSynthesis.cancel();
+  parts.forEach((p,i)=>{
+    const u=new SpeechSynthesisUtterance(p.t);u.lang=p.l||'en-US';u.rate=.9;
+    const v=voiceFor(u.lang);if(v)u.voice=v;
+    if(i===0&&cb){u.onstart=()=>cb('start');u.onerror=()=>cb('error')}
+    speechSynthesis.speak(u);
+  });
+  return true;
+}
+$('#tst').onclick=()=>{
+  const s=$('#astat');s.textContent='Проверяю…';let ok=false;
+  const started=speak([{t:'Audio check. If you can hear this, the sound is working.',l:'en-US'}],e=>{
+    if(e==='start'){ok=true;s.textContent='Звук запущен ✓ (голосов: '+voices.length+'). Если не слышно — проверьте громкость.'}
+    else s.textContent='Ошибка озвучки. Попробуйте другой браузер (Chrome, Safari, Edge).';
+  });
+  if(!started){s.textContent='Озвучка недоступна в этом браузере.';return}
+  setTimeout(()=>{if(!ok&&!/Ошибка/.test(s.textContent))s.textContent='Звук не стартовал: включите громкость или попробуйте другой браузер.'},3000);
+};
+
+/* ---------- helpers ---------- */
+const filled=(it,vals)=>{let k=0;return it.text.replace(/___/g,()=>vals[k++]||'…').replace(/<br>/g,' ').split('|')[0].trim()};
+const speechText=(it)=>it.say||it.text.split('|')[0].replace(/___/g,'blank').replace(/<br>/g,' ');
+const fullText=(it)=>it.full||it.text.split('|')[0].replace(/___/g,(()=>{let k=0;return()=>it.a[k++].split('|')[0]})());
+
+function lines(ei){
+  const sec=$$('section')[ei],ex=EX[ei],out=[];
+  $$('li',sec).forEach((li,ii)=>{
+    const it=ex.items[ii],vals=$$('input',li).map(i=>i.value.trim());
+    const mark=li.classList.contains('ok')?' ✓':li.classList.contains('bad')?' ✗':'';
+    const stu=ei===0?`${it.say} → ${vals[0]||'…'}`:ei===2?`${filled({text:it.text.split('|')[0]},[vals[0]])} [${vals[1]||'…'}]`:ei===5?`${it.say} → ${vals[0]||'…'}`:filled(it,vals);
+    out.push(`${ii+1}. ${stu}${mark}`);
+  });
+  const sc=$('.score',sec).textContent;
+  return `${ex.t}${sc?' ('+sc+')':''}\n`+out.join('\n');
+}
+function copyText(t){
+  const done=()=>toast('Скопировано ✓');
+  const fb=()=>{const a=document.createElement('textarea');a.value=t;a.style.position='fixed';a.style.opacity=0;document.body.appendChild(a);a.select();try{document.execCommand('copy');done()}catch(e){toast('Не удалось скопировать')}a.remove()};
+  if(navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(t).then(done,fb);else fb();
+}
+const head=()=>{const n=$('#who').value.trim();return (n?'Имя: '+n+'\n':'')+'Дата: '+new Date().toLocaleDateString('ru-RU')+'\n\n'};
+
+/* ---------- actions ---------- */
+function check(ei){
+  const sec=$$('section')[ei],ex=EX[ei];let n=0;
+  $$('li',sec).forEach((li,ii)=>{
+    const it=ex.items[ii],ins=$$('input',li);
+    const ok=ins.every((inp,k)=>good(inp.value,it.a[k]));
+    li.classList.toggle('ok',ok);li.classList.toggle('bad',!ok);
+    if(ok)n++;
+    const fb=$('.fb',li);
+    if(!ok&&!st[ei].shown){fb.className='fb w';fb.textContent=ins.some(i=>!i.value.trim())?'Есть пустые поля':'Не совсем. Попробуйте ещё раз.'}
+    else if(ok){fb.className='fb';fb.textContent=''}
+  });
+  $('.score',sec).textContent=`${n} / ${ex.items.length}`;
+}
+function show(ei){
+  const sec=$$('section')[ei],ex=EX[ei];st[ei].shown=true;
+  $$('li',sec).forEach((li,ii)=>{
+    const fb=$('.fb',li);fb.className='fb ans';
+    fb.textContent='Ответ: '+(ei===5?ex.items[ii].a[0].split('|')[0]:ex.items[ii].a.map(x=>x.split('|')[0].toUpperCase()===x.split('|')[0]&&x.length<2?x.toUpperCase():x.split('|')[0]).join(' / '));
+  });
+}
+function reset(ei){
+  const sec=$$('section')[ei];st[ei].shown=false;
+  $$('input',sec).forEach(i=>i.value='');
+  $$('li',sec).forEach(li=>{li.className='';const f=$('.fb',li);f.className='fb';f.textContent=''});
+  $('.score',sec).textContent='';
+}
+
+document.addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;
+  const sec=b.closest('section');if(!sec)return;
+  const ei=+sec.dataset.e;
+  if(b.dataset.act==='check')check(ei);
+  else if(b.dataset.act==='show')show(ei);
+  else if(b.dataset.act==='reset')reset(ei);
+  else if(b.dataset.act==='copy')copyText(head()+lines(ei));
+  else if(b.classList.contains('sp')){
+    const li=b.closest('li'),it=EX[ei].items[+li.dataset.i];
+    const parts=[{t:speechText(it),l:'en-US'}];
+    if(st[ei].shown){ if(ei===0)parts.push({t:it.gb,l:'en-GB'}); else parts.push({t:fullText(it),l:'en-US'}) }
+    speak(parts);
+  }
+});
+$('#cpall').onclick=()=>copyText(head()+EX.map((_,i)=>lines(i)).join('\n\n'));
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&e.target.matches('input.b')){
+    const ins=$$('input.b',e.target.closest('section')),i=ins.indexOf(e.target);
+    (ins[i+1]||e.target).focus();
+  }
+});
+build();
+</script>
+</body>
+</html>
