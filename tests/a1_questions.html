@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>A1 · Simple Questions</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#f6f4ef;--card:#fff;--tx:#222;--mu:#6b6b6b;--ac:#2f6fed;--ok:#1f9d55;--bad:#d64545;--ln:#e3dfd5}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#17181b;--card:#222428;--tx:#eee;--mu:#9a9a9a;--ac:#6b9bff;--ok:#4cc27f;--bad:#ff7a7a;--ln:#33363c}}
+:root[data-theme="dark"]{--bg:#17181b;--card:#222428;--tx:#eee;--mu:#9a9a9a;--ac:#6b9bff;--ok:#4cc27f;--bad:#ff7a7a;--ln:#33363c}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:1100px;margin:auto;padding:16px;display:grid;grid-template-columns:1fr 250px;gap:16px}
+@media(max-width:820px){.wrap{grid-template-columns:1fr}}
+h1{font-size:1.5rem;margin:0 0 4px}h2{font-size:1.1rem;margin:0 0 10px}
+.card{background:var(--card);border:1px solid var(--ln);border-radius:12px;padding:14px;margin-bottom:14px}
+.mu{color:var(--mu);font-size:.9rem}
+button{font:inherit;cursor:pointer;border:1px solid var(--ln);background:var(--card);color:var(--tx);border-radius:8px;padding:6px 12px}
+button.p{background:var(--ac);color:#fff;border-color:var(--ac)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.vg{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:6px;margin:8px 0}
+.v{display:block;text-align:left;width:100%;padding:6px 10px}
+.v b{display:block}.v small{color:var(--mu)}
+.it{padding:10px 0;border-top:1px solid var(--ln)}
+.it input[type=text]{width:100%;max-width:460px;font:inherit;padding:6px 8px;border:1px solid var(--ln);border-radius:8px;background:var(--bg);color:var(--tx);margin-top:4px}
+.opts{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.opts button.sel{border-color:var(--ac);background:var(--ac);color:#fff}
+.ok{border-color:var(--ok)!important}.bad{border-color:var(--bad)!important}
+.opts button.ok{background:var(--ok);color:#fff}.opts button.bad{background:var(--bad);color:#fff}
+.ans{color:var(--ok);font-size:.92rem;margin-top:2px}
+.sc{font-weight:600;margin-left:6px}
+aside .card{position:sticky;top:12px}
+#pw li{display:flex;justify-content:space-between;gap:6px;cursor:pointer;padding:2px 0}
+#pw ul{list-style:none;padding:0;margin:0}
+textarea{width:100%;height:120px;font:13px monospace;background:var(--bg);color:var(--tx);border:1px solid var(--ln);border-radius:8px;padding:6px}
+select,input.nm{font:inherit;padding:5px;border-radius:8px;border:1px solid var(--ln);background:var(--bg);color:var(--tx)}
+</style></head><body>
+<div class="wrap"><main>
+<h1>A1 · Simple Questions</h1>
+<p class="mu">Повторение: построение простых вопросов (to be / do) и лексика.</p>
+
+<div class="card" id="audio">
+<h2>🔊 Слова — прослушайте и повторите вслух</h2>
+<div class="row">
+<label class="mu">Голос: <select id="vs"></select></label>
+<button onclick="testAudio()">Проверить звук</button>
+<button onclick="playAll()">▶ Слушать все</button>
+<button onclick="speechSynthesis.cancel()">■ Стоп</button>
+</div>
+<div class="mu" id="vstat" style="margin:6px 0">Выбираю голос: Google US English или Samantha…</div>
+<div id="vocab"></div>
+</div>
+
+<div id="exs"></div>
+
+<div class="card">
+<h2>📋 Результаты для преподавателя</h2>
+<div class="row"><input class="nm" id="nm" placeholder="Имя студента">
+<button class="p" onclick="copyAll()">Скопировать мои ответы</button></div>
+<p class="mu" id="cs"></p>
+<textarea id="out" readonly placeholder="Здесь появится текст с ответами…"></textarea>
+</div>
+</main>
+<aside><div class="card" id="pw"><h2>⚠️ Проблемные слова</h2>
+<p class="mu">Слова из заданий, где была ошибка. Нажмите — прослушать.</p><ul id="pl"></ul>
+<button onclick="clearPW()" style="margin-top:8px">Очистить</button></div></aside>
+</div>
+<script>
+const V=[
+["Questions",[["phone number","/ˈfoʊn ˌnʌmbər/","номер телефона"],["postcode","/ˈpoʊstkoʊd/","почтовый индекс"],["address","/ˈæˌdrɛs/","адрес"],["Where are you from?","/wɛr ɑr ju frʌm/","Откуда ты?"],["How old are you?","/haʊ oʊld ɑr ju/","Сколько тебе лет?"],["surname","/ˈsɜrneɪm/","фамилия"],["name","/neɪm/","имя"],["How do you spell it?","/haʊ du ju spɛl ɪt/","Как это пишется?"]]],
+["Daily routine",[["work from home","/wɜrk frʌm hoʊm/","работать из дома"],["get up","/ɡɛt ʌp/","вставать"],["get dressed","/ɡɛt drɛst/","одеваться"],["leave home","/liv hoʊm/","уходить из дома"],["brush my teeth","/brʌʃ maɪ tiθ/","чистить зубы"],["tidy my room","/ˈtaɪdi maɪ rum/","убирать комнату"],["have breakfast","/hæv ˈbrɛkfəst/","завтракать"],["go to bed","/ɡoʊ tu bɛd/","ложиться спать"],["take a shower","/teɪk ə ˈʃaʊər/","принимать душ"],["go for a walk","/ɡoʊ fɔr ə wɔk/","идти гулять"],["check my phone","/tʃɛk maɪ foʊn/","проверять телефон"],["wake up","/weɪk ʌp/","просыпаться"]]],
+["Feelings",[["thirsty","/ˈθɜrsti/","хочу пить"],["ill","/ɪl/","больной"],["all right","/ɔl raɪt/","нормально"],["angry","/ˈæŋɡri/","злой"],["bored","/bɔrd/","скучно"],["hungry","/ˈhʌŋɡri/","голодный"],["tired","/ˈtaɪərd/","уставший"],["relaxed","/rɪˈlækst/","расслабленный"]]]];
+// type: c=choose, t=typed. a = answers (accepted), o = options, k = index of correct (positions mixed)
+const E=[
+{t:"1. Choose the correct answer",ty:"c",d:"Выберите правильный вариант.",items:[
+{q:"___ is your phone number?",o:["Where","What","How"],a:1,w:["phone number"]},
+{q:"___ do you spell your surname?",o:["How","What","Who"],a:0,w:["How do you spell it?","surname"]},
+{q:"___ are you from?",o:["What","When","Where"],a:2,w:["Where are you from?"]},
+{q:"___ old are you?",o:["What","How","Where"],a:1,w:["How old are you?"]},
+{q:"___ do you get up?",o:["What time","Where time","How time"],a:0,w:["get up"]},
+{q:"___ you tired?",o:["Do","Does","Are"],a:2,w:["tired"]},
+{q:"___ you work from home?",o:["Are","Do","Is"],a:1,w:["work from home"]},
+{q:"___ your address?",o:["What's","Where","Do"],a:0,w:["address"]}]},
+{t:"2. Find the mistake",ty:"t",d:"Найдите ошибку и напишите правильный вопрос целиком.",items:[
+{q:"Where you are from?",a:["Where are you from"],w:["Where are you from?"]},
+{q:"Do you tired?",a:["Are you tired"],w:["tired"]},
+{q:"How old you are?",a:["How old are you"],w:["How old are you?"]},
+{q:"Are you work from home?",a:["Do you work from home"],w:["work from home"]},
+{q:"What your name is?",a:["What is your name"],w:["name"]},
+{q:"How you spell your surname?",a:["How do you spell your surname"],w:["How do you spell it?","surname"]},
+{q:"What time you get up?",a:["What time do you get up"],w:["get up"]},
+{q:"Is you hungry?",a:["Are you hungry"],w:["hungry"]}]},
+{t:"3. Fill in the gaps using the correct form",ty:"t",d:"Впишите to be (am/is/are) или do.",items:[
+{q:"What time ___ you go to bed?",a:["do"],w:["go to bed"]},
+{q:"___ you ill?",a:["Are"],w:["ill"]},
+{q:"How ___ you spell it?",a:["do"],w:["How do you spell it?"]},
+{q:"What ___ your surname?",a:["is"],w:["surname"]},
+{q:"___ you tidy your room on Sunday?",a:["Do"],w:["tidy my room"]},
+{q:"Where ___ you from?",a:["are"],w:["Where are you from?"]},
+{q:"___ your phone number 555-0199?",a:["Is"],w:["phone number"]},
+{q:"___ you go for a walk every day?",a:["Do"],w:["go for a walk"]}]},
+{t:"4. Translate",ty:"t",d:"Переведите на английский.",items:[
+{q:"Сколько тебе лет?",a:["How old are you"],w:["How old are you?"]},
+{q:"Ты работаешь из дома?",a:["Do you work from home"],w:["work from home"]},
+{q:"Как тебя зовут?",a:["What is your name"],w:["name"]},
+{q:"Ты хочешь пить?",a:["Are you thirsty"],w:["thirsty"]},
+{q:"Какой у тебя номер телефона?",a:["What is your phone number"],w:["phone number"]},
+{q:"Откуда ты?",a:["Where are you from"],w:["Where are you from?"]},
+{q:"Во сколько ты просыпаешься?",a:["What time do you wake up"],w:["wake up"]},
+{q:"Как это пишется?",a:["How do you spell it","How do you spell that"],w:["How do you spell it?"]}]}];
+const $=id=>document.getElementById(id);
+let voice=null,PW={},S=E.map(e=>e.items.map(()=>null)),SH=E.map(()=>false),CK=E.map(()=>false);
+try{PW=JSON.parse(localStorage.getItem("pw_a1")||"{}")}catch(e){}
+function savePW(){try{localStorage.setItem("pw_a1",JSON.stringify(PW))}catch(e){}}
+// audio
+function pick(){const vs=speechSynthesis.getVoices().filter(v=>/^en/i.test(v.lang));
+const sel=$("vs");sel.innerHTML=vs.map((v,i)=>`<option value="${i}">${v.name} (${v.lang})</option>`).join("");
+if(!vs.length){$("vstat").textContent="⚠️ Английские голоса не найдены в этом браузере. Попробуйте Chrome (Google US English) или Safari (Samantha).";voice=null;return}
+let i=vs.findIndex(v=>/google us english/i.test(v.name));
+if(i<0)i=vs.findIndex(v=>/samantha/i.test(v.name));
+if(i<0)i=vs.findIndex(v=>v.lang==="en-US");if(i<0)i=0;
+sel.value=i;voice=vs[i];$("vstat").textContent="✅ Голос: "+voice.name;
+sel.onchange=()=>{voice=vs[sel.value];$("vstat").textContent="✅ Голос: "+voice.name}}
+function say(t,cb){if(!window.speechSynthesis){$("vstat").textContent="⚠️ Озвучка не поддерживается";return}
+speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t.replace(/___/g,"blank"));u.lang="en-US";u.rate=.85;if(voice)u.voice=voice;
+u.onend=cb||null;u.onerror=()=>{};speechSynthesis.speak(u)}
+function testAudio(){say("Hello! This is a sound test. What's your name?")}
+function playAll(){const l=V.flatMap(g=>g[1].map(w=>w[0]));let i=0;(function n(){if(i<l.length)say(l[i++],()=>setTimeout(n,300))})()}
+if(window.speechSynthesis){pick();speechSynthesis.onvoiceschanged=pick}else $("vstat").textContent="⚠️ Озвучка не поддерживается";
+// vocab
+$("vocab").innerHTML=V.map(g=>`<h3 style="margin:10px 0 0;font-size:.95rem">${g[0]}</h3><div class="vg">`+g[1].map(w=>`<button class="v" data-s="${w[0]}"><b>🔈 ${w[0]}</b><small>${w[1]} · ${w[2]}</small></button>`).join("")+"</div>").join("");
+$("vocab").onclick=e=>{const b=e.target.closest(".v");if(b)say(b.dataset.s)};
+// normalize
+const nz=s=>s.toLowerCase().replace(/[’`]/g,"'").replace(/\b(what|where|who|how|that|there)'s\b/g,"$1 is").replace(/[.?!,]/g,"").replace(/\s+/g," ").trim();
+// exercises
+function render(){$("exs").innerHTML=E.map((e,x)=>`<div class="card"><h2>${e.t} <span class="sc" id="sc${x}"></span></h2><p class="mu">${e.d}</p>`+
+e.items.map((it,i)=>`<div class="it" id="it${x}_${i}"><div>${i+1}) ${it.q} <button onclick="say(E[${x}].items[${i}].q)" title="Слушать">🔈</button></div>`+
+(e.ty==="c"?`<div class="opts">${it.o.map((o,k)=>`<button data-x="${x}" data-i="${i}" data-k="${k}">${o}</button>`).join("")}</div>`:
+`<input type="text" autocomplete="off" autocapitalize="off" spellcheck="false" data-x="${x}" data-i="${i}" placeholder="Напишите ответ…">`)+`<div class="ans" id="an${x}_${i}"></div></div>`).join("")+
+`<div class="row" style="margin-top:10px"><button class="p" onclick="check(${x})">Проверить</button><button onclick="show(${x})">Показать ответы</button><button onclick="reset(${x})">Сбросить</button></div></div>`).join("");}
+render();
+$("exs").addEventListener("input",e=>{if(e.target.matches("input")){S[e.target.dataset.x][e.target.dataset.i]=e.target.value;e.target.classList.remove("ok","bad")}});
+$("exs").addEventListener("click",e=>{const b=e.target.closest("[data-k]");if(!b)return;const{x,i,k}=b.dataset;S[x][i]=+k;
+document.querySelectorAll(`[data-x="${x}"][data-i="${i}"]`).forEach(o=>o.classList.remove("sel","ok","bad"));b.classList.add("sel")});
+const okAns=(x,i)=>{const e=E[x],it=e.items[i],v=S[x][i];if(v===null||v==="")return false;
+return e.ty==="c"?v===it.a:it.a.some(a=>nz(a)===nz(v))};
+const corr=(x,i)=>{const e=E[x],it=e.items[i];return e.ty==="c"?it.o[it.a]:it.a[0]};
+function check(x){let n=0;CK[x]=true;E[x].items.forEach((it,i)=>{const ok=okAns(x,i);n+=ok;
+const els=document.querySelectorAll(`[data-x="${x}"][data-i="${i}"]`);
+if(E[x].ty==="c")els.forEach(o=>{o.classList.remove("ok","bad");if(o.classList.contains("sel"))o.classList.add(ok?"ok":"bad")});
+else els.forEach(o=>{o.classList.remove("ok","bad");o.classList.add(ok?"ok":"bad")});
+if(!ok&&S[x][i]!==null&&S[x][i]!==""||!ok){it.w.forEach(w=>PW[w]=(PW[w]||0)+1)}});
+$("sc"+x).textContent=`${n}/8`;savePW();pwr()}
+function show(x){SH[x]=true;E[x].items.forEach((it,i)=>{$("an"+x+"_"+i).textContent="✔ "+corr(x,i)})}
+function reset(x){S[x]=E[x].items.map(()=>null);SH[x]=CK[x]=false;E[x].items.forEach((_,i)=>$("an"+x+"_"+i).textContent="");
+document.querySelectorAll(`[data-x="${x}"]`).forEach(o=>{o.classList.remove("ok","bad","sel");if(o.tagName==="INPUT")o.value=""});$("sc"+x).textContent=""}
+function pwr(){const l=Object.entries(PW).sort((a,b)=>b[1]-a[1]);
+$("pl").innerHTML=l.length?l.map(([w,c])=>`<li data-s="${w}"><span>🔈 ${w}</span><b>×${c}</b></li>`).join(""):'<li class="mu">Пока пусто 🙂</li>'}
+$("pl").onclick=e=>{const li=e.target.closest("li[data-s]");if(li)say(li.dataset.s)};
+function clearPW(){PW={};savePW();pwr()}pwr();
+// copy
+function copyAll(){const L=[`Student: ${$("nm").value||"(без имени)"}`,`Date: ${new Date().toLocaleString()}`,""];let tot=0;
+E.forEach((e,x)=>{let n=0;L.push("== "+e.t+" ==");e.items.forEach((it,i)=>{const ok=okAns(x,i);n+=ok;
+const st=e.ty==="c"?(S[x][i]===null?"":it.o[S[x][i]]):(S[x][i]||"");
+L.push(`${i+1}. ${it.q}\n   Student: ${st||"—"} ${ok?"✓":"✗"}${ok?"":"   | Correct: "+corr(x,i)}`)});
+L.push(`Score: ${n}/8`,"");tot+=n});
+L.push(`TOTAL: ${tot}/32`);const l=Object.keys(PW);if(l.length)L.push("Problem words: "+l.join(", "));
+const t=L.join("\n");$("out").value=t;
+let done=false;try{navigator.clipboard.writeText(t).then(()=>$("cs").textContent="✅ Скопировано!",()=>fb(t))}catch(e){fb(t)}
+function fb(t){$("out").select();try{done=document.execCommand("copy")}catch(e){}$("cs").textContent=done?"✅ Скопировано!":"Текст ниже выделен — скопируйте вручную (Ctrl/Cmd+C)."}}
+</script></body></html>
