@@ -1,0 +1,68 @@
+<!DOCTYPE html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>English A2: Review</title>
+<style>
+:root{--bg:#f7f5f0;--cd:#fff;--tx:#1d1d1f;--mu:#6b6b70;--ac:#2f6fed;--ok:#1f9d55;--no:#d64545;--bd:#e2ded5;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#17181b;--cd:#202226;--tx:#ecebe8;--mu:#9a9aa0;--ac:#6b9bff;--ok:#4cc885;--no:#ff7a7a;--bd:#33353b}}
+:root[data-theme="dark"]{--bg:#17181b;--cd:#202226;--tx:#ecebe8;--mu:#9a9aa0;--ac:#6b9bff;--ok:#4cc885;--no:#ff7a7a;--bd:#33353b}
+html,body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:1100px;margin:0 auto;padding:12px;display:grid;grid-template-columns:minmax(0,1fr) 230px;gap:14px}
+aside{position:sticky;top:8px;align-self:start;background:var(--cd);border:1px solid var(--bd);border-radius:12px;padding:10px;max-height:80vh;overflow:auto}
+@media(max-width:800px){.wrap{grid-template-columns:1fr}aside{order:-1;position:static;max-height:150px}}
+section,.card{background:var(--cd);border:1px solid var(--bd);border-radius:12px;padding:14px;margin-bottom:14px}
+h1{font-size:1.4rem;margin:.2em 0}h2{font-size:1.1rem;margin:0 0 4px}h3{margin:0 0 6px;font-size:.95rem}
+.d,small,.mu{color:var(--mu);font-size:.88rem}.sc{float:right;color:var(--ac);font-weight:700}
+ol{padding-left:22px;margin:8px 0}li{margin:9px 0}
+input,select{font:inherit;color:var(--tx);background:var(--bg);border:1.5px solid var(--bd);border-radius:8px;padding:5px 8px;max-width:100%}
+input{width:min(420px,100%)}input.w{width:110px}
+.ok{border-color:var(--ok)!important}.no{border-color:var(--no)!important}
+.ans{display:none;color:var(--ok);font-size:.88rem;margin-left:6px}.show .ans{display:block}
+button{font:inherit;cursor:pointer;border:1px solid var(--bd);background:var(--bg);color:var(--tx);border-radius:8px;padding:5px 11px}
+button.p{background:var(--ac);color:#fff;border-color:var(--ac)}
+.bt{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+table{border-collapse:collapse;width:100%}td{padding:4px 6px;border-bottom:1px solid var(--bd);font-size:.9rem}
+.ch span{display:inline-block;background:var(--bg);border:1px solid var(--bd);border-radius:14px;padding:1px 10px;margin:2px 3px 2px 0}
+</style></head><body><div class="wrap"><main>
+<h1>🔁 English A2 — Review</h1>
+<div class="card">Имя: <input id="nm" placeholder="Your name"> <div class="bt"><button class="at">🔊 Проверить звук</button><span class="mu" id="vs"></span></div></div>
+<div id="ex"></div>
+<section><h2>Готово!</h2><div class="bt"><button class="at">🔊 Проверить звук</button><button class="p" id="cp">📋 Скопировать мои ответы</button></div>
+<textarea id="out" rows="6" style="width:100%;box-sizing:border-box;margin-top:8px;display:none;font:inherit"></textarea></section>
+</main>
+<aside><h3>⚠️ Проблемные слова</h3><table id="pt"></table><p class="mu" id="pe">Пока ошибок нет 🎉</p><button id="pc">Очистить</button></aside></div>
+<script>
+const $=s=>document.querySelector(s),nm=s=>s.toLowerCase().replace(/[.,!?'’]/g,'').replace(/\s+/g,' ').trim();
+let voice=null;
+function pick(){const vs=speechSynthesis.getVoices();voice=vs.find(v=>v.name==='Google US English')||vs.find(v=>/samantha/i.test(v.name))||vs.find(v=>v.lang==='en-US'||v.lang==='en_US')||vs.find(v=>/^en/i.test(v.lang))||null;$('#vs').textContent=voice?'Голос: '+voice.name:'⚠️ Английский голос не найден на этом устройстве'}
+function say(t,r=.9){try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='en-US';if(voice)u.voice=voice;u.rate=r;speechSynthesis.speak(u)}catch(e){}}
+try{pick();speechSynthesis.onvoiceschanged=pick}catch(e){$('#vs').textContent='⚠️ Озвучка не поддерживается'}
+document.querySelectorAll('.at').forEach(b=>b.onclick=()=>{pick();say('Audio test. Make a list, have a picnic, go for a walk.')});
+document.addEventListener('click',e=>{const b=e.target.closest('[data-say]');if(b)say(b.dataset.say,+b.dataset.r||.9)});
+const P=new Map();
+function prob(w){P.set(w,(P.get(w)||0)+1);rp()}
+function rp(){const a=[...P].sort((x,y)=>y[1]-x[1]);$('#pt').innerHTML=a.map(x=>`<tr><td>${x[0]}</td><td>×${x[1]}</td></tr>`).join('');$('#pe').style.display=a.length?'none':''}
+$('#pc').onclick=()=>{P.clear();rp()};
+const inp=(a,ph='',p,c='')=>`<input class="${c}" data-a="${a}" data-p="${p||a}" placeholder="${ph}" autocomplete="off" autocapitalize="off" spellcheck="false"><span class="ans">✔ ${a}</span>`;
+const sel=(o,a)=>`<select data-a="${a}" data-p="${a}"><option value="">—</option>${o.map(v=>`<option>${v}</option>`).join('')}</select><span class="ans" style="display:none"></span>`;
+const L=l=>'<ol>'+l.map(x=>`<li>${x}</li>`).join('')+'</ol>';
+const shuf=s=>{const w=s.replace(/[.?!]$/,'').split(' ');let r;do{r=w.slice().sort(()=>Math.random()-.5)}while(r.join(' ')==w.join(' '));return r};
+const C=[["I want to ___ a language.","learn","do","go"],["Let's ___ a picnic!","go","have","ride"],["She likes to ___ karaoke.","make","take","do"],["We ___ on holiday in August.","try","read","go"],["Can you ___ a photo of us?","have","make","take"],["He wants to ___ a horse.","bake","ride","get"],["I always ___ a to-do list.","do","go","make"],["___ in the taxi, please.","get","go","try"],["I'd like to ___ a new sport.","make","try","read"],["They ___ for a walk every evening.","do","have","go"]];
+const U=["I make a shopping list every week.","She wants to ride a horse.","We go for a walk in the park.","Can you take a photo of me?","They bake a cake on Sunday.","He is going to learn a new language.","Let's have a picnic tomorrow.","I want to try a new sport."];
+const M=[["I do a shopping list.","I make a shopping list."],["They make karaoke on Friday.","They do karaoke on Friday."],["She goes to walk every day.","She goes for a walk every day."],["I want to make a new language.","I want to learn a new language."],["Let's make a picnic!","Let's have a picnic!"],["We go in a taxi.","We get in a taxi."],["She does a cake on Sunday.","She bakes a cake on Sunday."],["I want to go a new sport.","I want to try a new sport."]];
+const S=[["I want to ___ a horse.","ride"],["We go ___ a walk.","for"],["She ___ a cake.","bakes"],["Let's take a ___.","photo"],["They ___ karaoke on Friday.","do"],["He ___ a book every week.","reads"],["We have a ___ in the park.","picnic"],["I get ___ a taxi.","in"],["It is a new ___.","experience"]];
+const full=s=>s[0].replace('___',s[1]);
+const E=[
+["Choose the correct verb","Выберите правильный глагол.",L(C.map(c=>c[0].replace('___',sel([c[1],c[2],c[3]].sort(()=>Math.random()-.5),[c[1],c[2],c[3]][0]===c[1]?c[1]:c[1]))))],
+["Unscramble the sentence","Составьте предложение из слов.",L(U.map(u=>`<div class="ch">${shuf(u).map(w=>`<span>${w}</span>`).join('')}</div>`+inp(u,'Write the sentence…',u)))],
+["Find and correct the mistake","В каждом предложении есть ошибка. Перепишите его правильно.",L(M.map(m=>`<b>✗ ${m[0]}</b><br>`+inp(m[1],'Correct sentence…',m[1].split(' ').slice(1,3).join(' '))))],
+["Listen and complete","Нажмите ▶ (или 🐢 — медленно) и впишите пропущенное слово.",L(S.map(s=>`<button data-say="${full(s)}">▶</button> <button data-say="${full(s)}" data-r=".55">🐢</button> `+s[0].replace('___',inp(s[1],'…',s[1],'w'))))]
+];
+$('#ex').innerHTML=E.map((e,i)=>`<section class="ex"><h2>${i+1}. ${e[0]} <span class="sc"></span></h2><p class="d">${e[1]}</p>${e[2]}<div class="bt"><button class="p" data-c>Проверить</button><button data-s>Показать ответы</button><button data-r>Сбросить</button></div></section>`).join('');
+document.querySelectorAll('select+.ans').forEach(s=>s.textContent='✔ '+s.previousElementSibling.dataset.a);
+$('#ex').addEventListener('click',e=>{const x=e.target.closest('.ex');if(!x)return;
+if(e.target.closest('[data-c]')){let ok=0,n=0;x.querySelectorAll('[data-a]').forEach(el=>{n++;const r=nm(el.value)===nm(el.dataset.a);const pv=el.dataset.st;el.classList.toggle('ok',r);el.classList.toggle('no',!r);el.dataset.st=r?1:0;if(r)ok++;else if(pv!=='0')prob(el.dataset.p)});x.querySelector('.sc').textContent=ok+'/'+n}
+if(e.target.closest('[data-s]')){x.classList.add('show');x.querySelectorAll('select+.ans').forEach(s=>s.style.display='inline')}
+if(e.target.closest('[data-r]')){x.classList.remove('show');x.querySelector('.sc').textContent='';x.querySelectorAll('select+.ans').forEach(s=>s.style.display='none');x.querySelectorAll('input,select').forEach(el=>{el.value='';el.classList.remove('ok','no');delete el.dataset.st})}});
+$('#cp').onclick=()=>{let t='Student: '+($('#nm').value||'—')+'\n';document.querySelectorAll('.ex').forEach((x,i)=>{t+='\n'+(i+1)+'. '+E[i][0]+' '+x.querySelector('.sc').textContent+'\n';x.querySelectorAll('[data-a]').forEach((el,j)=>{const st=el.dataset.st;t+=(j+1)+') '+(el.value||'—')+(st==='1'?' ✓':st==='0'?' ✗ ('+el.dataset.a+')':'')+'\n'})});
+t+='\nProblem words: '+([...P].map(x=>x[0]+' ×'+x[1]).join(', ')||'none');
+const o=$('#out');o.style.display='block';o.value=t;o.select();try{navigator.clipboard.writeText(t).then(()=>$('#cp').textContent='✅ Скопировано')}catch(e){}};
+rp();
+</script></body></html>
