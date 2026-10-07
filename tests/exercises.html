@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8"><title>English A2 Exercises</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root{--bg:#f4f6fb;--card:#fff;--tx:#1b2240;--mu:#6b7390;--ac:#3b5bdb;--ok:#2f9e44;--no:#e03131;--ln:#dde2f0;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12162b;--card:#1c2240;--tx:#eef0fa;--mu:#9aa3c7;--ac:#7c93ff;--ln:#2d3560}}
+:root[data-theme="dark"]{--bg:#12162b;--card:#1c2240;--tx:#eef0fa;--mu:#9aa3c7;--ac:#7c93ff;--ln:#2d3560}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:system-ui,Arial,sans-serif;padding:14px;line-height:1.4}
+h1{margin:0 0 4px;font-size:1.5rem}h2{margin:14px 0 6px;font-size:1.1rem}
+.layout{display:grid;grid-template-columns:1fr 260px;gap:14px;max-width:1000px;margin:auto}
+@media(max-width:760px){.layout{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--ln);border-radius:12px;padding:14px;margin-bottom:12px}
+.mu{color:var(--mu);font-size:.9rem}
+button{font:inherit;cursor:pointer;border-radius:8px;border:1px solid var(--ln);background:var(--card);color:var(--tx);padding:8px 12px}
+button.p{background:var(--ac);color:#fff;border-color:var(--ac);font-weight:600}
+.sp{padding:2px 8px;margin-left:6px}
+input{font:inherit;padding:8px;border-radius:8px;border:1px solid var(--ln);background:var(--bg);color:var(--tx);width:100%;max-width:260px}
+.vt{overflow-x:auto}table{border-collapse:collapse;width:100%}
+td,th{padding:5px 6px;border-bottom:1px solid var(--ln);text-align:left;font-size:.92rem}
+.ipa{color:var(--mu);font-family:Georgia,serif}
+.opt{display:block;width:100%;text-align:left;margin:6px 0;padding:11px 12px}
+.opt.ok{background:var(--ok);color:#fff;border-color:var(--ok)}
+.opt.no{background:var(--no);color:#fff;border-color:var(--no)}
+.q{font-size:1.25rem;margin:8px 0 10px}
+.bar{height:6px;background:var(--ln);border-radius:4px;overflow:hidden}.bar i{display:block;height:100%;background:var(--ac)}
+textarea{width:100%;height:200px;font:.85rem monospace;background:var(--bg);color:var(--tx);border:1px solid var(--ln);border-radius:8px;padding:8px}
+.hide{display:none}.st{margin-left:8px;font-size:.9rem}
+aside .card{position:sticky;top:10px}
+</style></head><body>
+<div class="layout"><main>
+<h1>English A2 · Exercises</h1>
+<div class="card">
+<input id="nm" placeholder="Имя ученика / Student name">
+<p><button onclick="testAudio('st')">🔊 Проверить звук</button><span class="st" id="st"></span></p>
+<p class="mu">Голос: <b id="vn">…</b> (Google US English / Samantha)</p>
+</div>
+
+<section id="s1">
+<div class="card"><h2>1. Words / Слова — послушайте каждое слово 🔊</h2><div class="vt"><table id="vt"></table></div>
+<p><button class="p" onclick="menu()">К упражнениям →</button></p></div>
+</section>
+
+<section id="s0" class="hide"><p><button onclick="view('s1')">← Слова</button></p><div id="mn"></div>
+<div class="card"><h2 style="margin-top:0">Общий результат</h2>
+<p><button onclick="testAudio('st2')">🔊 Проверить звук</button><span class="st" id="st2"></span></p>
+<textarea id="rs" readonly></textarea>
+<p><button class="p" onclick="copyRes()">📋 Скопировать все ответы</button><span class="st" id="cp"></span></p></div></section>
+<section id="s2" class="hide"><div class="card">
+<h2 id="et" style="margin-top:0"></h2><div class="mu" id="sec"></div><div class="bar"><i id="pb"></i></div>
+<div class="q"><span id="qt"></span><button class="sp" id="qs" onclick="say(cur.s)">🔊</button></div>
+<div id="ops"></div>
+<p><button class="p hide" id="nx" onclick="next()">Дальше →</button> <button onclick="menu()">☰ Меню</button></p>
+</div></section>
+
+<section id="s3" class="hide"><div class="card"><h2 id="rt" style="margin-top:0"></h2><p id="sc" style="font-size:1.4rem"></p>
+<p><button class="p" id="nxe" onclick="nextEx()">Следующее упражнение →</button> <button onclick="menu()">☰ Меню</button> <button onclick="startEx(exk)">↻ Ещё раз</button></p></div></section>
+</main>
+<aside><div class="card"><h2 style="margin-top:0">Проблемные слова</h2>
+<table id="pw"><tr><td class="mu">Пока ошибок нет 🙂</td></tr></table></div></aside></div>
+<script>
+const $=i=>document.getElementById(i);
+/* ---- audio ---- */
+let voice=null;
+function pick(){if(!('speechSynthesis' in window)){$('vn').textContent='speechSynthesis не поддерживается';return}
+const v=speechSynthesis.getVoices();
+voice=v.find(x=>/Google US English/i.test(x.name))||v.find(x=>/Samantha/i.test(x.name))||v.find(x=>x.lang==='en-US')||v.find(x=>x.lang.startsWith('en'))||null;
+$('vn').textContent=voice?voice.name:'английский голос не найден (будет голос по умолчанию)'}
+if('speechSynthesis' in window){pick();speechSynthesis.onvoiceschanged=pick}
+function say(t,onstart){if(!t||!('speechSynthesis' in window))return;speechSynthesis.cancel();
+const u=new SpeechSynthesisUtterance(t);u.lang='en-US';u.rate=.85;if(voice)u.voice=voice;if(onstart)u.onstart=onstart;speechSynthesis.speak(u)}
+function testAudio(id){let ok=false;$(id).textContent='…';
+say('Hello! The audio is working.',()=>ok=true);
+setTimeout(()=>$(id).textContent=ok?'✅ Звук работает':'⚠️ Звук не запустился: проверьте громкость, беззвучный режим и браузер (Chrome/Safari)',2500)}
+/* ---- vocab ---- */
+const V=[["Natural disasters"],
+["tornado","/tɔːrˈneɪdoʊ/","торнадо"],["tsunami","/tsuːˈnɑːmi/","цунами"],["volcanic eruption","/vɑːlˈkænɪk ɪˈrʌpʃn/","извержение вулкана"],["flood","/flʌd/","наводнение"],["blizzard","/ˈblɪzərd/","метель"],["thunderstorm","/ˈθʌndərstɔːrm/","гроза"],["earthquake","/ˈɜːrθkweɪk/","землетрясение"],["wildfire","/ˈwaɪldfaɪər/","лесной пожар"],["hurricane","/ˈhɜːrəkeɪn/","ураган"],["typhoon","/taɪˈfuːn/","тайфун"],["dust storm","/dʌst stɔːrm/","пыльная буря"],["drought","/draʊt/","засуха"],
+["Verbs"],
+["arrive / leave","/əˈraɪv, liːv/","приезжать / уезжать"],["break, broke, broken","/breɪk, broʊk, ˈbroʊkən/","ломать"],["mend (repair)","/mend/","чинить"],["sell, sold, sold","/sel, soʊld/","продавать"],["lend, lent, lent","/lend, lent/","давать в долг"],["borrow","/ˈbɑːroʊ/","брать в долг"],["win, won, won","/wɪn, wʌn/","побеждать"],["teach, taught, taught","/tiːtʃ, tɔːt/","учить кого-то"],["catch, caught, caught","/kætʃ, kɔːt/","ловить; успеть"],["miss","/mɪs/","опоздать"]];
+V.forEach(r=>{const tr=document.createElement('tr');
+if(r.length==1){tr.innerHTML='<th colspan=3></th>';tr.firstChild.textContent=r[0]}
+else{tr.innerHTML='<td></td><td class="ipa"></td><td></td>';const c=tr.children;c[0].textContent=r[0]+' ';c[1].textContent=r[1];c[2].textContent=r[2];
+const b=document.createElement('button');b.className='sp';b.textContent='🔊';b.onclick=()=>say(r[0].replace(/[\/()]/g,',').replace('mend, repair','mend'));c[0].appendChild(b)}
+$('vt').appendChild(tr)});
+/* ---- 5 exercises x 8 items: [section, text, speak(listening), options (1st = correct; 1 option = type-in, "/" = alternatives), tag, tag translation] ---- */
+const INS={"Disasters":"Ex.1 Natural disasters — listen / choose the word","Will":"Ex.2 Will / be going to — choose","Quantifiers":"Ex.3 Too much / enough — choose","Comparatives":"Ex.4 Comparatives & superlatives — type the answer","Verbs":"Ex.5 Verbs — choose","Tenses":"Ex.6 Verb forms (different tenses) — type the correct form","Rephrase":"Ex.7 Rephrase — choose the sentence with the same meaning","Mistake":"Ex.8 Find the mistake — choose the correct sentence"};
+const Q=[
+["Disasters","Listen and choose the word.","tornado",["tornado","tsunami","typhoon","hurricane"],"tornado","торнадо"],
+["Disasters","Listen and choose the word.","earthquake",["earthquake","thunderstorm","drought","flood"],"earthquake","землетрясение"],
+["Disasters","Listen and choose the word.","wildfire",["wildfire","blizzard","dust storm","volcanic eruption"],"wildfire","лесной пожар"],
+["Disasters","Listen and choose the word.","thunderstorm",["thunderstorm","blizzard","hurricane","tsunami"],"thunderstorm","гроза"],
+["Disasters","A huge wave after an earthquake under the sea.","",["tsunami","flood","blizzard","drought"],"tsunami","цунами"],
+["Disasters","Heavy snow and strong wind.","",["blizzard","earthquake","flood","tornado"],"blizzard","метель"],
+["Disasters","Hot lava and ash come out of a mountain.","",["volcanic eruption","wildfire","flood","tornado"],"volcanic eruption","извержение вулкана"],
+["Disasters","There is no rain for many months.","",["drought","flood","typhoon","blizzard"],"drought","засуха"],
+["Will","It's cold in here. I ___ close the window. (instant decision)","",["will","going to","am","does"],"will","will — решение сразу"],
+["Will","Look at the black clouds! It ___ rain. (prediction)","",["is going to","will to","shall","does"],"be going to","be going to — прогноз по признакам"],
+["Will","I promise I ___ call you tonight.","",["will","am","does","has"],"will (promise)","will — обещание"],
+["Will","___ I open the window? (offer)","",["Shall","Will","Am","Does"],"shall","shall — предложение"],
+["Will","I think people ___ live on Mars in 2100. (prediction)","",["will","are","do","shall to"],"will (prediction)","will — предположение"],
+["Will","I have bought the tickets. We ___ visit Rome next week. (plan)","",["are going to","is going to","will to","going"],"be going to (plan)","be going to — план"],
+["Will","There is no milk. I ___ buy some. (instant decision)","",["will","buy","going to","am"],"will (decision)","will — решение сразу"],
+["Will","I ___ tell anyone your secret. (negative promise)","",["won't","don't will","am not will","willn't"],"won't","won't — не буду"],
+["Quantifiers","There are ___ people on the bus. I can't sit down.","",["too many","too much","enough","a little"],"too many","слишком много (счётные)"],
+["Quantifiers","The tea is ___ hot. I can't drink it.","",["too","too much","too many","enough"],"too","слишком"],
+["Quantifiers","We need 10 chairs. We have 10. We have ___ chairs.","",["enough","too","a little","much"],"enough","достаточно"],
+["Quantifiers","I have ___ time. I'm very busy. (почти нет)","",["little","few","a few","many"],"little / few","little/few — почти нет"],
+["Quantifiers","Can I have ___ sugar, please? Just a bit.","",["a little","a few","too many","few"],"a little","немного (неисчисл.)"],
+["Quantifiers","I have ___ friends in this city. Two or three.","",["a few","a little","much","little"],"a few","несколько (счётные)"],
+["Quantifiers","There is ___ traffic today. I'm late!","",["too much","too many","a few","few"],"too much","слишком много (неисчисл.)"],
+["Quantifiers","I can't buy this car. I don't have ___ money.","",["enough","too","many","a few"],"enough","достаточно"],
+["Comparatives","big → (comparative)","",["bigger"],"bigger","больше"],
+["Comparatives","beautiful → (comparative)","",["more beautiful"],"more beautiful","красивее"],
+["Comparatives","good → (comparative)","",["better"],"better","лучше"],
+["Comparatives","bad → (superlative)","",["the worst"],"the worst","самый плохой"],
+["Comparatives","far → (comparative)","",["further/farther"],"further / farther","дальше"],
+["Comparatives","hot → (superlative)","",["the hottest"],"the hottest","самый горячий"],
+["Comparatives","My car is old, but your car is ___ . (old → comparative)","",["older"],"older","старше"],
+["Comparatives","Everest is ___ mountain in the world. (high → superlative)","",["the highest"],"the highest","самый высокий"],
+["Verbs","приезжать","",["arrive","leave","miss","mend"],"arrive","приезжать"],
+["Verbs","чинить","",["mend","break","lend","borrow"],"mend","чинить"],
+["Verbs","Past Simple of «sell»","",["sold","selled","sell","sould"],"sold","sell — sold"],
+["Verbs","брать в долг","",["borrow","lend","win","send"],"borrow","брать в долг"],
+["Verbs","Past Simple of «win» (произносится «ван»)","",["won","winned","win","wan"],"won","win — won"],
+["Verbs","I ___ the bus, so I was late. (опоздал)","",["missed","caught","mended","taught"],"missed","опоздал"],
+["Verbs","Past Simple of «catch»","",["caught","catched","cought","catch"],"caught","catch — caught"],
+["Verbs","Мой телефон выпал из кармана.","",["My phone fell out of my pocket.","My phone fall out from my pocket.","My phone falled out of pocket.","My phone is fell out my pocket."],"fell out of my pocket","выпал из кармана"],
+["Tenses","Yesterday I ___ (buy) a new phone.","",["bought"],"bought","buy — bought"],
+["Tenses","She has ___ (break) her phone.","",["broken"],"broken","break — broke — broken"],
+["Tenses","Last year they ___ (sell) their house.","",["sold"],"sold","sell — sold"],
+["Tenses","He ___ (lend) me his book last week.","",["lent"],"lent","lend — lent"],
+["Tenses","We ___ (win) the match yesterday.","",["won"],"won","win — won"],
+["Tenses","My teacher ___ (teach) me English last year.","",["taught"],"taught","teach — taught"],
+["Tenses","Tomorrow we ___ (arrive) in Krakow.","",["will arrive/'ll arrive"],"will arrive","will + глагол (будущее)"],
+["Tenses","She ___ (catch) the bus at 8 o'clock yesterday.","",["caught"],"caught","catch — caught"],
+["Rephrase","Same meaning: «My phone is cheaper than yours.»","",["Your phone is more expensive than mine.","Your phone is cheaper than mine.","My phone is more expensive than yours.","Your phone is the most expensive."],"cheaper / more expensive","дешевле / дороже"],
+["Rephrase","Same meaning: «There isn't enough water.»","",["There is too little water.","There is too much water.","There are too many water.","There is enough water."],"too little","слишком мало"],
+["Rephrase","Same meaning: «I lent my pen to Anna.»","",["Anna borrowed my pen.","Anna lent my pen.","I borrowed Anna's pen.","Anna sold my pen."],"borrow / lend","брать / давать в долг"],
+["Rephrase","Same meaning: «Let me open the window.» (offer)","",["Shall I open the window?","Will I open the window?","Do I open the window?","I opened the window."],"shall (offer)","shall — предложение"],
+["Rephrase","Same meaning: «Everest is higher than any other mountain.»","",["Everest is the highest mountain.","Everest is the most high mountain.","Everest is higher mountain.","Everest is highest than mountains."],"the highest","самый высокий"],
+["Rephrase","Same meaning: «I didn't catch the bus.»","",["I missed the bus.","I caught the bus.","I mended the bus.","I lost the bus."],"miss","опоздать"],
+["Rephrase","Same meaning: «He lost the game.»","",["He didn't win the game.","He won the game.","He didn't lose the game.","He wins the game."],"win / lose","побеждать / проигрывать"],
+["Rephrase","Same meaning: «There was too much water in the town after the rain.»","",["There was a flood in the town.","There was a drought in the town.","There was a blizzard in the town.","There was a wildfire in the town."],"flood","наводнение"],
+["Mistake","Find the mistake: «I will to call you tonight.»","",["I will call you tonight.","I will to calling you tonight.","I am will call you tonight.","I will called you tonight."],"will + verb","will + глагол без to"],
+["Mistake","Find the mistake: «She is more tall than me.»","",["She is taller than me.","She is more taller than me.","She is tallest than me.","She is the taller than me."],"taller","короткие прилагательные + -er"],
+["Mistake","Find the mistake: «There are too much people here.»","",["There are too many people here.","There is too many people here.","There are too much peoples here.","There are too many peoples here."],"too many","too many + счётные"],
+["Mistake","Find the mistake: «Yesterday I buyed a new bag.»","",["Yesterday I bought a new bag.","Yesterday I buy a new bag.","Yesterday I boughted a new bag.","Yesterday I have bought a new bag."],"bought","buy — bought"],
+["Mistake","Find the mistake: «Can I lend your pen?»","",["Can I borrow your pen?","Can I lent your pen?","Can I borrowed your pen?","Can you borrow my pen?"],"borrow","брать в долг"],
+["Mistake","Find the mistake: «My phone is more bad than yours.»","",["My phone is worse than yours.","My phone is badder than yours.","My phone is the worst than yours.","My phone is more worse than yours."],"worse","bad — worse — the worst"],
+["Mistake","Find the mistake: «We lost the match, so they winned.»","",["We lost the match, so they won.","We lost the match, so they win.","We losed the match, so they won.","We lost the match, so they wined."],"won","win — won"],
+["Mistake","Find the mistake: «There was big earthquake yesterday.»","",["There was a big earthquake yesterday.","There were a big earthquake yesterday.","There was a big earthquakes yesterday.","There was big earthquakes yesterday."],"earthquake","землетрясение (a + noun)"]];
+/* ---- quiz: each exercise separately ---- */
+const KEYS=Object.keys(INS),res={};
+let exk,L,i=0,cur,last=-1,prob={};
+const norm=s=>s.toLowerCase().trim().replace(/\s+/g,' ').replace(/^the /,'');
+function view(id){['s1','s0','s2','s3'].forEach(x=>$(x).classList.toggle('hide',x!=id));window.scrollTo(0,0)}
+function menu(){view('s0');if('speechSynthesis' in window)speechSynthesis.cancel();
+const m=$('mn');m.innerHTML='';
+KEYS.forEach(k=>{const [t,d]=INS[k].split(' — '),r=res[k],c=document.createElement('div');c.className='card';
+c.innerHTML='<h2 style="margin-top:0"></h2><p class="mu"></p><button class="p"></button><span class="st"></span>';
+const e=c.children;e[0].textContent=t;e[1].textContent=d;e[2].textContent=r?'↻ Ещё раз':'Начать →';e[2].onclick=()=>startEx(k);
+e[3].textContent=r?'⭐ '+r.score+' / '+r.n:'';m.appendChild(c)});
+buildRes()}
+function startEx(k){exk=k;L=Q.filter(q=>q[0]==k);i=0;last=-1;res[k]={score:0,n:L.length,log:[]};view('s2');show()}
+function mk(q){let o=q[3].map((x,k)=>({x,c:k==0}));
+do{for(let k=o.length-1;k>0;k--){const j=Math.floor(Math.random()*(k+1));[o[k],o[j]]=[o[j],o[k]]}}while(o.findIndex(z=>z.c)==last);
+last=o.findIndex(z=>z.c);return o}
+function show(){const q=L[i],ty=q[3].length==1,[t,d]=INS[exk].split(' — ');cur={s:q[2]||q[1]};
+$('et').textContent=t;$('sec').textContent=d+' · '+(i+1)+'/'+L.length;$('pb').style.width=(i/L.length*100)+'%';
+$('qt').textContent=q[1];
+$('qs').style.display=(ty||(/[а-яё]/i.test(q[1])&&!q[2]))?'none':'';
+$('nx').classList.add('hide');$('ops').innerHTML='';
+if(ty){const inp=document.createElement('input');inp.placeholder='Type your answer';inp.autocomplete='off';inp.autocapitalize='off';
+const b=document.createElement('button');b.className='p';b.textContent='Check';b.style.marginLeft='6px';
+const go=()=>{if(inp.disabled)return;inp.disabled=b.disabled=true;const ok=q[3][0].split('/').some(a=>norm(a)==norm(inp.value));
+inp.style.borderColor=ok?'var(--ok)':'var(--no)';rec(ok,inp.value||'—',q)};
+b.onclick=go;inp.onkeydown=e=>{if(e.key=='Enter')go()};$('ops').append(inp,b);inp.focus()}
+else mk(q).forEach(o=>{const b=document.createElement('button');b.className='opt';b.textContent=o.x;b.onclick=()=>ans(b,o,q);$('ops').appendChild(b)});
+if(q[2])say(q[2])}
+function ans(b,o,q){[...$('ops').children].forEach(x=>{x.disabled=true;if(x.textContent==q[3][0])x.classList.add('ok')});if(!o.c)b.classList.add('no');rec(o.c,o.x,q)}
+function rec(ok,given,q){const r=res[exk];
+if(!ok){const p=prob[q[4]]||(prob[q[4]]={n:0,tr:q[5],s:q[2]||q[3][0].split('/')[0]});p.n++;renderProb()}else r.score++;
+r.log.push({q:q[2]?'(listening) '+q[2]:q[1],a:given,r:q[3][0],ok});
+if(q[3].length==1&&!ok){const d=document.createElement('div');d.className='mu';d.textContent='✔ '+q[3][0];$('ops').appendChild(d)}
+say(q[3][0].split('/')[0]);$('nx').classList.remove('hide')}
+function next(){i++;i<L.length?show():endEx()}
+function endEx(){const r=res[exk],ix=KEYS.indexOf(exk);
+$('rt').textContent=INS[exk].split(' — ')[0]+' — готово';$('sc').textContent='⭐ '+r.score+' / '+r.n;
+$('nxe').style.display=ix<KEYS.length-1?'':'none';view('s3');
+if(KEYS.every(k=>res[k]))testAudio('st2')}
+function nextEx(){startEx(KEYS[KEYS.indexOf(exk)+1])}
+function renderProb(){const t=$('pw');t.innerHTML='';
+Object.entries(prob).forEach(([w,p])=>{const r=document.createElement('tr');r.innerHTML='<td></td><td></td>';
+r.children[0].textContent=w+' ×'+p.n;r.children[1].textContent=p.tr;
+const b=document.createElement('button');b.className='sp';b.textContent='🔊';b.onclick=()=>say(p.s);r.children[0].appendChild(b);t.appendChild(r)})}
+function buildRes(){const ks=KEYS.filter(k=>res[k]);let tot=0,n=0,body='';
+ks.forEach(k=>{const r=res[k];tot+=r.score;n+=r.n;body+='\n== '+INS[k].split(' — ')[0]+': '+r.score+'/'+r.n+' ==\n';
+r.log.forEach((l,j)=>body+=(j+1)+'. '+l.q+'\n   Ответ ученика: '+l.a+(l.ok?' ✔':' ✘ (правильно: '+l.r+')')+'\n')});
+const pw=Object.entries(prob);
+$('rs').value='English A2 — '+($('nm').value||'Student')+'\nИтого: '+tot+'/'+n+' (упражнений: '+ks.length+'/'+KEYS.length+')\nГолос: '+$('vn').textContent+'\n'+body+'\nПроблемные слова: '+(pw.length?pw.map(([w,p])=>w+' ×'+p.n+' ('+p.tr+')').join('; '):'нет')}
+function copyRes(){buildRes();const t=$('rs').value;const done=()=>$('cp').textContent='✅ Скопировано';
+const fb=()=>{$('rs').select();try{document.execCommand('copy')?done():$('cp').textContent='Выделите текст и скопируйте вручную'}catch(e){$('cp').textContent='Выделите текст и скопируйте вручную'}};
+if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(done,fb);else fb()}
+</script></body></html>
