@@ -1,0 +1,85 @@
+<!DOCTYPE html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Connectors A1</title>
+<style>
+:root{--bg:#f6f7fb;--c:#fff;--t:#1d2433;--m:#667;--p:#4f46e5;--ok:#16a34a;--no:#dc2626;--b:#d9dce8;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#12141c;--c:#1c2030;--t:#e8eaf2;--m:#99a;--b:#32384e}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--t);font:16px/1.5 system-ui,sans-serif}
+.w{max-width:1050px;margin:auto;padding:14px;display:grid;grid-template-columns:1fr 210px;gap:14px}
+@media(max-width:760px){.w{grid-template-columns:1fr}aside{order:-1;position:static!important}}
+.card{background:var(--c);border:1px solid var(--b);border-radius:12px;padding:14px;margin-bottom:14px}
+h1{margin:0 0 10px;font-size:22px}h2{margin:0 0 6px;font-size:18px;color:var(--p)}.h{color:var(--m);font-size:14px;margin:0 0 10px}
+table{border-collapse:collapse;width:100%;font-size:14px}td,th{padding:5px;border-bottom:1px solid var(--b);text-align:left}
+button{background:var(--p);color:#fff;border:0;border-radius:8px;padding:7px 12px;font:inherit;cursor:pointer;margin:4px 6px 0 0}button.g{background:transparent;color:var(--p);border:1px solid var(--p)}
+.ico{padding:2px 8px;margin:0}
+input[type=text]{font:inherit;border:1px solid var(--b);border-radius:6px;padding:3px 7px;width:130px;background:var(--bg);color:var(--t)}input.long{width:100%;margin-top:4px}
+select{font:inherit;padding:4px;border-radius:6px;background:var(--bg);color:var(--t);border:1px solid var(--b);max-width:100%}
+.it{padding:6px 0;border-bottom:1px dashed var(--b)}.ok{border-color:var(--ok)!important;background:rgba(22,163,74,.15)!important}.no{border-color:var(--no)!important;background:rgba(220,38,38,.15)!important}
+.ans{color:var(--ok);font-size:14px;font-weight:600}.bank{background:var(--bg);border-radius:8px;padding:6px 10px;font-weight:600;margin-bottom:8px}
+aside{position:sticky;top:10px;align-self:start}.cl{cursor:text}.cl.f{background:rgba(22,163,74,.3);border-radius:4px}
+#txt{font-size:17px;line-height:1.9}#st{font-size:14px;color:var(--m)}
+</style></head><body><div class="w"><main>
+<div class="card"><h1>Connectors · A1</h1>
+<h2>Слова для повторения</h2><p class="h">Нажми 🔊 и прослушай каждое слово (голос Google US English / Samantha).</p>
+<table id="words"></table><button onclick="playAll()">▶ Прослушать все слова</button><div id="st"></div></div>
+
+<div class="card"><h2>Find them in the wild</h2><p class="h">Read the text once. Then click every stretch of words from the topic. Click the whole phrase, not a single word. (Найди 7 фраз.)</p>
+<div id="txt"></div><button onclick="wildShow()" class="g">Показать ответы</button> <span id="wc"></span></div>
+
+<div id="ex"></div>
+
+<div class="card"><h2>Match the halves</h2><p class="h">Соедини половинки выражений.</p><div id="mt"></div><button onclick="chk('m')">Проверить</button><button class="g" onclick="shw('m')">Показать ответы</button></div>
+
+<div id="ex2"></div>
+
+<div class="card"><h2>Финал</h2><button onclick="testAudio()">🔊 Проверить аудио</button><button onclick="copyAll()">📋 Скопировать все ответы</button><div id="fin" class="h"></div></div>
+</main>
+<aside class="card"><h2>Проблемные слова</h2><p class="h">Здесь появляются слова, в которых была ошибка.</p><table id="prob"></table><button class="g" onclick="prob={};drawProb()">Очистить</button></aside></div>
+<script>
+const W=[["while","/waɪl/","в то время как"],["instead of","/ɪnˈstɛd əv/","вместо"],["however","/haʊˈɛvɚ/","однако"],["that's why","/ðæts waɪ/","поэтому"],["because of","/bɪˈkɔz əv/","из-за"],["except","/ɪkˈsɛpt/","кроме"],["also","/ˈɔlsoʊ/","также"]];
+const BANK="while · instead of · however · that's why · because of · except · also";
+// gap exercises: [before, answer, after]
+const G=[["Ex 1. Fill the gaps",[["My sister reads ","while"," I cook dinner."],["I was tired. "," however".trim(),", I did my homework."],["We stayed at home ","because of"," the rain."],["I like all fruit ","except"," bananas."],["I like coffee. I ","also"," like tea."],["It is cold, ","that's why"," I wear a hat."]]],
+["Ex 2. Fill the gaps",[["Let's go to the park ","instead of"," staying at home."],["She is happy ","because of"," her new phone."],["I'm hungry, ","that's why"," I eat now."],["The shop is open every day ","except"," Sunday."],["He likes football. He ","also"," plays tennis."],["Tom works, ","while"," Anna sleeps."]]],
+["Ex 3. Fill the gaps",[["I drink water ","instead of"," juice."],["It's a small flat. ","however",", it is very nice."],["We were late ","because of"," the bus."],["She sings ","while"," she walks."],["Everyone came ","except"," Ben."],["I'm a student. I ","also"," work in a cafe."]]]];
+const R=[["Tom has tea. He doesn't have coffee.","instead of","Tom has tea instead of coffee."],["I like all animals. I don't like snakes.","except","I like all animals except snakes."],["It was raining. We stayed home.","because of","We stayed home because of the rain."],["I'm tired. I go to bed early.","that's why","I'm tired, that's why I go to bed early."],["I watch TV. I eat dinner.","while","I watch TV while I eat dinner."],["The test is hard. I like it.","however","The test is hard. However, I like it."]];
+const M=[["I like tea,","while he likes coffee."],["It rained.","However, we went out."],["She is ill,","that's why she is at home."],["We stayed home","because of the rain."],["I eat everything","except fish."],["He speaks English.","He also speaks French."]];
+const WILD=[["Sam likes Saturdays, ",0],["while his mum cooks",1],[". He plays games ",0],["instead of sleeping",1],[". He is tired. ",0],["However,",1],[" he is happy. He has no school ",0],["except Sunday",1],[", ",0],["that's why",1],[" he likes Monday. He walks ",0],["because of the rain",1],[" and he ",0],["also",1],[" takes an umbrella.",0]];
+let prob={},wf=0,mixM=[];
+const $=id=>document.getElementById(id),norm=s=>s.toLowerCase().replace(/[’`]/g,"'").replace(/\s+/g," ").trim();
+function say(t,cb){speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);const v=speechSynthesis.getVoices();const x=v.find(a=>/Google US English/i.test(a.name))||v.find(a=>/Samantha/i.test(a.name))||v.find(a=>a.lang=="en-US")||v.find(a=>/^en/.test(a.lang));if(x)u.voice=x;u.lang="en-US";u.rate=.85;u.onend=cb;speechSynthesis.speak(u);return x}
+function playAll(){let i=0;const n=()=>{if(i<W.length)say(W[i++][0],()=>setTimeout(n,300))};n()}
+function testAudio(){if(!window.speechSynthesis){$("fin").textContent="❌ Аудио не поддерживается в этом браузере.";return}const v=say("Audio is working. While, however, because of.");$("fin").textContent=v?"✅ Играет голос: "+v.name+(/Google US English|Samantha/i.test(v.name)?"":" (Google US English / Samantha не найден — выбран запасной)"):"⚠️ Голоса не найдены, попробуй Chrome или Safari."}
+$("words").innerHTML="<tr><th></th><th>Word</th><th>Транскрипция</th><th>Перевод</th></tr>"+W.map((w,i)=>`<tr><td><button class="ico" onclick="say('${w[0].replace("'","\\'")}')">🔊</button></td><td><b>${w[0]}</b></td><td>${w[1]}</td><td>${w[2]}</td></tr>`).join("");
+function drawProb(){const k=Object.entries(prob);$("prob").innerHTML=k.length?k.map(([a,n])=>`<tr><td><b>${a}</b></td><td>×${n}</td></tr>`).join(""):"<tr><td>Пока пусто 🎉</td></tr>"}drawProb();
+function addP(a){prob[a]=(prob[a]||0)+1;drawProb()}
+// wild
+$("txt").innerHTML=WILD.map(([t,k],i)=>k?`<span class="cl" data-i="${i}" onclick="wc(this)">${t}</span>`:t).join("");
+function wc(e){if(e.classList.contains("f"))return;e.classList.add("f");wf++;$("wc").textContent=wf+" / 7"}
+function wildShow(){document.querySelectorAll(".cl").forEach(e=>e.classList.add("f"));wf=7;$("wc").textContent="7 / 7"}
+// gap exercises
+$("ex").innerHTML=G.map((g,e)=>`<div class="card"><h2>${g[0]}</h2><p class="h">Впиши слово или выражение руками.</p><div class="bank">${BANK}</div>${g[1].map((r,i)=>`<div class="it">${i+1}. ${r[0]}<input type="text" id="g${e}_${i}" autocomplete="off" autocapitalize="off" spellcheck="false">${r[2]} <span class="ans" id="a${e}_${i}"></span></div>`).join("")}<button onclick="chk('g${e}')">Проверить</button><button class="g" onclick="shw('g${e}')">Показать ответы</button></div>`).join("");
+// rephrase + own
+$("ex2").innerHTML=`<div class="card"><h2>Rephrase</h2><p class="h">Соедини два предложения в одно с помощью слова в скобках.</p>${R.map((r,i)=>`<div class="it">${i+1}. ${r[0]} <b>(${r[1]})</b><input type="text" class="long" id="r_${i}" autocomplete="off"><span class="ans" id="ra_${i}"></span></div>`).join("")}<button onclick="chk('r')">Проверить</button><button class="g" onclick="shw('r')">Показать образец</button></div>
+<div class="card"><h2>Write your own sentence</h2><p class="h">Напиши своё предложение с каждым словом.</p>${W.map((w,i)=>`<div class="it">${i+1}. <b>${w[0]}</b><input type="text" class="long" id="o_${i}" autocomplete="off"></div>`).join("")}<button onclick="chk('o')">Проверить</button></div>`;
+// match
+const opts=M.map(m=>m[1]).sort(()=>Math.random()-.5);
+$("mt").innerHTML=M.map((m,i)=>`<div class="it">${m[0]} <select id="m_${i}"><option value="">— choose —</option>${opts.map(o=>`<option>${o}</option>`).join("")}</select> <span class="ans" id="ma_${i}"></span></div>`).join("");
+function mark(el,ok){el.classList.remove("ok","no");el.classList.add(ok?"ok":"no")}
+function chk(k){
+ if(k[0]=="g"){const e=+k.slice(1);G[e][1].forEach((r,i)=>{const el=$(`g${e}_${i}`);if(!el.value.trim())return;const ok=norm(el.value)==norm(r[1]);mark(el,ok);if(!ok)addP(r[1])})}
+ if(k=="r")R.forEach((r,i)=>{const el=$("r_"+i);if(!el.value.trim())return;const ok=norm(el.value).includes(norm(r[1]))&&el.value.trim().split(" ").length>=4;mark(el,ok);if(!ok)addP(r[1])});
+ if(k=="o")W.forEach((w,i)=>{const el=$("o_"+i);if(!el.value.trim())return;const ok=norm(el.value).includes(w[0])&&el.value.trim().split(" ").length>=4;mark(el,ok);if(!ok)addP(w[0])});
+ if(k=="m")M.forEach((m,i)=>{const el=$("m_"+i);if(!el.value)return;const ok=el.value==m[1];mark(el,ok);if(!ok)addP(m[0].replace(/[,.]/g,""))})}
+function shw(k){
+ if(k[0]=="g"){const e=+k.slice(1);G[e][1].forEach((r,i)=>$(`a${e}_${i}`).textContent="→ "+r[1])}
+ if(k=="r")R.forEach((r,i)=>$("ra_"+i).textContent="→ "+r[2]);
+ if(k=="m")M.forEach((m,i)=>$("ma_"+i).textContent="→ "+m[1])}
+function copyAll(){let o="Connectors A1 — ответы студента\n";
+ G.forEach((g,e)=>{o+="\n"+g[0]+"\n";g[1].forEach((r,i)=>{const v=$(`g${e}_${i}`).value.trim();o+=`${i+1}. ${r[0]}${v||"___"}${r[2]} ${v?(norm(v)==norm(r[1])?"✓":"✗ (правильно: "+r[1]+")"):"(пусто)"}\n`})});
+ o+="\nMatch the halves\n";M.forEach((m,i)=>{const v=$("m_"+i).value;o+=`${i+1}. ${m[0]} ${v||"___"} ${v==m[1]?"✓":"✗ (правильно: "+m[1]+")"}\n`});
+ o+="\nRephrase\n";R.forEach((r,i)=>o+=`${i+1}. ${r[0]} (${r[1]}) → ${$("r_"+i).value.trim()||"___"}\n   Образец: ${r[2]}\n`);
+ o+="\nMy own sentences\n";W.forEach((w,i)=>o+=`${i+1}. ${w[0]}: ${$("o_"+i).value.trim()||"___"}\n`);
+ const p=Object.entries(prob);o+="\nПроблемные слова: "+(p.length?p.map(a=>a[0]+" ×"+a[1]).join(", "):"нет")+"\n";
+ const done=()=>$("fin").textContent="✅ Скопировано! Вставь в чат или сообщение учителю.";
+ (navigator.clipboard?navigator.clipboard.writeText(o):Promise.reject()).then(done).catch(()=>{const t=document.createElement("textarea");t.value=o;document.body.appendChild(t);t.select();try{document.execCommand("copy");done()}catch(e){$("fin").textContent="❌ Не удалось скопировать"}t.remove()})}
+if(window.speechSynthesis)speechSynthesis.onvoiceschanged=()=>{};
+</script></body></html>
