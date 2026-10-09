@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Shopping A2 — часть 3</title>
+<style>
+:root{--bg:#f4f6fb;--card:#fff;--tx:#1b1f2a;--mu:#5d6679;--ac:#2f6fed;--ok:#1a8f4c;--bad:#d03b3b;--bd:#dde1ea;--hl:#fff1b8;--okbg:#d9f3e3;--badbg:#fadcdc;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12151c;--card:#1c212c;--tx:#e8ecf4;--mu:#9aa4b8;--ac:#6c9bff;--ok:#4fd18a;--bad:#ff7b7b;--bd:#2c3342;--hl:#5a4b10;--okbg:#17402b;--badbg:#4a2323}}
+:root[data-theme="dark"]{--bg:#12151c;--card:#1c212c;--tx:#e8ecf4;--mu:#9aa4b8;--ac:#6c9bff;--ok:#4fd18a;--bad:#ff7b7b;--bd:#2c3342;--hl:#5a4b10;--okbg:#17402b;--badbg:#4a2323}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{padding:18px 16px 8px;max-width:1150px;margin:auto}
+h1{margin:0 0 6px;font-size:24px}h2{margin:0 0 4px;font-size:19px}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:16px;max-width:1150px;margin:auto;padding:8px 16px 40px}
+@media(max-width:820px){.layout{grid-template-columns:1fr}aside{order:-1;position:static!important}}
+aside{position:sticky;top:12px;align-self:start}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px 16px;margin-bottom:14px}
+.instr{color:var(--mu);margin:0 0 10px;font-size:14px}
+button{font:inherit;cursor:pointer;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:9px;padding:6px 12px}
+button.pri{background:var(--ac);border-color:var(--ac);color:#fff}
+input,textarea{font:inherit;color:var(--tx);background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:6px 9px;min-width:0}
+input{width:min(100%,380px)}textarea{width:100%;box-sizing:border-box}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:7px 0}
+.n{color:var(--mu);width:20px}.p{flex:1 1 220px}
+.fb{font-weight:600;min-width:20px;white-space:pre-wrap}.fb.ok{color:var(--ok)}.fb.bad{color:var(--bad)}.fb.show{color:var(--ac);font-weight:500}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}.score{font-weight:600}
+.vg{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:6px}
+.vg div{display:flex;gap:6px;align-items:center;font-size:14px}.ipa{color:var(--mu)}
+.read{line-height:2.1}.tok{padding:2px 3px;border-radius:6px;cursor:pointer;border:1px solid transparent}
+.tok:hover{background:var(--hl)}.tok.sel{background:var(--hl);border-color:#d9b400}
+.tok.good{background:var(--okbg);border-color:var(--ok)}.tok.miss{border:1px dashed var(--bad);background:var(--badbg)}.tok.wrong{background:var(--badbg);text-decoration:line-through}
+.opt{display:block;width:100%;text-align:left;margin:6px 0;padding:9px 12px}.q{font-size:18px;margin:8px 0}.prize{color:var(--ac);font-weight:700}.bad{color:var(--bad)}
+#plist div{display:flex;justify-content:space-between;gap:6px;padding:3px 0;border-bottom:1px solid var(--bd);font-size:14px}
+#plist span.c{color:var(--bad);font-weight:700}
+#out{height:150px;margin-top:8px}
+</style></head><body>
+<header>
+<h1>🛒 Shopping — часть 3</h1>
+<div class="row"><input id="nm" placeholder="Имя ученика / Student name" style="width:240px">
+<button class="pri" id="tst">🔊 Проверить звук</button><span class="ipa">Голос: <b id="vname">…</b></span>
+<button id="theme">🌓</button></div>
+<div class="instr" id="ttsnote"></div>
+</header>
+<div class="layout"><main id="main"></main>
+<aside><div class="card"><h2>⚠️ Проблемные слова</h2><p class="instr">Слова с ошибками (нажми — услышишь).</p><div id="plist"><i class="instr">Пока пусто 🎉</i></div><div class="bar"><button id="pclr">Очистить</button></div></div></aside></div>
+<script>
+const $=s=>document.querySelector(s);
+const h=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e};
+const shuf=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+const norm=s=>s.toLowerCase().replace(/[’`]/g,"'").replace(/[.,!?;:"]/g,'').replace(/\s+/g,' ').trim();
+let ITEMS=[];const P={},LOG={};
+
+/* AUDIO */
+const TTS='speechSynthesis' in window;let voice=null;
+function pickVoice(){if(!TTS)return;const vs=speechSynthesis.getVoices();
+ voice=vs.find(v=>/Google US English/i.test(v.name))||vs.find(v=>/Samantha/i.test(v.name))||vs.find(v=>v.lang==='en-US'||v.lang==='en_US')||vs.find(v=>/^en/i.test(v.lang))||null;
+ $('#vname').textContent=voice?voice.name+' ('+voice.lang+')':'голос по умолчанию (en-US)'}
+if(TTS){pickVoice();speechSynthesis.onvoiceschanged=pickVoice}else{$('#vname').textContent='не поддерживается';$('#ttsnote').textContent='Браузер не поддерживает озвучку. Откройте страницу в Chrome / Safari.'}
+function say(t,r=.9){if(!TTS)return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='en-US';if(voice)u.voice=voice;u.rate=r;speechSynthesis.speak(u)}
+$('#tst').onclick=()=>{pickVoice();say("Hello! Where is the changing room, please?")};
+$('#theme').onclick=()=>{const r=document.documentElement;r.dataset.theme=(r.dataset.theme||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'))==='dark'?'light':'dark'};
+
+/* PROBLEMS */
+function addP(t){P[t]=(P[t]||0)+1;renderP()}
+function renderP(){const b=$('#plist');b.innerHTML='';const k=Object.keys(P).sort((a,c)=>P[c]-P[a]);if(!k.length){b.innerHTML='<i class="instr">Пока пусто 🎉</i>';return}
+ k.forEach(w=>{const d=h('div');const a=h('a',null,'🔊 '+w);a.style.cursor='pointer';a.onclick=()=>say(w);d.append(a,h('span','c','×'+P[w]));b.append(d)})}
+$('#pclr').onclick=()=>{for(const k in P)delete P[k];renderP()};
+
+/* ENGINE */
+function addItem(ex,wrap,o){const fb=h('span','fb');wrap.append(fb);
+ const it={ex,fb,get:o.get,ans:o.ans,tag:o.tag,label:o.label,judge:o.judge||((v,a)=>a.split('|').some(x=>norm(x)===norm(v))),ok:null,lg:false};ITEMS.push(it);return it}
+function check(ex,sc){let ok=0,tot=0;ITEMS.filter(i=>i.ex===ex).forEach(i=>{tot++;const v=i.get();if(!v.trim()){i.ok=null;i.fb.textContent='';return}
+ const r=i.judge(v,i.ans);i.ok=r;i.fb.textContent=r?'✅':'❌';i.fb.className='fb '+(r?'ok':'bad');if(r)ok++;else if(!i.lg){i.lg=true;addP(i.tag)}});sc.textContent=`✅ ${ok} / ${tot}`}
+function reveal(ex){ITEMS.filter(i=>i.ex===ex).forEach(i=>{i.fb.textContent=' → '+i.ans.split('|')[0];i.fb.className='fb show'})}
+function sec(id,title,instr,build,c={}){const s=h('section','card');s.id=id;s.innerHTML=`<h2>${title}</h2><p class="instr">${instr}</p>`;
+ const body=h('div'),bar=h('div','bar'),sc=h('span','score');s.append(body,bar);
+ const run=()=>{ITEMS=ITEMS.filter(i=>i.ex!==id);body.innerHTML='';sc.textContent='';build(body,id)};
+ if(!c.nobar){const b1=h('button','pri','Проверить'),b2=h('button',null,'Показать ответы'),b3=h('button',null,'Заново');
+  b1.onclick=()=>c.check?c.check(body,sc):check(id,sc);b2.onclick=()=>c.reveal?c.reveal(body,sc):reveal(id);b3.onclick=run;bar.append(b1,b2,b3,sc)}
+ run();$('#main').append(s)}
+const inp=()=>{const i=h('input');i.autocomplete='off';i.spellcheck=false;i.autocapitalize='off';return i};
+function textList(arr){return(body,id)=>shuf(arr).forEach(([p,a,t],n)=>{const r=h('div','row');const sp=h('span','p');sp.innerHTML=p;r.append(h('span','n',n+1),sp);
+ const i=inp();r.append(i);addItem(id,r,{get:()=>i.value,ans:a,tag:t,label:p});body.append(r)})}
+
+/* VOCAB REMINDER */
+const W=[['self-service checkout','касса самообслуж.','/ˌself ˈsɜːvɪs ˈtʃekaʊt/'],['shop assistant','продавец','/ʃɒp əˈsɪstənt/'],['trolley','тележка','/ˈtrɒli/'],['customer','покупатель','/ˈkʌstəmə/'],['shopping bag','пакет','/ˈʃɒpɪŋ bæɡ/'],['basket','корзина','/ˈbɑːskɪt/'],['receipt','чек','/rɪˈsiːt/'],['the sales','распродажа','/ðə seɪlz/'],['changing room','примерочная','/ˈtʃeɪndʒɪŋ ruːm/'],['shelf / shelves','полка / полки','/ʃelf/ – /ʃelvz/'],['till','касса','/tɪl/'],['chain store','сеть магазинов','/tʃeɪn stɔː/'],['size','размер','/saɪz/'],['try on','примерять','/traɪ ɒn/'],['fit','подходить по размеру','/fɪt/'],['suit','идти (к лицу)','/suːt/'],['take back','возвращать','/teɪk bæk/']];
+(()=>{const s=h('section','card');s.innerHTML='<h2>📚 Быстрое напоминание</h2><p class="instr">Нажми 🔊 и повтори слово вслух.</p>';const g=h('div','vg');
+ W.forEach(w=>{const d=h('div');const b=h('button',null,'🔊');b.onclick=()=>say(w[0].replace('/',','));const t=h('span');t.innerHTML=`<b>${w[0]}</b> — ${w[1]} <span class="ipa">${w[2]}</span>`;d.append(b,t);g.append(d)});s.append(g);$('#main').append(s)})();
+
+/* 1. FIND IN THE WILD */
+const T1=`On Saturday my brother and I went to a [[chain store]] in the city centre. There were a lot of [[customers]] because [[the sales]] were on. We took a [[trolley]] and I took a [[basket]] for small things. A [[shop assistant]] helped my brother: "[[What size are you?]]" He wanted to [[try on]] some jeans in the [[changing room]]. They [[fit him perfectly]] and they [[really suit him]]! The T-shirts were on the [[shelves]]. I bought one, but later I changed my mind and decided to [[take it back]]. At the [[till]] a lady gave me my money because I had the [[receipt]]. Then we used the [[self-service checkout]] to pay for our lunch and put everything in a [[shopping bag]].`;
+const toks=b=>b.querySelectorAll('.tok');
+sec('e1','1. Find them in the wild','Read the text once. Then click every stretch of words from the topic. Click the whole phrase, not a single word.',(body)=>{
+ const p=h('p','read');const mk=(x,t)=>{const e=h('span','tok',x);e.dataset.t=t;e.onclick=()=>e.classList.toggle('sel');p.append(e,' ')};
+ T1.split(/(\[\[.*?\]\])/).forEach(pt=>pt.startsWith('[[')?mk(pt.slice(2,-2),1):pt.split(/\s+/).filter(Boolean).forEach(w=>mk(w,0)));body.append(p)},
+ {check(b,sc){let f=0,t=0,w=0;toks(b).forEach(e=>{const s=e.classList.contains('sel'),T=e.dataset.t==='1';e.classList.remove('good','miss','wrong');
+  if(T){t++;if(s){f++;e.classList.add('good')}else{e.classList.add('miss');if(!e.dataset.lg){e.dataset.lg=1;addP(e.textContent)}}}else if(s){w++;e.classList.add('wrong')}});
+  sc.textContent=`Найдено ${f}/${t}, лишних: ${w}`;LOG.e1='1. Find them in the wild: '+sc.textContent},
+  reveal(b,sc){toks(b).forEach(e=>{if(e.dataset.t==='1')e.classList.add('sel')});this.check(b,sc)}});
+
+/* 2. TENSES */
+sec('e2','2. Измени время глагола','Перепиши предложение в указанном времени.',textList([
+['My brother tries on some jeans. <i>(Past Simple)</i>','My brother tried on some jeans.','try on'],
+['The shop assistant helps me. <i>(Past Continuous)</i>','The shop assistant was helping me.','shop assistant'],
+['Customers wait at the till. <i>(Present Continuous)</i>','Customers are waiting at the till.|The customers are waiting at the till.','customer / till'],
+["I don't take the trolley. <i>(Future: will)</i>","I won't take the trolley.|I will not take the trolley.",'trolley'],
+['She puts the receipt in her bag. <i>(Present Perfect)</i>',"She has put the receipt in her bag.|She's put the receipt in her bag.",'receipt'],
+['Does this jacket fit you? <i>(Past Simple)</i>','Did this jacket fit you?','fit'],
+['We take the shopping bags back. <i>(Past Simple)</i>','We took the shopping bags back.|We took back the shopping bags.','take back'],
+['The sales start. <i>(Future: going to)</i>','The sales are going to start.','the sales'],
+['That colour suits her. <i>(Past Simple)</i>','That colour suited her.','suit']].map(([p,a,t])=>[p,a,t])));
+
+/* 3. DIALOGUES */
+const D=[
+['Ты ищешь розовое платье, продавец спрашивает твой размер.',['size','dress'],`A: Excuse me, do you have this dress in pink?\nB: Yes. What size are you?\nA: I'm a small.`,'size'],
+['Друг примерил джинсы. Спроси, подходят ли они, и скажи, что они ему идут.',['fit','suit'],`A: Do they fit?\nB: Yes, they fit me well.\nA: And they really suit you!`,'fit / suit'],
+['Ты хочешь вернуть сумку, но у тебя нет чека.',['back','receipt'],`A: I'd like to take this bag back.\nB: Do you have the receipt?\nA: No, I'm sorry, I don't.`,'take back / receipt'],
+['Ты на кассе самообслуживания, закончились пакеты — попроси продавца помочь.',['checkout','bag'],`A: Excuse me, I'm at the self-service checkout and there are no shopping bags.\nB: Here you are.\nA: Thank you for your help!`,'self-service checkout / shopping bag'],
+['Узнай, когда заканчиваются распродажи и где взять корзину.',['sales','basket'],`A: When do the sales finish?\nB: On Sunday.\nA: Where can I get a basket?`,'the sales / basket']];
+sec('e3','3. Write mini-dialogues','Напиши мини-диалог (A / B, 2–4 реплики). Проверка ищет ключевые слова; образец — под «Показать ответы».',(body,id)=>{
+ shuf(D).forEach(([sit,keys,model,tag],n)=>{const r=h('div');r.append(h('p',null,(n+1)+'. '+sit));const t=h('textarea');t.rows=3;r.append(t);
+  addItem(id,r,{get:()=>t.value,ans:model,tag,label:sit,judge:v=>v.length>15&&keys.every(k=>v.toLowerCase().includes(k))});body.append(r)})});
+
+/* 4. MILLIONAIRE */
+const Q=[
+['You carry it in your hand and put small things in it when you shop.','basket',['trolley','receipt','shelf'],'basket'],
+['A person who works in a shop and helps customers','shop assistant',['customer','till','size'],'shop assistant'],
+['Shops have lower prices during ___ (распродажа).','the sales|sales',['the receipt','the shelves','the till'],'the sales'],
+['"Wow, that hat really ___ you!" (= looks good on you)','suits|suit',['fits','sizes','takes'],'suit'],
+['Past Simple of "take back":','took back',['taken back','taked back','take backed'],'take back'],
+['Zara, H&M and Reserved are all ___.','chain stores|chain store',['shopping bags','receipts','changing rooms'],'chain store'],
+['You use it in a big supermarket when you buy a lot.','trolley',['basket','receipt','size'],'trolley'],
+['You scan and pay by yourself at the ___.','self-service checkout|self-checkout|checkout',['changing room','shelf','receipt'],'self-service checkout'],
+['Translate: «размер»','size',['fit','suit','till'],'size'],
+['Translate: «возвращать в магазин»','take back',['try on','fit','suit'],'take back'],
+['You put your shopping in a shopping ___.','bag',['shelf','till','size'],'shopping bag'],
+['Translate: «примерочная»','changing room',['shopping bag','chain store','self-checkout'],'changing room'],
+['Translate: «касса (аппарат)»','till',['shelf','trolley','basket'],'till'],
+['Translate: «покупатель»','customer',['shop assistant','receipt','size'],'customer'],
+['Plural of "shelf":','shelves',['shelfs','shelfes','shelvs'],'shelves']];
+const PR=[100,200,300,500,1000,2000,4000,8000,16000,32000,64000,125000,250000,500000,1000000];
+sec('e4','4. Кто хочет стать миллионером? 💰','15 вопросов. Выбирай вариант или переключись на «Писать самому». Ошибка — игра заканчивается.',(body)=>{
+ let n=0,mode='mc';LOG.quiz='';const bar=h('div','row'),box=h('div');bar.append(h('b',null,'Режим:'));
+ [['mc','Варианты'],['tx','Писать самому']].forEach(([m,t])=>{const b=h('button',null,t);b.onclick=()=>{mode=m;n=0;render()};bar.append(b)});body.append(bar,box);
+ function done(ok,given){const [,c,,t]=Q[n];if(ok){n++;render();return}addP(t);const won=n?PR[n-1]:0;
+  LOG.quiz=`4. Millionaire: stopped at Q${n+1}, answered "${given}", correct "${c.split('|')[0]}", prize ${won}`;
+  box.innerHTML='';const d=h('div','bad','❌ Неверно. Правильный ответ: '+c.split('|')[0]+'. Ваш выигрыш: '+won.toLocaleString('ru')+' £');const b=h('button','pri','Играть снова');b.onclick=()=>{n=0;render()};box.append(d,b)}
+ function render(){box.innerHTML='';if(n>=15){LOG.quiz='4. Millionaire: WON 1 000 000';box.append(h('h2',null,'🎉 Миллион фунтов! Ты выиграл!'));return}
+  const [q,c,ds]=Q[n];box.append(h('div','prize','Вопрос '+(n+1)+' / 15 · за '+PR[n].toLocaleString('ru')+' £'),h('div','q',q));
+  if(mode==='mc')shuf([c.split('|')[0],...ds]).forEach(o=>{const b=h('button','opt',o);b.onclick=()=>done(c.split('|').includes(o),o);box.append(b)});
+  else{const i=inp(),b=h('button','pri','Ответить');const go=()=>done(c.split('|').some(x=>norm(x)===norm(i.value)),i.value);b.onclick=go;i.onkeydown=e=>{if(e.key==='Enter')go()};box.append(i,b)}}
+ render()},{nobar:1});
+
+/* COPY */
+const EX={e2:'2. Tenses',e3:'3. Mini-dialogues'};
+const sf=h('section','card');sf.innerHTML='<h2>📋 Ответы ученика</h2><p class="instr">Собрать все ответы с отметками ✔/✘ и скопировать — для отправки учителю.</p>';
+const cb=h('button','pri','Собрать и скопировать ответы'),out=h('textarea');out.id='out';out.readOnly=true;
+cb.onclick=async()=>{let t='A2 Shopping — part 3 answers\nStudent: '+($('#nm').value||'—')+'\n\n'+(LOG.e1||'1. Find them in the wild: not checked')+'\n';let cur='';
+ ITEMS.forEach(i=>{if(i.ex!==cur){cur=i.ex;t+='\n'+EX[cur]+'\n'}t+=`• ${i.label.replace(/<[^>]+>/g,'')} → ${(i.get()||'—').replace(/\n/g,' / ')}  ${i.ok==null?'':i.ok?'✔':'✘ (correct: '+i.ans.split('|')[0].replace(/\n/g,' / ')+')'}\n`});
+ t+='\n'+(LOG.quiz||'4. Millionaire: not played')+'\n';const pk=Object.keys(P);t+='\nProblem words: '+(pk.length?pk.map(k=>k+' ×'+P[k]).join(', '):'none')+'\n';out.value=t;
+ try{await navigator.clipboard.writeText(t);cb.textContent='✅ Скопировано!'}catch(e){out.select();try{document.execCommand('copy');cb.textContent='✅ Скопировано!'}catch(_){cb.textContent='Скопируйте текст ниже вручную'}}
+ setTimeout(()=>cb.textContent='Собрать и скопировать ответы',2500)};
+sf.append(cb,out);$('#main').append(sf);
+</script></body></html>
