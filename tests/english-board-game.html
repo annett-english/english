@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>English B1 Board Game 🎲</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#f4f1ea;--card:#fff;--text:#1f2430;--muted:#6b7280;--line:#d9d4c7;--accent:#2f6fed;--ok:#16a34a;--bad:#dc2626}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#15171c;--card:#1f232b;--text:#eceff4;--muted:#98a2b3;--line:#363c48}}
+:root[data-theme="dark"]{--bg:#15171c;--card:#1f232b;--text:#eceff4;--muted:#98a2b3;--line:#363c48}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;min-height:100vh}
+.wrap{max-width:760px;margin:0 auto;padding:12px}
+h1{font-size:1.3rem;margin:6px 0 10px;text-align:center}
+.board{display:grid;grid-template-columns:repeat(7,1fr);grid-template-rows:repeat(7,1fr);gap:4px;aspect-ratio:1/1;width:100%}
+.cell{border-radius:10px;border:2px solid var(--line);background:var(--card);position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:clamp(.9rem,3.6vw,1.5rem);overflow:hidden}
+.cell small{position:absolute;top:2px;left:4px;font-size:.55rem;color:var(--muted);font-weight:700}
+.cell .tk{position:absolute;bottom:2px;display:flex;gap:2px;flex-wrap:wrap;justify-content:center;font-size:clamp(.7rem,3vw,1.1rem);line-height:1}
+.center{grid-row:2/7;grid-column:2/7;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;padding:6px}
+.dice{width:76px;height:76px;border-radius:16px;background:var(--accent);color:#fff;font-size:2.4rem;font-weight:800;display:flex;align-items:center;justify-content:center;clip-path:polygon(50% 2%,98% 92%,2% 92%);padding-top:22px;border:0}
+.dice.roll{animation:spin .15s linear infinite}
+@keyframes spin{to{transform:rotate(15deg) scale(1.05)}}
+button{font:inherit;cursor:pointer}
+.btn{background:var(--accent);color:#fff;border:0;border-radius:12px;padding:10px 18px;font-weight:700}
+.btn.sec{background:transparent;color:var(--text);border:2px solid var(--line)}
+.btn:disabled{opacity:.5}
+.turn{font-weight:700;font-size:clamp(.9rem,3.6vw,1.1rem)}
+.score{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;font-size:.8rem;color:var(--muted)}
+.legend{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:10px;font-size:.75rem}
+.legend span{padding:3px 8px;border-radius:99px;color:#fff;font-weight:600}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;padding:14px;z-index:9}
+.modal.show{display:flex}
+.box{background:var(--card);border-radius:18px;padding:18px;width:100%;max-width:460px;max-height:90vh;overflow:auto}
+.tag{display:inline-block;color:#fff;font-weight:700;font-size:.78rem;padding:3px 10px;border-radius:99px;margin-bottom:8px}
+.q{font-size:1.15rem;font-weight:700;margin:6px 0 12px}
+.opt{display:block;width:100%;text-align:left;background:transparent;color:var(--text);border:2px solid var(--line);border-radius:12px;padding:11px 14px;margin:7px 0;font-size:1rem}
+.opt.ok{border-color:var(--ok);background:rgba(22,163,74,.15)}
+.opt.bad{border-color:var(--bad);background:rgba(220,38,38,.15)}
+.fb{margin:10px 0;font-size:.92rem;color:var(--muted)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.setup label{display:block;margin:8px 0 3px;font-size:.85rem;color:var(--muted)}
+.setup input{width:100%;padding:9px;border-radius:10px;border:2px solid var(--line);background:var(--bg);color:var(--text);font:inherit}
+.pc{display:flex;gap:6px;margin:6px 0}
+.pc button{flex:1}
+.pc button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🎲 English B1 — Board Game</h1>
+  <div class="board" id="board"></div>
+  <div class="legend" id="legend"></div>
+</div>
+
+<div class="modal show" id="setup"><div class="box setup">
+  <h2 style="margin-top:0">Новая игра</h2>
+  <p style="font-size:.9rem;color:var(--muted);margin:0">Бросай кубик (1–4), иди по клеткам и выполняй задания. Верно — остаёшься и получаешь ⭐. Ошибка — шаг назад. Кто первый дойдёт до финиша — победил!</p>
+  <label>Сколько игроков?</label>
+  <div class="pc" id="pc"></div>
+  <div id="names"></div>
+  <div class="row"><button class="btn" id="startBtn">Играть!</button></div>
+</div></div>
+
+<div class="modal" id="task"><div class="box" id="taskBox"></div></div>
+
+<script>
+const CAT={g:['Grammar','#7c5cff','🧩'],m:['Money','#16a34a','💰'],f:['Food','#d97706','🍋'],b:['Body & Health','#dc2626','🫀'],fa:['Family','#0284c7','👨‍👩‍👧'],p:['Personality','#c026d3','🎭']};
+// q = multiple choice (a = right option), say = speaking task
+const T=[
+{c:'g',t:'q',q:'This soup ___ delicious.',o:['tastes','is tasting','taste'],a:0,e:'taste = state verb (вкус как свойство) → Present Simple. This soup tastes delicious.'},
+{c:'m',t:'q',q:'I can’t ___ a new phone. It’s too expensive.',o:['afford','earn','charge'],a:0,e:'can’t afford sth /kɑːnt əˈfɔːd/ — не могу себе позволить.'},
+{c:'f',t:'q',q:'The lemon is very ___.',o:['sour','sweet','tasteless'],a:0,e:'sour — кислый.'},
+{c:'fa',t:'q',q:'A child with no brothers or sisters is an ___ child.',o:['only','oldest','extended'],a:0,e:'an only child — единственный ребёнок.'},
+{c:'p',t:'q',q:'You can always trust her. She’s very ___.',o:['reliable','bossy','insecure'],a:0,e:'reliable /rɪˈlaɪəbl/ — надёжный.'},
+{c:'g',t:'q',q:'The chef ___ the soup right now.',o:['is tasting','tastes','taste'],a:0,e:'Здесь действие (пробует) → Present Continuous: is tasting.'},
+{c:'b',t:'q',q:'Swimming can improve your lung ___.',o:['capacity','muscles','liver'],a:0,e:'lung capacity — объём лёгких.'},
+{c:'m',t:'q',q:'Can you ___ me ten euros until Friday?',o:['lend','borrow','owe'],a:0,e:'lend sb money /lend/ — одолжить кому-то. borrow = взять в долг.'},
+{c:'g',t:'q',q:'I ___ my doctor tomorrow at 5 o’clock. (arrangement)',o:['am seeing','see','am going see'],a:0,e:'Договорённость на будущее → Present Continuous: I’m seeing my doctor tomorrow.'},
+{c:'f',t:'say',q:'Tell us 2 things you usually eat for breakfast. Use: savoury / sweet / filling.',e:'Пример: I usually have a savoury breakfast. It’s really filling.'},
+{c:'fa',t:'q',q:'My father’s daughter from another marriage is my ___.',o:['half-sister','cousin’s wife','ex-husband'],a:0,e:'half-sister — единокровная/единоутробная сестра.'},
+{c:'p',t:'q',q:'She never waits in queues. She’s so ___!',o:['impatient','patient','sensible'],a:0,e:'impatient — нетерпеливый.'},
+{c:'g',t:'q',q:'He ___ very rude today. I don’t know why.',o:['is being','is','be'],a:0,e:'be + adjective в Continuous = ведёт себя так (временно): He is being rude today.'},
+{c:'m',t:'q',q:'My uncle died and I ___ his house.',o:['inherited','invested','raised'],a:0,e:'inherit money /ɪnˈherɪt/ — унаследовать.'},
+{c:'b',t:'q',q:'Stress can make the body produce the stress ___ cortisol.',o:['hormone','blood','capacity'],a:0,e:'produce the stress hormone — вырабатывать гормон стресса.'},
+{c:'f',t:'q',q:'I’m trying to ___ sugar, but not stop completely.',o:['cut down on','cut out','eat out'],a:0,e:'cut down on = сократить; cut out = полностью исключить.'},
+{c:'p',t:'say',q:'Describe your best friend with 3 personality adjectives (e.g. charming, honest, ambitious).',e:'Пример: My friend is honest, sociable and very independent.'},
+{c:'g',t:'q',q:'Look at those clouds! It ___ rain.',o:['is going to','will to','is going'],a:0,e:'Прогноз по признакам (видим тучи) → be going to.'},
+{c:'fa',t:'say',q:'Tell us about your family. Are you the oldest, a middle or the youngest child? Who is in your immediate family?',e:'Пример: I’m the youngest child. My immediate family is my parents and my sister.'},
+{c:'m',t:'say',q:'Tell us about something you think was a waste of money. Why? (waste money, be worth, cost)',e:'Пример: I wasted money on a gadget. It cost a lot and wasn’t worth it.'},
+{c:'p',t:'q',q:'He loves giving orders to everybody. He’s so ___.',o:['bossy','affectionate','unselfish'],a:0,e:'bossy /ˈbɒsi/ — властный, командующий.'},
+{c:'f',t:'q',q:'She’s ___ lactose, so she can’t drink milk.',o:['intolerant to','allergic from','sensitive of'],a:0,e:'be intolerant to sth — иметь непереносимость.'},
+{c:'g',t:'q',q:'Bob is in the bathroom. He ___ a shower.',o:['is having','has','have'],a:0,e:'have = принимать душ (действие) → Continuous. Bob has a Porsche (владеет) — Simple.'}
+];
+const FINISH=T.length+1; // 23
+const PATH=[];
+for(let c=0;c<7;c++)PATH.push([0,c]);
+for(let r=1;r<7;r++)PATH.push([r,6]);
+for(let c=5;c>=0;c--)PATH.push([6,c]);
+for(let r=5;r>=1;r--)PATH.push([r,0]);
+const COLORS=['🔴','🔵','🟢','🟡'];
+let players=[],cur=0,busy=false,nP=2;
+
+const $=id=>document.getElementById(id);
+const board=$('board');
+board.innerHTML='';
+PATH.forEach(([r,c],i)=>{
+  const d=document.createElement('div');d.className='cell';d.id='c'+i;
+  d.style.gridRow=r+1;d.style.gridColumn=c+1;
+  if(i===0){d.innerHTML='<b style="font-size:.7rem">СТАРТ</b>';}
+  else if(i===FINISH){d.innerHTML='<span>🏁</span>';d.style.background='var(--accent)';d.style.color='#fff';}
+  else{const k=CAT[T[i-1].c];d.style.borderColor=k[1];d.innerHTML='<small>'+i+'</small><span>'+(T[i-1].t==='say'?'🗣️':k[2])+'</span>';}
+  d.insertAdjacentHTML('beforeend','<div class="tk"></div>');
+  board.appendChild(d);
+});
+const ctr=document.createElement('div');ctr.className='center';
+ctr.innerHTML='<div class="turn" id="turn"></div><button class="dice" id="dice" disabled>?</button><button class="btn" id="roll">Бросить кубик 🎲</button><div class="score" id="score"></div>';
+board.appendChild(ctr);
+$('legend').innerHTML=Object.values(CAT).map(k=>'<span style="background:'+k[1]+'">'+k[2]+' '+k[0]+'</span>').join('')+'<span style="background:#64748b">🗣️ Speaking</span>';
+
+// setup
+function drawSetup(){
+  $('pc').innerHTML=[1,2,3,4].map(n=>'<button class="btn sec'+(n===nP?' on':'')+'" data-n="'+n+'">'+n+'</button>').join('');
+  $('pc').querySelectorAll('button').forEach(b=>b.onclick=()=>{nP=+b.dataset.n;drawSetup()});
+  const old=[...document.querySelectorAll('#names input')].map(i=>i.value);
+  $('names').innerHTML=Array.from({length:nP},(_,i)=>'<label>'+COLORS[i]+' Имя игрока '+(i+1)+'</label><input value="'+(old[i]||'Player '+(i+1))+'" maxlength="14">').join('');
+}
+drawSetup();
+$('startBtn').onclick=()=>{
+  const names=[...document.querySelectorAll('#names input')].map((i,k)=>i.value.trim()||'Player '+(k+1));
+  players=names.map((n,i)=>({n,pos:0,s:0,tok:COLORS[i]}));
+  cur=0;busy=false;$('setup').classList.remove('show');render();
+};
+function render(){
+  document.querySelectorAll('.tk').forEach(t=>t.innerHTML='');
+  players.forEach(p=>document.querySelector('#c'+p.pos+' .tk').insertAdjacentHTML('beforeend','<span>'+p.tok+'</span>'));
+  $('turn').textContent=players[cur].tok+' '+players[cur].n+' — ваш ход';
+  $('score').innerHTML=players.map(p=>'<span>'+p.tok+' '+p.n+': ⭐'+p.s+'</span>').join('');
+  $('roll').disabled=busy;
+}
+$('roll').onclick=()=>{
+  if(busy)return;busy=true;$('roll').disabled=true;
+  const d=$('dice');d.classList.add('roll');
+  let n=0;const iv=setInterval(()=>{d.textContent=1+Math.floor(Math.random()*4);if(++n>7){clearInterval(iv);d.classList.remove('roll');const v=1+Math.floor(Math.random()*4);d.textContent=v;move(v)}},90);
+};
+function move(steps){
+  const p=players[cur];
+  const go=()=>{
+    if(steps>0&&p.pos<FINISH){p.pos++;steps--;render();setTimeout(go,260)}
+    else landed();
+  };go();
+}
+function landed(){
+  const p=players[cur];
+  if(p.pos>=FINISH){return win(p)}
+  showTask(T[p.pos-1],p.pos);
+}
+function shuffle(a){return a.map(x=>[Math.random(),x]).sort((x,y)=>x[0]-y[0]).map(x=>x[1])}
+function showTask(t,num){
+  const k=CAT[t.c];
+  let h='<span class="tag" style="background:'+k[1]+'">'+k[2]+' '+k[0]+' · клетка '+num+'</span><div class="q">'+t.q+'</div>';
+  const box=$('taskBox');
+  if(t.t==='q'){
+    const opts=shuffle(t.o.map((x,i)=>({x,ok:i===t.a})));
+    h+=opts.map((o,i)=>'<button class="opt" data-i="'+i+'">'+o.x+'</button>').join('')+'<div class="fb" id="fb"></div>';
+    box.innerHTML=h;$('task').classList.add('show');
+    box.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
+      const o=opts[+b.dataset.i];
+      box.querySelectorAll('.opt').forEach((x,i)=>{x.disabled=true;if(opts[i].ok)x.classList.add('ok')});
+      if(!o.ok)b.classList.add('bad');
+      $('fb').innerHTML=(o.ok?'✅ Верно! +⭐<br>':'❌ Неверно — шаг назад.<br>')+t.e;
+      box.insertAdjacentHTML('beforeend','<div class="row"><button class="btn" id="nx">Дальше</button></div>');
+      $('nx').onclick=()=>finish(o.ok);
+    });
+  }else{
+    h+='<div class="fb">Скажи вслух 2–3 предложения. Остальные игроки решают — получилось?</div><div class="row"><button class="btn" id="yes">✅ Получилось</button><button class="btn sec" id="no">❌ Не получилось</button></div><div class="fb" id="fb"></div>';
+    box.innerHTML=h;$('task').classList.add('show');
+    const done=ok=>{
+      $('fb').innerHTML=(ok?'⭐ Отлично!<br>':'Шаг назад.<br>')+t.e;
+      box.querySelector('.row').innerHTML='<button class="btn" id="nx">Дальше</button>';
+      $('nx').onclick=()=>finish(ok);
+    };
+    $('yes').onclick=()=>done(true);$('no').onclick=()=>done(false);
+  }
+}
+function finish(ok){
+  const p=players[cur];
+  $('task').classList.remove('show');
+  if(ok)p.s++;else if(p.pos>0)p.pos--;
+  cur=(cur+1)%players.length;busy=false;render();
+}
+function win(p){
+  p.s+=2;render();
+  const sorted=[...players].sort((a,b)=>b.s-a.s);
+  $('taskBox').innerHTML='<h2 style="margin-top:0">🏆 '+p.tok+' '+p.n+' дошёл(ла) до финиша!</h2><p>Бонус за финиш: +2 ⭐</p>'+sorted.map(x=>'<div>'+x.tok+' '+x.n+' — ⭐ '+x.s+'</div>').join('')+'<div class="row"><button class="btn" id="again">Играть снова</button></div>';
+  $('task').classList.add('show');
+  $('again').onclick=()=>{$('task').classList.remove('show');$('setup').classList.add('show')};
+}
+</script>
+</body>
+</html>
