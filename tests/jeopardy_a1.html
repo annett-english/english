@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>Jeopardy A1</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:#0b1a6b;color:#fff;font-family:system-ui,Arial,sans-serif;padding:10px}
+h1{text-align:center;color:#ffcc00;margin:6px 0;font-size:1.6rem;letter-spacing:2px}
+.teams{display:flex;gap:10px;justify-content:center;margin:8px 0}
+.team{background:#12258f;border:3px solid transparent;border-radius:10px;padding:6px 14px;text-align:center;cursor:pointer;min-width:120px}
+.team.on{border-color:#ffcc00}
+.team b{display:block;font-size:1.5rem;color:#ffcc00}
+.wrap{overflow-x:auto}
+.board{display:grid;grid-template-columns:repeat(5,minmax(110px,1fr));gap:6px;min-width:600px}
+.cat{background:#1a34c4;text-align:center;font-weight:700;padding:10px 4px;display:flex;align-items:center;justify-content:center;min-height:64px;font-size:.95rem;text-transform:uppercase}
+.cell{background:#1a34c4;color:#ffcc00;font-size:1.8rem;font-weight:800;border:0;border-radius:4px;padding:22px 0;cursor:pointer}
+.cell:hover{background:#2a48e0}
+.cell.done{visibility:hidden}
+#modal{display:none;position:fixed;inset:0;background:#0b1a6bf2;align-items:center;justify-content:center;padding:20px;z-index:5}
+#modal.show{display:flex}
+.card{max-width:640px;width:100%;text-align:center}
+.pts{color:#ffcc00;font-size:1.2rem}
+#h{opacity:.8;font-size:1rem}
+#q{font-size:1.9rem;margin:16px 0;line-height:1.3}
+#a{font-size:2rem;color:#ffcc00;font-weight:800;min-height:2.6rem;margin-bottom:16px}
+button.b{font-size:1.1rem;padding:10px 18px;margin:4px;border:0;border-radius:8px;cursor:pointer;font-weight:700}
+.ok{background:#2ecc71}.no{background:#e74c3c;color:#fff}.sh{background:#ffcc00}.sk{background:#888;color:#fff}
+</style></head><body>
+<h1>JEOPARDY · A1</h1>
+<div class="teams">
+<div class="team on" id="t0" onclick="sel(0)">Team 1<b id="s0">0</b></div>
+<div class="team" id="t1" onclick="sel(1)">Team 2<b id="s1">0</b></div>
+</div>
+<div class="wrap"><div class="board" id="board"></div></div>
+<div id="modal"><div class="card">
+<div class="pts" id="p"></div><div id="h"></div><div id="q"></div><div id="a"></div>
+<button class="b sh" onclick="reveal()">Показать ответ</button>
+<button class="b ok" onclick="fin(1)">✔ Верно</button>
+<button class="b no" onclick="fin(-1)">✘ Неверно</button>
+<button class="b sk" onclick="fin(0)">Закрыть</button>
+</div></div>
+<script>
+/* [category, hint, [[clue, answer] x5]] */
+const D=[
+["Grammar","Fill in the gap / answer",[
+["I ___ a student. (am / is / are)","am"],
+["___ he like pizza? (Do / Does)","Does"],
+["a or an?  ___ book,  ___ orange","a book, an orange"],
+["Plural: one woman → two ___ ; one man → two ___","women ; men"],
+["Plural: one child → two ___ ; one person → two ___","children ; people"]]],
+["Things","What is it?",[
+["🎧 You put them in your ears to listen to music.","earphones"],
+["👛 You keep money and cards in it.","a wallet"],
+["🕶 You wear them when the sun is strong.","sunglasses"],
+["🔌 You use it to charge your phone.","a charger"],
+["📔 You write about your day in it.","a diary"]]],
+["Feelings","I'm ___ .",[
+["😴 I want to sleep.","tired"],
+["🍔 I want to eat.","hungry"],
+["🥤 I want to drink water.","thirsty"],
+["🥱 This film isn't interesting.","bored"],
+["😡 He shouts. He's very ...","angry"]]],
+["Possessives","my / his / our / their / its",[
+["I have a phone. It's ___ phone.","my"],
+["Tom has a pen. It's ___ pen.","his"],
+["We have a car. It's ___ car.","our"],
+["Anna and Tom have a house. It's ___ house.","their"],
+["The dog has a bone. It's ___ bone.","its"]]],
+["Questions","Ask the question!",[
+["My name is Anna.","What's your name?"],
+["I'm twelve.","How old are you?"],
+["I'm from Poland.","Where are you from?"],
+["It's 555-0123.","What's your phone number?"],
+["It's 12 Green Street.","What's your address?"]]]
+];
+let cur=null,team=0,sc=[0,0];
+const bd=document.getElementById('board');
+D.forEach(c=>{const d=document.createElement('div');d.className='cat';d.textContent=c[0];bd.appendChild(d)});
+for(let r=0;r<5;r++)D.forEach((c,i)=>{const b=document.createElement('button');b.className='cell';b.textContent=(r+1)*100;b.onclick=()=>open_(b,i,r);bd.appendChild(b)});
+function open_(b,i,r){cur=b;p.textContent=D[i][0]+' · '+(r+1)*100;h.textContent=D[i][1];q.textContent=D[i][2][r][0];a.textContent='';a.dataset.v=D[i][2][r][1];a.dataset.pt=(r+1)*100;modal.classList.add('show')}
+function reveal(){a.textContent=a.dataset.v}
+function fin(k){if(k)sc[team]+=k*a.dataset.pt;document.getElementById('s'+team).textContent=sc[team];cur.classList.add('done');modal.classList.remove('show')}
+function sel(i){team=i;t0.classList.toggle('on',i==0);t1.classList.toggle('on',i==1)}
+</script></body></html>
