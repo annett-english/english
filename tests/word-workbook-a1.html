@@ -1,0 +1,676 @@
+<title>Word Workbook A1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=Noto+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: one working column (exercises) + sticky side card "Проблемные слова"; stacks on phones.
+   Idea: a school workbook page. Ink-blue text, cobalt buttons, yellow highlighter for phrases. */
+:root{
+  --bg:#F1F4F9; --surface:#FFFFFF; --surface2:#E7ECF4; --ink:#152033; --muted:#556580; --line:#C9D3E2;
+  --accent:#2457D6; --accent-ink:#FFFFFF; --accent-soft:#DCE6FB;
+  --ok:#17794F; --okbg:#DDF3E8; --bad:#B6361F; --badbg:#FBE4DE;
+  --mark:#FFD84D; --markink:#3A2F00; --shown:#7A5A00; --shownbg:#FFF2C7;
+  --font-display:"Bricolage Grotesque","Noto Sans",system-ui,sans-serif;
+  --font-body:"Noto Sans","Segoe UI",system-ui,-apple-system,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0E1520; --surface:#162131; --surface2:#1E2C41; --ink:#E8EEF7; --muted:#9DAEC6; --line:#2C3E58;
+    --accent:#82A6FF; --accent-ink:#0E1520; --accent-soft:#1D2E52;
+    --ok:#6FD6A2; --okbg:#12362A; --bad:#FF9C86; --badbg:#42201A;
+    --mark:#E8C23A; --markink:#171200; --shown:#F0CF6A; --shownbg:#3A3010; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0E1520; --surface:#162131; --surface2:#1E2C41; --ink:#E8EEF7; --muted:#9DAEC6; --line:#2C3E58;
+  --accent:#82A6FF; --accent-ink:#0E1520; --accent-soft:#1D2E52;
+  --ok:#6FD6A2; --okbg:#12362A; --bad:#FF9C86; --badbg:#42201A;
+  --mark:#E8C23A; --markink:#171200; --shown:#F0CF6A; --shownbg:#3A3010; color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.55;padding-inline:16px;padding-block:0 48px}
+h1,h2,h3{font-family:var(--font-display);line-height:1.15;margin:0;text-wrap:balance}
+button,input,textarea,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.wrap{max-width:1120px;margin-inline:auto}
+
+/* top bar */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);border-bottom:1px solid var(--line);
+  margin-inline:-16px;padding:10px 16px;display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between}
+.bar .brand{font-family:var(--font-display);font-weight:800;font-size:1.15rem;letter-spacing:-.01em}
+.bar .brand small{font-family:var(--font-body);font-weight:600;color:var(--muted);font-size:.8rem;margin-left:8px}
+.bar .right{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.score{font-weight:700;font-variant-numeric:tabular-nums;background:var(--surface2);padding:6px 12px;border-radius:999px;font-size:.9rem}
+
+.btn{border:1.5px solid var(--accent);background:var(--accent);color:var(--accent-ink);padding:8px 14px;border-radius:8px;font-weight:700;font-size:.92rem}
+.btn:hover{filter:brightness(1.08)}
+.btn.ghost{background:transparent;color:var(--accent)}
+.btn.ghost:hover{background:var(--accent-soft);filter:none}
+.btn.sm{padding:5px 10px;font-size:.82rem;border-radius:7px}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+
+.hero{padding-block:28px 8px;max-width:760px}
+.hero h1{font-size:clamp(2rem,6vw,3.1rem);font-weight:800;letter-spacing:-.025em}
+.hero p{color:var(--muted);margin:10px 0 0}
+
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:28px;align-items:start;margin-top:18px}
+@media (max-width:980px){.grid{grid-template-columns:minmax(0,1fr)} aside.side{order:-1}}
+main{min-width:0;display:flex;flex-direction:column;gap:28px}
+
+/* voice card */
+.voice{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center}
+.voice label{font-weight:600;font-size:.88rem}
+.voice select{min-width:0;max-width:100%;flex:1 1 200px;padding:7px 8px;border:1.5px solid var(--line);border-radius:8px;background:var(--bg)}
+.voice .vstat{flex:1 1 100%;font-size:.86rem;color:var(--muted)}
+.voice .vstat.warn{color:var(--bad)}
+
+section.ex{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px 20px 18px;min-width:0}
+.ex-head{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:baseline;justify-content:space-between;margin-bottom:6px}
+.ex-head h2{font-size:1.45rem;font-weight:700}
+.ex-head .tag{font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.ex .task{color:var(--muted);margin:2px 0 14px;max-width:62ch}
+.ex .task b{color:var(--ink)}
+.bank{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px}
+.bank span{background:var(--accent-soft);color:var(--ink);padding:4px 11px;border-radius:7px;font-weight:600;font-size:.92rem}
+
+.rows{display:flex;flex-direction:column;gap:10px}
+.row{display:flex;gap:10px;align-items:flex-start;min-width:0}
+.row .n{flex:none;width:26px;height:26px;border-radius:50%;background:var(--surface2);font-weight:700;font-size:.82rem;display:grid;place-items:center;margin-top:5px;font-variant-numeric:tabular-nums}
+.row .body{flex:1 1 auto;min-width:0}
+.sent{display:flex;flex-wrap:wrap;gap:4px 6px;align-items:center;font-size:1.05rem}
+.sent .wrong{background:var(--badbg);color:var(--bad);padding:1px 8px;border-radius:6px}
+.hint{font-size:.86rem;color:var(--muted);margin-bottom:4px}
+.hint b{color:var(--ink)}
+input.ans,textarea.ans{border:1.5px solid var(--line);background:var(--bg);border-radius:8px;padding:6px 10px;min-width:0;font-size:1rem}
+input.ans.inline{width:9.5ch;max-width:100%}
+input.ans.wide{width:100%;margin-top:4px}
+textarea.ans{width:100%;resize:vertical;min-height:2.6em}
+input.ans.ok,textarea.ans.ok{border-color:var(--ok);background:var(--okbg)}
+input.ans.bad{border-color:var(--bad);background:var(--badbg)}
+input.ans.shown,textarea.ans.shown{border-color:var(--shown);background:var(--shownbg);color:var(--shown);font-weight:600}
+.row .mini{flex:none;margin-top:4px}
+.fb{font-size:.84rem;margin-top:3px;min-height:0}
+.fb.ok{color:var(--ok)} .fb.bad{color:var(--bad)} .fb.shown{color:var(--shown)}
+.ex-foot{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:16px}
+.ex-foot .res{margin-left:auto;font-weight:700;font-variant-numeric:tabular-nums}
+
+/* words */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
+.card{border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:2px;background:var(--bg);min-width:0}
+.card .en{font-family:var(--font-display);font-weight:700;font-size:1.12rem}
+.card .ipa{font-size:.9rem;color:var(--accent);word-break:break-word}
+.card .ru{font-size:.92rem}
+.card .exs{font-size:.84rem;color:var(--muted);font-style:italic}
+.card .btns{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.vhead{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 14px}
+
+/* find in the wild */
+.text{font-size:1.18rem;line-height:2.1;max-width:62ch}
+.tok{border:0;background:transparent;padding:1px 3px;margin:0;border-radius:5px;font:inherit;line-height:inherit;color:inherit;cursor:pointer}
+.tok:hover{background:var(--accent-soft)}
+.tok.sel{background:var(--mark);color:var(--markink);font-weight:600}
+.tok.hit{background:var(--okbg);color:var(--ok);font-weight:700;box-shadow:inset 0 -2px 0 var(--ok)}
+.tok.bad{background:var(--badbg);color:var(--bad);text-decoration:line-through}
+.tok.reveal{background:var(--shownbg);color:var(--shown);font-weight:700;box-shadow:inset 0 -2px 0 var(--shown)}
+.wildinfo{font-size:.9rem;color:var(--muted);margin-top:10px}
+
+/* quiz */
+.quiz{display:grid;grid-template-columns:minmax(0,1fr) 150px;gap:18px}
+@media (max-width:640px){.quiz{grid-template-columns:minmax(0,1fr)} .ladder{order:-1;flex-direction:row!important;flex-wrap:wrap}}
+.qmain{min-width:0}
+.qtop{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+.seg{display:inline-flex;border:1.5px solid var(--accent);border-radius:8px;overflow:hidden}
+.seg button{border:0;background:transparent;color:var(--accent);padding:6px 12px;font-weight:700;font-size:.85rem}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.qbox{background:var(--surface2);border-radius:12px;padding:16px 18px;font-size:1.12rem;font-weight:600;margin-bottom:12px;min-height:3.4em}
+.qopts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+@media (max-width:520px){.qopts{grid-template-columns:minmax(0,1fr)}}
+.opt{display:flex;gap:10px;align-items:center;text-align:left;border:1.5px solid var(--line);background:var(--bg);border-radius:10px;padding:10px 12px;min-width:0;font-weight:600}
+.opt .L{flex:none;width:26px;height:26px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font-size:.8rem;font-weight:800}
+.opt:hover:not([disabled]){border-color:var(--accent)}
+.opt.ok{background:var(--okbg);border-color:var(--ok);color:var(--ok)}
+.opt.bad{background:var(--badbg);border-color:var(--bad);color:var(--bad)}
+.opt.gone{visibility:hidden}
+.qtype{display:flex;flex-wrap:wrap;gap:8px}
+.qtype input{flex:1 1 200px}
+.qmsg{margin-top:12px;font-weight:600}
+.qmsg.ok{color:var(--ok)} .qmsg.bad{color:var(--bad)}
+.ladder{display:flex;flex-direction:column;gap:4px;list-style:none;margin:0;padding:0}
+.ladder li{font-variant-numeric:tabular-nums;font-size:.85rem;font-weight:700;padding:4px 10px;border-radius:7px;background:var(--surface2);color:var(--muted);display:flex;justify-content:space-between;gap:8px}
+.ladder li.done{background:var(--okbg);color:var(--ok)}
+.ladder li.now{background:var(--accent);color:var(--accent-ink)}
+
+/* side */
+aside.side{position:sticky;top:calc(env(safe-area-inset-top,0px) + 66px);min-width:0}
+@media (max-width:980px){aside.side{position:static}}
+.pw{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px}
+.pw h3{font-size:1.15rem;display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.pw .sub{font-size:.84rem;color:var(--muted);margin:4px 0 12px}
+.pw ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.pw li{display:flex;gap:10px;align-items:center;border:1px solid var(--line);border-radius:9px;padding:8px 10px;min-width:0}
+.pw li .t{flex:1 1 auto;min-width:0}
+.pw li .e{font-family:var(--font-display);font-weight:700;display:block}
+.pw li .r{font-size:.82rem;color:var(--muted);display:block}
+.pw li .c{flex:none;background:var(--badbg);color:var(--bad);font-weight:800;font-size:.82rem;min-width:26px;text-align:center;border-radius:999px;padding:2px 7px;font-variant-numeric:tabular-nums}
+.pw .empty{font-size:.9rem;color:var(--muted);border:1.5px dashed var(--line);border-radius:9px;padding:12px}
+
+/* report */
+.report textarea{width:100%;min-height:260px;border:1.5px solid var(--line);background:var(--bg);border-radius:10px;padding:12px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.85rem;line-height:1.5}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 18px);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;font-weight:600;font-size:.92rem;z-index:50;max-width:calc(100% - 32px)}
+@media (prefers-reduced-motion:no-preference){.tok,.opt,.btn,input.ans{transition:background .15s,border-color .15s}}
+</style>
+
+<div class="wrap">
+  <div class="bar">
+    <div class="brand">Word Workbook<small>A1</small></div>
+    <div class="right">
+      <span class="score" id="totalScore">Верно: 0 из 0</span>
+      <button class="btn" data-act="copyAll">Скопировать все ответы</button>
+    </div>
+  </div>
+
+  <header class="hero">
+    <h1>Words for every day</h1>
+    <p>Сначала повторите слова и послушайте их. Потом выполните 6 упражнений: вписывайте ответы руками, нажимайте «Проверить» или «Показать ответы». В конце есть викторина и кнопка, которая копирует все ваши ответы.</p>
+  </header>
+
+  <div class="grid">
+    <main>
+      <div class="voice" id="voiceBox">
+        <label for="voiceSel">Голос</label>
+        <select id="voiceSel"></select>
+        <button class="btn ghost sm" data-act="testSound">Проверить звук</button>
+        <button class="btn ghost sm" data-act="stopSound">Стоп</button>
+        <div class="vstat" id="vstat"></div>
+      </div>
+
+      <section class="ex" id="words">
+        <div class="ex-head"><h2>Words</h2><span class="tag">Повторение</span></div>
+        <p class="task"><b>Задание:</b> нажмите «Слушать все слова» и повторите каждое слово вслух. Потом послушайте карточки по одной: слово и пример.</p>
+        <div class="vhead"><button class="btn" data-act="playAll">Слушать все слова</button></div>
+        <div class="cards" id="cards"></div>
+      </section>
+
+      <div id="exercises" style="display:contents"></div>
+
+      <section class="ex" id="quiz">
+        <div class="ex-head"><h2>Who wants to be a millionaire?</h2><span class="tag">Викторина · 8 вопросов</span></div>
+        <p class="task">Отвечайте по порядку: за каждый правильный ответ вы поднимаетесь на ступень выше. Один неверный ответ, и игра заканчивается. Можно играть с вариантами или вписывать ответ самому.</p>
+        <div class="quiz">
+          <div class="qmain">
+            <div class="qtop">
+              <div class="seg" role="group" aria-label="Режим">
+                <button data-act="qmode" data-m="choice" aria-pressed="true">Варианты</button>
+                <button data-act="qmode" data-m="type" aria-pressed="false">Писать самому</button>
+              </div>
+              <button class="btn ghost sm" data-act="q5050" id="b5050">50:50</button>
+              <button class="btn ghost sm" data-act="qlisten">Слушать вопрос</button>
+              <button class="btn ghost sm" data-act="qrestart">Сначала</button>
+            </div>
+            <div class="qbox" id="qbox"></div>
+            <div id="qans"></div>
+            <div class="qmsg" id="qmsg" aria-live="polite"></div>
+            <div class="ex-foot"><button class="btn" data-act="qnext" id="qnext" hidden>Дальше</button></div>
+          </div>
+          <ol class="ladder" id="ladder"></ol>
+        </div>
+      </section>
+
+      <section class="ex report" id="report-sec">
+        <div class="ex-head"><h2>Мои ответы</h2><span class="tag">Для копирования</span></div>
+        <p class="task">Здесь собираются все ваши ответы, правильные ответы и результат викторины. Нажмите кнопку, чтобы скопировать всё одним действием. Если копирование не сработало, текст выделится сам, и его можно скопировать вручную.</p>
+        <textarea id="report" readonly aria-label="Все ответы"></textarea>
+        <div class="ex-foot"><button class="btn" data-act="copyAll">Скопировать все ответы</button></div>
+      </section>
+    </main>
+
+    <aside class="side">
+      <div class="pw">
+        <h3>Проблемные слова <button class="btn ghost sm" data-act="clearProblems">Очистить</button></h3>
+        <p class="sub">Сюда попадают слова, в которых вы ошиблись. Верный ответ уменьшает счётчик.</p>
+        <div id="problems"></div>
+      </div>
+    </aside>
+  </div>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(function(){
+"use strict";
+var $=function(s,r){return (r||document).querySelector(s)};
+var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function norm(s){return String(s).toLowerCase().replace(/[’`]/g,"'").replace(/[.,!?;:]/g,"").replace(/\s+/g," ").trim()}
+function same(val,answers){var v=norm(val);return answers.some(function(a){return norm(a)===v})}
+
+/* ---------- data ---------- */
+var WORDS=[
+ {id:"verymuch",en:"like … very much",ru:"очень любить, очень нравится",ipa:"/laɪk ˈveri mʌtʃ/",say:"like it very much",ex:"I like pizza very much."},
+ {id:"really",en:"really like",ru:"действительно любить",ipa:"/ˈrɪəli laɪk/",say:"really like",ex:"I really like music."},
+ {id:"alone",en:"go alone",ru:"идти одному",ipa:"/ɡəʊ əˈləʊn/",say:"go alone",ex:"He goes alone."},
+ {id:"walk",en:"go for a walk alone",ru:"гулять одному",ipa:"/ɡəʊ fər ə ˈwɔːk əˈləʊn/",say:"go for a walk alone",ex:"I go for a walk alone."},
+ {id:"somewhere",en:"go somewhere alone",ru:"пойти куда-то одному",ipa:"/ɡəʊ ˈsʌmweər əˈləʊn/",say:"go somewhere alone",ex:"She goes somewhere alone."},
+ {id:"breakfast",en:"have … for breakfast",ru:"есть или пить на завтрак",ipa:"/hæv fə ˈbrekfəst/",say:"have something for breakfast",ex:"I have eggs for breakfast."},
+ {id:"eatdrink",en:"eat + drink",ru:"есть + пить",ipa:"/iːt/ + /drɪŋk/",say:"eat. drink.",ex:"I eat toast and drink tea."},
+ {id:"or",en:"or",ru:"или",ipa:"/ɔː/",say:"or",ex:"Tea or coffee?"},
+ {id:"after",en:"after that",ru:"после этого",ipa:"/ˈɑːftə ðæt/",say:"after that",ex:"After that, I go home."},
+ {id:"get",en:"get",ru:"получать",ipa:"/ɡet/",say:"get",ex:"I get a letter."}
+];
+function W(id){return WORDS.filter(function(w){return w.id===id})[0]}
+
+var EX=[
+ {id:"ex1",title:"Fill the gap",tag:"Упражнение 1",type:"gap",
+  task:"<b>Впишите слово или фразу из рамки.</b> Одно слово в рамке лишнее не будет: два слова добавлены для запутывания.",
+  bank:["or","very much","and","get","alone","after that","have","much"],
+  items:[
+   {b:"I like pizza ",a:"",ans:["very much"],tag:"verymuch"},
+   {b:"Do you want tea ",a:" coffee?",ans:["or"],tag:"or"},
+   {b:"I ",a:" an egg and tea for breakfast.",ans:["have"],tag:"breakfast"},
+   {b:"My brother likes to go for a walk ",a:".",ans:["alone"],tag:"walk"},
+   {b:"",a:", I wash my face.",ans:["After that"],tag:"after"},
+   {b:"I ",a:" a letter from my friend every week.",ans:["get"],tag:"get"}
+  ]},
+ {id:"ex2",title:"Find them in the wild",tag:"Упражнение 2",type:"wild",
+  task:"<b>Прочитайте текст один раз. Потом нажмите на каждую фразу по теме урока.</b> Нажимайте на всю фразу целиком, а не на одно слово: отметьте каждое слово фразы. Ищите 6 фраз: <b>after that, go for a walk alone, very much, for breakfast, or, get a message</b>.",
+  text:"On Saturday I get up late. I have toast or eggs for breakfast. I like tea very much. After that, I go for a walk alone. In the evening I get a message from my friend.",
+  chunks:[{p:"after that",tag:"after"},{p:"go for a walk alone",tag:"walk"},{p:"very much",tag:"verymuch"},{p:"for breakfast",tag:"breakfast"},{p:"or",tag:"or"},{p:"get a message",tag:"get"}]},
+ {id:"ex3",title:"Find mistakes",tag:"Упражнение 3",type:"fix",
+  task:"<b>В каждом предложении есть одна ошибка.</b> Перепишите предложение правильно.",
+  items:[
+   {s:"I very like pizza.",ans:["I like pizza very much"],tag:"verymuch"},
+   {s:"Tom goes to somewhere alone.",ans:["Tom goes somewhere alone"],tag:"somewhere"},
+   {s:"I have breakfast for eggs.",ans:["I have eggs for breakfast"],tag:"breakfast"},
+   {s:"I really likes music.",ans:["I really like music"],tag:"really"},
+   {s:"After than, I wash my face.",ans:["After that, I wash my face","After that I wash my face"],tag:"after"},
+   {s:"I gets a letter every week.",ans:["I get a letter every week"],tag:"get"}
+  ]},
+ {id:"ex4",title:"What usually comes after?",tag:"Упражнение 4",type:"gap",
+  task:"<b>Впишите слово, которое чаще всего стоит дальше.</b> Одного слова достаточно.",
+  items:[
+   {b:"I go for a ",a:" alone.",ans:["walk"],tag:"walk"},
+   {b:"I really ",a:" music.",ans:["like"],tag:"really"},
+   {b:"I like pizza very ",a:".",ans:["much"],tag:"verymuch"},
+   {b:"She goes ",a:" alone, to the park.",ans:["somewhere"],tag:"somewhere"},
+   {b:"I ",a:" tea for breakfast. (eat или drink?)",ans:["drink"],tag:"eatdrink"},
+   {b:"I have eggs ",a:" breakfast.",ans:["for"],tag:"breakfast"}
+  ]},
+ {id:"ex5",title:"Rephrase",tag:"Упражнение 5",type:"rephrase",
+  task:"<b>Скажите то же самое по-другому, используя фразу в подсказке.</b> Пишите полное предложение.",
+  items:[
+   {s:"I love pizza.",use:"very much",ans:["I like pizza very much"],tag:"verymuch"},
+   {s:"In the morning, Tom eats eggs.",use:"have … for breakfast",ans:["Tom has eggs for breakfast","He has eggs for breakfast"],tag:"breakfast"},
+   {s:"Anna walks. Nobody is with her.",use:"go for a walk alone",ans:["Anna goes for a walk alone"],tag:"walk"},
+   {s:"Tea? Coffee? You choose one.",use:"or",ans:["Do you want tea or coffee","Tea or coffee"],tag:"or"},
+   {s:"First I wash my hands. Then I eat.",use:"after that",ans:["First I wash my hands. After that, I eat","I wash my hands. After that, I eat","First I wash my hands. After that I eat"],tag:"after"},
+   {s:"I receive an email.",use:"get",ans:["I get an email"],tag:"get"}
+  ]},
+ {id:"ex6",title:"Finish with your own ideas",tag:"Упражнение 6",type:"open",
+  task:"<b>Закончите предложения своими словами.</b> Здесь нет одного верного ответа. Нажмите «Проверить», и страница покажет, какие предложения вы закончили. «Показать ответы» даёт примеры.",
+  items:[
+   {s:"I like",e:" very much.",ex:"music",tag:null,sample:"I like chocolate very much."},
+   {s:"For breakfast I have",e:"",ex:"",tag:null,sample:"For breakfast I have eggs and tea."},
+   {s:"I go for a walk alone when",e:"",ex:"",tag:null,sample:"I go for a walk alone when I am tired."},
+   {s:"Do you want",e:" or",ex:"",tag:null,sample:"Do you want tea or coffee?"},
+   {s:"After that,",e:"",ex:"",tag:null,sample:"After that, I go to school."},
+   {s:"I get",e:" every",ex:"",tag:null,sample:"I get a letter every week."}
+  ]}
+];
+
+var QUIZ=[
+ {q:"I like cats ___.",o:["very","very much","much very","very many"],c:1,t:["very much"],tag:"verymuch",say:"I like cats blank."},
+ {q:"I have an apple ___ breakfast.",o:["to","in","at","for"],c:3,t:["for"],tag:"breakfast",say:"I have an apple blank breakfast."},
+ {q:"Do you want tea ___ coffee?",o:["or","and","but","too"],c:0,t:["or"],tag:"or",say:"Do you want tea blank coffee?"},
+ {q:"She goes for a walk ___.",o:["one","only","alone","lonely"],c:2,t:["alone"],tag:"walk",say:"She goes for a walk blank."},
+ {q:"I ___ a letter from my friend.",o:["eat","put","do","get"],c:3,t:["get"],tag:"get",say:"I blank a letter from my friend."},
+ {q:"I wash my hands. ___, I eat.",o:["After than","After that","Than after","That after"],c:1,t:["After that"],tag:"after",say:"I wash my hands. blank, I eat."},
+ {q:"Что значит слово «get» в уроке?",o:["отдавать","терять","получать","спрашивать"],c:2,t:["получать","получить"],tag:"get",say:"get"},
+ {q:"Which sentence is correct?",o:["I have eggs for breakfast.","I have breakfast for eggs.","I eat breakfast for tea.","I breakfast have eggs."],c:0,t:["I have eggs for breakfast"],tag:"breakfast",say:"I have eggs for breakfast."}
+];
+var PRIZE=["100","200","300","500","1 000","2 000","4 000","1 000 000"];
+
+/* ---------- storage (optional) ---------- */
+var LS_KEY="a1-workbook-problems";
+function lsGet(){try{var r=localStorage.getItem(LS_KEY);return r?JSON.parse(r):{}}catch(e){return {}}}
+function lsSet(o){try{localStorage.setItem(LS_KEY,JSON.stringify(o))}catch(e){}}
+var problems=lsGet();
+function addProblem(tag){if(!tag)return;problems[tag]=(problems[tag]||0)+1;lsSet(problems);renderProblems()}
+function subProblem(tag){if(!tag||!problems[tag])return;problems[tag]--;if(problems[tag]<=0)delete problems[tag];lsSet(problems);renderProblems()}
+function renderProblems(){
+  var box=$("#problems");var ids=Object.keys(problems).sort(function(a,b){return problems[b]-problems[a]});
+  if(!ids.length){box.innerHTML='<div class="empty">Пока ошибок нет. Слова, в которых вы ошибётесь, появятся здесь.</div>';return}
+  box.innerHTML="<ul>"+ids.map(function(id){var w=W(id);return '<li><div class="t"><span class="e">'+esc(w.en)+'</span><span class="r">'+esc(w.ipa)+" · "+esc(w.ru)+'</span></div><span class="c" title="Ошибок">'+problems[id]+'</span><button class="btn ghost sm" data-act="say" data-t="'+esc(w.say)+'" aria-label="Слушать: '+esc(w.en)+'">Слушать</button></li>'}).join("")+"</ul>";
+}
+/* status tracker: tracks transitions so a repeated check does not double count */
+var status={};
+function setStatus(key,tag,now){
+  var old=status[key];status[key]=now;
+  if(now==="bad"&&old!=="bad")addProblem(tag);
+  if(now==="ok"&&old==="bad")subProblem(tag);
+}
+
+/* ---------- speech ---------- */
+var voices=[],voice=null,userPicked=false;
+var hasTTS=("speechSynthesis" in window)&&("SpeechSynthesisUtterance" in window);
+function pickBest(list){
+  var by=function(re){return list.filter(function(v){return re.test(v.name)})[0]};
+  return by(/google us english/i)||by(/samantha/i)||list.filter(function(v){return /^en[-_]US$/i.test(v.lang)})[0]||list[0]||null;
+}
+function loadVoices(){
+  if(!hasTTS){updateVoiceStatus();return}
+  voices=speechSynthesis.getVoices().filter(function(v){return /^en/i.test(v.lang)});
+  var sel=$("#voiceSel");var keep=voice?voice.name:null;
+  sel.innerHTML=voices.map(function(v,i){return '<option value="'+i+'">'+esc(v.name)+" ("+esc(v.lang)+")</option>"}).join("");
+  if(!voices.length){sel.innerHTML='<option>нет английских голосов</option>'}
+  if(userPicked&&keep){var f=voices.filter(function(v){return v.name===keep})[0];voice=f||pickBest(voices)}else voice=pickBest(voices);
+  if(voice){sel.value=String(voices.indexOf(voice))}
+  updateVoiceStatus();
+}
+function updateVoiceStatus(){
+  var el=$("#vstat");
+  if(!hasTTS){el.className="vstat warn";el.textContent="В этом браузере нет озвучки. Откройте страницу в Chrome, Edge или Safari.";return}
+  if(!voice){el.className="vstat warn";el.textContent="Английские голоса пока не загрузились. Нажмите «Проверить звук» через несколько секунд.";return}
+  var pref=/google us english|samantha/i.test(voice.name);
+  el.className="vstat"+(pref?"":" warn");
+  el.textContent=pref?("Выбран голос: "+voice.name+"."):("Голоса Google US English и Samantha не найдены, используется: "+voice.name+". Другой голос можно выбрать в списке.");
+}
+function utter(text){
+  var u=new SpeechSynthesisUtterance(text);
+  if(voice){u.voice=voice;u.lang=voice.lang}else u.lang="en-US";
+  u.rate=.85;u.pitch=1;return u;
+}
+function speak(text){
+  if(!hasTTS){toast("В этом браузере нет озвучки");return}
+  try{speechSynthesis.cancel();if(speechSynthesis.paused)speechSynthesis.resume();speechSynthesis.speak(utter(text))}catch(e){toast("Не удалось воспроизвести звук")}
+}
+function speakQueue(list){
+  if(!hasTTS){toast("В этом браузере нет озвучки");return}
+  try{speechSynthesis.cancel();list.forEach(function(t){speechSynthesis.speak(utter(t))})}catch(e){}
+}
+if(hasTTS){loadVoices();try{speechSynthesis.onvoiceschanged=loadVoices}catch(e){};setTimeout(loadVoices,400);setTimeout(loadVoices,1500)}else{updateVoiceStatus()}
+
+/* ---------- toast ---------- */
+var tt;function toast(m){var t=$("#toast");t.textContent=m;t.hidden=false;clearTimeout(tt);tt=setTimeout(function(){t.hidden=true},2600)}
+
+/* ---------- render: words ---------- */
+$("#cards").innerHTML=WORDS.map(function(w){
+  return '<div class="card"><span class="en">'+esc(w.en)+'</span><span class="ipa">'+esc(w.ipa)+'</span><span class="ru">'+esc(w.ru)+'</span><span class="exs">'+esc(w.ex)+'</span><div class="btns"><button class="btn ghost sm" data-act="say" data-t="'+esc(w.say)+'">Слово</button><button class="btn ghost sm" data-act="say" data-t="'+esc(w.ex)+'">Пример</button></div></div>';
+}).join("");
+
+/* ---------- render: exercises ---------- */
+var chunkMap={};/* ex2 token -> chunk index */
+var wildTokens=[];var wildSel={};var wildRevealed=false;
+
+function rowGap(ex,it,i){
+  var w=Math.max(6,Math.min(16,it.ans[0].length+3));
+  return '<div class="row" data-ex="'+ex.id+'" data-i="'+i+'"><span class="n">'+(i+1)+'</span><div class="body"><div class="sent">'+esc(it.b)+'<input class="ans inline" id="'+ex.id+'-'+i+'" data-ex="'+ex.id+'" data-i="'+i+'" style="width:'+w+'ch" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Пропуск '+(i+1)+'">'+esc(it.a)+'</div><div class="fb" id="fb-'+ex.id+'-'+i+'"></div></div><button class="btn ghost sm mini" data-act="reveal1" data-ex="'+ex.id+'" data-i="'+i+'" title="Показать ответ">ответ</button></div>';
+}
+function rowFix(ex,it,i){
+  return '<div class="row" data-ex="'+ex.id+'" data-i="'+i+'"><span class="n">'+(i+1)+'</span><div class="body"><div class="sent"><span class="wrong">'+esc(it.s)+'</span><button class="btn ghost sm" data-act="say" data-t="'+esc(it.ans[0])+'" aria-label="Слушать верный вариант">Слушать</button></div><input class="ans wide" id="'+ex.id+'-'+i+'" data-ex="'+ex.id+'" data-i="'+i+'" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Правильное предложение" aria-label="Исправьте предложение '+(i+1)+'"><div class="fb" id="fb-'+ex.id+'-'+i+'"></div></div><button class="btn ghost sm mini" data-act="reveal1" data-ex="'+ex.id+'" data-i="'+i+'" title="Показать ответ">ответ</button></div>';
+}
+function rowRe(ex,it,i){
+  return '<div class="row" data-ex="'+ex.id+'" data-i="'+i+'"><span class="n">'+(i+1)+'</span><div class="body"><div class="sent">'+esc(it.s)+'</div><div class="hint">Используйте: <b>'+esc(it.use)+'</b></div><input class="ans wide" id="'+ex.id+'-'+i+'" data-ex="'+ex.id+'" data-i="'+i+'" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Ваше предложение" aria-label="Ваше предложение '+(i+1)+'"><div class="fb" id="fb-'+ex.id+'-'+i+'"></div></div><button class="btn ghost sm mini" data-act="reveal1" data-ex="'+ex.id+'" data-i="'+i+'" title="Показать пример">ответ</button></div>';
+}
+function rowOpen(ex,it,i){
+  return '<div class="row" data-ex="'+ex.id+'" data-i="'+i+'"><span class="n">'+(i+1)+'</span><div class="body"><div class="sent"><b>'+esc(it.s)+'</b><span>'+esc(it.e)+'</span></div><textarea class="ans" id="'+ex.id+'-'+i+'" data-ex="'+ex.id+'" data-i="'+i+'" rows="1" placeholder="Допишите своими словами" aria-label="Допишите предложение '+(i+1)+'"></textarea><div class="fb" id="fb-'+ex.id+'-'+i+'"></div></div><button class="btn ghost sm mini" data-act="reveal1" data-ex="'+ex.id+'" data-i="'+i+'" title="Показать пример">пример</button></div>';
+}
+function buildWild(ex){
+  var toks=ex.text.split(/\s+/);
+  wildTokens=toks.map(function(r){return {raw:r,w:norm(r)}});
+  ex.found=[];
+  ex.chunks.forEach(function(c,ci){
+    var ws=c.p.split(" ");
+    for(var i=0;i<=wildTokens.length-ws.length;i++){
+      var ok=true;for(var j=0;j<ws.length;j++){if(wildTokens[i+j].w!==ws[j]){ok=false;break}}
+      if(ok){c.idx=[];for(var k=0;k<ws.length;k++){chunkMap[i+k]=ci;c.idx.push(i+k)}break}
+    }
+  });
+  return '<div class="text" id="wildtext">'+wildTokens.map(function(t,i){return '<button class="tok" data-act="tok" data-i="'+i+'" aria-pressed="false">'+esc(t.raw)+'</button>'}).join(" ")+'</div><div class="wildinfo" id="wildinfo">Фраз отмечено: 0</div>';
+}
+function exSection(ex){
+  var body="";
+  if(ex.bank){body+='<div class="bank" aria-label="Слова в рамке">'+ex.bank.map(function(b){return "<span>"+esc(b)+"</span>"}).join("")+'</div>'}
+  if(ex.type==="wild"){body+=buildWild(ex)}
+  else{body+='<div class="rows">'+ex.items.map(function(it,i){return ex.type==="gap"?rowGap(ex,it,i):ex.type==="fix"?rowFix(ex,it,i):ex.type==="rephrase"?rowRe(ex,it,i):rowOpen(ex,it,i)}).join("")+'</div>'}
+  return '<section class="ex" id="'+ex.id+'"><div class="ex-head"><h2>'+esc(ex.title)+'</h2><span class="tag">'+esc(ex.tag)+'</span></div><p class="task">'+ex.task+'</p>'+body+'<div class="ex-foot"><button class="btn" data-act="check" data-ex="'+ex.id+'">Проверить</button><button class="btn ghost" data-act="reveal" data-ex="'+ex.id+'">Показать ответы</button><button class="btn ghost" data-act="reset" data-ex="'+ex.id+'">Сбросить</button><span class="res" id="res-'+ex.id+'"></span></div></section>';
+}
+/* ex1 and ex2 share the bank/words ordering; build everything */
+$("#exercises").innerHTML=EX.map(exSection).join("");
+
+/* ---------- exercise logic ---------- */
+var scores={};/* exId -> {ok,total} */
+function exById(id){return EX.filter(function(e){return e.id===id})[0]}
+function field(exId,i){return document.getElementById(exId+"-"+i)}
+function paintRes(ex){
+  var s=scores[ex.id];var el=$("#res-"+ex.id);
+  el.textContent=s?("Верно: "+s.ok+" из "+s.total):"";
+  el.style.color=s&&s.ok===s.total?"var(--ok)":"var(--ink)";
+  var ok=0,tot=0;Object.keys(scores).forEach(function(k){if(k==="ex6")return;ok+=scores[k].ok;tot+=scores[k].total});
+  var qs=quizState.done?quizState.reached:0;
+  $("#totalScore").textContent="Верно: "+ok+" из "+tot;
+}
+function mark(input,fb,state,msg){
+  input.classList.remove("ok","bad","shown");
+  if(state)input.classList.add(state);
+  fb.className="fb"+(state?" "+state:"");fb.textContent=msg||"";
+}
+function checkEx(ex){
+  if(ex.type==="wild")return checkWild(ex);
+  var ok=0,total=ex.items.length;
+  ex.items.forEach(function(it,i){
+    var inp=field(ex.id,i),fb=$("#fb-"+ex.id+"-"+i),v=inp.value.trim(),key=ex.id+":"+i;
+    if(ex.type==="open"){
+      if(v){ok++;mark(inp,fb,"ok","Готово.")}else mark(inp,fb,"bad","Допишите предложение.");
+      return;
+    }
+    if(!v){mark(inp,fb,"bad","Впишите ответ.");return}
+    if(same(v,it.ans)){ok++;mark(inp,fb,"ok","Верно.");setStatus(key,it.tag,"ok")}
+    else{mark(inp,fb,"bad","Пока не так. Подумайте ещё или нажмите «ответ».");setStatus(key,it.tag,"bad")}
+  });
+  scores[ex.id]={ok:ok,total:total};paintRes(ex);
+}
+function revealEx(ex){
+  if(ex.type==="wild"){wildRevealed=true;paintWild(false);var i2=$("#wildinfo");i2.textContent="Правильные фразы выделены. Это нужно запомнить.";scores[ex.id]=scores[ex.id]||{ok:0,total:ex.chunks.length};return}
+  ex.items.forEach(function(it,i){reveal1(ex,i)});
+}
+function reveal1(ex,i){
+  var it=ex.items[i],inp=field(ex.id,i),fb=$("#fb-"+ex.id+"-"+i);
+  inp.value=ex.type==="open"?it.sample:it.ans[0];
+  mark(inp,fb,"shown","Показан ответ.");
+  status[ex.id+":"+i]="shown";
+}
+function resetEx(ex){
+  if(ex.type==="wild"){wildSel={};wildRevealed=false;paintWild(false);$("#wildinfo").textContent="Фраз отмечено: 0";delete scores[ex.id];$("#res-"+ex.id).textContent="";paintRes(ex);return}
+  ex.items.forEach(function(it,i){var inp=field(ex.id,i);inp.value="";mark(inp,$("#fb-"+ex.id+"-"+i),"","");delete status[ex.id+":"+i]});
+  delete scores[ex.id];$("#res-"+ex.id).textContent="";paintRes(ex);
+}
+/* wild */
+function paintWild(checked){
+  var ex=exById("ex2");
+  $$(".tok").forEach(function(b){
+    var i=+b.getAttribute("data-i");b.className="tok";
+    var sel=!!wildSel[i];b.setAttribute("aria-pressed",sel?"true":"false");
+    var ci=chunkMap[i];
+    if(wildRevealed&&ci!==undefined){b.classList.add("reveal");return}
+    if(checked){
+      if(sel&&ci===undefined){b.classList.add("bad");return}
+      if(sel&&ci!==undefined){var all=ex.chunks[ci].idx.every(function(k){return wildSel[k]});b.classList.add(all?"hit":"sel");return}
+    }
+    if(sel)b.classList.add("sel");
+  });
+}
+function wildCounts(){
+  var ex=exById("ex2");var found=0,extra=0;
+  ex.chunks.forEach(function(c){if(c.idx.every(function(k){return wildSel[k]}))found++});
+  wildTokens.forEach(function(t,i){if(wildSel[i]&&chunkMap[i]===undefined)extra++});
+  return {found:found,extra:extra,total:ex.chunks.length};
+}
+function checkWild(ex){
+  wildRevealed=false;paintWild(true);
+  var c=wildCounts();
+  ex.chunks.forEach(function(ch,ci){
+    var all=ch.idx.every(function(k){return wildSel[k]});
+    setStatus("ex2:"+ci,ch.tag,all?"ok":"bad");
+  });
+  $("#wildinfo").textContent="Найдено фраз: "+c.found+" из "+c.total+(c.extra?". Лишних слов отмечено: "+c.extra+" (красные).":".")+(c.found<c.total?" Отметьте каждое слово фразы целиком.":"");
+  scores[ex.id]={ok:c.extra?Math.max(0,c.found-1):c.found,total:c.total};
+  /* keep displayed count equal to the found count, penalty only affects the total */
+  $("#res-ex2").textContent="Верно: "+c.found+" из "+c.total;
+  var ok=0,tot=0;Object.keys(scores).forEach(function(k){if(k==="ex6")return;ok+=scores[k].ok;tot+=scores[k].total});
+  $("#totalScore").textContent="Верно: "+ok+" из "+tot;
+}
+
+/* ---------- quiz ---------- */
+var quizState={mode:"choice",i:0,locked:false,used5050:false,done:false,reached:0,over:false,log:[],hidden:{}};
+function quizReset(){quizState={mode:quizState.mode,i:0,locked:false,used5050:false,done:false,reached:0,over:false,log:[],hidden:{}};quizDraw()}
+function ladderDraw(){
+  var s=quizState;
+  $("#ladder").innerHTML=PRIZE.map(function(p,idx){return {p:p,idx:idx}}).reverse().map(function(o){
+    var cls=o.idx<s.reached?"done":(o.idx===s.i&&!s.over&&!s.done?"now":"");
+    return '<li class="'+cls+'"><span>'+(o.idx+1)+'</span><span>$'+o.p+'</span></li>';
+  }).join("");
+}
+function quizDraw(){
+  var s=quizState,box=$("#qbox"),ans=$("#qans"),msg=$("#qmsg"),nx=$("#qnext");
+  $$(".seg button").forEach(function(b){b.setAttribute("aria-pressed",b.getAttribute("data-m")===s.mode?"true":"false")});
+  $("#b5050").disabled=s.used5050||s.mode!=="choice"||s.over||s.done;
+  nx.hidden=true;msg.textContent="";msg.className="qmsg";
+  ladderDraw();
+  if(s.over||s.done){
+    box.textContent=s.done?"Вы миллионер! Все 8 вопросов пройдены.":"Игра окончена. Ваш выигрыш: "+(s.reached?"$"+PRIZE[s.reached-1]:"$0")+".";
+    ans.innerHTML='';msg.textContent=s.done?"Отлично! Скопируйте результат кнопкой внизу страницы.":"Нажмите «Сначала», чтобы сыграть ещё раз.";msg.className="qmsg "+(s.done?"ok":"bad");return;
+  }
+  var q=QUIZ[s.i];
+  box.innerHTML='<span style="color:var(--muted);font-size:.85rem;display:block;margin-bottom:4px">Вопрос '+(s.i+1)+" из "+QUIZ.length+" · $"+PRIZE[s.i]+"</span>"+esc(q.q);
+  if(s.mode==="choice"){
+    ans.innerHTML='<div class="qopts">'+q.o.map(function(o,k){return '<button class="opt'+(s.hidden[k]?" gone":"")+'" data-act="qpick" data-k="'+k+'"><span class="L">'+"ABCD"[k]+"</span><span>"+esc(o)+"</span></button>"}).join("")+"</div>";
+  }else{
+    ans.innerHTML='<div class="qtype"><input class="ans" id="qinput" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Впишите ответ" aria-label="Ваш ответ"><button class="btn" data-act="qsubmit">Ответить</button></div>';
+    var qi=$("#qinput");qi.addEventListener("keydown",function(e){if(e.key==="Enter")qSubmit()});
+  }
+  s.locked=false;
+}
+function qFinish(correct,given){
+  var s=quizState,q=QUIZ[s.i];
+  s.locked=true;
+  s.log.push({q:q.q,given:given,right:q.t[0],ok:correct});
+  if(correct){
+    s.reached=s.i+1;setStatus("quiz:"+s.i,q.tag,"ok");
+    $("#qmsg").textContent="Верно! +$"+PRIZE[s.i];$("#qmsg").className="qmsg ok";
+    if(s.i===QUIZ.length-1){s.done=true;setTimeout(function(){quizDraw();update()},900)}
+    else{$("#qnext").hidden=false}
+  }else{
+    s.over=true;setStatus("quiz:"+s.i,q.tag,"bad");
+    $("#qmsg").textContent="Неверно. Правильный ответ: "+q.t[0]+".";$("#qmsg").className="qmsg bad";
+    $("#qnext").hidden=false;$("#qnext").textContent="Результат";
+  }
+  ladderDraw();$("#b5050").disabled=true;
+}
+function qPick(k){
+  var s=quizState;if(s.locked)return;var q=QUIZ[s.i];
+  $$(".opt").forEach(function(b){b.disabled=true;var kk=+b.getAttribute("data-k");if(kk===q.c)b.classList.add("ok");else if(kk===k)b.classList.add("bad")});
+  qFinish(k===q.c,q.o[k]);
+}
+function qSubmit(){
+  var s=quizState;if(s.locked)return;var inp=$("#qinput"),v=inp.value.trim();
+  if(!v){toast("Впишите ответ");return}
+  var q=QUIZ[s.i];var ok=same(v,q.t);
+  inp.classList.add(ok?"ok":"bad");inp.disabled=true;
+  qFinish(ok,v);
+}
+function qNext(){
+  var s=quizState;
+  if(s.over){s.over=true;quizDraw();return}
+  s.i++;s.hidden={};$("#qnext").textContent="Дальше";quizDraw();
+}
+function q5050(){
+  var s=quizState;if(s.used5050||s.locked||s.mode!=="choice"||s.over||s.done)return;
+  var q=QUIZ[s.i];var wrong=[0,1,2,3].filter(function(k){return k!==q.c});
+  wrong.sort(function(){return Math.random()-.5});s.hidden={};s.hidden[wrong[0]]=1;s.hidden[wrong[1]]=1;s.used5050=true;quizDraw();
+}
+
+/* ---------- report ---------- */
+function buildReport(){
+  var L=[];var d=new Date();
+  L.push("WORD WORKBOOK A1 — мои ответы");
+  L.push("Дата: "+d.toLocaleDateString("ru-RU")+" "+d.toLocaleTimeString("ru-RU",{hour:"2-digit",minute:"2-digit"}));
+  L.push("");
+  EX.forEach(function(ex){
+    L.push(ex.tag.toUpperCase()+". "+ex.title);
+    if(ex.type==="wild"){
+      var sel=wildTokens.filter(function(t,i){return wildSel[i]}).map(function(t){return t.raw.replace(/[.,]/g,"")}).join(" ");
+      var c=wildCounts();
+      L.push("Отмечено: "+(sel||"—"));
+      L.push("Правильные фразы: "+ex.chunks.map(function(c){return c.p}).join("; "));
+      L.push("Найдено: "+c.found+" из "+c.total+(c.extra?", лишних слов: "+c.extra:""));
+    }else{
+      ex.items.forEach(function(it,i){
+        var v=field(ex.id,i).value.trim(),st=status[ex.id+":"+i];
+        var prompt=ex.type==="gap"?(it.b+"____"+it.a):ex.type==="open"?(it.s+" ... "+it.e):ex.type==="fix"?it.s:(it.s+" [use: "+it.use+"]");
+        var line=(i+1)+". "+prompt.replace(/\s+/g," ").trim()+"  →  "+(v||"—");
+        if(ex.type==="open"){}
+        else if(st==="shown")line+="  [ответ показан]";
+        else if(st==="ok")line+="  [верно]";
+        else if(st==="bad")line+="  [ошибка; правильно: "+it.ans[0]+"]";
+        else if(v)line+="  [не проверено; правильно: "+it.ans[0]+"]";
+        else line+="  [правильно: "+it.ans[0]+"]";
+        L.push(line);
+      });
+    }
+    L.push("");
+  });
+  L.push("QUIZ. Who wants to be a millionaire?");
+  var s=quizState;
+  if(!s.log.length)L.push("Пока не играли.");
+  s.log.forEach(function(e,i){L.push((i+1)+". "+e.q+"  →  "+e.given+(e.ok?"  [верно]":"  [ошибка; правильно: "+e.right+"]"))});
+  if(s.log.length)L.push("Выигрыш: "+(s.reached?"$"+PRIZE[s.reached-1]:"$0")+(s.done?" (все вопросы пройдены)":""));
+  L.push("");
+  var pids=Object.keys(problems);
+  L.push("ПРОБЛЕМНЫЕ СЛОВА");
+  L.push(pids.length?pids.map(function(id){return W(id).en+" — "+W(id).ru+" ("+problems[id]+")"}).join("\n"):"Нет.");
+  return L.join("\n");
+}
+var upT;function update(){clearTimeout(upT);upT=setTimeout(function(){var r=$("#report");if(r)r.value=buildReport()},0)}
+function copyAll(){
+  var ta=$("#report");ta.value=buildReport();var text=ta.value;
+  function fallback(){
+    ta.focus();ta.select();
+    try{var ok=document.execCommand&&document.execCommand("copy");toast(ok?"Скопировано":"Текст выделен. Скопируйте его (Ctrl+C или «Копировать»)")}
+    catch(e){toast("Текст выделен. Скопируйте его вручную")}
+  }
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    try{navigator.clipboard.writeText(text).then(function(){toast("Все ответы скопированы")},fallback)}catch(e){fallback()}
+  }else fallback();
+}
+
+/* ---------- events ---------- */
+document.addEventListener("click",function(e){
+  var el=e.target.closest("[data-act]");if(!el)return;
+  var a=el.getAttribute("data-act");
+  if(a==="say")speak(el.getAttribute("data-t"));
+  else if(a==="playAll")speakQueue(WORDS.map(function(w){return w.say}));
+  else if(a==="testSound"){speak("Hello! I like English very much.");setTimeout(function(){if(hasTTS&&!speechSynthesis.speaking&&!speechSynthesis.pending){toast("Звук не пошёл. Проверьте громкость и выберите другой голос.")}},1500)}
+  else if(a==="stopSound"){if(hasTTS)speechSynthesis.cancel()}
+  else if(a==="check")checkEx(exById(el.getAttribute("data-ex")));
+  else if(a==="reveal")revealEx(exById(el.getAttribute("data-ex")));
+  else if(a==="reveal1")reveal1(exById(el.getAttribute("data-ex")),+el.getAttribute("data-i"));
+  else if(a==="reset")resetEx(exById(el.getAttribute("data-ex")));
+  else if(a==="tok"){var i=+el.getAttribute("data-i");if(wildSel[i])delete wildSel[i];else wildSel[i]=1;wildRevealed=false;paintWild(false);var c=wildCounts();$("#wildinfo").textContent="Фраз отмечено полностью: "+c.found}
+  else if(a==="clearProblems"){problems={};lsSet(problems);renderProblems()}
+  else if(a==="copyAll")copyAll();
+  else if(a==="qmode"){quizState.mode=el.getAttribute("data-m");quizReset()}
+  else if(a==="qpick")qPick(+el.getAttribute("data-k"));
+  else if(a==="qsubmit")qSubmit();
+  else if(a==="qnext")qNext();
+  else if(a==="q5050")q5050();
+  else if(a==="qlisten"){var qq=QUIZ[quizState.i];if(qq&&!quizState.over&&!quizState.done){if(/[а-яё]/i.test(qq.q))toast("Этот вопрос на русском, озвучки нет");else speak(qq.say.replace(/blank/g,"blank"))}}
+  else if(a==="qrestart")quizReset();
+  update();
+});
+document.addEventListener("input",function(){update()});
+$("#voiceSel").addEventListener("change",function(e){var v=voices[+e.target.value];if(v){voice=v;userPicked=true;updateVoiceStatus();speak("Hello! This is "+v.name.replace(/\(.*\)/,""))}});
+
+renderProblems();quizDraw();update();
+})();
+</script>
