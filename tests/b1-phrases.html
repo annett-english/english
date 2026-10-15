@@ -1,0 +1,146 @@
+<!DOCTYPE html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>B1 Work Phrases Trainer</title>
+<style>
+:root{--bg:#f6f5f0;--fg:#1d1d1b;--mu:#6b6b66;--card:#fff;--bd:#dedbd0;--ac:#2b5fd9;--ok:#16813f;--bad:#c23030;--okb:#e4f5ea;--badb:#fbe8e8;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#17181b;--fg:#ececea;--mu:#9a9a94;--card:#22242a;--bd:#363944;--ac:#6d93f2;--ok:#5fd18c;--bad:#f28585;--okb:#1d3a29;--badb:#40222a}}
+:root[data-theme="dark"]{--bg:#17181b;--fg:#ececea;--mu:#9a9a94;--card:#22242a;--bd:#363944;--ac:#6d93f2;--ok:#5fd18c;--bad:#f28585;--okb:#1d3a29;--badb:#40222a}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:1080px;margin:0 auto;padding:12px;display:grid;grid-template-columns:1fr 240px;gap:14px;align-items:start}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px}
+.full{grid-column:1/-1}aside{position:sticky;top:12px}
+@media(max-width:760px){.wrap{grid-template-columns:1fr}aside{position:static}}
+h1{font-size:19px;margin:0 0 6px}h2{font-size:17px;margin:0 0 4px}h3{margin:0 0 6px;font-size:15px}
+nav{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+button,select,input,textarea{font:inherit;color:inherit}
+.b,.p,.t{border:1px solid var(--bd);background:var(--card);border-radius:8px;padding:6px 11px;cursor:pointer}
+.p,.t.on{background:var(--ac);border-color:var(--ac);color:#fff}.b:disabled{opacity:.45}
+input,select,textarea{padding:7px 9px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);width:100%}
+.it{display:grid;grid-template-columns:26px 1fr minmax(150px,230px);gap:6px 8px;align-items:center;padding:9px 6px;border-bottom:1px solid var(--bd);border-radius:6px}
+.fb{grid-column:2/-1;font-weight:600}.fb:empty{display:none}
+.ok{background:var(--okb)}.bad{background:var(--badb)}.ok .fb{color:var(--ok)}.bad .fb{color:var(--bad)}
+.ans{color:var(--ac);font-weight:500}small,.mu{color:var(--mu)}small{display:block}
+@media(max-width:760px){.it{grid-template-columns:24px 1fr}.it input,.it select{grid-column:1/-1}.fb{grid-column:1/-1}}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 0}
+table{width:100%;border-collapse:collapse}td{padding:7px 6px;border-bottom:1px solid var(--bd);vertical-align:middle}
+ul{padding-left:18px;margin:0}li{margin-bottom:6px}
+.chips label{display:inline-block;border:1px solid var(--bd);border-radius:8px;padding:5px 9px;margin:3px;cursor:pointer}
+.mil{display:grid;grid-template-columns:150px 1fr;gap:14px}.lad div{font-size:13px;padding:2px 6px;border-radius:5px}.lad .cu{background:var(--ac);color:#fff}.lad .dn{color:var(--ok)}
+.qq{font-size:17px;font-weight:600;margin-bottom:10px}.op{display:block;width:100%;text-align:left;margin-bottom:7px;padding:10px;border:1px solid var(--bd);background:var(--card);border-radius:10px;cursor:pointer}
+.op.ok{background:var(--okb);border-color:var(--ok)}.op.bad{background:var(--badb);border-color:var(--bad)}
+@media(max-width:760px){.mil{grid-template-columns:1fr}.lad{display:none}}
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:8px 14px;border-radius:20px;display:none}
+</style></head><body><div class="wrap">
+<div class="card full"><h1>🎧 B1 Work Phrases · тренажёр</h1>
+<div class="bar" style="margin:0"><select id="vs" style="width:auto;max-width:280px"><option>голоса загружаются…</option></select>
+<button class="b" onclick="say('Let’s call it a day. Keep me posted.')">🔊 Проверить звук</button>
+<label><input type="checkbox" id="sl" style="width:auto"> медленно</label><span class="mu" id="vst"></span></div>
+<nav id="nav"></nav></div>
+<main class="card" id="main"></main>
+<aside class="card"><h3>⚠ Проблемные слова</h3><ul id="pw"></ul><p><button class="b" onclick="S={};sv()">Очистить</button></p></aside>
+</div><div id="toast"></div>
+<script>
+const P=[
+["Call it a day","заканчиваем работу на сегодня","/kɔːl ɪt ə deɪ/",["call it a day"]],
+["Wrap things up","подводим итоги","/ræp θɪŋz ʌp/",["wrap things up","wrap up"]],
+["Keep me posted","держите меня в курсе","/kiːp miː ˈpoʊstɪd/",["keep me posted"]],
+["Circle back to this","вернёмся к этому позже","/ˈsɝːkəl bæk tə ðɪs/",["circle back"]],
+["We could consider…","мы могли бы рассмотреть…","/wi kʊd kənˈsɪdɚ/",["could consider"]],
+["Could you clarify…?","можете уточнить…?","/kʊd ju ˈklɛrəfaɪ/",["clarify"]],
+["Can you elaborate on…?","можете подробнее рассказать о…?","/kæn ju ɪˈlæbərət ɑːn/",["elaborate"]],
+["Make sure we’re on track","убедиться, что всё идёт по плану","/meɪk ʃʊr wɪr ɑːn træk/",["on track"]],
+["Let’s set a deadline for…","давайте назначим срок для…","/lɛts sɛt ə ˈdɛdlaɪn fɔːr/",["set a deadline","deadline"]],
+["Follow up on this","продолжим работу по этому вопросу","/ˈfɑːloʊ ʌp ɑːn ðɪs/",["follow up"]]];
+const $=s=>document.querySelector(s),nm=s=>s.toLowerCase().replace(/[’']/g,'').replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim(),
+sp=p=>P[p][0].replace(/[…?]/g,'').trim(),pm=(a,s,o)=>a.map((_,j)=>a[(j*s+o)%a.length]),
+B2=[1,0,0,1,0,1,1,0,1,0],B4=[2,0,3,1,3,0,2,1,0,3];
+let S={},V=null,cur;try{S=JSON.parse(localStorage.getItem('b1s')||'{}')}catch(e){}
+function sv(){try{localStorage.setItem('b1s',JSON.stringify(S))}catch(e){}
+const c={};Object.values(S).forEach(p=>c[p]=(c[p]||0)+1);const r=Object.keys(c).sort((a,b)=>c[b]-c[a]);
+$('#pw').innerHTML=r.length?r.map(p=>`<li><b>${P[p][0]}</b> <span class="mu">×${c[p]}</span><small>${P[p][1]}</small></li>`).join(''):'<li class="mu">Пока ошибок нет 👍</li>'}
+function toast(t){const e=$('#toast');e.textContent=t;e.style.display='block';setTimeout(()=>e.style.display='none',1600)}
+/* AUDIO */
+function vl(){if(!window.speechSynthesis){$('#vst').textContent='⚠ Озвучка не поддерживается — открой в Chrome/Safari';return}
+const vs=speechSynthesis.getVoices().filter(v=>/^en/i.test(v.lang));if(!vs.length){$('#vst').textContent='Голоса не найдены — подожди пару секунд или обнови страницу';return}
+const s=$('#vs');s.innerHTML=vs.map((v,i)=>`<option value="${i}">${v.name} (${v.lang})</option>`).join('');
+let i=vs.findIndex(v=>/Google US English/i.test(v.name));if(i<0)i=vs.findIndex(v=>/Samantha/i.test(v.name));if(i<0)i=vs.findIndex(v=>v.lang=='en-US');if(i<0)i=0;
+const set=()=>{V=vs[s.value];$('#vst').textContent='Голос: '+V.name};s.value=i;s.onchange=set;set()}
+function say(t,q){if(!window.speechSynthesis){toast('Нет озвучки в браузере');return}if(!q)speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='en-US';if(V)u.voice=V;u.rate=$('#sl').checked?.6:.92;speechSynthesis.speak(u)}
+if(window.speechSynthesis){speechSynthesis.onvoiceschanged=vl}vl();
+/* DATA */
+const G=["We’ve done enough. Let’s ___ it a day.|call","Please ___ me posted about the project.|keep","I need to ___ things up before the meeting ends.|wrap","We don’t have time now. Let’s circle ___ to this tomorrow.|back","We ___ consider moving the launch date.|could","Could you ___ what you mean by “soon”?|clarify","Can you ___ on that idea a bit more?|elaborate","Let’s check the plan to make sure we’re on ___.|track","Let’s set a ___ for the final report.|deadline","I’ll follow ___ on this by email.|up"].map(x=>x.split('|'));
+const ENDS=["day","up","posted","to this","consider…","clarify…?","on…?","on track","deadline for…","on this"],BEG=["Call it a","Wrap things","Keep me","Circle back","We could","Could you","Can you elaborate","Make sure we’re","Let’s set a","Follow up"];
+const CT=["It’s the end of a tiring workday.","The meeting is almost over and you summarize the decisions.","Your boss is travelling and you ask for news.","The topic is too big for today, so you postpone it.","You politely suggest an option.","You didn’t understand your colleague’s request.","The idea sounds interesting and you want more details.","You want to be sure the project is moving as planned.","The project has no end date yet.","After yesterday’s meeting you send an email about open questions."];
+const R=[["Let’s stop working for today.","Let’s call it a day."],["Let’s finish and summarize.","Let’s wrap things up."],["Please update me later.","Please keep me posted."],["We’ll talk about this again later.","We’ll circle back to this later."],["Maybe we should think about a new supplier.","We could consider a new supplier."],["What do you mean?","Could you clarify what you mean?"],["Tell me more about it.","Can you elaborate on that?"],["Let’s check that we’re doing it right.","Let’s make sure we’re on track."],["When must this be finished?","Let’s set a deadline for this."],["I’ll contact you again about this.","I’ll follow up on this."]];
+const D=[["A: It’s almost midnight!<br>B: You’re right. Let’s ___.","call it a day"],["A: Is everything covered?<br>B: Yes. Let’s ___ and send the notes.","wrap things up|wrap it up|wrap up"],["A: I’ll be away next week.<br>B: OK, just ___ about any news.","keep me posted"],["A: Prices are a different topic.<br>B: True. Let’s ___ to this after lunch.","circle back"],["A: How can we save money?<br>B: We ___ working from home two days a week.","could consider"],["A: Send it ASAP.<br>B: Could you ___ what ASAP means — today or tomorrow?","clarify"],["A: I have a new idea for the app.<br>B: Interesting! Can you ___ it?","elaborate on"],["A: We’re two weeks into the project.<br>B: Let’s make sure we’re ___.","on track"],["A: Nobody knows when it’s due.<br>B: Let’s ___ the report: Friday.","set a deadline for"],["A: I haven’t got the answer yet.<br>B: I’ll ___ this tomorrow.","follow up on"]].map(x=>[x[0],x[1].split('|')]);
+const W=[["call it a day","make it a day"],["wrap things up","roll things up"],["keep me posted","hold me posted"],["circle back to this","round back to this"],["We could consider moving","We could consider to move"],["Could you clarify","Could you clear"],["Can you elaborate on","Can you elaborate about"],["make sure we’re on track","make sure we’re in track"],["set a deadline for","make a deadline for"],["follow up on","follow up for"]];
+const mk=(p,i)=>{const o=[2,5,7].map(d=>P[(p+d)%10][0]);return o};
+const EXS=[
+{t:"Вставь пропущенное слово",s:1,o:0,it:G.map((g,p)=>({p,q:g[0],t:'t',a:[g[1]],h:P[p][1]}))},
+{t:"Прослушай и напиши выражение",d:"Нажми ▶ (можно включить «медленно» вверху), запиши услышанное.",s:3,o:1,it:P.map((_,p)=>({p,q:'Listen and write',au:1,t:'t',a:[sp(p)]}))},
+{t:"Сочетаемость: соедини начало и конец",s:7,o:2,it:BEG.map((b,p)=>({p,q:b+' ___',t:'s',all:1,o:pm(ENDS,3,2),a:[ENDS[p]]}))},
+{t:"Context: какое выражение подходит?",s:9,o:3,it:CT.map((c,p)=>({p,q:c,t:'s',o:mk(p),a:[P[p][0]]}))},
+{t:"Rephrase: перефразируй с выражением",d:"Напиши предложение, где есть выражение из подсказки.",s:3,o:5,it:R.map((r,p)=>({p,q:`Use “${P[p][0]}”:<br><i>${r[0]}</i>`,t:'t',m:1,a:P[p][3],md:r[1]}))},
+{t:"Complete the mini-situations",d:"Впиши пропущенное выражение целиком.",s:7,o:4,it:D.map((d,p)=>({p,q:d[0],t:'t',a:d[1]}))},
+{t:"Choose the better collocation",d:"Выбери правильный вариант.",s:9,o:7,it:W.map((w,p)=>({p,q:'Choose the better one',t:'s',o:[w[1]],a:[w[0]],h:P[p][1]}))}];
+/* GENERIC ENGINE */
+function items(arr,k){cur={k,arr};$('#area').innerHTML=arr.map((it,j)=>{let c;
+if(it.t=='t')c=`<input id="f${j}" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="пиши здесь">`;
+else{let o=it.o;if(!it.all){o=o.slice();o.splice((o.length==1?B2:B4)[j],0,it.a[0])}
+c=`<select id="f${j}"><option value="">— выбери —</option>${o.map(x=>`<option>${x}</option>`).join('')}</select>`}
+return `<div class="it" id="i${j}"><span class="mu">${j+1}</span><div>${it.q}${it.au?` <button class="b" onclick="say(sp(${it.p}))">▶</button>`:''}${it.h?`<small>${it.h}</small>`:''}</div>${c}<div class="fb" id="b${j}"></div></div>`}).join('');$('#sc').textContent=''}
+function chk(show){if(cur.r)return chkR(show);let n=0;cur.arr.forEach((it,j)=>{const v=$('#f'+j).value,w=nm(v),ok=!!w&&(it.m?it.a.some(x=>w.includes(nm(x))):it.a.some(x=>w==nm(x)));it.u=v;it.ok=ok;if(ok)n++;
+if(show){$('#i'+j).className='it';$('#b'+j).innerHTML='<span class="ans">→ '+(it.md||it.a[0])+'</span>';return}
+$('#i'+j).className='it '+(ok?'ok':'bad');$('#b'+j).innerHTML=ok?'✓ верно':`✗ <button class="b" onclick="rv(${j})">ответ</button>`;ok?delete S[cur.k+j]:S[cur.k+j]=it.p});
+if(!show)$('#sc').textContent='Результат: '+n+'/'+cur.arr.length;sv()}
+function rv(j){const it=cur.arr[j];$('#b'+j).innerHTML='✗ <span class="ans">→ '+(it.md||it.a[0])+'</span>'}
+function reset(){if(cur.r){$('#ta').value='';$('#rs').innerHTML='';$('#sc').textContent=''}else items(cur.arr,cur.k)}
+function cp(){chk();let t=cur.r?cur.txt:cur.arr.map((it,j)=>`${j+1}. ${it.q.replace(/<[^>]+>/g,' ')} | Мой ответ: ${it.u||'—'} | ${it.ok?'✓':'✗ Правильно: '+(it.md||it.a[0])}`).join('\n');
+const fb=()=>{const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy');toast('Скопировано')}catch(e){toast('Не удалось скопировать')}a.remove()};
+navigator.clipboard?navigator.clipboard.writeText(t).then(()=>toast('Скопировано'),fb):fb()}
+const BAR='<div class="bar"><button class="p" onclick="chk()">Проверить</button><button class="b" onclick="chk(1)">Показать ответы</button><button class="b" onclick="reset()">Сбросить</button><button class="b" onclick="cp()">📋 Копировать мои ответы</button><b id="sc"></b></div>';
+/* RETRIEVE */
+function chkR(show){const t=nm($('#ta').value),f=P.map(p=>p[3].some(x=>t.includes(nm(x))));f.forEach((o,i)=>o?delete S['r'+i]:S['r'+i]=i);
+const n=f.filter(Boolean).length,miss=P.filter((_,i)=>!f[i]).map(p=>p[0]);
+cur.txt='Вспомнено '+n+'/10\nМои: '+$('#ta').value.replace(/\n/g,'; ')+'\nЗабыл(а): '+(miss.join('; ')||'—');
+$('#rs').innerHTML=show?'<span class="ans">'+P.map(p=>p[0]+' — '+p[1]).join('<br>')+'</span>':`<b>Вспомнено ${n}/10.</b>${miss.length?'<br>Забыл(а): '+miss.join(' · '):' 🎉'}`;sv()}
+/* WEAK 3 */
+function gen3(){const sel=[...document.querySelectorAll('.chips input:checked')].map(x=>+x.value);if(sel.length!=3){toast('Выбери ровно 3 выражения');return}
+const a=[];sel.forEach(p=>a.push({p,q:`Переведи на английский:<br>«${P[p][1]}»`,t:'t',a:[sp(p)]},{p,q:'Listen and write',au:1,t:'t',a:[sp(p)]},{p,q:`Напиши своё предложение с “${P[p][0]}”`,t:'t',m:1,a:P[p][3],md:R[p][1]}));
+items(pm(a,4,1),'w');$('#sc').textContent=''}
+function auto3(){const c={};Object.values(S).forEach(p=>c[p]=(c[p]||0)+1);const top=Object.keys(c).sort((a,b)=>c[b]-c[a]).slice(0,3);document.querySelectorAll('.chips input').forEach(x=>x.checked=top.includes(x.value));if(!top.length)toast('Ошибок пока нет — выбери сам(а)')}
+/* MILLIONAIRE */
+const L=[100,200,300,500,1000,2000,4000,8000,16000,32000,64000,125000,250000,500000,1000000];
+const Q=[[0,"What does “call it a day” mean?","Stop working for today","Phone someone every day","Have a very long day","Start a new project"],
+[2,"“Keep me posted” means…","keep me updated","keep me waiting","send me a post","leave me alone"],
+[5,"“Could you ___ what you mean?”","clarify","clean","close","clear"],
+[3,"“Let’s circle back to this” means…","we’ll discuss it again later","we’ll walk around","we’ll cancel it","we’ll finish now"],
+[4,"Which is a polite suggestion?","We could consider a new plan.","You must consider!","Consider it, now!","We consider could."],
+[1,"“Wrap things up” means…","finish and conclude","pack a present","start again","delay a meeting"],
+[6,"You want more details. You say:","Can you elaborate on that?","Can you eliminate that?","Can you escape that?","Can you elevate that?"],
+[7,"“We’re on track” means…","progress is as planned","we’re on a train","we’re late","we’re lost"],
+[8,"“Let’s set a deadline for…” means…","decide a final date","start a race","cancel the task","make it longer"],
+[9,"“I’ll follow up on this” means…","I’ll deal with it later","I’ll walk behind you","I’ll ignore it","I’ll forget it"],
+[0,"It’s 7 p.m. “Let’s call it a ___.”","day","night","time","job"],
+[6,"Which sentence is correct?","Can you elaborate on that?","Can you elaborate about that?","Can you elaborate to that?","Can you elaborate that on?"],
+[9,"“I’ll ___ up on this after the call.”","follow","fall","make","take"],
+[7,"“Let’s make sure we’re on ___.”","track","rail","road","line"],
+[2,"Reply to “I’m travelling next week.”","Keep me posted.","Keep me post.","Hold me posted.","Stay me posted."]];
+let M;function mil(){M={n:0,pos:-1,fl:1};mq()}
+function mq(){const q=Q[M.n];let p;do p=Math.floor(Math.random()*4);while(p==M.pos);M.pos=p;M.o=q.slice(3);M.o.splice(p,0,q[2]);M.h=[];M.done=0;M.sel=-1;dr()}
+function dr(){if(M.n==15){$('#area').innerHTML='<h2>🏆 Миллион! 15 из 15!</h2><button class="p" onclick="mil()">Играть снова</button>';return}
+const q=Q[M.n],ok=M.done&&M.o[M.sel]==q[2];
+$('#area').innerHTML=`<div class="mil"><div class="lad">${L.map((v,i)=>`<div class="${i==M.n?'cu':i<M.n?'dn':''}">${i+1}. $${v.toLocaleString('en-US')}</div>`).reverse().join('')}</div><div><div class="qq">Question ${M.n+1}/15<br>${q[1]}</div>${M.o.map((o,i)=>`<button class="op ${M.done?(o==q[2]?'ok':i==M.sel?'bad':''):''}" ${M.h.includes(i)||M.done?'disabled':''} onclick="pk(${i})">${'ABCD'[i]}: ${M.h.includes(i)?'—':o}</button>`).join('')}<div class="bar"><button class="b" onclick="ff()" ${M.fl&&!M.done?'':'disabled'}>50:50</button>${M.done?`<button class="p" onclick="nx()">${ok?'Дальше →':'Начать заново'}</button>${ok?'':'<span class="ans">Правильно: '+q[2]+'</span>'}`:''}</div></div></div>`}
+function pk(i){if(M.done)return;M.done=1;M.sel=i;const q=Q[M.n];M.o[i]==q[2]?delete S['m'+M.n]:S['m'+M.n]=q[0];sv();dr()}
+function nx(){if(M.o[M.sel]!=Q[M.n][2])return mil();M.n++;M.n<15?mq():dr()}
+function ff(){const q=Q[M.n],w=[0,1,2,3].filter(i=>M.o[i]!=q[2]).sort(()=>Math.random()-.5).slice(0,2);M.h=w;M.fl=0;dr()}
+/* VIEWS */
+const T=["📖 Повторение","1 Gaps","2 Dictation","3 Match","4 Context","5 Rephrase","6 Mini","7 Collocation","8 Retrieve","9 Weak 3","🎯 Millionaire"];
+$('#nav').innerHTML=T.map((t,i)=>`<button class="t" id="t${i}" onclick="go(${i})">${t}</button>`).join('');
+function go(i){speechSynthesis&&speechSynthesis.cancel();document.querySelectorAll('.t').forEach((b,j)=>b.classList.toggle('on',i==j));const m=$('#main');
+if(i==0){m.innerHTML=`<h2>Повторение</h2><p class="mu">Послушай каждое выражение и повтори вслух (голос: Google US English / Samantha).</p><p><button class="p" onclick="speechSynthesis.cancel();P.forEach((_,p)=>say(sp(p),1))">▶ Прослушать все</button></p><table>${P.map((p,j)=>`<tr><td><button class="b" onclick="say(sp(${j}))">▶</button></td><td><b>${p[0]}</b><small>${p[2]}</small></td><td>${p[1]}</td></tr>`).join('')}</table>`;return}
+if(i<=7){const e=EXS[i-1];m.innerHTML=`<h2>${e.t}</h2><p class="mu">${e.d||''}</p>${BAR}<div id="area"></div>`;items(pm(e.it,e.s,e.o),'e'+i);return}
+if(i==8){m.innerHTML=`<h2>Write as many as you remember</h2><p class="mu">Без подсказок напиши выражения из урока (по одному в строке).</p><textarea id="ta" rows="9" placeholder="1. …"></textarea>${BAR}<div id="rs"></div>`;cur={r:1,k:'r'};return}
+if(i==9){m.innerHTML=`<h2>3 least confident</h2><p class="mu">Выбери 3 выражения, в которых ты менее всего уверен(а) — получишь по 3 задания на каждое.</p><div class="chips">${P.map((p,j)=>`<label><input type="checkbox" value="${j}" style="width:auto"> ${p[0]}</label>`).join('')}</div><div class="bar"><button class="b" onclick="auto3()">Взять мои проблемные</button><button class="p" onclick="gen3()">Создать задания</button></div>${BAR}<div id="area"></div>`;cur={k:'w',arr:[]};return}
+m.innerHTML='<h2>Who Wants to Be a Millionaire? 🎯</h2><p class="mu">15 вопросов, есть подсказка 50:50.</p><div id="area"></div>';mil()}
+sv();go(0);
+</script></body></html>
