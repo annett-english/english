@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Vocabulary: Help & Rebuild</title>
+<style>
+:root{--bg:#f6f7fb;--card:#fff;--tx:#1f2430;--mu:#6b7280;--ac:#3b6cf6;--ok:#16a34a;--bad:#dc2626;--wn:#d97706;--bd:#e3e6ee;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14161c;--card:#1d2029;--tx:#e8eaf0;--mu:#9aa1b0;--ac:#7c9cff;--ok:#4ade80;--bad:#f87171;--wn:#fbbf24;--bd:#30343f}}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+.wrap{max-width:1100px;margin:auto;padding:16px;display:grid;grid-template-columns:1fr 230px;gap:16px}
+@media(max-width:800px){.wrap{grid-template-columns:1fr}}
+h1{font-size:1.5rem;margin:0 0 4px}h2{font-size:1.1rem;margin:0 0 4px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:16px;margin-bottom:14px}
+.mu{color:var(--mu);font-size:.9rem}
+table{width:100%;border-collapse:collapse}td{padding:6px 4px;border-bottom:1px solid var(--bd)}
+td.tr{color:var(--mu);font-family:Georgia,serif}
+button{font:inherit;cursor:pointer;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:9px;padding:6px 12px}
+button.p{background:var(--ac);color:#fff;border-color:var(--ac)}button:hover{filter:brightness(.95)}
+input[type=text],textarea{font:inherit;border:1px solid var(--bd);border-radius:8px;padding:5px 8px;background:var(--bg);color:var(--tx);min-width:150px}
+textarea{width:100%;min-height:60px}
+ol{padding-left:22px}li{margin:9px 0}
+.ok{border-color:var(--ok)!important;background:color-mix(in srgb,var(--ok) 15%,var(--bg))!important}
+.bad{border-color:var(--bad)!important;background:color-mix(in srgb,var(--bad) 15%,var(--bg))!important}
+.shown{border-color:var(--wn)!important}
+.bank{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}.bank span{background:var(--bg);border:1px solid var(--bd);border-radius:20px;padding:2px 10px;font-size:.9rem}
+.tok{cursor:pointer;padding:1px 2px;border-radius:4px}.tok:hover{background:var(--bd)}
+.tok.sel{background:color-mix(in srgb,var(--ac) 30%,transparent)}
+.tok.g{background:color-mix(in srgb,var(--ok) 35%,transparent)}.tok.m{outline:2px solid var(--wn)}.tok.w{background:color-mix(in srgb,var(--bad) 35%,transparent)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px}
+.score{font-weight:600}aside .card{position:sticky;top:12px}
+aside li{display:flex;justify-content:space-between;gap:6px;list-style:none;margin:4px 0}aside ul{padding:0;margin:8px 0}
+.mod{font-size:.9rem;color:var(--ok);margin:3px 0}
+</style></head><body>
+<div class="wrap"><main>
+<div class="card"><h1>🧭 Vocabulary: Help &amp; Rebuild</h1>
+<div class="mu">Сначала повторите слова и прослушайте их. Голос: <b id="vi">…</b> (ищу Google US English / Samantha)</div>
+<div class="row"><button class="p" onclick="listenAll()">🔊 Прослушать все слова</button><button onclick="speak('Testing the audio. Orphanage, malnutrition, lorry.')">Проверить звук</button><span id="aw" class="mu"></span></div>
+<table id="vt" style="margin-top:10px"></table></div>
+<div id="ex"></div>
+<div class="card"><h2>📋 Скопировать всё</h2><div class="mu">Все ваши ответы, предложения и правильные варианты — одним текстом.</div>
+<div class="row"><button class="p" onclick="copyAll()">Скопировать все ответы</button><span id="cp" class="score"></span></div></div>
+</main>
+<aside><div class="card"><h2>⚠️ Проблемные слова</h2><div class="mu">Слова, где была ошибка</div><ul id="pw"><li class="mu">Пока нет ошибок 🎉</li></ul><button onclick="PW={};rp()">Очистить</button></div></aside></div>
+<script>
+const W=[["lorry","/ˈlɒri/","грузовик",/lorr(y|ies)/],["repair","/rɪˈpeə(r)/","ремонтировать, чинить",/repair/],["shelter","/ˈʃeltə(r)/","убежище, приют",/shelter/],["set up a new organization","/set ʌp ə njuː ˌɔːɡənaɪˈzeɪʃn/","создать новую организацию",/set up/],["rebuild","/ˌriːˈbɪld/","восстановить, отстроить заново",/rebuil/],["orphan","/ˈɔːfn/","сирота",/orphan(?!age)/],["malnutrition","/ˌmælnjuˈtrɪʃn/","недоедание, плохое питание",/malnutrition/],["seeds","/siːdz/","семена",/seed/],["orphanage","/ˈɔːfənɪdʒ/","детский дом",/orphanage/],["AIDS","/eɪdz/","СПИД",/\baids\b/i]];
+let V=null,PW={};
+const $=s=>document.querySelector(s),n=s=>s.toLowerCase().trim().replace(/\s+/g,' ').replace(/[.!]$/,'').replace(/^(a|an|the) /,'');
+function pick(){const a=speechSynthesis.getVoices();V=a.find(v=>/google us english/i.test(v.name))||a.find(v=>/samantha/i.test(v.name))||a.find(v=>v.lang==='en-US')||a.find(v=>/^en/.test(v.lang))||null;$('#vi').textContent=V?V.name:'голос по умолчанию';if(!V&&a.length)$('#aw').textContent='⚠ Английский голос не найден — звук может быть на другом языке.'}
+function say(t){const u=new SpeechSynthesisUtterance(t);if(V)u.voice=V;u.lang='en-US';u.rate=.9;speechSynthesis.speak(u)}
+function speak(t){if(!window.speechSynthesis){$('#aw').textContent='⚠ Браузер не поддерживает озвучку.';return}speechSynthesis.cancel();say(t)}
+function listenAll(){if(!window.speechSynthesis)return speak('');speechSynthesis.cancel();W.forEach(w=>say(w[0]))}
+if(window.speechSynthesis){pick();speechSynthesis.onvoiceschanged=pick}else $('#aw').textContent='⚠ Браузер не поддерживает озвучку.';
+$('#vt').innerHTML=W.map(w=>`<tr><td><button onclick="speak('${w[0]}')">🔊</button></td><td><b>${w[0]}</b></td><td class="tr">${w[1]}</td><td>${w[2]}</td></tr>`).join('');
+function rp(){const k=Object.entries(PW).sort((a,b)=>b[1]-a[1]);$('#pw').innerHTML=k.length?k.map(([w,c])=>`<li><span>${w} <span class="mu">×${c}</span></span><button onclick="speak('${w}')">🔊</button></li>`).join(''):'<li class="mu">Пока нет ошибок 🎉</li>'}
+const E=[
+{t:"1. Definition",d:"Напишите слово по определению.",items:[
+["a child without a mother or father",["orphan"],"orphan"],["not having enough to eat",["malnutrition"],"malnutrition"],["the small, hard part of a plant from which a new plant can grow",["seeds","seed"],"seeds"],["a place where children without parents live",["orphanage"],"orphanage"],["a large vehicle that carries goods by road",["lorry"],"lorry"],["an illness which attacks the body's immune system",["aids"],"AIDS"],["to make something broken work again",["repair"],"repair"],["a place that protects you from bad weather or danger",["shelter"],"shelter"]]},
+{t:"2. Context",d:"Вставьте нужное слово (форму менять не нужно, кроме числа).",bank:"AIDS · lorry · malnutrition · orphan · orphanage · rebuild · repair · seeds · shelter",items:[
+["After the flood, many families lived in a temporary ___.",["shelter"],"shelter"],["The ___ brought food and blankets to the village.",["lorry"],"lorry"],["Farmers planted ___ as soon as the rain came.",["seeds"],"seeds"],["Children suffering from ___ often get ill easily.",["malnutrition"],"malnutrition"],["The mechanic needs two days to ___ the engine.",["repair"],"repair"],["She became an ___ when both her parents died.",["orphan"],"orphan"],["The charity wants to ___ the school that the war destroyed.",["rebuild"],"rebuild"],["He grew up in an ___ run by nuns.",["orphanage"],"orphanage"]]},
+{t:"3. Rephrase",d:"Замените выделенные слова одним словом/выражением из списка.",items:[
+["The doctor helped <u>a boy who had lost both parents</u>.",["orphan"],"orphan"],["The villagers want to <u>build the bridge again</u>.",["rebuild"],"rebuild"],["A big <u>truck</u> arrived with water.",["lorry"],"lorry"],["Many people got ill because of <u>not having enough food</u>.",["malnutrition"],"malnutrition"],["In 2005 she <u>created</u> an organization for street children.",["set up","set up a new organization","set up an organization"],"set up a new organization"],["Workers will <u>fix</u> the broken road.",["repair"],"repair"]]},
+{t:"5. Text gaps",d:"Заполните пропуски в тексте (связный рассказ).",items:[
+["Millions of children in Africa lose their parents because of ___.",["aids"],"AIDS"],["Many of them become ___.",["orphans","orphan"],"orphans"],["Some live in an ___, but there are not enough places.",["orphanage"],"orphanage"],["Others have no ___ and sleep outside.",["shelter"],"shelter"],["Without enough food they suffer from ___.",["malnutrition"],"malnutrition"],["Aid workers deliver food by ___.",["lorry","lorries"],"lorry"],["A new charity will ___ the destroyed school,",["rebuild"],"rebuild"],["and give local farmers ___ to grow their own food.",["seeds"],"seeds"]]}
+];
+const TXT="After the war the village was almost destroyed. A [[lorry]] brought food to families living in a [[shelter]]. Many children were [[orphans]] and lived in an [[orphanage]]. Doctors warned about [[malnutrition]] and [[AIDS]]. The charity decided to [[set up a new organization]] to [[repair]] houses, [[rebuild]] the school and give farmers [[seeds]].";
+const OWN=[["orphan","He became an orphan at the age of five."],["shelter","We found shelter from the storm in a cave."],["set up a new organization","They want to set up a new organization for refugees."],["rebuild","After the earthquake, people began to rebuild their town."],["seeds","The children planted seeds in the garden."],["malnutrition","Malnutrition is a serious problem in poor regions."],["repair","My dad can repair almost anything."],["lorry","A lorry blocked the narrow road."]];
+let T=[];const ex=$('#ex');
+E.forEach((e,k)=>{const s=document.createElement('div');s.className='card';s.id='e'+k;
+s.innerHTML=`<h2>${e.t}</h2><div class="mu">${e.d}</div>${e.bank?`<div class="bank">${e.bank.split(' · ').map(x=>`<span>${x}</span>`).join('')}</div>`:''}<ol>${e.items.map((it,i)=>`<li>${it[0].includes('___')?it[0].replace('___',`<input type="text" data-i="${i}" autocomplete="off" spellcheck="false">`):it[0]+` → <input type="text" data-i="${i}" autocomplete="off" spellcheck="false">`}</li>`).join('')}</ol><div class="row"><button class="p" onclick="chk(${k})">Проверить</button><button onclick="shw(${k})">Показать ответы</button><button onclick="rst(${k})">Сбросить</button><span class="score" id="s${k}"></span></div>`;ex.appendChild(s);
+s.addEventListener('keydown',ev=>{if(ev.key==='Enter')chk(k)})});
+function inp(k){return[...document.querySelectorAll(`#e${k} input`)]}
+function chk(k){let c=0;inp(k).forEach((x,i)=>{const it=E[k].items[i],ok=it[1].map(n).includes(n(x.value));x.classList.remove('ok','bad','shown');x.classList.add(ok?'ok':'bad');if(ok)c++;else PW[it[2]]=(PW[it[2]]||0)+1});$('#s'+k).textContent=`${c} / ${E[k].items.length}`;rp()}
+function shw(k){inp(k).forEach((x,i)=>{x.value=E[k].items[i][2];x.className='shown'});$('#s'+k).textContent='ответы показаны'}
+function rst(k){inp(k).forEach(x=>{x.value='';x.className=''});$('#s'+k).textContent=''}
+// Ex4
+const g=[];let gi=-1;TXT.split(/(\[\[.*?\]\])/).forEach(p=>{const t=/^\[\[/.test(p);if(t)gi++;(t?p.slice(2,-2):p).split(/\s+/).filter(Boolean).forEach(w=>T.push({w,g:t?gi:-1,s:0}))});
+const s4=document.createElement('div');s4.className='card';s4.id='e4';
+s4.innerHTML=`<h2>4. Find them in the wild</h2><div class="mu">Прочитайте текст один раз. Затем кликните по каждому слову/выражению из темы (фразу — целиком, по всем её словам).</div><p id="tx" style="line-height:2"></p><div class="row"><button class="p" onclick="c4()">Проверить</button><button onclick="a4()">Показать ответы</button><button onclick="r4()">Сбросить</button><span class="score" id="s4"></span></div>`;
+ex.insertBefore(s4,$('#e3'));
+function d4(m){$('#tx').innerHTML=T.map((t,i)=>{let c='tok';if(m==='c')c+=t.g>=0&&t.s?' g':t.g>=0?' m':t.s?' w':'';else if(m==='a')c+=t.g>=0?' g':'';else if(t.s)c+=' sel';return`<span class="${c}" onclick="tg(${i})">${t.w}</span>`}).join(' ')}
+function tg(i){T[i].s^=1;d4()}d4();
+function c4(){let ok=0;const tot=gi+1;for(let q=0;q<tot;q++){const z=T.filter(t=>t.g===q);if(z.every(t=>t.s)){ok++}else{const w=z.map(t=>t.w).join(' ').replace(/[.,]/g,'');PW[w]=(PW[w]||0)+1}}const wr=T.filter(t=>t.g<0&&t.s).length;$('#s4').textContent=`найдено ${ok} / ${tot}, лишних: ${wr}`;d4('c');rp()}
+function a4(){d4('a');$('#s4').textContent='зелёным — правильные ответы'}function r4(){T.forEach(t=>t.s=0);$('#s4').textContent='';d4()}
+// Ex6
+const s6=document.createElement('div');s6.className='card';s6.id='e6';
+s6.innerHTML=`<h2>6. Write your own sentence + Retrieve</h2><div class="mu">Составьте своё предложение (минимум 4 слова) со словом/выражением.</div><ol>${OWN.map((o,i)=>`<li><b>${o[0]}</b><textarea data-o="${i}" rows="2"></textarea><div class="mu" id="m${i}"></div></li>`).join('')}</ol>
+<div class="row"><button class="p" onclick="c6()">Проверить предложения</button><button onclick="a6()">Показать образцы</button><span class="score" id="s6"></span></div>
+<h2 style="margin-top:18px">Retrieve</h2><div class="mu">Напишите как можно больше слов из списка по памяти (через запятую или с новой строки). Список скрыт 😉</div>
+<textarea id="rt" rows="4"></textarea><div class="row"><button class="p" onclick="cr()">Проверить</button><button onclick="ar()">Показать слова</button><span class="score" id="sr"></span></div>`;ex.appendChild(s6);
+const ow=()=>[...document.querySelectorAll('[data-o]')];
+function c6(){let c=0;ow().forEach((x,i)=>{const r=W.find(w=>w[0]===OWN[i][0])[3],ok=r.test(x.value.toLowerCase())&&x.value.trim().split(/\s+/).length>=4;x.className=ok?'ok':'bad';if(ok)c++;else PW[OWN[i][0]]=(PW[OWN[i][0]]||0)+1});$('#s6').textContent=`${c} / ${OWN.length}`;rp()}
+function a6(){OWN.forEach((o,i)=>$('#m'+i).textContent='Пример: '+o[1])}
+function cr(){const v=$('#rt').value.toLowerCase(),f=W.filter(w=>w[3].test(v)),m=W.filter(w=>!f.includes(w));$('#sr').textContent=`вспомнили ${f.length} / ${W.length}`+(m.length?` · не хватает: ${m.length}`:' 🎉');m.forEach(w=>PW[w[0]]=(PW[w[0]]||0)+1);rp()}
+function ar(){$('#sr').textContent=W.map(w=>w[0]).join(', ')}
+// Copy all
+function copyAll(){let o='VOCABULARY: Help & Rebuild\n';E.forEach((e,k)=>{o+=`\n${e.t}\n`;inp(k).forEach((x,i)=>{const it=E[k].items[i],ok=it[1].map(n).includes(n(x.value));o+=`${i+1}. ${it[0].replace(/<\/?u>/g,'')} → ${x.value||'—'} ${ok?'✓':'✗ (correct: '+it[2]+')'}\n`})
+if(k===2){o+='\n4. Find them in the wild\nChosen: '+(T.filter(t=>t.s).map(t=>t.w).join(' ')||'—')+'\nCorrect: '+TXT.match(/\[\[.*?\]\]/g).map(x=>x.slice(2,-2)).join(', ')+'\n'}});
+o+='\n6. My sentences\n';ow().forEach((x,i)=>o+=`${OWN[i][0]}: ${x.value||'—'}\n`);o+='\nRetrieve\nMine: '+($('#rt').value.replace(/\n/g,', ')||'—')+'\nAll: '+W.map(w=>w[0]).join(', ')+'\n';
+const done=()=>$('#cp').textContent='✓ Скопировано!',fb=()=>{const t=document.createElement('textarea');t.value=o;document.body.appendChild(t);t.select();try{document.execCommand('copy');done()}catch(e){$('#cp').textContent='Не удалось скопировать'}t.remove()};
+navigator.clipboard?navigator.clipboard.writeText(o).then(done,fb):fb()}
+</script></body></html>
