@@ -1,0 +1,75 @@
+<!DOCTYPE html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Hair & Face — Review games</title>
+<style>
+:root{--bg:#f6f3ee;--c:#fff;--t:#222;--m:#6b6b6b;--a:#3b6fd4;--ok:#1f8f4e;--no:#c93636;--b:#ddd5c8;--hl:#fff3b8;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#1b1c1f;--c:#26282c;--t:#eee;--m:#a0a0a0;--a:#7aa2f7;--ok:#5fd08a;--no:#ff7b7b;--b:#3a3d43;--hl:#5a4f1c}}
+:root[data-theme=dark]{--bg:#1b1c1f;--c:#26282c;--t:#eee;--m:#a0a0a0;--a:#7aa2f7;--ok:#5fd08a;--no:#ff7b7b;--b:#3a3d43;--hl:#5a4f1c}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--t);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:760px;margin:auto;padding:16px}h1{margin:.2em 0}h2{margin:0 0 4px;font-size:1.15rem}.in{color:var(--m);margin:0 0 10px;font-size:.92rem}
+.card{background:var(--c);border:1px solid var(--b);border-radius:12px;padding:16px;margin-bottom:14px}
+button{font:inherit;cursor:pointer;border:1px solid var(--b);background:var(--c);color:var(--t);border-radius:8px;padding:6px 12px}
+button.pr{background:var(--a);color:#fff;border-color:var(--a)}button:disabled{opacity:.45;cursor:default}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}@media(max-width:520px){.opts{grid-template-columns:1fr}}
+.opts button{text-align:left;padding:10px}.ok{background:color-mix(in srgb,var(--ok) 25%,var(--c))!important;border-color:var(--ok)!important}.bad{background:color-mix(in srgb,var(--no) 25%,var(--c))!important;border-color:var(--no)!important}
+.sc{font-weight:600;margin-left:8px}.big{font-size:1.5rem;letter-spacing:.3em;text-align:center;margin:10px 0;word-break:break-all}
+.kb{display:flex;flex-wrap:wrap;gap:5px;justify-content:center}.kb button{width:36px;padding:5px 0;text-align:center}
+table{border-collapse:collapse;margin:8px auto;user-select:none}td{width:34px;height:34px;text-align:center;font-weight:700;border:1px solid var(--b);cursor:pointer;text-transform:uppercase}
+td.s{background:var(--hl);outline:2px solid var(--a)}td.f{background:color-mix(in srgb,var(--ok) 35%,var(--c))}td.h{background:color-mix(in srgb,var(--no) 25%,var(--c))}
+.wl{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}.wl span{border:1px solid var(--b);border-radius:20px;padding:1px 10px;font-size:.9rem}.wl .d{text-decoration:line-through;color:var(--ok)}
+li{margin:12px 0}ol{padding-left:22px}
+</style></head><body><main>
+<h1>Hair & Face — Review 🔁</h1>
+<p class="in">Голос: <b id="vn">…</b> <button onclick="say('Audio check. Curly red hair.')">🔈 Проверить звук</button></p>
+<section class="card" id="q"><h2>Review 1 — Who wants to be a millionaire? 💰</h2><p class="in">15 вопросов. Ошибся — игра заканчивается. Есть подсказка 50:50.</p><div id="qb"></div></section>
+<section class="card" id="h"><h2>Review 2 — Hangman</h2><p class="in">Угадай слово по переводу. Можно послушать подсказку 🔊 (ошибок не больше 6).</p><div id="hb"></div></section>
+<section class="card" id="ws"><h2>Review 3 — Word search</h2><p class="in">Нажми первую и последнюю букву слова. Слова идут →, ↓, ↘ и ↙ (и в обратную сторону).</p><div id="wb"></div></section>
+<section class="card" id="n"><h2>Review 4 — Which sentence sounds natural?</h2><p class="in">Выбери естественное предложение. Нажми 🔊, чтобы послушать.</p><div id="nb"></div></section>
+<section class="card"><h2>📋 Copy my results</h2><p class="in">Имя: <input id="nm" placeholder="Your name" style="font:inherit;color:var(--t);background:var(--bg);border:1px solid var(--b);border-radius:8px;padding:4px 8px"></p><button class="pr" onclick="copyAll()">Copy results</button><span class="sc" id="cm"></span></section>
+</main><script>
+const $=s=>document.querySelector(s),sh=a=>[...a].sort(()=>Math.random()-.5);
+let voice=null;
+function pick(){const v=speechSynthesis.getVoices();voice=v.find(x=>/Google US English/i.test(x.name))||v.find(x=>/Samantha/i.test(x.name))||v.find(x=>/en[-_]US/.test(x.lang))||null;$('#vn').textContent=voice?voice.name:'голос по умолчанию'}
+try{speechSynthesis.onvoiceschanged=pick;pick()}catch(e){$('#vn').textContent='нет аудио'}
+function say(t){try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='en-US';if(voice)u.voice=voice;u.rate=.9;speechSynthesis.speak(u)}catch(e){}}
+const R={q:'not played',h:'0 won / 0 lost',ws:'not finished',n:'not checked'};const log=[];
+/* 1 quiz */
+const Q=[["A person with no hair is …","bald","spiky","wavy","long"],["Hair on the chin is a …","beard","moustache","ponytail","bun"],["Hair above the upper lip is a …","moustache","bun","eyebrows","braids"],["Short rough hair after not shaving is …","stubble","a bun","plaits","wavy"],["Hair with soft S-shaped waves is …","wavy","straight","bald","coily"],["Tight little spirals: the hair is …","coily","straight","spiky","long"],["“Plaits” is the British word for …","braids","a bun","a beard","stubble"],["The colour of carrots is …","red","ash blonde","grey","dark brown"],["Which is the correct order?","long wavy red hair","red wavy long hair","wavy long red hair","long red wavy hair"],["Pale yellowish-grey hair is …","ash blonde","dark brown","red","light brown"],["Which is NOT a hair colour?","coily","red","grey","light brown"],["Which is NOT a hairstyle?","stubble","a bun","a ponytail","braids"],["How do we say /ˈaɪbraʊz/?","eyebrows","eyelashes","eyelids","eyesight"],["Hair that is neither short nor long is …","medium-length","bald","spiky","straight"],["Which sentence is natural?","She has short curly ash blonde hair.","She has ash blonde curly short hair.","She has curly short ash blonde hair.","She has hair short curly ash blonde."]];
+const $$=[100,200,300,500,1000,2000,4000,8000,16000,32000,64000,125000,250000,500000,1000000];
+let qi=0,qo=[],qf=true,qlock=false;
+function qs(){qi=0;qf=true;qshow()}
+function qshow(){qlock=false;const q=Q[qi];qo=sh(q.slice(1));$('#qb').innerHTML=`<b>Question ${qi+1}/15 · ${$$[qi].toLocaleString()} 💰</b><p>${q[0]}</p><div class="opts">${qo.map((o,i)=>`<button data-i="${i}">${'ABCD'[i]}. ${o}</button>`).join('')}</div><button id="ff" ${qf?'':'disabled'}>50:50</button>`;
+document.querySelectorAll('#qb .opts button').forEach(b=>b.onclick=()=>{if(qlock)return;qlock=true;const g=qo[b.dataset.i]==Q[qi][1];b.classList.add(g?'ok':'bad');if(!g)[...document.querySelectorAll('#qb .opts button')].find(x=>qo[x.dataset.i]==Q[qi][1]).classList.add('ok');
+setTimeout(()=>{if(g){if(qi==14){R.q='🏆 won 1,000,000!';$('#qb').innerHTML='<h2>🏆 You are a millionaire!</h2><button class="pr" onclick="qs()">Play again</button>'}else{qi++;qshow()}}else{R.q=`lost on question ${qi+1} (${qi?$$[qi-1].toLocaleString():0} earned)`;$('#qb').innerHTML=`<h2>Game over 😢</h2><p>You earned ${qi?$$[qi-1].toLocaleString():0}. Correct: <b>${Q[qi][1]}</b></p><button class="pr" onclick="qs()">Try again</button>`}},g?800:1500)});
+$('#ff').onclick=()=>{if(qlock)return;qf=false;$('#ff').disabled=true;const w=sh([...document.querySelectorAll('#qb .opts button')].filter(x=>qo[x.dataset.i]!=Q[qi][1])).slice(0,2);w.forEach(x=>{x.disabled=true;x.style.visibility='hidden'})}}
+qs();
+/* 2 hangman */
+const HW=[["bald","лысый"],["beard","борода"],["stubble","щетина"],["eyebrows","брови"],["eyelashes","ресницы"],["ponytail","хвост"],["moustache","усы"],["wavy","волнистые"],["curly","кудрявые"],["spiky","торчащие"],["straight","прямые"],["coily","афро-кудри"]];
+let hq=[],hw,hg,hm,hwin=0,hl=0;
+function hn(){if(!hq.length)hq=sh(HW);[hw]=[hq.pop()];hg=[];hm=0;hr()}
+function hr(){const w=hw[0],done=[...w].every(c=>hg.includes(c)),dead=hm>=6;
+$('#hb').innerHTML=`<p style="text-align:center">${'😀😐😕😟😧😨💀'[hm]} Mistakes: ${hm}/6 · Hint: <b>${hw[1]}</b> <button data-s="1" onclick="say(hw[0])">🔊</button></p><div class="big">${[...w].map(c=>hg.includes(c)||dead?c:'_').join(' ')}</div><div class="kb">${[...'abcdefghijklmnopqrstuvwxyz'].map(c=>`<button ${hg.includes(c)||done||dead?'disabled':''} onclick="hp('${c}')">${c}</button>`).join('')}</div>${done?'<p style="text-align:center"><b>🎉 Correct!</b> ':dead?`<p style="text-align:center"><b>The word was: ${w}</b> `:'<p>'}${done||dead?'<button class="pr" onclick="hn()">Next word</button>':''}</p><p class="sc">Won ${hwin} · Lost ${hl}</p>`}
+function hp(c){hg.push(c);if(!hw[0].includes(c))hm++;const done=[...hw[0]].every(x=>hg.includes(x));if(done)hwin++;if(hm>=6)hl++;R.h=`${hwin} won / ${hl} lost`;hr()}
+hn();
+/* 3 word search */
+const SW=["bald","beard","bun","wavy","curly","spiky","stubble","ponytail","eyebrows","coily"],N=11,D=[[0,1],[1,0],[1,1],[1,-1]];
+let G,PL,fd,st;
+function wsn(){fd=new Set();st=null;G=Array.from({length:N},()=>Array(N).fill(''));PL={};
+for(const w of sh(SW).sort((a,b)=>b.length-a.length)){for(let t=0;t<500;t++){const d=D[Math.random()*4|0],rv=Math.random()<.5,s=rv?[...w].reverse().join(''):w,r=Math.random()*N|0,c=Math.random()*N|0,er=r+d[0]*(s.length-1),ec=c+d[1]*(s.length-1);if(er<0||er>=N||ec<0||ec>=N)continue;if([...s].some((ch,i)=>G[r+d[0]*i][c+d[1]*i]&&G[r+d[0]*i][c+d[1]*i]!=ch))continue;[...s].forEach((ch,i)=>G[r+d[0]*i][c+d[1]*i]=ch);PL[w]=[r,c,d,s.length,rv];break}}
+for(let i=0;i<N;i++)for(let j=0;j<N;j++)if(!G[i][j])G[i][j]='abcdefghijklmnopqrstuvwxyz'[Math.random()*26|0];wsr()}
+function cells(r,c,d,n){return Array.from({length:n},(_,i)=>[r+d[0]*i,c+d[1]*i])}
+function wsr(h){const hs=new Set();if(h)Object.values(PL).forEach(p=>cells(p[0],p[1],p[2],p[3]).forEach(x=>hs.add(x+'')));const fs=new Set();[...fd].forEach(w=>{const p=PL[w];cells(p[0],p[1],p[2],p[3]).forEach(x=>fs.add(x+''))});
+$('#wb').innerHTML=`<table>${G.map((row,i)=>`<tr>${row.map((ch,j)=>`<td data-r="${i}" data-c="${j}" class="${st&&st[0]==i&&st[1]==j?'s':fs.has([i,j]+'')?'f':hs.has([i,j]+'')?'h':''}">${ch}</td>`).join('')}</tr>`).join('')}</table><div class="wl">${SW.map(w=>`<span class="${fd.has(w)?'d':''}">${w}</span>`).join('')}</div><p style="text-align:center"><span class="sc">${fd.size}/${SW.length}</span> <button onclick="wsr(1)">Show answers</button> <button onclick="wsn()">New grid</button></p>`;
+R.ws=`${fd.size}/${SW.length} found`;
+document.querySelectorAll('#wb td').forEach(td=>td.onclick=()=>{const r=+td.dataset.r,c=+td.dataset.c;if(!st){st=[r,c];wsr();return}const dr=r-st[0],dc=c-st[1],n=Math.max(Math.abs(dr),Math.abs(dc))+1;if((dr==0||dc==0||Math.abs(dr)==Math.abs(dc))&&n>1){const d=[Math.sign(dr),Math.sign(dc)],s=cells(st[0],st[1],d,n).map(x=>G[x[0]][x[1]]).join(''),w=SW.find(x=>x==s||x==[...s].reverse().join(''));if(w)fd.add(w)}st=null;wsr()})}
+wsn();
+/* 4 natural */
+const NS=[["She has long straight dark hair.","She has dark straight long hair."],["He has stubble on his chin.","He has a stubble on his chin."],["She tied her hair in a bun.","She tied her hair at a bun."],["He is going bald.","He is going to bald."],["I’ve got short spiky hair.","I’ve got spiky short hair."],["He has a grey beard.","He has a beard grey."],["She has her hair in braids.","She has her hairs in braids."],["Her hair is wavy.","Her hairs are wavy."]];
+const ns=NS.map(p=>sh([[p[0],1],[p[1],0]])),na=[];
+$('#nb').innerHTML='<ol>'+ns.map((p,i)=>`<li><div class="opts" style="margin:0">${p.map((o,j)=>`<button data-i="${i}" data-j="${j}">${'AB'[j]}. ${o[0]}</button>`).join('')}</div><button onclick="say('${p.map(o=>o[0].replace(/'/g,'’')).join('. ... ')}')">🔊 both</button> <span class="mk"></span></li>`).join('')+'</ol><button class="pr" onclick="nc()">Check</button><button onclick="ns2()">Show answers</button> <span class="sc" id="ns"></span>';
+document.querySelectorAll('#nb .opts button').forEach(b=>b.onclick=()=>{const i=+b.dataset.i;na[i]=+b.dataset.j;b.parentNode.querySelectorAll('button').forEach(x=>x.classList.remove('ok','bad'));b.style.outline='2px solid var(--a)';[...b.parentNode.children].filter(x=>x!=b).forEach(x=>x.style.outline='')});
+function nc(){let n=0;document.querySelectorAll('#nb li').forEach((li,i)=>{const bs=li.querySelectorAll('.opts button');bs.forEach((b,j)=>{b.style.outline='';b.classList.remove('ok','bad');if(ns[i][j][1]&&na[i]!==undefined)b.classList.add('ok');else if(na[i]==j)b.classList.add('bad')});if(na[i]!==undefined&&ns[i][na[i]][1])n++});$('#ns').textContent=`${n}/${NS.length}`;R.n=`${n}/${NS.length}`}
+function ns2(){document.querySelectorAll('#nb li').forEach((li,i)=>li.querySelectorAll('.opts button').forEach((b,j)=>{b.style.outline='';b.classList.toggle('ok',!!ns[i][j][1])}))}
+/* copy */
+function cp(txt,el){const ok=()=>{el.textContent='✓ Copied!';setTimeout(()=>el.textContent='',2500)};try{navigator.clipboard.writeText(txt).then(ok,fb)}catch(e){fb()}function fb(){const a=document.createElement('textarea');a.value=txt;document.body.append(a);a.select();try{document.execCommand('copy')}catch(e){}a.remove();ok()}}
+function copyAll(){cp(`Student: ${$('#nm').value||'—'}\nReview 1 — Millionaire: ${R.q}\nReview 2 — Hangman: ${R.h}\nReview 3 — Word search: ${R.ws}\nReview 4 — Natural sentences: ${R.n}`,$('#cm'))}
+</script></body></html>
