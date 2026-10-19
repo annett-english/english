@@ -1,0 +1,106 @@
+<!DOCTYPE html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Quantifiers — повторение</title>
+<style>
+:root{--bg:#fafaf7;--card:#fff;--tx:#1f2430;--mu:#667;--ac:#3b6fd8;--ok:#1f9d55;--okb:#e7f6ec;--bad:#d64545;--badb:#fdecec;--bd:#dcdfe6;--sh:#eef2fc;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15171c;--card:#1e222a;--tx:#e8eaf0;--mu:#9aa3b2;--ac:#7aa2ff;--ok:#4cc27f;--okb:#17301f;--bad:#ff7a7a;--badb:#3a1c1c;--bd:#343a46;--sh:#262d3d}}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:760px;margin:0 auto;padding:16px}
+h1{font-size:1.5rem;margin:.2em 0}.sub{color:var(--mu);margin:0 0 12px}
+.rule{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:10px 14px;margin-bottom:12px;font-size:.93rem}
+.rule summary{cursor:pointer;font-weight:600}.rule td{padding:2px 8px;text-align:left;vertical-align:top}.rule div{overflow-x:auto}
+nav{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:8px}
+nav button{flex:none;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:20px;padding:6px 12px;cursor:pointer;font:inherit;font-size:.9rem}
+nav button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+section{display:none;background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px}section.on{display:block}
+h2{font-size:1.15rem;margin:0 0 2px}.ins{color:var(--mu);margin:0 0 12px;font-size:.92rem}
+.item{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-start;border:1px solid var(--bd);border-left:4px solid var(--bd);border-radius:10px;padding:8px 10px;margin-bottom:8px}
+.item.ok{border-left-color:var(--ok);background:var(--okb)}.item.bad{border-left-color:var(--bad);background:var(--badb)}.item.show{border-left-color:var(--ac);background:var(--sh)}
+.n{font-weight:700;color:var(--mu);min-width:1.4em}.b{flex:1;min-width:200px}.fb{flex-basis:100%;font-size:.88rem;display:none;padding-left:1.9em}
+.item.ok .fb,.item.bad .fb,.item.show .fb{display:block}
+.opts{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.opt,.chip,.btn{border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:8px;padding:5px 12px;font:inherit;cursor:pointer}
+.opt.sel,.chip:hover,.w.sel{background:var(--ac);color:#fff;border-color:var(--ac)}
+.w{cursor:pointer;border-radius:5px;padding:0 3px;border-bottom:1px dashed var(--mu)}
+.gap{font:inherit;border:0;border-bottom:2px solid var(--ac);background:transparent;color:var(--tx);padding:2px 4px;margin:0 4px;max-width:60%;outline:0}
+.ans{min-height:40px;border:1px dashed var(--bd);border-radius:8px;padding:4px;display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px}.pool{display:flex;flex-wrap:wrap;gap:6px}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}.btn.pri{background:var(--ac);color:#fff;border-color:var(--ac)}.sc{font-weight:600;margin-left:auto}
+</style></head><body><main>
+<h1>🔁 Quantifiers — повторение</h1><p class="sub">a / an · some · any · a lot of · числа — 4 упражнения, A1–A2</p>
+<details class="rule" open><summary>Правило-шпаргалка</summary><div><table>
+<tr><td><b>a / an</b></td><td>исчисляемые, единственное число: <i>a banana, an apple</i></td></tr>
+<tr><td><b>числа</b></td><td>исчисляемые, множественное число: <i>four apples</i></td></tr>
+<tr><td><b>some</b></td><td>утверждения (и предложения-просьбы): <i>I’d like some pasta.</i></td></tr>
+<tr><td><b>any</b></td><td>вопросы и отрицания: <i>Do you have any juice?</i></td></tr>
+<tr><td><b>a lot of</b></td><td>исчисляемые (мн. число) и неисчисляемые: <i>a lot of rice</i></td></tr>
+<tr><td><b>неисчисл.</b></td><td>глагол в единственном числе: <i>The milk is cold.</i></td></tr></table></div></details>
+<nav id="nav"></nav><div id="secs"></div>
+<script>
+const $=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e};
+const shuf=n=>{let a=[...Array(n).keys()],o=a.join();do{a.sort(()=>Math.random()-.5)}while(a.join()==o&&n>1);return a};
+const T={
+choice(it,b){let s=-1;const r=$("div","opts");const bs=it.o.map((t,i)=>{const x=$("button","opt",t);x.onclick=()=>{s=i;mk()};r.append(x);return x});
+ const mk=()=>bs.forEach((x,i)=>x.classList.toggle("sel",i==s));b.append($("div","q",it.q),r);
+ return{check:()=>s==it.a,show:()=>{s=it.a;mk()},reset:()=>{s=-1;mk()}}},
+fm(it,b){let s=-1;const r=$("div","q");const sp=it.s.split(" ").map((t,i)=>{const x=$("span","w",t);x.onclick=()=>{s=i;mk()};r.append(x," ");return x});
+ const mk=()=>sp.forEach((x,i)=>x.classList.toggle("sel",i==s));b.append(r);
+ return{check:()=>s==it.w,show:()=>{s=it.w;mk()},reset:()=>{s=-1;mk()}}},
+gap(it,b){const[p,q]=it.t.split("___");const i=$("input","gap");i.autocomplete="off";i.size=9;
+ b.append($("span","q",p),i,$("span","q",q));
+ return{check:()=>it.a.includes(i.value.trim().toLowerCase()),show:()=>i.value=it.a[0],reset:()=>i.value=""}},
+bld(it,b){const ws=it.s.split(" "),p=shuf(ws.length);let c=[];const an=$("div","ans"),po=$("div","pool");b.append(an,po);
+ const dr=()=>{an.innerHTML="";po.innerHTML="";c.forEach((k,j)=>{const x=$("button","chip",ws[k]);x.onclick=()=>{c.splice(j,1);dr()};an.append(x)});
+  p.filter(k=>!c.includes(k)).forEach(k=>{const x=$("button","chip",ws[k]);x.onclick=()=>{c.push(k);dr()};po.append(x)})};dr();
+ return{check:()=>c.map(k=>ws[k]).join(" ")==it.s,show:()=>{c=ws.map((_,i)=>i);dr()},reset:()=>{c=[];dr()}}}
+};
+const X=[
+{n:"Choose",type:"choice",ins:"Choose the correct answer. Выбери правильный вариант.",items:[
+{q:"She wants ___ orange.",o:["a","an","some"],a:1,e:"Orange — исчисляемое в ед. числе, начинается с гласного звука → an."},
+{q:"Do we have ___ bread?",o:["some","any","an"],a:1,e:"Вопрос → any. Bread — неисчисляемое, an нельзя."},
+{q:"I need ___ sugar for the cake.",o:["a","some","four"],a:1,e:"Sugar — неисчисляемое, утверждение → some. A и числа не подходят."},
+{q:"There are ___ students in the class.",o:["a lot of","a","an"],a:0,e:"Students — мн. число. A / an нельзя, a lot of — можно."},
+{q:"He doesn’t want ___ coffee.",o:["some","any","a"],a:1,e:"Отрицание (doesn’t) → any."},
+{q:"We have ___ eggs.",o:["three","a","an"],a:0,e:"Eggs — мн. число: нужно число (three), а не a / an."},
+{q:"My brother has ___ umbrella.",o:["a","an","some"],a:1,e:"Umbrella — ед. число, гласный звук → an."},
+{q:"They drink ___ tea every day.",o:["a lot of","a","an"],a:0,e:"Tea — неисчисляемое. A lot of подходит, a / an — нет."}]},
+{n:"Fill in the gaps",type:"gap",ins:"Fill in the gaps. Впиши a, an, some, any или a lot of.",items:[
+{t:"I’d like ___ cup of tea.",a:["a"],e:"Cup — исчисляемое, ед. число, согласный звук → a."},
+{t:"We don’t have ___ milk.",a:["any"],e:"Отрицание → any."},
+{t:"Would you like ___ cake?",a:["some"],e:"Предложение (угощение) — обычно some, хотя это вопрос."},
+{t:"He eats ___ vegetables every day.",a:["a lot of","some"],e:"Vegetables — мн. число, утверждение: a lot of или some."},
+{t:"She has ___ idea!",a:["an"],e:"Idea начинается с гласного звука → an."},
+{t:"Are there ___ chairs in the room?",a:["any"],e:"Вопрос + мн. число → any."},
+{t:"Can I have ___ water, please?",a:["some"],e:"Просьба — обычно some. Water неисчисляемое."},
+{t:"There is ___ apple on the table.",a:["an"],e:"Apple — ед. число, гласный звук → an."}]},
+{n:"Find the mistake",type:"fm",ins:"Find the mistake. Нажми на слово, в котором ошибка.",items:[
+{s:"She has an dog.",w:2,e:"Dog начинается с согласного звука → a dog."},
+{s:"We don’t need some water.",w:3,e:"Отрицание → any: We don’t need any water."},
+{s:"There is a lot of cars in the street.",w:1,e:"Cars — мн. число, поэтому глагол are: There are a lot of cars."},
+{s:"Do they have some friends here?",w:3,e:"Вопрос → any: Do they have any friends here?"},
+{s:"I eat a bread every morning.",w:2,e:"Bread неисчисляемое: I eat some bread / a lot of bread."},
+{s:"My mom wants three apple.",w:4,e:"После числа — множественное число: three apples."},
+{s:"The milk are cold.",w:2,e:"Milk неисчисляемое → глагол в ед. числе: The milk is cold."},
+{s:"He has any money.",w:2,e:"Это утверждение → some или a lot of: He has some money."}]},
+{n:"Sentence Builder",type:"bld",ins:"Sentence Builder. Собери предложение. Нажми на слово в рамке, чтобы убрать его.",items:[
+{s:"Would you like some tea?",e:"Предложение угощения → some."},
+{s:"I don’t have any money.",e:"Отрицание → any."},
+{s:"There are a lot of books here.",e:"Books — мн. число, поэтому are; a lot of — «много»."},
+{s:"She has an umbrella.",e:"Umbrella — гласный звук → an."},
+{s:"We need two eggs.",e:"Число + мн. число: two eggs."},
+{s:"Is there any milk?",e:"Вопрос + неисчисляемое → any; глагол is."},
+{s:"He eats a lot of fish.",e:"Fish неисчисляемое → a lot of."},
+{s:"The water is cold.",e:"Неисчисляемое → глагол is."}]}
+];
+const nav=document.getElementById("nav"),secs=document.getElementById("secs");
+const go=i=>{[...nav.children].forEach((b,j)=>b.classList.toggle("on",j==i));[...secs.children].forEach((s,j)=>s.classList.toggle("on",j==i))};
+X.forEach((ex,k)=>{
+ const nb=$("button","",(k+1)+". "+ex.n);nb.onclick=()=>go(k);nav.append(nb);
+ const s=$("section");s.append($("h2","",(k+1)+". "+ex.n),$("p","ins",ex.ins));
+ const os=ex.items.map((it,i)=>{const w=$("div","item",'<span class="n">'+(i+1)+'</span><div class="b"></div><div class="fb"></div>');const o=T[ex.type](it,w.querySelector(".b"));o.w=w;o.it=it;s.append(w);return o});
+ const sc=$("span","sc"),bar=$("div","bar");
+ const fb=(o,c,t)=>{o.w.className="item "+c;o.w.querySelector(".fb").innerHTML=t};
+ const bc=$("button","btn pri","Проверить");bc.onclick=()=>{let n=0;os.forEach(o=>{const ok=o.check();n+=ok;fb(o,ok?"ok":"bad",(ok?"✓ ":"✗ ")+o.it.e)});sc.textContent=n+" / "+os.length};
+ const bs=$("button","btn","Показать ответы");bs.onclick=()=>{os.forEach(o=>{o.show();fb(o,"show","→ "+o.it.e)});sc.textContent=""};
+ const br=$("button","btn","Сбросить");br.onclick=()=>{os.forEach(o=>{o.reset();fb(o,"","")});sc.textContent=""};
+ bar.append(bc,bs,br,sc);s.append(bar);secs.append(s)});
+go(0);
+</script></main></body></html>
