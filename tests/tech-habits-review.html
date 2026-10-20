@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tech habits — Review A2</title>
+<style>
+:root{--bg:#f6f7fb;--card:#fff;--tx:#1d2433;--mu:#667085;--ac:#3b5bdb;--ok:#2b8a3e;--okb:#e6f6ea;--no:#c92a2a;--nob:#fdeaea;--bd:#dde1ea}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12151c;--card:#1b202b;--tx:#e8ebf2;--mu:#98a2b3;--ac:#8da2ff;--ok:#69db7c;--okb:#173222;--no:#ff8787;--nob:#3a1b1b;--bd:#2d3444}}
+:root[data-theme="dark"]{--bg:#12151c;--card:#1b202b;--tx:#e8ebf2;--mu:#98a2b3;--ac:#8da2ff;--ok:#69db7c;--okb:#173222;--no:#ff8787;--nob:#3a1b1b;--bd:#2d3444}
+*{box-sizing:border-box}body{margin:0;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px);background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:1100px;margin:0 auto;padding:16px;display:grid;grid-template-columns:1fr 220px;gap:16px}
+main{min-width:0}aside{position:sticky;top:12px;align-self:start}
+@media(max-width:800px){.wrap{grid-template-columns:1fr}aside{position:static;order:-1}}
+h1{margin:.2em 0}h2{margin:0 0 4px;font-size:1.15rem}
+.card,section{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px;margin-bottom:14px}
+.ins{color:var(--mu);margin:0 0 8px;font-size:.92rem}.tiny{font-size:.82rem;color:var(--mu)}
+table{width:100%;border-collapse:collapse;font-size:.92rem}td{padding:5px 6px;border-bottom:1px solid var(--bd)}.ipa{color:var(--mu)}
+button{font:inherit;border:1px solid var(--bd);background:var(--card);color:var(--tx);padding:6px 12px;border-radius:9px;cursor:pointer}
+button.p{background:var(--ac);color:var(--card);border-color:var(--ac)}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}.msg{font-weight:600}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:7px 10px;border:1px solid var(--bd);border-radius:10px;margin:6px 0}
+.sol{display:none;width:100%;color:var(--ok);font-size:.9rem}.show .sol{display:block}
+.good{background:var(--okb);border-color:var(--ok)}.bad{background:var(--nob);border-color:var(--no)}
+input[type=text],select{font:inherit;background:var(--bg);color:var(--tx);border:1px solid var(--bd);border-radius:8px;padding:5px 8px}
+.chip{border:1px solid var(--ac);border-radius:8px;padding:3px 9px;cursor:pointer;background:var(--card)}
+.ans{min-height:34px;display:flex;gap:6px;flex-wrap:wrap;width:100%;border-bottom:2px dashed var(--bd);padding-bottom:4px}.num{color:var(--mu);width:1.4em}
+</style></head><body><div class="wrap"><main>
+<h1>🔁 Tech habits — повторение</h1>
+<p class="ins">Уровень A2. 4 упражнения по 6 пунктов. Пиши руками, нажимай «Проверить» или «Ответы».</p>
+<details class="card"><summary><b>Напоминание слов</b> (нажми, чтобы открыть)</summary>
+<div class="bar"><button class="p" id="pa">▶ Слушать всё</button><button id="ps">⏹ Стоп</button><button id="pt">🔊 Проверить звук</button><span class="tiny" id="vs"></span></div>
+<table id="vt"></table></details>
+<div id="exs"></div>
+<div class="card"><div class="bar"><button class="p" onclick="copyAll()">📋 Скопировать все ответы</button><button onclick="speak('Audio check. Once in a blue moon.')">🔊 Проверка звука</button><span class="msg" id="cm"></span></div></div>
+</main>
+<aside><div class="card"><h2>⚠ Проблемные слова</h2><p class="tiny">Здесь ошибки из проверок.</p><ul id="prob" style="padding-left:18px;margin:6px 0"></ul><button onclick="clearProb()">Очистить</button></div>
+<div class="card"><button class="p" style="width:100%" onclick="copyAll()">📋 Копировать всё</button></div></aside></div>
+<script>
+const P=[["download a new app","/ˌdaʊnˈləʊd ə njuː æp/","скачать новое приложение"],["send an email","/send ən ˈiːmeɪl/","отправить письмо"],["take a photo or make a video","/teɪk ə ˈfəʊtəʊ ɔː meɪk ə ˈvɪdiəʊ/","сделать фото или снять видео"],["get directions","/ɡet dəˈrekʃnz/","узнать маршрут"],["read a book","/riːd ə bʊk/","читать книгу"],["count your steps","/kaʊnt jɔː steps/","считать шаги"],["listen to a playlist","/ˈlɪsn tə ə ˈpleɪlɪst/","слушать плейлист"],["book a flight","/bʊk ə flaɪt/","забронировать авиабилет"],["get information about your health","/ɡet ˌɪnfəˈmeɪʃn əˈbaʊt jɔː helθ/","получать информацию о здоровье"],["read the news headlines","/riːd ðə njuːz ˈhedlaɪnz/","читать заголовки новостей"],["play a game","/pleɪ ə ɡeɪm/","играть в игру"],["almost never","/ˈɔːlməʊst ˈnevə/","почти никогда"],["once in a blue moon","/wʌns ɪn ə bluː muːn/","раз в сто лет, очень редко"],["very rarely","/ˈveri ˈreəli/","очень редко"]];
+const $=s=>document.querySelector(s),h=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e};
+const norm=s=>s.toLowerCase().replace(/[’‘]/g,"'").replace(/'m\b/g," am").replace(/'re\b/g," are").replace(/'s\b/g," is").replace(/[^a-z ]/g," ").replace(/\s+/g," ").trim();
+function sh(a,seed){a=a.slice();let s=seed*9301+49297;for(let i=a.length-1;i>0;i--){s=(s*9301+49297)%233280;const j=Math.floor(s/233280*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+let voice=null,stop=false;
+function pick(){if(!window.speechSynthesis){$('#vs').textContent='Озвучка не поддерживается браузером';return}const v=speechSynthesis.getVoices();voice=v.find(x=>/Google US English/i.test(x.name))||v.find(x=>/Samantha/i.test(x.name))||v.find(x=>/en[-_]US/i.test(x.lang))||v.find(x=>/^en/i.test(x.lang))||null;$('#vs').textContent=voice?'Голос: '+voice.name:'Голос загружается… (или системный)'}
+if(window.speechSynthesis){pick();speechSynthesis.onvoiceschanged=pick}else pick();
+function speak(t,r){return new Promise(res=>{if(!window.speechSynthesis)return res();speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='en-US';if(voice)u.voice=voice;u.rate=r||.9;u.onend=u.onerror=()=>res();speechSynthesis.speak(u)})}
+$('#pt').onclick=()=>speak('Hello! Audio is working.');
+$('#ps').onclick=()=>{stop=true;window.speechSynthesis&&speechSynthesis.cancel()};
+$('#pa').onclick=async()=>{stop=false;for(const p of P){if(stop)break;await speak(p[0]);await new Promise(r=>setTimeout(r,500))}};
+P.forEach(p=>{const tr=h('tr'),b=h('button','','🔊'),c=h('td');b.onclick=()=>speak(p[0]);c.append(b);tr.append(h('td','',p[0]),h('td','ipa',p[1]),h('td','',p[2]),c);$('#vt').append(tr)});
+const prob={};function renderProb(){const u=$('#prob');u.innerHTML='';Object.entries(prob).sort((a,b)=>b[1]-a[1]).forEach(([k,v])=>u.append(h('li','',k+' ×'+v)))}
+function clearProb(){for(const k in prob)delete prob[k];renderProb()}
+function bad(k){if(!k)return;prob[k]=(prob[k]||0)+1;renderProb()}
+const E=[];function sol(el,t){el.append(h('div','sol','✔ '+t))}
+function ex(n,title,ins,build){const sec=h('section'),rows=[],body=h('div'),msg=h('span','msg');sec.append(h('h2','',n+'. '+title),h('p','ins',ins),body);build(body,rows);
+const bar=h('div','bar'),cb=h('button','p','Проверить'),sb=h('button','','Ответы'),rb=h('button','','Сбросить'),o={n,title,rows,checked:false};
+cb.onclick=()=>{let k=0;rows.forEach(r=>{const g=r.ok();r.el.classList.toggle('good',g);r.el.classList.toggle('bad',!g);if(g)k++;else bad(r.key)});o.checked=true;msg.textContent=k+' / '+rows.length};
+sb.onclick=()=>sec.classList.toggle('show');
+rb.onclick=()=>{rows.forEach(r=>{r.clear();r.el.classList.remove('good','bad')});sec.classList.remove('show');msg.textContent='';o.checked=false};
+bar.append(cb,sb,rb,msg);sec.append(bar);$('#exs').append(sec);E.push(o)}
+function inp(sz){const i=h('input');i.type='text';i.autocomplete='off';i.autocapitalize='off';i.spellcheck=false;i.size=sz||28;return i}
+/* 1 Translate */
+ex(1,'Translate into English','Переведи на английский и напиши выражение.',(b,rows)=>{
+[["узнать маршрут","get directions"],["раз в сто лет","once in a blue moon"],["скачать новое приложение","download a new app"],["читать заголовки новостей","read the news headlines"],["слушать плейлист","listen to a playlist"],["почти никогда","almost never"]].forEach((d,n)=>{
+const r=h('div','row'),x=inp();r.append(h('span','num',n+1),h('b','',d[0]),'→',x);sol(r,d[1]);b.append(r);
+rows.push({el:r,key:d[1],ok:()=>norm(x.value)==norm(d[1]),ans:()=>d[0]+' → '+x.value,clear:()=>x.value=''})})});
+/* 2 Sentence dictation */
+ex(2,'Listen and write the sentence','Нажми 🔊 (или 🐢) и напиши предложение целиком.',(b,rows)=>{
+["She very rarely sends an email.","We book a flight once in a blue moon.","I took a photo yesterday.","He is listening to a playlist.","They are going to download a new app.","I almost never play games."].forEach((t,n)=>{
+const r=h('div','row'),x=inp(40),a=h('button','','🔊'),s=h('button','','🐢');a.onclick=()=>speak(t);s.onclick=()=>speak(t,.55);
+r.append(h('span','num',n+1),a,s,x);sol(r,t);b.append(r);
+rows.push({el:r,key:t.split(' ').slice(0,3).join(' '),ok:()=>norm(x.value)==norm(t),ans:()=>x.value,clear:()=>x.value=''})})});
+/* 3 Choose the form */
+ex(3,'Choose the correct form','Выбери правильную форму глагола.',(b,rows)=>{
+const pos=[2,0,1,1,0,2];
+[["Yesterday I ___ a video of my dog.","took","take","am taking"],["Look! He ___ a game now.","is playing","plays","played"],["We ___ a flight to Paris next week.","are going to book","booked","book"],["She very rarely ___ the news.","reads","is reading","read"],["Last week they ___ a new app.","downloaded","download","are downloading"],["Sh! I ___ to a playlist.","am listening","listened","listen"]].forEach((d,n)=>{
+const o=[d[2],d[3]];o.splice(pos[n],0,d[1]);const r=h('div','row'),s=h('select'),pt=d[0].split('___');s.append(new Option('…',''));o.forEach(t=>s.append(new Option(t,t)));
+r.append(h('span','num',n+1),pt[0],s,pt[1]);sol(r,d[1]);b.append(r);
+rows.push({el:r,key:d[1],ok:()=>s.value==d[1],ans:()=>s.value,clear:()=>s.value=''})})});
+/* 4 Build the sentence */
+ex(4,'Build the sentence','Нажимай на слова по порядку, чтобы собрать предложение. Нажми на слово в строке, чтобы убрать его.',(b,rows)=>{
+[["I almost never read a book"],["She sends an email every day"],["He is going to book a flight"],["Once in a blue moon I play a game","I play a game once in a blue moon"],["We are getting directions now"],["They very rarely count their steps"]].forEach((al,n)=>{
+const ph=al[0],words=ph.split(' ');let pool=sh(words,n+5);if(pool.join(' ')==ph)pool.reverse();let cur=[];
+const r=h('div','row'),an=h('div','ans'),pl=h('div','ans');pl.style.border='0';r.append(an,pl);
+const rd=()=>{an.innerHTML='';pl.innerHTML='';cur.forEach((j,q)=>{const c=h('span','chip',pool[j]);c.onclick=()=>{cur.splice(q,1);rd()};an.append(c)});
+pool.forEach((w,j)=>{if(!cur.includes(j)){const c=h('button','',w);c.onclick=()=>{cur.push(j);rd()};pl.append(c)}})};rd();sol(r,al.join('  /  '));b.append(r);
+const txt=()=>cur.map(j=>pool[j]).join(' ');
+rows.push({el:r,key:ph.split(' ').slice(0,3).join(' '),ok:()=>al.some(a=>norm(a)==norm(txt())),ans:txt,clear:()=>{cur=[];rd()}})})});
+function copyAll(){let o='English A2 — Review\n';E.forEach(e=>{o+='\n'+e.n+'. '+e.title+(e.checked?' ('+e.rows.filter(r=>r.ok()).length+'/'+e.rows.length+')':'')+'\n';
+e.rows.forEach((r,i)=>{o+=(i+1)+'. '+(r.ans()||'—')+(e.checked?(r.ok()?' ✓':' ✗'):'')+'\n'})});
+const pk=Object.entries(prob).map(([k,v])=>k+' ×'+v).join(', ');if(pk)o+='\nProblem words: '+pk+'\n';
+const done=()=>{$('#cm').textContent='Скопировано ✓';setTimeout(()=>$('#cm').textContent='',2500)};
+const fb=()=>{const t=h('textarea');t.value=o;document.body.append(t);t.select();try{document.execCommand('copy');done()}catch(e){$('#cm').textContent='Не удалось скопировать'}t.remove()};
+try{navigator.clipboard.writeText(o).then(done,fb)}catch(e){fb()}}
+</script></body></html>
