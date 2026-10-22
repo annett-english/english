@@ -1,0 +1,584 @@
+<title>At, In, On Practice</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&family=Onest:wght@400;500;600&family=Rubik:wght@500;600;700&display=swap">
+<style>
+/* Layout: one narrow workbook column. Rule card first (three tinted columns AT / IN / ON),
+   then seven exercise sheets with handwriting-style answer fields on ruled lines. */
+:root{
+  --font-display:'Rubik',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --font-body:'Onest',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --font-hand:'Caveat','Segoe Print','Bradley Hand',cursive;
+  --bg:#F2F5FA; --surface:#FFFFFF; --fg:#16203A; --muted:#566178;
+  --line:#DCE2EE; --line-strong:#B7C0D3;
+  --at:#1D55C7; --in:#A8530A; --on:#7A35D4;
+  --at-bg:#E6EEFC; --in-bg:#FBEBD8; --on-bg:#EFE7FB;
+  --ink:#1B3AA6; --field:#F6F8FC;
+  --ok:#17803F; --ok-bg:#E3F4E8; --bad:#C0261D; --bad-bg:#FCE7E5;
+  --focus:#1D55C7;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0E1424; --surface:#161E33; --fg:#E7ECF7; --muted:#97A3BD;
+    --line:#26304A; --line-strong:#3C4A6B;
+    --at:#86AEFF; --in:#F4AA62; --on:#C7A6FF;
+    --at-bg:#1A2A4D; --in-bg:#3A2A17; --on-bg:#2B2148;
+    --ink:#A9C1FF; --field:#10172A;
+    --ok:#5ED08D; --ok-bg:#133222; --bad:#FF8F86; --bad-bg:#3C1D1F;
+    --focus:#86AEFF; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0E1424; --surface:#161E33; --fg:#E7ECF7; --muted:#97A3BD;
+  --line:#26304A; --line-strong:#3C4A6B;
+  --at:#86AEFF; --in:#F4AA62; --on:#C7A6FF;
+  --at-bg:#1A2A4D; --in-bg:#3A2A17; --on-bg:#2B2148;
+  --ink:#A9C1FF; --field:#10172A;
+  --ok:#5ED08D; --ok-bg:#133222; --bad:#FF8F86; --bad-bg:#3C1D1F;
+  --focus:#86AEFF; color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{
+  background:var(--bg);color:var(--fg);
+  font:16px/1.55 var(--font-body);
+  padding-block:28px 64px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+}
+.wrap{max-width:780px;margin:0 auto;display:grid;gap:22px}
+.wrap>*{min-width:0}
+
+h1{font:700 clamp(2.8rem,11vw,4.4rem)/1 var(--font-display);letter-spacing:-.03em;margin:0}
+h1 .at{color:var(--at)} h1 .in{color:var(--in)} h1 .on{color:var(--on)}
+.lead{color:var(--muted);margin:10px 0 0;max-width:54ch}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.summary{margin:12px 0 0;font-weight:500;min-height:1.5em}
+.fb{margin-top:10px}
+.fb textarea{width:100%;font:14px/1.5 var(--font-body);color:var(--fg);background:var(--field);border:1px solid var(--line-strong);border-radius:8px;padding:10px}
+.status{color:var(--muted);font-size:.9rem;align-self:center}
+
+.btn{font:500 .9rem var(--font-body);min-height:40px;padding:0 16px;border-radius:8px;border:1px solid var(--line-strong);background:var(--surface);color:var(--fg);cursor:pointer}
+.btn:hover{border-color:var(--fg)}
+.btn:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.btn.primary{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.btn.warn{border-color:var(--bad);color:var(--bad)}
+
+.sec-title{font:600 .78rem var(--font-display);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+.rule{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media (max-width:700px){.rule{grid-template-columns:1fr}}
+.rcol{border-radius:12px;padding:16px;background:var(--pbg);min-width:0}
+.rcol[data-p="at"]{--pbg:var(--at-bg);--pc:var(--at)}
+.rcol[data-p="in"]{--pbg:var(--in-bg);--pc:var(--in)}
+.rcol[data-p="on"]{--pbg:var(--on-bg);--pc:var(--on)}
+.rcol h3{font:700 2.2rem/1 var(--font-display);margin:0;color:var(--pc);letter-spacing:-.02em}
+.rcol .gist{margin:6px 0 12px;font-size:.92rem;color:var(--fg)}
+.rcol ul{list-style:none;margin:0;padding:0;display:grid;gap:8px;font-size:.95rem}
+.rcol li{display:grid;gap:0}
+.rcol .k{font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+
+.ex-list{display:grid;gap:18px}
+.ex{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px clamp(14px,4vw,26px) 20px;min-width:0}
+.eyebrow{font:600 .75rem var(--font-display);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0}
+.ex h2{font:600 1.4rem/1.2 var(--font-display);margin:2px 0 0;text-wrap:balance}
+.hint{color:var(--muted);margin:4px 0 16px;font-size:.95rem}
+
+ol.items{list-style:none;margin:0;padding:0;counter-reset:q;display:grid;gap:4px}
+ol.items>li{counter-increment:q;position:relative;padding-left:2.2rem;line-height:2.3;font-size:1.05rem;min-width:0}
+ol.items>li::before{content:counter(q);position:absolute;left:0;top:0;width:1.6rem;text-align:right;font:600 .85rem/2.85 var(--font-display);color:var(--muted);font-variant-numeric:tabular-nums}
+ol.free{gap:10px}
+ol.free>li{line-height:1.4;display:grid;gap:4px}
+ol.free>li::before{line-height:1.7;top:2px}
+
+.f{display:inline-flex;align-items:baseline;gap:2px}
+.f.block{display:flex;width:100%}
+.f.block .w{flex:1}
+.w{font:600 1.5rem/1.2 var(--font-hand);color:var(--ink);background:var(--field);border:0;border-bottom:2px solid var(--line-strong);border-radius:4px 4px 0 0;padding:2px 6px;min-width:0;text-align:center}
+.w.gap{width:3.3em}
+.w.tbl,.w.free{width:100%;text-align:left}
+.w:focus-visible{outline:2px solid var(--focus);outline-offset:1px;border-bottom-color:var(--focus)}
+.w.ok{border-bottom-color:var(--ok);background:var(--ok-bg)}
+.w.bad{border-bottom-color:var(--bad);background:var(--bad-bg)}
+.mk{display:inline-block;width:1.25em;text-align:center;font:700 .95rem var(--font-body)}
+.w.ok+.mk{color:var(--ok)}
+.w.bad+.mk{color:var(--bad)}
+
+.ans{display:none;font:600 .85rem var(--font-body);color:var(--ok);background:var(--ok-bg);padding:1px 9px;border-radius:999px;margin-left:4px;white-space:nowrap}
+.shown .ans{display:inline-block}
+.ans.long{white-space:normal;border-radius:8px;margin:2px 0 0;padding:3px 10px;width:fit-content;max-width:100%}
+.shown .ans.long{display:block}
+.ans-block{display:none;margin-top:14px;grid-template-columns:repeat(3,1fr);gap:8px}
+.shown .ans-block{display:grid}
+.ans-block div{background:var(--ok-bg);color:var(--fg);border-radius:8px;padding:8px 10px;font-size:.92rem;min-width:0}
+.ans-block b{display:block;font:700 .8rem var(--font-display);color:var(--ok);letter-spacing:.06em;margin-bottom:2px}
+
+s.wrong{color:var(--bad);text-decoration-thickness:2px}
+.story{font-size:1.05rem;line-height:2.5;margin:0;max-width:62ch}
+.gn{font:600 .65rem var(--font-display);color:var(--muted);margin:0 2px 0 5px;vertical-align:super}
+.starter{font-weight:500}
+.tag{font-size:.75rem;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:1px 8px;margin-left:6px;white-space:nowrap}
+
+.bank{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 14px;padding:0;list-style:none}
+.chip{padding:3px 12px;border:1px solid var(--line-strong);border-radius:999px;font-size:.95rem}
+.chip.used{opacity:.4;text-decoration:line-through}
+.tablewrap{overflow-x:auto}
+table.sort{width:100%;border-collapse:collapse;table-layout:fixed}
+table.sort th{font:700 1.5rem/1.1 var(--font-display);padding:10px 8px 8px;text-align:left;border:1px solid var(--line)}
+table.sort th.at{background:var(--at-bg);color:var(--at)}
+table.sort th.in{background:var(--in-bg);color:var(--in)}
+table.sort th.on{background:var(--on-bg);color:var(--on)}
+table.sort th .cnt{display:block;font:500 .72rem var(--font-body);color:var(--muted);margin-top:2px}
+table.sort td{border:1px solid var(--line);padding:6px;vertical-align:middle;min-width:0}
+table.sort td.na{background:repeating-linear-gradient(135deg,transparent 0 6px,var(--line) 6px 7px)}
+
+.ex-foot{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px;align-items:center}
+.result{margin:12px 0 0;font-weight:500;min-height:1.5em}
+.result.perfect{color:var(--ok)}
+@media (max-width:520px){
+  .ans-block{grid-template-columns:1fr}
+  table.sort th{font-size:1.2rem;padding:8px 6px}
+  table.sort td{padding:4px}
+  .w{font-size:1.35rem;padding:2px 4px}
+}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1><span class="at">At</span>, <span class="in">in</span>, <span class="on">on</span></h1>
+    <p class="lead">Предлоги места и времени. Прочитайте правило, выполните 7 упражнений и впишите ответы сами. Потом проверьте себя.</p>
+    <div class="toolbar">
+      <button class="btn primary" type="button" id="checkAll">Проверить всё</button>
+      <button class="btn" type="button" id="copyAll">Копировать все ответы</button>
+      <button class="btn" type="button" id="resetAll">Сбросить всё</button>
+      <span class="status" id="allStatus" role="status"></span>
+    </div>
+    <p class="summary" id="summary" role="status"></p>
+    <div class="fb" id="allFb" hidden></div>
+  </header>
+
+  <section aria-labelledby="rule-h">
+    <h2 class="sec-title" id="rule-h">Коротко о правиле</h2>
+    <div class="rule" id="rule"></div>
+  </section>
+
+  <div class="ex-list" id="exercises"></div>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+function $$(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s));}
+function h(tag,props){
+  var e=document.createElement(tag), p=props||{};
+  for(var k in p){
+    var v=p[k];
+    if(v==null||v===false)continue;
+    if(k==="class")e.className=v;
+    else if(v===true)e.setAttribute(k,"");
+    else e.setAttribute(k,v);
+  }
+  for(var i=2;i<arguments.length;i++){
+    [].concat(arguments[i]).forEach(function(c){
+      if(c==null||c===false)return;
+      e.append(c.nodeType?c:document.createTextNode(String(c)));
+    });
+  }
+  return e;
+}
+function norm(s){
+  return String(s).toLowerCase().replace(/[’‘`´]/g,"'").replace(/[.,!?;:'"]/g,"").replace(/\s+/g," ").trim().replace(/^(the|a|an) /,"");
+}
+
+/* ---------- content ---------- */
+var RULE=[
+  {p:"at",gist:"точка: место и точное время",groups:[
+    ["places","school, home, work, university; the airport, the station, a bus stop"],
+    ["times","6 o'clock, half past two, quarter to eight"],
+    ["also","night, the weekend, festival periods: Christmas, Easter"]]},
+  {p:"in",gist:"внутри: помещения и периоды времени",groups:[
+    ["rooms","the kitchen"],
+    ["buildings","a shop, a museum"],
+    ["closed spaces","a park, a garden, a car"],
+    ["seasons","winter"],
+    ["years","2018"],
+    ["times of day","the morning, the afternoon, the evening"]]},
+  {p:"on",gist:"на поверхности и в конкретный день",groups:[
+    ["transport","a bike, a bus, a train, a plane, a ship"],
+    ["surfaces","the floor, a table, a shelf, the balcony, the roof, the wall"],
+    ["dates","1st March"],
+    ["days","Tuesday, New Year's Day, Valentine's Day"]]}
+];
+
+var EX=[
+  {type:"table",title:"Put the words in the table",
+   hint:"Впишите каждое слово в нужный столбец: AT, IN или ON. Слова из списка использовать по одному разу.",
+   bank:["Tuesday","the kitchen","Christmas","6 o'clock","a garden","the floor","winter","a bike","the weekend","2018"],
+   cols:{at:["6 o'clock","the weekend","Christmas"],in:["the kitchen","winter","a garden","2018"],on:["a bike","Tuesday","the floor"]}},
+  {type:"gap",title:"Places",hint:"Вставьте at, in или on.",items:[
+    ["We have breakfast ___ the kitchen.","in"],
+    ["My dad is ___ work until six.","at"],
+    ["The keys are ___ the shelf.","on"],
+    ["They are waiting ___ the airport.","at"],
+    ["Look at the pictures ___ the wall.","on"],
+    ["The children are playing ___ the garden.","in"],
+    ["My sister studies ___ university.","at"],
+    ["There is a cat ___ the roof.","on"],
+    ["Let's wait ___ the bus stop.","at"],
+    ["I like having coffee ___ the balcony.","on"]]},
+  {type:"gap",title:"Time",hint:"Вставьте at, in или on.",items:[
+    ["I get up ___ 7 o'clock.","at"],
+    ["My birthday is ___ 1st March.","on"],
+    ["We go skiing ___ winter.","in"],
+    ["I never drink coffee ___ the evening.","in"],
+    ["The lesson finishes ___ half past two.","at"],
+    ["My grandmother was born ___ 1960.","in"],
+    ["We give presents ___ Christmas.","at"],
+    ["I usually see my friends ___ the weekend.","at"],
+    ["We have a test ___ Tuesday.","on"],
+    ["People send cards ___ Valentine's Day.","on"]]},
+  {type:"gap",title:"Transport, surfaces, rooms",hint:"Вставьте at, in или on.",items:[
+    ["I go to school ___ a bus.","on"],
+    ["We are sitting ___ the car.","in"],
+    ["Please don't put your feet ___ the table.","on"],
+    ["They travel to Spain ___ a plane.","on"],
+    ["Her bag is ___ the floor.","on"],
+    ["The train is late, so we are ___ the station.","at"],
+    ["It is late, so I am ___ home.","at"],
+    ["She is ___ a museum with her class.","in"],
+    ["I like reading a book ___ the train.","on"],
+    ["The towels are ___ the bathroom.","in"]]},
+  {type:"story",title:"Read and complete the text",hint:"В тексте 10 пропусков. Впишите at, in или on.",
+   text:"Hello! I was born [[in]] 2012, and my birthday is [[on]] 5th June. [[In]] the morning I have breakfast [[in]] the kitchen. Then I read a book [[on]] the bus and I am [[at]] school [[at]] 8 o'clock. [[At]] the weekend I visit my grandma. [[In]] summer we eat dinner [[on]] the balcony."},
+  {type:"fix",title:"Find and correct the mistake",hint:"Зачёркнутый предлог в предложении неверный. Впишите правильный.",items:[
+    ["I go to bed","on","10 o'clock.","at"],
+    ["She was born","at","1999.","in"],
+    ["The pizza is","in","the table.","on"],
+    ["We play football","in","Saturday.","on"],
+    ["They are waiting","on","the airport.","at"],
+    ["I like swimming","on","summer.","in"],
+    ["There are many flowers","at","the garden.","in"],
+    ["She is reading a magazine","in","the train.","on"],
+    ["I do my homework","on","the evening.","in"],
+    ["We see our friends","in","the weekend.","at"]]},
+  {type:"free",title:"Finish the sentences. Use your own ideas.",
+   hint:"Закончите каждое предложение так, как это правда для вас. Пишите целую мысль, а не одно слово.",items:[
+    ["I get up at","время","7 o'clock on school days."],
+    ["My birthday is in","месяц","July."],
+    ["On Saturday I usually","что вы делаете","go shopping with my mum."],
+    ["At the weekend I like","что вам нравится","cycling with my friends."],
+    ["In summer I","что вы делаете","swim in the lake."],
+    ["At school I","что вы делаете","have lunch at 12 o'clock."],
+    ["In my bedroom there is","что там есть","a big bed and a small desk."],
+    ["On the table in my kitchen there are","что там есть","some apples and a green cup."],
+    ["I was born in","год","2010."],
+    ["At night I","что вы делаете","read a book before bed."]]}
+];
+
+/* ---------- storage (optional convenience) ---------- */
+var KEY="at-in-on-practice-v1", store={};
+try{store=JSON.parse(localStorage.getItem(KEY)||"{}")||{};}catch(e){store={};}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(store));}catch(e){}}
+
+/* ---------- rule ---------- */
+var ruleHost=document.getElementById("rule");
+RULE.forEach(function(r){
+  ruleHost.append(h("div",{class:"rcol","data-p":r.p},
+    h("h3",null,r.p.toUpperCase()),
+    h("p",{class:"gist"},r.gist),
+    h("ul",null,r.groups.map(function(g){
+      return h("li",null,h("span",{class:"k"},g[0]),h("span",null,g[1]));
+    }))));
+});
+
+/* ---------- building blocks ---------- */
+function field(id,cls,label,ans){
+  var inp=h("input",{id:id,class:"w "+cls,type:"text",autocomplete:"off",autocapitalize:"none",autocorrect:"off",spellcheck:"false","aria-label":label,"data-ans":ans});
+  return h("span",{class:"f"+(cls==="gap"?"":" block")},inp,h("span",{class:"mk","aria-hidden":"true"}));
+}
+function setState(inp,state){
+  inp.classList.remove("ok","bad");
+  inp.removeAttribute("aria-invalid");
+  var mk=inp.nextElementSibling;
+  if(mk)mk.textContent="";
+  if(state==="ok"){inp.classList.add("ok");if(mk)mk.textContent="✓";}
+  else if(state==="bad"){inp.classList.add("bad");inp.setAttribute("aria-invalid","true");if(mk)mk.textContent="✕";}
+}
+
+function renderTable(ex,n){
+  var keys=["at","in","on"];
+  var rows=Math.max.apply(null,keys.map(function(k){return ex.cols[k].length;}));
+  var bank=h("ul",{class:"bank","aria-label":"Words to sort"},ex.bank.map(function(w){
+    return h("li",{class:"chip","data-w":norm(w)},w);
+  }));
+  var thead=h("tr",null,keys.map(function(k){
+    return h("th",{class:k,scope:"col"},k.toUpperCase(),h("span",{class:"cnt"},ex.cols[k].length+" слова"));
+  }));
+  var trs=[];
+  for(var r=0;r<rows;r++){
+    var tds=keys.map(function(k){
+      if(r<ex.cols[k].length){
+        var f=field("e"+n+"-"+k+"-"+r,"tbl","Exercise "+n+", column "+k.toUpperCase()+", row "+(r+1),"");
+        f.firstChild.setAttribute("data-col",k);
+        return h("td",null,f);
+      }
+      return h("td",{class:"na","aria-hidden":"true"});
+    });
+    trs.push(h("tr",null,tds));
+  }
+  var ans=h("div",{class:"ans-block"},keys.map(function(k){
+    return h("div",null,h("b",null,k.toUpperCase()),ex.cols[k].join(", "));
+  }));
+  return h("div",null,bank,h("div",{class:"tablewrap"},h("table",{class:"sort"},h("thead",null,thead),h("tbody",null,trs))),ans);
+}
+function renderGap(ex,n){
+  return h("ol",{class:"items"},ex.items.map(function(it,i){
+    var parts=it[0].split("___");
+    return h("li",null,
+      h("span",{class:"s"},parts[0],field("e"+n+"-"+i,"gap","Exercise "+n+", sentence "+(i+1),it[1]),parts[1]),
+      h("span",{class:"ans"},it[1]));
+  }));
+}
+function renderStory(ex,n){
+  var k=0, kids=[];
+  ex.text.split(/\[\[(.+?)\]\]/).forEach(function(part,idx){
+    if(idx%2===0){kids.push(part);}
+    else{
+      var i=k++, a=part.toLowerCase();
+      kids.push(h("sup",{class:"gn"},String(i+1)),field("e"+n+"-"+i,"gap","Exercise "+n+", gap "+(i+1),a),h("span",{class:"ans"},a));
+    }
+  });
+  return h("p",{class:"story"},kids);
+}
+function renderFix(ex,n){
+  return h("ol",{class:"items"},ex.items.map(function(it,i){
+    return h("li",null,
+      h("span",{class:"s"},it[0]+" ",h("s",{class:"wrong"},it[1])," ",field("e"+n+"-"+i,"gap","Exercise "+n+", sentence "+(i+1),it[3])," "+it[2]),
+      h("span",{class:"ans"},it[3]));
+  }));
+}
+function renderFree(ex,n){
+  return h("ol",{class:"items free"},ex.items.map(function(it,i){
+    var id="e"+n+"-"+i;
+    return h("li",null,
+      h("label",{class:"starter","for":id},it[0],h("span",{class:"tag"},it[1])),
+      field(id,"free",null,""),
+      h("span",{class:"ans long"},"Например: "+it[2]));
+  }));
+}
+
+/* ---------- logic ---------- */
+var results={}, api={};
+function val(id){var e=document.getElementById(id);return e?e.value.trim():"";}
+
+function exText(n){
+  var ex=EX[n-1], out=["Exercise "+n+". "+ex.title];
+  if(ex.type==="table"){
+    ["at","in","on"].forEach(function(k){
+      var vals=ex.cols[k].map(function(_,r){return val("e"+n+"-"+k+"-"+r);}).filter(Boolean);
+      out.push(k.toUpperCase()+": "+(vals.join(", ")||"—"));
+    });
+  }else if(ex.type==="gap"){
+    ex.items.forEach(function(it,i){
+      var p=it[0].split("___");
+      out.push((i+1)+". "+(p[0]+(val("e"+n+"-"+i)||"___")+p[1]).replace(/\s+/g," ").trim());
+    });
+  }else if(ex.type==="story"){
+    var k=0;
+    out.push(ex.text.replace(/\[\[(.+?)\]\]/g,function(){var x=val("e"+n+"-"+(k++));return x||"___";}));
+  }else if(ex.type==="fix"){
+    ex.items.forEach(function(it,i){
+      out.push((i+1)+". "+(it[0]+" "+(val("e"+n+"-"+i)||"___")+" "+it[2]).replace(/\s+/g," ").trim());
+    });
+  }else{
+    ex.items.forEach(function(it,i){
+      out.push((i+1)+". "+(it[0]+" "+(val("e"+n+"-"+i)||"…")).trim());
+    });
+  }
+  return out.join("\n");
+}
+
+function updateBank(){
+  var used={};
+  $$('input[data-col]').forEach(function(i){var v=norm(i.value);if(v)used[v]=true;});
+  $$(".chip").forEach(function(c){c.classList.toggle("used",!!used[c.getAttribute("data-w")]);});
+}
+
+function summary(){
+  var ks=Object.keys(results), el=document.getElementById("summary");
+  if(!ks.length){el.textContent="";return;}
+  var ok=0,tot=0,free=null;
+  ks.forEach(function(k){
+    if(results[k].free){free=results[k];}
+    else{ok+=results[k].ok;tot+=results[k].total;}
+  });
+  var t="Проверено упражнений: "+ks.length+" из "+EX.length+".";
+  if(tot)t+=" Верных ответов: "+ok+" из "+tot+".";
+  if(free)t+=" Предложений написано: "+free.ok+" из "+free.total+".";
+  el.textContent=t;
+}
+
+function flash(el,msg){
+  el.textContent=msg;
+  clearTimeout(el._t);
+  el._t=setTimeout(function(){el.textContent="";},3500);
+}
+function showFallback(box,text){
+  var ta=h("textarea",{readonly:true,rows:8,"aria-label":"Текст для копирования"});
+  ta.value=text;
+  box.replaceChildren(ta);
+  box.hidden=false;
+  ta.focus();ta.select();
+  try{document.execCommand("copy");}catch(e){}
+}
+function copyText(text,statusEl,box){
+  var p;
+  try{p=navigator.clipboard.writeText(text);}catch(e){p=Promise.reject(e);}
+  p.then(function(){
+    box.hidden=true;box.replaceChildren();
+    flash(statusEl,"Скопировано ✓");
+  },function(){
+    showFallback(box,text);
+    flash(statusEl,"Текст выделен: нажмите Ctrl+C");
+  });
+}
+function twoStep(btn,label,fn){
+  var t;
+  btn.addEventListener("click",function(){
+    if(btn.getAttribute("data-armed")){
+      clearTimeout(t);btn.removeAttribute("data-armed");
+      btn.textContent=label;btn.classList.remove("warn");
+      fn();
+    }else{
+      btn.setAttribute("data-armed","1");
+      btn.textContent="Точно сбросить?";btn.classList.add("warn");
+      t=setTimeout(function(){btn.removeAttribute("data-armed");btn.textContent=label;btn.classList.remove("warn");},3500);
+    }
+  });
+}
+
+/* ---------- exercises ---------- */
+var host=document.getElementById("exercises");
+EX.forEach(function(ex,i){
+  var n=i+1, body;
+  if(ex.type==="table")body=renderTable(ex,n);
+  else if(ex.type==="story")body=renderStory(ex,n);
+  else if(ex.type==="fix")body=renderFix(ex,n);
+  else if(ex.type==="free")body=renderFree(ex,n);
+  else body=renderGap(ex,n);
+
+  var isFree=ex.type==="free";
+  var showLabel=isFree?"Показать примеры":"Показать ответы";
+  var hideLabel=isFree?"Скрыть примеры":"Скрыть ответы";
+  var res=h("p",{class:"result",role:"status"});
+  var bCheck=h("button",{class:"btn primary",type:"button"},"Проверить");
+  var bShow=h("button",{class:"btn",type:"button"},showLabel);
+  var bReset=h("button",{class:"btn",type:"button"},"Сбросить");
+  var foot=h("div",{class:"ex-foot"},bCheck,bShow,bReset);
+  var extra=[];
+  if(isFree){
+    var bCopy=h("button",{class:"btn",type:"button"},"Копировать мои предложения");
+    var st=h("span",{class:"status",role:"status"});
+    var fb=h("div",{class:"fb",hidden:true});
+    foot.append(bCopy,st);
+    bCopy.addEventListener("click",function(){copyText(exText(n),st,fb);});
+    extra.push(fb);
+  }
+  var sec=h("section",{class:"ex",id:"ex"+n,"aria-labelledby":"ex"+n+"-h"},
+    h("p",{class:"eyebrow"},"Exercise "+n),
+    h("h2",{id:"ex"+n+"-h"},ex.title),
+    h("p",{class:"hint"},ex.hint),
+    body,foot,extra,res);
+  host.append(sec);
+
+  function check(){
+    var ok=0,total=0,empty=0;
+    var inputs=$$("input.w",sec);
+    if(ex.type==="table"){
+      ["at","in","on"].forEach(function(k){
+        var set={};ex.cols[k].forEach(function(w){set[norm(w)]=true;});
+        var seen={};
+        $$('input[data-col="'+k+'"]',sec).forEach(function(inp){
+          total++;
+          var v=norm(inp.value);
+          if(!v){empty++;setState(inp,null);return;}
+          if(set[v]&&!seen[v]){seen[v]=true;ok++;setState(inp,"ok");}
+          else setState(inp,"bad");
+        });
+      });
+    }else if(isFree){
+      inputs.forEach(function(inp){
+        total++;
+        if(inp.value.trim().length>=2){ok++;setState(inp,"ok");}
+        else{empty++;setState(inp,"bad");}
+      });
+    }else{
+      inputs.forEach(function(inp){
+        total++;
+        var v=norm(inp.value);
+        if(!v){empty++;setState(inp,null);return;}
+        var alts=inp.getAttribute("data-ans").split("|").map(norm);
+        if(alts.indexOf(v)>-1){ok++;setState(inp,"ok");}else setState(inp,"bad");
+      });
+    }
+    var msg=isFree?("Написано: "+ok+" из "+total):("Верно: "+ok+" из "+total);
+    if(!isFree&&empty)msg+=". Пропущено: "+empty;
+    if(ok===total)msg+=". Отлично!";
+    res.textContent=msg;
+    res.className="result"+(ok===total?" perfect":"");
+    results[n]={ok:ok,total:total,free:isFree};
+    summary();
+  }
+  function reset(){
+    $$("input.w",sec).forEach(function(inp){inp.value="";setState(inp,null);delete store[inp.id];});
+    save();
+    delete results[n];
+    res.textContent="";res.className="result";
+    sec.classList.remove("shown");
+    bShow.textContent=showLabel;
+    updateBank();summary();
+  }
+  bCheck.addEventListener("click",check);
+  bShow.addEventListener("click",function(){
+    var on=sec.classList.toggle("shown");
+    bShow.textContent=on?hideLabel:showLabel;
+  });
+  twoStep(bReset,"Сбросить",reset);
+  api[n]={check:check,reset:reset};
+});
+
+/* ---------- restore saved answers ---------- */
+$$("input.w").forEach(function(inp){
+  if(typeof store[inp.id]==="string")inp.value=store[inp.id];
+});
+updateBank();
+
+/* ---------- input events ---------- */
+document.addEventListener("input",function(e){
+  var t=e.target;
+  if(!t.matches||!t.matches("input.w"))return;
+  store[t.id]=t.value;save();
+  setState(t,null);
+  if(t.hasAttribute("data-col"))updateBank();
+});
+document.addEventListener("keydown",function(e){
+  var t=e.target;
+  if(e.key!=="Enter"||!t.matches||!t.matches("input.w"))return;
+  e.preventDefault();
+  var all=$$("input.w",t.closest(".ex")), i=all.indexOf(t);
+  if(all[i+1])all[i+1].focus();
+});
+
+/* ---------- header actions ---------- */
+var allStatus=document.getElementById("allStatus"), allFb=document.getElementById("allFb");
+document.getElementById("checkAll").addEventListener("click",function(){
+  Object.keys(api).forEach(function(k){api[k].check();});
+});
+document.getElementById("copyAll").addEventListener("click",function(){
+  var parts=["At / In / On: мои ответы"];
+  for(var n=1;n<=EX.length;n++)parts.push(exText(n));
+  copyText(parts.join("\n\n"),allStatus,allFb);
+});
+twoStep(document.getElementById("resetAll"),"Сбросить всё",function(){
+  Object.keys(api).forEach(function(k){api[k].reset();});
+});
+})();
+</script>
