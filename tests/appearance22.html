@@ -1,0 +1,115 @@
+<!DOCTYPE html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Describing Appearance</title>
+<style>
+:root{--bg:#f7f6f2;--card:#fff;--tx:#1f2430;--mut:#6b7280;--ac:#3b5bdb;--ok:#2b8a3e;--okb:#e6f4ea;--no:#c92a2a;--nob:#fdeaea;--bd:#e3e1d9;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15171c;--card:#1e2128;--tx:#e8e9ee;--mut:#9aa0ad;--ac:#7c9cff;--ok:#69db7c;--okb:#173a22;--no:#ff8787;--nob:#3f1c1c;--bd:#2f333c}}
+:root[data-theme="dark"]{--bg:#15171c;--card:#1e2128;--tx:#e8e9ee;--mut:#9aa0ad;--ac:#7c9cff;--ok:#69db7c;--okb:#173a22;--no:#ff8787;--nob:#3f1c1c;--bd:#2f333c}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+.wrap{display:grid;grid-template-columns:1fr 230px;gap:16px;max-width:1040px;margin:auto;padding:12px}
+main{min-width:0}aside{position:sticky;top:12px;align-self:start;max-height:90vh;overflow:auto}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px 16px;margin-bottom:14px}
+h1{font-size:24px;margin:6px 0 2px}h2{font-size:18px;margin:0 0 4px}h3{font-size:15px;margin:0 0 6px}
+.mut{color:var(--mut);font-size:14px}table{border-collapse:collapse;width:100%;font-size:14px}td,th{padding:5px 6px;border-bottom:1px solid var(--bd);text-align:left}
+button,select,input{font:inherit;color:var(--tx)}button{background:var(--card);border:1px solid var(--bd);border-radius:8px;padding:6px 10px;cursor:pointer}
+button:hover{border-color:var(--ac)}button.p{background:var(--ac);color:#fff;border-color:var(--ac)}
+input,select{background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:5px 8px;min-width:120px}
+.it{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:6px 8px;border-radius:8px;border:1px solid transparent;margin:3px 0}
+.it.ok{background:var(--okb);border-color:var(--ok)}.it.no{background:var(--nob);border-color:var(--no)}.it.shown{background:var(--bg);border-color:var(--ac)}
+.n{font-weight:700;color:var(--mut);width:20px}.q{flex:1;min-width:200px}.fb{font-size:14px;font-weight:600}.it.ok .fb{color:var(--ok)}.it.no .fb{color:var(--no)}
+.sp{visibility:hidden;padding:2px 7px}.it.ok .sp,.it.no .sp,.it.shown .sp{visibility:visible}
+.fig{flex-basis:100%;text-align:center}.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}.sc{font-weight:700}
+.ch{display:flex;flex-direction:column;gap:6px;flex-basis:100%;margin-top:4px}.built,.bank{display:flex;flex-wrap:wrap;gap:5px}.built{min-height:38px;border-bottom:2px dashed var(--bd);padding:3px}
+.t{padding:4px 9px}.qq{font-size:18px;font-weight:600;margin:10px 0}.qo{display:grid;grid-template-columns:1fr 1fr;gap:8px}.qo button{text-align:left;padding:10px}
+.qo .ok{background:var(--okb);border-color:var(--ok)}.qo .no{background:var(--nob);border-color:var(--no)}
+@media(max-width:760px){.wrap{grid-template-columns:1fr}aside{order:-1;position:static;max-height:200px}.qo{grid-template-columns:1fr}}
+</style></head><body><div class="wrap"><main>
+<div class="card"><h1>🧑 Describing Appearance</h1><p class="mut" style="margin:0">Внешность: телосложение, цвет кожи, особенности лица. 5 упражнений по 10 пунктов + викторина «Кто хочет стать миллионером».</p></div>
+<div class="card"><h2>Слова для повторения</h2><p class="mut">Нажмите 🔊 у слова или «Прослушать все». Голос: Google US English / Samantha. <span id="vl"></span></p>
+<div class="bar" style="margin:6px 0"><button class="p" id="pa">▶ Прослушать все</button><button id="ps">■ Стоп</button></div>
+<table id="vt"></table></div>
+<div id="ex"></div>
+<div class="card"><h2>🎓 Кто хочет стать миллионером?</h2><p class="mut">15 вопросов с вариантами ответа, есть подсказка 50:50 и несгораемые суммы.</p><div id="qz"></div></div>
+<div class="card"><h2>Итоги</h2><p>Упражнения 1–5: <b id="tot">0 / 50</b></p><div class="bar"><button class="p" id="ca">📋 Копировать все ответы</button><button id="at">🔊 Проверить звук</button><span id="as" class="mut"></span></div></div>
+</main><aside class="card"><h3>⚠️ Проблемные слова</h3><table id="pl"></table><div class="bar"><button id="pr">Очистить</button></div></aside></div>
+<script>
+const $=s=>document.querySelector(s),shuf=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+const n=s=>String(s).toLowerCase().replace(/[’‘`]/g,"'").replace(/\s+/g,' ').trim().replace(/[.!?]$/,'');
+const V=[['skinny / thin','/ˈskɪni/ · /θɪn/','худой, тощий','skinny, thin'],['chubby','/ˈtʃʌbi/','пухлый, полноватый'],['average','/ˈævrɪdʒ/','средний'],['slim','/slɪm/','стройный'],['overweight','/ˌoʊvərˈweɪt/','с избыточным весом'],['olive skin','/ˈɑːlɪv skɪn/','оливковая кожа'],['fair / light skin','/fer/ · /laɪt/','светлая кожа','fair skin, light skin'],['medium skin','/ˈmiːdiəm/','средний тон кожи'],['dark skin','/dɑːrk/','тёмная кожа'],['dark complexion','/kəmˈplekʃn/','тёмный цвет лица'],['olive complexion','/ˈɑːlɪv kəmˈplekʃn/','оливковый цвет лица'],['pale complexion','/peɪl/','бледный цвет лица'],['fair complexion','/fer kəmˈplekʃn/','светлый цвет лица'],['scar','/skɑːr/','шрам'],['spot / pimple','/spɑːt/ · /ˈpɪmpl/','прыщик','spot, pimple'],['wrinkles','/ˈrɪŋklz/','морщины'],['freckles','/ˈfrekəlz/','веснушки'],['mole','/moʊl/','родинка'],['dimples','/ˈdɪmpəlz/','ямочки'],['dark circles','/ˈsɜːrkəlz/','круги под глазами'],['birthmark','/ˈbɜːrθmɑːrk/','родимое пятно'],['He’s of average build.','/əv ˈævrɪdʒ bɪld/','Он среднего телосложения.']];
+/* audio */
+let voice=null,stop=0;
+function pick(){if(!('speechSynthesis' in window)){$('#vl').textContent='⚠ озвучка не поддерживается';return}const vs=speechSynthesis.getVoices();voice=vs.find(v=>/Google US English/i.test(v.name))||vs.find(v=>/Samantha/i.test(v.name))||vs.find(v=>v.lang=='en-US'||v.lang=='en_US')||vs.find(v=>/^en/i.test(v.lang))||null;$('#vl').textContent=voice?'Сейчас: '+voice.name:'Сейчас: голос по умолчанию'}
+if('speechSynthesis' in window){speechSynthesis.onvoiceschanged=pick;pick()}
+function say(t,end,start){if(!('speechSynthesis' in window)){alert('Озвучка не поддерживается — откройте страницу в Chrome или Safari');return}speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='en-US';if(voice)u.voice=voice;u.rate=.9;if(end){u.onend=end;u.onerror=end}if(start)u.onstart=start;speechSynthesis.speak(u)}
+const vsp=i=>V[i][3]||V[i][0];
+$('#vt').innerHTML='<tr><th>Слово</th><th>Транскрипция</th><th>Перевод</th><th></th></tr>'+V.map((v,i)=>`<tr><td><b>${v[0]}</b></td><td class="mut">${v[1]}</td><td>${v[2]}</td><td><button data-v="${i}">🔊</button></td></tr>`).join('');
+$('#vt').onclick=e=>{const b=e.target.closest('button');if(b)say(vsp(b.dataset.v))};
+$('#pa').onclick=()=>{stop=0;let i=0;const go=()=>{if(stop||i>=V.length)return;say(vsp(i++),()=>setTimeout(go,350))};go()};
+$('#ps').onclick=()=>{stop=1;speechSynthesis.cancel()};
+$('#at').onclick=()=>{const st=$('#as');if(!('speechSynthesis' in window)){st.textContent='✗ Озвучка не поддерживается';return}st.textContent='Проверка…';let ok=0;say('Audio test. She has olive skin.',()=>{if(ok)st.textContent='✓ Звук работает: '+(voice?voice.name:'голос по умолчанию')},()=>ok=1);setTimeout(()=>{if(!ok)st.textContent='✗ Звука нет: проверьте громкость и разрешения браузера'},2500)};
+/* problem words */
+let prob={};try{prob=JSON.parse(localStorage.getItem('prob')||'{}')}catch(e){}
+function saveP(){try{localStorage.setItem('prob',JSON.stringify(prob))}catch(e){}const k=Object.keys(prob).sort((a,b)=>prob[b]-prob[a]);$('#pl').innerHTML=k.length?k.map(i=>`<tr><td><b>${V[i][0]}</b><br><span class="mut">${V[i][2]}</span></td><td>×${prob[i]}</td></tr>`).join(''):'<tr><td class="mut">Пока пусто 🎉</td></tr>'}
+$('#pr').onclick=()=>{prob={};saveP()};saveP();
+/* faces */
+function fig(b,s,f){const h=x=>f.includes(x),r=b>70?25:22;let g=`<svg viewBox="0 0 120 150" width="100" role="img"><rect x="${60-b/2}" y="78" width="${b}" height="72" rx="${Math.min(b/2,30)}" fill="#5c7cfa"/><rect x="52" y="58" width="16" height="26" fill="${s}"/><circle cx="60" cy="42" r="${r}" fill="${s}"/><circle cx="51" cy="38" r="2.5" fill="#222"/><circle cx="69" cy="38" r="2.5" fill="#222"/><path d="M52 52Q60 58 68 52" stroke="#6b2d2d" stroke-width="2" fill="none"/>`;
+if(h('dc'))g+='<ellipse cx="51" cy="43" rx="5" ry="2.5" fill="#503070" opacity=".5"/><ellipse cx="69" cy="43" rx="5" ry="2.5" fill="#503070" opacity=".5"/>';
+if(h('fr'))g+=[[46,45],[50,47],[54,45],[66,45],[70,47],[74,45]].map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="1.1" fill="#a0522d"/>`).join('');
+if(h('di'))g+='<path d="M45 49q-2 3 0 6M75 49q2 3 0 6" stroke="#6b2d2d" stroke-width="1.5" fill="none"/>';
+if(h('sc'))g+='<path d="M72 34L78 48M71 38l4-1M72 43l4-1" stroke="#b03a48" stroke-width="1.6" fill="none"/>';
+if(h('mo'))g+='<circle cx="66" cy="49" r="1.7" fill="#3b2a20"/>';
+if(h('wr'))g+='<path d="M48 25q12-3 24 0M49 29q11-3 22 0M50 33q10-2 20 0" stroke="#000" opacity=".35" fill="none"/>';
+if(h('bm'))g+='<ellipse cx="74" cy="34" rx="5" ry="4" fill="#8b4a2b" opacity=".7"/>';
+return g+'</svg>'}
+/* exercises */
+const O={b:'Build · телосложение',s:'Skin colour · цвет кожи',m:'Marks · особенности кожи и лица'};
+const mask=w=>[...w].map((c,i)=>c!=' '&&i%3==2?'_':c).join('');
+const F=[[38,'#f6dcd0',['fr']],[78,'#7a4a2b',['di']],[58,'#c8a06a',['sc','mo']],[58,'#f1c9a8',['wr']],[92,'#d9a77c',['bm','dc']]];
+const S4=[[0,'He’s skinny and has freckles.',1],[0,'He has dark skin.',0],[1,'She has a scar on her cheek.',0],[1,'She’s chubby and has dimples.',1],[2,'He’s of average build.',1],[2,'He has pale skin.',0],[3,'She is overweight.',0],[3,'She has wrinkles.',1],[4,'He has fair skin.',0],[4,'He has a birthmark and dark circles.',1]];
+const S5=[['Она стройная и довольно высокая.','She’s slim and quite tall.',3],['Ты выглядишь стройной в этом платье.','You look slim in that dress.',3],['Он среднего телосложения.','He’s of average build.',21],['Её кожа довольно бледная.','Her skin is quite pale.',11],['У неё оливковая кожа.','She has olive skin.',5],['Она стройного телосложения.','She’s of slim build.',21],['У него круги под глазами.','He has dark circles under his eyes.',19],['У неё на подбородке небольшой шрам.','She has a small scar on her chin.',13],['Он среднего телосложения (medium).','He’s of medium build.',21],['У неё светлая кожа и веснушки.','She has fair skin and freckles.',16]];
+const T=(a,t)=>t;
+const E=[
+{t:'1 · Вставьте пропущенные буквы',d:'Впишите слово целиком — подсказка: перевод.',k:'t',items:[[16,'freckles','веснушки'],[13,'scar','шрам'],[4,'overweight','избыточный вес'],[18,'dimples','ямочки'],[0,'skinny','худой'],[20,'birthmark','родимое пятно'],[11,'pale complexion','бледный цвет лица'],[1,'chubby','пухлый'],[14,'pimple','прыщ'],[15,'wrinkles','морщины']].map(([w,a,r])=>({w,a:[a],sp:a,q:`<b>${mask(a)}</b> — ${r} → {}`}))},
+{t:'2 · Sort by topic',d:'Выберите тему для каждого слова.',k:'s',items:[[3,'slim','b'],[13,'scar','m'],[5,'olive skin','s'],[18,'dimples','m'],[1,'chubby','b'],[6,'fair skin','s'],[4,'overweight','b'],[16,'freckles','m'],[9,'dark complexion','s'],[2,'average','b']].map(([w,x,a])=>({w,a:[a],sp:x,q:`<b>${x}</b> → {}`}))},
+{t:'3 · Сочетаемость: be / look / be of + build / have / have got',d:'Впишите нужный глагол или предлог (например: is, looks, of, has, has got).',k:'t',items:[['You {} slim in that dress.',['look'],3],['She {} olive skin.',['has','has got','’s got'],5],['He’s {} average build.',['of'],21],['She {} slim and quite tall.',['is','’s'],3],['My brother {} freckles on his nose.',['has','has got'],16],['Her skin {} quite pale.',['is'],11],['They’re {} medium build.',['of'],21],['She {} very pale — is she ill?',['looks','is'],11],['She’s {} slim build.',['of'],21],['He {} a small scar on his chin.',['has','has got'],13]].map(([q,a,w])=>({w,a,q,sp:q.replace('{}',a[0])}))},
+{t:'4 · По картинке: true / false',d:'Посмотрите на картинку и впишите true или false.',k:'t',items:S4.map(([f,q,v],i)=>({w:[0,1,5,13,2,11,4,15,6,20][i],a:v?['true','t']:['false','f'],q:q+' → {}',sp:q,pre:i%2?'':`<div class="fig">${fig(...F[f])}</div>`}))},
+{t:'5 · Build the chunk',d:'Нажимайте на слова, чтобы собрать предложение (клик по слову в рамке — вернуть).',k:'c',items:S5.map(([r,en,w])=>({w,a:[en],sp:en,q:r+' → {}'}))}
+];
+const val=d=>{const s=d.querySelector('select');if(s)return s.value;const i=d.querySelector('input');if(i)return i.value;return[...d.querySelectorAll('.built .t')].map(b=>b.textContent).join(' ')};
+const tk=a=>a.split(' ').map(w=>`<button class="t">${w}</button>`).join('');
+const ans=(e,it)=>e.k=='s'?O[it.a[0]]:it.a[0];
+function exText(e){return e.t+'\n'+e.ds.map((d,i)=>{const it=e.items[i],v=val(d);return `${i+1}. ${it.q.replace(/<[^>]+>/g,'').replace('{}','['+(v?(e.k=='s'?O[v]:v):'—')+']')} | верно: ${ans(e,it)}`}).join('\n')}
+function cp(t,b){const o=b.textContent,done=()=>{b.textContent='✓ Скопировано';setTimeout(()=>b.textContent=o,1500)},fb=()=>{const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy');done()}catch(x){prompt('Скопируйте текст:',t)}a.remove()};navigator.clipboard?navigator.clipboard.writeText(t).then(done,fb):fb()}
+function tot(){$('#tot').textContent=E.reduce((a,e)=>a+(e.score||0),0)+' / 50'}
+E.forEach((e,ei)=>{const s=document.createElement('section');s.className='card';
+s.innerHTML=`<h2>${e.t}</h2><p class="mut">${e.d}</p><div class="items"></div><div class="bar"><button class="p" data-a="c">Проверить</button><button data-a="s">Показать ответы</button><button data-a="r">Сбросить</button><button data-a="p">📋 Копировать</button><span class="sc"></span></div>`;
+const box=s.querySelector('.items');e.ds=[];
+e.items.forEach((it,i)=>{const d=document.createElement('div');d.className='it';let c;
+if(e.k=='s')c=`<select><option value="">— выберите —</option>${Object.entries(O).map(([k,v])=>`<option value="${k}">${v}</option>`).join('')}</select>`;
+else if(e.k=='c'){d.dataset.bank=tk(shuf(it.a[0].split(' ')).join(' '));let x=it.a[0].split(' ');do{var sh=shuf(x)}while(sh.join(' ')==x.join(' ')&&x.length>2);d.dataset.bank=tk(sh.join(' '));c='<span class="ch"><span class="built"></span><span class="bank">'+d.dataset.bank+'</span></span>'}
+else c='<input autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="'+(ei==3?'true / false':'…')+'">';
+d.innerHTML=(it.pre||'')+`<span class="n">${i+1}</span><span class="q">${it.q.replace('{}',c)}</span><button class="sp" data-s="${i}">🔊</button><span class="fb"></span>`;box.appendChild(d);e.ds.push(d)});
+s.onclick=ev=>{const b=ev.target.closest('button');if(!b)return;
+if(b.classList.contains('t')){const d=b.closest('.it');if(d.classList.contains('ok')||d.classList.contains('shown'))return;const p=b.parentElement;(p.classList.contains('bank')?d.querySelector('.built'):d.querySelector('.bank')).appendChild(b);return}
+if(b.dataset.s!==undefined){say(e.items[b.dataset.s].sp);return}
+const a=b.dataset.a;
+if(a=='c'){let ok=0;e.ds.forEach((d,i)=>{const it=e.items[i],v=n(val(d)),g=it.a.some(x=>n(x)==v);d.className='it '+(g?'ok':'no');d.querySelector('.fb').textContent=g?'✓':'✗';if(g)ok++;else if(v&&!d.dataset.l){prob[it.w]=(prob[it.w]||0)+1;d.dataset.l=1}});e.score=ok;s.querySelector('.sc').textContent=ok+' / 10';saveP();tot()}
+if(a=='s')e.ds.forEach((d,i)=>{const it=e.items[i];d.className='it shown';d.querySelector('.fb').textContent='→ '+ans(e,it);const se=d.querySelector('select'),inp=d.querySelector('input');if(se)se.value=it.a[0];else if(inp)inp.value=it.a[0];else{d.querySelector('.built').innerHTML=tk(it.a[0]);d.querySelector('.bank').innerHTML=''}});
+if(a=='r'){e.ds.forEach(d=>{d.className='it';d.dataset.l='';d.querySelector('.fb').textContent='';const se=d.querySelector('select'),inp=d.querySelector('input');if(se)se.value='';else if(inp)inp.value='';else{d.querySelector('.built').innerHTML='';d.querySelector('.bank').innerHTML=d.dataset.bank}});e.score=0;s.querySelector('.sc').textContent='';tot()}
+if(a=='p')cp(exText(e),b)};
+$('#ex').appendChild(s)});
+$('#ca').onclick=function(){cp(E.map(exText).join('\n\n')+'\n\n'+qres,this)};
+/* quiz */
+const Q=[['«chubby» значит:','пухлый',['худой','высокий','бледный'],1],['Синоним слова thin:','skinny',['chubby','average','fair'],0],['She ___ olive skin.','has',['is','looks','of'],5],['He’s ___ average build.','of',['in','has','is'],21],['Как по-английски «родинка»?','mole',['scar','spot','dimple'],17],['Как по-английски «веснушки»?','freckles',['wrinkles','dimples','birthmark'],16],['You ___ slim in that dress.','look',['have','of','has got'],3],['«pale complexion» значит:','бледный цвет лица',['тёмный цвет лица','оливковая кожа','круги под глазами'],11],['Что НЕ описывает цвет кожи?','dimples',['olive','fair','dark'],18],['Круги под глазами:','dark circles',['dark skin','birthmarks','spots'],19],['Her skin ___ quite pale.','is',['has','of','have got'],11],['Нейтральное слово вместо fat:','overweight',['skinny','pale','slim'],4],['Выберите верное:','She’s of slim build.',['She’s from slim build.','She has of slim build.','She’s in slim build.'],21],['Прыщ — это…','pimple',['mole','scar','freckle'],14],['Родимое пятно:','birthmark',['mole','scar','pimple'],20]];
+const L=[100,200,300,500,1000,2000,4000,8000,16000,32000,64000,125000,250000,500000,1000000];
+let qi=0,used=0,x,op,lock,qres='Викторина: не играли';
+function qr(){x=Q[qi];op=shuf([x[1],...x[2]]);lock=0;$('#qz').innerHTML=`<div class="mut">Вопрос ${qi+1} из 15 · ${L[qi].toLocaleString('ru')} баллов</div><div class="qq">${x[0]}</div><div class="qo">${op.map((o,i)=>`<button data-o="${i}">${'ABCD'[i]}. ${o}</button>`).join('')}</div><div class="bar"><button id="f5" ${used?'disabled':''}>50:50</button><span id="qm"></span></div>`}
+function qend(m){$('#qm').innerHTML=m+' <button class="p" id="qs">Играть снова</button>';$('#qs').onclick=()=>{qi=0;used=0;qr()}}
+$('#qz').onclick=ev=>{const b=ev.target.closest('button');if(!b)return;
+if(b.id=='f5'){used=1;b.disabled=true;const w=[...$('#qz').querySelectorAll('[data-o]')].filter(z=>op[z.dataset.o]!=x[1]);shuf(w).slice(0,2).forEach(z=>{z.style.visibility='hidden'});return}
+if(b.id=='nx'){qi++;qr();return}
+if(b.dataset.o===undefined||lock)return;lock=1;const bs=[...$('#qz').querySelectorAll('[data-o]')],g=op[b.dataset.o]==x[1];
+bs.forEach(z=>{if(op[z.dataset.o]==x[1])z.classList.add('ok')});
+if(g){if(qi==14){qres='Викторина: миллион! 🏆';$('#qm').innerHTML='🏆 Вы миллионер! 1 000 000 баллов.';return}$('#qm').innerHTML='✓ Верно! <button class="p" id="nx">Дальше</button>';qres='Викторина: пройдено вопросов — '+(qi+1)}
+else{b.classList.add('no');prob[x[3]]=(prob[x[3]]||0)+1;saveP();const sf=qi>=10?L[9]:qi>=5?L[4]:0;qres='Викторина: ошибка на вопросе '+(qi+1)+', выигрыш '+sf;qend('✗ Неверно. Правильный ответ: <b>'+x[1]+'</b>. Ваш выигрыш: '+sf.toLocaleString('ru')+' баллов.')}};
+qr();
+</script></body></html>
