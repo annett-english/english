@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>What is it like? – A1</title>
+<style>
+:root{--bg:#f6f7fb;--card:#fff;--tx:#1d2433;--mu:#6b7488;--ac:#3b6cf6;--ok:#1f9d55;--bad:#d64545;--bd:#dfe3ee;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14171f;--card:#1e2330;--tx:#e8ebf4;--mu:#9aa3b8;--ac:#7a9bff;--ok:#4cc585;--bad:#ff7b7b;--bd:#323a4d;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#14171f;--card:#1e2330;--tx:#e8ebf4;--mu:#9aa3b8;--ac:#7a9bff;--ok:#4cc585;--bad:#ff7b7b;--bd:#323a4d;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:760px;margin:0 auto;padding:16px}
+h1{font-size:1.5rem;margin:.4em 0}
+h2{font-size:1.15rem;margin:0 0 .6em}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:16px;margin:14px 0}
+.mu{color:var(--mu);font-size:.9rem}
+button{font:inherit;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:10px;padding:6px 12px;cursor:pointer}
+button.p{background:var(--ac);color:#fff;border-color:var(--ac)}
+.words{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px}
+.w{display:flex;align-items:center;gap:8px;border:1px solid var(--bd);border-radius:10px;padding:6px 10px}
+.w b{display:block}.w span{font-size:.85rem;color:var(--mu)}
+.row{padding:8px 0;border-top:1px solid var(--bd)}
+.row:first-of-type{border-top:0}
+input[type=text],select{font:inherit;color:var(--tx);background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:5px 8px;max-width:100%}
+input.g{width:9em}input.l{width:100%;margin-top:6px}
+.ok{border-color:var(--ok)!important;background:color-mix(in srgb,var(--ok) 14%,var(--bg))!important}
+.bad{border-color:var(--bad)!important;background:color-mix(in srgb,var(--bad) 14%,var(--bg))!important}
+.ans{color:var(--ok);font-size:.9rem;margin-top:4px}
+.bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px}
+.sc{margin-left:auto;font-weight:600}
+textarea{width:100%;min-height:90px;font:inherit;background:var(--bg);color:var(--tx);border:1px solid var(--bd);border-radius:8px;padding:8px}
+</style>
+</head>
+<body>
+<main>
+<h1>What is it like? <span class="mu">A1</span></h1>
+<p class="mu">What is / was / will be … like? Weather · people · food</p>
+
+<section class="card">
+<h2>Words: listen and repeat 🔊</h2>
+<div class="words" id="words"></div>
+<div class="bar"><button class="p" id="playAll">▶ Listen to all</button><span class="mu" id="voiceInfo"></span></div>
+</section>
+
+<div id="ex"></div>
+
+<section class="card">
+<h2>Finish</h2>
+<div class="bar"><button class="p" id="copy">Copy my answers</button><button id="test">🔊 Test audio</button><span id="copied" class="mu"></span></div>
+<textarea id="out" readonly placeholder="Your answers will appear here…"></textarea>
+</section>
+</main>
+<script>
+const WORDS=[["weather","/ˈweðər/","погода"],["sunny","/ˈsʌni/","солнечно"],["rainy","/ˈreɪni/","дождливо"],["cloudy","/ˈklaʊdi/","облачно"],["windy","/ˈwɪndi/","ветрено"],["cold","/koʊld/","холодно"],["yesterday","/ˈjestərdeɪ/","вчера"],["tomorrow","/təˈmɑːroʊ/","завтра"],["people","/ˈpiːpəl/","люди"],["friendly","/ˈfrendli/","дружелюбные"],["hotel","/hoʊˈtel/","отель"],["delicious","/dɪˈlɪʃəs/","очень вкусный"]];
+const EX=[
+{t:"1. Fill in the missing word",type:"gap",items:[
+{a:"It ",b:" sunny yesterday.",ans:["was"]},
+{a:"What ",b:" the weather like today?",ans:["is"]},
+{a:"It will ",b:" cold tomorrow.",ans:["be"]},
+{a:"What were the people ",b:" in this city?",ans:["like"]},
+{a:"The food was ",b:".",ans:["delicious"],ru:"очень вкусная"},
+{a:"What ",b:" the weather be like tomorrow?",ans:["will"]},
+{a:"The people in the hotel were very ",b:".",ans:["friendly"],ru:"дружелюбные"},
+{a:"What ",b:" the weather like yesterday?",ans:["was"]}]},
+{t:"2. Listen and write the whole sentence 🎧",type:"dict",items:[
+{s:"The food was delicious.",ipa:"/ðə fuːd wʌz dɪˈlɪʃəs/"},
+{s:"What will the weather be like tomorrow?",ipa:"/wʌt wɪl ðə ˈweðər biː laɪk təˈmɑːroʊ/"},
+{s:"It was cloudy yesterday.",ipa:"/ɪt wʌz ˈklaʊdi ˈjestərdeɪ/"},
+{s:"What were the people like in this city?",ipa:"/wʌt wɜːr ðə ˈpiːpəl laɪk ɪn ðɪs ˈsɪti/"},
+{s:"What is the weather like today?",ipa:"/wʌt ɪz ðə ˈweðər laɪk təˈdeɪ/"},
+{s:"The people in the hotel were friendly.",ipa:"/ðə ˈpiːpəl ɪn ðə hoʊˈtel wɜːr ˈfrendli/"}]},
+{t:"3. Context: write the question",type:"ctx",items:[
+{q:"It was rainy and cold.",ans:["what was the weather like yesterday","what was the weather like"]},
+{q:"They were very friendly.",ans:["what were the people like","what were the people like in the hotel","what were the people like in this city","what were the people like in the city"]},
+{q:"It’s sunny and hot.",ans:["what is the weather like today","what is the weather like"]},
+{q:"It was delicious!",ans:["what was the food like","what was the food like at the restaurant"]},
+{q:"It will be windy.",ans:["what will the weather be like tomorrow","what will the weather be like"]},
+{q:"They were kind and helpful.",ans:["what were the people like","what were the people like in the hotel","what were the people like in this city","what were the people like in the city"]}]},
+{t:"4. Match the halves",type:"match",items:[
+{l:"What was the food",r:"like at the restaurant?"},
+{l:"What will the weather",r:"be like tomorrow?"},
+{l:"What were the people",r:"like in the hotel?"},
+{l:"It was",r:"sunny and warm."},
+{l:"What is the weather",r:"like today?"},
+{l:"What was the weather",r:"like yesterday?"}]}
+];
+const N=s=>s.toLowerCase().replace(/[’`]/g,"'").replace(/what's/g,"what is").replace(/it's/g,"it is").replace(/[^a-z' ]/g," ").replace(/\s+/g," ").trim();
+const voice=()=>{const v=speechSynthesis.getVoices();return v.find(x=>/Google US English/i.test(x.name))||v.find(x=>/Samantha/i.test(x.name))||v.find(x=>x.lang==="en-US")||v.find(x=>/^en/.test(x.lang))};
+function say(t,cb){try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);const v=voice();if(v)u.voice=v;u.lang="en-US";u.rate=.85;if(cb)u.onend=cb;speechSynthesis.speak(u)}catch(e){}}
+function info(){try{const v=voice();document.getElementById("voiceInfo").textContent=v?"Voice: "+v.name:"Voice: browser default"}catch(e){}}
+try{speechSynthesis.onvoiceschanged=info}catch(e){}info();
+const $=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e};
+const W=document.getElementById("words");
+WORDS.forEach(([w,ipa,ru])=>{const d=$("div","w",`<div><b>${w}</b><span>${ipa} · ${ru}</span></div>`);const b=$("button",null,"🔊");b.onclick=()=>say(w);d.append(b);W.append(d)});
+document.getElementById("playAll").onclick=()=>{let i=0;const nx=()=>{if(i<WORDS.length)say(WORDS[i++][0],()=>setTimeout(nx,350))};nx()};
+const reg=[];
+EX.forEach((ex,ei)=>{
+const c=$("section","card");c.append($("h2",null,ex.t));
+const rows=[];
+ex.items.forEach((it,ii)=>{
+const r=$("div","row");let el,ok,show;
+if(ex.type==="gap"){el=$("input","g");el.type="text";r.append(it.a,el,it.b);if(it.ru)r.append($("span","mu"," ("+it.ru+")"));ok=v=>it.ans.includes(N(v));show=it.ans[0];}
+if(ex.type==="dict"){const b=$("button",null,"▶ Play");b.onclick=()=>say(it.s);const d=$("details","mu","<summary>Transcription</summary>"+it.ipa);r.append(b,d);el=$("input","l");el.type="text";r.append(el);ok=v=>N(v)===N(it.s);show=it.s;}
+if(ex.type==="ctx"){r.append($("div",null,"“"+it.q+"”"));el=$("input","l");el.type="text";r.append(el);ok=v=>it.ans.includes(N(v));show=it.ans[0].replace(/^w/,"W")+"?";}
+if(ex.type==="match"){const opts=ex.items.map(x=>x.r).sort((a,b)=>(a.length*7+a.charCodeAt(3))%11-(b.length*7+b.charCodeAt(3))%11);el=$("select");el.append($("option",null,"— choose —"));opts.forEach(o=>{const op=$("option",null,o);op.value=o;el.append(op)});el.firstChild.value="";r.append(it.l+" ",el);ok=v=>v===it.r;show=it.l+" "+it.r;}
+const a=$("div","ans",show);a.hidden=true;r.append(a);c.append(r);rows.push({el,ok,a,show,lab:ex.type==="match"?it.l:(it.q||it.s||it.a+"___"+it.b)});
+});
+const sc=$("span","sc");
+const bar=$("div","bar");const chk=$("button","p","Check");const sh=$("button",null,"Show answers");const rs=$("button",null,"Reset");
+chk.onclick=()=>{let n=0;rows.forEach(r=>{const g=r.ok(r.el.value);if(g)n++;r.el.classList.toggle("ok",g);r.el.classList.toggle("bad",!g)});sc.textContent=n+" / "+rows.length};
+sh.onclick=()=>rows.forEach(r=>r.a.hidden=!r.a.hidden);
+rs.onclick=()=>{rows.forEach(r=>{r.el.value="";r.el.classList.remove("ok","bad");r.a.hidden=true});sc.textContent=""};
+bar.append(chk,sh,rs,sc);c.append(bar);document.getElementById("ex").append(c);reg.push({t:ex.t,rows});
+});
+document.getElementById("copy").onclick=async()=>{
+const txt=reg.map(e=>e.t+"\n"+e.rows.map((r,i)=>`${i+1}. ${r.lab} → ${r.el.value||"—"} ${r.el.value?(r.ok(r.el.value)?"✓":"✗ ("+r.show+")"):""}`).join("\n")).join("\n\n");
+const o=document.getElementById("out");o.value=txt;
+try{await navigator.clipboard.writeText(txt);document.getElementById("copied").textContent="Copied ✓"}catch(e){o.select();try{document.execCommand("copy");document.getElementById("copied").textContent="Copied ✓"}catch(_){document.getElementById("copied").textContent="Select and copy the text below"}}};
+document.getElementById("test").onclick=()=>{info();say("Hello! What is the weather like today?")};
+</script>
+</body>
+</html>
