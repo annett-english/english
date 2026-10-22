@@ -1,0 +1,679 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Home and Airport Vocabulary</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Noto+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: airport-signage header band, a vocabulary board with audio, six numbered exercise cards, a free-writing card, and a sticky "Проблемные слова" side panel */
+:root{
+  --bg:#EDF0F4; --surface:#FFFFFF; --ink:#101B2B; --muted:#55627A; --line:#D2D9E4;
+  --navy:#0E2745; --navy-ink:#F3F6FB; --signal:#FFC629; --signal-ink:#1B1500;
+  --furn:#2B6AD6; --air:#B27D00; --house:#8546B5;
+  --good:#1F7A4D; --good-bg:#E3F4EA; --bad:#B3261E; --bad-bg:#FBE7E5;
+  --focus:#2B6AD6; --field:#F7F9FC;
+  --f-display:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
+  --f-body:"Noto Sans","Segoe UI",system-ui,-apple-system,Roboto,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0A121D; --surface:#121E2F; --ink:#E6EDF7; --muted:#9DABC1; --line:#26364D;
+    --navy:#07182C; --furn:#6FA2FF; --air:#FFC629; --house:#C79BEF;
+    --good:#5CCB92; --good-bg:#12332A; --bad:#FF8A80; --bad-bg:#3A1B1B; --focus:#8DB6FF; --field:#0E1826;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0A121D; --surface:#121E2F; --ink:#E6EDF7; --muted:#9DABC1; --line:#26364D;
+  --navy:#07182C; --furn:#6FA2FF; --air:#FFC629; --house:#C79BEF;
+  --good:#5CCB92; --good-bg:#12332A; --bad:#FF8A80; --bad-bg:#3A1B1B; --focus:#8DB6FF; --field:#0E1826;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.5}
+.pad{padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px))}
+.wrap{max-width:1120px;margin:0 auto}
+button{font:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+
+/* header band */
+.band{background:var(--navy);color:var(--navy-ink)}
+.band .wrap{padding-block:28px 24px;display:flex;flex-wrap:wrap;gap:16px 32px;align-items:flex-end;justify-content:space-between}
+.sign{display:inline-block;background:var(--signal);color:var(--signal-ink);font-family:var(--f-display);font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-size:15px;padding:3px 10px;border-radius:3px}
+.band h1{font-family:var(--f-display);font-weight:700;font-size:clamp(38px,7vw,64px);line-height:1;margin:10px 0 0;letter-spacing:.01em;text-wrap:balance}
+.band p{margin:10px 0 0;color:#B9C7DB;max-width:46ch}
+.hdr-tools{display:flex;flex-direction:column;gap:8px;min-width:0;width:min(100%,300px)}
+.hdr-tools label{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#B9C7DB}
+.hdr-tools input{width:100%}
+.progress{font-variant-numeric:tabular-nums;font-size:14px;color:#D9E3F1}
+
+/* controls */
+input[type=text],textarea,select{font:inherit;color:var(--ink);background:var(--field);border:1.5px solid var(--line);border-radius:6px;padding:8px 10px;min-width:0}
+textarea{width:100%;min-height:64px;resize:vertical}
+input[type=text]:focus,textarea:focus,select:focus{border-color:var(--focus)}
+.btn{border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:6px;padding:8px 14px;font-weight:600;font-size:14px}
+.btn:hover{border-color:var(--focus)}
+.btn.primary{background:var(--signal);border-color:var(--signal);color:var(--signal-ink)}
+.btn.primary:hover{filter:brightness(.96)}
+.btn.small{padding:5px 10px;font-size:13px}
+
+main{padding-block:24px 56px}
+.layout{display:grid;grid-template-columns:minmax(0,1fr);gap:20px}
+@media (min-width:1000px){.layout{grid-template-columns:minmax(0,1fr) 280px;gap:28px;align-items:start}}
+.stack{display:flex;flex-direction:column;gap:20px;min-width:0}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:20px;min-width:0}
+h2{font-family:var(--f-display);font-weight:700;font-size:28px;line-height:1.1;margin:0;letter-spacing:.01em}
+.sub{margin:6px 0 0;color:var(--muted);font-size:14px}
+
+/* audio bar */
+.audio{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:14px;padding:12px;background:var(--field);border:1px solid var(--line);border-radius:8px}
+.audio select{max-width:100%;flex:1 1 220px}
+.voice-status{flex:1 1 100%;font-size:13px;color:var(--muted)}
+
+/* vocabulary */
+.cat{margin-top:22px}
+.cat-head{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:space-between;border-bottom:3px solid var(--c);padding-bottom:6px}
+.cat-head h3{margin:0;font-family:var(--f-display);font-size:24px;letter-spacing:.04em;text-transform:uppercase;color:var(--c)}
+.cat[data-c=f]{--c:var(--furn)} .cat[data-c=a]{--c:var(--air)} .cat[data-c=h]{--c:var(--house)}
+.words{list-style:none;margin:10px 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:6px 18px}
+.w{display:grid;grid-template-columns:34px minmax(0,1fr);gap:10px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line)}
+.play{width:34px;height:34px;border-radius:50%;border:1.5px solid var(--c);background:transparent;color:var(--c);display:grid;place-items:center;padding:0}
+.play:hover,.play.on{background:var(--c);color:var(--surface)}
+.play svg{width:14px;height:14px;fill:currentColor}
+.w b{font-weight:600}
+.ipa{color:var(--muted);font-size:14px;margin-left:6px;white-space:nowrap}
+.ru{display:block;color:var(--muted);font-size:14px}
+.w .t{min-width:0;overflow-wrap:anywhere}
+
+/* exercises */
+.ex-head{display:flex;gap:14px;align-items:flex-start}
+.num{flex:none;width:44px;height:44px;border-radius:4px;background:var(--signal);color:var(--signal-ink);font-family:var(--f-display);font-weight:700;font-size:30px;display:grid;place-items:center}
+.items{list-style:none;margin:16px 0 0;padding:0;display:flex;flex-direction:column;gap:14px}
+.item{display:grid;grid-template-columns:26px minmax(0,1fr);gap:10px}
+.item .n{color:var(--muted);font-variant-numeric:tabular-nums;padding-top:2px}
+.prompt{font-size:17px;overflow-wrap:anywhere}
+.prompt .bl{display:inline-block;width:.7em;border-bottom:2px solid var(--ink);margin:0 1px;height:.9em;vertical-align:baseline}
+.orig{color:var(--muted);font-style:italic}
+.hint{font-size:13px;color:var(--muted);margin-top:1px}
+.row{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;margin-top:6px}
+.row input{flex:1 1 180px;max-width:360px}
+.row input.inline{flex:0 1 190px}
+.mark{font-weight:700;min-width:1.4em}
+.ok input{border-color:var(--good);background:var(--good-bg)} .ok .mark{color:var(--good)}
+.no input{border-color:var(--bad);background:var(--bad-bg)} .no .mark{color:var(--bad)}
+.ans{margin-top:4px;font-size:14px;color:var(--good);font-weight:600}
+.tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:18px;padding-top:14px;border-top:1px solid var(--line)}
+.score{margin-left:auto;font-variant-numeric:tabular-nums;font-weight:700}
+.bank{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0 0}
+.bank span{border:1.5px dashed var(--line);border-radius:4px;padding:3px 10px;font-weight:600;background:var(--field)}
+.cloze{margin-top:14px;line-height:2.4;font-size:17px}
+.gapw{display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
+.gapw sup{font-size:11px;color:var(--muted);font-weight:700}
+.gapw input{width:150px;padding:4px 8px}
+.gapw.ok input{border-color:var(--good);background:var(--good-bg)}
+.gapw.no input{border-color:var(--bad);background:var(--bad-bg)}
+.gapw .mark{min-width:1em}
+.gapw .ans{margin:0;font-size:13px}
+.legend{margin-top:10px;display:flex;flex-wrap:wrap;gap:6px 14px;font-size:14px}
+.legend b{font-weight:700}
+.free label{display:block;margin-bottom:4px}
+
+/* problem words */
+.side{position:sticky;top:16px;min-width:0}
+@media (max-width:999px){.side{position:static;order:-1}}
+.side details{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.side summary{cursor:pointer;font-weight:700;list-style:none;display:flex;justify-content:space-between;gap:8px}
+.side summary::-webkit-details-marker{display:none}
+.side .count{background:var(--signal);color:var(--signal-ink);border-radius:10px;padding:0 8px;font-size:13px;line-height:22px}
+.pw{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;gap:6px;max-height:60vh;overflow:auto}
+.pw li{display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:8px;align-items:center;border-bottom:1px solid var(--line);padding-bottom:6px}
+.pw .play{--c:var(--bad);width:30px;height:30px}
+.pw .t{min-width:0;overflow-wrap:anywhere;font-size:14px}
+.pw .x{font-size:12px;color:var(--bad);font-weight:700;font-variant-numeric:tabular-nums}
+.empty{color:var(--muted);font-size:14px;margin:10px 0 0}
+
+.final{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom, 0px));background:var(--navy);color:var(--navy-ink);padding:10px 16px;border-radius:6px;font-weight:600;font-size:14px;z-index:20;max-width:calc(100% - 32px)}
+.fallback{margin-top:12px}
+.fallback textarea{min-height:200px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px}
+@media (prefers-reduced-motion:no-preference){.btn,.play{transition:background .15s,border-color .15s}}
+</style>
+<style>html{color-scheme:light}body{margin:0}</style>
+</head>
+<body>
+
+<div class="band pad">
+  <div class="wrap">
+    <div>
+      <span class="sign">Vocabulary · Unit review</span>
+      <h1>Home and Airport Words</h1>
+      <p>Furniture, airport and housework. Listen, write each answer by hand, check it, then copy everything in one click.</p>
+    </div>
+    <div class="hdr-tools">
+      <label for="stuname">Имя ученика</label>
+      <input type="text" id="stuname" autocomplete="off" placeholder="Anna S.">
+      <div class="progress" id="progress">Проверено упражнений: 0 из 6</div>
+    </div>
+  </div>
+</div>
+
+<main class="pad">
+<div class="wrap layout">
+  <div class="stack" id="stack">
+
+    <section class="card" id="vocab">
+      <h2>Words to remember</h2>
+      <p class="sub">Нажмите ▶ рядом со словом, чтобы послушать. Голос по умолчанию: Google US English или Samantha.</p>
+      <div class="audio">
+        <button class="btn primary small" id="testBtn" type="button">Проверить звук</button>
+        <label for="voiceSel" class="sub" style="margin:0">Голос</label>
+        <select id="voiceSel"></select>
+        <button class="btn small" id="stopBtn" type="button">Стоп</button>
+        <div class="voice-status" id="voiceStatus" role="status">Ищу голос…</div>
+      </div>
+      <div id="vocabBody"></div>
+    </section>
+
+    <div id="exercises" class="stack"></div>
+
+    <section class="card final">
+      <div style="flex:1 1 260px;min-width:0">
+        <h2>Готово?</h2>
+        <p class="sub">В копию попадут ваши ответы ко всем упражнениям, отметки ✓ / ✗ и правильные ответы там, где была ошибка или нажато «Показать ответы».</p>
+      </div>
+      <button class="btn primary" id="copyAll2" type="button">Копировать все ответы</button>
+    </section>
+    <div id="fallbackHost"></div>
+  </div>
+
+  <aside class="side" aria-label="Проблемные слова">
+    <details id="pwBox" open>
+      <summary><span>Проблемные слова</span><span class="count" id="pwCount">0</span></summary>
+      <p class="sub" style="margin-top:8px">Сюда попадают слова, в которых была ошибка при проверке. Нажмите ▶, чтобы послушать.</p>
+      <ul class="pw" id="pwList"></ul>
+      <p class="empty" id="pwEmpty">Пока ошибок нет.</p>
+      <div style="margin-top:10px"><button class="btn small" id="pwClear" type="button">Очистить список</button></div>
+    </details>
+  </aside>
+</div>
+</main>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(function(){
+"use strict";
+
+/* ---------- vocabulary data: [cat, id, display, say, ipa, ru] ---------- */
+var V = [
+["f","washing machine","washing machine","washing machine","/ˈwɑːʃɪŋ məˌʃiːn/","стиральная машина"],
+["f","fridge","fridge","fridge","/frɪdʒ/","холодильник"],
+["f","cooker","cooker","cooker","/ˈkʊkər/","плита"],
+["f","dishwasher","dishwasher","dishwasher","/ˈdɪʃˌwɑːʃər/","посудомоечная машина"],
+["f","floor","floor","floor","/flɔːr/","пол"],
+["f","microwave","microwave","microwave","/ˈmaɪkrəweɪv/","микроволновка"],
+["f","sofa","sofa","sofa","/ˈsoʊfə/","диван"],
+["f","armchair","armchair","armchair","/ˈɑːrmˌtʃer/","кресло"],
+["f","carpet","carpet","carpet","/ˈkɑːrpɪt/","ковёр"],
+["f","cupboard","cupboard","cupboard","/ˈkʌbərd/","шкаф, буфет"],
+["f","fireplace","fireplace","fireplace","/ˈfaɪərˌpleɪs/","камин"],
+["f","bath","bath","bath","/bæθ/","ванна"],
+["f","wardrobe","wardrobe","wardrobe","/ˈwɔːrdroʊb/","платяной шкаф"],
+["f","stairs","stairs","stairs","/sterz/","лестница"],
+["f","shelf","shelf (shelves)","shelf, shelves","/ʃelf/ · /ʃelvz/","полка (полки)"],
+["f","ceiling","ceiling","ceiling","/ˈsiːlɪŋ/","потолок"],
+["f","plant","plant","plant","/plænt/","растение"],
+["f","light","light","light","/laɪt/","свет, лампа"],
+
+["a","arrivals","arrivals","arrivals","/əˈraɪvəlz/","прилёт, зал прибытия"],
+["a","customs","customs","customs","/ˈkʌstəmz/","таможня"],
+["a","passport control","passport control","passport control","/ˈpæspɔːrt kənˌtroʊl/","паспортный контроль"],
+["a","bag drop","bag drop","bag drop","/ˈbæɡ drɑːp/","сдача багажа"],
+["a","departures","departures","departures","/dɪˈpɑːrtʃərz/","вылет, зал вылета"],
+["a","security check","security check","security check","/sɪˈkjʊrəti tʃek/","досмотр"],
+["a","baggage reclaim","baggage reclaim","baggage reclaim","/ˈbæɡɪdʒ riˌkleɪm/","получение багажа"],
+["a","gates","gates","gates","/ɡeɪts/","выходы на посадку"],
+["a","check-in","check-in","check-in","/ˈtʃek ɪn/","регистрация"],
+["a","trolley","trolley","trolley","/ˈtrɑːli/","тележка для багажа"],
+
+["h","dust the furniture","dust the furniture","dust the furniture","/dʌst ðə ˈfɜːrnɪtʃər/","вытирать пыль с мебели"],
+["h","make the bed","make the bed","make the bed","/meɪk ðə bed/","заправить кровать"],
+["h","tidy up the room","tidy up the room","tidy up the room","/ˈtaɪdi ʌp ðə ruːm/","убраться в комнате"],
+["h","vacuum the floor","vacuum the floor","vacuum the floor","/ˈvækjuːm ðə flɔːr/","пылесосить"],
+["h","load the dishwasher","load the dishwasher","load the dishwasher","/loʊd ðə ˈdɪʃˌwɑːʃər/","загрузить посудомоечную машину"],
+["h","put your clothes away","put your clothes away","put your clothes away","/pʊt jɔːr kloʊðz əˈweɪ/","убрать свою одежду"],
+["h","do the shopping","do the shopping","do the shopping","/duː ðə ˈʃɑːpɪŋ/","делать покупки"],
+["h","set the table","set the table","set the table","/set ðə ˈteɪbl/","накрыть на стол"],
+["h","pick up dirty clothes","pick up dirty clothes","pick up dirty clothes","/pɪk ʌp ˈdɜːrti kloʊðz/","собрать грязную одежду с пола"],
+["h","iron clothes","iron clothes","iron clothes","/ˈaɪərn kloʊðz/","гладить одежду"],
+["h","do the laundry","do the laundry","do the laundry","/duː ðə ˈlɔːndri/","стирать"],
+["h","cook lunch","cook lunch / dinner","cook lunch, cook dinner","/kʊk lʌntʃ/ · /ˈdɪnər/","приготовить обед / ужин"],
+["h","take out the rubbish","take out the rubbish (BrE) / trash (AmE)","take out the rubbish. take out the trash","/teɪk aʊt ðə ˈrʌbɪʃ/ · /træʃ/","вынести мусор"],
+["h","do the washing up","do the washing up / wash the dishes","do the washing up. wash the dishes","/duː ðə ˌwɑːʃɪŋ ˈʌp/ · /wɑːʃ ðə ˈdɪʃɪz/","мыть посуду"]
+];
+var CATS = {f:"Furniture", a:"Airport", h:"Do housework"};
+var VBY = {}; V.forEach(function(v){ VBY[v[1]] = v; });
+
+/* ---------- exercises ---------- */
+var EX = [
+{ title:"Missing letters", ru:"Вставьте пропущенные буквы и напишите слово или фразу целиком.", items:[
+ {p:"w_rd_o_e", hint:"платяной шкаф", a:["wardrobe"], show:"wardrobe", w:"wardrobe"},
+ {p:"c_st_ms", hint:"таможня", a:["customs"], show:"customs", w:"customs"},
+ {p:"d_shw_sh_r", hint:"посудомоечная машина", a:["dishwasher"], show:"dishwasher", w:"dishwasher"},
+ {p:"s_t th_ t_bl_", hint:"накрыть на стол", a:["set the table"], show:"set the table", w:"set the table"},
+ {p:"b_gg_ge r_cl_im", hint:"получение багажа", a:["baggage reclaim"], show:"baggage reclaim", w:"baggage reclaim"},
+ {p:"f_r_pl_ce", hint:"камин", a:["fireplace"], show:"fireplace", w:"fireplace"},
+ {p:"_ro_ cl_th_s", hint:"гладить одежду", a:["iron clothes","iron the clothes"], show:"iron clothes", w:"iron clothes"},
+ {p:"d_p_rt_r_s", hint:"вылет", a:["departures"], show:"departures", w:"departures"}
+]},
+{ title:"Translate into English", ru:"Переведите с русского на английский.", items:[
+ {p:"стиральная машина", a:["washing machine"], show:"washing machine", w:"washing machine"},
+ {p:"вынести мусор", a:["take out the rubbish","take out the trash","take out rubbish","take out trash"], show:"take out the rubbish / trash", w:"take out the rubbish"},
+ {p:"паспортный контроль", a:["passport control"], show:"passport control", w:"passport control"},
+ {p:"ковёр", a:["carpet"], show:"carpet", w:"carpet"},
+ {p:"накрыть на стол", a:["set the table"], show:"set the table", w:"set the table"},
+ {p:"тележка (для багажа)", a:["trolley"], show:"trolley", w:"trolley"},
+ {p:"лестница", a:["stairs","staircase"], show:"stairs", w:"stairs"},
+ {p:"гладить одежду", a:["iron clothes","iron the clothes","do the ironing"], show:"iron clothes", w:"iron clothes"}
+]},
+{ title:"Sort by topic", ru:"Напишите тему каждого слова: furniture, airport или housework (можно цифрой).", legend:"<b>1</b> furniture · <b>2</b> airport · <b>3</b> housework", items:[
+ {p:"security check", a:["airport","2"], show:"airport", w:"security check", ph:"тема"},
+ {p:"do the laundry", a:["housework","do housework","3"], show:"housework", w:"do the laundry", ph:"тема"},
+ {p:"microwave", a:["furniture","1"], show:"furniture", w:"microwave", ph:"тема"},
+ {p:"bag drop", a:["airport","2"], show:"airport", w:"bag drop", ph:"тема"},
+ {p:"a plant", a:["furniture","1"], show:"furniture", w:"plant", ph:"тема"},
+ {p:"take out the rubbish", a:["housework","do housework","3"], show:"housework", w:"take out the rubbish", ph:"тема"},
+ {p:"stairs", a:["furniture","1"], show:"furniture", w:"stairs", ph:"тема"},
+ {p:"trolley", a:["airport","2"], show:"airport", w:"trolley", ph:"тема"}
+]},
+{ title:"Definitions", ru:"Прочитайте определение и напишите слово или фразу.", items:[
+ {p:"A machine that washes plates, cups and glasses for you.", hint:"d…", a:["dishwasher"], show:"dishwasher", w:"dishwasher"},
+ {p:"The place at the airport where officers check what you bring into a country.", hint:"c…", a:["customs"], show:"customs", w:"customs"},
+ {p:"A long, soft seat for two or three people.", hint:"s…", a:["sofa"], show:"sofa", w:"sofa"},
+ {p:"To put things in their places and make a room neat.", hint:"t… u…", a:["tidy up","tidy up the room","tidy"], show:"tidy up (the room)", w:"tidy up the room"},
+ {p:"The surface above your head inside a room.", hint:"c…", a:["ceiling"], show:"ceiling", w:"ceiling"},
+ {p:"A small cart you push to carry suitcases at the airport.", hint:"t…", a:["trolley"], show:"trolley", w:"trolley"},
+ {p:"To wipe a thin layer of dirt from tables and shelves.", hint:"d…", a:["dust","dust the furniture"], show:"dust (the furniture)", w:"dust the furniture"},
+ {p:"The place where you wait and then get on your plane.", hint:"g…", a:["gate","gates"], show:"gate", w:"gates"}
+]},
+{ title:"Context: fill the text", ru:"Вставьте слова из рамки в текст по смыслу. Если нужно, измените форму слова.", cloze:true,
+ bank:["wardrobe","gate","load","baggage reclaim","rubbish","check-in","put","security check"],
+ text:"Last Saturday I had a lot to do before our flight. First, I [1] the dishwasher and took out the [2]. Then I [3] my clothes away in the [4]. At the airport, we went to [5] to get our boarding passes, and then through the [6], where officers scan your bags. We waited at the [7] for an hour. When we landed in London, we collected our suitcases at [8].",
+ items:[
+ {a:["loaded"], show:"loaded", w:"load the dishwasher"},
+ {a:["rubbish","trash"], show:"rubbish (trash)", w:"take out the rubbish"},
+ {a:["put"], show:"put", w:"put your clothes away"},
+ {a:["wardrobe"], show:"wardrobe", w:"wardrobe"},
+ {a:["check-in","check in"], show:"check-in", w:"check-in"},
+ {a:["security check"], show:"security check", w:"security check"},
+ {a:["gate","gates"], show:"gate", w:"gates"},
+ {a:["baggage reclaim"], show:"baggage reclaim", w:"baggage reclaim"}
+]},
+{ title:"Rephrase", ru:"Допишите второе предложение так, чтобы смысл остался прежним.", items:[
+ {p:"It's time to clean the floor with a vacuum cleaner.", pre:"It's time to", post:"the floor.", a:["vacuum"], show:"vacuum", w:"vacuum the floor"},
+ {p:"Please throw away the rubbish.", pre:"Please", post:"the rubbish.", a:["take out"], show:"take out", w:"take out the rubbish"},
+ {p:"I must buy food at the supermarket today.", pre:"I must", post:"today.", a:["do the shopping","go shopping","do shopping"], show:"do the shopping", w:"do the shopping"},
+ {p:"Put the plates and forks on the table before dinner.", pre:"", post:"before dinner.", a:["set the table"], show:"Set the table", w:"set the table"},
+ {p:"You have to show your passport to the officer.", pre:"You have to go through", post:".", a:["passport control"], show:"passport control", w:"passport control"},
+ {p:"He pressed his shirts so they were smooth.", pre:"He", post:"his shirts.", a:["ironed"], show:"ironed", w:"iron clothes"},
+ {p:"We have a place for a real fire in our living room.", pre:"We have a", post:"in our living room.", a:["fireplace"], show:"fireplace", w:"fireplace"},
+ {p:"Wait in the area where you get on the plane.", pre:"Wait at the", post:".", a:["gate","gates"], show:"gate", w:"gates"}
+]}
+];
+
+var FREE = {
+ title:"Your ideas", ru:"Не проверяется. Допишите свои идеи, и все ответы скопируются кнопкой внизу.",
+ parts:[
+  {head:"Expand the sentence — добавьте детали: когда, как часто, чем, где.", items:[
+   {p:"I dust the furniture.", ph:"I dust the furniture every Saturday morning with …"},
+   {p:"My sister vacuums the floor.", ph:"My sister …"},
+   {p:"We wait at the gate.", ph:"We …"}
+  ]},
+  {head:"Finish the sentences — закончите предложения со своими идеями.", items:[
+   {p:"At the airport, the first thing I do is …", ph:""},
+   {p:"If I could buy one new piece of furniture, I would buy … because …", ph:""},
+   {p:"The housework I hate most is … because …", ph:""},
+   {p:"When my flight is late, I …", ph:""},
+   {p:"In my bedroom there is …, but there isn't …", ph:""}
+  ]}
+ ]
+};
+
+/* ---------- helpers ---------- */
+function $(s,r){ return (r||document).querySelector(s); }
+function el(tag,cls,html){ var e=document.createElement(tag); if(cls) e.className=cls; if(html!=null) e.innerHTML=html; return e; }
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function norm(s){ return String(s).toLowerCase().replace(/[’‘`]/g,"'").replace(/[-–—]/g," ").replace(/[^a-z0-9' ]/g," ").replace(/\s+/g," ").trim(); }
+function stripArt(s){ return s.replace(/^(a|an|the) /,""); }
+function matches(val, answers){
+  var v = norm(val); if(!v) return false;
+  return answers.some(function(a){
+    var n = norm(a);
+    return v===n || stripArt(v)===stripArt(n) || v.replace(/ /g,"")===n.replace(/ /g,"");
+  });
+}
+function store(k,v){ try{ if(v===undefined){ return localStorage.getItem(k); } localStorage.setItem(k,v); }catch(e){ return null; } }
+var ICON = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 1.8v12.4L14 8z"/></svg>';
+
+/* ---------- audio ---------- */
+var synth = ("speechSynthesis" in window) ? window.speechSynthesis : null;
+var voices = [], curVoice = null, playToken = 0, playingBtn = null;
+var vsel = $("#voiceSel"), vstat = $("#voiceStatus");
+
+function preferred(list){
+  var i, n;
+  for(i=0;i<list.length;i++){ n=list[i].name; if(/Google US English/i.test(n)) return list[i]; }
+  for(i=0;i<list.length;i++){ n=list[i].name; if(/^Samantha/i.test(n)) return list[i]; }
+  for(i=0;i<list.length;i++){ if(/^en[-_]US$/i.test(list[i].lang)) return list[i]; }
+  return list[0] || null;
+}
+function loadVoices(){
+  if(!synth){ vstat.textContent = "Озвучка не поддерживается в этом браузере. Попробуйте Chrome, Edge или Safari."; vsel.disabled=true; return; }
+  var all = synth.getVoices();
+  voices = all.filter(function(v){ return /^en/i.test(v.lang); });
+  if(!voices.length){ vstat.textContent = "Английские голоса пока не найдены. Подождите секунду или перезагрузите страницу."; return; }
+  var saved = store("hav-voice"), pick = null;
+  if(saved){ voices.forEach(function(v){ if(v.name===saved) pick=v; }); }
+  curVoice = pick || preferred(voices);
+  vsel.innerHTML = "";
+  voices.forEach(function(v,i){
+    var o = document.createElement("option"); o.value = String(i); o.textContent = v.name + " (" + v.lang + ")";
+    if(v===curVoice) o.selected = true; vsel.appendChild(o);
+  });
+  var good = /Google US English|^Samantha/i.test(curVoice.name);
+  vstat.textContent = good ? ("Голос: " + curVoice.name + ". Нажмите «Проверить звук».")
+    : ("Голоса Google US English / Samantha здесь нет, выбран: " + curVoice.name + ". Другой голос можно выбрать в списке.");
+}
+if(synth){
+  loadVoices();
+  if(synth.addEventListener) synth.addEventListener("voiceschanged", loadVoices); else synth.onvoiceschanged = loadVoices;
+}
+vsel.addEventListener("change", function(){
+  var v = voices[parseInt(vsel.value,10)]; if(v){ curVoice=v; store("hav-voice", v.name); vstat.textContent = "Голос: " + v.name; speak("Hello! This is "+v.name.replace(/Google /,"")+".", null); }
+});
+function clearPlaying(){ if(playingBtn){ playingBtn.classList.remove("on"); playingBtn=null; } }
+function stopAll(){ playToken++; if(synth) synth.cancel(); clearPlaying(); }
+function speak(text, done, btn){
+  if(!synth){ vstat.textContent = "Озвучка не поддерживается в этом браузере."; return; }
+  playToken++; var my = playToken;
+  synth.cancel(); clearPlaying();
+  if(btn){ btn.classList.add("on"); playingBtn = btn; }
+  var u = new SpeechSynthesisUtterance(text);
+  if(curVoice) u.voice = curVoice;
+  u.lang = (curVoice && curVoice.lang) || "en-US"; u.rate = 0.9;
+  u.onend = function(){ if(my!==playToken) return; clearPlaying(); if(done) done(); };
+  u.onerror = function(){ if(my!==playToken) return; clearPlaying(); };
+  setTimeout(function(){ if(my===playToken){ synth.resume && synth.resume(); synth.speak(u); } }, 30);
+}
+function speakList(ids, btn){
+  var i = 0; var my;
+  function next(){
+    if(i>=ids.length){ clearPlaying(); return; }
+    var v = VBY[ids[i++]]; if(!v){ next(); return; }
+    speak(v[3], function(){ setTimeout(next, 250); }, btn);
+  }
+  next();
+}
+$("#testBtn").addEventListener("click", function(){ speak("Hello! This is a test. Washing machine, passport control, set the table.", null); });
+$("#stopBtn").addEventListener("click", stopAll);
+
+/* ---------- vocabulary board ---------- */
+(function(){
+  var host = $("#vocabBody");
+  ["f","a","h"].forEach(function(c){
+    var sec = el("div","cat"); sec.setAttribute("data-c", c);
+    var head = el("div","cat-head");
+    head.appendChild(el("h3",null,CATS[c]));
+    var all = el("button","btn small","▶ Listen to all"); all.type="button";
+    var ids = V.filter(function(v){return v[0]===c;}).map(function(v){return v[1];});
+    all.addEventListener("click", function(){ speakList(ids, null); });
+    head.appendChild(all); sec.appendChild(head);
+    var ul = el("ul","words");
+    V.filter(function(v){return v[0]===c;}).forEach(function(v){
+      var li = el("li","w");
+      var b = el("button","play",ICON); b.type="button"; b.setAttribute("aria-label","Listen: "+v[2]);
+      b.addEventListener("click", function(){ speak(v[3], null, b); });
+      var t = el("div","t","<b>"+esc(v[2])+"</b><span class=\"ipa\">"+esc(v[4])+"</span><span class=\"ru\">"+esc(v[5])+"</span>");
+      li.appendChild(b); li.appendChild(t); ul.appendChild(li);
+    });
+    sec.appendChild(ul); host.appendChild(sec);
+  });
+})();
+
+/* ---------- problem words ---------- */
+var problems = {}; var lastWrong = {};
+try{ var pj = store("hav-problems"); if(pj) problems = JSON.parse(pj) || {}; }catch(e){ problems = {}; }
+function saveProblems(){ store("hav-problems", JSON.stringify(problems)); }
+function renderProblems(){
+  var list = $("#pwList"); list.innerHTML = "";
+  var keys = Object.keys(problems).sort(function(a,b){ return problems[b]-problems[a]; });
+  keys.forEach(function(k){
+    var v = VBY[k]; if(!v) return;
+    var li = el("li");
+    var b = el("button","play",ICON); b.type="button"; b.setAttribute("aria-label","Listen: "+v[2]);
+    b.addEventListener("click", function(){ speak(v[3], null, b); });
+    var t = el("div","t","<b>"+esc(v[2])+"</b><span class=\"ru\">"+esc(v[5])+"</span>");
+    var x = el("span","x","×"+problems[k]);
+    li.appendChild(b); li.appendChild(t); li.appendChild(x); list.appendChild(li);
+  });
+  $("#pwCount").textContent = String(keys.length);
+  $("#pwEmpty").hidden = keys.length>0;
+}
+function recordProblem(id, key, val){
+  var nv = norm(val); if(lastWrong[key]===nv) return;
+  lastWrong[key] = nv; problems[id] = (problems[id]||0)+1; saveProblems(); renderProblems();
+}
+$("#pwClear").addEventListener("click", function(){ problems = {}; lastWrong = {}; saveProblems(); renderProblems(); });
+(function(){ var mq = window.matchMedia ? window.matchMedia("(min-width:1000px)") : null; $("#pwBox").open = mq ? mq.matches : true; })();
+
+/* ---------- exercise state ---------- */
+var state = EX.map(function(){ return {checked:false, revealed:false, results:[]}; });
+
+function buildPrompt(p){ return esc(p).replace(/_/g,'<span class="bl"></span>'); }
+
+function renderExercise(ex, xi){
+  var card = el("section","card"); card.id = "ex"+(xi+1);
+  var head = el("div","ex-head");
+  head.appendChild(el("div","num",String(xi+1)));
+  var hb = el("div"); hb.style.minWidth="0";
+  hb.appendChild(el("h2",null,ex.title)); hb.appendChild(el("p","sub",ex.ru));
+  head.appendChild(hb); card.appendChild(head);
+  if(ex.legend){ card.appendChild(el("div","legend",ex.legend)); }
+
+  var ul;
+  if(ex.cloze){
+    if(ex.bank){ var bank = el("div","bank"); ex.bank.forEach(function(w){ bank.appendChild(el("span",null,esc(w))); }); card.appendChild(bank); }
+    var para = el("p","cloze");
+    var parts = ex.text.split(/\[(\d)\]/);
+    parts.forEach(function(part,idx){
+      if(idx%2===0){ para.appendChild(document.createTextNode(part)); }
+      else {
+        var i = parseInt(part,10)-1;
+        var w = el("span","gapw"); w.setAttribute("data-i", String(i));
+        w.appendChild(el("sup",null,String(i+1)));
+        var inp = document.createElement("input"); inp.type="text"; inp.id="e"+(xi+1)+"-"+i;
+        inp.autocomplete="off"; inp.autocapitalize="off"; inp.spellcheck=false; inp.setAttribute("aria-label","Gap "+(i+1));
+        w.appendChild(inp); w.appendChild(el("span","mark"));
+        var ans = el("span","ans"); ans.hidden = true; w.appendChild(ans);
+        para.appendChild(w);
+      }
+    });
+    card.appendChild(para);
+  } else {
+    ul = el("ol","items"); ul.style.listStyle="none";
+    ex.items.forEach(function(it,i){
+      var li = el("li","item"); li.setAttribute("data-i", String(i));
+      li.appendChild(el("span","n",(i+1)+"."));
+      var body = el("div"); body.style.minWidth="0";
+      var inline = (it.pre!==undefined);
+      body.appendChild(el("div", inline?"prompt orig":"prompt", inline ? esc(it.p) : buildPrompt(it.p)));
+      if(it.hint) body.appendChild(el("div","hint",esc(it.hint)));
+      var row = el("div","row");
+      if(inline && it.pre) row.appendChild(el("span",null,esc(it.pre)));
+      var inp = document.createElement("input"); inp.type="text"; inp.id="e"+(xi+1)+"-"+i;
+      inp.autocomplete="off"; inp.autocapitalize="off"; inp.spellcheck=false;
+      inp.setAttribute("aria-label","Answer "+(i+1));
+      if(it.ph) inp.placeholder = it.ph;
+      if(inline) inp.className="inline";
+      row.appendChild(inp);
+      if(inline && it.post) row.appendChild(el("span",null,esc(it.post)));
+      row.appendChild(el("span","mark"));
+      body.appendChild(row);
+      var ans = el("div","ans"); ans.hidden = true; body.appendChild(ans);
+      li.appendChild(body); ul.appendChild(li);
+    });
+    card.appendChild(ul);
+  }
+
+  var tools = el("div","tools");
+  var bc = el("button","btn primary","Проверить"); bc.type="button";
+  var bs = el("button","btn","Показать ответы"); bs.type="button";
+  var br = el("button","btn","Сбросить"); br.type="button";
+  var sc = el("span","score"); sc.setAttribute("aria-live","polite");
+  tools.appendChild(bc); tools.appendChild(bs); tools.appendChild(br); tools.appendChild(sc);
+  card.appendChild(tools);
+
+  function cells(){ return Array.prototype.slice.call(card.querySelectorAll(ex.cloze ? ".gapw" : ".item")); }
+  function inputOf(c){ return c.querySelector("input"); }
+
+  bc.addEventListener("click", function(){
+    var good = 0;
+    cells().forEach(function(c,i){
+      var it = ex.items[i], inp = inputOf(c), val = inp.value;
+      var ok = matches(val, it.a);
+      c.classList.remove("ok","no");
+      c.classList.add(ok?"ok":"no");
+      c.querySelector(".mark").textContent = ok ? "✓" : "✗";
+      c.querySelector(".mark").setAttribute("aria-label", ok ? "correct" : "incorrect");
+      if(ok){ good++; } else if(val.trim()){ recordProblem(it.w, xi+"-"+i, val); }
+      state[xi].results[i] = ok;
+    });
+    state[xi].checked = true;
+    sc.textContent = good + " / " + ex.items.length;
+    updateProgress();
+  });
+  bs.addEventListener("click", function(){
+    var on = !state[xi].revealed; state[xi].revealed = on;
+    cells().forEach(function(c,i){
+      var a = c.querySelector(".ans"); a.hidden = !on;
+      if(on) a.textContent = ex.cloze ? ex.items[i].show : "Ответ: " + ex.items[i].show;
+    });
+    bs.textContent = on ? "Скрыть ответы" : "Показать ответы";
+  });
+  br.addEventListener("click", function(){
+    cells().forEach(function(c){
+      inputOf(c).value=""; c.classList.remove("ok","no"); c.querySelector(".mark").textContent=""; c.querySelector(".ans").hidden=true;
+    });
+    state[xi] = {checked:false, revealed:false, results:[]}; bs.textContent="Показать ответы"; sc.textContent="";
+    Object.keys(lastWrong).forEach(function(k){ if(k.indexOf((xi)+"-")===0) delete lastWrong[k]; });
+    updateProgress();
+  });
+  card.addEventListener("keydown", function(e){
+    if(e.key!=="Enter" || e.target.tagName!=="INPUT") return;
+    e.preventDefault();
+    var ins = Array.prototype.slice.call(card.querySelectorAll("input"));
+    var k = ins.indexOf(e.target);
+    if(k>=0 && k<ins.length-1) ins[k+1].focus(); else bc.focus();
+  });
+  return card;
+}
+
+var exHost = $("#exercises");
+EX.forEach(function(ex,xi){ exHost.appendChild(renderExercise(ex,xi)); });
+
+/* free-writing card */
+(function(){
+  var card = el("section","card free"); card.id="ex7";
+  var head = el("div","ex-head");
+  head.appendChild(el("div","num","7"));
+  var hb = el("div"); hb.style.minWidth="0";
+  hb.appendChild(el("h2",null,FREE.title)); hb.appendChild(el("p","sub",FREE.ru));
+  head.appendChild(hb); card.appendChild(head);
+  var n = 0;
+  FREE.parts.forEach(function(part){
+    var h = el("p",null,"<b>"+esc(part.head)+"</b>"); h.style.margin="18px 0 8px"; card.appendChild(h);
+    var ol = el("ol","items"); ol.style.listStyle="none";
+    part.items.forEach(function(it){
+      var li = el("li","item"); li.appendChild(el("span","n",(++n)+"."));
+      var b = el("div"); b.style.minWidth="0";
+      var lab = el("label","prompt",esc(it.p)); lab.setAttribute("for","f-"+n);
+      var ta = document.createElement("textarea"); ta.id="f-"+n; ta.spellcheck=false; ta.autocomplete="off";
+      if(it.ph) ta.placeholder = it.ph;
+      b.appendChild(lab); b.appendChild(ta); li.appendChild(b); ol.appendChild(li);
+    });
+    card.appendChild(ol);
+  });
+  var tools = el("div","tools");
+  var cb = el("button","btn primary","Копировать все ответы"); cb.type="button"; cb.id="copyAll1";
+  tools.appendChild(cb); card.appendChild(tools);
+  exHost.appendChild(card);
+})();
+
+function updateProgress(){
+  var done = state.filter(function(s){return s.checked;}).length;
+  var good = 0, total = 0;
+  state.forEach(function(s,xi){ if(s.checked){ total += EX[xi].items.length; s.results.forEach(function(r){ if(r) good++; }); } });
+  $("#progress").textContent = "Проверено упражнений: " + done + " из 6" + (total ? " · верно " + good + " из " + total : "");
+}
+
+/* ---------- copy all answers ---------- */
+function buildReport(){
+  var L = [];
+  var name = $("#stuname").value.trim();
+  L.push("Home and Airport Words — answers");
+  if(name) L.push("Student: " + name);
+  L.push("");
+  EX.forEach(function(ex,xi){
+    var st = state[xi];
+    L.push("Exercise " + (xi+1) + " — " + ex.title + (st.checked ? "  (" + st.results.filter(Boolean).length + "/" + ex.items.length + ")" : "  (not checked)"));
+    ex.items.forEach(function(it,i){
+      var v = ($("#e"+(xi+1)+"-"+i).value || "").trim();
+      var ok = st.checked ? (st.results[i] ? " ✓" : " ✗") : "";
+      var line;
+      if(ex.cloze){ line = (i+1) + ". " + (v || "—") + ok; }
+      else if(it.pre!==undefined){ line = (i+1) + ". " + [it.pre, v || "…", it.post].filter(Boolean).join(" ") + ok; }
+      else if(ex.legend){ line = (i+1) + ". " + it.p + " → " + (v || "—") + ok; }
+      else { line = (i+1) + ". " + it.p.replace(/_/g,"_") + " → " + (v || "—") + ok; }
+      if((st.checked && !st.results[i]) || st.revealed) line += "   [answer: " + it.show + "]";
+      L.push(line);
+    });
+    L.push("");
+  });
+  L.push("Exercise 7 — " + FREE.title);
+  var n = 0;
+  FREE.parts.forEach(function(part){
+    L.push(part.head);
+    part.items.forEach(function(it){ n++; var v = ($("#f-"+n).value || "").trim(); L.push(n + ". " + it.p + "\n   → " + (v || "—")); });
+  });
+  var keys = Object.keys(problems);
+  if(keys.length){
+    L.push(""); L.push("Problem words: " + keys.sort(function(a,b){return problems[b]-problems[a];}).map(function(k){ return k + " (×" + problems[k] + ")"; }).join(", "));
+  }
+  return L.join("\n");
+}
+var toastTimer;
+function toast(msg){ var t=$("#toast"); t.textContent=msg; t.hidden=false; clearTimeout(toastTimer); toastTimer=setTimeout(function(){ t.hidden=true; }, 2400); }
+function showFallback(text){
+  var host = $("#fallbackHost"); host.innerHTML = "";
+  var box = el("div","card fallback");
+  box.appendChild(el("p","sub","Автоматическое копирование недоступно. Текст выделен: нажмите Ctrl+C (на телефоне — «Копировать»)."));
+  var ta = document.createElement("textarea"); ta.value = text; ta.readOnly = true; ta.id="fallbackText"; box.appendChild(ta);
+  host.appendChild(box); ta.focus(); ta.select();
+}
+function copyAll(){
+  var text = buildReport();
+  var done = function(){ $("#fallbackHost").innerHTML=""; toast("Ответы скопированы"); };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(done, function(){ showFallback(text); });
+  } else { showFallback(text); }
+}
+$("#copyAll1").addEventListener("click", copyAll);
+$("#copyAll2").addEventListener("click", copyAll);
+
+renderProblems();
+})();
+</script>
+
+</body>
+</html>
