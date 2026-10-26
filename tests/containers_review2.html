@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8"><title>Review 2: Containers & Food</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root{--bg:#faf8f4;--card:#fff;--tx:#222;--mu:#6b6b6b;--ac:#d9622b;--ok:#2e8b57;--bad:#c93a3a;--bd:#e4ded3;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#191816;--card:#242220;--tx:#eee;--mu:#a09a90;--bd:#3a3631;--ac:#f08a55;--ok:#58c58a;--bad:#ff7070}}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:1100px;margin:auto;padding:16px;display:grid;grid-template-columns:1fr 230px;gap:16px}
+@media(max-width:800px){.wrap{grid-template-columns:1fr}aside{order:-1}}
+h1{margin:0 0 4px;font-size:26px}h2{margin:0 0 4px;font-size:18px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:16px;margin-bottom:16px}
+.mu{color:var(--mu);font-size:14px}
+table{border-collapse:collapse;width:100%;font-size:14px}td,th{border-bottom:1px solid var(--bd);padding:5px 6px;text-align:left}
+.sc{overflow-x:auto}
+button{font:inherit;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:8px;padding:6px 12px;cursor:pointer}
+button.p{background:var(--ac);color:#fff;border-color:var(--ac)}
+button.sp{padding:2px 8px}
+input[type=text],textarea{font:inherit;border:1.5px solid var(--bd);border-radius:8px;padding:6px 8px;background:var(--bg);color:var(--tx);width:100%;max-width:340px}
+textarea{max-width:100%;min-height:52px}
+ol{padding-left:24px;margin:10px 0}li{margin:10px 0}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.big{font-size:34px;line-height:1}
+.ok input,.ok textarea{border-color:var(--ok)}.bad input,.bad textarea{border-color:var(--bad)}
+.fb{font-size:14px;margin-left:4px}.ok .fb{color:var(--ok)}.bad .fb{color:var(--bad)}
+.tf button.on{background:var(--ac);color:#fff}
+aside .card{position:sticky;top:12px}
+#st{font-size:14px}
+</style></head><body><div class="wrap"><main>
+<h1>🔁 Review 2: Containers &amp; Food</h1>
+<p class="mu">Повторение 2: миллионер, ошибки, перефразирование, порядок слов</p>
+<div class="card"><h2>Быстрое напоминание</h2>
+<div class="row" style="margin:6px 0"><button class="p" id="tst">🔊 Проверить звук</button><button id="all">▶ Прослушать все</button><button id="newv">🔀 Новый вариант заданий</button></div>
+<div id="st" class="mu"></div><select id="vs" style="margin:6px 0;max-width:100%;font:inherit;padding:4px"></select>
+<p class="mu">Прослушай выражения и повтори вслух.</p>
+<div class="sc"><table id="vt"></table></div></div>
+<div id="exs"></div>
+<div class="card"><button class="p" id="copy">📋 Скопировать все мои ответы</button> <span id="cm" class="mu"></span></div>
+</main>
+<aside><div class="card"><h2>⚠ Проблемные слова</h2><p class="mu">Где были ошибки</p><table id="pw"><tr><td class="mu">Пока ошибок нет 🎉</td></tr></table></div></aside></div>
+<script>
+const W=[
+["a bar of chocolate","плитка шоколада","/ə bɑːr əv ˈtʃɑːklət/","🍫","bar","chocolate"],
+["a cup of coffee","чашка кофе","/ə kʌp əv ˈkɔːfi/","☕","cup","coffee"],
+["a loaf of bread","буханка хлеба","/ə loʊf əv brɛd/","🍞","loaf","bread"],
+["a piece of cake","кусок торта","/ə piːs əv keɪk/","🍰","piece","cake"],
+["a jar of jam","банка варенья","/ə dʒɑːr əv dʒæm/","🍯","jar","jam"],
+["a can of Coke","банка колы","/ə kæn əv koʊk/","🥤","can","Coke"],
+["a slice of cheese","ломтик сыра","/ə slaɪs əv tʃiːz/","🧀","slice","cheese"],
+["a bowl of soup","миска супа","/ə boʊl əv suːp/","🍲","bowl","soup"],
+["a packet of rice","пачка риса","/ə ˈpækɪt əv raɪs/","🍚","packet","rice"],
+["a bottle of water","бутылка воды","/ə ˈbɑːtl əv ˈwɔːtər/","💧","bottle","water"],
+["a bag of food","пакет еды","/ə bæɡ əv fuːd/","🛍️","bag","food"],
+["a tin of tomatoes","консервная банка помидоров","/ə tɪn əv təˈmeɪtoʊz/","🥫","tin","tomatoes"],
+["a glass of juice","стакан сока","/ə ɡlæs əv dʒuːs/","🍹","glass","juice"],
+["a box of things","коробка вещей","/ə bɑːks əv θɪŋz/","📦","box","things"],
+["a carton of juice","пакет сока (картонный)","/ə ˈkɑːrtn əv dʒuːs/","🧃","carton","juice"]];
+const sh=a=>{a=[...a];for(let i=a.length-1;i>0;i--){let j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+const nm=s=>s.toLowerCase().replace(/[’']/g,"'").replace(/[.!?,]/g,"").trim().replace(/\s+/g," ").replace(/^an? /,"");
+const $=id=>document.getElementById(id);
+let voice=null,prob={};
+const BAD=/eddy|flo\b|grandma|grandpa|reed|rocko|sandy|shelley|bad news|bahh|bells|boing|bubbles|cellos|good news|jester|organ|superstar|trinoids|whisper|wobble|zarvox|albert|fred|junior|kathy|ralph/i;
+function pick(){const v=speechSynthesis.getVoices().filter(x=>/^en/i.test(x.lang));
+$("vs").innerHTML=v.map(x=>`<option value="${x.name}">${x.name} (${x.lang})</option>`).join("");
+let sv="";try{sv=localStorage.getItem("vn")||""}catch(e){}
+const g=v.filter(x=>!BAD.test(x.name));
+voice=v.find(x=>x.name==sv)||g.find(x=>/google us english.*natural.*1/i.test(x.name))||g.find(x=>/google us english.*natural/i.test(x.name))||g.find(x=>/google us english/i.test(x.name))||g.find(x=>/samantha/i.test(x.name))||g.find(x=>x.lang=="en-US")||g[0]||v[0]||null;
+if(voice)$("vs").value=voice.name;
+$("st").textContent=voice?"Голос: "+voice.name+" — можно выбрать другой в списке ниже":"Английский голос не найден — установи English (US) в настройках устройства."}
+function say(t,cb){if(!window.speechSynthesis)return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang="en-US";if(voice)u.voice=voice;u.rate=.9;if(cb)u.onend=cb;speechSynthesis.speak(u)}
+if(window.speechSynthesis){pick();speechSynthesis.onvoiceschanged=pick}else $("st").textContent="Озвучка не поддерживается этим браузером."
+$("vs").onchange=e=>{voice=speechSynthesis.getVoices().find(x=>x.name==e.target.value)||voice;try{localStorage.setItem("vn",voice.name)}catch(x){}$("st").textContent="Голос: "+voice.name;say("A cup of coffee, please.")};
+$("tst").onclick=()=>say("Hello! A cup of coffee, please.");
+$("all").onclick=()=>{let i=0;const n=()=>{if(i<W.length)say(W[i++][0],()=>setTimeout(n,500))};n()};
+$("vt").innerHTML="<tr><th></th><th>English</th><th>Перевод</th><th>Транскрипция</th><th></th></tr>"+W.map((w,i)=>`<tr><td>${w[3]}</td><td><b>${w[0]}</b></td><td>${w[1]}</td><td>${w[2]}</td><td><button class="sp" onclick="say(W[${i}][0])">🔊</button></td></tr>`).join("");
+function renderProb(){const e=Object.entries(prob).sort((a,b)=>b[1]-a[1]);$("pw").innerHTML=e.length?e.map(([k,v])=>`<tr><td>${k}</td><td>×${v}</td><td><button class="sp" onclick="say('${k}')">🔊</button></td></tr>`).join(""):'<tr><td class="mu">Пока ошибок нет 🎉</td></tr>'}
+function cp(t){const d=()=>$("cm").textContent="Скопировано ✓";if(navigator.clipboard)navigator.clipboard.writeText(t).then(d,fb);else fb();function fb(){const a=document.createElement("textarea");a.value=t;document.body.appendChild(a);a.select();try{document.execCommand("copy");d()}catch(e){$("cm").textContent="Не удалось скопировать"}a.remove()}}
+
+const I=[...Array(15).keys()];
+let items=[],mil="не играл(а)";
+function mark(it,okk,keys){it.li.className=okk?"ok":"bad";it.li.querySelector(".fb").textContent=okk?" ✓":(it.msg||" ✗");if(!okk){const v=it.val();if(it.last!==v){(keys||[W[it.w][0]]).forEach(k=>prob[k]=(prob[k]||0)+1);renderProb()}}it.last=it.val()}
+function card(title,desc,list,extra){const c=document.createElement("div");c.className="card";
+c.innerHTML=`<h2>${title}</h2><p class="mu">${desc}</p><ol></ol><div class="row"><button class="p ck">Проверить</button><button class="sh">Показать ответы</button><button class="rs">Сбросить</button><span class="sc mu"></span></div>`;
+const ol=c.querySelector("ol");const own=[];
+const add=it=>{ol.appendChild(it.li);it.q=own.length+1;it.ex=title.replace(/&amp;/g,"&");own.push(it);items.push(it)};
+list.forEach(add);
+c.querySelector(".ck").onclick=()=>{let n=0;own.forEach(it=>{const o=it.ok();if(o)n++;mark(it,o,it.keys)});c.querySelector(".sc").textContent=`Результат: ${n} / ${own.length}`+(n==own.length?" 🎉":"")};
+c.querySelector(".sh").onclick=()=>own.forEach(it=>{it.show();it.li.className="ok";it.li.querySelector(".fb").textContent=it.note||" ✓"});
+c.querySelector(".rs").onclick=()=>{own.forEach(it=>{it.clr();it.li.className="";it.li.querySelector(".fb").textContent="";it.last=undefined});c.querySelector(".sc").textContent=""};
+$("exs").appendChild(c);if(extra)extra(c,add,own);return c}
+
+const MQ=[
+["a ___ of chocolate",["bar","loaf","jar","can"],"You break it into squares.",0],
+["«ломтик сыра» по-английски:",["a slice of cheese","a bowl of cheese","a jar of cheese","a bottle of cheese"],"Cut thin, for a sandwich.",6],
+["Which phrase is correct?",["a loaf of bread","a bar of bread","a bowl of bread","a can of bread"],"Think of the shape of bread.",2],
+["Which container is made of paper or cardboard?",["a carton of juice","a tin of tomatoes","a jar of jam","a glass of juice"],"Milk and juice often come in it.",14],
+["Open ___ of tomatoes for the sauce.",["a tin","a slice","a loaf","a piece"],"It is made of metal.",11],
+["Which one is NOT a drink?",["a bowl of soup","a can of Coke","a glass of juice","a bottle of water"],"You eat it with a spoon.",7],
+["«пачка риса» по-английски:",["a packet of rice","a bag of rice","a bar of rice","a slice of rice"],"Small paper or plastic container.",8],
+["She put ___ on her toast.",["a jar of jam","a loaf of jam","a bar of jam","a bowl of jam"],"It is sweet and made of fruit.",4],
+["British “tin” = American English ___",["can","jar","bar","box"],"A can of Coke.",5],
+["Which sentence is correct?",["He ate a piece of cake.","He ate a loaf of cake.","He ate a bottle of cake.","He ate a can of cake."],"Cake can be cut into pieces.",3]];
+const PR=[100,200,300,500,1000,2000,4000,8000,16000,32000],SAFE=[4,7];
+function mill(){const c=document.createElement("div");c.className="card";
+c.innerHTML=`<h2>1. Who wants to be a millionaire? 💰</h2><p class="mu">10 вопросов. Несгораемые суммы: 🔒 1 000 и 🔒 8 000. Подсказки: 50:50 и 💡 Hint (по одному разу).</p><div class="row" style="align-items:flex-start"><div style="flex:1;min-width:230px"><div id="mq" style="font-size:18px;margin:6px 0"></div><div id="mo" style="display:grid;gap:8px"></div><div class="row" style="margin-top:10px"><button id="l5">50:50</button><button id="lh">💡 Hint</button><button id="tk">💵 Забрать деньги</button><button id="rs">↻ Заново</button></div><div id="mh" class="mu" style="margin-top:6px"></div><div id="mr" style="margin-top:8px;font-weight:600"></div></div><div id="ml" class="sc" style="min-width:130px"></div></div>`;
+$("exs").appendChild(c);
+let q,i,over,u5,uh,ord;
+const L=s=>c.querySelector(s);
+const start=()=>{q=MQ.map(x=>({t:x[0],o:sh(x[1].map((t,k)=>({t,ok:k==0}))),h:x[2],key:W[x[3]][0]}));i=0;over=false;u5=uh=false;mil="играет…";L("#mr").textContent="";L("#mh").textContent="";L("#l5").disabled=L("#lh").disabled=L("#tk").disabled=false;rd()};
+const lad=()=>{L("#ml").innerHTML="<table>"+PR.map((p,k)=>`<tr style="${k==i&&!over?"background:rgba(217,98,43,.25);font-weight:700":""}"><td>${k+1}</td><td>${SAFE.includes(k)?"🔒 ":""}${p.toLocaleString("ru")}</td></tr>`).reverse().join("")+"</table>"};
+const rd=()=>{lad();if(over)return;L("#mq").innerHTML=`<b>${i+1}.</b> ${q[i].t}`;L("#mh").textContent="";L("#mo").innerHTML="";
+q[i].o.forEach((o,k)=>{const b=document.createElement("button");b.textContent="ABCD"[k]+") "+o.t;b.style.textAlign="left";b.onclick=()=>ans(o,b);L("#mo").appendChild(b)})};
+const fin=t=>{over=true;mil=t;L("#mr").textContent=t;L("#l5").disabled=L("#lh").disabled=L("#tk").disabled=true;[...L("#mo").children].forEach((b,k)=>{b.disabled=true;if(q[i].o[k].ok)b.style.borderColor="var(--ok)"});lad()};
+const ans=(o,b)=>{if(over)return;if(o.ok){if(i==9){fin("🏆 Миллионер! Выигрыш: "+PR[9].toLocaleString("ru"));i=10;lad();return}i++;rd()}
+else{const k=q[i].key;prob[k]=(prob[k]||0)+1;renderProb();b.style.borderColor="var(--bad)";const s=SAFE.filter(x=>x<i).pop();fin("❌ Неверно. Несгораемая сумма: "+(s===undefined?0:PR[s].toLocaleString("ru")))}};
+L("#l5").onclick=()=>{if(over||u5)return;u5=true;L("#l5").disabled=true;let w=[...L("#mo").children].filter((b,k)=>!q[i].o[k].ok);sh(w).slice(0,2).forEach(b=>{b.disabled=true;b.style.opacity=.3})};
+L("#lh").onclick=()=>{if(over||uh)return;uh=true;L("#lh").disabled=true;L("#mh").textContent="💡 "+q[i].h;say(q[i].h)};
+L("#tk").onclick=()=>{if(!over)fin("💵 Ты забрал(а): "+(i?PR[i-1].toLocaleString("ru"):0))};
+L("#rs").onclick=start;start()}
+const ti=(w,q,acc,ph)=>{const li=document.createElement("li");li.innerHTML=`<div class="row"><span>${q}</span><input type="text" style="max-width:480px" placeholder="${ph}" autocomplete="off" autocapitalize="off" spellcheck="false"> <span class="fb"></span></div>`;const n=li.querySelector("input");return{w,li,val:()=>n.value,ok:()=>acc.some(a=>nm(a)==nm(n.value)),ans:acc[0],note:" → "+acc[0],show:()=>n.value=acc[0],clr:()=>n.value=""}};
+const SN=[["She bought a bar of chocolate.",0],["I drink a cup of coffee every morning.",1],["Please buy a loaf of bread.",2],["He wants a piece of cake.",3],["We have a jar of jam.",4],["She opened a can of Coke.",5],["Put a slice of cheese on it.",6],["We want a bowl of soup.",7],["Buy a packet of rice.",8],["Give me a bottle of water.",9],["Carry a bag of food.",10],["Open a tin of tomatoes.",11],["He drank a glass of juice.",12],["Put it in a box of things.",13],["She bought a carton of juice.",14]];
+function build(){items=[];mil="не играл(а)";$("exs").innerHTML="";
+mill();
+card("2. Find the mistake","В выражении ошибка. Впиши правильный вариант.",sh(I).slice(0,10).map(w=>{const bad=sh(I.filter(x=>W[x][5]!=W[w][5]))[0];const acc=W.filter(x=>x[5]==W[w][5]).map(x=>x[0]);
+const it=ti(w,`<span class="big">${W[w][3]}</span> ❌ <b>a ${W[bad][4]} of ${W[w][5]}</b>`,acc,"a … of …");return it}));
+card("3. Rephrase","Перепиши предложение, используя выражение с указанным контейнером.",sh(I).slice(0,8).map(w=>{const li=document.createElement("li");const f=W[w][5];
+li.innerHTML=`<div>I want some ${f}. <span class="mu">→ используй: <b>${W[w][4]}</b></span></div><input type="text" style="max-width:480px" placeholder="I want a … of …" autocomplete="off" autocapitalize="off" spellcheck="false"><span class="fb"></span>`;const n=li.querySelector("input");
+const t=()=>n.value.toLowerCase();const ex=`I want a ${W[w][4]} of ${f}.`;
+return{w,li,free:`I want some ${f}. (${W[w][4]})`,val:()=>n.value,ok:()=>t().includes(W[w][4])&&t().includes(f.toLowerCase())&&t().includes(" of ")&&t().split(/\s+/).length>=4,msg:` Нужно: ${W[w][4]} of ${f}`,ans:ex,note:" → "+ex,show:()=>n.value=ex,clr:()=>n.value=""}}));
+card("4. Unscramble","Собери предложение из слов.",sh(SN).slice(0,10).map(([s,w])=>{const words=sh(s.replace(/\.$/,"").split(" ")).join(" / ");return ti(w,`<b>${words}</b>`,[s],"Write the sentence")}))}
+$("copy").onclick=()=>{let o="Review 2: Containers & Food — мои ответы\n\nMillionaire: "+mil+"\n",last="";items.forEach(it=>{if(it.ex!=last){o+="\n"+it.ex+"\n";last=it.ex}const v=it.val().trim()||"—";o+=`${it.q}. ${it.free?it.free+" → ":""}${v}${it.free?"":" ["+it.ans+"] "}${it.ok()?"✓":"✗"}\n`});o+="\nПроблемные слова: "+(Object.keys(prob).join(", ")||"нет");cp(o)};
+$("newv").onclick=build;build();
+</script></body></html>
