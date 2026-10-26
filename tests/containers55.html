@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8"><title>Containers & Food</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root{--bg:#faf8f4;--card:#fff;--tx:#222;--mu:#6b6b6b;--ac:#d9622b;--ok:#2e8b57;--bad:#c93a3a;--bd:#e4ded3;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#191816;--card:#242220;--tx:#eee;--mu:#a09a90;--bd:#3a3631;--ac:#f08a55;--ok:#58c58a;--bad:#ff7070}}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:1100px;margin:auto;padding:16px;display:grid;grid-template-columns:1fr 230px;gap:16px}
+@media(max-width:800px){.wrap{grid-template-columns:1fr}aside{order:-1}}
+h1{margin:0 0 4px;font-size:26px}h2{margin:0 0 4px;font-size:18px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:16px;margin-bottom:16px}
+.mu{color:var(--mu);font-size:14px}
+table{border-collapse:collapse;width:100%;font-size:14px}td,th{border-bottom:1px solid var(--bd);padding:5px 6px;text-align:left}
+.sc{overflow-x:auto}
+button{font:inherit;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:8px;padding:6px 12px;cursor:pointer}
+button.p{background:var(--ac);color:#fff;border-color:var(--ac)}
+button.sp{padding:2px 8px}
+input[type=text],textarea{font:inherit;border:1.5px solid var(--bd);border-radius:8px;padding:6px 8px;background:var(--bg);color:var(--tx);width:100%;max-width:340px}
+textarea{max-width:100%;min-height:52px}
+ol{padding-left:24px;margin:10px 0}li{margin:10px 0}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.big{font-size:34px;line-height:1}
+.ok input,.ok textarea{border-color:var(--ok)}.bad input,.bad textarea{border-color:var(--bad)}
+.fb{font-size:14px;margin-left:4px}.ok .fb{color:var(--ok)}.bad .fb{color:var(--bad)}
+.tf button.on{background:var(--ac);color:#fff}
+aside .card{position:sticky;top:12px}
+#st{font-size:14px}
+</style></head><body><div class="wrap"><main>
+<h1>🍫 Containers &amp; Food</h1>
+<p class="mu">Контейнеры и еда: a … of …</p>
+<div class="card"><h2>Слова и озвучка</h2>
+<div class="row" style="margin:6px 0"><button class="p" id="tst">🔊 Проверить звук</button><button id="all">▶ Прослушать все</button><button id="newv">🔀 Новый вариант заданий</button></div>
+<div id="st" class="mu"></div><select id="vs" style="margin:6px 0;max-width:100%;font:inherit;padding:4px"></select>
+<p class="mu">Задание: нажми 🔊 у каждого выражения, послушай и повтори вслух 2 раза.</p>
+<div class="sc"><table id="vt"></table></div></div>
+<div id="exs"></div>
+<div class="card"><button class="p" id="copy">📋 Скопировать все мои ответы</button> <span id="cm" class="mu"></span></div>
+</main>
+<aside><div class="card"><h2>⚠ Проблемные слова</h2><p class="mu">Где были ошибки</p><table id="pw"><tr><td class="mu">Пока ошибок нет 🎉</td></tr></table></div></aside></div>
+<script>
+const W=[
+["a bar of chocolate","плитка шоколада","/ə bɑːr əv ˈtʃɑːklət/","🍫","bar","chocolate"],
+["a cup of coffee","чашка кофе","/ə kʌp əv ˈkɔːfi/","☕","cup","coffee"],
+["a loaf of bread","буханка хлеба","/ə loʊf əv brɛd/","🍞","loaf","bread"],
+["a piece of cake","кусок торта","/ə piːs əv keɪk/","🍰","piece","cake"],
+["a jar of jam","банка варенья","/ə dʒɑːr əv dʒæm/","🍯","jar","jam"],
+["a can of Coke","банка колы","/ə kæn əv koʊk/","🥤","can","Coke"],
+["a slice of cheese","ломтик сыра","/ə slaɪs əv tʃiːz/","🧀","slice","cheese"],
+["a bowl of soup","миска супа","/ə boʊl əv suːp/","🍲","bowl","soup"],
+["a packet of rice","пачка риса","/ə ˈpækɪt əv raɪs/","🍚","packet","rice"],
+["a bottle of water","бутылка воды","/ə ˈbɑːtl əv ˈwɔːtər/","💧","bottle","water"],
+["a bag of food","пакет еды","/ə bæɡ əv fuːd/","🛍️","bag","food"],
+["a tin of tomatoes","консервная банка помидоров","/ə tɪn əv təˈmeɪtoʊz/","🥫","tin","tomatoes"],
+["a glass of juice","стакан сока","/ə ɡlæs əv dʒuːs/","🍹","glass","juice"],
+["a box of things","коробка вещей","/ə bɑːks əv θɪŋz/","📦","box","things"],
+["a carton of juice","пакет сока (картонный)","/ə ˈkɑːrtn əv dʒuːs/","🧃","carton","juice"]];
+const CTX=["I broke ___ into small squares.","I need ___ to wake up in the morning.","Buy ___ and slice it for toast.","It’s my birthday! Let’s have ___.","Spread ___ on your toast; it’s sweet and made of fruit.","I opened ___ and it went fizz.","Put ___ on the burger.","It’s cold. I’d like ___ with a spoon.","We need ___ for sushi; buy it at the shop.","I’m thirsty. Give me ___.","Please carry ___ from the supermarket.","For pasta sauce, open ___.","He drank ___ with ice.","I put my old toys in ___.","She bought ___ — it comes in a paper pack."];
+const FREE=[["Every morning I have a cup of coffee and …",0],["For a picnic I would take a loaf of bread and …",2],["When it’s cold, a bowl of soup …",7],["At a birthday party there is always a piece of cake and …",3],["In my fridge there is a jar of jam, a slice of cheese and …",4],["Would you rather have a bar of chocolate or a bag of food? Why?",0],["Would you rather drink a bottle of water or a glass of juice? Why?",9],["In my bag I have a box of things: …",13],["Would you rather eat a bowl of soup or a packet of rice every day? Why?",8]];
+const sh=a=>{a=[...a];for(let i=a.length-1;i>0;i--){let j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+const nm=s=>s.toLowerCase().replace(/[’']/g,"'").replace(/[.!?,]/g,"").trim().replace(/\s+/g," ").replace(/^an? /,"");
+const $=id=>document.getElementById(id);
+let voice=null,prob={},items=[];
+const BAD=/eddy|flo\b|grandma|grandpa|reed|rocko|sandy|shelley|bad news|bahh|bells|boing|bubbles|cellos|good news|jester|organ|superstar|trinoids|whisper|wobble|zarvox|albert|fred|junior|kathy|ralph/i;
+function pick(){const v=speechSynthesis.getVoices().filter(x=>/^en/i.test(x.lang));
+$("vs").innerHTML=v.map(x=>`<option value="${x.name}">${x.name} (${x.lang})</option>`).join("");
+let sv="";try{sv=localStorage.getItem("vn")||""}catch(e){}
+const g=v.filter(x=>!BAD.test(x.name));
+voice=v.find(x=>x.name==sv)||g.find(x=>/google us english.*natural.*1/i.test(x.name))||g.find(x=>/google us english.*natural/i.test(x.name))||g.find(x=>/google us english/i.test(x.name))||g.find(x=>/samantha/i.test(x.name))||g.find(x=>x.lang=="en-US")||g[0]||v[0]||null;
+if(voice)$("vs").value=voice.name;
+$("st").textContent=voice?"Голос: "+voice.name+" — можно выбрать другой в списке ниже":"Английский голос не найден — установи English (US) в настройках устройства."}
+function say(t,cb){if(!window.speechSynthesis)return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang="en-US";if(voice)u.voice=voice;u.rate=.9;if(cb)u.onend=cb;speechSynthesis.speak(u)}
+if(window.speechSynthesis){pick();speechSynthesis.onvoiceschanged=pick}else $("st").textContent="Озвучка не поддерживается этим браузером."
+$("vs").onchange=e=>{voice=speechSynthesis.getVoices().find(x=>x.name==e.target.value)||voice;try{localStorage.setItem("vn",voice.name)}catch(x){}$("st").textContent="Голос: "+voice.name;say("A cup of coffee, please.")};
+$("tst").onclick=()=>say("Hello! A cup of coffee, please.");
+$("all").onclick=()=>{let i=0;const n=()=>{if(i<W.length)say(W[i++][0],()=>setTimeout(n,500))};n()};
+$("vt").innerHTML="<tr><th></th><th>English</th><th>Перевод</th><th>Транскрипция</th><th></th></tr>"+W.map((w,i)=>`<tr><td>${w[3]}</td><td><b>${w[0]}</b></td><td>${w[1]}</td><td>${w[2]}</td><td><button class="sp" onclick="say(W[${i}][0])">🔊</button></td></tr>`).join("");
+function renderProb(){const e=Object.entries(prob).sort((a,b)=>b[1]-a[1]);$("pw").innerHTML=e.length?e.map(([k,v])=>`<tr><td>${k}</td><td>×${v}</td><td><button class="sp" onclick="say('${k}')">🔊</button></td></tr>`).join(""):'<tr><td class="mu">Пока ошибок нет 🎉</td></tr>'}
+function mark(it,okk){it.li.className=okk?"ok":"bad";it.li.querySelector(".fb").textContent=okk?"✓":"✗";if(!okk){const k=W[it.w][0];if(it.last!==it.val()){prob[k]=(prob[k]||0)+1;renderProb()}}it.last=it.val()}
+function build(){items=[];const box=$("exs");box.innerHTML="";
+const I=[...Array(15).keys()];
+const defs=[
+{t:"1. Picture → phrase",d:"Посмотри на картинку и впиши выражение целиком.",n:10,mk:w=>({q:`<span class="big">${W[w][3]}</span>`,ph:"a … of …",acc:[W[w][0]]})},
+{t:"2. True / False",d:"Подходит ли выражение к картинке?",n:10,tf:1},
+{t:"3. Which word fits?",d:"Впиши недостающее слово-контейнер (bar, cup, loaf…).",n:10,mk:w=>({q:`<span class="mu">${W[w][1]}:</span> a <input type="text" size="9"> of ${W[w][5]}`,inl:1,acc:[W[w][4]]})},
+{t:"4. Listen &amp; write",d:"Нажми 🔊, послушай и напиши, что услышал.",n:10,mk:w=>({q:`<button class="sp" onclick="say(W[${w}][0])">🔊 Listen</button>`,ph:"впиши по звуку",acc:[W[w][0]],auto:w})},
+{t:"5. Первая буква дана",d:"Достань слова из памяти: подсказана первая буква.",n:10,mk:w=>({q:`<span class="mu">${W[w][1]}</span><br>a <b>${W[w][4][0]}${"_".repeat(W[w][4].length-1)}</b> of <b>${W[w][5][0]}${"_".repeat(W[w][5].length-1)}</b>`,ph:"впиши целиком",acc:[W[w][0]]})},
+{t:"6. Context",d:"Угадай выражение по предложению и впиши его.",n:10,mk:w=>({q:CTX[w].replace("___","<b>___</b>"),ph:"a … of …",acc:[W[w][0]]})}];
+defs.forEach((df,di)=>{const c=document.createElement("div");c.className="card";
+c.innerHTML=`<h2>${df.t}</h2><p class="mu">${df.d}</p><ol></ol><div class="row"><button class="p ck">Проверить</button><button class="sh">Показать ответы</button><button class="rs">Сбросить</button><span class="sc mu"></span></div>`;
+const ol=c.querySelector("ol"),own=[];const ids=sh(I).slice(0,df.n);
+ids.forEach((w,k)=>{const li=document.createElement("li");let it={w,li};
+if(df.tf){const right=Math.random()<.5;let phrase=W[w][0];if(!right){const bad=sh(I.filter(x=>W[x][5]!=W[w][5]));const b=bad[0];phrase=`a ${W[b][4]} of ${W[w][5]}`}
+li.innerHTML=`<span class="big">${W[w][3]}</span> <b>${phrase}</b> <span class="tf"><button data-v="T">True</button> <button data-v="F">False</button></span> <span class="fb"></span>`;
+it.v="";li.querySelectorAll(".tf button").forEach(b=>b.onclick=()=>{it.v=b.dataset.v;li.querySelectorAll(".tf button").forEach(x=>x.classList.toggle("on",x==b))});
+it.val=()=>it.v;it.ok=()=>it.v==(right?"T":"F");it.ans=right?"True":`False → ${W[w][0]}`;it.setv=()=>{};it.clr=()=>{it.v="";li.querySelectorAll(".tf button").forEach(x=>x.classList.remove("on"))}}
+else{const d=df.mk(w);li.innerHTML=`<div class="row"><span>${d.q}</span>${d.inl?"":`<input type="text" placeholder="${d.ph}" autocomplete="off" autocapitalize="off" spellcheck="false">`} <span class="fb"></span></div>`;
+const inp=li.querySelector("input");inp.addEventListener("keydown",e=>{if(e.key=="Enter")c.querySelector(".ck").click()});
+it.val=()=>inp.value;it.ok=()=>d.acc.some(a=>nm(a)==nm(inp.value));it.ans=d.inl?d.acc[0]:d.acc[0];it.show=()=>inp.value=d.acc[0];it.clr=()=>inp.value="";
+if(d.auto!==undefined)it.auto=d.auto}
+ol.appendChild(li);own.push(it);it.q=ol.children.length;it.ex=df.t.replace(/&amp;/g,"&");items.push(it)});
+c.querySelector(".ck").onclick=()=>{let s=0;own.forEach(it=>{const o=it.ok();if(o)s++;mark(it,o)});c.querySelector(".sc").textContent=`Результат: ${s} / ${own.length}`+(s==own.length?" 🎉":"")};
+c.querySelector(".sh").onclick=()=>own.forEach(it=>{if(it.show)it.show();else{const l=it.li;l.className="";l.querySelector(".fb").textContent="→ "+it.ans}if(it.show){it.li.className="ok";it.li.querySelector(".fb").textContent="✓"}});
+c.querySelector(".rs").onclick=()=>{own.forEach(it=>{it.clr();it.li.className="";it.li.querySelector(".fb").textContent="";it.last=undefined});c.querySelector(".sc").textContent=""};
+box.appendChild(c)});
+// ex7 free writing
+const c=document.createElement("div");c.className="card";
+c.innerHTML=`<h2>7. Rephrase &amp; Would you rather…</h2><p class="mu">Закончи предложения со своими идеями. Здесь нет одного правильного ответа.</p><ol></ol><div class="row"><button class="p ck">Проверить</button><button class="sh">Примеры</button><button class="cp">📋 Скопировать ответы</button><span class="sc mu"></span></div>`;
+const ol=c.querySelector("ol"),own=[];
+sh(FREE).slice(0,8).forEach(f=>{const li=document.createElement("li");li.innerHTML=`<div>${f[0]} <button class="sp" onclick="say(this.parentNode.firstChild.textContent)">🔊</button></div><textarea placeholder="Your answer in English…"></textarea><span class="fb"></span>`;
+const ta=li.querySelector("textarea");const ex=["tea and a slice of cheese.","a jar of jam and a packet of rice.","I would rather have a bar of chocolate, because it is sweet."];
+own.push({li,w:f[1],q:ol.children.length+1,ex:"7. Free writing",val:()=>ta.value,ok:()=>ta.value.trim().split(/\s+/).length>=4,ans:"(свой ответ)",free:f[0],show:()=>ta.value=ex[Math.random()*3|0],clr:()=>ta.value=""});ol.appendChild(li)});
+own.forEach(i=>{i.q=own.indexOf(i)+1;items.push(i)});
+c.querySelector(".ck").onclick=()=>{let s=0;own.forEach(it=>{const o=it.ok();if(o)s++;it.li.className=o?"ok":"bad";it.li.querySelector(".fb").textContent=o?" ✓":" Напиши минимум 4 слова"});c.querySelector(".sc").textContent=`Выполнено: ${s} / ${own.length}`};
+c.querySelector(".sh").onclick=()=>own.forEach(it=>it.show());
+c.querySelector(".cp").onclick=()=>cp(own.map(i=>i.free+"\n"+i.val()).join("\n\n"));
+box.appendChild(c)}
+function cp(t){const d=()=>$("cm").textContent="Скопировано ✓";if(navigator.clipboard)navigator.clipboard.writeText(t).then(d,fb);else fb();function fb(){const a=document.createElement("textarea");a.value=t;document.body.appendChild(a);a.select();try{document.execCommand("copy");d()}catch(e){$("cm").textContent="Не удалось скопировать"}a.remove()}}
+$("copy").onclick=()=>{let o="Containers & Food — мои ответы\n",last="";items.forEach(it=>{if(it.ex!=last){o+="\n"+it.ex+"\n";last=it.ex}const v=it.val().trim()||"—";o+=`${it.q}. ${it.free?it.free+" → ":""}${v}${it.free?"":" ["+it.ans+"] "+(it.ok()?"✓":"✗")}\n`});o+="\nПроблемные слова: "+(Object.keys(prob).join(", ")||"нет");cp(o)};
+$("newv").onclick=build;
+build();
+</script></body></html>
