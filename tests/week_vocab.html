@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Week & Work: практика лексики A2</title>
+<style>
+:root{--bg:#f7f6f2;--card:#fff;--tx:#1f2430;--mu:#6b7280;--ac:#2f6fed;--ok:#1a8f4c;--okb:#e1f5e9;--no:#c0392b;--nob:#fbe4e1;--bd:#e3e1da;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15171c;--card:#1f232b;--tx:#e8eaf0;--mu:#9aa3b2;--ac:#6b9bff;--ok:#4cc58a;--okb:#16352a;--no:#ff7b6b;--nob:#3b1f1c;--bd:#323846}}
+:root[data-theme="dark"]{--bg:#15171c;--card:#1f232b;--tx:#e8eaf0;--mu:#9aa3b2;--ac:#6b9bff;--ok:#4cc58a;--okb:#16352a;--no:#ff7b6b;--nob:#3b1f1c;--bd:#323846}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:1050px;margin:0 auto;padding:16px;display:grid;grid-template-columns:1fr 220px;gap:16px}
+@media(max-width:800px){.wrap{grid-template-columns:1fr}aside{order:-1}}
+h1{font-size:24px;margin:0 0 4px}h2{font-size:18px;margin:0 0 4px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:16px;margin-bottom:16px}
+.mu{color:var(--mu);font-size:14px}
+table{border-collapse:collapse;width:100%;font-size:14px}td{padding:5px 6px;border-bottom:1px solid var(--bd);vertical-align:top}
+.ipa{color:var(--mu);font-family:Georgia,serif}
+button{font:inherit;cursor:pointer;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:8px;padding:6px 12px}
+button:hover{border-color:var(--ac)}button.p{background:var(--ac);color:#fff;border-color:var(--ac)}
+.sp{padding:2px 8px}
+.it{padding:8px 0;border-bottom:1px solid var(--bd)}.it:last-child{border:0}
+.opts{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}.opts button.sel{border-color:var(--ac);background:var(--ac);color:#fff}
+input[type=text],textarea{font:inherit;width:100%;padding:7px 9px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx)}
+textarea{min-height:56px;resize:vertical}
+.ok{background:var(--okb)!important;border-color:var(--ok)!important}.bad{background:var(--nob)!important;border-color:var(--no)!important}
+.fb{font-size:14px;margin-top:4px;min-height:1px}.fb.o{color:var(--ok)}.fb.b{color:var(--no)}
+.bar{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}
+aside .card{position:sticky;top:12px}aside li{margin:4px 0;font-size:14px}
+.note{background:var(--okb);border-radius:8px;padding:8px 12px;font-size:14px;margin-top:10px}
+</style></head><body>
+<div class="wrap"><main>
+<h1>Week &amp; Work · A2</h1>
+<p class="mu">Повторите слова, послушайте их, затем выполните 4 упражнения по 8 пунктов.</p>
+
+<div class="card"><h2>0. Words &amp; phrases</h2>
+<p class="mu">Нажмите 🔊 и повторите вслух. Голос: Google US English / Samantha.</p>
+<div class="bar" style="margin:0 0 8px"><button class="p" onclick="listenAll()">🔊 Прослушать все</button><button onclick="speechSynthesis.cancel()">⏹ Стоп</button></div>
+<table id="vt"></table>
+<div class="note"><b>Обратите внимание:</b><br>❌ on last / this / next week → ✅ last / this / next week (без on).<br>✅ at home, но ❌ at my home («дома»).<br>on Monday — в конкретный понедельник; on Mondays — регулярно.</div></div>
+
+<div id="exs"></div>
+
+<div class="card"><h2>Финал</h2>
+<div class="bar" style="margin:0 0 8px"><button onclick="audioTest()">🔊 Проверить звук</button><span id="vinfo" class="mu"></span></div>
+<div class="bar"><button class="p" onclick="copyAll()">📋 Скопировать все мои ответы</button><span id="cp" class="mu"></span></div>
+<p class="mu">Вставьте скопированный текст в чат или письмо преподавателю.</p></div>
+</main>
+<aside><div class="card"><h2>Проблемные слова</h2><p class="mu">Здесь собираются выражения, в которых вы ошиблись. Нажмите, чтобы послушать.</p><ul id="pw" style="padding-left:18px"><li class="mu">Пока пусто 🎉</li></ul></div></aside></div>
+<script>
+const V=[["week","/wiːk/","неделя"],["weekend","/ˈwiːkend/","выходные"],["at the same time","/æt ðə seɪm taɪm/","в то же время, одновременно"],["the same + noun","/ðə seɪm/","тот же самый"],["work on something","/wɜːrk ɑːn/","работать над чем-либо"],["healthy lifestyle","/ˈhelθi ˈlaɪfstaɪl/","здоровый образ жизни"],["on Monday","/ɑːn ˈmʌndeɪ/","в понедельник"],["on Mondays","/ɑːn ˈmʌndeɪz/","по понедельникам"],["last / this / next week","/læst, ðɪs, nekst wiːk/","на прошлой / этой / следующей неделе"],["at home / at work","/æt hoʊm, æt wɜːrk/","дома / на работе"],["in the café","/ɪn ðə kæˈfeɪ/","в кафе"],["a live wire","/ə laɪv ˈwaɪər/","энергичный человек"],["a boring job","/ə ˈbɔːrɪŋ dʒɑːb/","скучная работа"],["I’m bored with …","/aɪm bɔːrd wɪð/","мне скучно, наскучило"],["consider another job","/kənˈsɪdər əˈnʌðər dʒɑːb/","рассматривать другую работу"]];
+const SP=["week","weekend","at the same time","the same","work on","healthy lifestyle","on Monday","on Mondays","last week, this week, next week","at home, at work","in the café","a live wire","a boring job","I'm bored with my work","consider another job"];
+document.getElementById('vt').innerHTML=V.map((v,i)=>`<tr><td><button class="sp" onclick="say(SP[${i}])">🔊</button></td><td><b>${v[0]}</b></td><td class="ipa">${v[1]}</td><td>${v[2]}</td></tr>`).join('');
+
+let voice=null;
+function pick(){const vs=speechSynthesis.getVoices();voice=vs.find(v=>/Google US English/i.test(v.name))||vs.find(v=>/Samantha/i.test(v.name))||vs.find(v=>v.lang==='en-US')||vs.find(v=>/^en/.test(v.lang))||null;document.getElementById('vinfo').textContent=voice?'Голос: '+voice.name:'Английский голос не найден — проверьте настройки браузера'}
+if('speechSynthesis' in window){pick();speechSynthesis.onvoiceschanged=pick}
+function say(t,cb){if(!('speechSynthesis' in window)){alert('Озвучка не поддерживается в этом браузере');return}speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='en-US';u.rate=.85;if(voice)u.voice=voice;if(cb)u.onend=cb;speechSynthesis.speak(u)}
+function listenAll(){let i=0;const n=()=>{if(i<SP.length)say(SP[i++],()=>setTimeout(n,500))};n()}
+function audioTest(){say("Hello! This is a test. I work five days a week.");pick()}
+
+const norm=s=>s.toLowerCase().replace(/[’‘]/g,"'").replace(/\bi'm\b/g,"i am").replace(/[.,!?]/g,'').replace(/\s+/g,' ').trim();
+const shuf=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const problems=new Set();
+function addP(k){problems.add(k);document.getElementById('pw').innerHTML=[...problems].map(p=>`<li><button class="sp" onclick="say('${p.replace(/'/g,"\\'")}')">🔊</button> ${p}</li>`).join('')}
+
+const EX=[
+{t:"1. Choose the better collocation",d:"Выберите вариант, который подходит.",type:"mc",items:[
+["I have an English lesson ___ Monday.","on",["at","in"],"on Monday"],
+["I go to the gym every week — I go ___.","on Mondays",["on Monday","in Mondays"],"on Mondays"],
+["I’m going to Spain ___ week.","next",["on next","at next"],"next week"],
+["I’m at ___ now, but my husband is at work.","home",["my home","the home"],"at home"],
+["My husband is ___ work today.","at",["in","on"],"at work"],
+["We work in ___ office.","the same",["same","the same of"],"the same + noun"],
+["I’m ___ with my work. It’s so dull.","bored",["boring","bore"],"bored with"],
+["She’s a real ___ — she’s always full of energy.","live wire",["alive wire","living wire"],"a live wire"]]},
+{t:"2. Listen & write",d:"Нажмите 🔊 и впишите выражение, которое услышали.",type:"tx",audio:1,items:[
+["weekend","weekend"],["at the same time","at the same time"],["work on","work on"],["healthy lifestyle","healthy lifestyle"],["on Mondays","on Mondays"],["last week","last week"],["a boring job","a boring job"],["consider another job","consider another job"]]},
+{t:"3. Translate into English",d:"Переведите предложения на английский.",type:"tx",items:[
+["Я работаю пять дней в неделю.","I work five days a week","","week"],
+["Обычно я отдыхаю на выходных.","I usually relax at the weekend","I usually relax on the weekend","weekend"],
+["Я подумываю о другой работе.","I'm considering another job","I am considering another job","consider another job"],
+["У меня урок английского в понедельник.","I have an English lesson on Monday","","on Monday"],
+["Я сейчас дома, а мой муж на работе.","I'm at home now, but my husband is at work","I am at home now but my husband is at work","at home / at work"],
+["Мне скучно на работе.","I'm bored with my work","I'm bored at work|I am bored at work","bored with"],
+["Мы работаем в одном и том же офисе.","We work in the same office","","the same + noun"],
+["Я работаю над новым проектом.","I'm working on a new project","I am working on a new project","work on"]]},
+{t:"4. Write your own sentence",d:"Напишите своё предложение (минимум 4 слова) с выражением из подсказки.",type:"fr",items:[
+["Расскажите, что вы делаете по понедельникам.","on Mondays","I usually go to the gym on Mondays."],
+["Что вы любите делать одновременно?","at the same time","I like to cook and listen to podcasts at the same time."],
+["Над чем вы сейчас работаете?","work on","I’m working on a report for my boss."],
+["Что для вас значит здоровый образ жизни?","healthy lifestyle","A healthy lifestyle means sleeping well and walking every day."],
+["Что бы вы хотели изменить в жизни?","change my life","I want to change my life and learn English."],
+["Что вам кажется скучным?","boring","I think cleaning is boring."],
+["Где вы обычно бываете в выходные?","weekend","I’m usually at home at the weekend."],
+["Что вы делали на прошлой неделе?","last week","Last week I met my friends in a café."]]}
+];
+const S=EX.map(e=>({}));
+function build(){document.getElementById('exs').innerHTML=EX.map((e,ei)=>{
+ let items=e.items.map((it,ii)=>{let h='';
+  if(e.type==='mc'){const o=shuf([it[1],...it[2]]);h=`<div>${ii+1}. ${it[0]}</div><div class="opts" id="o${ei}_${ii}">${o.map(x=>`<button onclick="selMc(${ei},${ii},this)">${x}</button>`).join('')}</div>`}
+  else if(e.type==='tx'){h=`<div>${ii+1}. ${e.audio?`<button class="sp" onclick="say('${it[0]}')">🔊</button> <button class="sp" onclick="say('${it[0]}')">↻</button>`:it[0]}</div><input type="text" id="i${ei}_${ii}" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="...">`}
+  else{h=`<div>${ii+1}. ${it[0]} <span class="mu">Подсказка: <b>${it[1]}</b></span></div><textarea id="i${ei}_${ii}" placeholder="Write here..."></textarea>`}
+  return `<div class="it" id="r${ei}_${ii}">${h}<div class="fb" id="f${ei}_${ii}"></div></div>`}).join('');
+ return `<div class="card"><h2>${e.t}</h2><p class="mu">${e.d}</p>${items}<div class="bar"><button class="p" onclick="chk(${ei})">Проверить</button><button onclick="show(${ei})">Показать ответы</button><button onclick="rst(${ei})">Сначала</button><span class="mu" id="sc${ei}"></span></div></div>`}).join('')}
+function selMc(ei,ii,b){b.parentNode.querySelectorAll('button').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');}
+function fb(ei,ii,ok,msg){const r=document.getElementById(`r${ei}_${ii}`),f=document.getElementById(`f${ei}_${ii}`);f.className='fb '+(ok?'o':'b');f.textContent=msg;const el=document.getElementById(`i${ei}_${ii}`)||document.getElementById(`o${ei}_${ii}`);el.classList.remove('ok','bad');if(ok!==null)el.classList.add(ok?'ok':'bad')}
+function chk(ei){const e=EX[ei];let n=0;e.items.forEach((it,ii)=>{
+ if(e.type==='mc'){const s=document.querySelector(`#o${ei}_${ii} .sel`);const ok=s&&s.textContent===it[1];if(ok)n++;else addP(it[3]);fb(ei,ii,!!ok,ok?'✓ Верно':(s?'✗ Попробуйте ещё раз':'Выберите ответ'))}
+ else if(e.type==='tx'){const v=document.getElementById(`i${ei}_${ii}`).value;const al=[it[1],...(it[2]||'').split('|')].filter(Boolean).map(norm);const ok=al.includes(norm(v));if(ok)n++;else{addP(it[3]||it[0]);}fb(ei,ii,ok,ok?'✓ Верно':(v?'✗ Проверьте написание':'Впишите ответ'))}
+ else{const v=document.getElementById(`i${ei}_${ii}`).value.trim();const w=v.split(/\s+/).filter(Boolean).length;const used=norm(v).includes(norm(it[1]).replace('change my life','change my life'));const ok=w>=4&&used;if(ok)n++;fb(ei,ii,ok,ok?'✓ Отлично!':(w<4?'Нужно минимум 4 слова':'Используйте «'+it[1]+'»'))}});
+ document.getElementById('sc'+ei).textContent=`Результат: ${n}/8`;S[ei].n=n}
+function show(ei){const e=EX[ei];e.items.forEach((it,ii)=>{const f=document.getElementById(`f${ei}_${ii}`);f.className='fb o';
+ if(e.type==='mc'){document.querySelectorAll(`#o${ei}_${ii} button`).forEach(b=>{b.classList.toggle('sel',b.textContent===it[1])});f.textContent='Ответ: '+it[1]}
+ else if(e.type==='tx'){f.textContent='Ответ: '+it[1]}
+ else f.textContent='Пример: '+it[2]})}
+function rst(ei){const e=EX[ei];e.items.forEach((it,ii)=>{const i=document.getElementById(`i${ei}_${ii}`);if(i){i.value='';i.classList.remove('ok','bad')}const o=document.getElementById(`o${ei}_${ii}`);if(o){o.classList.remove('ok','bad');o.querySelectorAll('button').forEach(b=>b.classList.remove('sel'))}const f=document.getElementById(`f${ei}_${ii}`);f.textContent='';});document.getElementById('sc'+ei).textContent=''}
+function copyAll(){let t='Week & Work — мои ответы\n';EX.forEach((e,ei)=>{t+='\n'+e.t+(S[ei].n!=null?` (${S[ei].n}/8)`:'')+'\n';e.items.forEach((it,ii)=>{let a='';if(e.type==='mc'){const s=document.querySelector(`#o${ei}_${ii} .sel`);a=s?s.textContent:'—'}else a=document.getElementById(`i${ei}_${ii}`).value.trim()||'—';t+=`${ii+1}. ${e.type==='mc'?it[0].replace('___','['+a+']'):(e.type==='tx'&&e.audio?'(audio) ':it[0]+' → ')+a}\n`})});
+ t+='\nПроблемные слова: '+(problems.size?[...problems].join(', '):'нет')+'\n';
+ const done=()=>document.getElementById('cp').textContent='Скопировано ✓';
+ if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(done,()=>fallback(t,done));else fallback(t,done)}
+function fallback(t,done){const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy');done()}catch(e){document.getElementById('cp').textContent='Не удалось скопировать — выделите текст вручную'}a.remove()}
+build();
+</script></body></html>
