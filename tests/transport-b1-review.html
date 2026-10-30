@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Transport · B1 · Повторение</title>
+<style>
+:root{color-scheme:light dark;--bg:#f7f6f2;--card:#fff;--tx:#1d1d1b;--mu:#6b6a64;--ac:#2a5bd7;--ok:#1f8a4c;--no:#c93a3a;--bd:#e2e0d8;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#16171a;--card:#202226;--tx:#ecebe6;--mu:#9a998f;--ac:#7aa2ff;--ok:#4fcf84;--no:#ff7a7a;--bd:#33353b}}
+:root[data-theme=dark]{--bg:#16171a;--card:#202226;--tx:#ecebe6;--mu:#9a998f;--ac:#7aa2ff;--ok:#4fcf84;--no:#ff7a7a;--bd:#33353b}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:1000px;margin:0 auto;padding:16px;display:grid;grid-template-columns:1fr 230px;gap:16px;align-items:start}
+@media(max-width:800px){.wrap{grid-template-columns:1fr}aside{order:-1}}
+h1{margin:0 0 4px;font-size:26px}h2{font-size:18px;margin:0 0 4px;display:flex;justify-content:space-between}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:16px;margin-bottom:16px}
+.mu{color:var(--mu);font-size:14px;margin:0 0 10px}
+aside .card{position:sticky;top:12px}
+button{font:inherit;cursor:pointer;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:8px;padding:6px 12px}
+button:hover{border-color:var(--ac)}.pri{background:var(--ac);color:#fff;border-color:var(--ac)}
+.ic{padding:0 6px;border-radius:50%}
+#fc{min-height:150px;border:2px dashed var(--bd);border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:16px;cursor:pointer;font-size:22px;margin-bottom:10px}
+.ipa{color:var(--ac);font-size:15px}
+.row{display:flex;gap:6px;flex-wrap:wrap}
+.it{padding:10px 0;border-top:1px solid var(--bd)}
+.sc{letter-spacing:4px;font-weight:700;font-size:18px}
+input,textarea{font:inherit;flex:1;min-width:160px;padding:6px 10px;border-radius:8px;border:1px solid var(--bd);background:var(--bg);color:var(--tx)}
+.fb{font-size:14px;margin-top:4px}.ok{color:var(--ok)}.no{color:var(--no)}
+table{width:100%;border-collapse:collapse;font-size:14px}td{padding:3px 0;border-bottom:1px solid var(--bd)}
+</style></head><body>
+<div class="wrap"><main>
+<h1>🔁 Transport · повторение</h1>
+<p class="mu">Три быстрых упражнения. <span id="vs"></span> <button id="test">Проверить звук</button></p>
+
+<div class="card"><h2><span>1. Flashcards</span><span class="mu" id="left"></span></h2>
+<p class="mu">Вспомни английское слово по русскому переводу, нажми на карточку и оцени себя. «Не знаю» и «не уверен» возвращаются в конец колоды.</p>
+<div id="fc"></div><div class="row" id="fb1" style="display:none">
+<button data-g="k">✅ Знаю</button><button data-g="u">🤔 Не уверен</button><button data-g="d">❌ Не знаю</button></div></div>
+
+<div class="card"><h2><span>2. Unscramble the word ✍️</span><span class="mu" id="s2">0/10</span></h2>
+<p class="mu">Буквы каждого слова перемешаны. Напиши слово правильно.</p><div id="un"></div></div>
+
+<div class="card"><h2><span>3. Write as many words as you remember ✍️</span></h2>
+<p class="mu">Напиши по памяти слова темы — по одному на строку. Затем сверься со списком.</p>
+<textarea id="rec" rows="8" placeholder="tram&#10;ferry&#10;…"></textarea>
+<p class="row"><button class="pri" id="rc">Проверить</button><button id="rs">Показать пропущенные</button></p><div class="fb" id="rr"></div></div>
+
+<div class="card"><button class="pri" id="copy">📋 Скопировать все мои ответы</button> <button id="re">↻ Заново</button> <span class="mu" id="cs"></span></div>
+</main>
+<aside><div class="card"><h2>Проблемные слова</h2><div id="pw" class="mu">Пока ошибок нет 🎉</div></div></aside></div>
+<script>
+const W=[["truck","грузовик (амер.)","/trʌk/"],["scooter","скутер, самокат","/ˈskuːtər/"],["the Underground","лондонское метро","/ði ˈʌndərɡraʊnd/"],["lorry","грузовик (брит.)","/ˈlɔːri/"],["motorway","автострада (брит.)","/ˈmoʊtərweɪ/"],["subway","метро (амер.)","/ˈsʌbweɪ/"],["freeway","автострада (амер.)","/ˈfriːweɪ/"],["coach","междугородний автобус","/koʊtʃ/"],["van","фургон","/væn/"],["ferry","паром","/ˈferi/"],["motorbike","мотоцикл","/ˈmoʊtərbaɪk/"],["tram","трамвай","/træm/"],["traffic jam","пробка","/ˈtræfɪk dʒæm/"],["petrol station","автозаправка","/ˈpetrəl ˌsteɪʃn/"],["speed camera","камера контроля скорости","/ˈspiːd ˌkæmərə/"],["pedestrian zone","пешеходная зона","/pəˈdestriən zoʊn/"],["road works","дорожные работы","/ˈroʊd wɜːrks/"],["speed limit","ограничение скорости","/ˈspiːd ˌlɪmɪt/"],["cycle lane","велодорожка","/ˈsaɪkl leɪn/"],["rush hour","час пик","/ˈrʌʃ aʊər/"],["seat belt","ремень безопасности","/ˈsiːt belt/"],["zebra crossing","пешеходный переход","/ˌzebrə ˈkrɒsɪŋ/"],["parking fine","штраф за парковку","/ˈpɑːrkɪŋ faɪn/"],["taxi rank","стоянка такси","/ˈtæksi ræŋk/"],["car crash","авария","/ˈkɑːr kræʃ/"],["traffic lights","светофор","/ˈtræfɪk laɪts/"]];
+const $=s=>document.querySelector(s);
+const sh=a=>{a=[...a];for(let i=a.length;i>1;){const j=Math.random()*i--|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+const n=s=>s.toLowerCase().replace(/[^a-z0-9 ]/g,'').replace(/\s+/g,' ').trim();
+const cmp=s=>n(s).replace(/^the /,'').replace(/ /g,'');
+let V=null,P={},LOG={fc:[],un:{},rec:''},deck=[],flip=false,sOK=new Set();
+function pick(){const v=speechSynthesis.getVoices();V=v.find(x=>/Google US English/i.test(x.name))||v.find(x=>/Samantha/i.test(x.name))||v.find(x=>/^en[-_]US/i.test(x.lang))||v.find(x=>/^en/i.test(x.lang))||null;$('#vs').textContent=V?'Голос: '+V.name+'.':'Английский голос не найден — голос по умолчанию.'}
+function say(t){if(!('speechSynthesis' in window)){alert('Озвучка не поддерживается этим браузером.');return}speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='en-US';u.rate=.9;if(V)u.voice=V;speechSynthesis.speak(u)}
+if('speechSynthesis' in window){pick();speechSynthesis.onvoiceschanged=pick}else $('#vs').textContent='Озвучка недоступна.';
+document.addEventListener('click',e=>{const b=e.target.closest('[data-s]');if(b){e.stopPropagation();say(b.dataset.s)}},true);
+$('#test').onclick=()=>say('Hello! Let’s review transport vocabulary.');
+function bad(w){P[w]=(P[w]||0)+1;const e=Object.entries(P).sort((a,b)=>b[1]-a[1]);$('#pw').innerHTML='<table>'+e.map(x=>`<tr><td>${x[0]}</td><td>×${x[1]}</td></tr>`).join('')+'</table>'}
+/* 1 flashcards */
+function card(){
+ $('#left').textContent=deck.length?'Осталось: '+deck.length:'';
+ const c=$('#fc');
+ if(!deck.length){c.innerHTML='🎉 Колода пройдена!';$('#fb1').style.display='none';return}
+ const w=deck[0];
+ c.innerHTML=flip?`<b>${w[0]}</b><span class="ipa">${w[2]}</span><span class="mu">${w[1]}</span><button class="ic" data-s="${w[0]}">🔊</button>`:`${w[1]}<span class="mu">нажми, чтобы перевернуть</span>`;
+ $('#fb1').style.display=flip?'flex':'none'}
+$('#fc').onclick=()=>{if(deck.length){flip=true;card()}};
+$('#fb1').onclick=e=>{const g=e.target.dataset.g;if(!g)return;const w=deck.shift();
+ LOG.fc.push(w[0]+' — '+({k:'знаю',u:'не уверен',d:'не знаю'})[g]);
+ if(g!='k'){bad(w[0]);deck.push(w)}
+ flip=false;card()};
+/* 2 unscramble */
+const scr=w=>w.split(' ').map(t=>{if(t.length<3)return t.toUpperCase();let r;do{r=sh(t.split('')).join('')}while(r==t);return r.toUpperCase().split('').join(' ')}).join('  /  ');
+function unscr(){
+ const box=$('#un');box.innerHTML='';sOK=new Set();$('#s2').textContent='0/10';
+ sh(W.filter(w=>w[0]!='the Underground')).slice(0,10).forEach((w,i)=>{
+  const d=document.createElement('div');d.className='it';
+  d.innerHTML=`<div>${i+1}. <span class="sc">${scr(w[0])}</span> <span class="mu">— ${w[1]}</span> <button class="ic" data-s="${w[0]}">🔊</button></div><div class="row"><input autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Type here…"><button class="b1">Проверить</button><button class="b2">Показать ответ</button></div><div class="fb"></div>`;
+  const inp=d.querySelector('input'),fb=d.querySelector('.fb');let miss=false;
+  d.querySelector('.b1').onclick=()=>{const v=inp.value.trim();if(!v)return;const r=cmp(v)==cmp(w[0]);LOG.un[w[0]]=v+(r?' ✓':' ✗');
+   if(r){fb.className='fb ok';fb.textContent='✅ Верно!';if(!miss)sOK.add(i);$('#s2').textContent=sOK.size+'/10'}else{fb.className='fb no';fb.textContent='Пока нет, попробуй ещё.';if(!miss){miss=true;bad(w[0])}}};
+  d.querySelector('.b2').onclick=()=>{fb.className='fb no';fb.textContent='Ответ: '+w[0];LOG.un[w[0]]=LOG.un[w[0]]||'(показан ответ)';if(!miss){miss=true;bad(w[0])}};
+  box.appendChild(d)})}
+/* 3 recall */
+function recall(){
+ const got=new Set(),typed=$('#rec').value.split('\n').map(x=>x.trim()).filter(Boolean);
+ LOG.rec=typed.join(', ');
+ typed.forEach(t=>{const w=W.find(x=>cmp(x[0])==cmp(t));if(w)got.add(w[0])});
+ return got}
+$('#rc').onclick=()=>{const g=recall(),wrong=$('#rec').value.split('\n').map(x=>x.trim()).filter(x=>x&&!W.find(w=>cmp(w[0])==cmp(x)));
+ $('#rr').className='fb';$('#rr').innerHTML=`Найдено слов: <b>${g.size} из ${W.length}</b>.`+(wrong.length?`<br><span class="no">Не из списка / с ошибкой: ${wrong.join(', ')}</span>`:'')};
+$('#rs').onclick=()=>{const g=recall(),m=W.filter(w=>!g.has(w[0]));m.forEach(w=>bad(w[0]));
+ $('#rr').className='fb';$('#rr').innerHTML=`Найдено: <b>${g.size} из ${W.length}</b>.`+(m.length?'<br>Пропущено: '+m.map(w=>`${w[0]} <button class="ic" data-s="${w[0]}">🔊</button>`).join(', '):' Отлично, все слова на месте! 🎉')};
+/* common */
+$('#copy').onclick=async()=>{
+ let out='Transport B1 — повторение\n\n1. Flashcards:\n'+(LOG.fc.join('\n')||'—')+'\n\n2. Unscramble:\n'+(Object.entries(LOG.un).map(x=>x[0]+' → '+x[1]).join('\n')||'—')+'\n\n3. Слова по памяти:\n'+($('#rec').value.trim().split('\n').join(', ')||'—');
+ const p=Object.entries(P);if(p.length)out+='\n\nПроблемные слова: '+p.map(x=>x[0]+' ×'+x[1]).join(', ');
+ let ok=false;try{await navigator.clipboard.writeText(out);ok=true}catch(e){const t=document.createElement('textarea');t.value=out;document.body.appendChild(t);t.select();try{ok=document.execCommand('copy')}catch(_){}t.remove()}
+ $('#cs').textContent=ok?'Скопировано ✓':'Не удалось скопировать'};
+function init(){deck=sh(W);flip=false;P={};LOG={fc:[],un:{},rec:''};$('#pw').textContent='Пока ошибок нет 🎉';$('#rec').value='';$('#rr').innerHTML='';card();unscr()}
+$('#re').onclick=init;init();
+</script></body></html>
