@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Transport · B1 · Production</title>
+<style>
+:root{color-scheme:light dark;--bg:#f7f6f2;--card:#fff;--tx:#1d1d1b;--mu:#6b6a64;--ac:#2a5bd7;--ok:#1f8a4c;--no:#c93a3a;--bd:#e2e0d8;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#16171a;--card:#202226;--tx:#ecebe6;--mu:#9a998f;--ac:#7aa2ff;--ok:#4fcf84;--no:#ff7a7a;--bd:#33353b}}
+:root[data-theme=dark]{--bg:#16171a;--card:#202226;--tx:#ecebe6;--mu:#9a998f;--ac:#7aa2ff;--ok:#4fcf84;--no:#ff7a7a;--bd:#33353b}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:1000px;margin:0 auto;padding:16px;display:grid;grid-template-columns:1fr 230px;gap:16px;align-items:start}
+@media(max-width:800px){.wrap{grid-template-columns:1fr}aside{order:-1}}
+h1{margin:0 0 4px;font-size:26px}h2{font-size:18px;margin:0 0 4px;display:flex;justify-content:space-between;gap:8px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:16px;margin-bottom:16px}
+.mu{color:var(--mu);font-size:14px;margin:0 0 10px}
+aside .card{position:sticky;top:12px}
+button{font:inherit;cursor:pointer;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:8px;padding:6px 12px}
+button:hover{border-color:var(--ac)}.pri{background:var(--ac);color:#fff;border-color:var(--ac)}
+.ic{padding:0 6px;border-radius:50%}
+.it{padding:10px 0;border-top:1px solid var(--bd)}.q{margin-bottom:6px}
+.row{display:flex;gap:6px;flex-wrap:wrap}
+input,textarea{font:inherit;flex:1;min-width:160px;padding:6px 10px;border-radius:8px;border:1px solid var(--bd);background:var(--bg);color:var(--tx)}
+.fb{font-size:14px;margin-top:4px}.ok{color:var(--ok)}.no{color:var(--no)}
+.chip{display:inline-block;border:1px solid var(--bd);border-radius:20px;padding:2px 12px;margin:0 6px 6px 0}
+.chip.ok{border-color:var(--ok);background:rgba(31,138,76,.12)}
+table{width:100%;border-collapse:collapse;font-size:14px}td{padding:3px 0;border-bottom:1px solid var(--bd)}
+</style></head><body>
+<div class="wrap"><main>
+<h1>✍️ Transport · production</h1>
+<p class="mu">Четыре задания на письмо. Проверка смотрит на ключевую лексику, а после ответа можно открыть образец. <span id="vs"></span> <button id="test">Проверить звук</button></p>
+<div id="ex"></div>
+<div class="card"><h2><span>4. Story with 5 words</span><span class="mu" id="stc"></span></h2>
+<p class="mu">Напиши мини-рассказ (минимум 30 слов), используя 5 слов. Чип становится зелёным, когда слово использовано.</p>
+<p class="row"><button id="newst">🎲 Выбрать 5 слов</button></p><div id="chips"></div>
+<textarea id="story" rows="6" placeholder="Last Friday I…"></textarea><div class="fb" id="stf"></div></div>
+<div class="card"><button class="pri" id="copy">📋 Скопировать все мои ответы</button> <button id="re">↻ Заново</button> <span class="mu" id="cs"></span></div>
+</main>
+<aside><div class="card"><h2>Проблемные слова</h2><div id="pw" class="mu">Пока ошибок нет 🎉</div></div></aside></div>
+<script>
+const TERMS=["truck","scooter","underground","lorry","motorway","subway","freeway","coach","van","ferry","motorbike","tram","traffic jam","petrol station","speed camera","pedestrian zone","road works","roadworks","speed limit","cycle lane","rush hour","seat belt","seatbelt","zebra crossing","parking fine","taxi rank","car crash","traffic light"];
+const WORDS=["truck","scooter","the Underground","lorry","motorway","subway","freeway","coach","van","ferry","motorbike","tram","traffic jam","petrol station","speed camera","pedestrian zone","road works","speed limit","cycle lane","rush hour","seat belt","zebra crossing","parking fine","taxi rank","car crash","traffic lights"];
+const $=s=>document.querySelector(s);
+const sh=a=>{a=[...a];for(let i=a.length;i>1;){const j=Math.random()*i--|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+const n=s=>s.toLowerCase().replace(/[^a-z0-9 ]/g,'').replace(/\s+/g,' ').trim();
+const cnt=s=>n(s).split(' ').filter(Boolean).length;
+const has=(s,w)=>n(s).replace(/\b(\w+)s\b/g,'$1').includes(n(w).replace(/^the /,'').replace(/\b(\w+)s\b/g,'$1'));
+let V=null,P={},S={},L={},T={},st=[];
+function pick(){const v=speechSynthesis.getVoices();V=v.find(x=>/Google US English/i.test(x.name))||v.find(x=>/Samantha/i.test(x.name))||v.find(x=>/^en[-_]US/i.test(x.lang))||v.find(x=>/^en/i.test(x.lang))||null;$('#vs').textContent=V?'Голос: '+V.name+'.':'Английский голос не найден — голос по умолчанию.'}
+function say(t){if(!('speechSynthesis' in window)){alert('Озвучка не поддерживается этим браузером.');return}speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='en-US';u.rate=.85;if(V)u.voice=V;speechSynthesis.speak(u)}
+if('speechSynthesis' in window){pick();speechSynthesis.onvoiceschanged=pick}else $('#vs').textContent='Озвучка недоступна.';
+document.addEventListener('click',e=>{const b=e.target.closest('[data-s]');if(b)say(b.dataset.s)});
+$('#test').onclick=()=>say('Hello! Let’s write some sentences about transport.');
+function bad(w){P[w]=(P[w]||0)+1;const e=Object.entries(P).sort((a,b)=>b[1]-a[1]);$('#pw').innerHTML='<table>'+e.map(x=>`<tr><td>${x[0]}</td><td>×${x[1]}</td></tr>`).join('')+'</table>'}
+function sec(id,t,ins,items){
+ S[id]=new Set();L[id]={};T[id]=t;
+ const s=document.createElement('section');s.className='card';
+ s.innerHTML=`<h2><span>${t}</span><span class="mu">0/${items.length}</span></h2><p class="mu">${ins}</p>`;
+ items.forEach((it,i)=>{
+  const d=document.createElement('div');d.className='it';
+  d.innerHTML=`<div class="q">${i+1}. ${it.q}${it.say?` <button class="ic" data-s="${it.say}">🔊</button>`:''}</div><div class="row"><input autocomplete="off" spellcheck="false" placeholder="Type here…"><button class="b1">Проверить</button><button class="b2">Показать ответ</button></div><div class="fb"></div>`;
+  const inp=d.querySelector('input'),fb=d.querySelector('.fb'),plain=it.q.replace(/<[^>]+>/g,'');let miss=false;
+  const flag=()=>{if(!miss){miss=true;bad(it.w)}};
+  d.querySelector('.b1').onclick=()=>{const v=inp.value.trim();if(!v){fb.className='fb';fb.textContent='Сначала напиши ответ.';return}
+   const r=it.chk(v);L[id][i]=`${i+1}. ${plain} → ${v} ${r?'✓':'✗'}`;
+   if(r){fb.className='fb ok';fb.textContent='✅ Принято! Образец: '+it.show;if(!miss)S[id].add(i);s.querySelector('.mu').textContent=S[id].size+'/'+items.length}
+   else{fb.className='fb no';fb.textContent=it.hint||'Пока не совсем — попробуй ещё или открой ответ.';flag()}};
+  d.querySelector('.b2').onclick=()=>{fb.className='fb no';fb.textContent='Образец: '+it.show;if(!L[id][i])L[id][i]=`${i+1}. ${plain} → (показан образец)`;flag()};
+  s.appendChild(d)});
+ $('#ex').appendChild(s)}
+const REP=[["I go to school by tram.","Change the vehicle and the place.","I go to the gym by motorbike."],["The speed limit here is 50 km/h.","Change the place and the number.","The speed limit near my house is 30 km/h."],["I was late because of a traffic jam.","Change the reason.","I was late because of road works."],["You must wear a seat belt in the car.","Change the rule.","You must stop at the traffic lights."],["There is a taxi rank next to the station.","Change the place.","There is a taxi rank in front of the hotel."],["He got a parking fine yesterday.","Change the person and the time.","My dad got a parking fine last week."]];
+const DLG=[["Why are you so late?","traffic jam","Sorry, I got stuck in a traffic jam."],["Can I park here?","parking fine","No, you will get a parking fine."],["Why are we going so slowly?","road works","Because there are road works ahead."],["Is it safe to cross here?","zebra crossing","Use the zebra crossing over there."],["Let’s visit the island tomorrow.","ferry","OK, but the ferry leaves very early."],["How do you get to work?","rush hour","By tram, but in rush hour it’s very crowded."]];
+const DIC=["There is a speed camera near the zebra crossing.","We were stuck in a traffic jam for an hour.","You must wear a seat belt on the motorway.","Take the tram during rush hour.","He got a parking fine near the petrol station.","There are road works on the cycle lane."];
+function build(){
+ $('#ex').innerHTML='';P={};$('#pw').textContent='Пока ошибок нет 🎉';
+ sec('A','1. Listen & write the sentence','Послушай предложение и запиши его целиком (знаки препинания и регистр не важны).',sh(DIC).map(s=>({w:TERMS.find(t=>has(s,t))||'sentence',say:s,q:'Напиши, что услышал(а):',chk:v=>n(v)==n(s),show:s,hint:'Есть расхождения — послушай ещё раз.'})));
+ sec('B','2. Repeat & Change','Возьми образец и измени его. Предложение должно остаться осмысленным и содержать лексику темы.',sh(REP).map(r=>({w:TERMS.find(t=>has(r[0],t))||'sentence',q:`<i>${r[0]}</i> — ${r[1]}`,chk:v=>cnt(v)>=4&&n(v)!=n(r[0])&&TERMS.some(t=>has(v,t)),show:r[2],hint:'Нужно минимум 4 слова, отличие от образца и слово по теме.'})));
+ sec('C','3. Finish the dialogue','Ответь на реплику, используя слово из подсказки.',sh(DLG).map(r=>({w:r[1],q:`A: “${r[0]}” <span class="mu">Use: <b>${r[1]}</b></span>`,chk:v=>cnt(v)>=3&&has(v,r[1]),show:r[2],hint:'Нужно минимум 3 слова и слово «'+r[1]+'».'})));
+ newStory();$('#story').value='';$('#stf').textContent='';
+}
+function newStory(){st=sh(WORDS).slice(0,5);$('#chips').innerHTML=st.map(w=>`<span class="chip" data-w="${w}">${w}</span>`).join('');upd()}
+function upd(){const t=$('#story').value;let u=0;document.querySelectorAll('.chip').forEach(c=>{const o=has(t,c.dataset.w);c.classList.toggle('ok',o);if(o)u++});
+ const c=cnt(t);$('#stc').textContent=`слов: ${u}/5 · длина: ${c}`;$('#stf').className='fb '+(u==5&&c>=30?'ok':'');$('#stf').textContent=u==5&&c>=30?'✅ Отлично! Все слова использованы.':''}
+$('#story').oninput=upd;$('#newst').onclick=()=>{newStory();$('#story').value='';upd()};
+$('#copy').onclick=async()=>{
+ let out='Transport B1 — production\n';
+ for(const k in L){out+=`\n${T[k]}\n`+Object.keys(L[k]).sort((a,b)=>a-b).map(i=>L[k][i]).join('\n')+'\n'}
+ out+=`\n4. Story (${st.join(', ')}):\n`+($('#story').value.trim()||'—');
+ const p=Object.entries(P);if(p.length)out+='\n\nПроблемные слова: '+p.map(x=>x[0]+' ×'+x[1]).join(', ');
+ let ok=false;try{await navigator.clipboard.writeText(out);ok=true}catch(e){const t=document.createElement('textarea');t.value=out;document.body.appendChild(t);t.select();try{ok=document.execCommand('copy')}catch(_){}t.remove()}
+ $('#cs').textContent=ok?'Скопировано ✓':'Не удалось скопировать'};
+$('#re').onclick=build;build();
+</script></body></html>
