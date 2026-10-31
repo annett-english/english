@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Table Setting 2: Production</title>
+<style>
+:root{--bg:#eef2f1;--cd:#fff;--tx:#1d2523;--mu:#5d6b68;--ac:#1f5f5b;--acb:#d9ebe8;--ok:#1b6e2b;--okb:#e2f3e4;--no:#b3261e;--nob:#fbe7e5;--ln:#d3dcda;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141b1a;--cd:#1e2827;--tx:#e8efed;--mu:#9fb0ac;--ac:#6fc4bb;--acb:#25403d;--ok:#86d493;--okb:#1f3a25;--no:#f0958e;--nob:#46221f;--ln:#34423f;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#141b1a;--cd:#1e2827;--tx:#e8efed;--mu:#9fb0ac;--ac:#6fc4bb;--acb:#25403d;--ok:#86d493;--okb:#1f3a25;--no:#f0958e;--nob:#46221f;--ln:#34423f;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 "Avenir Next","Segoe UI",system-ui,sans-serif}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 230px;gap:20px;max-width:1040px;margin:0 auto;padding:16px}
+aside{position:sticky;top:12px;align-self:start;background:var(--cd);border:1px solid var(--ln);border-radius:10px;padding:12px;font-size:14px}
+@media(max-width:800px){.layout{grid-template-columns:1fr}aside{position:static;order:-1}}
+h1,h2,h3{font-family:Georgia,"Times New Roman",serif;margin:0 0 6px}
+h1{font-size:30px}h2{font-size:21px}h3{font-size:16px}
+.hero{display:flex;gap:16px;align-items:center;margin-bottom:12px}
+.ring{flex:none;width:76px;height:76px;border-radius:50%;background:radial-gradient(circle,var(--acb) 0 42%,var(--cd) 43% 58%,var(--ac) 59% 62%,transparent 63%);border:1px solid var(--ln)}
+.mu{color:var(--mu);margin:0 0 8px}
+.card{background:var(--cd);border:1px solid var(--ln);border-radius:10px;padding:16px;margin-bottom:16px}
+summary{font:600 19px Georgia,serif;cursor:pointer}
+table{border-collapse:collapse;width:100%}
+td{padding:5px 6px;border-bottom:1px solid var(--ln)}
+.ipa{color:var(--mu);font-family:"Segoe UI",system-ui,sans-serif}
+tr.hl td{background:var(--acb)}
+button,select{font:inherit;font-size:14px;padding:6px 11px;border-radius:7px;border:1px solid var(--ln);background:var(--cd);color:var(--tx);cursor:pointer}
+button:hover{border-color:var(--ac)}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid var(--ac);outline-offset:1px}
+.b{background:var(--ac);border-color:var(--ac);color:var(--bg);font-weight:600}
+.s{padding:2px 8px}
+.r{padding:9px 10px;border:1px solid var(--ln);border-radius:8px;margin-bottom:8px}
+.r.ok{background:var(--okb);border-color:var(--ok)}
+.r.no{background:var(--nob);border-color:var(--no)}
+.p{margin-bottom:5px}
+.in{width:100%;font:inherit;padding:7px 9px;border-radius:7px;border:1px solid var(--ln);background:var(--bg);color:var(--tx)}
+.m{font-size:14px;margin-top:4px}.r.ok .m{color:var(--ok)}.r.no .m{color:var(--no)}
+.ans{margin-top:4px;font-size:14px;color:var(--ac);font-weight:600;white-space:pre-line}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+.sc{margin-left:auto}
+img{max-width:100%;border-radius:8px;display:block;margin:0 0 10px}
+.vo{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+td button{padding:1px 7px}
+</style></head><body>
+<div class="layout"><main>
+<div class="hero"><div class="ring"></div><div><h1>Table Setting 2</h1><p class="mu" style="margin:0">Production: пишем и говорим · Продукция</p></div></div>
+
+<div class="card vo"><b>🔈 Озвучка</b><select id="vsel" aria-label="Voice"></select><button id="test">▶ Тест звука</button><div id="vst" class="mu" style="flex-basis:100%;margin:0;font-size:14px"></div></div>
+
+<details class="card" open><summary>Word bank · Подсказки</summary>
+<p class="mu">Посмотри слова и закрой список ▲, когда будешь готов(а). Кнопка 🔊 — произношение.</p>
+<table><tbody id="vocab"></tbody></table>
+<div class="bar"><button class="b" id="pa">▶ Прослушать все слова</button><button id="stop">■ Стоп</button></div></details>
+
+<div id="tasks"></div>
+
+<section class="card"><h2>Итог</h2><p class="mu">Введи имя, собери результаты и скопируй их, чтобы отправить учителю.</p>
+<div class="bar" style="margin:0 0 8px"><input id="nm" class="in" style="max-width:240px" placeholder="Имя"><button class="b" onclick="fin()">Собрать результаты</button><button onclick="cp($('#out').value,this)">📋 Копировать всё</button></div>
+<textarea id="out" class="in" rows="10" readonly></textarea></section>
+</main>
+<aside><h3>Проблемные слова</h3><p class="mu" style="font-size:13px">Слова, в которых была ошибка</p><table><tbody id="pb"></tbody></table></aside></div>
+
+<script>
+const $=(s,e=document)=>e.querySelector(s),$$=(s,e=document)=>[...e.querySelectorAll(s)];
+const sh=a=>{a=[...a];for(let i=a.length;i>1;){const j=Math.random()*i--|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+const nz=s=>s.toLowerCase().replace(/ё/g,'е').replace(/[^a-zа-я0-9' ]+/g,' ').replace(/\s+/g,' ').trim();
+const W=[
+{w:'fork',ipa:'/fɔːrk/',ru:'вилка',ra:['вилка'],d:'a tool with points that you use to pick up food',m:['metal','steel','silver']},
+{w:'sugar',ipa:'/ˈʃʊɡər/',ru:'сахар',ra:['сахар'],d:'sweet white powder you put in tea or coffee'},
+{w:'cup',ipa:'/kʌp/',ru:'чашка',ra:['чашка','кружка'],d:'a small container with a handle for tea or coffee',m:['ceramic','china','porcelain','glass']},
+{w:'glass',ipa:'/ɡlæs/',ru:'стакан / бокал',ra:['стакан','бокал','стекло','рюмка'],d:'a transparent container for water, juice or wine',m:['glass']},
+{w:'knife',ipa:'/naɪf/',ru:'нож',ra:['нож'],d:'a sharp tool for cutting food',m:['metal','steel','silver']},
+{w:'napkin',ipa:'/ˈnæpkɪn/',ru:'салфетка',ra:['салфетка'],d:'paper or cloth you use to clean your mouth and hands',m:['paper','cloth','fabric']},
+{w:'salt',ipa:'/sɔːlt/',ru:'соль',ra:['соль'],d:'white powder that makes food taste salty'},
+{w:'pepper',ipa:'/ˈpepər/',ru:'перец',ra:['перец'],d:'black or red powder that makes food hot and spicy'},
+{w:'plate',ipa:'/pleɪt/',ru:'тарелка',ra:['тарелка'],d:'a flat round dish that you eat from',m:['ceramic','china','porcelain','glass']},
+{w:'spoon',ipa:'/spuːn/',ru:'ложка',ra:['ложка'],d:'a tool you use to eat soup or ice cream',m:['metal','steel','silver']},
+{w:'chopsticks',ipa:'/ˈtʃɑːpstɪks/',ru:'палочки для еды',ra:['палочки','палочки для еды'],d:'two thin sticks used for eating in China and Japan',m:['wood','bamboo','wooden','plastic']},
+{w:'bowl',ipa:'/boʊl/',ru:'миска / пиала',ra:['миска','пиала','чаша','тарелка глубокая'],d:'a deep round dish for soup or cereal',m:['ceramic','china','porcelain','glass','wood']}];
+const A=w=>w==='chopsticks'?[w,'chopstick']:[w];
+const P={};
+function bad(w,id){(P[w]=P[w]||new Set).add(id);drawP()}
+function drawP(){const e=Object.entries(P).sort((a,b)=>b[1].size-a[1].size);$('#pb').innerHTML=e.length?e.map(([w,s])=>`<tr><td><b>${w}</b></td><td>×${s.size}</td><td><button class="s" data-say="${w}" aria-label="play">🔊</button></td></tr>`).join(''):'<tr><td class="mu">Пока ошибок нет 🎉</td></tr>'}
+/* ---- audio ---- */
+let V=null,vs=[],stopF=false;
+function load(){if(!('speechSynthesis' in window)){$('#vst').textContent='⚠️ Этот браузер не поддерживает озвучку. Откройте страницу в Chrome или Safari.';return}
+vs=speechSynthesis.getVoices().filter(v=>/^en/i.test(v.lang));
+V=vs.find(v=>/Google US English/i.test(v.name))||vs.find(v=>/Samantha/i.test(v.name))||vs.find(v=>v.lang==='en-US')||vs[0]||null;
+$('#vsel').innerHTML=vs.map((v,i)=>`<option value="${i}"${v===V?' selected':''}>${v.name} (${v.lang})</option>`).join('');stat()}
+function stat(){$('#vst').textContent=V?'Голос: '+V.name+(/Google US English|Samantha/i.test(V.name)?' ✅':' — рекомендуем выбрать Google US English (Chrome) или Samantha (Safari / Apple).'):'Английские голоса не найдены. Проверьте настройки системы или попробуйте Chrome.'}
+const sp=(t,r=.9)=>new Promise(res=>{if(!('speechSynthesis' in window))return res();speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);if(V){u.voice=V;u.lang=V.lang}else u.lang='en-US';u.rate=r;u.onend=u.onerror=res;setTimeout(res,7000);speechSynthesis.speak(u)});
+if('speechSynthesis' in window){speechSynthesis.onvoiceschanged=load;setTimeout(load,400)}
+load();
+$('#vsel').onchange=e=>{V=vs[e.target.value];stat();sp('Hello! Let’s set the table.')};
+$('#test').onclick=()=>sp('Hello! Let’s set the table.');
+document.addEventListener('click',e=>{const b=e.target.closest('[data-say]');if(b)sp(b.dataset.say,+b.dataset.r||.9)});
+$('#vocab').innerHTML=W.map(x=>`<tr><td><b>${x.w}</b></td><td class="ipa">${x.ipa}</td><td>${x.ru}</td><td><button class="s" data-say="${x.w}" aria-label="play ${x.w}">🔊</button></td></tr>`).join('');
+$('#pa').onclick=async()=>{stopF=false;const rows=$$('#vocab tr');for(let i=0;i<W.length;i++){if(stopF)break;rows[i].classList.add('hl');await sp(W[i].w,.85);await new Promise(r=>setTimeout(r,1000));rows[i].classList.remove('hl')}rows.forEach(r=>r.classList.remove('hl'))};
+$('#stop').onclick=()=>{stopF=true;speechSynthesis.cancel()};
+/* ---- tasks ---- */
+const T=[];
+const used=(v,pool)=>{const g=new Set(nz(v).split(' '));return pool.filter(x=>g.has(x.w)||g.has(x.w+'s')||g.has(x.w+'es')||(x.w==='chopsticks'&&g.has('chopstick')))};
+const miss=(v,keys)=>{const t=nz(v.replace(/’/g,"'"));return keys.filter(k=>!k.split('|').some(x=>t.includes(x))).map(k=>k.split('|')[0])};
+const vw=m=>m.filter(x=>W.some(y=>y.w===x));
+const E1=[['Можно мне, пожалуйста, чашку чая?',['cup|mug','tea','please'],'Can I have a cup of tea, please?'],
+['Нож лежит справа от тарелки.',['knife','right','plate'],'The knife is on the right of the plate.'],
+['Мне нужна ложка для супа.',['spoon','soup'],'I need a spoon for the soup.'],
+['Поставь соль и перец на стол.',['salt','pepper','table'],'Put the salt and pepper on the table.'],
+['Он ест лапшу палочками.',['chopstick','noodles'],'He eats noodles with chopsticks.'],
+['В миске нет сахара.',['bowl','sugar','no|not|n\'t'],'There is no sugar in the bowl.'],
+['Положи салфетку рядом с тарелкой, пожалуйста.',['napkin','plate','next to|near|beside|by'],'Put the napkin next to the plate, please.']];
+T.push({title:'Translate into English',intro:'Скажи фразу вслух, потом запиши её по-английски целиком. Проверяются ключевые слова — подойдут разные варианты.',items:sh(E1).map(([p,k,m])=>({p,ta:1,ph:'Write in English…',show:m,chk:v=>{const x=miss(v,k),ok=!x.length&&v.trim().split(/\s+/).length>=3;return{ok,msg:ok?'✓ Все ключевые слова на месте':'Не хватает: '+(x.join(', ')||'полного предложения'),miss:vw(x)}}}))});
+const S={fork:'I eat salad with a fork.',sugar:'I don’t put sugar in my tea.',cup:'My mum drinks coffee from a big cup.',glass:'Please give me a glass of water.',knife:'Be careful, the knife is very sharp.',napkin:'There is a white napkin on my plate.',salt:'Too much salt is bad for you.',pepper:'I like pepper on my pizza.',plate:'She put the cake on a small plate.',spoon:'I eat soup with a big spoon.',chopsticks:'It is difficult to eat rice with chopsticks.',bowl:'He has a bowl of cereal for breakfast.'};
+T.push({title:'Use the word in your own sentence',intro:'Составь своё предложение (минимум 4 слова) с каждым словом. Лучше — правдивое, про тебя или твою семью.',items:sh(W).slice(0,7).map(x=>({p:`Sentence with <b>${x.w}</b> (${x.ru})`,w:x.w,ta:1,ph:'Your sentence…',show:S[x.w],chk:v=>{const ok=used(v,[x]).length>0&&v.trim().split(/\s+/).length>=4;return{ok,msg:ok?'✓ Предложение принято':`Нужно слово ${x.w} и минимум 4 слова`}}}))});
+const E3=[['Твоя вилка упала на пол. Попроси новую.',['fork'],'Excuse me, could I have a clean fork, please?'],
+['Чай несладкий. Попроси то, что нужно.',['sugar'],'Could I have some sugar, please?'],
+['Нужно разрезать мясо. Попроси…',['knife'],'Can I have a sharp knife, please?'],
+['Ты хочешь воды. Попроси посуду для неё.',['glass'],'May I have a glass of water, please?'],
+['Суп безвкусный. Попроси две приправы.',['salt','pepper'],'Could you pass the salt and pepper, please?'],
+['Руки в соусе. Что ты просишь?',['napkin'],'Can I have a napkin, please?'],
+['Ты хочешь попробовать есть по-азиатски.',['chopsticks'],'Could I have chopsticks, please?']];
+T.push({title:'At the restaurant: what do you say?',intro:'Ты в ресторане. Скажи вслух вежливую просьбу и запиши её. Нужны нужное слово и вежливость (can / could / may / please / I’d like). После проверки нажми «Ответы» и послушай образец 🔊.',items:sh(E3).map(([p,k,m])=>({p,ta:1,ph:'Excuse me, could I have…',show:m,chk:v=>{const x=miss(v,k),pl=miss(v,['please|can i|could i|may i|would|i\'d like']).length===0,ok=!x.length&&pl;return{ok,msg:ok?'✓ Вежливо и по делу':(x.length?'Не хватает слова: '+x.join(', ')+'. ':'')+(pl?'':'Добавь вежливость (could I / please).'),miss:vw(x)}}}))});
+T.forEach((t,k)=>{const s=document.createElement('section');s.className='card';
+s.innerHTML=`<h2>${k+1}. ${t.title}</h2><p class="mu">${t.intro}</p>${t.pre||''}`+t.items.map(it=>`<div class="r"><div class="p">${it.p}</div>${it.ta?`<textarea class="in" rows="${it.rows||2}" placeholder="${it.ph||''}"></textarea>`:`<input class="in" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="${it.ph||''}">`}<div class="m"></div><div class="ans" hidden></div></div>`).join('')+`<div class="bar"><button class="b" onclick="chkT(${k})">✓ Проверить</button><button onclick="showT(${k})">👁 Ответы</button><button onclick="rstT(${k})">↺ Заново</button><button onclick="cp(taskText(${k}),this)">📋 Копировать мои ответы</button><b class="sc"></b></div>`;
+t.el=s;$('#tasks').append(s)});
+function chkT(k){const t=T[k];let s=0,m=0;$$('.r',t.el).forEach((r,i)=>{const it=t.items[i],v=$('.in',r).value;const res=it.chk?it.chk(v):{ok:it.a.some(x=>nz(x)===nz(v))};const mx=res.max??1,pt=res.pts??(res.ok?1:0);s+=pt;m+=mx;
+r.classList.toggle('ok',pt===mx);r.classList.toggle('no',pt<mx);$('.m',r).textContent=res.msg||(pt===mx?'✓ Верно':'✗ Попробуй ещё раз');
+if(pt<mx&&it.w)bad(it.w,k+'-'+i);(res.miss||[]).forEach(w=>bad(w,k+'-'+i))});
+$('.sc',t.el).textContent=`Результат: ${s} / ${m}`;t.s=s;t.m=m}
+function showT(k){const t=T[k];$$('.r',t.el).forEach((r,i)=>{const it=t.items[i],a=$('.ans',r);const tx=it.show||it.a.join(' / ');a.textContent='✔ '+tx+' ';const bt=document.createElement('button');bt.className='s';bt.textContent='🔊';bt.dataset.say=tx;a.append(bt);a.hidden=!a.hidden})}
+function rstT(k){const t=T[k];$$('.r',t.el).forEach(r=>{$('.in',r).value='';r.className='r';$('.m',r).textContent='';$('.ans',r).hidden=true});$('.sc',t.el).textContent='';t.m=0}
+function taskText(k){const t=T[k];return `${k+1}. ${t.title}\n`+$$('.r',t.el).map((r,i)=>{const c=$('.p',r).cloneNode(true);$$('button',c).forEach(b=>b.remove());return `${i+1}) ${c.textContent.trim()} → ${$('.in',r).value.trim()||'—'}${r.classList.contains('ok')?' ✓':r.classList.contains('no')?' ✗':''}`}).join('\n')}
+function cp(txt,btn){const o=btn.textContent,done=()=>{btn.textContent='✓ Скопировано';setTimeout(()=>btn.textContent=o,1600)};
+const fb=()=>{const a=document.createElement('textarea');a.value=txt;document.body.appendChild(a);a.select();try{document.execCommand('copy');done()}catch(e){btn.textContent='Выдели текст и скопируй вручную';setTimeout(()=>btn.textContent=o,2500)}a.remove()};
+navigator.clipboard&&navigator.clipboard.writeText?navigator.clipboard.writeText(txt).then(done,fb):fb()}
+function fin(){let o=`Имя: ${$('#nm').value||'—'}\nДата: ${new Date().toLocaleDateString('ru-RU')}\n`;T.forEach((t,k)=>{o+='\n'+taskText(k)+(t.m?`\nРезультат: ${t.s} / ${t.m}`:'\n(не проверено)')+'\n'});o+=`\nПроблемные слова: ${Object.keys(P).join(', ')||'—'}`;$('#out').value=o}
+drawP();
+</script></body></html>
