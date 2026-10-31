@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Restaurant vocabulary: повторение</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f2f6f3;--ink:#14302a;--mut:#5a6e68;--line:#c0cfc8;--acc:#d6452b;--yes:#1f7a4d;--yesb:#d3eedf;--no:#b3261e;--nob:#fbdcd8;--pan:#e4ece7;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12201c;--ink:#e9f1ec;--mut:#9db3ab;--line:#2f4a42;--acc:#ff8f6b;--yes:#7fe0ae;--yesb:#1b4733;--no:#ff9b92;--nob:#4a2320;--pan:#1a2d27;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#12201c;--ink:#e9f1ec;--mut:#9db3ab;--line:#2f4a42;--acc:#ff8f6b;--yes:#7fe0ae;--yesb:#1b4733;--no:#ff9b92;--nob:#4a2320;--pan:#1a2d27;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.55 "Bricolage Grotesque","Segoe UI","Noto Sans",Arial,sans-serif}
+.page{max-width:760px;margin:0 auto;padding:34px 20px 60px}
+h1{font-size:clamp(2rem,6vw,3rem);line-height:1;margin:0 0 10px;font-weight:800;letter-spacing:-.02em}
+h2{font-size:1.4rem;margin:0 0 4px;font-weight:600}
+.lead{color:var(--mut);margin:0 0 6px}
+section{padding:24px 0;border-top:2px solid var(--line)}
+#tasks{counter-reset:t}#tasks h2::before{counter-increment:t;content:counter(t) ". "}
+.hint{color:var(--mut);margin:0 0 12px;font-size:.95rem}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.btn{background:var(--ink);color:var(--bg);border:0;border-radius:8px;padding:8px 16px;font-weight:600}
+.btn.alt{background:transparent;color:var(--ink);border:2px solid var(--ink)}
+.bar{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.score{margin:10px 0 0;font-weight:600;min-height:1.4em}
+.spk{background:var(--pan);border:0;border-radius:50%;width:40px;height:40px;flex:none}
+.item{padding:10px 0;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.item .q{margin:0;flex:1 1 100%}
+.item.ln .q{flex:0 0 auto}
+.gap{font:inherit;color:inherit;background:var(--pan);border:2px solid var(--line);border-radius:6px;padding:4px 10px;width:min(100%,22ch)}
+.gap.yes,.opt.yes{background:var(--yesb);border-color:var(--yes)}
+.gap.no,.opt.no{background:var(--nob);border-color:var(--no)}
+.gap.shown{background:var(--yesb);border-color:var(--yes)}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opt{background:var(--pan);border:2px solid transparent;border-radius:8px;padding:7px 12px}
+.opt.sel{border-color:var(--ink)}
+.pl{background:var(--pan);border-radius:12px;padding:10px 14px;margin:14px 0 0;font-size:.95rem}
+.pl button{background:none;border:0;padding:0 8px 0 0;font-weight:600}
+#vs{font-size:.9rem;color:var(--mut);margin:8px 0 0}
+</style>
+</head>
+<body>
+<div class="page">
+<h1>Dinner for two: повторение</h1>
+<p class="lead">3 коротких упражнения на те же 8 слов: слушаем и пишем, переводим, выбираем в предложении.</p>
+<div class="bar"><button class="btn alt" id="test" type="button">Проверить звук</button></div>
+<p id="vs"></p>
+<div class="pl"><b>Проблемные слова:</b> <span id="pl">пока ошибок нет</span></div>
+<div id="tasks"></div>
+<section><div class="bar"><button class="btn" id="copyall" type="button">Скопировать все мои ответы</button></div></section>
+</div>
+<script>
+const $=(s,r=document)=>r.querySelector(s),el=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e};
+const sh=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+const norm=s=>s.toLowerCase().replace(/[^a-z0-9% ]/g,"").replace(/\s+/g," ").trim();
+const W=[
+{en:"starters",ru:"закуски",alt:["starter"]},{en:"main courses",ru:"основные блюда",alt:["main course"]},
+{en:"side dishes",ru:"гарниры",alt:["side dish"]},{en:"desserts",ru:"десерты",alt:["dessert"]},
+{en:"waiter",ru:"официант",alt:[]},{en:"bill",ru:"счёт",alt:[]},
+{en:"service charge",ru:"плата за обслуживание",alt:[]},{en:"dinner for two",ru:"ужин на двоих",alt:[]}];
+const by=Object.fromEntries(W.map(w=>[w.en,w]));
+/* audio */
+let V=null;const TTS="speechSynthesis" in window;
+function pick(){const v=speechSynthesis.getVoices();V=v.find(x=>/Google US English/i.test(x.name))||v.find(x=>/Samantha/i.test(x.name))||v.find(x=>x.lang==="en-US")||v.find(x=>/^en/i.test(x.lang))||null;$("#vs").textContent=V?"Голос: "+V.name+" ("+V.lang+")":"Английский голос не найден. Откройте страницу в Chrome или Safari."}
+if(TTS){pick();speechSynthesis.onvoiceschanged=pick}else $("#vs").textContent="Браузер не умеет озвучивать текст. Откройте страницу в Chrome или Safari.";
+function say(t){if(!TTS)return;speechSynthesis.cancel();setTimeout(()=>{const u=new SpeechSynthesisUtterance(t);u.lang="en-US";u.rate=.85;if(V)u.voice=V;speechSynthesis.speak(u)},60)}
+$("#test").onclick=()=>say("Dinner for two, please.");
+/* problems */
+const P={},seen=new Set();
+function miss(k,w){const key=k+"|"+w;if(seen.has(key))return;seen.add(key);P[w]=(P[w]||0)+1;const s=$("#pl");s.innerHTML="";Object.entries(P).sort((a,b)=>b[1]-a[1]).forEach(([w,n])=>{const b=el("button","",`${w} ×${n}`);b.type="button";b.onclick=()=>say(w);s.append(b)})}
+/* task wrapper */
+function mk(id,title,hint,build){
+ const s=el("section","task");s.innerHTML=`<h2>${title}</h2><p class="hint">${hint}</p>`;
+ const box=el("div"),bar=el("div","bar"),sc=el("p","score");let api;
+ const run=()=>{box.innerHTML="";sc.textContent="";api=build(box,id)};
+ const b=(t,f,c)=>{const x=el("button","btn "+(c||""),t);x.type="button";x.onclick=f;bar.append(x)};
+ b("Проверить",()=>{const r=api.check();sc.textContent=`Верно: ${r[0]} из ${r[1]}`});
+ b("Показать ответы",()=>api.show(),"alt");b("Заново",run,"alt");
+ s.append(box,bar,sc);$("#tasks").append(s);run()}
+const acc=i=>{const v=norm(i.value);return !!v&&i.dataset.w.split("|").map(norm).includes(v)};
+function typed(box,id,rows){
+ const G=[];
+ rows.forEach(r=>{const d=el("div","item ln");d.append(r.node);const i=el("input","gap");i.type="text";i.autocomplete="off";i.autocapitalize="off";i.spellcheck=false;i.setAttribute("aria-label","Ответ");i.dataset.w=[r.w.en,...r.w.alt].join("|");i.dataset.q=r.q;i.dataset.k=r.w.en;d.append(i);box.append(d);G.push(i)});
+ return{check(){let n=0;G.forEach(i=>{const ok=acc(i);i.classList.remove("yes","no","shown");if(i.value.trim())i.classList.add(ok?"yes":"no");if(ok)n++;else if(i.value.trim())miss(id+i.dataset.q,i.dataset.k);i.dataset.ok=ok?"1":"0"});return[n,G.length]},
+ show(){G.forEach(i=>{i.classList.remove("no","yes");i.classList.add("shown");i.value=i.dataset.w.split("|")[0]})}}}
+/* 1 listen & write */
+mk("a","Listen & write","Нажмите 🔊 и напишите услышанное слово. Следите за написанием.",(box,id)=>{
+ const rows=sh(W).map((w,n)=>{const b=el("button","spk","🔊");b.type="button";b.setAttribute("aria-label","Слушать");b.onclick=()=>say(w.en);return{node:b,w,q:"audio: "+w.en}});
+ return typed(box,id,rows)});
+/* 2 RU -> EN */
+mk("b","Translate: RU → EN","Переведите на английский. Слова идут в новом порядке.",(box,id)=>{
+ const rows=sh(W).map(w=>({node:el("p","q",`<b>${w.ru}</b>`),w,q:w.ru}));
+ return typed(box,id,rows)});
+/* 3 choose in sentence */
+let lp=-1;
+mk("c","Choose the right word","Выберите слово, которое подходит в предложение.",(box,id)=>{
+ const S=[["Could we have the ___, please? We’d like to pay.","bill"],["Our ___ recommended the fish.","waiter"],["It’s our anniversary, so I booked a ___.","dinner for two"],["Soup and salad are popular ___.","starters"],["The steak comes with two ___: chips and vegetables.","side dishes"],["A 12% ___ is added to every bill.","service charge"],["For ___, I’d like some ice cream.","desserts"],["Lamb was the most expensive of the ___.","main courses"]];
+ const items=sh(S).map(([q,k])=>{const d=el("div","item");d.dataset.q=q;d.append(el("p","q",q));
+  const o=sh([k,...sh(W.map(w=>w.en).filter(x=>x!==k)).slice(0,3)]);let p=o.indexOf(k);
+  if(p===lp){const j=(p+1+(Math.random()*3|0))%4;[o[p],o[j]]=[o[j],o[p]];p=j}lp=p;
+  const g=el("div","opts");o.forEach(t=>{const b=el("button","opt",t);b.type="button";b.dataset.v=t;b.onclick=()=>{g.querySelectorAll(".opt").forEach(x=>x.classList.remove("sel","yes","no"));b.classList.add("sel");d.dataset.a=t};g.append(b)});
+  d.append(g);box.append(d);return{d,k}});
+ return{check(){let n=0;items.forEach(({d,k},i)=>{const s=$(".sel",d);d.querySelectorAll(".opt").forEach(x=>x.classList.remove("yes","no"));const ok=!!s&&s.dataset.v===k;if(s)s.classList.add(ok?"yes":"no");if(ok)n++;else if(s)miss(id+i,k);d.dataset.ok=ok?"1":"0"});return[n,items.length]},
+ show(){items.forEach(({d,k})=>d.querySelectorAll(".opt").forEach(x=>x.classList.toggle("yes",x.dataset.v===k)))}}});
+/* copy */
+function cp(t,btn){const o=btn.textContent,ok=()=>{btn.textContent="Скопировано ✓";setTimeout(()=>btn.textContent=o,1800)},fb=()=>{const a=document.createElement("textarea");a.value=t;document.body.append(a);a.select();try{document.execCommand("copy");ok()}catch(e){btn.textContent="Не удалось скопировать"}a.remove()};
+ if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(ok,fb);else fb()}
+$("#copyall").onclick=function(){let o="Restaurant vocabulary: повторение\n";
+ document.querySelectorAll("section.task").forEach(s=>{o+="\n"+s.querySelector("h2").textContent+"\n";s.querySelectorAll("[data-q]").forEach(e=>{const a=e.tagName==="INPUT"?e.value:(e.dataset.a||"");o+="• "+e.dataset.q+" → "+(a||"—")+(e.dataset.ok==="1"?" ✓":e.dataset.ok==="0"?" ✗":"")+"\n"})});
+ const p=Object.entries(P);if(p.length)o+="\nПроблемные слова: "+p.map(([w,n])=>w+" ×"+n).join(", ");cp(o,this)};
+</script>
+</body>
+</html>
