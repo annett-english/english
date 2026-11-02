@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Polite requests: production</title>
+<style>
+:root{--bg:#eef3f1;--card:#fff;--tx:#14231f;--mu:#5b6b66;--ac:#0f766e;--ok:#166534;--okb:#d9f2e3;--no:#b42318;--nob:#fde4e1;--bd:#cfdcd7;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1a17;--card:#172622;--tx:#e8f1ee;--mu:#9bb0a9;--ac:#2dd4bf;--ok:#86efac;--okb:#12351f;--no:#fca5a5;--nob:#401614;--bd:#2a403a;color-scheme:dark}}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:760px;margin:0 auto;padding:20px 16px 48px}
+h1{font:700 30px/1.15 Georgia,"Iowan Old Style",serif;margin:8px 0 6px}
+.rule{background:var(--card);border:1px solid var(--bd);border-left:6px solid var(--ac);border-radius:8px;padding:12px 16px;margin:14px 0;font-size:15px}
+nav{display:flex;gap:6px;overflow-x:auto;padding:4px 0 10px}
+nav button{flex:none;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:20px;padding:6px 12px;font:inherit;font-size:14px;cursor:pointer}
+nav button.on{background:var(--ac);color:var(--bg);border-color:var(--ac)}
+section{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:16px}
+h2{font:700 20px Georgia,serif;margin:0 0 4px}.ins{color:var(--mu);margin:0 0 14px;font-size:15px}
+.it{padding:10px 0;border-top:1px solid var(--bd)}.it:first-child{border-top:0}
+input[type=text],textarea{font:inherit;color:var(--tx);background:var(--bg);border:1px solid var(--bd);border-radius:6px;padding:4px 8px}
+.w{width:100%;max-width:440px}textarea{width:100%;min-height:150px;padding:8px}
+label{display:block;padding:3px 0;cursor:pointer}button{font:inherit;cursor:pointer}
+.bar{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.bar button{border:1px solid var(--ac);background:transparent;color:var(--ac);border-radius:8px;padding:7px 14px}
+.bar .pri{background:var(--ac);color:var(--bg)}
+.fb{font-size:14px;margin-top:6px;padding:6px 10px;border-radius:6px}.fb:empty{display:none}
+.fb.ok{background:var(--okb);color:var(--ok)}.fb.no{background:var(--nob);color:var(--no)}
+.score{margin-top:10px;font-weight:600}.cnt{font-size:22px;font-family:Georgia,serif;margin:8px 0}
+.d{margin:4px 0}.d b{font-family:Georgia,serif}
+</style></head><body><main>
+<h1>Polite requests: production</h1>
+<div class="rule"><b>Напоминание.</b> Could/Can/May I have + noun? · Would you like + some + noun? · I would (’d) like + noun, please. · some — в просьбах и предложениях, any — в отрицаниях и вопросах · the — конкретное, без артикля — «вообще».</div>
+<nav id="nav"></nav><div id="box"></div>
+</main>
+<script>
+const norm=s=>s.toLowerCase().replace(/[’‘`]/g,"'").replace(/[?.!,]/g,"").replace(/\s+/g," ").trim();
+const fb=(el,ok,t)=>{el.className="fb "+(ok?"ok":"no");el.innerHTML=(ok?"✓ ":"✗ ")+t};
+const EX=[
+{n:"Rephrase",t:"Rephrase",ins:"Перепишите грубую фразу вежливо: Could/Can/May I have… или I’d like… и добавьте please.",type:"re",items:[
+ ["Give me the bill.","bill","Could I have the bill, please?"],
+ ["I want some ice.","ice","Can I have some ice, please?"],
+ ["I want a glass of juice.","juice","I’d like a glass of juice, please."],
+ ["Bring me some salt.","salt","Could I have some salt, please?"],
+ ["I want the pasta.","pasta","I would like the pasta, please."],
+ ["Give me a coffee.","coffee","May I have a coffee, please?"]]},
+{n:"Ideas",t:"Закончи предложения",ins:"Допишите своими идеями, затем нажмите «Копировать всё».",type:"free",items:[
+ ["Could I have","?"],["Can I have some","?"],["May I have the","?"],["Would you like some","?"],["Would you like a","?"],["I’d like the","."],["I would like some","."],["I don’t want any","."]]},
+{n:"Dialogue",t:"Finish the dialogue",ins:"Вы в кофейне. Ответьте за гостя, используя структуры из правила, и скопируйте диалог.",type:"dlg",items:[
+ ["Barista","Hi! What can I get you?","Закажите напиток: I’d like…"],
+ ["Barista","Sure. Would you like milk in your coffee?","Ответьте: Yes, some milk, please."],
+ ["Barista","Would you like anything to eat?","Попросите выпечку: Could I have…?"],
+ ["Barista","We have croissants and muffins.","Выберите: I’d like the…"],
+ ["Barista","Would you like any sugar?","Ответьте вежливо."],
+ ["Barista","That’s six euros, please.","Поблагодарите и попросите чек: Could I have…?"]]},
+{n:"Me",t:"Write about yourself",ins:"Напишите 5 предложений о себе в кафе. В каждом одна структура: Could/Can/May I have, Would you like, I’d like.",type:"me"},
+{n:"Can do",t:"Я могу…",ins:"Отметьте, что у вас получается.",type:"cd",items:["вежливо попросить что-то: Could I have…?","предложить что-то: Would you like…?","сделать заказ: I’d like… please","выбрать some или any","выбрать the или нулевой артикль","вежливо перефразировать грубую просьбу"]}
+];
+const nav=document.getElementById("nav");
+EX.forEach((e,i)=>{const b=document.createElement("button");b.textContent=(i+1)+". "+e.n;b.onclick=()=>show(i);nav.append(b)});
+function show(i){[...nav.children].forEach((b,j)=>b.classList.toggle("on",i==j));
+ const e=EX[i],box=document.getElementById("box");
+ box.innerHTML=`<section><h2>${i+1}. ${e.t}</h2><p class="ins">${e.ins}</p><div class="body"></div><div class="bar"></div><div class="score"></div></section>`;
+ const body=box.querySelector(".body"),bar=box.querySelector(".bar"),sc=box.querySelector(".score"),api=B[e.type](body,e);
+ const add=(t,f,c)=>{const b=document.createElement("button");b.textContent=t;if(c)b.className="pri";b.onclick=f;bar.append(b)};
+ if(api.check)add("Проверить",()=>{const s=api.check();sc.textContent=`Верно: ${s[0]} из ${s[1]}`},1);
+ if(api.reveal)add("Показать ответы",()=>{api.reveal();sc.textContent=""});
+ if(api.copy)add("Копировать всё",()=>{const t=api.copy();
+  (navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>sc.textContent="Скопировано ✓").catch(()=>{const x=document.createElement("textarea");x.value=t;document.body.append(x);x.select();try{document.execCommand("copy");sc.textContent="Скопировано ✓"}catch(_){sc.textContent="Не удалось скопировать"}x.remove()})},1);
+ add("Сначала",()=>show(i));
+}
+const B={
+re(body,e){const its=e.items.map((q,i)=>{const d=document.createElement("div");d.className="it";
+  d.innerHTML=`${i+1}. <i>${q[0]}</i><br><input type="text" class="w" autocomplete="off"><div class="fb"></div>`;body.append(d);return d});
+ return{check(){let s=0;its.forEach((d,i)=>{const q=e.items[i],v=norm(d.querySelector("input").value),ok=new RegExp("^(?:(?:could|can|may) i have|i(?:'d| would) like)\\b.*"+q[1]).test(v);if(ok)s++;
+  fb(d.querySelector(".fb"),ok,ok?"Вежливо! Образец: "+q[2]:"Начните с Could/Can/May I have… или I’d like… и назовите предмет. Образец: "+q[2])});return[s,its.length]},
+  reveal(){its.forEach((d,i)=>{const q=e.items[i];d.querySelector("input").value=q[2];fb(d.querySelector(".fb"),1,"Could/Can/May I have или I’d like + что просим — вежливо, без приказа.")})}}},
+free(body,e){const its=e.items.map(q=>{const d=document.createElement("div");d.className="it";d.innerHTML=`${q[0]} <input type="text" class="w" autocomplete="off"> ${q[1]}`;body.append(d);return d});
+ return{copy:()=>its.map((d,i)=>e.items[i][0]+" "+d.querySelector("input").value.trim()+e.items[i][1]).join("\n")}},
+dlg(body,e){const its=e.items.map(q=>{const d=document.createElement("div");d.className="it";d.innerHTML=`<div class="d"><b>${q[0]}:</b> ${q[1]}</div><div class="d"><b>You:</b> <input type="text" class="w" placeholder="${q[2]}"></div>`;body.append(d);return d});
+ return{copy:()=>its.map((d,i)=>e.items[i][0]+": "+e.items[i][1]+"\nYou: "+d.querySelector("input").value.trim()).join("\n")}},
+me(body){body.innerHTML=`<textarea placeholder="At the café I…"></textarea><div class="cnt"></div><div class="fb"></div>`;
+ const ta=body.querySelector("textarea"),c=body.querySelector(".cnt"),f=body.querySelector(".fb");
+ const re=/\b(could i have|can i have|may i have|would you like|i'd like|i would like)\b/;
+ const upd=()=>{const ss=ta.value.split(/(?<=[.?!])\s+/).map(norm).filter(Boolean),n=ss.filter(s=>re.test(s)).length;
+  c.textContent=`Структур использовано: ${Math.min(n,5)} из 5`;
+  if(!ss.length){f.className="fb";f.textContent="";return}
+  fb(f,n>=5,n>=5?"Отлично! Все 5 предложений со структурой.":ss.length>n?"Есть предложения без нужной структуры.":"Продолжайте.")};
+ ta.oninput=upd;upd();return{copy:()=>ta.value}},
+cd(body,e){body.innerHTML=e.items.map(t=>`<label><input type="checkbox"> Я могу ${t}</label>`).join("")+`<div class="cnt"></div>`;
+ const cs=body.querySelectorAll("input"),c=body.querySelector(".cnt"),u=()=>{const n=[...cs].filter(x=>x.checked).length;c.textContent=`Готово: ${n} из ${cs.length}`+(n==cs.length?" 🎉":"")};
+ cs.forEach(x=>x.onchange=u);u();return{}}
+};
+show(0);
+</script></body></html>
