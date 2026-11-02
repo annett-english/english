@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Polite requests: повторение</title>
+<style>
+:root{--bg:#eef3f1;--card:#fff;--tx:#14231f;--mu:#5b6b66;--ac:#0f766e;--ok:#166534;--okb:#d9f2e3;--no:#b42318;--nob:#fde4e1;--bd:#cfdcd7;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1a17;--card:#172622;--tx:#e8f1ee;--mu:#9bb0a9;--ac:#2dd4bf;--ok:#86efac;--okb:#12351f;--no:#fca5a5;--nob:#401614;--bd:#2a403a;color-scheme:dark}}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:760px;margin:0 auto;padding:20px 16px 48px}
+h1{font:700 30px/1.15 Georgia,"Iowan Old Style",serif;margin:8px 0 6px}
+.rule{background:var(--card);border:1px solid var(--bd);border-left:6px solid var(--ac);border-radius:8px;padding:12px 16px;margin:14px 0;font-size:15px}
+nav{display:flex;gap:6px;overflow-x:auto;padding:4px 0 10px}
+nav button{flex:none;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:20px;padding:6px 12px;font:inherit;font-size:14px;cursor:pointer}
+nav button.on{background:var(--ac);color:var(--bg);border-color:var(--ac)}
+section{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:16px}
+h2{font:700 20px Georgia,serif;margin:0 0 4px}.ins{color:var(--mu);margin:0 0 14px;font-size:15px}
+.it{padding:10px 0;border-top:1px solid var(--bd)}.it:first-child{border-top:0}
+input[type=text]{font:inherit;color:var(--tx);background:var(--bg);border:1px solid var(--bd);border-radius:6px;padding:4px 8px;width:110px}
+label{display:block;padding:3px 0;cursor:pointer}button{font:inherit;cursor:pointer}
+.bar{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.bar button{border:1px solid var(--ac);background:transparent;color:var(--ac);border-radius:8px;padding:7px 14px}
+.bar .pri{background:var(--ac);color:var(--bg)}
+.fb{font-size:14px;margin-top:6px;padding:6px 10px;border-radius:6px}.fb:empty{display:none}
+.fb.ok{background:var(--okb);color:var(--ok)}.fb.no{background:var(--nob);color:var(--no)}
+.score{margin-top:10px;font-weight:600}
+.chip{display:inline-block;margin:3px;padding:5px 10px;border:1px solid var(--ac);background:var(--bg);color:var(--tx);border-radius:16px}
+.ans{min-height:44px;border:2px dashed var(--bd);border-radius:8px;padding:4px;margin:6px 0}
+</style></head><body><main>
+<h1>Polite requests: повторение</h1>
+<div class="rule"><b>Напоминание.</b> Could/Can/May I have + noun? · Would you like + some + noun? · I would (’d) like + noun, please. · some — в просьбах и предложениях, any — в отрицаниях и обычных вопросах · the — конкретное, без артикля — «вообще».</div>
+<nav id="nav"></nav><div id="box"></div>
+</main>
+<script>
+const norm=s=>s.toLowerCase().replace(/[’‘`]/g,"'").replace(/[?.!,]/g,"").replace(/\s+/g," ").trim();
+const fb=(el,ok,t)=>{el.className="fb "+(ok?"ok":"no");el.innerHTML=(ok?"✓ ":"✗ ")+t};
+const shuf=a=>{const r=[...a];do{r.sort(()=>Math.random()-.5)}while(r.join()==a.join());return r};
+const EX=[
+{n:"Choose",t:"Choose the correct word",ins:"Выберите верный вариант.",type:"quiz",items:[
+ ["___ I have some more water, please?",["Could","Would","Do"],0,"Просим — Could I have…? Would you like…? — это предложение."],
+ ["Would you like ___ coffee?",["some","any","a few"],0,"В предложении используем some. Coffee неисчисляемое, поэтому a few не подходит."],
+ ["We don’t have ___ tomatoes today.",["some","any","the"],1,"В отрицании — any."],
+ ["I’d like ___ soup of the day, please.",["the","a","–"],0,"Конкретное блюдо (soup of the day) — the."],
+ ["I ___ like a pizza, please.",["would","will","am"],0,"I would like — вежливый заказ (I’d like)."],
+ ["Could I have ___ sugar, please?",["some","any","the"],0,"В просьбе — some."],
+ ["Is there ___ cheese in this salad?",["some","any","the"],1,"Обычный вопрос о наличии — any."],
+ ["I like ___ fish, but I don’t like meat.",["the","a","–"],2,"Еда вообще — без артикля."]]},
+{n:"Gaps",t:"Fill in the gaps",ins:"Впишите слово (подсказка в скобках). Если артикля нет, напишите «-».",type:"gap",items:[
+ ["___ I have the bill, please? (could / can / may)",["could","can","may"],"Просьба: Could/Can/May I have + noun."],
+ ["___ you like some more potatoes? (would)",["would"],"Предложение: Would you like…?"],
+ ["I ___ like the salmon, please. (would / ’d)",["would","'d"],"I would like = I’d like."],
+ ["Could I have ___ ice in my water, please? (some / any)",["some"],"В просьбе — some."],
+ ["There isn’t ___ butter on the table. (some / any)",["any"],"В отрицании — any."],
+ ["Sorry, we haven’t got ___ orange juice left. (some / any)",["any"],"Отрицание — any."],
+ ["Could I have ___ menu, please? (the / -)",["the"],"Конкретное меню в этом кафе — the."],
+ ["I love ___ chicken, but I don’t eat fish. (the / -)",["-","–","no","no article"],"Любимая еда вообще — без артикля."]]},
+{n:"Builder",t:"Sentence Builder",ins:"Соберите предложение: нажимайте слова по порядку. Слово в ответе можно убрать кликом.",type:"build",items:[
+ ["Could I have the bill, please?","Просьба: Could I have + the + noun."],
+ ["Would you like some more potatoes?","Предложение: Would you like + some."],
+ ["I’d like a table for two, please.","Заказ: I’d like + noun."],
+ ["Can I have some ice in my water?","Просьба с some."],
+ ["May I have the salt, please?","May I have — формальный вариант."],
+ ["I would like the salmon, please.","I would like + the + блюдо."],
+ ["Would you like a glass of juice?","Предложение: Would you like + a + noun."]]}
+];
+const nav=document.getElementById("nav");
+EX.forEach((e,i)=>{const b=document.createElement("button");b.textContent=(i+1)+". "+e.n;b.onclick=()=>show(i);nav.append(b)});
+function show(i){[...nav.children].forEach((b,j)=>b.classList.toggle("on",i==j));
+ const e=EX[i],box=document.getElementById("box");
+ box.innerHTML=`<section><h2>${i+1}. ${e.t}</h2><p class="ins">${e.ins}</p><div class="body"></div><div class="bar"></div><div class="score"></div></section>`;
+ const body=box.querySelector(".body"),bar=box.querySelector(".bar"),sc=box.querySelector(".score"),api=B[e.type](body,e);
+ const add=(t,f,c)=>{const b=document.createElement("button");b.textContent=t;if(c)b.className="pri";b.onclick=f;bar.append(b)};
+ add("Проверить",()=>{const s=api.check();sc.textContent=`Верно: ${s[0]} из ${s[1]}`},1);
+ add("Показать ответы",()=>{api.reveal();sc.textContent=""});
+ add("Сначала",()=>show(i));
+}
+const B={
+quiz(body,e){const its=e.items.map((q,i)=>{const d=document.createElement("div");d.className="it";
+  d.innerHTML=`<b>${i+1}. ${q[0]}</b>`+q[1].map((o,j)=>`<label><input type="radio" name="q${i}" value="${j}"> ${o}</label>`).join("")+`<div class="fb"></div>`;body.append(d);return d});
+ return{check(){let s=0;its.forEach((d,i)=>{const c=d.querySelector("input:checked"),q=e.items[i],ok=c&&+c.value==q[2];if(ok)s++;fb(d.querySelector(".fb"),ok,(c?"":"Выберите вариант. ")+q[3])});return[s,its.length]},
+  reveal(){its.forEach((d,i)=>{const q=e.items[i];d.querySelector(`input[value="${q[2]}"]`).checked=true;fb(d.querySelector(".fb"),1,"Ответ: «"+q[1][q[2]]+"». "+q[3])})}}},
+gap(body,e){const its=e.items.map((q,i)=>{const d=document.createElement("div");d.className="it";
+  d.innerHTML=`${i+1}. ${q[0].replace("___",'<input type="text" autocomplete="off" autocapitalize="off">')}<div class="fb"></div>`;body.append(d);return d});
+ return{check(){let s=0;its.forEach((d,i)=>{const q=e.items[i],v=norm(d.querySelector("input").value),ok=q[1].some(a=>norm(a)==v);if(ok)s++;fb(d.querySelector(".fb"),ok,ok?q[2]:"Правильно: "+q[1][0]+". "+q[2])});return[s,its.length]},
+  reveal(){its.forEach((d,i)=>{const q=e.items[i];d.querySelector("input").value=q[1][0];fb(d.querySelector(".fb"),1,q[2])})}}},
+build(body,e){const its=e.items.map(q=>{const d=document.createElement("div");d.className="it";
+  d.innerHTML=`<div class="ans"></div><div class="pool"></div><div class="fb"></div>`;body.append(d);
+  const A=d.querySelector(".ans"),P=d.querySelector(".pool");
+  shuf(q[0].split(" ")).forEach(w=>{const b=document.createElement("button");b.className="chip";b.textContent=w;
+   const toA=()=>{A.append(b);b.onclick=toP},toP=()=>{P.append(b);b.onclick=toA};b.onclick=toA;P.append(b)});
+  d.A=A;return d});
+ return{check(){let s=0;its.forEach((d,i)=>{const q=e.items[i],ok=[...d.A.children].map(b=>b.textContent).join(" ")==q[0];if(ok)s++;fb(d.querySelector(".fb"),ok,ok?q[1]:"Правильно: "+q[0]+" — "+q[1])});return[s,its.length]},
+  reveal(){its.forEach((d,i)=>{const q=e.items[i];d.querySelector(".pool").innerHTML="";d.A.innerHTML=q[0].split(" ").map(w=>`<span class="chip">${w}</span>`).join("");fb(d.querySelector(".fb"),1,q[1])})}}}
+};
+show(0);
+</script></body></html>
