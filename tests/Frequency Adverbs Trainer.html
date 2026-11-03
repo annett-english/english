@@ -1,0 +1,837 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Frequency Adverbs Trainer</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Onest:wght@400;500;600;700&family=Unbounded:wght@500;600&display=swap">
+<style>
+/* Layout concept: a worksheet binder. A frequency scale (never to always) and the rule cards open the page, then nine numbered exercise cards in one column, with a sticky strip of exercise tabs. */
+:root{
+  --bg:#edf1f4; --surface:#ffffff; --surface-2:#f5f7f9; --ink:#13233a; --muted:#566a80; --line:#d3dce5;
+  --accent:#0a6a5b; --accent-ink:#ffffff; --accent-soft:#d9eee9;
+  --good:#17753f; --good-soft:#ddf2e5; --bad:#b0261d; --bad-soft:#fbe3e0; --mark:#c99a0a; --mark-soft:#fff1bd;
+  --font-display:'Unbounded','Onest',system-ui,sans-serif;
+  --font-body:'Onest',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --font-mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e1722; --surface:#152130; --surface-2:#1b2a3b; --ink:#e7eef6; --muted:#9db0c4; --line:#2c3d50;
+    --accent:#52c7b0; --accent-ink:#06201b; --accent-soft:#173a3a;
+    --good:#6fd39a; --good-soft:#14342a; --bad:#ff9087; --bad-soft:#3b1d1d; --mark:#e3b93c; --mark-soft:#3c3411;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e1722; --surface:#152130; --surface-2:#1b2a3b; --ink:#e7eef6; --muted:#9db0c4; --line:#2c3d50;
+  --accent:#52c7b0; --accent-ink:#06201b; --accent-soft:#173a3a;
+  --good:#6fd39a; --good-soft:#14342a; --bad:#ff9087; --bad-soft:#3b1d1d; --mark:#e3b93c; --mark-soft:#3c3411;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:var(--font-body); font-size:16px; line-height:1.55;
+  padding-block:8px 64px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:30}
+.wrap{max-width:880px;margin:0 auto}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+/* hero */
+.hero{padding-block:24px 4px}
+.eyebrow{font-family:var(--font-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin:0}
+h1{font-family:var(--font-display);font-weight:600;font-size:clamp(1.55rem,5.4vw,2.4rem);line-height:1.12;margin:8px 0 12px;text-wrap:balance}
+.lead{max-width:62ch;color:var(--muted);margin:0}
+.scale-box{margin-top:20px;overflow-x:auto;border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:12px}
+.scale-cap{font-family:var(--font-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+.scale{min-width:560px;display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.scale div{padding:8px 6px 6px;border-radius:6px;text-align:center;font-size:13px;font-weight:600;line-height:1.25;background:var(--accent-soft);background:color-mix(in srgb,var(--accent) var(--p),var(--surface));color:var(--ink)}
+.scale div.hi{color:var(--accent-ink)}
+.scale small{display:block;font-family:var(--font-mono);font-weight:400;font-size:11px;margin-top:2px;opacity:.85}
+
+/* rule */
+h2.sec{font-family:var(--font-display);font-weight:500;font-size:1.05rem;margin:28px 0 10px}
+.rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:12px}
+.rule{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px;min-width:0}
+.rule h3{margin:0 0 6px;font-family:var(--font-mono);font-weight:500;font-size:13.5px;color:var(--accent);line-height:1.4}
+.rule p{margin:0 0 8px;font-size:14px;color:var(--muted)}
+.rule ul{margin:0;padding-left:18px;font-size:14px}
+.rule li+li{margin-top:2px}
+.warn{color:var(--bad);font-size:13px}
+
+/* tabs */
+.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);padding-block:10px;margin-top:18px;border-bottom:1px solid var(--line);display:flex;gap:6px;overflow-x:auto}
+.tab{flex:none;min-width:40px;height:36px;padding:0 10px;border-radius:8px;border:1px solid var(--line);background:var(--surface);cursor:pointer;font-family:var(--font-mono);font-size:13px;font-weight:500;position:relative}
+.tab.done{border-color:var(--accent);color:var(--accent)}
+.tab.perfect{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+
+/* exercise card */
+.ex{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px;margin-top:18px;scroll-margin-top:calc(70px + env(safe-area-inset-top,0px))}
+.ex-head{display:flex;gap:12px;align-items:center}
+.ex-num{flex:none;width:40px;height:40px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-family:var(--font-display);font-weight:600}
+.ex h2{margin:0;font-family:var(--font-display);font-weight:500;font-size:1.05rem;line-height:1.25;text-wrap:balance}
+.ex-tag{margin:2px 0 0;font-family:var(--font-mono);font-size:12px;color:var(--muted)}
+.ex-instr{margin:12px 0;color:var(--muted);max-width:66ch}
+.ex-instr b{color:var(--ink)}
+.ex-body{display:flex;flex-direction:column;gap:8px}
+.ex-foot{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.result{min-height:1.5em;margin:10px 0 0;font-weight:600}
+.result.good{color:var(--good)} .result.bad{color:var(--bad)} .result.info{color:var(--muted)}
+.btn{padding:9px 16px;border-radius:8px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);font-weight:600;font-size:14px;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--accent)}
+.btn:disabled{opacity:.5;cursor:default}
+
+/* items */
+.q{background:var(--surface-2);border:1px solid transparent;border-radius:8px;padding:12px;min-width:0}
+.q.ok{background:var(--good-soft);border-color:var(--good)}
+.q.no{background:var(--bad-soft);border-color:var(--bad)}
+.q-row{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;justify-content:space-between}
+.q-text{min-width:0;flex:1 1 220px}
+.q-label{font-size:14px;color:var(--muted);margin:0 0 8px}
+.q-label b{font-family:var(--font-mono);font-weight:500;color:var(--ink);background:var(--accent-soft);padding:1px 7px;border-radius:5px}
+.expl{display:none;margin:10px 0 0;font-size:14px;color:var(--muted)}
+.expl b{color:var(--ink)}
+.q.rev .expl{display:block}
+.tf{display:flex;gap:6px}
+.tfb{min-width:68px;padding:7px 12px;border-radius:8px;border:1px solid var(--line);background:var(--surface);cursor:pointer;font-weight:600;font-size:14px}
+.tfb.sel{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+
+.chip{padding:6px 13px;border-radius:999px;border:1px solid var(--line);background:var(--surface);cursor:pointer;line-height:1.3}
+.chip.sel{border-color:var(--accent);background:var(--accent-soft);box-shadow:0 0 0 2px var(--accent)}
+.chip.ok{border-color:var(--good);background:var(--good-soft)}
+.chip.no{border-color:var(--bad);background:var(--bad-soft)}
+.chip.used{opacity:.25;pointer-events:none}
+
+/* drag and drop */
+.zones{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:10px}
+.zone{min-height:96px;border:1.5px dashed var(--line);border-radius:10px;padding:10px;min-width:0}
+.zone.over{border-color:var(--accent);background:var(--accent-soft)}
+.zone h4{margin:0;font-size:14px}
+.zs{margin:0 0 8px;font-size:12.5px;color:var(--muted)}
+.zl{display:flex;flex-wrap:wrap;gap:8px;min-height:36px}
+.dd-expl p{margin:6px 0 0;font-size:14px;color:var(--muted)}
+.dd-expl b{color:var(--ink)}
+
+/* gaps */
+.sent{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:17px}
+.gap{min-width:28px;height:32px;padding:0 8px;border-radius:999px;border:1.5px dashed var(--muted);background:transparent;color:var(--muted);cursor:pointer;font-size:13px;font-family:var(--font-mono)}
+.gap.on{border-style:solid;border-color:var(--accent);background:var(--accent-soft);color:var(--ink);font-weight:500}
+.gap.good{border-color:var(--good);background:var(--good-soft)}
+.gap.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.gap.miss{border-color:var(--good);border-style:dashed;color:var(--good)}
+
+/* builder */
+.answer{min-height:48px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:6px 0;border-bottom:2px solid var(--line)}
+.ph{color:var(--muted);font-size:14px}
+.bank{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+
+/* inputs */
+.txt,.area{width:100%;font:inherit;padding:9px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink)}
+.area{min-height:150px;resize:vertical}
+.src{margin:0 0 8px;font-size:17px}
+.src b{font-family:var(--font-mono);font-weight:500}
+
+/* write */
+.counter{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;font-family:var(--font-mono);font-size:14px}
+.struct{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.struct li{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;border-radius:8px;background:var(--surface-2);font-size:14px}
+.struct li i{flex:none;width:20px;height:20px;border-radius:50%;border:1.5px solid var(--muted);display:grid;place-items:center;font-style:normal;font-size:12px;line-height:1}
+.struct li.on{background:var(--good-soft)}
+.struct li.on i{background:var(--good);border-color:var(--good);color:var(--surface)}
+.struct small{display:block;color:var(--muted);font-family:var(--font-mono);font-size:12px}
+.notes{margin:0;padding-left:18px;color:var(--bad);font-size:14px}
+.sample{margin:0;padding:12px;border-radius:8px;background:var(--accent-soft);font-size:15px}
+
+/* truths */
+.facts{list-style:none;margin:0 0 10px;padding:0;display:flex;flex-wrap:wrap;gap:4px 14px;font-size:13.5px;color:var(--muted)}
+.facts li::before{content:"· "}
+.opt{display:block;width:100%;text-align:left;padding:9px 12px;margin-top:6px;border-radius:8px;border:1px solid var(--line);background:var(--surface);cursor:pointer}
+.opt.sel{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent)}
+.opt.lie{border-color:var(--bad);background:var(--bad-soft)}
+.opt.truth{border-color:var(--good);background:var(--good-soft)}
+.own{border-top:1px solid var(--line);margin-top:10px;padding-top:14px}
+.own h3{margin:0 0 4px;font-size:15px}
+.own-row{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;margin-top:8px}
+.own-row label{font-size:13px;color:var(--muted);white-space:nowrap;display:flex;gap:6px;align-items:center}
+.own-res{grid-column:1/-1;font-size:13.5px;margin:0}
+.own-res.good{color:var(--good)} .own-res.bad{color:var(--bad)} .own-res.info{color:var(--muted)}
+.own-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+
+/* race */
+.race-bar{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center}
+.timer{font-family:var(--font-mono);font-size:1.5rem;font-weight:500}
+.race-hint{font-size:14px;color:var(--muted);flex:1 1 240px}
+.race-list{display:flex;flex-direction:column;gap:8px}
+.race-list.locked{opacity:.35;pointer-events:none;filter:blur(2px)}
+.race-list .sent{gap:2px 8px;font-size:17px}
+.tok{border:0;background:none;padding:2px 4px;border-bottom:2px solid transparent;cursor:pointer;border-radius:3px}
+.tok:hover{background:var(--accent-soft)}
+.tok.flag{background:var(--mark-soft);border-bottom-color:var(--mark)}
+.tok.hit{background:var(--good-soft);border-bottom-color:var(--good)}
+.tok.miss{background:var(--bad-soft);border-bottom-color:var(--bad)}
+.tok.wrong{background:var(--bad-soft);border-bottom-color:var(--bad);text-decoration:line-through}
+
+/* self check */
+.chk{display:flex;gap:10px;align-items:flex-start;padding:11px 12px;border-radius:8px;background:var(--surface-2);cursor:pointer}
+.chk input{width:20px;height:20px;margin:2px 0 0;accent-color:var(--accent);flex:none}
+.chk.on{background:var(--good-soft)}
+.bar{height:10px;border-radius:999px;background:var(--line);overflow:hidden;margin-top:6px}
+.bar span{display:block;height:100%;width:0;background:var(--accent);transition:width .25s}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+
+<div class="wrap">
+  <header class="hero">
+    <p class="eyebrow">Present Simple · порядок слов</p>
+    <h1>Adverbs of Frequency</h1>
+    <p class="lead">Где в предложении стоят always, often, never и другие наречия частотности. Девять упражнений: в каждом есть проверка, кнопка «Показать ответы» и объяснение, почему правильно именно так.</p>
+    <div class="scale-box">
+      <p class="scale-cap">Как часто? От 0% до 100%</p>
+      <div class="scale" role="img" aria-label="Шкала: never 0%, hardly ever 5%, rarely 10%, sometimes 50%, often 70%, usually 90%, always 100%">
+        <div style="--p:0%">never<small>0%</small></div>
+        <div style="--p:12%">hardly ever<small>5%</small></div>
+        <div style="--p:22%">rarely<small>10%</small></div>
+        <div style="--p:45%">sometimes<small>50%</small></div>
+        <div class="hi" style="--p:65%">often<small>70%</small></div>
+        <div class="hi" style="--p:82%">usually<small>90%</small></div>
+        <div class="hi" style="--p:100%">always<small>100%</small></div>
+      </div>
+    </div>
+  </header>
+
+  <h2 class="sec">Правило</h2>
+  <div class="rules">
+    <article class="rule">
+      <h3>rarely, never, hardly ever, always, often</h3>
+      <p>Перед сказуемым; после to be, вспомогательных и модальных глаголов.</p>
+      <ul><li>I hardly ever drink water.</li><li>I am often tired.</li><li>I can always sing.</li><li>I don't often go for a walk.</li></ul>
+      <p class="warn" style="margin-top:8px">rarely, never, hardly ever не используются в отрицательных предложениях: I don't hardly ever go swimming.</p>
+    </article>
+    <article class="rule">
+      <h3>every day / week / month / year · twice a month · once a year · three times a week</h3>
+      <p>В начале или в конце предложения.</p>
+      <ul><li>Once a month he sends flowers.</li><li>He sends flowers once a month.</li><li>We work together every day.</li></ul>
+    </article>
+    <article class="rule">
+      <h3>usually</h3>
+      <p>В начале предложения или перед сказуемым.</p>
+      <ul><li>Usually I drink milk.</li><li>I usually drink milk.</li></ul>
+    </article>
+    <article class="rule">
+      <h3>sometimes</h3>
+      <p>В начале предложения, перед сказуемым или в конце.</p>
+      <ul><li>Sometimes, I see my aunt.</li><li>I sometimes see my aunt.</li><li>I see my aunt sometimes.</li></ul>
+    </article>
+  </div>
+
+  <nav class="tabs" id="tabs" aria-label="Упражнения"></nav>
+  <main id="exercises"></main>
+</div>
+
+<script>
+(function(){
+'use strict';
+var $=function(s,r){return (r||document).querySelector(s);};
+var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s));};
+var esc=function(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});};
+var norm=function(s){return s.toLowerCase().replace(/[’‘`´]/g,"'").replace(/[.,!?;:"]/g,'').replace(/\s+/g,' ').trim();};
+var shuffle=function(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;};
+var range=function(n){var r=[];for(var i=0;i<n;i++)r.push(i);return r;};
+
+var ADV='(?:always|usually|often|rarely|never|sometimes|hardly ever)';
+var TIMEX=/\b(?:every (?:day|week|month|year|morning|evening)|(?:once|twice) a (?:day|week|month|year)|(?:three|four|five|six|\d+) times a (?:day|week|month|year))\b/i;
+var ADVRE=new RegExp('\\b'+ADV+'\\b','i');
+
+/* ---------- tabs and progress ---------- */
+var state={};
+var tabsEl=$('#tabs'), mount=$('#exercises');
+var TITLES=['True / False','Drag & Drop','Fill in the gaps','Sentence Builder','Rephrase','Write about yourself','Two truths and a lie','Error hunt race','Я могу…'];
+TITLES.forEach(function(t,i){
+  var b=document.createElement('button');
+  b.type='button';b.className='tab';b.id='tab'+(i+1);b.textContent=String(i+1);b.title=t;b.setAttribute('aria-label','Упражнение '+(i+1)+': '+t);
+  b.addEventListener('click',function(){
+    var el=document.getElementById('ex'+(i+1));
+    var calm=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    el.scrollIntoView({behavior:calm?'auto':'smooth',block:'start'});
+  });
+  tabsEl.appendChild(b);
+});
+function paintTab(n){var b=$('#tab'+n);if(!b)return;var s=state[n]||{};b.classList.toggle('done',!!s.done);b.classList.toggle('perfect',!!s.perfect);}
+function mark(n,perfect){state[n]={done:true,perfect:!!perfect};paintTab(n);}
+function unmark(n){delete state[n];paintTab(n);}
+
+/* ---------- shell ---------- */
+function shell(n,title,tag,instr,o){
+  o=o||{};
+  var sec=document.createElement('section');
+  sec.className='ex';sec.id='ex'+n;sec.setAttribute('aria-labelledby','h'+n);
+  var foot='';
+  if(o.foot!==false){
+    foot='<div class="ex-foot"><button type="button" class="btn" data-act="check">'+(o.check||'Проверить')+'</button>'+
+      (o.show===false?'':'<button type="button" class="btn ghost" data-act="show">'+(o.show||'Показать ответы')+'</button>')+
+      '<button type="button" class="btn ghost" data-act="reset">'+(o.reset||'Сначала')+'</button></div>';
+  }
+  sec.innerHTML='<header class="ex-head"><span class="ex-num">'+n+'</span><div><h2 id="h'+n+'">'+esc(title)+'</h2><p class="ex-tag">'+esc(tag)+'</p></div></header>'+
+    '<p class="ex-instr">'+instr+'</p><div class="ex-body"></div>'+foot+'<p class="result" role="status" aria-live="polite"></p>';
+  mount.appendChild(sec);
+  var api={sec:sec,body:$('.ex-body',sec),res:$('.result',sec),hooks:{}};
+  api.say=function(t,k){api.res.textContent=t;api.res.className='result '+(k||'');};
+  sec.addEventListener('click',function(e){
+    var b=e.target.closest('[data-act]');
+    if(!b||!sec.contains(b))return;
+    var f=api.hooks[b.getAttribute('data-act')];
+    if(f)f();
+  });
+  return api;
+}
+function score(sh,n,total,n_ex){
+  var k=n===total?'good':(n>=total/2?'info':'bad');
+  var msg=n+' из '+total+' верно.';
+  if(n===total)msg+=' Всё правильно!';
+  else msg+=' Прочитай объяснения под ответами.';
+  sh.say(msg,k);
+  mark(n_ex,n===total);
+}
+
+/* ---------- 1. True / False ---------- */
+(function(){
+  var sh=shell(1,'True / False','8 предложений · проверка по правилу','Верно ли предложение по правилу о месте наречия? Выбери <b>True</b> или <b>False</b>.');
+  var D=[
+    {s:'I hardly ever drink water.',a:true,e:'hardly ever стоит перед сказуемым drink.'},
+    {s:'I often am tired.',a:false,e:'После глагола to be наречие стоит после него: I am often tired.'},
+    {s:"I don't hardly ever go swimming.",a:false,e:"hardly ever, rarely и never уже имеют отрицательный смысл, поэтому в отрицательных предложениях их не используют: I hardly ever go swimming."},
+    {s:'I can always sing.',a:true,e:'После модального глагола can наречие стоит перед основным глаголом sing.'},
+    {s:'Once a month he sends flowers.',a:true,e:'Выражения вроде once a month можно поставить в начало предложения.'},
+    {s:'We every day work together.',a:false,e:'every day стоит в начале или в конце, но не в середине: Every day we work together. / We work together every day.'},
+    {s:'I drink milk usually.',a:false,e:'usually стоит в начале предложения или перед сказуемым: Usually I drink milk. / I usually drink milk.'},
+    {s:'Sometimes, I see my aunt.',a:true,e:'sometimes может стоять в начале предложения (после него допустима запятая).'}
+  ];
+  var ans=D.map(function(){return null;});
+  sh.body.innerHTML=D.map(function(d,i){
+    return '<div class="q" data-i="'+i+'"><div class="q-row"><span class="q-text">'+esc(d.s)+'</span><span class="tf"><button type="button" class="tfb" data-v="1">True</button><button type="button" class="tfb" data-v="0">False</button></span></div><p class="expl"></p></div>';
+  }).join('');
+  var qs=$$('.q',sh.body);
+  function paint(rev){
+    qs.forEach(function(q,i){
+      $$('.tfb',q).forEach(function(b){b.classList.toggle('sel',ans[i]!==null&&(b.getAttribute('data-v')==='1')===ans[i]);});
+      q.classList.remove('ok','no','rev');
+      if(rev){
+        var d=D[i];
+        q.classList.add(ans[i]===d.a?'ok':'no','rev');
+        $('.expl',q).innerHTML='<b>'+(d.a?'True':'False')+'.</b> '+esc(d.e);
+      }
+    });
+  }
+  sh.body.addEventListener('click',function(e){
+    var b=e.target.closest('.tfb');if(!b)return;
+    var i=+b.closest('.q').getAttribute('data-i');
+    ans[i]=b.getAttribute('data-v')==='1';
+    paint(false);sh.say('');
+  });
+  sh.hooks.check=function(){
+    var n=0;D.forEach(function(d,i){if(ans[i]===d.a)n++;});
+    paint(true);score(sh,n,D.length,1);
+  };
+  sh.hooks.show=function(){ans=D.map(function(d){return d.a;});paint(true);sh.say('Ответы показаны.','info');mark(1,false);};
+  sh.hooks.reset=function(){ans=D.map(function(){return null;});paint(false);sh.say('');unmark(1);};
+})();
+
+/* ---------- 2. Drag & Drop ---------- */
+(function(){
+  var sh=shell(2,'Drag & Drop','8 слов · три категории','Перетащи слово в нужную категорию. На телефоне нажми на слово, потом на категорию.');
+  var C=[
+    {id:'before',n:'Перед сказуемым',s:'после to be, вспомогательных и модальных'},
+    {id:'edge',n:'В начале или в конце',s:'в середину предложения не ставим'},
+    {id:'flex',n:'Несколько позиций',s:'начало · перед сказуемым · иногда конец'}
+  ];
+  var D=[
+    {w:'never',c:'before',e:'Перед сказуемым: He never eats meat. После to be: He is never late.'},
+    {w:'hardly ever',c:'before',e:'Перед сказуемым: I hardly ever drink water. В отрицательных предложениях не используется.'},
+    {w:'always',c:'before',e:'Перед сказуемым или после to be и can: I am always on time. I can always sing.'},
+    {w:'every day',c:'edge',e:'В начале или в конце: Every day we work. / We work every day.'},
+    {w:'once a year',c:'edge',e:'В начале или в конце: Once a year we travel. / We travel once a year.'},
+    {w:'three times a week',c:'edge',e:'В начале или в конце: I swim three times a week.'},
+    {w:'usually',c:'flex',e:'В начале или перед сказуемым: Usually I drink milk. / I usually drink milk.'},
+    {w:'sometimes',c:'flex',e:'В начале, перед сказуемым или в конце: Sometimes I see my aunt. / I see my aunt sometimes.'}
+  ];
+  var place=D.map(function(){return 'pool';});
+  var order=shuffle(range(D.length));
+  var sel=-1,judged=false;
+  sh.body.innerHTML='<div class="zone" data-z="pool"><h4>Слова</h4><div class="zl"></div></div>'+
+    '<div class="zones">'+C.map(function(c){return '<div class="zone" data-z="'+c.id+'"><h4>'+esc(c.n)+'</h4><p class="zs">'+esc(c.s)+'</p><div class="zl"></div></div>';}).join('')+'</div><div class="dd-expl"></div>';
+  var expl=$('.dd-expl',sh.body);
+  function render(){
+    $$('.zl',sh.body).forEach(function(z){z.innerHTML='';});
+    order.forEach(function(i){
+      var b=document.createElement('button');
+      b.type='button';b.className='chip';b.textContent=D[i].w;b.draggable=true;b.setAttribute('data-i',i);
+      if(sel===i)b.classList.add('sel');
+      if(judged&&place[i]!=='pool')b.classList.add(place[i]===D[i].c?'ok':'no');
+      $('[data-z="'+place[i]+'"] .zl',sh.body).appendChild(b);
+    });
+  }
+  function catName(id){return C.filter(function(c){return c.id===id;})[0].n;}
+  function explain(){
+    expl.innerHTML=D.map(function(d){return '<p><b>'+esc(d.w)+'</b> → '+esc(catName(d.c))+'. '+esc(d.e)+'</p>';}).join('');
+  }
+  function move(i,z){place[i]=z;sel=-1;judged=false;expl.innerHTML='';sh.say('');render();}
+  sh.body.addEventListener('click',function(e){
+    var chip=e.target.closest('.chip');
+    if(chip){
+      var i=+chip.getAttribute('data-i');
+      if(sel>=0&&sel!==i){move(sel,chip.closest('.zone').getAttribute('data-z'));}
+      else{sel=(sel===i)?-1:i;render();}
+      return;
+    }
+    var z=e.target.closest('.zone');
+    if(z&&sel>=0)move(sel,z.getAttribute('data-z'));
+  });
+  sh.body.addEventListener('dragstart',function(e){
+    var chip=e.target.closest('.chip');if(!chip)return;
+    e.dataTransfer.setData('text/plain',chip.getAttribute('data-i'));
+    e.dataTransfer.effectAllowed='move';
+  });
+  sh.body.addEventListener('dragover',function(e){
+    var z=e.target.closest('.zone');if(!z)return;
+    e.preventDefault();z.classList.add('over');
+  });
+  sh.body.addEventListener('dragleave',function(e){
+    var z=e.target.closest('.zone');if(z&&!z.contains(e.relatedTarget))z.classList.remove('over');
+  });
+  sh.body.addEventListener('drop',function(e){
+    var z=e.target.closest('.zone');if(!z)return;
+    e.preventDefault();z.classList.remove('over');
+    var i=parseInt(e.dataTransfer.getData('text/plain'),10);
+    if(!isNaN(i))move(i,z.getAttribute('data-z'));
+  });
+  sh.hooks.check=function(){
+    var n=0;D.forEach(function(d,i){if(place[i]===d.c)n++;});
+    sel=-1;judged=true;render();explain();
+    var left=place.filter(function(p){return p==='pool';}).length;
+    if(left){sh.say('Не все слова размещены ('+left+' осталось). Верно: '+n+' из '+D.length+'.','info');mark(2,false);}
+    else score(sh,n,D.length,2);
+  };
+  sh.hooks.show=function(){place=D.map(function(d){return d.c;});sel=-1;judged=true;render();explain();sh.say('Ответы показаны.','info');mark(2,false);};
+  sh.hooks.reset=function(){place=D.map(function(){return 'pool';});sel=-1;judged=false;expl.innerHTML='';sh.say('');render();unmark(2);};
+  render();
+})();
+
+/* ---------- 3. Fill in the gaps ---------- */
+(function(){
+  var sh=shell(3,'Fill in the gaps','8 предложений · отметь все возможные места','Нажми на кружок между словами, куда можно поставить наречие. Отметь <b>все</b> возможные места: их может быть одно, два или три.');
+  var D=[
+    {adv:'usually',w:['I','drink','milk'],ok:[0,1],e:'usually стоит в начале предложения или перед сказуемым. В конце его не ставят.'},
+    {adv:'sometimes',w:['I','see','my','aunt'],ok:[0,1,4],e:'sometimes можно поставить в начале, перед сказуемым или в конце.'},
+    {adv:'always',w:['I','can','sing'],ok:[2],e:'always стоит после модального глагола can и перед основным глаголом sing.'},
+    {adv:'often',w:['She','is','tired'],ok:[2],e:'После глагола to be: She is often tired.'},
+    {adv:'hardly ever',w:['He','drinks','water'],ok:[1],e:'hardly ever стоит перед сказуемым: He hardly ever drinks water.'},
+    {adv:'once a month',w:['He','sends','flowers'],ok:[0,3],e:'Выражения вроде once a month стоят в начале или в конце предложения.'},
+    {adv:'never',w:['They','have','been','late'],ok:[2],e:'never стоит после вспомогательного глагола have: They have never been late.'},
+    {adv:'every day',w:['We','work','together'],ok:[0,3],e:'every day стоит в начале или в конце: Every day we work together. / We work together every day.'}
+  ];
+  function build(w,adv,g){
+    var a=w.slice();
+    if(g===0){
+      var f=a[0]==='I'?'I':a[0].charAt(0).toLowerCase()+a[0].slice(1);
+      var cap=adv.charAt(0).toUpperCase()+adv.slice(1);
+      return cap+' '+[f].concat(a.slice(1)).join(' ')+'.';
+    }
+    a.splice(g,0,adv);return a.join(' ')+'.';
+  }
+  var sel=D.map(function(){return {};});
+  var judged=D.map(function(){return false;});
+  sh.body.innerHTML=D.map(function(d,i){
+    return '<div class="q" data-i="'+i+'"><p class="q-label">Вставь: <b>'+esc(d.adv)+'</b></p><div class="sent"></div><p class="expl"></p></div>';
+  }).join('');
+  var qs=$$('.q',sh.body);
+  function paint(i){
+    var d=D[i],q=qs[i],h='';
+    for(var g=0;g<=d.w.length;g++){
+      var on=!!sel[i][g],cls='gap';
+      if(on)cls+=' on';
+      var isOk=d.ok.indexOf(g)>=0;
+      if(judged[i]){
+        if(on)cls+=isOk?' good':' wrong';
+        else if(isOk)cls+=' miss';
+      }
+      h+='<button type="button" class="'+cls+'" data-g="'+g+'" aria-label="Поставить '+esc(d.adv)+' '+(g<d.w.length?'перед словом '+esc(d.w[g]):'в конце')+'" aria-pressed="'+on+'">'+(on||(judged[i]&&isOk)?esc(d.adv):'+')+'</button>';
+      if(g<d.w.length)h+='<span>'+esc(d.w[g])+'</span>';
+    }
+    $('.sent',q).innerHTML=h;
+    q.classList.remove('ok','no','rev');
+  }
+  function verdict(i){
+    var d=D[i],q=qs[i];
+    var chosen=Object.keys(sel[i]).filter(function(k){return sel[i][k];}).map(Number).sort();
+    var good=chosen.length===d.ok.length&&chosen.every(function(g){return d.ok.indexOf(g)>=0;});
+    judged[i]=true;paint(i);
+    q.classList.add(good?'ok':'no','rev');
+    $('.expl',q).innerHTML='<b>Правильно:</b> '+d.ok.map(function(g){return esc(build(d.w,d.adv,g));}).join(' &nbsp;·&nbsp; ')+'<br>'+esc(d.e);
+    return good;
+  }
+  sh.body.addEventListener('click',function(e){
+    var b=e.target.closest('.gap');if(!b)return;
+    var i=+b.closest('.q').getAttribute('data-i'),g=+b.getAttribute('data-g');
+    sel[i][g]=!sel[i][g];judged[i]=false;paint(i);sh.say('');
+  });
+  sh.hooks.check=function(){var n=0;D.forEach(function(d,i){if(verdict(i))n++;});score(sh,n,D.length,3);};
+  sh.hooks.show=function(){D.forEach(function(d,i){sel[i]={};d.ok.forEach(function(g){sel[i][g]=true;});verdict(i);});sh.say('Ответы показаны.','info');mark(3,false);};
+  sh.hooks.reset=function(){D.forEach(function(d,i){sel[i]={};judged[i]=false;paint(i);});sh.say('');unmark(3);};
+  D.forEach(function(d,i){paint(i);});
+})();
+
+/* ---------- 4. Sentence Builder ---------- */
+(function(){
+  var sh=shell(4,'Sentence Builder','8 предложений · порядок слов','Собери предложение: нажимай на слова по порядку. Чтобы убрать слово, нажми на него в верхней строке. Заглавные буквы и точка не важны.');
+  var D=[
+    {w:['i','am','always','on','time'],acc:['I am always on time.'],e:'always стоит после глагола to be: am always.'},
+    {w:['she',"doesn't",'often','watch','TV'],acc:["She doesn't often watch TV."],e:"Наречие стоит после вспомогательного doesn't и перед основным глаголом watch."},
+    {w:['they','never','eat','fast','food'],acc:['They never eat fast food.'],e:'never стоит перед основным глаголом eat.'},
+    {w:['usually','I','walk','to','school'],acc:['Usually I walk to school.','I usually walk to school.'],e:'usually можно поставить в начало или перед сказуемым. В конец нельзя.'},
+    {w:['he','can','sometimes','cook','dinner'],acc:['He can sometimes cook dinner.','Sometimes he can cook dinner.','He can cook dinner sometimes.'],e:'sometimes подходит в начало, перед сказуемым (после can) и в конец.'},
+    {w:['I','go','to','the','gym','three','times','a','week'],acc:['I go to the gym three times a week.','Three times a week I go to the gym.'],e:'Выражение three times a week стоит в начале или в конце предложения.'},
+    {w:['my','sister','hardly','ever','calls','me'],acc:['My sister hardly ever calls me.'],e:'hardly ever стоит перед сказуемым calls.'},
+    {w:['we','have','always','lived','here'],acc:['We have always lived here.'],e:'always стоит после вспомогательного have и перед основным глаголом lived.'}
+  ];
+  var built=D.map(function(){return [];});
+  var order=D.map(function(d){return shuffle(range(d.w.length));});
+  var judged=D.map(function(){return false;});
+  sh.body.innerHTML=D.map(function(d,i){return '<div class="q" data-i="'+i+'"><div class="answer"></div><div class="bank"></div><p class="expl"></p></div>';}).join('');
+  var qs=$$('.q',sh.body);
+  function paint(i){
+    var d=D[i],q=qs[i];
+    $('.answer',q).innerHTML=built[i].length?built[i].map(function(wi,k){return '<button type="button" class="chip" data-k="'+k+'">'+esc(d.w[wi])+'</button>';}).join(''):'<span class="ph">нажимай на слова ниже</span>';
+    $('.bank',q).innerHTML=order[i].map(function(wi){return '<button type="button" class="chip'+(built[i].indexOf(wi)>=0?' used':'')+'" data-w="'+wi+'">'+esc(d.w[wi])+'</button>';}).join('');
+    q.classList.remove('ok','no','rev');
+  }
+  function verdict(i){
+    var d=D[i],q=qs[i];
+    var got=norm(built[i].map(function(wi){return d.w[wi];}).join(' '));
+    var good=d.acc.some(function(a){return norm(a)===got;});
+    paint(i);q.classList.add(good?'ok':'no','rev');
+    var h='<b>'+(good?'Верно.':'Правильно:')+'</b> '+d.acc.map(esc).join(' &nbsp;·&nbsp; ')+'<br>'+esc(d.e);
+    $('.expl',q).innerHTML=h;
+    return good;
+  }
+  sh.body.addEventListener('click',function(e){
+    var c=e.target.closest('.chip');if(!c)return;
+    var i=+c.closest('.q').getAttribute('data-i');
+    if(c.hasAttribute('data-w'))built[i].push(+c.getAttribute('data-w'));
+    else built[i].splice(+c.getAttribute('data-k'),1);
+    paint(i);sh.say('');
+  });
+  sh.hooks.check=function(){var n=0;D.forEach(function(d,i){if(verdict(i))n++;});score(sh,n,D.length,4);};
+  sh.hooks.show=function(){
+    D.forEach(function(d,i){
+      var used={},toks=norm(d.acc[0]).split(' ');
+      built[i]=toks.map(function(t){
+        for(var k=0;k<d.w.length;k++){if(!used[k]&&norm(d.w[k])===t){used[k]=true;return k;}}
+        return 0;
+      });
+      verdict(i);
+    });
+    sh.say('Ответы показаны.','info');mark(4,false);
+  };
+  sh.hooks.reset=function(){D.forEach(function(d,i){built[i]=[];paint(i);});sh.say('');unmark(4);};
+  D.forEach(function(d,i){paint(i);});
+})();
+
+/* ---------- 5. Rephrase ---------- */
+(function(){
+  var sh=shell(5,'Rephrase','8 предложений · перепиши по заданию','Перепиши предложение так, как сказано в задании. Заглавные буквы и точка не важны.');
+  var D=[
+    {src:'I go to the cinema twice a month.',task:'Начни предложение с «Twice a month».',acc:['Twice a month I go to the cinema.'],e:'Выражения вроде twice a month можно поставить в начало предложения.'},
+    {src:'I am tired. (often)',task:'Добавь наречие often.',acc:['I am often tired.'],e:'После глагола to be: am often.'},
+    {src:'She can sing. (always)',task:'Добавь наречие always.',acc:['She can always sing.'],e:'После модального глагола can, перед основным глаголом sing.'},
+    {src:"I don't go for a walk. (often)",task:'Добавь наречие often.',acc:["I don't often go for a walk.","I do not often go for a walk."],e:"После вспомогательного don't, перед основным глаголом go."},
+    {src:'We work together every day.',task:'Начни предложение с «Every day».',acc:['Every day we work together.'],e:'every day стоит в начале или в конце предложения.'},
+    {src:'I never go swimming.',task:'Замени never на hardly ever.',acc:['I hardly ever go swimming.'],e:'hardly ever стоит перед сказуемым. Отрицание don\'t здесь не нужно: наречие уже отрицательное по смыслу.'},
+    {src:'Sometimes, I see my aunt.',task:'Поставь sometimes перед сказуемым.',acc:['I sometimes see my aunt.'],e:'sometimes стоит перед глаголом see.'},
+    {src:'I drink milk. (usually)',task:'Поставь usually в начало предложения.',acc:['Usually I drink milk.'],e:'usually можно поставить в начало или перед сказуемым. В конец нельзя.'}
+  ];
+  sh.body.innerHTML=D.map(function(d,i){
+    return '<div class="q" data-i="'+i+'"><p class="src"><b>'+esc(d.src)+'</b></p><p class="q-label">'+esc(d.task)+'</p><input class="txt" id="rp'+i+'" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" aria-label="Ответ к предложению '+(i+1)+'"><p class="expl"></p></div>';
+  }).join('');
+  var qs=$$('.q',sh.body),ins=$$('.txt',sh.body);
+  function clear(i){qs[i].classList.remove('ok','no','rev');}
+  function verdict(i){
+    var d=D[i],q=qs[i];
+    var good=d.acc.some(function(a){return norm(a)===norm(ins[i].value);});
+    q.classList.remove('ok','no');q.classList.add(good?'ok':'no','rev');
+    $('.expl',q).innerHTML='<b>'+(good?'Верно.':'Правильно:')+'</b> '+d.acc.map(esc).join(' &nbsp;·&nbsp; ')+'<br>'+esc(d.e);
+    return good;
+  }
+  ins.forEach(function(inp,i){inp.addEventListener('input',function(){clear(i);sh.say('');});});
+  sh.hooks.check=function(){var n=0;D.forEach(function(d,i){if(verdict(i))n++;});score(sh,n,D.length,5);};
+  sh.hooks.show=function(){D.forEach(function(d,i){ins[i].value=d.acc[0];verdict(i);});sh.say('Ответы показаны.','info');mark(5,false);};
+  sh.hooks.reset=function(){D.forEach(function(d,i){ins[i].value='';clear(i);});sh.say('');unmark(5);};
+})();
+
+/* ---------- shared sentence judge (exercises 6 and 7) ---------- */
+function judge(raw){
+  var s=raw.replace(/[’‘]/g,"'").trim();
+  if(!s)return {k:'empty'};
+  if(!ADVRE.test(s)&&!TIMEX.test(s))return {k:'none',m:'Добавь наречие частотности или выражение вроде every day / twice a month.'};
+  if(/\b(?:don't|doesn't|didn't|do not|does not)\s+(?:hardly ever|never|rarely)\b/i.test(s))return {k:'bad',m:'hardly ever, rarely и never уже имеют отрицательный смысл. В отрицательных предложениях их не используют.'};
+  if(/\b(?:i|we|you|they|he|she)\s+(?:always|often|never|rarely|hardly ever|usually|sometimes)\s+(?:am|is|are|can|could|will|must|should)\b/i.test(s))return {k:'bad',m:'После to be и модальных глаголов наречие стоит после них: I am often tired. I can always sing.'};
+  if(/\busually\s*[.!?]*$/i.test(s))return {k:'bad',m:'usually стоит в начале предложения или перед сказуемым, но не в конце.'};
+  if(/\b(?:always|often|never|rarely|hardly ever)\s*[.!?]*$/i.test(s)||/^(?:always|often|never|rarely|hardly ever)\b/i.test(s))return {k:'bad',m:'always, often, never, rarely и hardly ever не стоят в начале или в конце предложения. Поставь наречие перед сказуемым.'};
+  return {k:'ok'};
+}
+
+/* ---------- 6. Write about yourself ---------- */
+(function(){
+  var sh=shell(6,'Write about yourself','5 предложений о себе · счётчик структур','Напиши 5 предложений о себе. В них должны встретиться все пять структур. Счётчик отмечает, сколько уже использовано. Это автоматическая проверка: она ищет структуры, а не оценивает каждое слово.',{check:'Проверить',show:'Показать пример',reset:'Очистить'});
+  var A=ADV;
+  var S=[
+    {l:'Наречие перед основным глаголом',h:'I usually get up at seven.',re:new RegExp("\\b(?:i|we|you|they|he|she)\\s+"+A+"\\s+(?!am\\b|is\\b|are\\b|can\\b|could\\b|will\\b|would\\b|must\\b|should\\b|may\\b|might\\b|do\\b|does\\b|did\\b|was\\b|were\\b)[a-z]+","i")},
+    {l:'Наречие после am / is / are',h:'I am often tired in the morning.',re:new RegExp("\\b(?:am|is|are)\\s+"+A+"\\b","i")},
+    {l:'Наречие после can, don\'t, have…',h:'I can always find my keys.',re:new RegExp("\\b(?:can|could|will|would|must|should|may|might|have|has|do|does|don't|doesn't|can't|haven't|hasn't)\\s+"+A+"\\b","i")},
+    {l:'every day / once a week / twice a month / three times a week',h:'I go to the gym twice a week.',re:TIMEX},
+    {l:'Предложение начинается с Usually или Sometimes',h:'Sometimes I see my friends after work.',re:/(?:^|[.!?])\s*(?:usually|sometimes)\b/im}
+  ];
+  var SAMPLE='I usually get up at seven. I am often tired in the morning. I can always find my keys. I go to the gym twice a week. Sometimes I see my friends after work.';
+  sh.body.innerHTML='<textarea class="area" id="about-text" placeholder="Пиши по-английски, каждое предложение с точкой." aria-label="Пять предложений о себе"></textarea>'+
+    '<div class="counter"><span id="c-sent"></span><span id="c-struct"></span></div>'+
+    '<ul class="struct" id="struct">'+S.map(function(s){return '<li><i>✓</i><span>'+esc(s.l)+'<small>'+esc(s.h)+'</small></span></li>';}).join('')+'</ul>'+
+    '<ul class="notes" id="notes" hidden></ul><p class="sample" id="sample" hidden></p>';
+  var ta=$('#about-text',sh.body),cS=$('#c-sent',sh.body),cT=$('#c-struct',sh.body),lis=$$('#struct li',sh.body),notes=$('#notes',sh.body),sample=$('#sample',sh.body);
+  function sentences(t){return t.split(/[.!?\n]+/).map(function(x){return x.trim();}).filter(function(x){return x.length>2&&/[a-z]/i.test(x);});}
+  function eval_(){
+    var t=ta.value.replace(/[’‘]/g,"'");
+    var sents=sentences(t);
+    var hit=S.map(function(s){return s.re.test(t);});
+    lis.forEach(function(li,i){li.classList.toggle('on',hit[i]);});
+    var used=hit.filter(Boolean).length;
+    cS.textContent='Предложений: '+sents.length+' / 5';
+    cT.textContent='Структур: '+used+' / 5';
+    return {sents:sents,hit:hit,used:used};
+  }
+  ta.addEventListener('input',function(){eval_();sh.say('');notes.hidden=true;});
+  sh.hooks.check=function(){
+    var r=eval_(),probs=[];
+    r.sents.forEach(function(s){var j=judge(s);if(j.k==='bad')probs.push('«'+s+'». '+j.m);});
+    notes.innerHTML=probs.map(function(p){return '<li>'+esc(p)+'</li>';}).join('');
+    notes.hidden=!probs.length;
+    var miss=[];S.forEach(function(s,i){if(!r.hit[i])miss.push(s.l);});
+    if(r.sents.length<5){sh.say('Нужно ещё предложений: '+(5-r.sents.length)+'.','info');mark(6,false);}
+    else if(miss.length){sh.say('Не хватает структур: '+miss.length+'. Загляни в список выше.','info');mark(6,false);}
+    else if(probs.length){sh.say('Структуры на месте, но проверь предложения с замечаниями.','bad');mark(6,false);}
+    else{sh.say('Отлично! Пять предложений, все структуры использованы.','good');mark(6,true);}
+  };
+  sh.hooks.show=function(){
+    sample.hidden=false;
+    sample.innerHTML='<b>Пример:</b> '+esc(SAMPLE);
+    sh.say('Пример показан. Свой текст я не трогаю.','info');
+  };
+  sh.hooks.reset=function(){ta.value='';notes.hidden=true;sample.hidden=true;eval_();sh.say('');unmark(6);};
+  eval_();
+})();
+
+/* ---------- 7. Two truths and a lie ---------- */
+(function(){
+  var sh=shell(7,'Two truths and a lie','6 карточек + твои предложения','Прочитай факты о человеке. Два предложения верные, одно ложное. Нажми на ложное. Потом придумай свои три предложения.',{check:'Проверить карточки',show:'Показать ответы',reset:'Сначала'});
+  var D=[
+    {n:'Max',f:['Кофе — никогда','Спортзал — 3 раза в неделю','Опаздывает на работу — почти никогда','Готовит ужин — иногда'],s:['Max never drinks coffee.','Max goes to the gym three times a week.','Max is often late for work.'],lie:2,e:'Max is <b>hardly ever</b> late («почти никогда»), а often значит «часто». Позиция верная: наречие после is.'},
+    {n:'Olga',f:['Чай — каждый день','Кино — два раза в месяц','Спит до обеда — никогда','Готовит ужин — иногда'],s:['Olga usually sleeps until noon.','Olga drinks tea every day.','Twice a month Olga goes to the cinema.'],lie:0,e:'Olga <b>never</b> sleeps until noon. Usually («обычно») не совпадает с фактом.'},
+    {n:'Tom',f:['Бегает — каждый день','Овощи ест — всегда','Смотрит ТВ — редко','Звонит маме — раз в неделю'],s:['Tom runs every day.','Tom calls his mom once a year.','Tom rarely watches TV.'],lie:1,e:'Tom calls his mom <b>once a week</b>, а не once a year.'},
+    {n:'Ben',f:['Ездит на метро — обычно','Ходит в музей — раз в год','Плавает — часто','Пьёт воду — всегда'],s:['Ben usually takes the metro.','Ben goes to the museum once a year.','Ben hardly ever swims.'],lie:2,e:'Ben <b>often</b> swims. Hardly ever значит «почти никогда».'},
+    {n:'Mia',f:['Цветы покупает — раз в месяц','Танцует — иногда','Сладкое ест — почти никогда','Читает — каждый день'],s:['Mia buys flowers once a month.','Mia always dances.','Mia reads every day.'],lie:1,e:'Mia <b>sometimes</b> dances. Always («всегда») сильнее, чем в факте.'},
+    {n:'Pavel',f:['Звонит бабушке — 3 раза в неделю','Ужинает дома — обычно','Забывает ключи — никогда','Ходит пешком — иногда'],s:['Pavel never forgets his keys.','Pavel usually has dinner at home.','Pavel calls his grandma twice a month.'],lie:2,e:'Pavel calls his grandma <b>three times a week</b>, а не twice a month.'}
+  ];
+  var pick=D.map(function(){return -1;});
+  var html=D.map(function(d,i){
+    return '<div class="q" data-i="'+i+'"><p class="q-label"><b>'+esc(d.n)+'</b></p><ul class="facts">'+d.f.map(function(x){return '<li>'+esc(x)+'</li>';}).join('')+'</ul><div class="opts">'+d.s.map(function(s,k){return '<button type="button" class="opt" data-k="'+k+'">'+esc(s)+'</button>';}).join('')+'</div><p class="expl"></p></div>';
+  }).join('');
+  html+='<div class="own"><h3>Твой ход</h3><p class="q-label">Напиши три предложения о себе с наречиями частотности. Одно из них должно быть ложным. Отметь его справа и прочитай все три вслух: пусть партнёр или учитель угадает.</p>'+
+    [0,1,2].map(function(k){return '<div class="own-row"><input class="txt" id="own'+k+'" type="text" autocomplete="off" autocapitalize="sentences" spellcheck="false" aria-label="Моё предложение '+(k+1)+'"><label for="lie'+k+'"><input type="radio" name="lie" id="lie'+k+'"> ложное</label><p class="own-res" id="ores'+k+'"></p></div>';}).join('')+
+    '<div class="own-actions"><button type="button" class="btn" id="own-check">Проверить мои предложения</button><button type="button" class="btn ghost" id="own-demo">Пример</button></div><p class="result" id="own-sum" role="status" aria-live="polite"></p></div>';
+  sh.body.innerHTML=html;
+  var qs=$$('.q',sh.body);
+  function paint(rev){
+    qs.forEach(function(q,i){
+      var d=D[i];
+      $$('.opt',q).forEach(function(b,k){
+        b.className='opt'+(pick[i]===k?' sel':'');
+        if(rev){if(k===d.lie)b.classList.add('lie');else b.classList.add('truth');}
+      });
+      q.classList.remove('ok','no','rev');
+      if(rev){
+        q.classList.add(pick[i]===d.lie?'ok':'no','rev');
+        $('.expl',q).innerHTML='<b>Ложное:</b> '+esc(d.s[d.lie])+'<br>'+d.e+' Остальные два предложения верны.';
+      }
+    });
+  }
+  sh.body.addEventListener('click',function(e){
+    var b=e.target.closest('.opt');if(!b)return;
+    var i=+b.closest('.q').getAttribute('data-i');
+    pick[i]=+b.getAttribute('data-k');paint(false);sh.say('');
+  });
+  sh.hooks.check=function(){var n=0;D.forEach(function(d,i){if(pick[i]===d.lie)n++;});paint(true);score(sh,n,D.length,7);};
+  sh.hooks.show=function(){pick=D.map(function(d){return d.lie;});paint(true);sh.say('Ответы показаны.','info');mark(7,false);};
+  sh.hooks.reset=function(){pick=D.map(function(){return -1;});paint(false);sh.say('');unmark(7);};
+
+  var ownIn=[0,1,2].map(function(k){return $('#own'+k,sh.body);});
+  var ownRes=[0,1,2].map(function(k){return $('#ores'+k,sh.body);});
+  var ownLie=[0,1,2].map(function(k){return $('#lie'+k,sh.body);});
+  var sum=$('#own-sum',sh.body);
+  function sayOwn(t,k){sum.textContent=t;sum.className='result '+(k||'');}
+  function ownCheck(){
+    var okCount=0,filled=0;
+    ownIn.forEach(function(inp,k){
+      var j=judge(inp.value),r=ownRes[k];
+      if(j.k==='empty'){r.textContent='';r.className='own-res';return;}
+      filled++;
+      if(j.k==='ok'){okCount++;r.textContent='Порядок слов верный.';r.className='own-res good';}
+      else{r.textContent=j.m;r.className='own-res '+(j.k==='bad'?'bad':'info');}
+    });
+    var lie=ownLie.some(function(x){return x.checked;});
+    if(filled<3)sayOwn('Напиши все три предложения.','info');
+    else if(!lie)sayOwn('Отметь, какое из предложений ложное.','info');
+    else if(okCount===3)sayOwn('Готово! Теперь прочитай их вслух и дай угадать, какое ложное.','good');
+    else sayOwn('Исправь предложения с замечаниями и проверь снова.','bad');
+  }
+  $('#own-check',sh.body).addEventListener('click',ownCheck);
+  $('#own-demo',sh.body).addEventListener('click',function(){
+    var ex=['I never eat breakfast.','I go to the gym twice a week.','Sometimes I cook for my friends.'];
+    ex.forEach(function(s,k){ownIn[k].value=s;});
+    ownLie[0].checked=true;
+    ownCheck();
+    sayOwn('Пример: ложным я отметил первое предложение. Теперь придумай свои.','info');
+  });
+  ownIn.forEach(function(inp,k){inp.addEventListener('input',function(){ownRes[k].textContent='';ownRes[k].className='own-res';sayOwn('');});});
+})();
+
+/* ---------- 8. Error hunt race ---------- */
+(function(){
+  var LIMIT=120;
+  var sh=shell(8,'Error hunt race','10 предложений · 120 секунд','Нажми «Старт». В каждом предложении нажми на слово или группу слов, которые стоят не на месте. Если предложение верное, ничего не нажимай. Потом нажми «Готово».',{check:'Готово',show:'Показать ответы',reset:'Заново'});
+  var D=[
+    {t:['She','can','always','sing.'],err:null,e:'always стоит после модального can. Всё верно.'},
+    {t:['I','often','am','tired.'],err:1,fix:'I am often tired.',e:'После глагола to be наречие ставится после него.'},
+    {t:['We','work','together','every day.'],err:null,e:'every day в конце предложения. Всё верно.'},
+    {t:['I',"don't",'hardly ever','go','swimming.'],err:2,fix:'I hardly ever go swimming.',e:'hardly ever не используют в отрицательных предложениях: наречие уже отрицательное по смыслу.'},
+    {t:['Usually','I','drink','milk.'],err:null,e:'usually в начале предложения. Всё верно.'},
+    {t:['He','goes','sometimes','to the cinema.'],err:2,fix:'He sometimes goes to the cinema.',e:'sometimes стоит в начале, перед сказуемым или в конце, но не между глаголом и дополнением.'},
+    {t:['He','sends','twice a month','flowers.'],err:2,fix:'He sends flowers twice a month.',e:'twice a month стоит в начале или в конце предложения.'},
+    {t:['I','see','my','aunt','sometimes.'],err:null,e:'sometimes в конце предложения. Всё верно.'},
+    {t:['They','never','are','late.'],err:1,fix:'They are never late.',e:'После глагола to be наречие ставится после него.'},
+    {t:['I','always','can','sing.'],err:1,fix:'I can always sing.',e:'После модального глагола can наречие ставится после него, перед основным глаголом.'}
+  ];
+  var flag=D.map(function(){return -1;});
+  var running=false,finished=false,t0=0,tid=null;
+  sh.body.innerHTML='<div class="race-bar"><button type="button" class="btn" id="race-start">Старт</button><span class="timer" id="race-timer" aria-live="off">02:00</span><span class="race-hint">Ошибок в списке не больше, чем верных предложений. Считай внимательно.</span></div>'+
+    '<div class="race-list locked" id="race-list">'+D.map(function(d,i){
+      return '<div class="q" data-i="'+i+'"><div class="sent">'+d.t.map(function(w,j){return '<button type="button" class="tok" data-j="'+j+'" aria-pressed="false">'+esc(w)+'</button>';}).join('')+'</div><p class="expl"></p></div>';
+    }).join('')+'</div>';
+  var list=$('#race-list',sh.body),timerEl=$('#race-timer',sh.body),startBtn=$('#race-start',sh.body),qs=$$('.q',list);
+  function fmt(s){var m=Math.floor(s/60),r=s%60;return (m<10?'0':'')+m+':'+(r<10?'0':'')+r;}
+  function paint(){
+    D.forEach(function(d,i){
+      var q=qs[i];
+      q.classList.remove('ok','no','rev');
+      $$('.tok',q).forEach(function(b,j){
+        b.className='tok';
+        b.setAttribute('aria-pressed',flag[i]===j?'true':'false');
+        if(flag[i]===j)b.classList.add('flag');
+        if(finished){
+          if(d.err===j)b.classList.add(flag[i]===j?'hit':'miss');
+          else if(flag[i]===j)b.classList.add('wrong');
+        }
+      });
+      if(finished){
+        var right=(d.err===null&&flag[i]===-1)||(d.err!==null&&flag[i]===d.err);
+        q.classList.add(right?'ok':'no','rev');
+        $('.expl',q).innerHTML=d.err===null?'<b>Верно.</b> '+esc(d.e):'<b>Ошибка:</b> '+esc(d.t[d.err])+' → <b>'+esc(d.fix)+'</b><br>'+esc(d.e);
+      }
+    });
+  }
+  function stop(){if(tid){clearInterval(tid);tid=null;}running=false;}
+  function used(){return Math.min(LIMIT,Math.floor((Date.now()-t0)/1000));}
+  function grade(secs){
+    var n=0;
+    D.forEach(function(d,i){if((d.err===null&&flag[i]===-1)||(d.err!==null&&flag[i]===d.err))n++;});
+    finished=true;list.classList.remove('locked');paint();
+    var msg=n+' из '+D.length+' за '+fmt(secs)+'.';
+    sh.say(n===D.length?msg+' Без единой ошибки!':msg+' Прочитай разбор под предложениями.',n===D.length?'good':(n>=7?'info':'bad'));
+    mark(8,n===D.length);
+  }
+  function tick(){
+    var left=Math.max(0,LIMIT-used());
+    timerEl.textContent=fmt(left);
+    if(left<=0){stop();grade(LIMIT);}
+  }
+  startBtn.addEventListener('click',function(){
+    if(running||finished)return;
+    running=true;t0=Date.now();list.classList.remove('locked');startBtn.disabled=true;sh.say('');
+    timerEl.textContent=fmt(LIMIT);tid=setInterval(tick,250);
+  });
+  list.addEventListener('click',function(e){
+    var b=e.target.closest('.tok');if(!b||!running)return;
+    var i=+b.closest('.q').getAttribute('data-i'),j=+b.getAttribute('data-j');
+    flag[i]=(flag[i]===j)?-1:j;paint();
+  });
+  sh.hooks.check=function(){
+    if(finished){sh.say('Попытка уже завершена. Нажми «Заново», чтобы повторить.','info');return;}
+    if(!running){sh.say('Сначала нажми «Старт».','info');return;}
+    var s=used();stop();grade(s);
+  };
+  sh.hooks.show=function(){
+    stop();finished=true;startBtn.disabled=true;
+    flag=D.map(function(d){return d.err===null?-1:d.err;});
+    list.classList.remove('locked');paint();
+    sh.say('Ответы показаны.','info');mark(8,false);
+  };
+  sh.hooks.reset=function(){
+    stop();finished=false;flag=D.map(function(){return -1;});
+    list.classList.add('locked');startBtn.disabled=false;timerEl.textContent=fmt(LIMIT);
+    paint();sh.say('');unmark(8);
+  };
+})();
+
+/* ---------- 9. Self-assessment ---------- */
+(function(){
+  var sh=shell(9,'Я могу…','Самооценка · отметь, что уже получается','Отметь всё, что у тебя получается. Отметки сохраняются на этом устройстве.',{foot:false});
+  var KEY='adv-freq-selfcheck';
+  var D=[
+    'назвать наречия always, usually, often, sometimes, rarely, hardly ever, never и сказать, как часто это происходит',
+    'поставить always, often, never перед основным глаголом',
+    'поставить наречие после глагола to be (I am often tired)',
+    'поставить наречие после can или don\'t, перед основным глаголом (I can always sing)',
+    'не использовать hardly ever, rarely и never в отрицательных предложениях',
+    'поставить every day, once a month, three times a week в начало или в конец предложения',
+    'правильно поставить usually и sometimes',
+    'рассказать о своих привычках в пяти предложениях'
+  ];
+  var on=D.map(function(){return false;});
+  try{var raw=localStorage.getItem(KEY);if(raw){var arr=JSON.parse(raw);if(Array.isArray(arr))on=D.map(function(d,i){return !!arr[i];});}}catch(err){}
+  sh.body.innerHTML=D.map(function(t,i){return '<label class="chk" for="sc'+i+'"><input type="checkbox" id="sc'+i+'" data-i="'+i+'"><span>Я могу '+esc(t)+'.</span></label>';}).join('')+
+    '<div><div class="counter"><span id="sc-count"></span></div><div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="'+D.length+'"><span id="sc-bar"></span></div></div>';
+  var boxes=$$('input',sh.body),cnt=$('#sc-count',sh.body),bar=$('#sc-bar',sh.body),pb=$('.bar',sh.body);
+  function paint(){
+    var n=0;
+    boxes.forEach(function(b,i){b.checked=on[i];b.closest('.chk').classList.toggle('on',on[i]);if(on[i])n++;});
+    cnt.textContent='Я могу: '+n+' из '+D.length;
+    bar.style.width=(n/D.length*100)+'%';pb.setAttribute('aria-valuenow',n);
+    if(n===D.length){sh.say('Отлично! Ты уверенно ставишь наречия частотности.','good');}
+    else if(n>=5){sh.say('Хороший результат. Повтори упражнения по пунктам, которые не отмечены.','info');}
+    else if(n>0){sh.say('Начало положено. Вернись к правилу и упражнениям 1–3.','info');}
+    else sh.say('');
+    if(n>0)mark(9,n===D.length);else unmark(9);
+  }
+  sh.body.addEventListener('change',function(e){
+    var b=e.target.closest('input');if(!b)return;
+    on[+b.getAttribute('data-i')]=b.checked;
+    try{localStorage.setItem(KEY,JSON.stringify(on));}catch(err){}
+    paint();
+  });
+  paint();
+})();
+
+})();
+</script>
+
+</body></html>
