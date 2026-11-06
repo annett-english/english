@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Accessories – Review</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#f0fbff;--card:#fff;--tx:#1f2a44;--mut:#6b7a99;--bd:#d6e6f2;--ok:#1fa971;--no:#e5484d;--a:#00b8d9;--b:#7c5cff}
+@media (prefers-color-scheme:dark){:root{color-scheme:dark;--bg:#111826;--card:#1b2538;--tx:#eaf1ff;--mut:#a9b7d6;--bd:#2f3d59}}
+*{box-sizing:border-box}
+body{margin:0;font:16px/1.5 "Trebuchet MS",system-ui,sans-serif;background:var(--bg);color:var(--tx)}
+header{text-align:center;padding:26px 16px 10px;background:linear-gradient(135deg,var(--a),var(--b));color:#fff;border-radius:0 0 32px 32px}
+header h1{margin:0;font-size:clamp(24px,5vw,38px)}header p{margin:6px 0 12px;opacity:.92}
+header input{padding:8px 14px;border-radius:20px;border:0;width:min(260px,80%);font:inherit;margin-bottom:12px}
+.wrap{display:grid;grid-template-columns:1fr 220px;gap:20px;max-width:1000px;margin:20px auto;padding:0 14px}
+aside{position:sticky;top:12px;align-self:start;background:var(--card);border:2px dashed var(--no);border-radius:20px;padding:12px}
+aside h3{margin:0 0 8px;font-size:15px}
+.sec{background:var(--card);border:2px solid var(--bd);border-radius:24px;padding:18px;margin-bottom:20px;border-top:8px solid var(--c)}
+.sec h2{margin:0 0 4px;font-size:20px}.sec h2 b{background:var(--c);color:#fff;border-radius:50%;display:inline-grid;place-items:center;width:30px;height:30px;font-size:15px;margin-right:8px}
+.hint{color:var(--mut);margin:0 0 12px;font-size:14px}
+button{font:inherit;cursor:pointer;border:0;border-radius:14px;padding:8px 14px;background:var(--b);color:#fff;margin:3px 3px 3px 0}
+button:hover{transform:translateY(-2px)}button.g{background:var(--bd);color:var(--tx)}button.ok{background:var(--ok)}
+.chip{background:#ffe3e5;color:#8a1c22;border-radius:14px;padding:4px 10px;display:block;width:100%;text-align:left;margin:4px 0}.chip small{opacity:.7}
+input[type=text],select{font:inherit;color:var(--tx);background:var(--bg);border:2px solid var(--bd);border-radius:12px;padding:6px 10px}
+.row{display:flex;gap:10px;align-items:center;margin:8px 0;flex-wrap:wrap}.row>b{min-width:150px}
+.s{width:150px}.gap{width:130px;padding:1px 8px}
+.ok-i{border-color:var(--ok)!important;background:#dff7ec!important;color:#0b5c3a!important}.no-i{border-color:var(--no)!important;background:#ffe5e6!important;color:#8a1c22!important}
+.res{margin:8px 0;font-weight:bold}.text{font-size:18px}
+@media(max-width:760px){.wrap{grid-template-columns:1fr}aside{position:static;order:-1}.row>b{min-width:0}}
+</style></head><body>
+<header><h1>🔁 Review: Accessories</h1><p>Повторение · 3 упражнения · голос: <span id="vname">…</span></p>
+<input id="nm" placeholder="Твоё имя / Your name"></header>
+<div class="wrap"><main>
+
+<section class="sec" style="--c:#ff5fa2"><h2><b>1</b>Dictation: послушай и напиши</h2>
+<p class="hint">Нажимай 🔊 — слово звучит, пиши его по-английски.</p>
+<button onclick="sayAll()">▶ Все подряд</button><button class="g" onclick="initDict()">↻ Новый набор</button>
+<div id="dict"></div>
+<button onclick="chk('#dict')">✔ Проверить</button><button class="g" onclick="show('#dict')">👁 Ответы</button>
+<button class="g" onclick="cp(sec('dict'),this)" data-t="📋 Копировать">📋 Копировать</button></section>
+
+<section class="sec" style="--c:#f59f00"><h2><b>2</b>Match: выбери перевод</h2>
+<p class="hint">Выбери правильный русский перевод для каждого слова.</p>
+<div id="match"></div>
+<button onclick="chkMatch()">✔ Проверить</button><button class="g" onclick="showMatch()">👁 Ответы</button><button class="g" onclick="initMatch()">↻ Перемешать</button></section>
+
+<section class="sec" style="--c:#7c5cff"><h2><b>3</b>Translate & fill: вставь слово по смыслу</h2>
+<p class="hint">Прочитай русскую подсказку и впиши английское слово в пропуск.</p>
+<div id="fill"></div>
+<button onclick="chk('#fill')">✔ Проверить</button><button class="g" onclick="show('#fill')">👁 Ответы</button><button class="g" onclick="initFill()">↻ Перемешать</button>
+<button class="g" onclick="cp(sec('fill'),this)" data-t="📋 Копировать">📋 Копировать</button></section>
+
+<section class="sec" style="--c:#2b3a67"><h2><b>🏁</b>Finish</h2>
+<p class="hint">Проверь звук и скопируй ответы.</p>
+<button onclick="audioTest()">🔊 Тест аудио</button><span id="at" class="res"></span><br>
+<button class="ok" onclick="cp(all(),this)" data-t="📋 Копировать все мои ответы">📋 Копировать все мои ответы</button></section>
+</main>
+<aside><h3>❗ Проблемные слова</h3><div id="prob"></div></aside></div>
+
+<script>
+const W=[['belt','ремень'],['gloves','перчатки'],['scarf','шарф'],['hat','шапка, шляпа'],['bobby pin','невидимка (для волос)'],['earrings','серьги'],['necklace','ожерелье, цепочка'],['hair clip','заколка'],['sunglasses','солнечные очки'],['ring','кольцо'],['claw clip','краб для волос'],['hair tie','резинка для волос'],['watch','наручные часы']].map(([e,r])=>({e,r}));
+const $=s=>document.querySelector(s),sh=a=>[...a].sort(()=>Math.random()-.5);
+const norm=s=>s.toLowerCase().replace(/[^a-z ]/g,' ').replace(/\s+/g,' ').trim();
+const tr=e=>(W.find(w=>w.e==e)||{}).r||'';
+const prob=new Set();
+function bad(w){prob.add(w);renderProb()}
+function renderProb(){$('#prob').innerHTML=prob.size?[...prob].map(w=>`<button class="chip" onclick="say('${w}')">🔊 ${w} <small>${tr(w)}</small></button>`).join(''):'<i>Пока пусто 🎉</i>'}
+let V=null;
+function pick(){const v=speechSynthesis.getVoices();V=v.find(x=>/Google US English/i.test(x.name))||v.find(x=>/Samantha/i.test(x.name))||v.find(x=>x.lang=='en-US'||x.lang=='en_US')||v.find(x=>x.lang.startsWith('en'))||null;$('#vname').textContent=V?V.name:'по умолчанию'}
+try{speechSynthesis.onvoiceschanged=pick;pick()}catch(e){}
+function say(t,cb){try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='en-US';if(V)u.voice=V;u.rate=.85;if(cb)u.onend=cb;window._u=u;speechSynthesis.speak(u)}catch(e){alert('Аудио не поддерживается в этом браузере')}}
+function sayList(a,i=0){if(i<a.length)say(a[i],()=>setTimeout(()=>sayList(a,i+1),800))}
+function audioTest(){pick();$('#at').textContent=' Играет…';say('Audio test. Belt, scarf, sunglasses.',()=>$('#at').textContent=' ✅ Звук работает: '+(V?V.name:'default'));setTimeout(()=>{if($('#at').textContent.includes('Играет'))$('#at').textContent=' ⚠️ Нет звука? Проверь громкость или открой в Chrome / Safari'},5000)}
+function chk(c){let ok=0,n=0;document.querySelectorAll(c+' [data-a]').forEach(i=>{n++;i.classList.remove('ok-i','no-i');if(norm(i.value)==norm(i.dataset.a)){i.classList.add('ok-i');ok++}else{i.classList.add('no-i');bad(i.dataset.a)}});
+ let r=$(c+'-res');if(!r){r=document.createElement('div');r.id=c.slice(1)+'-res';r.className='res';$(c).after(r)}r.textContent=`Результат: ${ok} из ${n} ${ok==n?'🎉':'💪'}`}
+function show(c){document.querySelectorAll(c+' [data-a]').forEach(i=>{i.value=i.dataset.a;i.classList.remove('no-i');i.classList.add('ok-i')})}
+/* 1 dictation */
+let D=[];
+function initDict(){D=sh(W).slice(0,7).map(w=>w.e);$('#dict').innerHTML=D.map((e,i)=>`<div class="row"><button class="g" onclick="say('${e}')">🔊 ${i+1}</button><input type="text" data-a="${e}" data-c="${i+1}. " autocomplete="off" placeholder="type here"></div>`).join('');const r=$('#dict-res');if(r)r.textContent=''}
+function sayAll(){sayList(D)}
+/* 2 match */
+function initMatch(){const a=sh(W).slice(0,8),opts=sh(W.map(w=>w.r));$('#match').innerHTML=a.map(w=>`<div class="row"><b>${w.e} <button class="g" onclick="say('${w.e}')">🔊</button></b><select class="s" data-a="${w.r}" style="width:auto;max-width:100%"><option value="">— выбери —</option>${sh(opts).map(o=>`<option>${o}</option>`).join('')}</select></div>`).join('');$('#match-res')&&($('#match-res').textContent='')}
+function chkMatch(){let ok=0,n=0;document.querySelectorAll('#match select').forEach(s=>{n++;s.classList.remove('ok-i','no-i');if(s.value==s.dataset.a){s.classList.add('ok-i');ok++}else{s.classList.add('no-i');bad(W.find(w=>w.r==s.dataset.a).e)}});res('#match',`Результат: ${ok} из ${n} ${ok==n?'🎉':'💪'}`)}
+function showMatch(){document.querySelectorAll('#match select').forEach(s=>{s.value=s.dataset.a;s.classList.remove('no-i');s.classList.add('ok-i')})}
+function res(c,t){let r=$(c+'-res');if(!r){r=document.createElement('div');r.id=c.slice(1)+'-res';r.className='res';$(c).after(r)}r.textContent=t}
+/* 3 fill */
+const F=[['Сегодня мороз, надень тёплые ___ на руки.','gloves'],['Она завязала волосы ___.','hair tie'],['Солнце слепит! Где мои ___?','sunglasses'],['Я смотрю время на своих ___.','watch'],['На ней длинный тёплый ___ вокруг шеи.','scarf'],['Он носит кожаный ___ с джинсами.','belt'],['Она убрала чёлку ___.','hair clip'],['У неё золотое ___ на пальце.','ring'],['Мама надела красивое ___ на шею.','necklace'],['Серебряные ___ очень подходят к платью.','earrings'],['Зимой я ношу вязаную ___.','hat'],['Для пучка мне нужен большой ___.','claw clip'],['Её ___ держит маленькую прядь.','bobby pin']];
+function initFill(){$('#fill').innerHTML=sh(F).slice(0,9).map(([t,a],i)=>`<div class="row text"><span>${t.replace('___',`</span><input type="text" class="gap" data-a="${a}" data-c="${t} " autocomplete="off"><span>`)}</span></div>`).join('');const r=$('#fill-res');if(r)r.textContent=''}
+function sec(id){return [...document.querySelectorAll('#'+id+' [data-c]')].map(e=>e.dataset.c+e.value).join('\n')}
+function all(){const m=[...document.querySelectorAll('#match select')].map(s=>s.previousSibling&&s.parentNode.firstChild.textContent.trim()+' → '+s.value).join('\n');return `Имя: ${$('#nm').value||'—'}\n\n— 1. Dictation —\n${sec('dict')}\n\n— 2. Match —\n${m}\n\n— 3. Fill —\n${sec('fill')}\n\nПроблемные слова: ${[...prob].join(', ')||'—'}`}
+async function cp(t,b){try{await navigator.clipboard.writeText(t)}catch(e){const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy')}catch(_){}a.remove()}b.textContent='Скопировано ✓';setTimeout(()=>b.textContent=b.dataset.t,1800)}
+initDict();initMatch();initFill();renderProb();
+</script></body></html>
