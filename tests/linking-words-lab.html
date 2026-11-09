@@ -1,0 +1,574 @@
+<title>Linking Words Lab</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;800&family=Figtree:wght@400;600;700&display=swap">
+<style>
+/* Layout concept: sticker-sheet / neo-brutalist workbook. One exercise at a time, thick outlines, hard offset shadows,
+   each exercise gets its own sticker color. Header holds the 11 words as flip-able stickers (click = перевод). */
+:root{
+  --bg:#CFEAFF; --surface:#FFFFFF; --surface-2:#EEF6FF; --ink:#16131C; --muted:#4B4A5E;
+  --line:#16131C; --shadow-c:#16131C; --dot:rgba(22,19,28,.13);
+  --c-yellow:#FFD83D; --c-pink:#FF86CB; --c-mint:#3EDDA8; --c-blue:#7C98FF; --c-red:#FF6A4A;
+  --on-color:#16131C; --ok:#3EDDA8; --bad:#FF6A4A; --warn:#FFC53D; --shown:#8FB0FF;
+  --f-display:'Bricolage Grotesque','Trebuchet MS',system-ui,sans-serif;
+  --f-body:'Figtree',system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#17141F; --surface:#241F31; --surface-2:#2E2841; --ink:#F4F1FF; --muted:#B8B2D1;
+    --line:#F4F1FF; --shadow-c:#05040A; --dot:rgba(255,255,255,.07); color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#17141F; --surface:#241F31; --surface-2:#2E2841; --ink:#F4F1FF; --muted:#B8B2D1;
+  --line:#F4F1FF; --shadow-c:#05040A; --dot:rgba(255,255,255,.07); color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{
+  background:var(--bg); color:var(--ink); font-family:var(--f-body); font-size:16px; line-height:1.5;
+  background-image:radial-gradient(var(--dot) 1.5px,transparent 1.5px); background-size:22px 22px;
+}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.wrap{
+  max-width:940px;margin:0 auto;overflow-x:clip;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:28px 72px;
+}
+button,input,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--c-blue);outline-offset:3px}
+
+/* hero */
+.hero{display:grid;gap:22px;align-items:end;margin-bottom:22px}
+@media(min-width:800px){.hero{grid-template-columns:1.1fr 1fr}}
+.kicker{margin:0 0 10px;font:700 .8rem var(--f-body);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+h1{margin:0;font:800 clamp(2.5rem,8vw,4.6rem)/.95 var(--f-display);letter-spacing:-.025em;text-wrap:balance}
+.hl{display:inline-block;background:var(--c-yellow);color:var(--on-color);border:3px solid var(--line);padding:0 .18em;border-radius:14px;transform:rotate(-2.5deg);box-shadow:5px 5px 0 var(--shadow-c)}
+.lead{margin:16px 0 0;max-width:46ch;color:var(--muted);font-size:1.05rem}
+.stickers{display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-start}
+.sticker{
+  --rot:0deg; border:3px solid var(--line);border-radius:14px;padding:.42em .8em;cursor:pointer;
+  font:800 1.02rem var(--f-display);color:var(--on-color);box-shadow:3px 3px 0 var(--shadow-c);
+  transform:rotate(var(--rot));transition:transform .15s,box-shadow .15s;min-height:44px;
+}
+.sticker:hover{transform:rotate(0) translateY(-3px);box-shadow:3px 6px 0 var(--shadow-c)}
+.sticker small{display:block;font:600 .72rem var(--f-body);opacity:.8}
+
+/* tabs */
+.tabs-bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);margin-inline:-8px;padding:8px 8px 6px}
+.tabs{display:flex;gap:10px;overflow-x:auto;padding:4px 6px 10px;scrollbar-width:thin}
+.tab{
+  flex:none;display:flex;align-items:center;gap:8px;min-height:44px;padding:.45em .95em;cursor:pointer;
+  background:var(--surface);color:var(--ink);border:3px solid var(--line);border-radius:999px;
+  font:800 .95rem var(--f-display);box-shadow:3px 3px 0 var(--shadow-c);transition:transform .1s,box-shadow .1s;
+}
+.tab:hover{transform:translate(-1px,-1px);box-shadow:4px 4px 0 var(--shadow-c)}
+.tab[aria-selected="true"]{background:var(--tabc);color:var(--on-color);transform:translate(3px,3px);box-shadow:0 0 0 var(--shadow-c)}
+.tab .no{opacity:.6;font-weight:600}
+.tab .bdg{min-width:2.6em;text-align:center;padding:.05em .5em;border-radius:999px;border:2px solid var(--line);background:var(--ok);color:var(--on-color);font:800 .78rem var(--f-body)}
+.tab .bdg:empty{display:none}
+
+/* exercise */
+.ex{position:relative;margin-top:14px}
+.ex-head{
+  display:flex;gap:18px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;
+  background:var(--tab);color:var(--on-color);border:3px solid var(--line);border-radius:24px;padding:20px 22px;
+  box-shadow:7px 7px 0 var(--shadow-c);
+}
+.ex-head-text{min-width:0;flex:1 1 320px}
+.ex-tag{margin:0 0 6px;font:700 .78rem var(--f-body);letter-spacing:.12em;text-transform:uppercase;opacity:.75}
+h2{margin:0;font:800 clamp(1.6rem,4.5vw,2.3rem)/1.05 var(--f-display);letter-spacing:-.015em;text-wrap:balance}
+.instr{margin:10px 0 0;max-width:56ch;font-weight:600}
+.score{
+  flex:none;display:flex;align-items:baseline;gap:2px;background:var(--surface);color:var(--ink);border:3px solid var(--line);
+  border-radius:18px;padding:.25em .7em;transform:rotate(3deg);box-shadow:4px 4px 0 var(--shadow-c);font-family:var(--f-display)
+}
+.score-n{font-weight:800;font-size:2.1rem;line-height:1.1}
+.score-t{font-weight:600;font-size:1.1rem;opacity:.7}
+.score.small .score-n{font-size:1.05rem;padding:.35em 0}
+.verdict{margin:14px 2px 0;font-weight:700;min-height:1.5em}
+.toolbar{display:flex;flex-wrap:wrap;gap:12px;margin:18px 0}
+.btn{
+  min-height:46px;padding:.6em 1.15em;cursor:pointer;background:var(--surface);color:var(--ink);
+  border:3px solid var(--line);border-radius:14px;font:800 .95rem var(--f-display);
+  box-shadow:4px 4px 0 var(--shadow-c);transition:transform .08s,box-shadow .08s
+}
+.btn:hover{transform:translate(-1px,-1px);box-shadow:5px 5px 0 var(--shadow-c)}
+.btn:active{transform:translate(4px,4px);box-shadow:0 0 0 var(--shadow-c)}
+.btn.primary{background:var(--c-yellow);color:var(--on-color)}
+.btn.show{background:var(--c-blue);color:var(--on-color)}
+.btn.small{min-height:40px;padding:.4em .9em;font-size:.88rem;box-shadow:3px 3px 0 var(--shadow-c)}
+
+.list{display:grid;gap:16px}
+.item{
+  display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:start;background:var(--surface);
+  border:3px solid var(--line);border-radius:18px;padding:16px;box-shadow:4px 4px 0 var(--shadow-c);
+}
+.item.ok{background:color-mix(in srgb,var(--ok) 26%,var(--surface))}
+.item.bad{background:color-mix(in srgb,var(--bad) 24%,var(--surface))}
+.item.shown{background:color-mix(in srgb,var(--shown) 26%,var(--surface))}
+.item.empty{background:color-mix(in srgb,var(--warn) 22%,var(--surface))}
+.item-main{min-width:0}
+.num{
+  width:40px;height:40px;border-radius:50%;border:3px solid var(--line);display:grid;place-items:center;
+  font:800 1rem var(--f-display);background:var(--tab);color:var(--on-color)
+}
+.item.ok .num{background:var(--ok)} .item.bad .num{background:var(--bad)} .item.shown .num{background:var(--shown)}
+.sent{margin:0;font-size:1.15rem;line-height:1.75;white-space:pre-line;overflow-wrap:anywhere}
+.blank{
+  display:inline-block;min-width:6.5em;text-align:center;border-bottom:3px dashed var(--line);margin:0 .15em;
+  padding:0 .4em;font-weight:800;border-radius:8px 8px 0 0;line-height:1.5;min-height:1.5em;vertical-align:bottom
+}
+.blank.filled{border-bottom-style:solid;background:var(--c-yellow);color:var(--on-color)}
+.item.ok .blank.filled{background:var(--ok)} .item.bad .blank.filled{background:var(--bad)} .item.shown .blank.filled{background:var(--shown)}
+.opts{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+.opt{
+  min-height:44px;padding:.45em 1em;cursor:pointer;background:var(--surface-2);color:var(--ink);font-weight:700;
+  border:3px solid var(--line);border-radius:12px;box-shadow:3px 3px 0 var(--shadow-c);transition:transform .08s,box-shadow .08s
+}
+.opt:hover{transform:translate(-1px,-1px);box-shadow:4px 4px 0 var(--shadow-c)}
+.opt.sel{background:var(--c-yellow);color:var(--on-color);transform:translate(3px,3px);box-shadow:0 0 0 var(--shadow-c)}
+.item.ok .opt.sel{background:var(--ok)} .item.bad .opt.sel{background:var(--bad)}
+.opt.right{outline:3px dashed var(--ok);outline-offset:3px}
+.fb{margin:10px 0 0;font-size:.95rem;color:var(--muted);min-height:0}
+.fb:empty{display:none}
+.fb b{color:var(--ink)}
+
+.tip{display:inline-block;margin-left:.5em;padding:.05em .6em;border:2px solid var(--line);border-radius:999px;background:var(--c-pink);color:var(--on-color);font:700 .75rem var(--f-body);vertical-align:middle;white-space:nowrap}
+.q-label{display:block;margin-bottom:4px;font:700 .75rem var(--f-body);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.field{
+  display:block;width:100%;margin-top:12px;padding:.65em .85em;background:var(--surface-2);color:var(--ink);
+  border:3px solid var(--line);border-radius:12px;resize:vertical;font-size:1.05rem
+}
+.field::placeholder{color:var(--muted);opacity:.8}
+
+/* gaps */
+.bank{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px;padding:14px 16px;background:var(--surface);border:3px dashed var(--line);border-radius:18px}
+.bank-t{flex-basis:100%;margin:0;font:700 .75rem var(--f-body);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.chip{padding:.2em .75em;border:2px solid var(--line);border-radius:999px;font-weight:700;background:var(--c-yellow);color:var(--on-color);transition:opacity .2s}
+.chip.used{opacity:.3;text-decoration:line-through}
+.gaptext{background:var(--surface);border:3px solid var(--line);border-radius:20px;padding:22px 22px 12px;box-shadow:5px 5px 0 var(--shadow-c)}
+.gaptext p{margin:0 0 14px;font-size:1.12rem;line-height:2.4;overflow-wrap:anywhere}
+.gapwrap{display:inline-block;position:relative;margin:0 .15em;white-space:nowrap}
+.gnum{position:absolute;left:2px;top:-.9em;font:800 .62rem var(--f-body);color:var(--muted);line-height:1}
+.gap{
+  width:9.5em;max-width:60vw;padding:.05em .35em;text-align:center;font-weight:700;background:color-mix(in srgb,var(--c-yellow) 35%,var(--surface));
+  border:0;border-bottom:3px solid var(--line);border-radius:8px 8px 0 0
+}
+.gap.ok{background:var(--ok);color:var(--on-color)}
+.gap.bad{background:var(--bad);color:var(--on-color);animation:shake .35s}
+.gap.shown{background:var(--shown);color:var(--on-color)}
+.gap.empty{background:var(--warn);color:var(--on-color)}
+.gap::placeholder{color:var(--muted)}
+
+/* own sentences */
+.own{display:grid;grid-template-columns:minmax(150px,210px) 1fr;gap:16px;align-items:start;background:var(--surface);border:3px solid var(--line);border-radius:18px;padding:16px;box-shadow:4px 4px 0 var(--shadow-c)}
+.own.ok{background:color-mix(in srgb,var(--ok) 26%,var(--surface))}
+.own.bad{background:color-mix(in srgb,var(--bad) 22%,var(--surface))}
+.own .word{display:inline-block;padding:.3em .8em;border:3px solid var(--line);border-radius:14px;background:var(--c-yellow);color:var(--on-color);font:800 1.1rem var(--f-display);transform:rotate(-2deg);box-shadow:3px 3px 0 var(--shadow-c)}
+.own .ru{margin:10px 0 0;color:var(--muted);font-size:.92rem}
+.own .field{margin-top:0}
+.own-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
+.example{margin:10px 0 0;padding:.5em .8em;border:2px dashed var(--line);border-radius:12px;background:var(--surface-2);font-style:italic}
+@media(max-width:560px){.own{grid-template-columns:1fr}}
+
+.toast{
+  position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0px));transform:translate(-50%,30px);opacity:0;pointer-events:none;
+  z-index:50;max-width:min(92vw,420px);padding:.7em 1.2em;background:var(--ink);color:var(--bg);border-radius:14px;font-weight:700;
+  transition:transform .25s,opacity .25s;text-align:center
+}
+.toast.on{transform:translate(-50%,0);opacity:1}
+
+.confetti{position:absolute;left:0;right:0;top:0;height:0;pointer-events:none;z-index:30}
+.confetti i{position:absolute;top:0;width:11px;height:15px;border:2px solid var(--line);border-radius:3px;animation:fall 1.7s cubic-bezier(.3,.6,.5,1) forwards}
+@keyframes fall{from{transform:translate(0,-10px) rotate(0);opacity:1}80%{opacity:1}to{transform:translate(var(--dx),480px) rotate(var(--rot));opacity:0}}
+@keyframes shake{25%{transform:translateX(-4px)}50%{transform:translateX(4px)}75%{transform:translateX(-3px)}}
+@media(prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+}
+@media(max-width:520px){
+  .ex-head{padding:16px}
+  .item{padding:12px;gap:10px}
+  .gaptext{padding:16px 14px 6px}
+}
+</style>
+
+<div class="wrap">
+  <header class="hero">
+    <div>
+      <p class="kicker">Английский · слова-связки</p>
+      <h1>Linking Words <span class="hl">Lab</span></h1>
+      <p class="lead">8 упражнений на 11 слов. Выбирай, пиши руками, проверяй себя и подглядывай в ответы, если завис(ла). Нажми на стикер, чтобы увидеть перевод.</p>
+    </div>
+    <div class="stickers" id="stickers" aria-label="Слова для повторения"></div>
+  </header>
+
+  <div class="tabs-bar"><nav class="tabs" id="tabs" role="tablist" aria-label="Упражнения"></nav></div>
+  <main id="panels"></main>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+"use strict";
+const $=(s,r=document)=>r.querySelector(s);
+function h(tag,props,...kids){
+  const e=document.createElement(tag);
+  for(const [k,v] of Object.entries(props||{})){
+    if(k==='class')e.className=v;
+    else if(k.startsWith('on'))e.addEventListener(k.slice(2),v);
+    else if(v!==false&&v!=null)e.setAttribute(k,v);
+  }
+  kids.flat().forEach(c=>{ if(c==null||c===false)return; e.append(c.nodeType?c:document.createTextNode(String(c))); });
+  return e;
+}
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+
+/* ---------- text helpers ---------- */
+const CONTR=[[/\bcannot\b/g,"can't"],[/\bcan not\b/g,"can't"],[/\bdo not\b/g,"don't"],[/\bdoes not\b/g,"doesn't"],[/\bdid not\b/g,"didn't"],
+[/\bwill not\b/g,"won't"],[/\bis not\b/g,"isn't"],[/\bwas not\b/g,"wasn't"],[/\bi will\b/g,"i'll"],[/\byou will\b/g,"you'll"],[/\bwe will\b/g,"we'll"],
+[/\bi have\b/g,"i've"],[/\byou have\b/g,"you've"],[/\bwe have\b/g,"we've"],[/\bthat is\b/g,"that's"],[/\bthats\b/g,"that's"],[/\bi am\b/g,"i'm"],[/\brealize\b/g,"realise"]];
+function norm(s){
+  s=String(s).toLowerCase().replace(/[’‘`´]/g,"'").replace(/\./g,'').replace(/[^a-z0-9'\s]/g,' ').replace(/\s+/g,' ').trim();
+  for(const [r,t] of CONTR)s=s.replace(r,t);
+  return s;
+}
+function lev(a,b){
+  const m=a.length,n=b.length,d=Array.from({length:m+1},(_,i)=>{const r=Array(n+1).fill(0);r[0]=i;return r});
+  for(let j=1;j<=n;j++)d[0][j]=j;
+  for(let i=1;i<=m;i++)for(let j=1;j<=n;j++)d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]===b[j-1]?0:1));
+  return d[m][n];
+}
+let toastT;
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),2200)}
+async function copyText(text,src){
+  try{await navigator.clipboard.writeText(text);toast('Скопировано');return}catch(e){}
+  try{
+    const ta=h('textarea',{style:'position:fixed;opacity:0;top:0;left:0'});ta.value=text;document.body.append(ta);ta.select();
+    const ok=document.execCommand('copy');ta.remove();if(ok){toast('Скопировано');return}
+  }catch(e){}
+  if(src){src.focus();if(src.select)src.select()}
+  toast('Не вышло скопировать. Текст выделен, нажми Ctrl+C');
+}
+function confetti(host){
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  const cols=['--c-yellow','--c-pink','--c-mint','--c-blue','--c-red'];
+  const box=h('div',{class:'confetti','aria-hidden':'true'});
+  for(let i=0;i<42;i++){
+    const s=h('i');
+    s.style.cssText='left:'+(Math.random()*100)+'%;background:var('+cols[i%5]+');--dx:'+((Math.random()-.5)*160)+'px;--rot:'+(Math.random()*720-360)+'deg;animation-delay:'+(Math.random()*.3)+'s';
+    box.append(s);
+  }
+  host.append(box);setTimeout(()=>box.remove(),2400);
+}
+
+/* ---------- data ---------- */
+const WORDS=[
+["while","пока, в то время как","I read a book while my dad cooks dinner."],
+["instead of","вместо","Let's walk instead of taking the bus."],
+["however","однако","I like pizza. However, I'm on a diet."],
+["that's why","вот почему, поэтому","I was very tired, that's why I went to bed early."],
+["because of","из-за","We stayed at home because of the snow."],
+["except","кроме","I like all fruit except bananas."],
+["also","также, ещё и","She speaks French and also Italian."],
+["in the end","в итоге, в конце концов","We argued a lot, but in the end we agreed."],
+["actually","на самом деле, вообще-то","Actually, I've never been to London."],
+["finally","наконец","Finally, the bus arrived!"],
+["until","пока не, до","Wait here until I call you."]
+];
+const COLS=['--c-yellow','--c-pink','--c-mint','--c-blue','--c-red'];
+
+const UNTIL=[
+["You can't go out before you finish your homework.","can't … until",["You can't go out until you finish your homework.","You can't go out until you have finished your homework."]],
+["She didn't call me before she got home.","didn't … until",["She didn't call me until she got home.","She didn't call me until she got back home.","She didn't call me until she had got home.","She didn't call me until she arrived home."]],
+["We kept walking and then we reached the hotel.","действие длится до",["We kept walking until we reached the hotel.","We kept walking until we got to the hotel.","We kept walking until we arrived at the hotel.","We walked until we reached the hotel."]],
+["I'll wait for you to come back.","wait until",["I'll wait until you come back.","I'll wait until you get back.","I'll wait until you have come back."]],
+["He started to feel better only after he took the medicine.","didn't … until",["He didn't feel better until he took the medicine.","He didn't start to feel better until he took the medicine.","He didn't begin to feel better until he took the medicine.","He didn't start feeling better until he took the medicine.","He didn't feel better until he had taken the medicine."]],
+["Tom played computer games and then his mum told him to stop.","действие длится до",["Tom played computer games until his mum told him to stop.","Tom kept playing computer games until his mum told him to stop."]],
+["I only realised my mistake when I read the email again.","didn't … until",["I didn't realise my mistake until I read the email again.","I didn't realise my mistake until I had read the email again.","I didn't realise my mistake until I reread the email."]],
+["The shop is open from 9 a.m. to 6 p.m.","until + время",["The shop is open until 6 p.m.","The shop is open from 9 a.m. until 6 p.m.","The shop is open from 9 until 6."]]
+];
+
+/* [sentence, correct, d1, d2, d3, explanation] */
+const PICK1=[
+["My sister was cooking dinner ___ I was setting the table.","while","until","except","however","while: «пока, в то время как». Два действия идут одновременно."],
+["We stayed at home all day ___ the heavy rain.","because of","that's why","while","except","because of + существительное: из-за чего? Из-за дождя (the heavy rain)."],
+["I forgot my umbrella, ___ I got really wet.","that's why","however","also","until","that's why: «вот почему». Сначала причина, потом следствие."],
+["Everyone came to the party ___ Tom, who was ill.","except","until","that's why","while","except: «кроме». Тома исключили из общей группы."],
+["I wanted to go to the cinema. ___, my friends preferred to stay at home.","However","Finally","Until","That's why","However: «однако». Противопоставление двух предложений."],
+["He walked home ___ taking a taxi.","instead of","except","because of","also","instead of + -ing: «вместо того чтобы»."],
+["We looked for the hotel for two hours, and ___ we found it!","finally","however","except","also","finally: «наконец». После долгих поисков или ожидания."],
+["Everybody thinks Anna is Polish, but ___ she was born in Ukraine.","actually","also","until","that's why","actually: «на самом деле». Поправляет то, что все думают."]
+];
+const PICK2=[
+["We can't board the plane ___ the gate opens.","until","while","except","also","until: «пока не». Мы ждём, пока ворота не откроются."],
+["The hotel has a pool. It ___ has a gym and a spa.","also","however","until","instead of","also: «ещё и». Добавляем новую информацию."],
+["Our flight was delayed ___ the fog.","because of","that's why","instead of","however","because of + существительное (the fog)."],
+["The museum is open every day ___ Monday.","except","until","while","also","except: «кроме». Понедельник выпадает из списка."],
+["It was freezing in Oslo, ___ we bought warm hats.","that's why","however","while","because of","that's why + следствие: «поэтому мы купили шапки»."],
+["We took the train ___ the bus because it was faster.","instead of","except","also","until","instead of: «вместо». Выбрали поезд, а не автобус."],
+["We tried five different restaurants, and ___ we ate at the first one.","in the end","until","except","while","in the end: «в итоге». Результат после долгих раздумий."],
+["My brother loves beaches, ___ I prefer the mountains.","while","except","until","also","while: «а, тогда как». Противопоставление двух людей."]
+];
+const PICK3=[
+["A: Do you like sushi?\nB: ___, I've never tried it.","Actually","Until","Also","Except","Actually: «вообще-то». Уточняет ответ."],
+["I didn't know about the party ___ yesterday.","until","while","also","finally","until + момент времени: «только вчера узнал»."],
+["The test was really difficult. ___, I got a good mark.","However","Finally","Until","That's why","However: «однако». Результат вопреки ожиданиям."],
+["I waited for an hour, and ___ the bus arrived.","finally","while","because of","also","finally: «наконец». Долго ждали, и вот оно."],
+["My phone takes great photos. It's ___ really cheap.","also","however","while","until","also: «ещё и». Добавляем второй плюс."],
+["We argued for hours about the movie, but ___ we watched a comedy.","in the end","while","until","because of","in the end: «в итоге». Итог долгого спора."],
+["She called me ___ I was having dinner.","while","until","finally","also","while: «пока, когда». Звонок случился в момент ужина."],
+["He couldn't sleep ___ the noise from the street.","because of","however","also","in the end","because of + существительное (the noise)."]
+];
+const PICK4=[
+["First, chop the onions. Then fry them for five minutes. ___, add the tomatoes.","Finally","However","Actually","Until","Finally: последний шаг в последовательности действий."],
+["At first Jack wanted to be a pilot, but ___ he became a teacher.","in the end","until","that's why","also","in the end: «в итоге». Результат после смены планов."],
+["You can't watch TV ___ you've done your homework.","until","however","also","actually","until: «пока не». Телевизор только после уроков."],
+["I love cooking. ___, I never have time to do it.","However","That's why","Also","Finally","However: «однако». Контраст между желанием и реальностью."],
+["He didn't sleep well. ___ he's so tired today.","That's why","However","In the end","Instead of","That's why: «вот почему». Следствие плохого сна."],
+["___ complaining, why don't you help me?","Instead of","However","Also","Until","Instead of + -ing: «вместо того чтобы жаловаться»."],
+["I thought the exam would be hard, but it was ___ quite easy.","actually","also","until","finally","actually: «на самом деле». Реальность не совпала с ожиданием."],
+["The room was small and dark. It ___ smelled bad.","also","until","however","that's why","also: «ещё и». Добавляем ещё один минус."]
+];
+
+const GAPS1={
+ text:"Last Saturday was my birthday. I wanted to have a picnic in the park. {1}, it rained all morning. We waited {2} noon, but it didn't stop. {3}, we had the party at home.\n\nMy mum was baking a cake {4} I was decorating the living room. Everybody came {5} my cousin Max, who had a cold. We played board games {6} playing football in the park. We {7} watched a funny film together.\n\n{8}, at 11 p.m., the last guest went home. I was exhausted, {9} I went to bed right away. It was a great day {10} my friends. It was {11} better than the picnic I had planned!",
+ answers:[["However"],["until"],["In the end","Finally"],["while"],["except"],["instead of"],["also"],["Finally","In the end"],["that's why"],["because of"],["actually"]]
+};
+const GAPS2={
+ text:"I was so excited about my trip to Rome, {1} I couldn't sleep the night before. I got up at 4 a.m. {2} the early flight. I packed my bag {3} my brother was making breakfast. I took the bus {4} a taxi because it was cheaper.\n\nAt the airport, first I showed my passport, then I left my suitcase, and {5} I went through security. I wanted to buy a souvenir, but I didn't have enough time. {6}, I bought nothing.\n\nIn Rome, everything was fine {7} my suitcase, which was missing! I was angry. {8}, the staff were really kind. They promised to find it, and they {9} gave me a free voucher. I waited at the hotel {10} midnight, when they brought my bag. The hotel looked expensive, but {11} it was quite cheap.",
+ answers:[["that's why"],["because of"],["while"],["instead of"],["finally","in the end"],["In the end"],["except"],["However"],["also"],["until"],["actually","in the end"]]
+};
+
+/* ---------- shared card helpers ---------- */
+function mark(it,state,nodes){
+  it.card.className=it.base+(state?' '+state:'');
+  it.num.textContent=state==='ok'?'✓':state==='bad'?'✕':String(it.i+1);
+  it.fb.replaceChildren(...(nodes||[]));
+}
+function verdictFor(n,total){
+  if(n===total)return 'Идеально! Все '+total+' из '+total+'.';
+  if(n/total>=.75)return 'Почти идеально. Проверь красные пункты.';
+  return 'Загляни в пояснения и попробуй ещё раз.';
+}
+
+/* ---------- builders: each returns {body, actions} ---------- */
+function buildRephrase(tab,api){
+  const items=tab.items.map(([q,tip,ans],i)=>({i,q,tip,ans,norms:ans.map(norm),base:'item'}));
+  const list=h('div',{class:'list'});
+  items.forEach((it,i)=>{
+    it.input=h('input',{type:'text',class:'field',id:tab.id+'-'+i,placeholder:'Перепиши с until…',autocomplete:'off',spellcheck:'false','aria-label':'Предложение '+(i+1)+' с until'});
+    it.num=h('span',{class:'num'},String(i+1));
+    it.fb=h('p',{class:'fb'});
+    it.card=h('article',{class:'item'},it.num,h('div',{class:'item-main'},
+      h('span',{class:'q-label'},'Перепиши с until',h('span',{class:'tip'},it.tip)),
+      h('p',{class:'sent'},it.q),it.input,it.fb));
+    it.input.addEventListener('input',()=>{mark(it,'',[])});
+    it.input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();checkOne(it);const nx=items[i+1];if(nx)nx.input.focus();updateScore()}});
+    list.append(it.card);
+  });
+  function checkOne(it){
+    const v=it.input.value;
+    if(!v.trim()){mark(it,'empty',['Впиши предложение.']);return}
+    const n=norm(v);
+    if(it.norms.includes(n)){mark(it,'ok',[h('b',null,'Верно!')]);return}
+    if(!n.split(' ').includes('until')){mark(it,'bad',['В предложении нет слова until.']);return}
+    const best=Math.min(...it.norms.map(a=>lev(n,a)/Math.max(n.length,a.length)));
+    if(best<=.12)mark(it,'empty',['Почти. Проверь опечатки и порядок слов.']);
+    else mark(it,'bad',['Пока не совпало. Подумай, что стоит после until, или посмотри ответ.']);
+  }
+  function updateScore(){
+    const n=items.filter(it=>it.card.classList.contains('ok')).length;
+    api.setScore(n,'check');
+  }
+  return{body:list,actions:[
+    {label:'Проверить',cls:'primary',fn:()=>{items.forEach(checkOne);updateScore()}},
+    {label:'Показать ответы',cls:'show',fn:()=>{
+      items.forEach(it=>{it.input.value=it.ans[0];
+        const alt=it.ans[1];
+        mark(it,'shown',[h('b',null,'Образец: '),it.ans[0],alt?h('span',null,'  ·  Также можно: '+alt):null]);});
+      api.setScore(0,'shown');}},
+    {label:'Сбросить',cls:'',fn:()=>{items.forEach(it=>{it.input.value='';mark(it,'',[])});api.setScore(0,'reset')}}
+  ]};
+}
+
+function buildMcq(tab,api){
+  const items=tab.items.map(([s,a,d1,d2,d3,e],i)=>({i,s,a,e,opts:shuffle([a,d1,d2,d3]),pick:null,base:'item'}));
+  const list=h('div',{class:'list'});
+  items.forEach((it,i)=>{
+    const [pre,post]=it.s.split('___');
+    it.blank=h('span',{class:'blank'});
+    it.num=h('span',{class:'num'},String(i+1));
+    it.fb=h('p',{class:'fb'});
+    it.btns=it.opts.map(o=>h('button',{class:'opt',type:'button',onclick:()=>{it.pick=o;mark(it,'',[]);paint(it)}},o));
+    it.card=h('article',{class:'item'},it.num,h('div',{class:'item-main'},
+      h('p',{class:'sent'},pre,it.blank,post),h('div',{class:'opts',role:'group','aria-label':'Варианты к пункту '+(i+1)},it.btns),it.fb));
+    list.append(it.card);
+  });
+  function paint(it,showRight){
+    it.blank.textContent=it.pick||'';
+    it.blank.classList.toggle('filled',!!it.pick);
+    it.btns.forEach(b=>{b.classList.toggle('sel',b.textContent===it.pick);b.classList.toggle('right',!!showRight&&b.textContent===it.a)});
+  }
+  function checkOne(it){
+    if(it.pick==null){mark(it,'empty',['Выбери слово.']);paint(it);return}
+    if(it.pick===it.a){mark(it,'ok',[h('b',null,'Верно. '),it.e]);paint(it)}
+    else{mark(it,'bad',[h('b',null,'Правильно: '+it.a+'. '),it.e]);paint(it,true)}
+  }
+  function updateScore(){api.setScore(items.filter(it=>it.card.classList.contains('ok')).length,'check')}
+  return{body:list,actions:[
+    {label:'Проверить',cls:'primary',fn:()=>{items.forEach(checkOne);updateScore()}},
+    {label:'Показать ответы',cls:'show',fn:()=>{items.forEach(it=>{it.pick=it.a;mark(it,'shown',[h('b',null,'Ответ: '+it.a+'. '),it.e]);paint(it,false)});api.setScore(0,'shown')}},
+    {label:'Сбросить',cls:'',fn:()=>{items.forEach(it=>{it.pick=null;mark(it,'',[]);paint(it)});api.setScore(0,'reset')}}
+  ]};
+}
+
+function buildGaps(tab,api){
+  const gaps=[];
+  const bankChips=WORDS.map(w=>({n:norm(w[0]),el:h('span',{class:'chip'},w[0])}));
+  const bank=h('div',{class:'bank'},h('p',{class:'bank-t'},'Слова (каждое подходит один раз, регистр не важен)'),bankChips.map(c=>c.el));
+  const box=h('div',{class:'gaptext'});
+  tab.data.text.split('\n\n').forEach(par=>{
+    const p=h('p');
+    par.split(/(\{\d+\})/).forEach(part=>{
+      const m=part.match(/^\{(\d+)\}$/);
+      if(!m){p.append(part);return}
+      const k=+m[1]-1,ans=tab.data.answers[k];
+      const input=h('input',{type:'text',class:'gap',id:tab.id+'-g'+k,autocomplete:'off',spellcheck:'false',autocapitalize:'off','aria-label':'Пропуск '+m[1]});
+      const g={input,ans,norms:ans.map(norm)};
+      gaps[k]=g;
+      input.addEventListener('input',()=>{input.className='gap';updateBank()});
+      p.append(h('span',{class:'gapwrap'},h('sup',{class:'gnum'},m[1]),input));
+    });
+    box.append(p);
+  });
+  function updateBank(){
+    const used=new Set(gaps.map(g=>norm(g.input.value)));
+    bankChips.forEach(c=>c.el.classList.toggle('used',used.has(c.n)));
+  }
+  function checkOne(g){
+    if(!g.input.value.trim()){g.input.className='gap empty';return false}
+    const ok=g.norms.includes(norm(g.input.value));
+    g.input.className='gap '+(ok?'ok':'bad');return ok;
+  }
+  let hinted=false;
+  const body=h('div',null,bank,box);
+  return{body,actions:[
+    {label:'Проверить',cls:'primary',fn:()=>{let n=0;gaps.forEach(g=>{if(checkOne(g))n++});api.setScore(n,'check')}},
+    {label:'Подсказка: первые буквы',cls:'',fn:()=>{hinted=!hinted;gaps.forEach(g=>{g.input.placeholder=hinted?g.ans[0][0].toLowerCase()+'…':''});toast(hinted?'Первые буквы показаны':'Подсказки убраны')}},
+    {label:'Показать ответы',cls:'show',fn:()=>{gaps.forEach(g=>{g.input.value=g.ans[0];g.input.className='gap shown'});updateBank();api.setScore(0,'shown')}},
+    {label:'Сбросить',cls:'',fn:()=>{gaps.forEach(g=>{g.input.value='';g.input.className='gap'});updateBank();api.setScore(0,'reset')}}
+  ]};
+}
+
+function buildOwn(tab,api){
+  const rows=WORDS.map(([w,ru,ex],i)=>{
+    const ta=h('textarea',{class:'field',rows:2,id:'own-'+i,placeholder:'Своё предложение со словом «'+w+'»…','aria-label':'Предложение со словом '+w});
+    const st=h('p',{class:'fb'});
+    const exEl=h('p',{class:'example',hidden:true},'Пример: '+ex);
+    const card=h('article',{class:'own'},
+      h('div',null,h('span',{class:'word'},w),h('p',{class:'ru'},ru)),
+      h('div',{class:'item-main'},ta,
+        h('div',{class:'own-actions'},
+          h('button',{class:'btn small primary',type:'button',onclick:()=>{const v=ta.value.trim();if(!v){toast('Сначала напиши предложение');return}copyText(v,ta)}},'Копировать'),
+          h('button',{class:'btn small',type:'button',onclick:()=>{exEl.hidden=!exEl.hidden}},'Пример')),
+        exEl,st));
+    const r={w,ta,st,card,exEl,ok:false};
+    ta.addEventListener('input',()=>live(r));
+    return r;
+  });
+  function live(r){
+    const v=r.ta.value.trim();
+    if(!v){r.card.className='own';r.st.textContent='';r.ok=false;total();return}
+    const n=norm(v),has=(' '+n+' ').includes(' '+norm(r.w)+' '),words=n.split(' ').length;
+    if(has&&words>=4){r.card.className='own ok';r.st.replaceChildren(h('b',null,'✓ '),'Слово на месте. Можно копировать.');r.ok=true}
+    else if(has){r.card.className='own';r.st.textContent='Нужно целое предложение, добавь слов.';r.ok=false}
+    else{r.card.className='own bad';r.st.textContent='В предложении нет «'+r.w+'».';r.ok=false}
+    total();
+  }
+  let celebrated=false;
+  function total(){
+    const n=rows.filter(r=>r.ok).length;
+    api.setScore(n,'live');
+    if(n===rows.length&&!celebrated){celebrated=true;confetti(api.host)}
+  }
+  const body=h('div',{class:'list'},rows.map(r=>r.card));
+  return{body,actions:[
+    {label:'Копировать всё',cls:'primary',fn:()=>{
+      const t=rows.map(r=>r.ta.value.trim()).filter(Boolean).join('\n');
+      if(!t){toast('Пока нечего копировать');return}copyText(t)}},
+    {label:'Показать примеры',cls:'show',fn:()=>{const open=rows.some(r=>r.exEl.hidden);rows.forEach(r=>{r.exEl.hidden=!open})}},
+    {label:'Очистить',cls:'',fn:()=>{rows.forEach(r=>{r.ta.value='';r.exEl.hidden=true;live(r)});celebrated=false}}
+  ]};
+}
+
+/* ---------- tabs / sections ---------- */
+const TABS=[
+ {id:'until',label:'until',color:'--c-red',kind:'rephrase',total:8,meta:'8 предложений',title:'Rephrase with until',items:UNTIL,
+  instr:'Перепиши каждое предложение так, чтобы в нём было until. Смысл должен остаться тем же. Справа от задания подсказка, какая конструкция нужна.'},
+ {id:'pick-1',label:'Pick 1',color:'--c-yellow',kind:'mcq',total:8,meta:'8 пунктов',title:'Pick the word: warm-up',items:PICK1,instr:'Выбери слово, которое подходит по смыслу. Нажми «Проверить», когда выберешь во всех пунктах.'},
+ {id:'pick-2',label:'Pick 2',color:'--c-mint',kind:'mcq',total:8,meta:'8 пунктов',title:'Pick the word: travel',items:PICK2,instr:'Выбери слово, которое подходит по смыслу. Следи за тем, что стоит после пропуска: существительное, глагол или целое предложение.'},
+ {id:'pick-3',label:'Pick 3',color:'--c-pink',kind:'mcq',total:8,meta:'8 пунктов',title:'Pick the word: mini-dialogues',items:PICK3,instr:'Выбери слово, которое подходит по смыслу. Здесь есть и диалог, и предложения с началом на слово-связку.'},
+ {id:'pick-4',label:'Pick 4',color:'--c-blue',kind:'mcq',total:8,meta:'8 пунктов',title:'Pick the word: hard mode',items:PICK4,instr:'Последний раунд на выбор слова. Варианты похожи, так что читай всё предложение целиком.'},
+ {id:'my-sentences',label:'My sentences',color:'--c-yellow',kind:'own',total:11,meta:'11 слов',title:'Write your own sentences',instr:'Придумай своё предложение с каждым словом. Страница проверит, что слово в нём есть. Потом копируй по одному или все сразу.'},
+ {id:'gaps-1',label:'Gaps 1',color:'--c-mint',kind:'gaps',total:11,meta:'11 пропусков',title:'Fill in the gaps: birthday',data:GAPS1,instr:'Впиши пропущенные слова руками. Все 11 слов из рамки встречаются по одному разу.'},
+ {id:'gaps-2',label:'Gaps 2',color:'--c-pink',kind:'gaps',total:11,meta:'11 пропусков',title:'Fill in the gaps: lost suitcase',data:GAPS2,instr:'Ещё один текст, те же 11 слов по одному разу. Впиши их руками.'}
+];
+
+const tabsEl=$('#tabs'),panels=$('#panels');
+TABS.forEach((tab,idx)=>{
+  const no=idx+1;
+  tab.btn=h('button',{class:'tab',type:'button',role:'tab',id:'t-'+tab.id,'aria-controls':'ex-'+tab.id,'aria-selected':'false',style:'--tabc:var('+tab.color+')',
+    onclick:()=>{if(location.hash==='#'+tab.id)show(tab.id);else location.hash=tab.id}},
+    h('span',{class:'no'},String(no)),tab.label,tab.badge=h('span',{class:'bdg'}));
+  tabsEl.append(tab.btn);
+
+  const sec=h('section',{class:'ex',id:'ex-'+tab.id,role:'tabpanel','aria-labelledby':'h-'+tab.id,hidden:true,style:'--tab:var('+tab.color+')'});
+  const nEl=h('span',{class:'score-n'},'–'),tEl=h('span',{class:'score-t'},'/'+tab.total);
+  const scoreEl=h('div',{class:'score','aria-live':'polite'},nEl,tEl);
+  const verdict=h('p',{class:'verdict'});
+  sec.append(h('div',{class:'ex-head'},h('div',{class:'ex-head-text'},
+    h('p',{class:'ex-tag'},'Упражнение '+no+' · '+tab.meta),h('h2',{id:'h-'+tab.id},tab.title),h('p',{class:'instr'},tab.instr)),scoreEl));
+
+  const api={host:sec,setScore(n,mode){
+    scoreEl.classList.toggle('small',mode==='shown');
+    if(mode==='shown'){nEl.textContent='ответы';tEl.textContent='';verdict.textContent='Ответы показаны. Нажми «'+(tab.kind==='own'?'Очистить':'Сбросить')+'», чтобы пройти заново.';tab.badge.textContent=''}
+    else if(mode==='reset'){nEl.textContent='–';tEl.textContent='/'+tab.total;verdict.textContent='';tab.badge.textContent=''}
+    else{
+      nEl.textContent=n;tEl.textContent='/'+tab.total;tab.badge.textContent=n+'/'+tab.total;
+      verdict.textContent=mode==='live'?(n?'Написано '+n+' из '+tab.total+'.':''):verdictFor(n,tab.total);
+      if(mode==='check'&&n===tab.total)confetti(sec);
+    }
+  }};
+  const built=tab.kind==='rephrase'?buildRephrase(tab,api):tab.kind==='mcq'?buildMcq(tab,api):tab.kind==='gaps'?buildGaps(tab,api):buildOwn(tab,api);
+  const bar=()=>h('div',{class:'toolbar'},built.actions.map(a=>h('button',{type:'button',class:'btn '+a.cls,onclick:a.fn},a.label)));
+  sec.append(verdict,bar(),built.body,bar());
+  panels.append(sec);
+});
+
+/* stickers */
+const stickers=$('#stickers');
+WORDS.forEach(([w,ru],i)=>{
+  const b=h('button',{type:'button',class:'sticker','aria-label':w+': '+ru,style:'background:var('+COLS[i%5]+');--rot:'+[-3,2,-1.5,3,-2,1.5,-3.5,2.5,-1,3,-2.5][i]+'deg'},w);
+  let flip=false;
+  b.addEventListener('click',()=>{flip=!flip;b.replaceChildren(flip?h('span',null,ru):w)});
+  stickers.append(b);
+});
+
+/* routing */
+function show(id){
+  if(!TABS.some(t=>t.id===id))id=TABS[0].id;
+  TABS.forEach(t=>{
+    const on=t.id===id;
+    $('#ex-'+t.id).hidden=!on;
+    t.btn.setAttribute('aria-selected',on?'true':'false');
+    if(on)t.btn.scrollIntoView({block:'nearest',inline:'center'});
+  });
+  const top=document.querySelector('.tabs-bar').getBoundingClientRect().top+window.scrollY-4;
+  if(window.scrollY>top)window.scrollTo({top:Math.max(0,top)});
+}
+window.addEventListener('hashchange',()=>show(location.hash.slice(1)));
+show(location.hash.slice(1));
+})();
+</script>
