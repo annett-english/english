@@ -1,0 +1,145 @@
+<!DOCTYPE html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>At / In / On — A2</title>
+<style>
+:root{--bg:#faf8f4;--fg:#222;--card:#fff;--mut:#6b6b6b;--bd:#ddd5c8;--ac:#2f6fed;--ok:#1f8a4c;--okb:#dff4e7;--no:#c0392b;--nob:#fbe3df;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#17181b;--fg:#ece9e2;--card:#222428;--mut:#a29f98;--bd:#383b41;--ac:#7aa5ff;--ok:#5fd08f;--okb:#1b3a2a;--no:#ff8a7a;--nob:#432622}}
+:root[data-theme="dark"]{--bg:#17181b;--fg:#ece9e2;--card:#222428;--mut:#a29f98;--bd:#383b41;--ac:#7aa5ff;--ok:#5fd08f;--okb:#1b3a2a;--no:#ff8a7a;--nob:#432622}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:760px;margin:auto;padding:16px}h1{font-size:24px;margin:0 0 4px}h2{font-size:20px;margin:0 0 4px}.mut{color:var(--mut);margin:0 0 12px}
+.rule{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px 14px;margin:10px 0;font-size:14px}
+nav{display:flex;gap:6px;overflow-x:auto;padding:8px 0}nav button{white-space:nowrap}
+button{font:inherit;border:1px solid var(--bd);background:var(--card);color:var(--fg);border-radius:10px;padding:8px 12px;cursor:pointer}
+button.on,button.pri{background:var(--ac);color:#fff;border-color:var(--ac)}
+section{display:none}section.v{display:block}
+.row{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:10px 12px;margin:8px 0}
+.row.good{border-color:var(--ok);background:var(--okb)}.row.bad{border-color:var(--no);background:var(--nob)}.row.show{border-color:var(--ac)}
+.fb{font-size:14px;margin-top:6px}.fb:empty{display:none}
+input,select,textarea{font:inherit;color:var(--fg);background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:6px 8px;max-width:100%}
+input.c{width:170px}input.w{width:100%;margin-top:6px}select{margin-top:6px;width:100%}textarea{width:100%;min-height:150px}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:12px 0}.score{font-weight:600}
+.pool,.zone{min-height:48px;border:2px dashed var(--bd);border-radius:12px;padding:8px;display:flex;flex-wrap:wrap;gap:6px;align-content:flex-start}
+.zones{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}.zones h3{margin:0 0 4px;font-size:16px;text-align:center}
+.chip{background:var(--card);border:1px solid var(--bd);border-radius:20px;padding:4px 10px;cursor:grab;font-size:14px}.chip.sel{outline:2px solid var(--ac)}.chip.ok{background:var(--okb);border-color:var(--ok)}.chip.no{background:var(--nob);border-color:var(--no)}
+.req{list-style:none;padding:0}.req li{padding:4px 0}.req li.d{color:var(--ok);font-weight:600}
+.opts{display:grid;gap:8px;margin:10px 0}.opts button{text-align:left}.opts .g{background:var(--okb);border-color:var(--ok)}.opts .r{background:var(--nob);border-color:var(--no)}.opts button:disabled{opacity:.45}.opts .g:disabled,.opts .r:disabled{opacity:1}
+@media(max-width:520px){.zones{grid-template-columns:1fr}}
+</style></head><body><main>
+<h1>At / In / On — места (A2)</h1>
+<div class="rule"><b>AT</b> — место как точка на карте, место встречи, работы или деятельности. Важно, где человек находится, а не внутри ли он здания.<br><b>IN</b> — внутри помещения или ограниченного пространства.<br><b>ON</b> — на поверхности и в общественном транспорте (on a bus, on a train).</div>
+<nav id="nav"></nav><div id="app"></div>
+<script>
+const $=s=>document.querySelector(s),app=$("#app"),nav=$("#nav"),secs=[];
+const norm=s=>s.toLowerCase().replace(/[’`]/g,"'").replace(/'m\b/g," am").replace(/'re\b/g," are").replace(/'s\b/g," is").replace(/[^a-zа-я0-9 ]/g," ").replace(/\s+/g," ").trim();
+function add(title,s){s.dataset.t=title;secs.push(s);app.append(s);const b=document.createElement("button");b.textContent=title;b.onclick=()=>go(secs.indexOf(s));nav.append(b)}
+function go(i){secs.forEach((s,j)=>{s.classList.toggle("v",i==j);nav.children[j].classList.toggle("on",i==j)})}
+function mk(id,title,intro,items,row,get,ok,set,txt,clear){
+ const s=document.createElement("section");
+ s.innerHTML=`<h2>${title}</h2><p class=mut>${intro}</p>`+items.map((it,i)=>`<div class=row id=${id}${i}><div>${i+1}. ${row(it)}</div><div class=fb></div></div>`).join("")+`<div class=bar><button class=pri>Проверить</button><button>Показать ответы</button><button>Сбросить</button><span class=score></span></div>`;
+ const c=()=>[...s.querySelectorAll(".c")],R=i=>s.querySelector("#"+id+i),B=s.querySelectorAll(".bar button");
+ B[0].onclick=()=>{let n=0;items.forEach((it,i)=>{const g=ok(it,get(c()[i]));n+=g;R(i).className="row "+(g?"good":"bad");R(i).lastChild.innerHTML=(g?"✅ ":"❌ Правильно: <b>"+txt(it)+"</b>. ")+it.e});s.querySelector(".score").textContent=`Результат: ${n} из ${items.length}`};
+ B[1].onclick=()=>{items.forEach((it,i)=>{set(c()[i],it);R(i).className="row show";R(i).lastChild.innerHTML="Ответ: <b>"+txt(it)+"</b>. "+it.e})};
+ B[2].onclick=()=>{items.forEach((it,i)=>{clear(c()[i]);R(i).className="row";R(i).lastChild.innerHTML=""});s.querySelector(".score").textContent=""};
+ add(title,s)}
+const sel=(o,p)=>`<select class=c><option value="-1">${p}</option>${o.map((x,j)=>`<option value="${j}">${x}</option>`).join("")}</select>`;
+// 1
+const OPT=["AT — место как точка на карте или место деятельности","IN — внутри помещения или ограниченного пространства","ON — на поверхности или в общественном транспорте"];
+mk("a","1. Правило","Выбери верное объяснение, почему в предложении именно этот предлог.",[
+{t:"She is <b>at</b> the airport.",a:0,e:"Аэропорт — пункт на карте: ждём рейс, встречаем людей."},
+{t:"Mum is <b>in</b> the kitchen.",a:1,e:"Кухня — помещение, мы находимся внутри."},
+{t:"He is <b>on</b> the bus.",a:2,e:"Общественный транспорт (bus, train, plane, ship) — всегда on."},
+{t:"The picture is <b>on</b> the wall.",a:2,e:"Картина висит на поверхности стены."},
+{t:"We are <b>in</b> a museum.",a:1,e:"Мы внутри здания музея."},
+{t:"The children are <b>at</b> school.",a:0,e:"School здесь — место учёбы, а не здание."},
+{t:"They are <b>in</b> the garden.",a:1,e:"Сад — ограниченное пространство с границами."},
+{t:"The book is <b>on</b> the shelf.",a:2,e:"Книга лежит на поверхности полки."},
+{t:"I am <b>at</b> the bus stop.",a:0,e:"Остановка — точка на карте, место встречи."},
+{t:"He is <b>in</b> the car.",a:1,e:"Машина — закрытое пространство (а автобус — on)."}],
+it=>it.t+sel(OPT,"— почему такой предлог? —"),e=>+e.value,(it,v)=>v==it.a,(e,it)=>e.value=it.a,it=>OPT[it.a],e=>e.value=-1);
+// 2 drag & drop
+{const Z={in:"the kitchen|a shop|a museum|a park|a garden|a car",on:"a bike|a bus|the wall|a train|a plane|a ship|the floor|a table|a shelf|the balcony|the roof",at:"university|the airport|the station|school|home|work|a bus stop"},CH=[];
+ for(const z in Z)Z[z].split("|").forEach(t=>CH.push({t,z}));CH.sort(()=>Math.random()-.5);
+ const s=document.createElement("section");
+ s.innerHTML=`<h2>2. Drag &amp; Drop</h2><p class=mut>Перетащи (или нажми слово, затем нажми на колонку) в нужную колонку: at, in или on.</p><div class="pool" data-z="">${CH.map((c,i)=>`<span class=chip draggable=true id=ch${i}>${c.t}</span>`).join("")}</div><div class=zones>${["at","in","on"].map(z=>`<div><h3>${z.toUpperCase()}</h3><div class=zone data-z=${z}></div></div>`).join("")}</div><div class=bar><button class=pri>Проверить</button><button>Показать ответы</button><button>Сбросить</button><span class=score></span></div><div class="rule fb"></div>`;
+ const chips=[...s.querySelectorAll(".chip")],box=[...s.querySelectorAll(".pool,.zone")],B=s.querySelectorAll(".bar button"),F=s.querySelector(".rule");let cur=null;F.hidden=true;
+ const mv=(ch,b)=>{b.append(ch);ch.classList.remove("ok","no","sel");cur=null};
+ chips.forEach(ch=>{ch.ondragstart=e=>{cur=ch;e.dataTransfer.setData("text","x")};ch.onclick=()=>{chips.forEach(x=>x.classList.remove("sel"));cur=ch;ch.classList.add("sel")}});
+ box.forEach(b=>{b.ondragover=e=>e.preventDefault();b.ondrop=e=>{e.preventDefault();cur&&mv(cur,b)};b.onclick=e=>{if(e.target==b&&cur)mv(cur,b)}});
+ const RL="<b>AT</b> — точка на карте, место деятельности (at school, at work).<br><b>IN</b> — внутри помещения или ограниченного пространства (in the kitchen, in a car).<br><b>ON</b> — поверхность и общественный транспорт (on the wall, on a bus).";
+ B[0].onclick=()=>{let n=0,w=[];chips.forEach((ch,i)=>{const g=ch.parentNode.dataset.z==CH[i].z;n+=g;ch.className="chip "+(g?"ok":"no");if(!g)w.push(CH[i].z+" "+CH[i].t)});s.querySelector(".score").textContent=`Верно: ${n} из ${CH.length}`;F.hidden=false;F.innerHTML=(w.length?"Исправь: <b>"+w.join(", ")+"</b>.<br>":"Отлично!<br>")+RL};
+ B[1].onclick=()=>{chips.forEach((ch,i)=>{mv(ch,s.querySelector(`.zone[data-z=${CH[i].z}]`));ch.classList.add("ok")});F.hidden=false;F.innerHTML=RL};
+ B[2].onclick=()=>{chips.forEach(ch=>mv(ch,box[0]));F.hidden=true;s.querySelector(".score").textContent=""};
+ add("2. Drag & Drop",s)}
+// 3
+const inp=(p)=>`<input class=c autocomplete=off>`,I={get:e=>e.value,ok:(it,v)=>it.a.split("|").map(norm).includes(norm(v)),set:(e,it)=>e.value=it.a.split("|")[0],txt:it=>it.a.split("|")[0],clr:e=>e.value=""};
+mk("c","3. Gaps","Вставь предлог и нужное слово из скобок (с артиклем, если он нужен).",[
+{t:"Mum is cooking <input class=c autocomplete=off> (kitchen).",a:"in the kitchen|in a kitchen",e:"Кухня — помещение: IN."},
+{t:"The kids are <input class=c autocomplete=off> (school) today.",a:"at school",e:"Место учёбы: at school, без артикля."},
+{t:"The picture is <input class=c autocomplete=off> (wall).",a:"on the wall",e:"Поверхность: ON."},
+{t:"We are waiting <input class=c autocomplete=off> (bus stop).",a:"at the bus stop|at a bus stop",e:"Остановка — точка: AT."},
+{t:"He is reading a book <input class=c autocomplete=off> (bus).",a:"on the bus|on a bus",e:"Общественный транспорт: ON."},
+{t:"My sister studies <input class=c autocomplete=off> (university).",a:"at university",e:"Место учёбы: at university, без артикля."},
+{t:"The keys are <input class=c autocomplete=off> (shelf).",a:"on the shelf",e:"Поверхность полки: ON."},
+{t:"They are walking <input class=c autocomplete=off> (park).",a:"in the park",e:"Парк — ограниченное пространство: IN."},
+{t:"I am <input class=c autocomplete=off> (home) now.",a:"at home",e:"Устойчивое выражение: at home."},
+{t:"My dad works <input class=c autocomplete=off> (airport).",a:"at the airport|at an airport",e:"Место работы как точка: AT."}],
+it=>it.t,I.get,I.ok,I.set,I.txt,I.clr);
+// 4
+const P=["at","in","on"];
+mk("d","4. Find the mistake","В каждом предложении ошибка в предлоге. Выбери правильный.",[
+{t:"She is <u>at</u> the kitchen.",a:1,e:"Кухня — помещение, поэтому in the kitchen."},
+{t:"I am waiting for you <u>in</u> the bus stop.",a:0,e:"Остановка — точка на карте: at the bus stop."},
+{t:"He is sitting <u>in</u> the bus.",a:2,e:"Общественный транспорт: on the bus."},
+{t:"There is a clock <u>in</u> the wall.",a:2,e:"Часы висят на поверхности: on the wall."},
+{t:"My brother studies <u>in</u> university.",a:0,e:"Место учёбы: at university."},
+{t:"The children are playing <u>at</u> the garden.",a:1,e:"Сад — ограниченное пространство: in the garden."},
+{t:"Put the book <u>in</u> the table.",a:2,e:"Книга лежит сверху: on the table."},
+{t:"We arrived <u>on</u> the airport at five.",a:0,e:"Аэропорт — пункт на карте: at the airport."},
+{t:"They are <u>on</u> school today.",a:0,e:"Школа как место учёбы: at school."},
+{t:"Your keys are <u>in</u> the shelf.",a:2,e:"Ключи лежат на поверхности: on the shelf."}],
+it=>it.t+sel(P,"— правильный предлог —"),e=>+e.value,(it,v)=>v==it.a,(e,it)=>e.value=it.a,it=>P[it.a],e=>e.value=-1);
+// 5
+mk("t","5. Translate","Переведи с русского на английский (подойдут и сокращения: I\u2019m).",[
+{t:"Я на кухне.",a:"I am in the kitchen",e:"Кухня — помещение: in."},
+{t:"Он в аэропорту.",a:"He is at the airport",e:"Аэропорт — точка на карте: at."},
+{t:"Мы едем в автобусе.",a:"We are on the bus|We are on a bus",e:"Автобус — общественный транспорт: on."},
+{t:"Картина на стене.",a:"The picture is on the wall",e:"Поверхность: on."},
+{t:"Она на работе.",a:"She is at work",e:"Место деятельности: at work."},
+{t:"Мои дети в школе.",a:"My children are at school|My kids are at school",e:"Место учёбы: at school."},
+{t:"Книга на полке.",a:"The book is on the shelf",e:"Поверхность полки: on."},
+{t:"Мы в парке.",a:"We are in the park",e:"Ограниченное пространство: in."},
+{t:"Ты дома?",a:"Are you at home",e:"Устойчивое выражение: at home."},
+{t:"Он сидит на балконе.",a:"He is sitting on the balcony",e:"Балкон — поверхность: on."}],
+it=>it.t+`<input class="c w" autocomplete=off>`,I.get,I.ok,I.set,I.txt,I.clr);
+// 6
+{const RQ=[["I live in … (город, страна)",/\bi live in\b/i],["I work / study at … (место работы или учёбы)",/\bi (work|study) at\b/i],["on the / a / my … (on the bus, on the balcony)",/\bon (the|a|my) \w+/i],["at home / at school / at the station …",/(?<!work |study )\bat (home|school|work|university|the \w+|a \w+)/i],["in the / a / my … (in the kitchen, in a park)",/(?<!live )\bin (the|a|my) \w+/i]];
+ const s=document.createElement("section");
+ s.innerHTML=`<h2>6. Write about yourself</h2><p class=mut>Напиши 5 предложений о себе. Используй все структуры — счётчик отметит, что уже есть.</p><ul class=req>${RQ.map(r=>`<li>☐ ${r[0]}</li>`).join("")}</ul><textarea placeholder="I live in Kraków. I study at university. ..."></textarea><div class=bar><button class=pri>Пример</button><span class=score></span></div><div class="rule fb" hidden></div>`;
+ const ta=s.querySelector("textarea"),L=s.querySelectorAll("li"),S=s.querySelector(".score"),F=s.querySelector(".rule");
+ const upd=()=>{let n=0;RQ.forEach((r,i)=>{const d=r[1].test(ta.value);n+=d;L[i].className=d?"d":"";L[i].textContent=(d?"✅ ":"☐ ")+r[0]});const sn=(ta.value.match(/[^.!?]+[.!?]/g)||[]).length;S.textContent=`Структур: ${n}/5 · предложений: ${sn}/5`;F.hidden=n<5||sn<5;F.innerHTML="🎉 Отлично! Все структуры использованы: in — внутри помещения/города, at — место деятельности и точка, on — поверхность и транспорт."};
+ ta.oninput=upd;s.querySelector(".pri").onclick=()=>{ta.value="I live in Kraków. I study at university. I read books on the bus. After lessons I am at home. My favourite place is the kitchen in my flat, and I like sitting in the garden.";upd()};
+ add("6. About me",s)}
+// 7
+{const PR=[100,200,300,500,1000,2000,4000,8000,16000,32000,64000,125000],Q=[
+["I am waiting ___ the bus stop.",["in","at","on","by"],1,"Остановка — точка на карте, место встречи: at."],
+["The cat is ___ the table.",["at","in","on","to"],2,"Кот сидит на поверхности: on."],
+["My sister studies ___ university.",["at","in","on","to"],0,"Университет как место учёбы: at."],
+["Mum is cooking ___ the kitchen.",["on","in","at","by"],1,"Кухня — помещение, мы внутри: in."],
+["I am ___ the train to Warsaw.",["in","at","on","by"],2,"Общественный транспорт: on a train / bus / plane."],
+["Which is correct?",["at home","in home","on home","to home"],0,"Устойчивое выражение: at home."],
+["Which is wrong?",["in the car","on the bus","at the airport","in the bus"],3,"Автобус — общественный транспорт: on the bus."],
+["The picture is ___ the wall.",["in","on","at","by"],1,"Картина висит на поверхности: on."],
+["The keys are ___ the car.",["on","at","in","to"],2,"Машина — закрытое пространство: in a car."],
+["Which is correct?",["in the balcony","at the balcony","by the balcony","on the balcony"],3,"Балкон — поверхность: on the balcony."],
+["Wait for me ___ the station.",["on","in","to","at"],3,"Станция — точка встречи: at the station."],
+["Which sentence is correct?",["I am at the roof.","I am on the roof.","I am in the roof.","I am by roof."],1,"Крыша — поверхность: on the roof."]];
+ const s=document.createElement("section");let i=0,h=!1,ended=!1;
+ s.innerHTML=`<h2>7. Кто хочет стать миллионером?</h2><p class=mut>12 вопросов. Ошибка — игра окончена; несгораемые суммы на 5-м и 10-м вопросах.</p><div class=rule id=st></div><div id=qq></div><div class=opts id=op></div><div class=fb id=mf></div><div class=bar><button id=nx class=pri hidden>Дальше</button><button id=h5>50:50</button><button id=rs>Заново</button></div>`;
+ const op=s.querySelector("#op"),mf=s.querySelector("#mf"),nx=s.querySelector("#nx"),st=s.querySelector("#st"),h5=s.querySelector("#h5");
+ function show(){const q=Q[i];s.querySelector("#qq").innerHTML=`<h3>${q[0]}</h3>`;mf.textContent="";nx.hidden=true;st.innerHTML=`Вопрос <b>${i+1}/12</b> · на кону <b>$${PR[i].toLocaleString("en-US")}</b>`+(i?` · уже есть $${PR[i-1].toLocaleString("en-US")}`:"");op.innerHTML=q[1].map((o,j)=>`<button data-j=${j}>${"ABCD"[j]}. ${o}</button>`).join("");op.querySelectorAll("button").forEach(b=>b.onclick=()=>pick(+b.dataset.j))}
+ function pick(j){const q=Q[i],b=op.querySelectorAll("button");b.forEach(x=>x.disabled=!0);b[q[2]].classList.add("g");if(j==q[2]){mf.innerHTML="✅ Верно! "+q[3];if(i==11){st.innerHTML="🏆 Ты миллионер! Выигрыш $125,000";}else nx.hidden=!1}else{b[j].classList.add("r");const sf=i>9?32000:i>4?1000:0;mf.innerHTML=`❌ Неверно. ${q[3]}<br>Игра окончена. Несгораемая сумма: <b>$${sf.toLocaleString("en-US")}</b>.`}}
+ nx.onclick=()=>{i++;show()};
+ h5.onclick=()=>{if(h)return;const b=[...op.querySelectorAll("button:not(:disabled)")],w=b.filter(x=>+x.dataset.j!=Q[i][2]).sort(()=>Math.random()-.5).slice(0,2);if(!b.length)return;w.forEach(x=>x.disabled=!0);h=!0;h5.disabled=!0};
+ s.querySelector("#rs").onclick=()=>{i=0;h=!1;h5.disabled=!1;show()};
+ show();add("7. Миллионер",s)}
+go(0);
+</script></main></body></html>
