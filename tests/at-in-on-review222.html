@@ -1,0 +1,79 @@
+<!DOCTYPE html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>At / In / On — повторение</title>
+<style>
+:root{--bg:#faf8f4;--fg:#222;--card:#fff;--mut:#6b6b6b;--bd:#ddd5c8;--ac:#2f6fed;--ok:#1f8a4c;--okb:#dff4e7;--no:#c0392b;--nob:#fbe3df;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#17181b;--fg:#ece9e2;--card:#222428;--mut:#a29f98;--bd:#383b41;--ac:#7aa5ff;--ok:#5fd08f;--okb:#1b3a2a;--no:#ff8a7a;--nob:#432622}}
+:root[data-theme="dark"]{--bg:#17181b;--fg:#ece9e2;--card:#222428;--mut:#a29f98;--bd:#383b41;--ac:#7aa5ff;--ok:#5fd08f;--okb:#1b3a2a;--no:#ff8a7a;--nob:#432622}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:760px;margin:auto;padding:16px}h1{font-size:24px;margin:0 0 4px}h2{font-size:20px;margin:0 0 4px}.mut{color:var(--mut);margin:0 0 12px}
+.rule{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px 14px;margin:10px 0;font-size:14px}
+nav{display:flex;gap:6px;overflow-x:auto;padding:8px 0}nav button{white-space:nowrap}
+button{font:inherit;border:1px solid var(--bd);background:var(--card);color:var(--fg);border-radius:10px;padding:8px 12px;cursor:pointer}
+button.on,button.pri{background:var(--ac);color:#fff;border-color:var(--ac)}
+section{display:none}section.v{display:block}
+.row{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:10px 12px;margin:8px 0}
+.row.good{border-color:var(--ok);background:var(--okb)}.row.bad{border-color:var(--no);background:var(--nob)}.row.show{border-color:var(--ac)}
+.fb{font-size:14px;margin-top:6px}.fb:empty{display:none}
+input,select{font:inherit;color:var(--fg);background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:6px 8px;max-width:100%}
+input.c{width:190px}select{margin-top:6px;width:100%}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:12px 0}.score{font-weight:600}
+</style></head><body><main>
+<h1>At / In / On — повторение</h1>
+<div class="rule"><b>AT</b> — точка на карте, место встречи/работы/учёбы (at the station, at work).<br><b>IN</b> — внутри помещения или ограниченного пространства (in the fridge, in a village).<br><b>ON</b> — поверхность и общественный транспорт (on the wall, on the train).</div>
+<nav id="nav"></nav><div id="app"></div>
+<script>
+const app=document.getElementById("app"),nav=document.getElementById("nav"),secs=[];
+const norm=s=>s.toLowerCase().replace(/[^a-z0-9 ]/g," ").replace(/\s+/g," ").trim();
+function go(i){secs.forEach((s,j)=>{s.classList.toggle("v",i==j);nav.children[j].classList.toggle("on",i==j)})}
+function mk(id,title,intro,items,row,get,ok,set,txt,clear){
+ const s=document.createElement("section");
+ s.innerHTML=`<h2>${title}</h2><p class=mut>${intro}</p>`+items.map((it,i)=>`<div class=row id=${id}${i}><div>${i+1}. ${row(it)}</div><div class=fb></div></div>`).join("")+`<div class=bar><button class=pri>Проверить</button><button>Показать ответы</button><button>Сбросить</button><span class=score></span></div>`;
+ const c=()=>[...s.querySelectorAll(".c")],R=i=>s.querySelector("#"+id+i),B=s.querySelectorAll(".bar button");
+ B[0].onclick=()=>{let n=0;items.forEach((it,i)=>{const g=ok(it,get(c()[i]));n+=g;R(i).className="row "+(g?"good":"bad");R(i).lastChild.innerHTML=(g?"✅ ":"❌ Правильно: <b>"+txt(it)+"</b>. ")+it.e});s.querySelector(".score").textContent=`Результат: ${n} из ${items.length}`};
+ B[1].onclick=()=>{items.forEach((it,i)=>{set(c()[i],it);R(i).className="row show";R(i).lastChild.innerHTML="Ответ: <b>"+txt(it)+"</b>. "+it.e})};
+ B[2].onclick=()=>{items.forEach((it,i)=>{clear(c()[i]);R(i).className="row";R(i).lastChild.innerHTML=""});s.querySelector(".score").textContent=""};
+ secs.push(s);app.append(s);const b=document.createElement("button");b.textContent=title.split(".")[0]+". "+title.split(". ")[1];b.onclick=()=>go(secs.indexOf(s));nav.append(b)}
+const sel=(o,p)=>`<select class=c><option value="-1">${p}</option>${o.map((x,j)=>`<option value="${j}">${x}</option>`).join("")}</select>`;
+const P=["at","in","on"],S={get:e=>+e.value,ok:(it,v)=>v==it.a,set:(e,it)=>e.value=it.a,clr:e=>e.value=-1};
+// 1
+mk("a","1. Choose at / in / on","Выбери нужный предлог.",[
+{t:"My grandma lives ___ a small village.",a:1,e:"Деревня — ограниченное пространство: in."},
+{t:"Let us meet ___ the cinema at six.",a:0,e:"Место встречи, точка на карте: at."},
+{t:"There is a spider ___ the ceiling.",a:2,e:"Потолок — поверхность: on."},
+{t:"The baby is sleeping ___ the bedroom.",a:1,e:"Спальня — помещение: in."},
+{t:"There are many fish ___ the river.",a:1,e:"Рыбы внутри реки (водоёма): in."},
+{t:"Look! There is a bird ___ the roof.",a:2,e:"Крыша — поверхность: on."},
+{t:"I saw him ___ the station yesterday.",a:0,e:"Станция — точка на карте: at."},
+{t:"She is sitting ___ the plane next to me.",a:2,e:"Общественный транспорт: on a plane."},
+{t:"My dad is ___ work until seven.",a:0,e:"Место деятельности: at work."},
+{t:"The milk is ___ the fridge.",a:1,e:"Холодильник — закрытое пространство: in."}],
+it=>it.t+sel(P,"— at / in / on —"),S.get,S.ok,S.set,it=>P[it.a],S.clr);
+// 2
+const I={get:e=>e.value,ok:(it,v)=>it.a.split("|").map(norm).includes(norm(v)),set:(e,it)=>e.value=it.a.split("|")[0],txt:it=>it.a.split("|")[0],clr:e=>e.value=""},F=`<input class=c autocomplete=off>`;
+mk("b","2. Gaps","Вставь предлог и слово из скобок (с артиклем, если нужно).",[
+{t:`Wait for me ${F} (entrance).`,a:"at the entrance",e:"Вход — точка встречи: at."},
+{t:`The cup is ${F} (desk).`,a:"on the desk",e:"Стол — поверхность: on."},
+{t:`My mum works ${F} (hospital).`,a:"at the hospital|in the hospital|at a hospital|in a hospital",e:"Место работы: at the hospital (in the hospital — тоже возможно, если важно, что внутри)."},
+{t:`My phone is ${F} (bag).`,a:"in my bag|in the bag|in a bag",e:"Сумка — закрытое пространство: in."},
+{t:`There are some flowers ${F} (vase).`,a:"in the vase|in a vase",e:"Цветы внутри вазы: in."},
+{t:`Do not sit ${F} (floor).`,a:"on the floor",e:"Пол — поверхность: on."},
+{t:`We are ${F} (train) to Berlin.`,a:"on the train|on a train",e:"Общественный транспорт: on."},
+{t:`I left my coat ${F} (home).`,a:"at home",e:"Устойчивое выражение: at home."},
+{t:`He lives ${F} (second floor).`,a:"on the second floor",e:"Этаж — уровень-поверхность: on the second floor."},
+{t:`The students are ${F} (library).`,a:"in the library|at the library",e:"Библиотека: in (внутри) или at (место занятий)."}],
+it=>it.t,I.get,I.ok,I.set,I.txt,I.clr);
+// 3
+mk("c","3. Choose the correct sentence","Выбери правильное предложение.",[
+{o:["He is in the work.","He is at work."],a:1,e:"Устойчивое выражение: at work."},
+{o:["The poster is on the wall.","The poster is in the wall."],a:0,e:"Постер висит на поверхности: on the wall."},
+{o:["We live at a big city.","We live in a big city."],a:1,e:"Город — ограниченное пространство: in."},
+{o:["I am at the bus stop.","I am on the bus stop."],a:0,e:"Остановка — точка на карте: at."},
+{o:["She is on the train now.","She is at the train now."],a:0,e:"Общественный транспорт: on."},
+{o:["There is water on the bottle.","There is water in the bottle."],a:1,e:"Вода внутри бутылки: in."},
+{o:["They are at university.","They are on university."],a:0,e:"Место учёбы: at university."},
+{o:["Do not leave your bag at the floor.","Do not leave your bag on the floor."],a:1,e:"Пол — поверхность: on the floor."},
+{o:["He is on the plane.","He is in the plane."],a:0,e:"Самолёт — общественный транспорт: on."},
+{o:["The kids are at home.","The kids are in home."],a:0,e:"Устойчивое выражение: at home."}],
+it=>sel(it.o,"— выбери предложение —"),S.get,S.ok,S.set,it=>it.o[it.a],S.clr);
+go(0);
+</script></main></body></html>
