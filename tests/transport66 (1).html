@@ -1,0 +1,636 @@
+<title>Transport Trainer</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Overpass:wght@600;800&display=swap">
+<style>
+/* Layout: asphalt top bar, content column + sticky "problem words" lane on the side; tasks are road-sign badges (V1-V5, G1-G4). */
+:root{
+  --bg:#e3e8ed; --surface:#f6f8fa; --surface-2:#eaeff3; --ink:#12202c; --muted:#566878; --line:#c3cdd6;
+  --blue:#0b4fa8; --blue-ink:#ffffff; --yellow:#f2b000; --road:#1b2229; --road-ink:#f1f4f7;
+  --ok:#17794a; --ok-bg:#d6efe1; --bad:#b52b23; --bad-bg:#f9dcd9; --shown-bg:#fdf0c4;
+  --f-display:'Overpass','Arial Narrow','Helvetica Neue',Arial,sans-serif;
+  --f-body:'Inter','Noto Sans','Segoe UI',system-ui,sans-serif;
+  --p0:#0b4fa8;--p1:#c2410c;--p2:#15803d;--p3:#7e22ce;--p4:#be185d;--p5:#0e7490;--p6:#a16207;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f1418; --surface:#18202a; --surface-2:#202a35; --ink:#e6edf3; --muted:#93a4b3; --line:#2c3947;
+  --blue:#6aa6ff; --blue-ink:#071b36; --yellow:#ffc933; --road:#0a0e12; --road-ink:#f1f4f7;
+  --ok:#52d490; --ok-bg:#12392a; --bad:#ff8077; --bad-bg:#431f1f; --shown-bg:#3b3212;
+  --p0:#6aa6ff;--p1:#fb923c;--p2:#4ade80;--p3:#c084fc;--p4:#f472b6;--p5:#22d3ee;--p6:#facc15;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1418; --surface:#18202a; --surface-2:#202a35; --ink:#e6edf3; --muted:#93a4b3; --line:#2c3947;
+  --blue:#6aa6ff; --blue-ink:#071b36; --yellow:#ffc933; --road:#0a0e12; --road-ink:#f1f4f7;
+  --ok:#52d490; --ok-bg:#12392a; --bad:#ff8077; --bad-bg:#431f1f; --shown-bg:#3b3212;
+  --p0:#6aa6ff;--p1:#fb923c;--p2:#4ade80;--p3:#c084fc;--p4:#f472b6;--p5:#22d3ee;--p6:#facc15;
+  color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:84px}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.5}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--road);z-index:50}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.1}
+p{margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--yellow);outline-offset:2px}
+.in{max-width:1220px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+/* top bar */
+.top{background:var(--road);color:var(--road-ink);position:sticky;top:env(safe-area-inset-top,0px);z-index:40;border-bottom:3px solid var(--yellow)}
+.top .in{display:flex;flex-wrap:wrap;align-items:center;gap:8px 18px;padding-block:10px}
+.brand{font-family:var(--f-display);font-weight:800;font-size:1.15rem;letter-spacing:.02em;display:flex;align-items:center;gap:10px;color:inherit;text-decoration:none}
+.brand i{display:inline-block;width:28px;height:28px;border-radius:7px;background:var(--blue);box-shadow:inset 0 0 0 2px var(--blue),inset 0 0 0 3.5px #fff;position:relative}
+.brand i::after{content:"";position:absolute;left:50%;top:5px;bottom:5px;width:2px;margin-left:-1px;background:repeating-linear-gradient(#fff 0 4px,transparent 4px 7px)}
+.nav{display:flex;gap:4px;flex-wrap:wrap}
+.nav a{color:inherit;text-decoration:none;padding:5px 11px;border-radius:999px;font-size:.9rem;font-weight:500;opacity:.85}
+.nav a:hover{background:rgba(255,255,255,.12);opacity:1}
+.voice{margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:.85rem}
+.voice select{background:#26313b;color:#fff;border:1px solid #3d4b58;border-radius:8px;padding:5px 8px;max-width:210px}
+.voice .btn{background:#26313b;color:#fff;border-color:#3d4b58;padding:5px 11px}
+.astat{display:inline-flex;align-items:center;gap:6px}
+.astat::before{content:"";width:9px;height:9px;border-radius:50%;background:#8b98a5}
+.astat.ok::before{background:#4ade80}.astat.err::before{background:#ff8077}
+@media(max-width:760px){.top{position:static}.nav{order:3;width:100%}.voice{margin-left:0;width:100%}}
+
+/* hero */
+.hero{background:var(--road);color:var(--road-ink);position:relative;overflow:hidden}
+.hero .in{padding-block:34px 44px;position:relative}
+.hero h1{font-weight:800;font-size:clamp(2.2rem,6.5vw,4.2rem);letter-spacing:-.01em}
+.hero p{max-width:60ch;margin-top:12px;color:#c9d3dc}
+.hero .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
+.hero .chips span{border:1px solid #3d4b58;border-radius:999px;padding:3px 12px;font-size:.85rem}
+.lane{height:12px;background:repeating-linear-gradient(90deg,var(--yellow) 0 38px,transparent 38px 72px);background-size:72px 4px;background-repeat:repeat-x;background-position:0 4px;animation:lane 2.4s linear infinite}
+@keyframes lane{to{background-position:72px 4px}}
+@media(prefers-reduced-motion:reduce){.lane{animation:none}html{scroll-behavior:auto}}
+
+/* layout */
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:30px;align-items:start;padding-block:30px 90px}
+.col{min-width:0;display:flex;flex-direction:column;gap:44px}
+@media(max-width:980px){.grid{grid-template-columns:minmax(0,1fr)}}
+.grid.noprob{grid-template-columns:minmax(0,1fr)}
+.grid.noprob .prob{display:none}
+.sec>header{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:6px}
+.sec h2{font-weight:800;font-size:clamp(1.6rem,4vw,2.2rem)}
+.lead{color:var(--muted);max-width:68ch;margin-bottom:16px}
+.road-rule{height:6px;border-radius:3px;background:repeating-linear-gradient(90deg,var(--yellow) 0 22px,transparent 22px 40px);margin:6px 0 18px;opacity:.9}
+
+/* buttons */
+.btn{border:1.5px solid var(--line);background:var(--surface);color:var(--ink);padding:8px 16px;border-radius:10px;cursor:pointer;font-weight:500;font-size:.92rem}
+.btn:hover{border-color:var(--blue)}
+.btn.primary{background:var(--blue);color:var(--blue-ink);border-color:var(--blue)}
+.btn.primary:hover{filter:brightness(1.1)}
+.btn.ghost{border-color:transparent;background:transparent;color:var(--muted)}
+.btn.ghost:hover{color:var(--ink);border-color:var(--line)}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+
+/* words */
+.wtools{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:14px}
+.wprog{color:var(--muted);font-size:.9rem}
+.wgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.wcard{display:flex;gap:12px;align-items:center;padding:10px 12px;background:var(--surface);border:1px solid var(--line);border-radius:12px;min-width:0}
+.wcard.heard{border-color:var(--ok)}
+.wcard.now{box-shadow:0 0 0 3px var(--yellow)}
+.say{flex:none;width:40px;height:40px;border-radius:50%;border:none;background:var(--blue);color:var(--blue-ink);display:grid;place-items:center;cursor:pointer}
+.say.sm{width:30px;height:30px}
+.say svg{width:20px;height:20px;fill:currentColor}
+.say.sm svg{width:16px;height:16px}
+.wtxt{min-width:0}
+.en{font-family:var(--f-display);font-weight:800;font-size:1.12rem;line-height:1.2;overflow-wrap:anywhere}
+.en .var{font-weight:600;color:var(--muted)}
+.ipa{font-family:var(--f-body);color:var(--blue);font-size:.88rem}
+.ru{color:var(--muted);font-size:.9rem}
+
+/* tasks */
+.tasks{display:flex;flex-direction:column;gap:22px}
+.task{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px 20px 16px;min-width:0}
+.thead{display:flex;gap:14px;align-items:flex-start}
+.sign{flex:none;min-width:52px;height:40px;padding:0 8px;border-radius:9px;background:var(--blue);color:var(--blue-ink);box-shadow:inset 0 0 0 2px var(--blue),inset 0 0 0 3.5px var(--blue-ink);display:grid;place-items:center;font-family:var(--f-display);font-weight:800;letter-spacing:.04em}
+.thead h3{font-size:1.3rem;font-weight:800}
+.thead p{color:var(--muted);font-size:.93rem;margin-top:4px;max-width:70ch}
+.score{margin-left:auto;font-family:var(--f-display);font-weight:800;font-size:1.05rem;padding:3px 12px;border-radius:999px;background:var(--surface-2);color:var(--muted);flex:none;visibility:hidden}
+.score.on{visibility:visible;color:var(--ink)}
+.tbody{margin-top:16px;min-width:0}
+.tbar{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;padding-top:14px;border-top:1px dashed var(--line)}
+.fb{min-height:1.4em;margin-top:10px;font-weight:500;font-size:.95rem}
+.fb.good{color:var(--ok)}.fb.warn{color:var(--bad)}
+@media(max-width:560px){.task{padding:16px 14px 14px}.thead{flex-wrap:wrap}.score{margin-left:0}}
+
+/* typed answers */
+.ans{border:1.5px solid var(--line);background:var(--bg);border-radius:8px;padding:4px 9px;min-width:0;font-size:1rem}
+.ans.ok{border-color:var(--ok);background:var(--ok-bg)}
+.ans.bad{border-color:var(--bad);background:var(--bad-bg)}
+.ans.shown{border-style:dashed;border-color:var(--yellow);background:var(--shown-bg)}
+.gap{width:9ch;max-width:100%;text-align:center;margin:0 3px}
+.text{line-height:2.3;max-width:75ch}
+.bank{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+.bank span{background:var(--surface-2);border-radius:8px;padding:2px 10px;font-size:.9rem}
+.bank span.used{text-decoration:line-through;opacity:.45}
+.list{display:flex;flex-direction:column;gap:12px;margin:0;padding:0;list-style:none}
+.list li{display:flex;flex-wrap:wrap;align-items:center;gap:4px 2px;line-height:2.1}
+.list .n{font-family:var(--f-display);font-weight:800;color:var(--muted);width:1.7em;flex:none}
+.hint{width:100%;font-size:.85rem;color:var(--muted);padding-left:1.7em;line-height:1.4}
+.hint.bad{color:var(--bad)}
+.rep{display:flex;flex-direction:column;gap:4px;width:100%}
+.rep q{font-style:normal;font-weight:500;quotes:none}
+.rep .kw{align-self:flex-start;background:var(--yellow);color:#1b2229;border-radius:6px;padding:0 8px;font-size:.78rem;font-weight:700;letter-spacing:.05em}
+.rep .ans{width:100%}
+.line{display:flex;gap:10px;align-items:baseline;margin-bottom:10px}
+.line b{flex:none;width:1.6em;font-family:var(--f-display)}
+.line .ans{flex:1;width:100%}
+.line .b{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.starter{font-weight:600}
+
+/* matching */
+.mcols{display:grid;grid-template-columns:1fr 1fr;gap:12px 26px;max-width:560px}
+.mcol{display:flex;flex-direction:column;gap:8px;min-width:0}
+.mb{position:relative;text-align:left;border:1.5px solid var(--line);background:var(--bg);border-radius:10px;padding:8px 12px 8px 12px;cursor:pointer;min-height:42px;font-weight:500;overflow-wrap:anywhere}
+.mb.sel{border-color:var(--yellow);box-shadow:0 0 0 3px color-mix(in srgb,var(--yellow) 40%,transparent)}
+.mb .pn{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:.78rem;font-weight:700;color:#fff}
+.mb.paired{padding-right:38px}
+.mb.ok{background:var(--ok-bg)}.mb.bad{background:var(--bad-bg)}.mb.shown{background:var(--shown-bg)}
+.mb.paired{border-color:var(--pc)}
+.mb .pn{background:var(--pc)}
+[data-c="0"]{--pc:var(--p0)}[data-c="1"]{--pc:var(--p1)}[data-c="2"]{--pc:var(--p2)}[data-c="3"]{--pc:var(--p3)}[data-c="4"]{--pc:var(--p4)}[data-c="5"]{--pc:var(--p5)}[data-c="6"]{--pc:var(--p6)}
+
+/* context */
+.ctx{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.cq{border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--bg);min-width:0}
+.cq p{margin-bottom:10px}
+.cq mark{background:color-mix(in srgb,var(--yellow) 55%,transparent);color:inherit;border-radius:4px;padding:0 3px;font-weight:600}
+.opts{display:flex;flex-direction:column;gap:6px}
+.opt{text-align:left;border:1.5px solid var(--line);background:var(--surface);border-radius:8px;padding:6px 10px;cursor:pointer}
+.opt.sel{border-color:var(--blue);background:var(--surface-2)}
+.opt.ok{border-color:var(--ok);background:var(--ok-bg)}.opt.bad{border-color:var(--bad);background:var(--bad-bg)}.opt.shown{border:1.5px dashed var(--yellow);background:var(--shown-bg)}
+
+/* story */
+.story textarea{width:100%;min-height:150px;resize:vertical;border:1.5px solid var(--line);background:var(--bg);border-radius:10px;padding:10px 12px;line-height:1.55}
+.tgt{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.tg{border:1.5px solid var(--line);border-radius:10px;padding:5px 12px;background:var(--bg)}
+.tg small{display:block;color:var(--muted);font-size:.78rem}
+.tg.used{border-color:var(--ok);background:var(--ok-bg)}
+.tg.used b::after{content:" ✓"}
+.cnt{margin-top:8px;color:var(--muted);font-size:.9rem}
+
+/* bingo */
+.bmodes{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.bmodes .btn.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.call{background:var(--road);color:var(--road-ink);border-radius:12px;padding:14px 16px;margin-bottom:12px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;min-height:68px;border-bottom:4px solid var(--yellow)}
+.call .ct{flex:1;min-width:200px}
+.call small{display:block;color:#a9b6c2}
+.call .btn{background:#26313b;border-color:#3d4b58;color:#fff}
+.bgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.bc{border:1.5px solid var(--line);background:var(--bg);border-radius:10px;min-height:64px;padding:6px;cursor:pointer;font-weight:600;font-size:.92rem;line-height:1.2;overflow-wrap:anywhere;display:grid;place-items:center;text-align:center}
+.bc.ok{background:var(--ok-bg);border-color:var(--ok);color:var(--ok)}
+.bc.bad{animation:shake .4s;border-color:var(--bad);background:var(--bad-bg)}
+.bc.shown{border:2px dashed var(--yellow);background:var(--shown-bg)}
+.bc.line{box-shadow:0 0 0 3px var(--yellow)}
+@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+@media(max-width:480px){.bgrid{gap:5px}.bc{font-size:.8rem;min-height:56px;padding:4px}}
+.banner{margin-top:10px;font-family:var(--f-display);font-weight:800;font-size:1.3rem;color:var(--ok)}
+
+/* rules */
+details.rules{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 18px;margin-bottom:22px}
+details.rules summary{cursor:pointer;font-family:var(--f-display);font-weight:800;font-size:1.1rem}
+.rgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-top:14px}
+.rb{background:var(--bg);border-radius:10px;padding:10px 12px;font-size:.93rem;min-width:0}
+.rb h4{margin:0 0 4px;font-family:var(--f-display);font-size:1rem}
+.rb code{display:block;font-family:var(--f-body);color:var(--blue);margin-top:3px}
+.rb .x{color:var(--bad)}
+
+/* self */
+.self{display:flex;flex-direction:column;gap:10px}
+.srow{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--surface);border:1px solid var(--line);border-radius:12px}
+.srow span{flex:1 1 280px;min-width:0}
+.seg{display:flex;border:1.5px solid var(--line);border-radius:10px;overflow:hidden}
+.seg button{border:none;background:var(--bg);padding:6px 12px;cursor:pointer;font-size:.88rem;border-right:1px solid var(--line)}
+.seg button:last-child{border:none}
+.seg button.on[data-l="0"]{background:var(--bad-bg);color:var(--bad)}
+.seg button.on[data-l="1"]{background:var(--shown-bg);color:var(--ink)}
+.seg button.on[data-l="2"]{background:var(--ok-bg);color:var(--ok)}
+.sum{margin-top:16px;background:var(--road);color:var(--road-ink);border-radius:14px;padding:18px;border-bottom:4px solid var(--yellow)}
+.sum h3{font-size:1.2rem;margin-bottom:8px}
+.sum ul{margin:0 0 12px;padding-left:1.1em}
+.sum .btn{background:#26313b;color:#fff;border-color:#3d4b58}
+
+/* problem words */
+.prob{position:sticky;top:calc(env(safe-area-inset-top,0px) + 84px);max-height:calc(100vh - 110px);overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:14px;border-top:5px solid var(--bad);padding:14px}
+.prob h3{font-size:1.1rem;font-weight:800;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.prob .sub{color:var(--muted);font-size:.84rem;margin:4px 0 10px}
+.prob ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.prob li{display:flex;gap:8px;align-items:center;background:var(--bg);border-radius:10px;padding:6px 8px;min-width:0}
+.prob li div{flex:1;min-width:0}
+.prob li b{display:block;overflow-wrap:anywhere;font-size:.95rem}
+.prob li small{color:var(--muted);display:block;line-height:1.3}
+.prob .times{font-family:var(--f-display);font-weight:800;color:var(--bad);flex:none}
+.prob .empty{color:var(--muted);font-size:.9rem;padding:8px 0}
+.prob .acts{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.prob .btn{padding:5px 10px;font-size:.82rem}
+.fab{display:none}
+.close{display:none}
+@media(max-width:980px){
+  .prob{position:fixed;left:0;right:0;bottom:0;top:auto;z-index:60;max-height:72vh;border-radius:16px 16px 0 0;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-bottom:calc(14px + env(safe-area-inset-bottom,0px));box-shadow:0 -10px 30px rgba(0,0,0,.25)}
+  .prob:not(.open){visibility:hidden;transform:translateY(105%)}
+  .prob{transition:transform .25s,visibility .25s}
+  .fab{display:flex;position:fixed;z-index:45;right:calc(16px + env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));border:none;border-radius:999px;background:var(--bad);color:#fff;padding:11px 18px;font-weight:600;box-shadow:0 6px 18px rgba(0,0,0,.3);cursor:pointer;gap:8px;align-items:center}
+  .fab[hidden]{display:none}
+  .close{display:inline-block}
+}
+
+/* overlays */
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);background:var(--ink);color:var(--bg);padding:9px 18px;border-radius:999px;opacity:0;pointer-events:none;transition:.25s;z-index:90;font-weight:500;max-width:90vw}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.sr-copy{position:fixed;left:-9999px;top:0}
+</style>
+
+<header class="top">
+  <div class="in">
+    <a class="brand" href="#top"><i></i>Transport Trainer</a>
+    <nav class="nav" aria-label="Разделы">
+      <a href="#words">Слова</a><a href="#vocab">Лексика</a><a href="#grammar">Грамматика</a><a href="#done">Итог</a>
+    </nav>
+    <div class="voice">
+      <label for="voiceSel" class="astat" id="astat">Голос</label>
+      <select id="voiceSel" aria-label="Голос озвучки"></select>
+      <button class="btn" id="voiceTest" type="button">Проверить звук</button>
+    </div>
+  </div>
+</header>
+
+<div class="hero" id="top">
+  <div class="in">
+    <h1>Traffic &amp; Transport</h1>
+    <p>29 слов о дороге и транспорте и четыре темы грамматики: сравнения, превосходная степень, less и likely / probably. Печатайте ответы руками, проверяйте их и открывайте подсказки. Слова, в которых вы ошиблись, собираются в боковой таблице.</p>
+    <div class="chips"><span>5 заданий по лексике</span><span>4 задания по грамматике</span><span>озвучка US English</span></div>
+  </div>
+  <div class="lane" aria-hidden="true"></div>
+</div>
+
+<div class="in">
+<div class="grid">
+<main class="col">
+
+  <section class="sec" id="words">
+    <header><h2>Слова на сегодня</h2></header>
+    <p class="lead">Нажмите на кнопку со звуком, послушайте слово и повторите его вслух. Можно включить все слова подряд.</p>
+    <div class="wtools">
+      <button class="btn primary" id="playAll" type="button">Прослушать все</button>
+      <span class="wprog" id="wprog"></span>
+    </div>
+    <div class="wgrid" id="wgrid"></div>
+  </section>
+
+  <section class="sec" id="vocab">
+    <header><h2>Лексика</h2></header>
+    <div class="road-rule"></div>
+    <div class="tasks" id="vtasks"></div>
+  </section>
+
+  <section class="sec" id="grammar">
+    <header><h2>Грамматика</h2></header>
+    <div class="road-rule"></div>
+    <details class="rules" open>
+      <summary>Напоминание</summary>
+      <div class="rgrid">
+        <div class="rb"><h4>Comparative + than</h4>old → older, big → bigger, easy → easier, modern → more modern<code>good → better · bad → worse · far → further / farther</code></div>
+        <div class="rb"><h4>(not) as … as · the same as</h4>She’s not as tall as me.<code>Her dress is the same as mine.</code>После than / as: me, him, her или I am, he is. <span class="x">She’s taller than I.</span></div>
+        <div class="rb"><h4>less … than = менее … чем</h4>This car is less expensive than that one.<code>He drives less carefully than his father.</code></div>
+        <div class="rb"><h4>Superlative</h4>the tallest · the most interesting · the best · the worst · the furthest<code>Adverbs: the fastest · the most carefully · the best</code>the least + adj / adv = наименее</div>
+        <div class="rb"><h4>Likely vs probably</h4>be likely to + verb: It’s likely to rain.<code>probably + verb: I’ll probably stay at home.</code>probably won’t + verb</div>
+      </div>
+    </details>
+    <div class="tasks" id="gtasks"></div>
+  </section>
+
+  <section class="sec" id="done">
+    <header><h2>Что я теперь знаю</h2></header>
+    <div class="road-rule"></div>
+    <p class="lead">Оцените себя честно. Итог можно скопировать и отправить учителю.</p>
+    <div class="self" id="self"></div>
+    <div class="sum" id="sum"></div>
+  </section>
+</main>
+
+<aside class="prob" id="prob" aria-label="Проблемные слова">
+  <h3><span>Проблемные слова</span><button class="btn ghost close" id="probClose" type="button">Закрыть</button></h3>
+  <p class="sub">Здесь собираются слова и правила, в которых была ошибка. Нажмите на звук, чтобы услышать слово.</p>
+  <div id="probList"></div>
+  <div class="acts"><button class="btn" id="probCopy" type="button">Копировать</button><button class="btn ghost" id="probClear" type="button">Очистить</button></div>
+</aside>
+</div>
+</div>
+
+<button class="fab" id="fab" type="button">Проблемные слова <b id="fabN">0</b></button>
+<div class="toast" id="toast" role="status"></div>
+
+
+<script>
+(function(){
+'use strict';
+const $=s=>document.querySelector(s);
+function h(tag,props,...kids){const e=document.createElement(tag);for(const k in props||{}){const v=props[k];if(k==='class')e.className=v;else if(k.startsWith('on'))e.addEventListener(k.slice(2),v);else if(v!==false&&v!=null)e.setAttribute(k,v===true?'':v)}for(const c of kids.flat()){if(c==null||c===false)continue;e.append(c.nodeType?c:document.createTextNode(c))}return e}
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+const E=s=>s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+function norm(s){return String(s).toLowerCase().replace(/[’‘`]/g,"'").replace(/\bwon't\b/g,'will not').replace(/\b(is|are|does|do|did|was|were|has|have|would)n't\b/g,'$1 not').replace(/[.,!?;:"“”]/g,' ').replace(/\s+/g,' ').trim()}
+const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+
+/* ---------- words ---------- */
+const W=[];
+function mk(t,ipa,ru,ex,def,o){o=o||{};const id=W.length;const parts=t.replace(/[!?]/g,'').split(' ');const rxs=o.rx||(parts.map(E).join('[\\s-]*')+'s?');
+  W.push({id,t,ipa,ru,ex,def,v:o.v||'',kind:o.kind||'n',split:o.split||null,rx:new RegExp('\\b(?:'+rxs+')\\b','i'),acc:[t.toLowerCase(),...(o.acc||[])]})}
+mk('road works','/ˌrəʊd ˈwɜːks/','дорожные работы','We took a different street because of the road works.','repairs on a road, with workers and signs',{rx:'road[\\s-]*works?',split:['road','works']});
+mk('traffic jam','/ˈtræfɪk dʒæm/','пробка','We sat in a traffic jam for an hour and arrived late.','a long line of cars that cannot move quickly',{split:['traffic','jam']});
+mk('speed limit','/ˈspiːd ˌlɪmɪt/','ограничение скорости','The speed limit in town is thirty kilometres an hour.','the fastest speed you can legally drive',{split:['speed','limit']});
+mk('petrol station','/ˈpetrəl ˌsteɪʃn/','заправка','Dad stopped at the petrol station to fill the tank.','a place where you buy fuel for your car',{split:['petrol','station']});
+mk('cycle lane','/ˈsaɪkl leɪn/','велодорожка','Cyclists should stay in the cycle lane, not on the pavement.','part of the road only for bicycles',{split:['cycle','lane']});
+mk('speed camera','/ˈspiːd ˌkæmərə/','камера контроля скорости','The speed camera took a photo of the car going too fast.','a camera that photographs cars going too fast',{split:['speed','camera']});
+mk('rush hour','/ˈrʌʃ ˌaʊə/','час пик','Buses are always full during the rush hour, around 8 a.m.','the time when roads are full because people go to or from work',{split:['rush','hour']});
+mk('pedestrian zone','/pəˈdestriən zəʊn/','пешеходная зона','Cars cannot enter the pedestrian zone, so the centre is quiet.','a street where cars are not allowed, only people on foot',{split:['pedestrian','zone']});
+mk('tram','/træm/','трамвай','The tram runs along rails in the middle of the street.','an electric vehicle that runs on rails in the street');
+mk('motorway','/ˈməʊtəweɪ/','автомагистраль (freeway)','We drove 300 kilometres on the motorway without any traffic lights.','a wide, fast road for long journeys',{v:'freeway',rx:'motorways?|freeways?',split:['motor','way'],acc:['freeway']});
+mk('seat belt','/ˈsiːt belt/','ремень безопасности','Always put on your seat belt before you start the car.','a strap that keeps you safe in a car seat',{split:['seat','belt'],rx:'seat[\\s-]*belts?'});
+mk('Look out!','/lʊk ˈaʊt/ · /wɒtʃ ˈaʊt/','Осторожно! (Watch out!)','Look out! A bike is coming from the left!','a warning you shout when there is danger',{v:'Watch out!',kind:'v',rx:'(?:look|watch)\\s+out',acc:['look out','watch out']});
+mk('zebra crossing','/ˌzebrə ˈkrɒsɪŋ/','пешеходный переход','Cars must stop when someone is on the zebra crossing.','black and white stripes where cars must stop for people',{split:['zebra','crossing']});
+mk('parking fine','/ˈpɑːkɪŋ faɪn/','штраф за парковку','He left the car in the wrong place and got a parking fine.','money you pay for leaving your car in the wrong place',{split:['parking','fine']});
+mk('traffic lights','/ˈtræfɪk laɪts/','светофор','Stop when the traffic lights are red.','red, yellow and green lights that control cars',{rx:'traffic[\\s-]*lights?',split:['traffic','lights'],acc:['traffic light']});
+mk('taxi rank','/ˈtæksi ræŋk/','стоянка такси','We waited at the taxi rank because there were no taxis in the street.','a place where taxis wait for passengers',{split:['taxi','rank']});
+mk('car crash','/ˈkɑː kræʃ/','авария','Two people were hurt in a car crash on the bridge.','an accident when cars hit each other',{rx:'car[\\s-]*crash(?:es)?',split:['car','crash']});
+mk('drop off','/ˌdrɒp ˈɒf/','высадить, подвезти','Mum will drop me off at school on her way to work.','to take someone somewhere by car and leave them there',{kind:'v',rx:'drop(?:s|ped|ping)?\\s+(?:\\w+\\s+)?off',split:['drop','off']});
+mk('set off','/ˌset ˈɒf/','отправиться в путь','We set off at six in the morning to avoid the traffic.','to start a journey',{kind:'v',rx:'set(?:s|ting)?\\s+off',split:['set','off']});
+mk('end up','/ˌend ˈʌp/','оказаться, очутиться','If you take the wrong bus, you will end up in a different town.','to finally be in a place or situation you did not plan',{kind:'v',rx:'end(?:s|ed|ing)?\\s+up',split:['end','up']});
+mk('coach','/kəʊtʃ/','междугородний автобус','The school trip to Paris was by coach, a very long ride.','a comfortable bus for long journeys',{rx:'coach(?:es)?'});
+mk('scooter','/ˈskuːtə/','скутер, самокат','She goes to work on a scooter because it is easy to park.','a small vehicle with two wheels, with a small motor or pushed with one foot');
+mk('van','/væn/','фургон','The workers loaded their tools into the van.','a vehicle smaller than a lorry, used for carrying goods');
+mk('ferry','/ˈferi/','паром','The ferry carried our car across the sea to Sweden.','a boat that carries people and cars across water',{rx:'ferr(?:y|ies)'});
+mk('the Underground','/ðə ˈʌndəɡraʊnd/','метро (the subway)','It is quicker to go by the Underground than by bus in London.','a railway system under a city',{v:'the subway',rx:'underground|subway|tube',acc:['underground','the subway','subway']});
+mk('motorbike','/ˈməʊtəbaɪk/','мотоцикл','He rides a motorbike and always wears a helmet.','a two-wheeled vehicle with an engine, faster than a bicycle',{split:['motor','bike']});
+mk('lorry','/ˈlɒri/','грузовик (truck)','A big lorry full of boxes blocked the narrow street.','a large vehicle for carrying heavy goods',{v:'truck',rx:'lorr(?:y|ies)|trucks?',acc:['truck']});
+mk('run out of','/ˌrʌn ˈaʊt əv/','закончиться, истощить запас','We ran out of petrol and had to push the car.','to use all of something so there is none left',{kind:'v',rx:'(?:ran|run(?:s|ning)?)\\s+out\\s+of',split:['run out','of']});
+mk('pick up','/ˌpɪk ˈʌp/','забрать (кого-то)','Can you pick me up from the station at seven?','to collect someone or something and take them with you',{kind:'v',rx:'pick(?:s|ed|ing)?\\s+(?:\\w+\\s+)?up',split:['pick','up']});
+const wname=w=>w.t+(w.v?' / '+w.v:'');
+
+const use={};
+function pick(n,pred){pred=pred||(()=>true);const c=W.filter(pred).map(w=>({w,k:(use[w.id]||0)+Math.random()})).sort((a,b)=>a.k-b.k).slice(0,n).map(x=>x.w);c.forEach(w=>use[w.id]=(use[w.id]||0)+1);return shuffle(c)}
+function pickPairs(n){const c=W.filter(w=>w.split).map(w=>({w,k:(use[w.id]||0)+Math.random()})).sort((a,b)=>a.k-b.k);const seen=new Set(),out=[];for(const x of c){if(seen.has(x.w.split[0]))continue;seen.add(x.w.split[0]);out.push(x.w);if(out.length===n)break}out.forEach(w=>use[w.id]=(use[w.id]||0)+1);return shuffle(out)}
+
+/* ---------- toast & copy ---------- */
+let tt;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),2200)}
+function copyText(txt){
+  const fallback=()=>{try{const ta=h('textarea',{class:'sr-copy','aria-hidden':'true'});ta.value=txt;document.body.append(ta);ta.select();const ok=document.execCommand('copy');ta.remove();if(ok){toast('Скопировано');return}}catch(e){}
+    toast('Не удалось скопировать')};
+  try{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(()=>toast('Скопировано'),fallback);return}}catch(e){}
+  fallback()}
+
+/* ---------- speech ---------- */
+const hasSpeech='speechSynthesis' in window&&'SpeechSynthesisUtterance' in window;
+let voice=null,keep=null;
+function voiceScore(v){const n=v.name||'',l=(v.lang||'').replace('_','-');let s=0;
+  if(/Google US English/i.test(n))s=100;else if(/Samantha/i.test(n))s=90;else if(/natural/i.test(n)&&/^en-US/i.test(l))s=80;else if(/^en-US/i.test(l))s=60;else if(/^en/i.test(l))s=30;return s}
+function loadVoices(){if(!hasSpeech)return;const all=speechSynthesis.getVoices().filter(v=>/^en/i.test(v.lang||''));const sel=$('#voiceSel');sel.textContent='';
+  if(!all.length){sel.append(h('option',{value:''},'нет английских голосов'));setStat('err','Голос не найден');return}
+  const sorted=all.slice().sort((a,b)=>voiceScore(b)-voiceScore(a)||a.name.localeCompare(b.name));
+  sorted.forEach(v=>sel.append(h('option',{value:v.name},v.name+' ('+v.lang+')')));
+  const saved=store.get('tt-voice');const found=sorted.find(v=>v.name===saved)||sorted[0];voice=found;sel.value=found.name;
+  setStat('',/Google US English|Samantha/i.test(found.name)?found.name:found.name+' (запасной)')}
+function setStat(c,t){const a=$('#astat');a.className='astat '+c;a.textContent=t}
+$('#voiceSel').onchange=e=>{const v=speechSynthesis.getVoices().find(x=>x.name===e.target.value);if(v){voice=v;store.set('tt-voice',v.name);setStat('',v.name)}};
+if(hasSpeech){loadVoices();if(speechSynthesis.addEventListener)speechSynthesis.addEventListener('voiceschanged',loadVoices);else speechSynthesis.onvoiceschanged=loadVoices}
+else{$('#voiceSel').append(h('option',{},'озвучка недоступна'));$('#voiceSel').disabled=true;$('#voiceTest').disabled=true;setStat('err','Нет озвучки')}
+function speak(text,o){o=o||{};if(!hasSpeech){toast('В этом браузере нет озвучки. Попробуйте Chrome или Safari.');if(o.onend)setTimeout(o.onend,0);return false}
+  const run=()=>{const u=new SpeechSynthesisUtterance(text);u.lang=voice?voice.lang:'en-US';if(voice)u.voice=voice;u.rate=o.rate||0.9;keep=u;let fin=false;const done=()=>{if(fin)return;fin=true;clearTimeout(tm);o.onend&&o.onend()};
+    const tm=o.onend?setTimeout(done,Math.max(2500,text.length*180)):0;
+    u.onstart=()=>{if(o.test)setStat('ok',(voice?voice.name:'голос по умолчанию')+' работает')};u.onend=done;u.onerror=ev=>{if(o.test)setStat('err','Не удалось озвучить');done()};speechSynthesis.speak(u)};
+  if(!o.queue){speechSynthesis.cancel();setTimeout(run,40)}else run();return true}
+$('#voiceTest').onclick=()=>{speak('Hello! Traffic and transport. Let us practise.',{test:true})};
+const say1=t=>speak(t.replace(/[!?]/g,''));
+
+/* ---------- problem words ---------- */
+let probs=new Map();
+try{const s=JSON.parse(store.get('tt-probs')||'[]');s.forEach(p=>probs.set(p.key,p))}catch(e){}
+function miss(key,hint,sayText){const p=probs.get(key)||{key,hint:hint||'',n:0,say:sayText||''};p.n++;if(hint)p.hint=hint;if(sayText)p.say=sayText;probs.set(key,p);renderProbs();store.set('tt-probs',JSON.stringify([...probs.values()]))}
+function renderProbs(){const box=$('#probList');box.textContent='';const arr=[...probs.values()].sort((a,b)=>b.n-a.n);$('#fabN').textContent=arr.length;
+  document.querySelector('.grid').classList.toggle('noprob',!arr.length);$('#fab').hidden=!arr.length;if(!arr.length)$('#prob').classList.remove('open');
+  if(!arr.length){box.append(h('p',{class:'empty'},'Пока пусто. Это хорошо.'));return}
+  const ul=h('ul');arr.forEach(p=>ul.append(h('li',{},p.say?h('button',{class:'say sm',type:'button','aria-label':'Прослушать '+p.key,onclick:()=>say1(p.say)},icon()):null,h('div',{},h('b',{},p.key),p.hint?h('small',{},p.hint):null),h('span',{class:'times'},'×'+p.n))));box.append(ul)}
+$('#probClear').onclick=()=>{probs.clear();store.set('tt-probs','[]');renderProbs()};
+$('#probCopy').onclick=()=>copyText([...probs.values()].sort((a,b)=>b.n-a.n).map(p=>p.key+(p.hint?' — '+p.hint:'')+' (×'+p.n+')').join('\n')||'Проблемных слов нет');
+$('#fab').onclick=()=>$('#prob').classList.add('open');$('#probClose').onclick=()=>$('#prob').classList.remove('open');
+function icon(){const s=document.createElement('span');s.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9v6h4l5 4V5L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 8v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z"/></svg>';return s.firstChild}
+
+/* ---------- words section ---------- */
+const heard=new Set();const cards=[];
+function upW(){$('#wprog').textContent='Прослушано: '+heard.size+' из '+W.length}
+W.forEach(w=>{const c=h('div',{class:'wcard'},h('button',{class:'say',type:'button','aria-label':'Прослушать '+w.t,onclick:()=>{heard.add(w.id);c.classList.add('heard');upW();say1(w.t)}},icon()),
+  h('div',{class:'wtxt'},h('div',{class:'en'},w.t,w.v?h('span',{class:'var'},' / '+w.v):null),h('div',{class:'ipa'},w.ipa),h('div',{class:'ru'},w.ru)));cards.push(c);$('#wgrid').append(c)});
+upW();
+let seq=false;
+function stopSeq(){seq=false;$('#playAll').textContent='Прослушать все';cards.forEach(c=>c.classList.remove('now'));if(hasSpeech)speechSynthesis.cancel()}
+$('#playAll').onclick=()=>{if(seq){stopSeq();return}if(!hasSpeech){toast('Нет озвучки в этом браузере');return}seq=true;$('#playAll').textContent='Стоп';let i=0;
+  const next=()=>{cards.forEach(c=>c.classList.remove('now'));if(!seq||i>=W.length){stopSeq();return}const w=W[i];cards[i].classList.add('now','heard');heard.add(w.id);upW();i++;speak(w.t,{queue:true,onend:()=>setTimeout(next,650)})};
+  speechSynthesis.cancel();setTimeout(next,60)};
+
+/* ---------- task shell ---------- */
+const results={};
+function task(host,cfg){
+  const score=h('span',{class:'score'}),fb=h('p',{class:'fb',role:'status'}),body=h('div',{class:'tbody'}),bar=h('div',{class:'tbar'});let api={};
+  const setScore=(n,t)=>{score.textContent=n+' / '+t;score.classList.add('on');results[cfg.code]={n,t,title:cfg.title}};
+  const say=(m,k)=>{fb.textContent=m;fb.className='fb '+(k||'')};
+  function mount(){body.textContent='';bar.textContent='';say('');score.textContent='';score.classList.remove('on');delete results[cfg.code];api=cfg.build(body,setScore,say)||{};
+    bar.append(h('button',{class:'btn primary',type:'button',onclick:()=>api.check&&api.check()},'Проверить'),h('button',{class:'btn',type:'button',onclick:()=>api.reveal&&api.reveal()},'Показать ответы'));
+    if(api.copy)bar.append(h('button',{class:'btn',type:'button',onclick:()=>copyText(api.copy())},'Копировать всё'));
+    bar.append(h('button',{class:'btn ghost',type:'button',onclick:mount},'Другой вариант'))}
+  host.append(h('section',{class:'task',id:'t-'+cfg.code},h('div',{class:'thead'},h('div',{class:'sign'},cfg.code),h('div',{},h('h3',{},cfg.title),h('p',{},cfg.instr)),score),body,fb,bar));mount()}
+
+/* typed-answer helpers */
+function mkInput(cls,ph){const i=h('input',{type:'text',class:'ans '+(cls||''),autocomplete:'off',autocapitalize:'off',autocorrect:'off',spellcheck:'false',placeholder:ph||''});return i}
+function newQ(inp,a,key,hint,sayT){const q={inp,a,key,hint,say:sayT,st:'',last:null};inp.addEventListener('input',()=>{q.st='';paintQ(q)});return q}
+function paintQ(q){q.inp.classList.remove('ok','bad','shown');if(q.st)q.inp.classList.add(q.st)}
+function checkQ(q){if(q.st==='shown')return false;const v=q.inp.value;if(!v.trim()){q.st='';paintQ(q);return false}const good=q.a.some(x=>norm(x)===norm(v));q.st=good?'ok':'bad';if(!good&&q.last!==norm(v)){q.last=norm(v);miss(q.key,q.hint,q.say)}paintQ(q);return good}
+function revealQ(q){if(q.st==='ok'||q.st==='shown')return;if(q.st!=='bad')miss(q.key,q.hint,q.say);q.inp.value=q.a[0];q.st='shown';paintQ(q)}
+function summary(qs,setScore,say){const n=qs.filter(q=>q.st==='ok').length;setScore(n,qs.length);const blank=qs.filter(q=>!q.inp.value.trim()).length;
+  if(n===qs.length)say('Отлично! Всё верно.','good');else say('Верно: '+n+' из '+qs.length+(blank?'. Не заполнено: '+blank:'')+'. Исправьте красные ответы или нажмите «Показать ответы».','warn')}
+const wordByAns=a=>W.find(w=>w.acc.includes(norm(a)));
+
+/* V1 matching */
+task($('#vtasks'),{code:'V1',title:'Соединить половинки выражений',instr:'Нажмите на левую половинку, затем на правую. Нажмите на связанную пару ещё раз, чтобы разъединить.',build(body,setScore,say){
+  const ws=pickPairs(7);const L=shuffle(ws.map(w=>({w,txt:w.split[0]}))),R=shuffle(ws.map(w=>({w,txt:w.split[1]})));
+  const valid=new Set(ws.map(w=>norm(w.split.join(' '))));const pairs=new Map();const order=[];let sel=-1;const res={};
+  const lb=[],rb=[];
+  const reset=()=>{for(const k in res)delete res[k]};
+  function paint(){L.forEach((x,i)=>{const b=lb[i];b.className='mb';b.dataset.c='';b.textContent=x.txt;if(i===sel)b.classList.add('sel');if(pairs.has(i)){const n=order.indexOf(i);b.classList.add('paired');b.dataset.c=n%7;b.append(h('span',{class:'pn'},n+1));if(res[i])b.classList.add(res[i])}});
+    R.forEach((x,j)=>{const b=rb[j];b.className='mb';b.dataset.c='';b.textContent=x.txt;const li=[...pairs.entries()].find(e=>e[1]===j);if(li){const n=order.indexOf(li[0]);b.classList.add('paired');b.dataset.c=n%7;b.append(h('span',{class:'pn'},n+1));if(res[li[0]])b.classList.add(res[li[0]])}})}
+  const cl=h('div',{class:'mcol'}),cr=h('div',{class:'mcol'});
+  L.forEach((x,i)=>{const b=h('button',{type:'button',class:'mb',onclick:()=>{reset();if(pairs.has(i)){pairs.delete(i);order.splice(order.indexOf(i),1);sel=-1}else sel=sel===i?-1:i;paint()}});lb.push(b);cl.append(b)});
+  R.forEach((x,j)=>{const b=h('button',{type:'button',class:'mb',onclick:()=>{reset();const ex=[...pairs.entries()].find(e=>e[1]===j);if(ex){pairs.delete(ex[0]);order.splice(order.indexOf(ex[0]),1)}else if(sel>=0){pairs.set(sel,j);order.push(sel);sel=-1}paint()}});rb.push(b);cr.append(b)});
+  body.append(h('div',{class:'mcols'},cl,cr));paint();
+  return{check(){let n=0;pairs.forEach((j,i)=>{const ok=valid.has(norm(L[i].txt+' '+R[j].txt));res[i]=ok?'ok':'bad';if(ok)n++;else miss(L[i].w.t,L[i].w.ru,L[i].w.t)});paint();setScore(n,ws.length);
+      if(n===ws.length)say('Отлично! Все выражения собраны.','good');else say('Верно: '+n+' из '+ws.length+(pairs.size<ws.length?'. Соедините все половинки.':'. Исправьте красные пары.'),'warn')},
+    reveal(){pairs.clear();order.length=0;sel=-1;const wasBad=Object.assign({},res);reset();L.forEach((x,i)=>{const j=R.findIndex(r=>r.w===x.w);pairs.set(i,j);order.push(i);res[i]='shown';if(wasBad[i]!=='ok'&&wasBad[i]!=='bad')miss(x.w.t,x.w.ru,x.w.t)});paint();say('Правильные пары показаны: '+ws.map(w=>w.split.join(' ')).join(', '))}}}});
+
+/* V2 text gaps */
+const TEXTS=[
+ 'Mondays are the worst in our city. At 8 a.m. it is {rush hour}, and there is always a {traffic jam} near the school because of the {road works}. My dad never drives fast: he always wears his {seat belt} and keeps to the {speed limit}, because there is a {speed camera} before the bridge. Last month he got a {parking fine} for leaving the car in front of a shop.',
+ 'Last Saturday we had to {set off} at six o’clock. After an hour we stopped at a {petrol station}, because we were going to {run out of} fuel. On the {motorway|freeway} we saw a terrible {car crash}, so everybody drove slowly. In the town we crossed the street at the {zebra crossing}, and then Dad went to {pick up} my cousin from the station.',
+ 'My city has a {pedestrian zone} in the centre, so cars cannot enter it. Near the river there is a {cycle lane} for bikes and a {taxi rank} next to the station. I go to school by {tram}, and my aunt prefers the {Underground|subway|underground}. Last summer we crossed the sea on a {ferry}. On Saturdays a big {lorry|truck} brings vegetables to our street, so please stop at the {traffic lights} and wait.'];
+task($('#vtasks'),{code:'V2',title:'Вставить слова в текст',instr:'Впишите слова из рамки так, чтобы они подходили по смыслу. Каждое слово используется один раз.',build(body,setScore,say){
+  const txt=TEXTS[Math.floor(Math.random()*TEXTS.length)];const p=h('p',{class:'text'});const qs=[];let last=0,m;const re=/\{([^}]+)\}/g;
+  while((m=re.exec(txt))){p.append(txt.slice(last,m.index));const a=m[1].split('|');const w=wordByAns(a[0]);const inp=mkInput('gap');inp.style.width=Math.max(8,a[0].length+3)+'ch';const q=newQ(inp,a.length>1||!w?a.concat(w?w.acc:[]):w.acc,a[0],w?w.ru:'',a[0]);q.main=a[0];qs.push(q);p.append(inp);last=m.index+m[0].length}
+  p.append(txt.slice(last));const bank=h('div',{class:'bank'});const chips=shuffle(qs).map(q=>{const s=h('span',{},q.main);bank.append(s);return{s,q}});
+  qs.forEach(q=>q.inp.addEventListener('input',()=>chips.forEach(c=>c.s.classList.toggle('used',c.q.st==='ok'))));
+  qs.forEach(q=>q.inp.addEventListener('keydown',e=>{if(e.key==='Enter')api.check()}));
+  const upd=()=>chips.forEach(c=>c.s.classList.toggle('used',c.q.st==='ok'||c.q.st==='shown'));
+  const api={check(){qs.forEach(checkQ);summary(qs,setScore,say);upd()},reveal(){qs.forEach(revealQ);upd();say('Ответы показаны. Прочитайте текст целиком вслух.')}};
+  body.append(p,bank);return api}});
+
+/* V3 context */
+task($('#vtasks'),{code:'V3',title:'Контекст: угадай значение',instr:'Прочитайте предложение. Что означает выделенное слово или выражение?',build(body,setScore,say){
+  const ws=pick(8);const items=ws.map(w=>{const ds=shuffle(W.filter(x=>x.id!==w.id&&x.kind===w.kind&&x.ru!==w.ru)).slice(0,2);return{w,opts:shuffle([w,...ds]),sel:-1,st:'',last:-1}});
+  const g=h('div',{class:'ctx'});
+  items.forEach(it=>{const m=it.w.rx.exec(it.w.ex);const s=h('p',{},'“',it.w.ex.slice(0,m.index),h('mark',{},m[0]),it.w.ex.slice(m.index+m[0].length),'”');const ob=h('div',{class:'opts'});it.btns=it.opts.map((o,i)=>{const b=h('button',{type:'button',class:'opt',onclick:()=>{it.sel=i;it.st='';paint(it)}},o.ru);ob.append(b);return b});g.append(h('div',{class:'cq'},s,ob))});
+  function paint(it){it.btns.forEach((b,i)=>{b.className='opt';if(it.st==='shown'&&it.opts[i]===it.w)b.classList.add('shown');else if(i===it.sel){b.classList.add(it.st||'sel')}})}
+  body.append(g);
+  return{check(){let n=0;items.forEach(it=>{if(it.sel<0)return;if(it.st==='shown')return;const ok=it.opts[it.sel]===it.w;it.st=ok?'ok':'bad';if(ok)n++;else if(it.last!==it.sel){it.last=it.sel;miss(it.w.t,it.w.ru,it.w.t)}paint(it)});n=items.filter(i=>i.st==='ok').length;setScore(n,items.length);
+      const un=items.filter(i=>i.sel<0).length;if(n===items.length)say('Отлично! Все значения угаданы.','good');else say('Верно: '+n+' из '+items.length+(un?'. Без ответа: '+un:'')+'. Подумайте ещё раз над красными.','warn')},
+    reveal(){items.forEach(it=>{if(it.st!=='ok'){if(it.st!=='bad')miss(it.w.t,it.w.ru,it.w.t);it.st='shown';it.sel=-1;paint(it)}});say('Правильные значения отмечены пунктиром.')}}}});
+
+/* V4 story */
+task($('#vtasks'),{code:'V4',title:'Story with 5 words',instr:'Напишите мини-рассказ из 4-6 предложений на английском. Используйте все 5 слов. Счётчик показывает, какие слова уже есть в тексте.',build(body,setScore,say){
+  const ws=pick(5);const tg=h('div',{class:'tgt'});const tags=ws.map(w=>{const t=h('div',{class:'tg'},h('b',{},wname(w)),h('small',{},w.ru));tg.append(t);return t});
+  const ta=h('textarea',{placeholder:'Once upon a time...',rows:'6'});const cnt=h('p',{class:'cnt'});
+  const used=()=>ws.map(w=>w.rx.test(ta.value));const words=()=>(ta.value.match(/\b[\w’']+\b/g)||[]).length;
+  function upd(){const u=used();tags.forEach((t,i)=>t.classList.toggle('used',u[i]));const n=u.filter(Boolean).length;cnt.textContent='Использовано слов: '+n+' из 5. Слов в рассказе: '+words()+'.'}
+  ta.addEventListener('input',upd);upd();body.append(h('div',{class:'story'},tg,ta,cnt));
+  return{check(){const u=used();const n=u.filter(Boolean).length;setScore(n,5);ws.forEach((w,i)=>{if(!u[i]&&ta.value.trim())miss(w.t,w.ru,w.t)});
+      if(!ta.value.trim())say('Сначала напишите рассказ.','warn');else if(n<5)say('Использовано '+n+' из 5. Добавьте: '+ws.filter((w,i)=>!u[i]).map(w=>w.t).join(', '),'warn');else if(words()<25)say('Все слова на месте. Добавьте ещё пару предложений, чтобы получился рассказ.','warn');else say('Отлично! Рассказ готов. Нажмите «Копировать всё» и отправьте его.','good')},
+    reveal(){const u=used();ws.forEach((w,i)=>{if(!u[i])miss(w.t,w.ru,w.t)});say('Примеры: '+ws.map(w=>w.ex).join(' '))},copy(){return ws.map(w=>w.t).join(', ')+'\n\n'+ta.value}}}});
+
+/* V5 bingo */
+task($('#vtasks'),{code:'V5',title:'Bingo',instr:'Нажмите «Следующее слово», послушайте слово или прочитайте определение и найдите его в таблице. Соберите линию из четырёх клеток.',build(body,setScore,say){
+  const cells=pick(16);const order=shuffle(cells);let mode=hasSpeech?'audio':'def',ci=-1,cur=null,ft=0,bingo=false;const done=new Set(),wrong={};
+  const panel=h('div',{class:'call'}),grid=h('div',{class:'bgrid'}),ban=h('div',{class:'banner',role:'status'});
+  const bA=h('button',{type:'button',class:'btn',onclick:()=>setMode('audio')},'Аудио'),bD=h('button',{type:'button',class:'btn',onclick:()=>setMode('def')},'Определения');
+  if(!hasSpeech)bA.disabled=true;
+  function setMode(m){mode=m;bA.classList.toggle('on',m==='audio');bD.classList.toggle('on',m==='def');draw()}
+  function callTxt(){if(cur)return mode==='audio'?'Слушайте и найдите слово в таблице':'“'+cur.def+'”';return ci>=order.length-1&&done.size===16?'Все слова найдены!':'Нажмите «Следующее слово»'}
+  function draw(){panel.textContent='';const t=h('div',{class:'ct'},h('b',{},cur?'Слово '+(ci+1)+' из 16':'Bingo'),h('small',{},callTxt()));
+    const next=h('button',{type:'button',class:'btn',onclick:nextW},ci<0?'Начать':'Следующее слово');if(cur||done.size===16)next.disabled=!!cur||done.size===16;panel.append(t,next);
+    if(cur&&mode==='audio')panel.append(h('button',{type:'button',class:'btn',onclick:()=>say1(cur.t)},'Повторить звук'))}
+  function nextW(){if(cur||ci>=order.length-1)return;ci++;cur=order[ci];draw();if(mode==='audio')say1(cur.t)}
+  const bc=cells.map((w,i)=>{const b=h('button',{type:'button',class:'bc',onclick:()=>click(i)},w.t+(w.v?' / '+w.v:''));grid.append(b);return b});
+  function lines(){const L=[];for(let r=0;r<4;r++){L.push([0,1,2,3].map(c=>r*4+c));L.push([0,1,2,3].map(c=>c*4+r))}L.push([0,5,10,15],[3,6,9,12]);return L}
+  function click(i){if(!cur){say('Сначала нажмите «Начать» или «Следующее слово».','warn');return}const w=cells[i];if(done.has(w.id))return;
+    if(w===cur){done.add(w.id);bc[i].className='bc ok';if(!wrong[w.id])ft++;cur=null;say('Верно! '+w.t+' — '+w.ru,'good');const ln=lines().filter(l=>l.every(k=>done.has(cells[k].id)));
+      if(ln.length&&!bingo){bingo=true;ban.textContent='BINGO! Линия собрана.';ln[0].forEach(k=>bc[k].classList.add('line'))}if(done.size===16)ban.textContent='Все слова найдены. Результат с первого раза: '+ft+' из 16.';setScore(ft,16);draw()}
+    else{wrong[cur.id]=true;miss(cur.t,cur.ru,cur.t);bc[i].classList.add('bad');setTimeout(()=>bc[i].classList.remove('bad'),450);say('Это не то слово. Попробуйте ещё раз.','warn')}}
+  body.append(h('div',{class:'bmodes'},bA,bD),panel,grid,ban);setMode(mode);
+  return{check(){setScore(ft,16);say('Найдено слов: '+done.size+' из 16. С первого раза: '+ft+'.',done.size===16?'good':'')},
+    reveal(){if(!cur){say('Нет текущего слова. Нажмите «Следующее слово».');return}wrong[cur.id]=true;miss(cur.t,cur.ru,cur.t);const i=cells.indexOf(cur);bc[i].classList.add('shown');say('Ответ: '+cur.t+' — '+cur.ru)}}}});
+
+/* G1 gaps */
+const G1=[
+ ['A motorbike is ','faster',' (fast) than a tram.','fast → faster'],
+ ['This coach is ','more comfortable',' (comfortable) than that van.','длинное прилагательное: more + adj + than'],
+ ['The traffic in London is ','worse',' (bad) than in my town.','исключение: bad → worse'],
+ ['Your scooter is not as ','fast',' (fast) as my motorbike.','as + прилагательное + as, форма не меняется'],
+ ['She is the ','tallest',' (tall) student in the class.','короткое прилагательное: the + -est'],
+ ['This is the ','most interesting',' (interesting) book I have ever read.','длинное прилагательное: the most + adj'],
+ ['He drives ','more carefully',' (carefully) than his brother.','наречие: more + adverb + than'],
+ ['Of all the drivers, Ola drives ','the most carefully|most carefully',' (carefully).','превосходная степень наречия: the most + adverb'],
+ ['Which station is ','the furthest|the farthest|furthest|farthest',' (far) from here?','исключение: far → the furthest / the farthest'],
+ ['Anna sings ','better',' (well) than her sister.','исключение: well → better'],
+ ['It was ','the worst|worst',' (bad) traffic jam of the year.','исключение: bad → the worst'],
+ ['Taking the tram is ','easier',' (easy) than driving a van.','y → ier: easy → easier'],
+ ['A ferry is ','bigger',' (big) than a van.','удвоение согласной: big → bigger'],
+ ['The Underground is ','the fastest|fastest',' (fast) way to cross London.','fast → the fastest'],
+ ['She speaks ','less confidently',' (less + confidently) than her sister.','less + adverb + than'],
+ ['This car is ','less expensive',' (less + expensive) than that one.','less + adjective + than']];
+task($('#gtasks'),{code:'G1',title:'Fill in the gaps',instr:'Поставьте слово в скобках в правильную форму. Если в скобках есть less, используйте его.',build(body,setScore,say){
+  const it=shuffle(G1).slice(0,8);const ul=h('ol',{class:'list'});const qs=[];
+  it.forEach((r,i)=>{const a=r[1].split('|');const inp=mkInput('',' ');inp.style.width=Math.max(10,a[0].length+4)+'ch';const q=newQ(inp,a,a[0],r[3],'');qs.push(q);inp.addEventListener('keydown',e=>{if(e.key==='Enter')api.check()});ul.append(h('li',{},h('span',{class:'n'},(i+1)+'.'),r[0],inp,r[2]))});
+  const api={check(){qs.forEach(checkQ);summary(qs,setScore,say)},reveal(){qs.forEach(revealQ);say('Ответы показаны. Правило каждого видно в «Проблемных словах», если была ошибка.')}};
+  body.append(ul);return api}});
+
+/* G2 rephrase */
+const G2=[
+ ['A tram is more expensive than a bus.','LESS',['A bus is less expensive than a tram.']],
+ ['My bike is slower than yours.','(NOT) AS … AS',['My bike is not as fast as yours.']],
+ ['Her phone and my phone are identical.','THE SAME AS',['Her phone is the same as mine.','My phone is the same as hers.']],
+ ['No other student in the class is taller than Anna.','SUPERLATIVE',['Anna is the tallest student in the class.','Anna is the tallest in the class.']],
+ ['His father drives more carefully than he does.','LESS',['He drives less carefully than his father.','He drives less carefully than his father does.']],
+ ['The Underground is faster than the bus.','(NOT) AS … AS',['The bus is not as fast as the Underground.']],
+ ['It will probably rain tomorrow.','LIKELY',['It is likely to rain tomorrow.']],
+ ['She will probably pass the exam.','LIKELY',['She is likely to pass the exam.']],
+ ['Your car is newer than mine.','(NOT) AS … AS',['My car is not as new as yours.']],
+ ['This road is busier than that road.','LESS',['That road is less busy than this road.','That road is less busy than this one.']],
+ ['A lorry is bigger than a van.','(NOT) AS … AS',['A van is not as big as a lorry.']],
+ ['He will probably be tired after the long drive.','LIKELY',['He is likely to be tired after the long drive.']]];
+task($('#gtasks'),{code:'G2',title:'Rephrase',instr:'Перепишите предложение с тем же смыслом, используя слово-подсказку. Пишите полное предложение.',build(body,setScore,say){
+  const it=shuffle(G2).slice(0,6);const qs=[];const box=h('div',{class:'list'});
+  it.forEach(r=>{const inp=mkInput('','Type the full sentence');const q=newQ(inp,r[2],r[1]+': '+r[0].replace(/\.$/,''),'Правильно: '+r[2][0],'');qs.push(q);inp.addEventListener('keydown',e=>{if(e.key==='Enter')api.check()});box.append(h('div',{class:'rep'},h('q',{},r[0]),h('span',{class:'kw'},r[1]),inp))});
+  const api={check(){qs.forEach(checkQ);summary(qs,setScore,say)},reveal(){qs.forEach(revealQ);say('Показан один из возможных вариантов. Ваш ответ мог быть другим, но тоже верным: спросите учителя.')}};
+  body.append(box);return api}});
+
+/* G3 own ideas */
+const G3=[
+ ['My phone is better than','my old phone because it has a better camera.'],
+ ['Going by coach is less expensive than','flying, but it takes much longer.'],
+ ['The most dangerous thing in traffic is','using a phone while driving.'],
+ ['I travel more comfortably by','train than by bus.'],
+ ['At rush hour the streets are not as quiet as','they are at night.'],
+ ['The worst traffic jam I have ever seen was','on the motorway near the sea.'],
+ ['Tomorrow I will probably','take the Underground to school.'],
+ ['It is likely to','be very busy on the roads this weekend.'],
+ ['My bike is the same as','my brother’s, but mine is red.'],
+ ['The most useful transport in my city is','the tram, because it is fast and cheap.']];
+task($('#gtasks'),{code:'G3',title:'Finish the sentences',instr:'Закончите предложения со своими идеями. Пишите по-английски, хотя бы 3 слова.',build(body,setScore,say){
+  const it=shuffle(G3).slice(0,6);const items=it.map(r=>{const inp=mkInput('','your idea...');return{r,inp,st:''}});const box=h('div',{class:'list'});
+  items.forEach((x,i)=>{x.inp.style.flex='1 1 240px';x.inp.addEventListener('input',()=>{x.st='';x.inp.classList.remove('ok','bad','shown')});box.append(h('div',{class:'rep'},h('span',{class:'starter'},(i+1)+'. '+x.r[0]+' …'),x.inp))});
+  const wc=s=>(s.match(/\S+/g)||[]).length;
+  body.append(box);
+  return{check(){let n=0;items.forEach(x=>{if(x.st==='shown')return;const ok=wc(x.inp.value)>=3;x.st=ok?'ok':(x.inp.value.trim()?'bad':'');x.inp.classList.remove('ok','bad','shown');if(x.st)x.inp.classList.add(x.st)});n=items.filter(x=>x.st==='ok').length;setScore(n,items.length);
+      if(n===items.length)say('Отлично! Нажмите «Копировать всё» и отправьте работу.','good');else say('Готово: '+n+' из '+items.length+'. Допишите предложения: нужно хотя бы 3 слова.','warn')},
+    reveal(){items.forEach(x=>{if(x.st!=='ok'){x.inp.value=x.r[1];x.st='shown';x.inp.classList.remove('ok','bad');x.inp.classList.add('shown')}});say('Показаны примеры. Придумайте свои идеи: они интереснее.')},
+    copy(){return items.map((x,i)=>(i+1)+'. '+x.r[0]+' '+x.inp.value.trim()).join('\n')}}}});
+
+/* G4 dialogue */
+const RX={cmp:/\b(\w+er|more \w+|less \w+|better|worse|further|farther)\s+than\b/i,asas:/\bas\s+\w+\s+as\b/i,sup:/\bthe\s+(\w+est|most\s+\w+|best|worst|least\s+\w+|furthest|farthest)\b/i,less:/\bless\s+\w+/i,lp:/\b(likely|probably)\b/i};
+const DL=[
+ [['Hi! How are we going to get to the festival on Saturday?',null],
+  ['True, but I think the coach will be slower. What about my brother’s van?',['cmp','comparative + than','The coach is cheaper than the train.']],
+  ['Hmm. What time should we set off?',['lp','likely or probably','We will probably set off at seven because of the traffic.']],
+  ['OK. Who is the best driver in our group?',['sup','a superlative: the most / the -est','Ola is the most careful driver in our group.']],
+  ['Great. Should we take the motorway?',['less','less + adjective','Yes, it is less stressful than the small roads.']],
+  ['Fine. One last thing: is the petrol station on the way?',['asas','as … as or not as … as','Yes, it is not as far as the city centre.']]],
+ [['Which is better in your city, the tram or the Underground?',null],
+  ['Do you think so? Is the Underground as crowded as the buses at rush hour?',['asas','as … as or not as … as','The Underground is not as crowded as the buses.']],
+  ['What is the most annoying thing about traffic?',['sup','a superlative: the most / the -est','The most annoying thing is the noise.']],
+  ['Do you think the prices will go up next year?',['lp','likely or probably','They are likely to go up.']],
+  ['And how do you go to school?',['cmp','comparative + than','I go by tram because it is faster than the bus.']],
+  ['Do you ever walk?',['less','less + adjective','Sometimes. Walking is less tiring than waiting for a bus.']]]];
+task($('#gtasks'),{code:'G4',title:'Finish the dialogue',instr:'Вы отвечаете как B. Придумайте свои ответы и используйте грамматику из подсказки под строкой.',build(body,setScore,say){
+  const d=DL[Math.floor(Math.random()*DL.length)];const lines=[];const box=h('div',{});
+  d.forEach((r,i)=>{if(i===0){box.append(h('div',{class:'line'},h('b',{},'A:'),h('span',{},r[0])));return}
+    const spec=r[1];const inp=mkInput('','B: write your answer');const note=h('span',{class:'hint'},'Используйте: '+spec[1]);const x={inp,spec,note,a:r[0],st:'',last:null};lines.push(x);
+    inp.addEventListener('input',()=>{x.st='';inp.classList.remove('ok','bad','shown');note.className='hint';note.textContent='Используйте: '+spec[1]});
+    inp.addEventListener('keydown',e=>{if(e.key==='Enter')api.check()});
+    box.append(h('div',{class:'line'},h('b',{},'A:'),h('span',{},r[0])),h('div',{class:'line'},h('b',{},'B:'),h('div',{class:'b'},inp,note)))});
+  const api={check(){lines.forEach(x=>{if(x.st==='shown')return;const v=x.inp.value.trim();x.inp.classList.remove('ok','bad');if(!v){x.st='';return}const words=(v.match(/\S+/g)||[]).length;const ok=words>=3&&RX[x.spec[0]].test(v);x.st=ok?'ok':'bad';x.inp.classList.add(x.st);
+        if(!ok){x.note.className='hint bad';x.note.textContent=words<3?'Напишите полное предложение (3 слова и больше).':'Не вижу нужной грамматики: '+x.spec[1];if(x.last!==norm(v)){x.last=norm(v);miss(x.spec[1],'Пример: '+x.spec[2],'')}}else{x.note.className='hint';x.note.textContent='Верно'}});
+      const n=lines.filter(x=>x.st==='ok').length;setScore(n,lines.length);if(n===lines.length)say('Отлично! Диалог готов. Нажмите «Копировать всё».','good');else say('Готово: '+n+' из '+lines.length+'. Проверьте строки с подсказками.','warn')},
+    reveal(){lines.forEach(x=>{if(x.st!=='ok'){if(x.st!=='bad')miss(x.spec[1],'Пример: '+x.spec[2],'');x.inp.value=x.spec[2];x.st='shown';x.inp.classList.remove('ok','bad');x.inp.classList.add('shown')}});say('Показаны примеры ответов. Придумайте свои.')},
+    copy(){const out=[];d.forEach((r,i)=>{out.push('A: '+r[0]);if(i>0){const x=lines[i-1];out.push('B: '+(x.inp.value.trim()||'...'))}});return out.join('\n')}};
+  body.append(box);return api}});
+
+/* ---------- self-assessment ---------- */
+const SELF=['Я знаю названия транспорта: tram, coach, ferry, lorry, van, motorbike','Я знаю слова про дорогу: traffic jam, speed limit, zebra crossing, road works','Я могу использовать drop off, set off, end up, run out of, pick up','Я могу сравнить двух людей или вещи: comparative + than','Я использую (not) as … as и the same as','Я использую less + adjective / adverb + than','Я могу построить превосходную степень: the tallest, the most interesting, the best','Я различаю likely и probably'];
+const LV=['Пока сложно','Почти','Уверенно'];const selfV=SELF.map(()=>-1);
+function sumRender(){const s=$('#sum');s.textContent='';const sure=selfV.filter(v=>v===2).length,answered=selfV.filter(v=>v>=0).length;
+  const r=Object.keys(results).sort();const ul=h('ul');r.forEach(k=>ul.append(h('li',{},k+' '+results[k].title+': '+results[k].n+' из '+results[k].t)));
+  s.append(h('h3',{},'Мой итог'),h('p',{},'Уверенно: '+sure+' из '+SELF.length+(answered<SELF.length?'. Осталось оценить: '+(SELF.length-answered)+'.':'.')),h('p',{},r.length?'Результаты заданий:':'Заданий с проверкой пока нет.'),ul,h('p',{},probs.size?'Проблемных слов: '+probs.size+'. Повторите их ещё раз.':'Проблемных слов нет.'),h('button',{class:'btn',type:'button',onclick:()=>copyText(sumText())},'Копировать итог'))}
+function sumText(){const l=['Что я теперь знаю:'];SELF.forEach((t,i)=>l.push('- '+t+': '+(selfV[i]<0?'не оценено':LV[selfV[i]])));l.push('','Результаты:');Object.keys(results).sort().forEach(k=>l.push(k+' '+results[k].title+': '+results[k].n+'/'+results[k].t));l.push('','Проблемные слова: '+([...probs.values()].map(p=>p.key).join(', ')||'нет'));return l.join('\n')}
+SELF.forEach((t,i)=>{const seg=h('div',{class:'seg',role:'group','aria-label':t});LV.forEach((n,l)=>seg.append(h('button',{type:'button','data-l':l,onclick:()=>{selfV[i]=l;[...seg.children].forEach((b,j)=>b.classList.toggle('on',j===l));sumRender()}},n)));$('#self').append(h('div',{class:'srow'},h('span',{},t),seg))});
+sumRender();
+const _miss=miss;
+renderProbs();
+document.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('.tbar .btn,.opt,.mb,.bc,#probClear'))setTimeout(sumRender,0)});
+document.addEventListener('keydown',e=>{if(e.key==='Enter')setTimeout(sumRender,0)});
+window.__tt={W,results,probs,speak};
+})();
+</script>
