@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jeopardy B1 – Transport & Comparisons</title>
+<style>
+  :root{
+    --bg:#0b1b4d; --tile:#1737a8; --tile-hover:#2a52e0; --gold:#ffd23f; --text:#fff;
+    --panel:#13286e; --ok:#2ecc71; --bad:#e74c3c;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Segoe UI",Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:16px}
+  h1{text-align:center;margin:4px 0 14px;font-size:clamp(22px,4vw,38px);letter-spacing:2px;color:var(--gold);text-shadow:2px 2px 0 #000}
+  .board{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;max-width:1100px;margin:0 auto}
+  .cat{background:#0a2a9c;border:2px solid #000;border-radius:8px;padding:10px 6px;text-align:center;font-weight:700;
+       font-size:clamp(11px,1.7vw,18px);display:flex;align-items:center;justify-content:center;min-height:70px;text-transform:uppercase;line-height:1.2}
+  .tile{background:var(--tile);border:2px solid #000;border-radius:8px;color:var(--gold);font-weight:800;
+        font-size:clamp(20px,4vw,40px);padding:0;min-height:80px;cursor:pointer;transition:.15s;text-shadow:2px 2px 0 #000}
+  .tile:hover{background:var(--tile-hover);transform:scale(1.03)}
+  .tile.used{background:#0a1438;color:transparent;cursor:default;text-shadow:none;transform:none}
+  .teams{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;max-width:1100px;margin:18px auto 6px}
+  .team{background:var(--panel);border:2px solid #2c4bb8;border-radius:10px;padding:8px 12px;min-width:170px;text-align:center}
+  .team input{background:transparent;border:none;border-bottom:1px dashed #6b82d6;color:#fff;font-size:16px;text-align:center;width:100%;font-weight:600}
+  .team .score{font-size:30px;font-weight:800;color:var(--gold);margin:4px 0}
+  .team .adj button{background:#223a96;color:#fff;border:none;border-radius:6px;padding:3px 9px;cursor:pointer;font-size:14px;margin:0 2px}
+  .toolbar{text-align:center;margin:10px 0}
+  .toolbar button{background:#223a96;color:#fff;border:none;border-radius:8px;padding:8px 14px;cursor:pointer;font-size:14px;margin:0 4px}
+  .toolbar button:hover{background:var(--tile-hover)}
+  .overlay{position:fixed;inset:0;background:rgba(0,0,10,.85);display:none;align-items:center;justify-content:center;padding:16px;z-index:10}
+  .overlay.show{display:flex}
+  .modal{background:var(--tile);border:4px solid var(--gold);border-radius:16px;max-width:820px;width:100%;padding:26px;text-align:center;max-height:94vh;overflow:auto}
+  .badge{display:inline-block;background:var(--gold);color:#000;font-weight:800;border-radius:20px;padding:3px 14px;font-size:14px;margin:0 3px 10px}
+  .badge.type{background:#fff}
+  .q{font-size:clamp(18px,2.6vw,28px);line-height:1.4;margin:10px 0;white-space:pre-line}
+  .ru{font-size:15px;color:#cdd8ff;font-style:italic;margin-bottom:8px}
+  .answer{display:none;background:#0a1438;border-radius:10px;padding:14px;margin:14px 0;font-size:clamp(16px,2.2vw,22px);color:#9dffb8;white-space:pre-line;text-align:left}
+  .answer.show{display:block}
+  .row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:12px}
+  .btn{border:none;border-radius:8px;padding:10px 16px;font-size:16px;font-weight:700;cursor:pointer;color:#fff;background:#223a96}
+  .btn.gold{background:var(--gold);color:#000}
+  .btn.ok{background:var(--ok)} .btn.bad{background:var(--bad)}
+  .timer{font-size:28px;font-weight:800;color:var(--gold);margin-top:8px}
+  .award{display:none;margin-top:14px}
+  .award.show{display:block}
+  @media(max-width:600px){.cat{font-size:10px;padding:4px}.tile{min-height:56px}}
+</style>
+</head>
+<body>
+<h1>JEOPARDY · B1</h1>
+<div class="board" id="board"></div>
+
+<div class="teams" id="teams"></div>
+<div class="toolbar">
+  <button onclick="changeTeams(-1)">− Команда</button>
+  <button onclick="changeTeams(1)">+ Команда</button>
+  <button onclick="resetGame()">↺ Новая игра</button>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div><span class="badge" id="mCat"></span><span class="badge type" id="mType"></span><span class="badge" id="mPts"></span></div>
+    <div class="q" id="mQ"></div>
+    <div class="ru" id="mRu"></div>
+    <div class="timer" id="mTimer"></div>
+    <div class="answer" id="mA"></div>
+    <div class="row">
+      <button class="btn" onclick="startTimer()">⏱ Таймер</button>
+      <button class="btn gold" onclick="showAnswer()">Показать ответ</button>
+    </div>
+    <div class="award" id="award">
+      <div style="margin:8px 0">Кто получает очки?</div>
+      <div class="row" id="awardBtns"></div>
+      <div class="row"><button class="btn bad" onclick="closeModal()">Никто</button></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const DATA = [
+ { name:"Getting Around 🚦", q:[
+  {t:"Quick", q:"What do you call the place where taxis wait for passengers?", ru:"Как называется место, где стоят такси?", a:"A taxi rank."},
+  {t:"Gap-fill", q:"Complete with a phrasal verb:\n“We need to find a petrol station – we’re going to ___ ___ petrol!”\n\nThen: “We ___ at 6 a.m. to avoid the rush hour.”", ru:"Вставьте фразовые глаголы: run out of / set off.", a:"run out of\nset off"},
+  {t:"Speaking", q:"Tell your partner about the worst traffic jam you have ever been in.\nSay where and when it was, how long it lasted and what you did.\n(at least 4 sentences)", ru:"Расскажите о худшей пробке в вашей жизни.", a:"Sample: Last summer we were stuck in a traffic jam on the motorway for three hours because of road works. We ran out of water and the children were bored. In the end we got off and took a different road."},
+  {t:"Pair work", q:"Role-play (3 exchanges):\nA is a tourist who has just arrived at the airport. B is a local.\nA asks how to get to the city centre (the Underground, tram, taxi, bus…).\nUse: pick up, drop off, set off.", ru:"Турист спрашивает у местного, как добраться до центра.", a:"Sample:\nA: Excuse me, what’s the best way to get to the city centre?\nB: The Underground is the fastest, but you can also take a taxi from the taxi rank.\nA: Where does the tram drop off passengers?\nB: Right in the main square. Don’t forget to buy a ticket – the parking fine… I mean the fine for no ticket is high!"},
+  {t:"Discussion", q:"Should the city centre become a pedestrian zone with no cars?\nGive 2 arguments FOR and 2 arguments AGAINST.\nUse at least 4 words: cycle lane, speed limit, parking fine, speed camera, public transport, pedestrian zone.", ru:"Нужна ли пешеходная зона в центре города? 2 аргумента «за» и 2 «против».", a:"Sample FOR: less pollution; safer for pedestrians; more cycle lanes.\nSample AGAINST: shops may lose customers; older people may find it hard to get around without a car; traffic moves to other streets."}
+ ]},
+ { name:"Compare It! ⚖️", q:[
+  {t:"Choose", q:"Which is correct (grammar rule)?\n a) She’s taller than I.\n b) She’s taller than I am.", ru:"Какой вариант правильный?", a:"b) She’s taller than I am.\n(also correct: She’s taller than me.)"},
+  {t:"Gap-fill", q:"Complete with the correct form of “good”:\n“My old phone is not ___ ___ yours.”", ru:"Вставьте: as … as.", a:"as good as"},
+  {t:"Speaking", q:"Compare two means of transport (e.g. tram and taxi).\nSay at least 3 sentences:\n• one with “comparative + than”\n• one with “not as … as”\n• one with “less … than”", ru:"Сравните два вида транспорта: than / not as…as / less…than.", a:"Sample: A taxi is faster than a tram. A tram is not as expensive as a taxi. A taxi is less crowded than a tram."},
+  {t:"Fix it", q:"Correct the mistakes:\n1) Her dress is same like mine.\n2) My bag is less bigger than yours.\n3) They’re not as busy as we.", ru:"Найдите и исправьте ошибки.", a:"1) Her dress is the same as mine.\n2) My bag is less big than yours (or: not as big as yours / smaller than yours).\n3) They’re not as busy as us (or: as we are)."},
+  {t:"Pair work", q:"Compare yourself with your partner.\nFind 3 things you have in common (the same as…) and 3 differences (older / taller / more … than, less … than, not as … as).\nThen tell the class.", ru:"Найдите 3 сходства и 3 различия с партнёром.", a:"Sample: My bag is the same as yours. I’m older than you. You’re less tired than I am. My phone is not as modern as yours."}
+ ]},
+ { name:"Do It Better! 🏃", q:[
+  {t:"Quick", q:"Give the comparative form of the adverbs:\nwell → ?   badly → ?", ru:"Сравнительная степень наречий.", a:"better\nworse"},
+  {t:"Quick", q:"Make comparatives:\nslowly → ?   carefully → ?   fast → ?", ru:"Сравнительная степень.", a:"more slowly\nmore carefully\nfaster"},
+  {t:"Gap-fill", q:"Complete the sentence:\n“He drives ___ carefully ___ his father.” (use less)", ru:"Менее осторожно, чем его отец.", a:"less … than\n(He drives less carefully than his father.)"},
+  {t:"Speaking", q:"Compare how you and a family member or friend do these things:\ndrive / cook / sing / speak English / get up in the morning.\nUse 4 sentences with comparative adverbs.", ru:"Сравните, как вы и ваш друг/родственник что-то делаете.", a:"Sample: My brother drives faster than I do. I cook better than my mum. He speaks English more confidently than me. I get up more slowly than my sister."},
+  {t:"Role-play", q:"Driving lesson!\nA is the instructor, B is the student.\nThe instructor gives feedback on the lesson using at least 4 comparative adverbs (more carefully, less confidently, faster, better…).\nThe student answers.", ru:"Инструктор по вождению даёт обратную связь ученику.", a:"Sample: You drive more carefully than last week, but you still brake too late. You should look out more often! – Yes, I’m driving less nervously now, and I park better than before."}
+ ]},
+ { name:"The Superlatives 🏆", q:[
+  {t:"Quick", q:"Give the superlative:\ngood → ?   bad → ?   far → ?", ru:"Превосходная степень.", a:"the best\nthe worst\nthe furthest / the farthest"},
+  {t:"Gap-fill", q:"Complete:\n“This is ___ ___ (interesting) book I have ever read.”\n“She runs ___ ___ (fast) in the team.”", ru:"Вставьте превосходную степень.", a:"the most interesting\nthe fastest"},
+  {t:"Speaking", q:"30 seconds! Say 5 superlative sentences about your city or country.\n(e.g. the oldest building, the most expensive street…)", ru:"За 30 секунд придумайте 5 предложений с превосходной степенью.", a:"Any correct sentences with the + superlative + in/of.\nSample: The oldest building in my city is the castle."},
+  {t:"Speaking", q:"Use “the least + adjective” to talk about transport.\nSay 3 sentences, e.g.:\n“The ferry is the least convenient way to get to work.”", ru:"Составьте 3 предложения с the least о транспорте.", a:"Sample: The scooter is the least safe way to travel in winter. The coach is the least expensive way to go to another city. The taxi is the least comfortable when there’s a traffic jam."},
+  {t:"Pair work", q:"Interview your partner! Ask 5 questions with the most / the least / the best / the worst.\n(e.g. What’s the most embarrassing thing that has ever happened to you on public transport?)\nReport the best answer to the class.", ru:"Возьмите интервью у партнёра, 5 вопросов с превосходной степенью.", a:"Sample questions:\nWhat’s the best journey you have ever made?\nWhat’s the worst traffic jam you’ve been in?\nWhat’s the most interesting place you have ever visited?\nWho drives the most carefully in your family?\nWhat’s the least useful thing in your bag?"}
+ ]},
+ { name:"Likely or Probably? 🔮", q:[
+  {t:"Choose", q:"Choose the correct word:\n“It’s ___ to rain tomorrow.” (likely / probably)", ru:"likely или probably?", a:"likely\n(be likely to + verb)"},
+  {t:"Fix it", q:"Correct the mistake:\n“I probably not go out tonight.”", ru:"Исправьте ошибку.", a:"I probably won’t go out tonight.\n(probably won’t + verb)"},
+  {t:"Speaking", q:"Make predictions about tomorrow:\n2 sentences with “is / are likely to”\n2 sentences with “will probably”\n(weather, traffic, your day…)", ru:"Сделайте прогнозы на завтра: likely to и probably.", a:"Sample: It’s likely to be cold. The roads are likely to be busy. I’ll probably stay at home. My friend will probably call me."},
+  {t:"Explain", q:"What is the difference in meaning?\n• She will probably come.\n• She is likely to come.", ru:"В чём разница по смыслу?", a:"She will probably come = I think she will come (my opinion/guess).\nShe is likely to come = there is a high chance that she will come (assessment of probability)."},
+  {t:"Pair work", q:"Transport in 2050!\nWith your partner, make 3 predictions with “is likely to” and 3 with “will probably” (cars, trams, ferries, motorways, traffic jams…).\nThen guess your partner’s weekend plans using probably.", ru:"Транспорт в 2050 году: 3 предсказания с likely to и 3 с probably.", a:"Sample: Cars are likely to be electric. Trams will probably be free. Traffic jams are likely to disappear in big cities. You’ll probably go shopping on Saturday."}
+ ]}
+];
+const POINTS=[100,200,300,400,500];
+let used, teams, current=null, timerId=null;
+
+function init(){
+  used = DATA.map(()=>[false,false,false,false,false]);
+  if(!teams) teams=[{n:"Team 1",s:0},{n:"Team 2",s:0},{n:"Team 3",s:0}];
+  renderBoard(); renderTeams();
+}
+function renderBoard(){
+  const b=document.getElementById('board'); b.innerHTML='';
+  DATA.forEach(c=>{const d=document.createElement('div');d.className='cat';d.textContent=c.name;b.appendChild(d);});
+  for(let r=0;r<5;r++) for(let c=0;c<5;c++){
+    const t=document.createElement('button');
+    t.className='tile'+(used[c][r]?' used':'');
+    t.textContent=used[c][r]?'':POINTS[r];
+    t.onclick=()=>{ if(!used[c][r]) openQ(c,r); };
+    b.appendChild(t);
+  }
+}
+function renderTeams(){
+  const w=document.getElementById('teams'); w.innerHTML='';
+  teams.forEach((t,i)=>{
+    const d=document.createElement('div'); d.className='team';
+    d.innerHTML=`<input value="${t.n}" onchange="teams[${i}].n=this.value">
+      <div class="score">${t.s}</div>
+      <div class="adj"><button onclick="adj(${i},-100)">−100</button><button onclick="adj(${i},100)">+100</button></div>`;
+    w.appendChild(d);
+  });
+}
+function adj(i,v){teams[i].s+=v;renderTeams();}
+function changeTeams(d){
+  if(d>0 && teams.length<6) teams.push({n:"Team "+(teams.length+1),s:0});
+  if(d<0 && teams.length>1) teams.pop();
+  renderTeams();
+}
+function openQ(c,r){
+  current={c,r}; const q=DATA[c].q[r];
+  document.getElementById('mCat').textContent=DATA[c].name;
+  document.getElementById('mType').textContent=q.t;
+  document.getElementById('mPts').textContent=POINTS[r];
+  document.getElementById('mQ').textContent=q.q;
+  document.getElementById('mRu').textContent=q.ru||'';
+  document.getElementById('mA').textContent=q.a;
+  document.getElementById('mA').classList.remove('show');
+  document.getElementById('award').classList.remove('show');
+  document.getElementById('mTimer').textContent='';
+  clearInterval(timerId);
+  document.getElementById('overlay').classList.add('show');
+}
+function showAnswer(){
+  document.getElementById('mA').classList.add('show');
+  const box=document.getElementById('awardBtns'); box.innerHTML='';
+  teams.forEach((t,i)=>{
+    const b=document.createElement('button'); b.className='btn ok'; b.textContent=t.n+' +'+POINTS[current.r];
+    b.onclick=()=>{teams[i].s+=POINTS[current.r];closeModal();};
+    box.appendChild(b);
+  });
+  document.getElementById('award').classList.add('show');
+}
+function startTimer(){
+  clearInterval(timerId);
+  let s=60; const el=document.getElementById('mTimer'); el.textContent='⏱ '+s;
+  timerId=setInterval(()=>{s--;el.textContent=s>0?'⏱ '+s:'⏰ Time’s up!';if(s<=0)clearInterval(timerId);},1000);
+}
+function closeModal(){
+  clearInterval(timerId);
+  used[current.c][current.r]=true; current=null;
+  document.getElementById('overlay').classList.remove('show');
+  renderBoard(); renderTeams();
+}
+function resetGame(){ if(confirm('Начать новую игру?')){teams.forEach(t=>t.s=0);init();} }
+init();
+</script>
+</body>
+</html>
