@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Present Perfect A2 — игры</title>
+<style>
+:root{--bg:#f4f6f8;--card:#fff;--ink:#16202c;--mut:#5d6b7a;--line:#d9e0e7;--acc:#1c6e8c;--accbg:#e1f0f6;--ok:#12805c;--okbg:#e0f4ea;--bad:#b42318;--badbg:#fde8e6;--gold:#fff1b8;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121a22;--card:#1a242f;--ink:#e8eef4;--mut:#9aabbb;--line:#2c3a48;--acc:#6cc1de;--accbg:#183645;--ok:#5fd3a2;--okbg:#14382b;--bad:#ff8f84;--badbg:#44201d;--gold:#5a4b12}}
+:root[data-theme="dark"]{--bg:#121a22;--card:#1a242f;--ink:#e8eef4;--mut:#9aabbb;--line:#2c3a48;--acc:#6cc1de;--accbg:#183645;--ok:#5fd3a2;--okbg:#14382b;--bad:#ff8f84;--badbg:#44201d;--gold:#5a4b12}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Georgia,"Times New Roman",serif}
+main{max-width:760px;margin:0 auto;padding:20px 16px 60px}
+h1{font-size:1.7rem;margin:.2em 0 .1em;line-height:1.2}h2{font-size:1.25rem;margin:0 0 .3em}
+.sub,.ins{color:var(--mut);font:.92rem system-ui,sans-serif;margin:0 0 12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:12px}
+nav{display:flex;gap:6px;flex-wrap:wrap;margin:16px 0}
+nav button{font:600 .85rem system-ui,sans-serif;padding:8px 11px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;cursor:pointer}
+nav button.on{background:var(--acc);color:var(--bg);border-color:var(--acc)}
+section{display:none}section.on{display:block}
+.btn,.opt{font:500 .95rem system-ui,sans-serif;padding:9px 12px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;cursor:pointer;text-align:left}
+.btn.p{background:var(--acc);color:var(--bg);border-color:var(--acc)}
+button:focus-visible{outline:3px solid var(--acc);outline-offset:1px}
+.bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:10px 0}
+.sc{font:600 .95rem system-ui,sans-serif;color:var(--acc)}
+.fb{font:.92rem/1.45 system-ui,sans-serif;margin-top:8px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.opt.ok{background:var(--okbg);border-color:var(--ok)}.opt.no{background:var(--badbg);border-color:var(--bad)}.opt.off{visibility:hidden}
+.lad{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px;font:.78rem system-ui,sans-serif}
+.lad span{padding:3px 7px;border:1px solid var(--line);border-radius:6px;color:var(--mut)}
+.lad .done{background:var(--okbg);color:var(--ok)}.lad .cur{background:var(--gold);color:var(--ink);font-weight:700}
+.mem{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.cd{min-height:60px;font:600 1rem system-ui,sans-serif;border:1px solid var(--line);border-radius:8px;background:var(--accbg);color:transparent;cursor:pointer;padding:6px}
+.cd.up{background:var(--card);color:var(--ink)}.cd.mt{background:var(--okbg);color:var(--ok);border-color:var(--ok)}
+.cg{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.cg .opt{text-align:center;font-size:.82rem;padding:8px 4px;min-height:58px}
+.cg .opt.sel{outline:2px solid var(--acc);background:var(--accbg)}
+.grp{border-radius:8px;padding:8px 10px;margin-bottom:6px;font:.9rem system-ui,sans-serif;background:var(--okbg);border:1px solid var(--ok)}
+.hs{display:block;width:100%;margin-bottom:8px}
+.hs.mk{background:var(--badbg);border-color:var(--bad)}
+.hs.ok{background:var(--okbg);border-color:var(--ok)}
+</style>
+</head>
+<body>
+<main>
+<h1>Present Perfect (A2): игры</h1>
+<p class="sub">Три игры на повторение: have / has + V3, ever / never / just / already / yet.</p>
+<nav id="nav"></nav>
+
+<section id="s1"><h2>1. «Кто хочет стать миллионером?»</h2><p class="ins">12 вопросов. Подсказка 50:50 одна. Несгораемые суммы: после 5-го и 10-го вопроса.</p><div id="mil"></div></section>
+<section id="s2"><h2>2. Memory pairs</h2><p class="ins">Найди пары: инфинитив и форма V3 (past participle).</p><div id="mem"></div></section>
+<section id="s3"><h2>3. Error hunt race</h2><p class="ins">Нажми на предложения с ошибкой. Таймер идёт. Потом нажми «Готово» и сравни время и результат.</p><div id="hunt"></div></section>
+</main>
+
+<script>
+const $=s=>document.querySelector(s);
+["Миллионер","Memory pairs","Error hunt"].forEach((n,i)=>{const b=document.createElement("button");b.textContent=(i+1)+". "+n;b.onclick=()=>{document.querySelectorAll("nav button,section").forEach(x=>x.classList.remove("on"));b.classList.add("on");$("#s"+(i+1)).classList.add("on")};$("#nav").appendChild(b)});
+$("#nav").firstChild.click();
+const sh=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+
+/* Millionaire */
+const Q=[
+ {q:"I ___ to Italy twice.",o:["was been","have been","has been","am been"],a:1,w:"I + have + V3 (been): опыт в жизни."},
+ {q:"The short form of “she has” is…",o:["she’re","she have","she’s","she’ve"],a:2,w:"she has → she’s (после ’s стоит V3, значит это has)."},
+ {q:"The past participle of “see” is…",o:["saw","sawn","seed","seen"],a:3,w:"see – saw – seen."},
+ {q:"___ you ever tried sushi?",o:["Have","Did","Are","Has"],a:0,w:"Вопрос об опыте: Have you ever + V3."},
+ {q:"He ___ his keys, so he can’t get in.",o:["lose","has lost","lost yesterday","is lost"],a:1,w:"Результат важен сейчас: Present Perfect."},
+ {q:"Which sentence is correct?",o:["I have seen him yesterday.","I have saw him.","I seen him.","I saw him yesterday."],a:3,w:"Yesterday — точное время, значит Past Simple."},
+ {q:"“Hasn’t” means…",o:["has not","have not","had not","was not"],a:0,w:"hasn’t = has not (he / she / it)."},
+ {q:"They ___ just left.",o:["has","have","are","did"],a:1,w:"They + have; just стоит между have и V3."},
+ {q:"Which word is often used in questions about life experience?",o:["yesterday","ago","ever","last year"],a:2,w:"Ever = «когда-нибудь». Остальные слова — Past Simple."},
+ {q:"She ___ never ___ fish soup.",o:["has / eaten","have / eaten","has / ate","is / eating"],a:0,w:"She + has + never + V3 (eaten)."},
+ {q:"“Tom has gone to Paris.” Where is Tom now?",o:["At home","In Paris (or on his way)","In London","We don’t know"],a:1,w:"has gone = уехал и ещё там. Has been = был и вернулся."},
+ {q:"Which question is correct?",o:["Have your sister ever flown?","Does your sister ever flown?","Has your sister ever flew?","Has your sister ever flown?"],a:3,w:"Your sister = she → Has; V3 от fly = flown."}
+];
+const SAFE=[4,9];let L=0,used=false,done=false;
+function mil(){
+ const box=$("#mil");
+ if(done){const s=L>=12?"MAX":L>SAFE[1]?"10":L>SAFE[0]?"5":"0";box.innerHTML=`<div class="card"><h2>${L>=12?"Ты прошёл все 12 вопросов! 🎉":"Игра окончена"}</h2><p>Уровень: <b>${L>=12?12:Math.min(L,12)}</b> из 12. Несгораемый уровень: ${s=="MAX"?"12":s}.</p></div><button class="btn p" id="rs">Играть снова</button>`;$("#rs").onclick=()=>{L=0;used=false;done=false;mil()};return}
+ const q=Q[L];
+ box.innerHTML=`<div class="lad">${Q.map((x,i)=>`<span class="${i<L?"done":i==L?"cur":""}">${i+1}${SAFE.includes(i)?"★":""}</span>`).join("")}</div><div class="card"><p><b>${L+1}.</b> ${q.q}</p><div class="grid2">${q.o.map((o,i)=>`<button class="opt" data-i="${i}">${["A","B","C","D"][i]}. ${o}</button>`).join("")}</div><div class="bar"><button class="btn" id="ff" ${used?"disabled":""}>50:50</button></div><div class="fb" id="fb"></div></div>`;
+ $("#ff").onclick=()=>{used=true;$("#ff").disabled=true;let w=[0,1,2,3].filter(i=>i!=q.a);sh(w).slice(0,2).forEach(i=>box.querySelector(`.opt[data-i="${i}"]`).classList.add("off"))};
+ box.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{
+  box.querySelectorAll(".opt").forEach(x=>x.disabled=true);const i=+b.dataset.i,ok=i==q.a;
+  b.classList.add(ok?"ok":"no");box.querySelector(`.opt[data-i="${q.a}"]`).classList.add("ok");
+  $("#fb").innerHTML=(ok?"✔ Верно! ":"✖ Неверно. ")+q.w+`<div class="bar"><button class="btn p" id="nx">${ok?(L==11?"Завершить":"Дальше"):"Результат"}</button></div>`;
+  $("#nx").onclick=()=>{if(ok){L++;if(L>=12)done=true}else{L=L<=SAFE[0]?0:L<=SAFE[1]?SAFE[0]+1:SAFE[1]+1;done=true}mil()}})
+}
+mil();
+
+/* Memory */
+const MP=[["be","been"],["see","seen"],["go","gone"],["eat","eaten"],["write","written"],["do","done"],["take","taken"],["fly","flown"]];
+function mem(){
+ const box=$("#mem");let cards=sh(MP.flatMap((p,i)=>[{t:p[0],k:i},{t:p[1],k:i}])),open=[],moves=0,found=0,lock=false;
+ box.innerHTML=`<div class="bar"><span class="sc" id="mv">Ходов: 0</span><button class="btn" id="mr">Заново</button></div><div class="mem" id="mg"></div><div class="fb" id="mf"></div>`;
+ $("#mr").onclick=mem;
+ cards.forEach((c,i)=>{const b=document.createElement("button");b.className="cd";b.textContent=c.t;b.onclick=()=>{
+  if(lock||b.classList.contains("up")||b.classList.contains("mt"))return;
+  b.classList.add("up");open.push([c,b]);
+  if(open.length==2){moves++;$("#mv").textContent="Ходов: "+moves;const [x,y]=open;
+   if(x[0].k==y[0].k&&x[0].t!=y[0].t){x[1].className=y[1].className="cd mt";found++;open=[];$("#mf").textContent=x[0].t+" – "+y[0].t;if(found==8)$("#mf").innerHTML="🎉 Все пары найдены за <b>"+moves+"</b> ходов. Present Perfect: have/has + эти формы.";}
+   else{lock=true;setTimeout(()=>{x[1].classList.remove("up");y[1].classList.remove("up");open=[];lock=false},800)}}};
+  $("#mg").appendChild(b)})
+}
+mem();
+
+/* Error hunt */
+const H=[
+ {t:"I have seen him yesterday.",bad:1,fix:"I saw him yesterday.",w:"Yesterday — точное время → Past Simple."},
+ {t:"She has just arrived.",bad:0,w:"Верно: недавнее событие, has + just + V3."},
+ {t:"Have you ever been to Spain?",bad:0,w:"Верно: вопрос об опыте."},
+ {t:"He haven’t finished his homework.",bad:1,fix:"He hasn’t finished his homework.",w:"С he нужно hasn’t."},
+ {t:"We have never ate sushi.",bad:1,fix:"We have never eaten sushi.",w:"После have нужна форма V3: eaten, а не ate."},
+ {t:"They’ve already left.",bad:0,w:"Верно: already + V3 между have и left."},
+ {t:"I have lost my phone last week.",bad:1,fix:"I lost my phone last week.",w:"Last week — точное время → Past Simple."},
+ {t:"Has she ever flown in a plane?",bad:0,w:"Верно: Has + she + ever + V3 (flown)."},
+ {t:"My brother have just come home.",bad:1,fix:"My brother has just come home.",w:"My brother = he → has."},
+ {t:"I’ve never been to London.",bad:0,w:"Верно: опыт в жизни, never + V3."}
+];
+let tm=null;
+function hunt(){
+ clearInterval(tm);const box=$("#hunt");let t=0,fin=false;
+ box.innerHTML=`<div class="bar"><span class="sc" id="tt">⏱ 0 с</span><button class="btn p" id="hd">Готово</button><button class="btn" id="hr">Заново</button></div><div id="hl"></div><div class="fb" id="hf"></div>`;
+ H.forEach(h=>{const b=document.createElement("button");b.className="opt hs";b.textContent=h.t;b.onclick=()=>{if(!fin)b.classList.toggle("mk")};$("#hl").appendChild(b)});
+ tm=setInterval(()=>{t++;$("#tt").textContent="⏱ "+t+" с"},1000);
+ $("#hr").onclick=hunt;
+ $("#hd").onclick=()=>{if(fin)return;fin=true;clearInterval(tm);let n=0;
+  [...$("#hl").children].forEach((b,i)=>{const h=H[i],m=b.classList.contains("mk"),ok=m==!!h.bad;if(ok)n++;
+   b.classList.remove("mk");b.classList.add(ok?"ok":"mk");
+   b.innerHTML=(ok?"✔ ":"✖ ")+h.t+`<br><small>${h.bad?"Ошибка. Правильно: <b>"+h.fix+"</b>. ":"Предложение верное. "}${h.w}</small>`});
+  $("#hf").innerHTML=`Результат: <b>${n} / ${H.length}</b> за ${t} с.`}
+}
+hunt();
+</script>
+</body>
+</html>
