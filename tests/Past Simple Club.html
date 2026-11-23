@@ -1,0 +1,818 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Past Simple Club</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;600;700;800&family=Nunito:wght@500;600;700;800&family=Caveat:wght@500;700&display=swap">
+<style>
+/* Layout: one sticker-notebook column. Yellow hero, rule board, scrollable tabs, one exercise card at a time. */
+:root{
+  --bg:#EEF3FB; --card:#FFFFFF; --field:#F5F8FE; --ink:#1B2240; --muted:#59628A;
+  --bd:#1B2240; --sh:#1B2240; --rule:#C9D1EA;
+  --sky:#8EC0FF; --lilac:#CDB8FF; --mint:#7FE3C4; --sun:#FFD84D; --coral:#FF9A8B; --pink:#FFB3D1; --lime:#C6F26B;
+  --on-pastel:#1B2240; --white:#FFFFFF;
+  --ok:#0F7A5A; --on-ok:#FFFFFF; --ok-bg:#D8F5E9;
+  --bad:#C2352B; --on-bad:#FFFFFF; --bad-bg:#FFE2DE;
+  --reveal-bg:#FFF0B0;
+  --font-d:'Rubik',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --font-b:'Nunito',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --font-h:'Caveat','Segoe Script',cursive;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#11152B; --card:#1B2142; --field:#141939; --ink:#EEF1FF; --muted:#A8B0DC;
+    --bd:#7C86C4; --sh:#05071A; --rule:#2E3665;
+    --ok:#5FE0B2; --on-ok:#0B2A22; --ok-bg:#123F33;
+    --bad:#FF8A7E; --on-bad:#3A0F12; --bad-bg:#4A2029;
+    --reveal-bg:#4D4311;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#11152B; --card:#1B2142; --field:#141939; --ink:#EEF1FF; --muted:#A8B0DC;
+  --bd:#7C86C4; --sh:#05071A; --rule:#2E3665;
+  --ok:#5FE0B2; --on-ok:#0B2A22; --ok-bg:#123F33;
+  --bad:#FF8A7E; --on-bad:#3A0F12; --bad-bg:#4A2029;
+  --reveal-bg:#4D4311;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:var(--font-b); font-size:16px; line-height:1.5;
+  padding-block:20px 40px;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));
+  padding-right:max(16px, env(safe-area-inset-right, 0px));
+}
+button,input,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid #4C8DFF;outline-offset:2px}
+.page{max-width:920px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+.card{background:var(--card);border:2.5px solid var(--bd);border-radius:18px;box-shadow:5px 5px 0 var(--sh)}
+
+/* Hero */
+.hero{background:var(--sun);color:var(--on-pastel);padding:22px 22px 20px}
+.hero h1{font-family:var(--font-d);font-weight:800;font-size:clamp(2.3rem,9vw,3.8rem);line-height:1;letter-spacing:-.02em;margin:0 0 .5rem;text-wrap:balance}
+.hero p{margin:0;max-width:48ch;font-weight:700}
+.stickers{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.sticker{font-family:var(--font-d);font-weight:700;background:var(--white);color:var(--on-pastel);border:2.5px solid var(--on-pastel);border-radius:10px;padding:3px 11px}
+.sticker:nth-child(1){transform:rotate(-2deg)} .sticker:nth-child(2){transform:rotate(1.5deg)} .sticker:nth-child(3){transform:rotate(-1deg)} .sticker:nth-child(4){transform:rotate(2deg)}
+.meter{margin-top:16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.meter b{font-family:var(--font-d)}
+.bar{flex:1 1 180px;height:16px;border:2.5px solid var(--on-pastel);border-radius:99px;background:var(--white);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--mint);transition:width .4s}
+
+/* Rule board */
+.rules{padding:0;overflow:hidden}
+.rules summary{cursor:pointer;list-style:none;padding:14px 18px;font-family:var(--font-d);font-weight:700;font-size:1.1rem;display:flex;justify-content:space-between;gap:12px}
+.rules summary::-webkit-details-marker{display:none}
+.rules summary::after{content:"＋";font-weight:800}
+.rules[open] summary::after{content:"－"}
+.rule-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;padding:0 18px 18px}
+.rule{border-radius:14px;padding:14px;color:var(--on-pastel);border:2px solid var(--on-pastel)}
+.rule h3{font-family:var(--font-d);font-size:1.05rem;margin:0 0 6px}
+.rule p{margin:0 0 6px;font-weight:600;font-size:.95rem}
+.rule code{font-family:var(--font-b);font-weight:800;background:var(--white);border-radius:6px;padding:0 6px}
+.rule ul{margin:0;padding-left:1.1rem;font-weight:600;font-size:.95rem}
+.r1{background:var(--sky)} .r2{background:var(--mint)} .r3{background:var(--lilac)}
+.markers{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-weight:700}
+.markers span.m{background:var(--pink);color:var(--on-pastel);border:2px solid var(--on-pastel);border-radius:99px;padding:1px 12px;font-family:var(--font-d);font-weight:600;font-size:.9rem}
+
+/* Tabs */
+.tabs{display:flex;gap:10px;overflow-x:auto;padding:4px 6px 14px;margin:-4px -6px -6px;scrollbar-width:thin}
+.tab{flex:0 0 auto;display:flex;align-items:center;gap:8px;font:700 .95rem var(--font-d);color:var(--ink);background:var(--card);border:2.5px solid var(--bd);border-radius:14px;padding:8px 12px;cursor:pointer;box-shadow:3px 3px 0 var(--sh);transition:transform .1s,box-shadow .1s}
+.tab .tn{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--on-pastel);border:2px solid var(--bd);font-size:.8rem}
+.tab[aria-selected="true"]{background:var(--accent);color:var(--on-pastel);transform:translate(2px,2px);box-shadow:1px 1px 0 var(--sh)}
+.tab[aria-selected="true"] .tn{background:var(--white)}
+.chip{font-size:.75rem;background:var(--ok-bg);color:var(--ink);border-radius:99px;padding:0 7px;border:1.5px solid var(--bd)}
+.chip[hidden]{display:none}
+
+/* Panel */
+.panel{overflow:hidden}
+.panel-head{background:var(--accent);color:var(--on-pastel);display:flex;gap:14px;align-items:flex-start;padding:16px 18px;border-bottom:2.5px solid var(--bd)}
+.pn{flex:none;display:grid;place-items:center;width:42px;height:42px;border-radius:50%;background:var(--white);border:2.5px solid var(--on-pastel);font:800 1.2rem var(--font-d)}
+.panel-head h2{font-family:var(--font-d);font-weight:800;margin:0;font-size:1.4rem;line-height:1.2}
+.panel-head p{margin:.25rem 0 0;font-weight:600}
+.panel-body{padding:6px 18px 22px}
+
+.item{display:flex;gap:12px;padding:15px 4px;border-bottom:2px dashed var(--rule);border-radius:10px}
+.item:last-child{border-bottom:0}
+.item .num{flex:none;display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--accent);color:var(--on-pastel);border:2px solid var(--bd);font:700 .85rem var(--font-d);margin-top:2px}
+.item .main{flex:1;min-width:0}
+.item.ok .num{background:var(--ok);color:var(--on-ok)}
+.item.bad .num{background:var(--bad);color:var(--on-bad)}
+.item.shown .num{background:var(--sun);color:var(--on-pastel)}
+.q{margin:0 0 .55rem;font-size:1.08rem;font-weight:700}
+.q.fill{line-height:2.2}
+.inp{background:var(--field);color:var(--ink);border:2.5px solid var(--bd);border-radius:10px;padding:.4rem .7rem;font-size:1rem;font-weight:600;min-width:0}
+.fill .inp{width:9.5ch;min-width:9.5ch;margin:0 .3rem;text-align:center}
+.inp.wide{width:100%}
+.item.ok .inp{border-color:var(--ok)} .item.bad .inp{border-color:var(--bad)}
+.hint{font-family:var(--font-h);font-size:1.4rem;color:var(--muted);margin-left:.2rem}
+.task{display:inline-block;font:700 .75rem var(--font-d);text-transform:uppercase;letter-spacing:.07em;background:var(--accent);color:var(--on-pastel);padding:3px 10px;border-radius:99px;border:2px solid var(--bd);margin-bottom:.5rem}
+.fb{margin-top:.6rem;padding:.55rem .8rem;border-radius:10px;font-size:.95rem;font-weight:600}
+.fb[hidden]{display:none}
+.item.ok .fb{background:var(--ok-bg)} .item.bad .fb{background:var(--bad-bg)} .item.shown .fb{background:var(--reveal-bg)}
+
+.toolbar{display:flex;flex-wrap:wrap;gap:12px;padding-top:18px}
+.btn{font:700 .95rem var(--font-d);color:var(--on-pastel);background:var(--white);border:2.5px solid var(--bd);border-radius:12px;padding:9px 16px;cursor:pointer;box-shadow:3px 3px 0 var(--sh);transition:transform .08s,box-shadow .08s}
+.btn:active{transform:translate(3px,3px);box-shadow:0 0 0 var(--sh)}
+.b-mint{background:var(--mint)} .b-sun{background:var(--sun)} .b-sky{background:var(--sky)} .b-plain{background:var(--card);color:var(--ink)}
+.result{min-height:1.5em;font-weight:800;margin:14px 0 0}
+.result.perfect{color:var(--ok)}
+.next{margin-top:6px;display:flex;justify-content:flex-end}
+
+/* True / False */
+.tfbtns{display:flex;gap:10px;flex-wrap:wrap}
+.tfbtn{font:700 1rem var(--font-d);min-width:96px;padding:7px 18px;background:var(--card);color:var(--ink);border:2.5px solid var(--bd);border-radius:12px;cursor:pointer;box-shadow:2px 2px 0 var(--sh)}
+.tfbtn[aria-pressed="true"]{background:var(--accent);color:var(--on-pastel);transform:translate(2px,2px);box-shadow:0 0 0 var(--sh)}
+.tfbtn.reveal{outline:3px solid var(--ok);outline-offset:2px}
+
+/* Timeline */
+.hintline{font-weight:600;color:var(--muted);margin:14px 0 0}
+.pool{display:flex;flex-wrap:wrap;gap:10px;padding:14px;border:2.5px dashed var(--bd);border-radius:14px;min-height:70px;margin-top:10px}
+.pool.empty::before{content:"Все карточки на шкале";font-family:var(--font-h);font-size:1.4rem;color:var(--muted)}
+.axis{display:flex;align-items:center;gap:10px;margin-top:18px;font-family:var(--font-h);font-size:1.4rem;color:var(--muted)}
+.axis i{flex:1;height:3px;background:var(--bd);border-radius:2px}
+.zones{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:8px}
+.zone{border:2.5px solid var(--bd);border-radius:14px;background:var(--field);min-height:170px;display:flex;flex-direction:column;overflow:hidden}
+.zhead{background:var(--zc);color:var(--on-pastel);padding:10px 12px;border-bottom:2.5px solid var(--bd)}
+.zhead b{display:block;font-family:var(--font-d);font-size:1rem}
+.zhead small{display:block;font-weight:700;font-size:.82rem}
+.zbtn{margin-top:6px;font:700 .8rem var(--font-d);background:var(--white);color:var(--on-pastel);border:2px solid var(--on-pastel);border-radius:8px;padding:2px 10px;cursor:pointer}
+.zbody{display:flex;flex-direction:column;gap:8px;padding:10px;flex:1}
+.zone.over,.pool.over{outline:3px dashed var(--accent);outline-offset:2px}
+.tcard{text-align:left;font:700 .95rem var(--font-b);color:var(--ink);background:var(--card);border:2.5px solid var(--bd);border-radius:12px;padding:8px 10px;cursor:grab;box-shadow:2px 2px 0 var(--sh)}
+.tcard.sel{background:var(--sun);color:var(--on-pastel);transform:rotate(-1.5deg)}
+.tcard.ok{background:var(--ok-bg)} .tcard.bad{background:var(--bad-bg)} .tcard.shown{background:var(--reveal-bg)}
+.twhy{display:block;font-weight:600;font-size:.85rem;color:var(--muted);margin-top:4px}
+.tcard.sel .twhy{color:var(--on-pastel)}
+
+/* Mistakes */
+.toks{display:flex;flex-wrap:wrap;gap:4px 6px;margin-bottom:.5rem}
+.tok{font:800 1.12rem var(--font-b);color:var(--ink);background:transparent;border:2px dashed transparent;border-radius:8px;padding:2px 7px;cursor:pointer}
+.tok:hover{border-color:var(--bd)}
+.tok[aria-pressed="true"]{background:var(--sun);color:var(--on-pastel);border:2px solid var(--bd)}
+.tok.reveal{background:var(--reveal-bg);color:var(--ink);border:2px solid var(--bd)}
+.fixrow{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.fixrow label{font-weight:800}
+.fixrow .inp{width:12ch}
+
+/* Own ideas */
+.ownline{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.pre{font-family:var(--font-d);font-weight:700;font-size:1.05rem}
+.inp.own{flex:1 1 220px;font-family:var(--font-h);font-size:1.45rem;font-weight:500;padding:.2rem .7rem}
+.ex{margin:.4rem 0 0;font-family:var(--font-h);font-size:1.3rem;color:var(--muted)}
+.ex[hidden]{display:none}
+.preview{width:100%;min-height:150px;margin-top:14px;background:var(--field);color:var(--ink);border:2.5px solid var(--bd);border-radius:12px;padding:.7rem;font-size:1rem}
+.preview[hidden]{display:none}
+
+/* Checklist */
+.can-row{display:flex;gap:14px;align-items:flex-start;padding:13px 6px;border-bottom:2px dashed var(--rule);cursor:pointer}
+.can-row:last-of-type{border-bottom:0}
+.can-row input{flex:none;width:26px;height:26px;margin:2px 0 0;accent-color:#1FA37F;cursor:pointer}
+.can-row b{display:block;font-weight:800}
+.can-row span{color:var(--muted);font-weight:600;font-size:.93rem}
+.can-prog{display:flex;align-items:center;gap:12px;margin-top:14px;flex-wrap:wrap}
+.can-prog .bar{border-color:var(--bd);background:var(--field)}
+
+.foot{text-align:center;color:var(--muted);font-weight:700;font-size:.9rem}
+
+@media (max-width:720px){
+  .rule-grid{grid-template-columns:1fr}
+  .zones{grid-template-columns:1fr}
+  .zone{min-height:0}
+  .axis{display:none}
+  .panel-head{padding:14px}
+  .panel-body{padding:4px 12px 20px}
+  .item{gap:10px}
+}
+@media (prefers-reduced-motion: reduce){
+  *{transition:none!important}
+  .sticker,.tcard.sel{transform:none!important}
+}
+</style>
+
+<div class="page">
+  <header class="hero card">
+    <h1>Past Simple Club</h1>
+    <p>Тренажёр для уровня A1–A2: was / were и did. Выполняй, проверяй, смотри ответы с объяснениями.</p>
+    <div class="stickers" aria-hidden="true">
+      <span class="sticker">was</span><span class="sticker">were</span><span class="sticker">did + V1</span><span class="sticker">woke · bought</span>
+    </div>
+    <div class="meter">
+      <b id="scoreText">Баллы: 0 / 0</b>
+      <div class="bar" role="progressbar" aria-label="Общий результат" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="scoreBar"><i id="scoreFill"></i></div>
+    </div>
+  </header>
+
+  <details class="rules card" open>
+    <summary>Правило на одной странице</summary>
+    <div class="rule-grid">
+      <div class="rule r1">
+        <h3>was / were</h3>
+        <p>I / he / she / it → <code>was</code><br>you / we / they → <code>were</code></p>
+        <ul>
+          <li>She was tired after work.</li>
+          <li>They were at a cozy café yesterday.</li>
+          <li>She wasn't at home. / They weren't busy.</li>
+          <li>Was she at the gym? Were they at the café?</li>
+        </ul>
+      </div>
+      <div class="rule r2">
+        <h3>did + глагол (V1)</h3>
+        <p>Отрицание и вопрос: <code>did</code> + начальная форма.</p>
+        <ul>
+          <li>She cleaned her room yesterday.</li>
+          <li>She didn't study. (не studied!)</li>
+          <li>Did she clean her room?</li>
+        </ul>
+      </div>
+      <div class="rule r3">
+        <h3>Неправильные глаголы</h3>
+        <p>В утверждении — 2-я форма, после did — снова V1.</p>
+        <ul>
+          <li>wake → woke · buy → bought</li>
+          <li>drink → drank · wear → wore</li>
+          <li>go → went · eat → ate</li>
+        </ul>
+      </div>
+      <div class="markers">Слова-маркеры: <span class="m">yesterday</span><span class="m">last weekend</span><span class="m">last night</span><span class="m">two days ago</span><span class="m">on Monday</span></div>
+    </div>
+  </details>
+
+  <nav class="tabs" id="tabs" role="tablist" aria-label="Упражнения"></nav>
+  <main id="panels"></main>
+  <p class="foot">Past Simple · was / were / did · A1–A2</p>
+</div>
+
+<script>
+(function(){
+'use strict';
+
+/* ---------- helpers ---------- */
+function el(tag, cls, html){ var e=document.createElement(tag); if(cls) e.className=cls; if(html!=null) e.innerHTML=html; return e; }
+function norm(s){
+  return String(s).normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase()
+    .replace(/[’`´]/g,"'").replace(/,/g,' ').replace(/\s+/g,' ').trim()
+    .replace(/[.!?]+$/,'')
+    .replace(/\bdid not\b/g,"didn't").replace(/\bwas not\b/g,"wasn't").replace(/\bwere not\b/g,"weren't")
+    .replace(/\s+/g,' ').trim();
+}
+function itemRow(n){
+  var row=el('div','item'), num=el('span','num',String(n)), main=el('div','main'), content=el('div','content'), fb=el('div','fb');
+  fb.hidden=true; main.append(content, fb); row.append(num, main);
+  return {row:row, content:content, fb:fb};
+}
+function setState(r, state, html){
+  r.row.classList.remove('ok','bad','shown');
+  if(state) r.row.classList.add(state);
+  if(html){ r.fb.hidden=false; r.fb.innerHTML=html; } else { r.fb.hidden=true; r.fb.innerHTML=''; }
+}
+function makeInput(id, label, cls){
+  var inp=el('input','inp'+(cls?' '+cls:''));
+  inp.type='text'; inp.id=id; inp.autocomplete='off'; inp.autocapitalize='off'; inp.spellcheck=false;
+  inp.setAttribute('aria-label', label);
+  return inp;
+}
+
+/* ---------- data ---------- */
+var EX = [
+ { id:'tf', n:'1', tab:'True / False', c:'sky', type:'tf',
+   title:'True or False?',
+   ru:'Прочитай предложение или правило. Верно или нет? Объяснение появится после проверки.',
+   items:[
+    {q:"Rule: We can use «was» with I, he, she and it.", a:true,
+     why:"I / he / she / it → was; you / we / they → were. Например: She was tired after work."},
+    {q:"Rule: After didn't we use the -ed form: She didn't cleaned her room.", a:false,
+     why:"После didn't (и did) глагол стоит в начальной форме: She didn't clean her room. Прошедшее время уже показывает did."},
+    {q:"They were at a cozy café yesterday.", a:true,
+     why:"They → were, а yesterday подсказывает прошедшее время."},
+    {q:"She didn't studied yesterday.", a:false,
+     why:"Нужно didn't study. Когда есть didn't, -ed не добавляем."},
+    {q:"Did she wake up early?", a:true,
+     why:"Вопрос: Did + she + wake (V1). Форма woke здесь не нужна, ведь did уже показывает прошлое."},
+    {q:"We was busy last Monday.", a:false,
+     why:"We → were: We were busy last Monday. Was только для I / he / she / it."},
+    {q:"She buyed fresh flowers.", a:false,
+     why:"buy — неправильный глагол: buy → bought. Правильно: She bought fresh flowers."},
+    {q:"Rule: With was / were we make questions without did: Was she at the gym?", a:true,
+     why:"С глаголом be (was/were) did не нужен. Просто меняем порядок слов: She was → Was she…?"},
+    {q:"Rule: Yesterday, last weekend and two days ago are Past Simple time words.", a:true,
+     why:"Это слова-маркеры прошедшего времени. Увидел их — думай о Past Simple."},
+    {q:"She wasn't at home yesterday.", a:true,
+     why:"Отрицание с be: was + not = wasn't. Did здесь не нужен."}
+   ]},
+ { id:'tl', n:'2', tab:'Timeline', c:'lilac', type:'tl',
+   title:'Put it on the timeline',
+   ru:'Нажми на карточку, потом на нужную зону (или перетащи её). Past Simple, Present Simple или Present Continuous?',
+   items:[
+    {s:"She cleaned her room yesterday.", z:'past', why:"cleaned + yesterday → Past Simple. Действие закончилось в прошлом."},
+    {s:"She cleans her room every Saturday.", z:'always', why:"every Saturday — привычка → Present Simple. Для she глагол с -s."},
+    {s:"She is cleaning her room now.", z:'now', why:"now + is cleaning → Present Continuous. Действие идёт прямо сейчас."},
+    {s:"They were at a café last night.", z:'past', why:"were + last night → Past Simple (глагол be)."},
+    {s:"They are sitting in a café now.", z:'now', why:"are sitting + now → Present Continuous."},
+    {s:"He doesn't drink coffee in the evening.", z:'always', why:"doesn't + V1 и привычка → Present Simple."},
+    {s:"I didn't cook dinner two days ago.", z:'past', why:"didn't + two days ago → Past Simple."},
+    {s:"We are painting a picture at the moment.", z:'now', why:"at the moment + are painting → Present Continuous."},
+    {s:"She wakes up early every day.", z:'always', why:"every day — регулярное действие → Present Simple."},
+    {s:"She woke up early last Sunday.", z:'past', why:"woke — 2-я форма от wake; last Sunday → Past Simple."}
+   ]},
+ { id:'gap', n:'3', tab:'Gaps', c:'mint', type:'fill',
+   title:'Fill in the gaps',
+   ru:'Впиши глагол в нужной форме. В скобках — подсказка. Отрицание можно писать didn\'t или did not.',
+   items:[
+    {q:"Yesterday she {} her room.", hint:"clean", a:["cleaned"], why:"Правильный глагол: clean + ed. Слово yesterday → Past Simple."},
+    {q:"They {} at the café last Sunday.", hint:"be", a:["were"], why:"be в прошлом: they → were."},
+    {q:"She {} yesterday.", hint:"not / study", a:["didn't study"], why:"Отрицание: didn't + начальная форма. study остаётся study."},
+    {q:"{} they at the gym last night?", hint:"be", a:["Were"], why:"Вопрос с be: Were + they…? Did не нужен."},
+    {q:"She {} fresh flowers on Friday.", hint:"buy", a:["bought"], why:"Неправильный глагол: buy → bought."},
+    {q:"I {} tired after work.", hint:"not / be", a:["wasn't"], why:"I → was, отрицание: wasn't (was not)."},
+    {q:"We {} in our sketchbooks last weekend.", hint:"paint", a:["painted"], why:"Правильный глагол: paint + ed."},
+    {q:"He {} coffee yesterday morning.", hint:"drink", a:["drank"], why:"Неправильный глагол: drink → drank."},
+    {q:"Last year we {} to Kraków.", hint:"go", a:["went"], why:"Неправильный глагол: go → went."},
+    {q:"She {} a dress to the party.", hint:"not / wear", a:["didn't wear"], why:"wear → wore, но после didn't глагол снова в начальной форме: didn't wear."}
+   ]},
+ { id:'chg', n:'4', tab:'Change', c:'sun', type:'text',
+   title:'Change the tense / person',
+   ru:'Перепиши предложение целиком по заданию. Не забудь точку или вопросительный знак по желанию, они не учитываются.',
+   items:[
+    {given:"She cleans her room every day.", task:"→ Past Simple (yesterday)", a:["She cleaned her room yesterday.","Yesterday she cleaned her room."],
+     why:"cleans → cleaned, every day → yesterday."},
+    {given:"I am tired after work.", task:"→ Past Simple", a:["I was tired after work."],
+     why:"am → was. I + was."},
+    {given:"They are at a café.", task:"→ Past Simple (yesterday)", a:["They were at a café yesterday.","Yesterday they were at a café."],
+     why:"are → were (they), yesterday подсказывает прошлое."},
+    {given:"I don't drink coffee.", task:"→ Past Simple", a:["I didn't drink coffee."],
+     why:"don't → didn't. Глагол drink остаётся в начальной форме."},
+    {given:"I woke up early.", task:"I → She", a:["She woke up early."],
+     why:"В Past Simple глагол не меняется по лицам. woke остаётся woke."},
+    {given:"We bought fresh flowers.", task:"We → He", a:["He bought fresh flowers."],
+     why:"bought одинаково для всех лиц. Меняется только подлежащее."},
+    {given:"She wasn't at home.", task:"She → They", a:["They weren't at home."],
+     why:"С be форма зависит от лица: she wasn't → they weren't (were not)."},
+    {given:"He paints in his sketchbook.", task:"→ Past Simple (last weekend)", a:["He painted in his sketchbook last weekend.","Last weekend he painted in his sketchbook."],
+     why:"paints → painted, и добавляем маркер last weekend."}
+   ]},
+ { id:'mis', n:'5', tab:'Mistake', c:'coral', type:'mis',
+   title:'Find the mistake',
+   ru:'В каждом предложении одна ошибка. Нажми на неправильное слово и впиши, как должно быть.',
+   items:[
+    {s:"She didn't went to school yesterday.", w:2, fix:["go"],
+     why:"После didn't нужна начальная форма: didn't go."},
+    {s:"They was at the café last night.", w:1, fix:["were"],
+     why:"They → were, а не was."},
+    {s:"Did she cleaned her room?", w:2, fix:["clean"],
+     why:"В вопросе после did глагол в начальной форме: Did she clean…?"},
+    {s:"He buyed a new bag.", w:1, fix:["bought"],
+     why:"buy — неправильный глагол: buy → bought."},
+    {s:"I weren't tired after work.", w:1, fix:["wasn't","was not"],
+     why:"С I используем was: I wasn't tired."},
+    {s:"She didn't wore a dress.", w:2, fix:["wear"],
+     why:"wore — это 2-я форма. После didn't ставим wear."},
+    {s:"Were she at the gym?", w:0, fix:["Was"],
+     why:"She → was: Was she at the gym?"},
+    {s:"Yesterday she wake up early.", w:2, fix:["woke"],
+     why:"В утверждении нужна 2-я форма: wake → woke."}
+   ]},
+ { id:'rep', n:'6', tab:'Rephrase', c:'pink', type:'text',
+   title:'Rephrase',
+   ru:'Преобразуй предложение: сделай отрицание, вопрос, утверждение или короткий ответ.',
+   items:[
+    {given:"She cleaned her room.", task:"Negative", a:["She didn't clean her room."],
+     why:"Отрицание: didn't + V1. cleaned → clean."},
+    {given:"She studied yesterday.", task:"Question", a:["Did she study yesterday?"],
+     why:"Вопрос: Did + she + study (V1)."},
+    {given:"They were at the café.", task:"Question", a:["Were they at the café?"],
+     why:"С be просто меняем порядок: Were they…?"},
+    {given:"She was at the gym.", task:"Negative", a:["She wasn't at the gym."],
+     why:"was + not = wasn't."},
+    {given:"She woke up early.", task:"Question", a:["Did she wake up early?"],
+     why:"Did + she + wake. woke возвращается в wake."},
+    {given:"They weren't busy.", task:"Affirmative (+)", a:["They were busy."],
+     why:"Убираем not: weren't → were."},
+    {given:"She didn't cook dinner.", task:"Affirmative (+)", a:["She cooked dinner."],
+     why:"didn't cook → cooked: прошедшее время теперь показывает сам глагол."},
+    {given:"She bought fresh flowers.", task:"Negative", a:["She didn't buy fresh flowers."],
+     why:"didn't + buy. bought возвращается в buy."},
+    {given:"Did she wear a dress?", task:"Short answer: Yes", a:["Yes, she did."],
+     why:"Короткий ответ повторяет did: Yes, she did."},
+    {given:"Was she tired after work?", task:"Short answer: No", a:["No, she wasn't."],
+     why:"Вопрос был с was, значит ответ тоже с was: No, she wasn't."}
+   ]},
+ { id:'own', n:'7', tab:'My ideas', c:'lime', type:'free',
+   title:'Finish with your own ideas',
+   ru:'Допиши предложения про себя. Потом нажми «Копировать всё» и вставь текст в чат, заметки или сообщение учителю.',
+   items:[
+    {pre:"Yesterday I", ph:"went to a café with my friend.", ex:"Yesterday I met my friend and we ate pizza."},
+    {pre:"Last weekend we", ph:"visited…", ex:"Last weekend we went to the cinema."},
+    {pre:"I wasn't", ph:"at school yesterday because…", ex:"I wasn't at school yesterday because I was ill."},
+    {pre:"My friend didn't", ph:"call me last Sunday.", ex:"My friend didn't call me last Sunday."},
+    {pre:"Two days ago I bought", ph:"a new…", ex:"Two days ago I bought a new notebook."},
+    {pre:"Last night I was", ph:"at home / tired / busy…", ex:"Last night I was at home with my cat."},
+    {pre:"I didn't", ph:"eat… this morning.", ex:"I didn't eat breakfast this morning."},
+    {pre:"Did you", ph:"watch a film yesterday?", ex:"Did you watch a film yesterday?"}
+   ]},
+ { id:'can', n:'✓', tab:'I can…', c:'sky', type:'can',
+   title:'Я могу…',
+   ru:'Отметь то, что у тебя уже получается. Честная самооценка показывает, что повторить.',
+   items:[
+    ["I can say what I did yesterday.","Я могу рассказать, что делал(а) вчера (She cleaned her room)."],
+    ["I can use was and were with the right person.","Я правильно выбираю was / were (I was, they were)."],
+    ["I can make negatives with didn't + V1.","Я строю отрицание: She didn't study."],
+    ["I can ask questions with Did…?","Я задаю вопросы: Did she wake up early?"],
+    ["I can ask questions with Was / Were…?","Я задаю вопросы с be: Were they at the café?"],
+    ["I know some irregular verbs.","Я знаю неправильные глаголы: woke, bought, drank, wore, went."],
+    ["I can use time words.","Я использую yesterday, last weekend, two days ago."],
+    ["I can tell Past Simple from Present Simple and Continuous.","Я различаю Past Simple, Present Simple и Present Continuous."],
+    ["I can find and fix mistakes.","Я нахожу и исправляю ошибки (didn't went → didn't go)."],
+    ["I can write 5 sentences about my weekend.","Я могу написать 5 предложений о своих выходных."]
+   ]}
+];
+
+var TOTAL = EX.reduce(function(a,e){ return a + ((e.type==='free'||e.type==='can') ? 0 : e.items.length); }, 0);
+var scores = {};
+var tabsEl = document.getElementById('tabs'), panelsEl = document.getElementById('panels');
+var tabBtns = {}, panels = {};
+
+function updateScore(){
+  var got = Object.keys(scores).reduce(function(a,k){ return a + scores[k]; }, 0);
+  document.getElementById('scoreText').textContent = 'Баллы: ' + got + ' / ' + TOTAL;
+  var pct = TOTAL ? Math.round(got/TOTAL*100) : 0;
+  document.getElementById('scoreFill').style.width = pct + '%';
+  document.getElementById('scoreBar').setAttribute('aria-valuenow', String(pct));
+}
+function setChip(id, score, total){
+  var chip = tabBtns[id] && tabBtns[id].querySelector('.chip');
+  if(!chip) return;
+  if(score==null){ chip.hidden = true; chip.textContent=''; } else { chip.hidden=false; chip.textContent = score + '/' + total; }
+}
+
+/* ---------- panel shell ---------- */
+function panelShell(ex){
+  var p = el('section','panel card'); p.id='panel-'+ex.id; p.hidden=true; p.setAttribute('role','tabpanel');
+  p.style.setProperty('--accent','var(--'+ex.c+')');
+  var head = el('div','panel-head');
+  head.append(el('span','pn',ex.n));
+  var t = el('div'); t.append(el('h2',null,ex.title), el('p',null,ex.ru)); head.append(t);
+  var body = el('div','panel-body');
+  p.append(head, body);
+  return {p:p, body:body};
+}
+function toolbar(list){
+  var t = el('div','toolbar');
+  list.forEach(function(x){ var b=el('button','btn '+x[1],x[0]); b.type='button'; b.addEventListener('click',x[2]); t.append(b); });
+  return t;
+}
+function nextBtn(ex){
+  var idx = EX.indexOf(ex), nx = EX[idx+1];
+  var w = el('div','next');
+  if(nx){ var b=el('button','btn b-plain','Дальше: '+nx.tab+' →'); b.type='button'; b.addEventListener('click',function(){ showTab(nx.id, true); }); w.append(b); }
+  return w;
+}
+
+/* ---------- scored panels ---------- */
+function scoredPanel(ex, impl){
+  var sh = panelShell(ex), items = el('div','items');
+  impl.build(items);
+  var res = el('p','result'); res.setAttribute('role','status'); res.setAttribute('aria-live','polite');
+  var tb = toolbar([
+    ['Проверить · Check','b-mint',function(){
+      var r = impl.check(); scores[ex.id]=r.score; setChip(ex.id, r.score, r.total); updateScore();
+      res.className = 'result' + (r.score===r.total ? ' perfect' : '');
+      res.textContent = r.score===r.total ? 'Отлично! '+r.score+' из '+r.total+', всё верно.' :
+        'Верно: '+r.score+' из '+r.total+'. Красные пункты ещё раз обдумай или нажми «Показать ответы».';
+    }],
+    ['Показать ответы · Answers','b-sun',function(){
+      impl.show(); res.className='result';
+      res.textContent='Ответы и объяснения открыты. Нажми «Заново» и попробуй без подсказок.';
+    }],
+    ['Заново · Reset','b-plain',function(){
+      impl.reset(); delete scores[ex.id]; setChip(ex.id); updateScore(); res.className='result'; res.textContent='';
+    }]
+  ]);
+  sh.body.append(items, tb, res, nextBtn(ex));
+  return sh.p;
+}
+
+/* True / False */
+function tfImpl(ex){
+  var rows=[], sel=[];
+  return {
+    build:function(root){
+      rows=[]; sel=ex.items.map(function(){ return null; });
+      ex.items.forEach(function(it,i){
+        var r=itemRow(i+1), q=el('p','q'); q.textContent=it.q;
+        var btns=el('div','tfbtns'); r.btns=[];
+        [['True',true],['False',false]].forEach(function(pair){
+          var b=el('button','tfbtn',pair[0]); b.type='button'; b.setAttribute('aria-pressed','false');
+          b.addEventListener('click',function(){
+            sel[i]=pair[1];
+            r.btns.forEach(function(x){ x.b.setAttribute('aria-pressed', String(x.b===b)); x.b.classList.remove('reveal'); });
+            setState(r,null);
+          });
+          r.btns.push({b:b,v:pair[1]}); btns.append(b);
+        });
+        r.content.append(q, btns); rows.push(r); root.append(r.row);
+      });
+    },
+    check:function(){
+      var score=0;
+      rows.forEach(function(r,i){
+        var it=ex.items[i];
+        if(sel[i]===null){ setState(r,'bad','✗ Выбери True или False.'); }
+        else if(sel[i]===it.a){ score++; setState(r,'ok','✓ <b>Верно!</b> '+it.why); }
+        else { setState(r,'bad','✗ Пока не то. Подумай ещё раз.'); }
+      });
+      return {score:score,total:rows.length};
+    },
+    show:function(){
+      rows.forEach(function(r,i){
+        var it=ex.items[i]; sel[i]=it.a;
+        r.btns.forEach(function(x){ x.b.setAttribute('aria-pressed', String(x.v===it.a)); x.b.classList.toggle('reveal', x.v===it.a); });
+        setState(r,'shown','Ответ: <b>'+(it.a?'True':'False')+'</b><br>'+it.why);
+      });
+    },
+    reset:function(){
+      rows.forEach(function(r,i){ sel[i]=null; r.btns.forEach(function(x){ x.b.setAttribute('aria-pressed','false'); x.b.classList.remove('reveal'); }); setState(r,null); });
+    }
+  };
+}
+
+/* Text inputs: gaps, change, rephrase */
+function textImpl(ex, kind){
+  var rows=[];
+  return {
+    build:function(root){
+      rows=[];
+      ex.items.forEach(function(it,i){
+        var r=itemRow(i+1), inp;
+        if(kind==='fill'){
+          var p=el('p','q fill'), parts=it.q.split('{}');
+          inp=makeInput(ex.id+'-'+i,'Ответ '+(i+1));
+          p.append(document.createTextNode(parts[0]), inp, document.createTextNode(parts[1]));
+          if(it.hint) p.append(el('span','hint','('+it.hint+')'));
+          r.content.append(p);
+        } else {
+          var g=el('p','q'); g.textContent=it.given;
+          inp=makeInput(ex.id+'-'+i,'Ответ '+(i+1),'wide');
+          r.content.append(g, el('span','task',it.task), inp);
+        }
+        inp.addEventListener('input',function(){ setState(r,null); });
+        inp.addEventListener('keydown',function(e){ if(e.key==='Enter'){ e.preventDefault(); var nx=rows[i+1]; if(nx) nx.inp.focus(); } });
+        r.inp=inp; rows.push(r); root.append(r.row);
+      });
+    },
+    check:function(){
+      var score=0;
+      rows.forEach(function(r,i){
+        var it=ex.items[i], v=norm(r.inp.value);
+        if(!v){ setState(r,'bad','✗ Напиши ответ.'); return; }
+        if(it.a.map(norm).indexOf(v)>-1){ score++; setState(r,'ok','✓ <b>Верно!</b> '+it.why); }
+        else setState(r,'bad','✗ Пока не то. Проверь форму глагола и порядок слов.');
+      });
+      return {score:score,total:rows.length};
+    },
+    show:function(){
+      rows.forEach(function(r,i){
+        var it=ex.items[i]; r.inp.value=it.a[0];
+        var full = kind==='fill' ? it.q.replace('{}', it.a[0]) : it.a[0];
+        setState(r,'shown','Ответ: <b>'+full+'</b><br>'+it.why);
+      });
+    },
+    reset:function(){ rows.forEach(function(r){ r.inp.value=''; setState(r,null); }); }
+  };
+}
+
+/* Find the mistake */
+function correctSentence(it){
+  var toks=it.s.split(' '), m=toks[it.w].match(/^(.*?)([.!?,]*)$/);
+  return toks.map(function(t,i){ return i===it.w ? it.fix[0]+m[2] : t; }).join(' ');
+}
+function misImpl(ex){
+  var rows=[];
+  function pick(r,j){
+    r.sel = (r.sel===j ? null : j);
+    r.toks.forEach(function(x,k){ x.setAttribute('aria-pressed', String(k===r.sel)); x.classList.remove('reveal'); });
+    setState(r,null);
+  }
+  return {
+    build:function(root){
+      rows=[];
+      ex.items.forEach(function(it,i){
+        var r=itemRow(i+1), wrap=el('div','toks'); r.sel=null; r.toks=[];
+        it.s.split(' ').forEach(function(t,j){
+          var b=el('button','tok'); b.type='button'; b.textContent=t; b.setAttribute('aria-pressed','false');
+          b.addEventListener('click',function(){ pick(r,j); });
+          r.toks.push(b); wrap.append(b);
+        });
+        var line=el('div','fixrow'), inp=makeInput(ex.id+'-'+i,'Исправление '+(i+1)), lab=el('label',null,'Правильно:');
+        lab.htmlFor=inp.id;
+        inp.addEventListener('input',function(){ setState(r,null); });
+        line.append(lab, inp); r.inp=inp;
+        r.content.append(wrap, line); rows.push(r); root.append(r.row);
+      });
+    },
+    check:function(){
+      var score=0;
+      rows.forEach(function(r,i){
+        var it=ex.items[i], wOK=(r.sel===it.w), fOK=it.fix.map(norm).indexOf(norm(r.inp.value))>-1;
+        if(wOK&&fOK){ score++; setState(r,'ok','✓ <b>Верно!</b> '+it.why); }
+        else if(r.sel===null) setState(r,'bad','✗ Нажми на слово с ошибкой.');
+        else if(!wOK) setState(r,'bad','✗ Ошибка в другом слове. Посмотри ещё раз.');
+        else setState(r,'bad','✗ Слово найдено верно! Теперь впиши правильную форму.');
+      });
+      return {score:score,total:rows.length};
+    },
+    show:function(){
+      rows.forEach(function(r,i){
+        var it=ex.items[i]; r.sel=it.w;
+        r.toks.forEach(function(x,k){ x.setAttribute('aria-pressed', String(k===it.w)); x.classList.toggle('reveal', k===it.w); });
+        r.inp.value=it.fix[0];
+        setState(r,'shown','Правильно: <b>'+correctSentence(it)+'</b><br>'+it.why);
+      });
+    },
+    reset:function(){
+      rows.forEach(function(r){ r.sel=null; r.inp.value=''; r.toks.forEach(function(x){ x.setAttribute('aria-pressed','false'); x.classList.remove('reveal'); }); setState(r,null); });
+    }
+  };
+}
+
+/* Timeline */
+var ZONES=[
+  {k:'past', t:'Past Simple', s:'было и закончилось', c:'var(--coral)'},
+  {k:'always', t:'Present Simple', s:'привычка, факт', c:'var(--sun)'},
+  {k:'now', t:'Present Continuous', s:'идёт прямо сейчас', c:'var(--mint)'}
+];
+function tlImpl(ex){
+  var place=[], states=[], sel=null, dragging=null, cards=[], pool, zoneBodies={}, zoneEls=[];
+  function put(i, key){ place[i]=key; states[i]=null; sel=null; render(); }
+  function render(){
+    pool.innerHTML=''; ZONES.forEach(function(z){ zoneBodies[z.k].innerHTML=''; });
+    var unplaced=0;
+    cards.forEach(function(c,i){
+      c.className='tcard'+(sel===i?' sel':'')+(states[i]?' '+states[i]:'');
+      var why=c.querySelector('.twhy'); why.hidden = !(states[i]==='ok'||states[i]==='shown');
+      (place[i]?zoneBodies[place[i]]:pool).append(c);
+      if(!place[i]) unplaced++;
+    });
+    pool.classList.toggle('empty', unplaced===0);
+  }
+  function target(node, key){
+    node.addEventListener('click',function(){ if(sel!==null) put(sel, key); });
+    node.addEventListener('dragover',function(e){ e.preventDefault(); node.classList.add('over'); });
+    node.addEventListener('dragleave',function(){ node.classList.remove('over'); });
+    node.addEventListener('drop',function(e){ e.preventDefault(); node.classList.remove('over'); if(dragging!==null){ put(dragging,key); dragging=null; } });
+  }
+  return {
+    build:function(root){
+      place=ex.items.map(function(){ return null; }); states=ex.items.map(function(){ return null; });
+      root.append(el('p','hintline','Карточки внизу. Выбери одну, затем нажми на зону (или кнопку «Сюда»). Чтобы вернуть, выбери карточку и нажми на серую область.'));
+      pool=el('div','pool'); pool.setAttribute('aria-label','Карточки');
+      target(pool,null);
+      root.append(pool);
+      root.append(el('div','axis','<span>← past</span><i></i><span>always</span><i></i><span>now →</span>'));
+      var zones=el('div','zones');
+      ZONES.forEach(function(z){
+        var zone=el('div','zone'); zone.style.setProperty('--zc',z.c);
+        var head=el('div','zhead'); head.append(el('b',null,z.t), el('small',null,z.s));
+        var btn=el('button','zbtn','Сюда'); btn.type='button';
+        btn.addEventListener('click',function(e){ e.stopPropagation(); if(sel!==null) put(sel,z.k); });
+        head.append(btn);
+        var body=el('div','zbody'); zoneBodies[z.k]=body;
+        zone.append(head, body); target(zone,z.k); zones.append(zone); zoneEls.push(zone);
+      });
+      root.append(zones);
+      cards=ex.items.map(function(it,i){
+        var c=el('button'); c.type='button'; c.draggable=true;
+        c.append(el('span','ts',''), el('span','twhy',''));
+        c.querySelector('.ts').textContent=it.s; c.querySelector('.twhy').textContent=it.why;
+        c.addEventListener('click',function(e){ e.stopPropagation(); sel=(sel===i?null:i); states[i]=null; render(); });
+        c.addEventListener('dragstart',function(e){ dragging=i; try{ e.dataTransfer.setData('text/plain',String(i)); }catch(_){} });
+        return c;
+      });
+      render();
+    },
+    check:function(){
+      var score=0;
+      ex.items.forEach(function(it,i){
+        if(place[i]===it.z){ states[i]='ok'; score++; } else states[i]='bad';
+      });
+      sel=null; render(); return {score:score,total:ex.items.length};
+    },
+    show:function(){ ex.items.forEach(function(it,i){ place[i]=it.z; states[i]='shown'; }); sel=null; render(); },
+    reset:function(){ ex.items.forEach(function(_,i){ place[i]=null; states[i]=null; }); sel=null; render(); }
+  };
+}
+
+/* ---------- free writing ---------- */
+function copyText(text, area){
+  function fallback(){
+    area.hidden=false; area.value=text; area.focus(); area.select();
+    var ok=false; try{ ok=document.execCommand('copy'); }catch(_){}
+    return ok;
+  }
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    return navigator.clipboard.writeText(text).then(function(){ return true; }, function(){ return fallback(); });
+  }
+  return Promise.resolve(fallback());
+}
+function freePanel(ex){
+  var sh=panelShell(ex), items=el('div','items'), inputs=[], exs=[];
+  ex.items.forEach(function(it,i){
+    var r=itemRow(i+1), line=el('div','ownline'), pre=el('span','pre'), inp=makeInput('own-'+i,'Предложение '+(i+1),'own');
+    pre.textContent=it.pre; inp.placeholder=it.ph;
+    line.append(pre, inp);
+    var exEl=el('p','ex'); exEl.textContent='Пример: '+it.ex; exEl.hidden=true;
+    r.content.append(line, exEl); inputs.push(inp); exs.push(exEl); items.append(r.row);
+  });
+  var area=el('textarea','preview'); area.readOnly=true; area.hidden=true; area.id='own-preview'; area.setAttribute('aria-label','Текст для копирования');
+  var status=el('p','result'); status.setAttribute('role','status'); status.setAttribute('aria-live','polite');
+  var showEx=false;
+  var tb=toolbar([
+    ['Копировать всё · Copy all','b-mint',function(){
+      var lines=[];
+      inputs.forEach(function(inp,i){ var v=inp.value.trim(); if(v) lines.push((lines.length+1)+'. '+ex.items[i].pre+' '+v); });
+      if(!lines.length){ status.textContent='Сначала допиши хотя бы одно предложение.'; return; }
+      var text='My Past Simple sentences\n'+lines.join('\n');
+      copyText(text, area).then(function(ok){
+        area.hidden=false; area.value=text;
+        status.textContent = ok ? 'Скопировано! ('+lines.length+' предл.)' : 'Не получилось скопировать сам. Текст выделен ниже, нажми Ctrl+C (или «Копировать» в меню).';
+        if(!ok){ area.focus(); area.select(); }
+      });
+    }],
+    ['Показать примеры · Examples','b-sun',function(){
+      showEx=!showEx; exs.forEach(function(e){ e.hidden=!showEx; });
+    }],
+    ['Очистить · Clear','b-plain',function(){
+      inputs.forEach(function(i){ i.value=''; }); area.value=''; area.hidden=true; status.textContent='';
+    }]
+  ]);
+  sh.body.append(items, tb, status, area, nextBtn(ex));
+  return sh.p;
+}
+
+/* ---------- checklist ---------- */
+function canPanel(ex){
+  var KEY='psc-can-v1', saved=[];
+  try{ saved=JSON.parse(localStorage.getItem(KEY)||'[]'); }catch(_){ saved=[]; }
+  var sh=panelShell(ex), boxes=[], list=el('div','items');
+  var prog=el('div','can-prog'), txt=el('b'), bar=el('div','bar'), fill=el('i'); bar.append(fill); prog.append(txt, bar);
+  var msg=el('p','result'); msg.setAttribute('aria-live','polite');
+  function upd(){
+    var n=boxes.filter(function(b){ return b.checked; }).length, t=boxes.length;
+    txt.textContent='Я могу: '+n+' из '+t; fill.style.width=Math.round(n/t*100)+'%';
+    msg.className='result'+(n===t?' perfect':'');
+    msg.textContent = n===0 ? 'Отметь то, что уже получается.' :
+      n<5 ? 'Хорошее начало! Вернись к упражнениям по тем пунктам, где пока не уверен(а).' :
+      n<t ? 'Почти готово! Осталось подтянуть несколько тем.' : 'Супер! Past Simple на уровне A1–A2 у тебя в кармане.';
+    try{ localStorage.setItem(KEY, JSON.stringify(boxes.map(function(b){ return b.checked; }))); }catch(_){}
+  }
+  ex.items.forEach(function(it,i){
+    var row=el('label','can-row'), cb=el('input'); cb.type='checkbox'; cb.id='can-'+i; cb.checked=!!saved[i];
+    var t=el('div'); t.append(el('b',null,'I can… '+it[0].replace(/^I /,'').replace(/^can /,'')), el('span',null,it[1]));
+    t.firstChild.textContent=it[0];
+    cb.addEventListener('change',upd); boxes.push(cb); row.append(cb,t); list.append(row);
+  });
+  sh.body.append(list, prog, msg);
+  upd();
+  return sh.p;
+}
+
+/* ---------- build ---------- */
+function showTab(id, scroll){
+  Object.keys(panels).forEach(function(k){
+    var on=(k===id); panels[k].hidden=!on;
+    tabBtns[k].setAttribute('aria-selected', String(on)); tabBtns[k].tabIndex = on ? 0 : -1;
+  });
+  if(scroll){
+    var smooth = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    tabsEl.scrollIntoView({block:'start', behavior: smooth ? 'smooth' : 'auto'});
+  }
+  try{ tabBtns[id].scrollIntoView({block:'nearest', inline:'center'}); }catch(_){}
+}
+EX.forEach(function(ex){
+  var tb=el('button','tab'); tb.type='button'; tb.setAttribute('role','tab'); tb.setAttribute('aria-selected','false');
+  tb.style.setProperty('--accent','var(--'+ex.c+')');
+  tb.append(el('span','tn',ex.n), el('span',null,ex.tab));
+  var chip=el('span','chip'); chip.hidden=true; tb.append(chip);
+  tb.addEventListener('click',function(){ showTab(ex.id,false); });
+  tb.addEventListener('keydown',function(e){
+    var i=EX.indexOf(ex), j=-1;
+    if(e.key==='ArrowRight') j=Math.min(EX.length-1,i+1); else if(e.key==='ArrowLeft') j=Math.max(0,i-1);
+    if(j>-1){ e.preventDefault(); showTab(EX[j].id,false); tabBtns[EX[j].id].focus(); }
+  });
+  tabBtns[ex.id]=tb; tabsEl.append(tb);
+  var p;
+  if(ex.type==='tf') p=scoredPanel(ex, tfImpl(ex));
+  else if(ex.type==='tl') p=scoredPanel(ex, tlImpl(ex));
+  else if(ex.type==='fill') p=scoredPanel(ex, textImpl(ex,'fill'));
+  else if(ex.type==='text') p=scoredPanel(ex, textImpl(ex,'text'));
+  else if(ex.type==='mis') p=scoredPanel(ex, misImpl(ex));
+  else if(ex.type==='free') p=freePanel(ex);
+  else p=canPanel(ex);
+  panels[ex.id]=p; panelsEl.append(p);
+});
+updateScore();
+showTab(EX[0].id,false);
+})();
+</script>
+
+</body></html>
