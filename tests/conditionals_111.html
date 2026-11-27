@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Conditionals Deck — 100 вопросов</title>
+<style>
+:root{--bg:#f4f1ff;--bg2:#e3dcff;--card:#ffffff;--ink:#1d1a33;--mute:#6d6890;--a:#6c4cff;--b:#ff5c8a;--line:#d9d3f5;--shadow:0 20px 50px rgba(80,60,180,.22);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12101f;--bg2:#241d4a;--card:#1e1a36;--ink:#f1eeff;--mute:#9f98c8;--a:#8f78ff;--b:#ff7aa2;--line:#352e63;--shadow:0 20px 50px rgba(0,0,0,.5)}}
+:root[data-theme="dark"]{--bg:#12101f;--bg2:#241d4a;--card:#1e1a36;--ink:#f1eeff;--mute:#9f98c8;--a:#8f78ff;--b:#ff7aa2;--line:#352e63;--shadow:0 20px 50px rgba(0,0,0,.5)}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:radial-gradient(900px 500px at 15% -10%,var(--bg2),transparent),radial-gradient(700px 500px at 100% 100%,var(--bg2),transparent),var(--bg);color:var(--ink);display:flex;justify-content:center}
+main{width:100%;max-width:640px;padding:22px 18px 40px;display:flex;flex-direction:column;gap:18px}
+header{display:flex;justify-content:space-between;align-items:center}
+h1{font-size:22px;margin:0;letter-spacing:-.02em}
+h1 span{background:linear-gradient(90deg,var(--a),var(--b));-webkit-background-clip:text;background-clip:text;color:transparent}
+.count{font-size:13px;color:var(--mute);font-variant-numeric:tabular-nums}
+.bar{height:6px;border-radius:9px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--a),var(--b));transition:width .4s}
+.seg{display:flex;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:4px;gap:4px}
+.seg button{flex:1;border:0;background:transparent;color:var(--mute);font:600 13px inherit;font-family:inherit;padding:9px 6px;border-radius:10px;cursor:pointer;transition:.2s}
+.seg button.on{background:linear-gradient(135deg,var(--a),var(--b));color:#fff}
+.stage{perspective:1200px;min-height:300px;display:flex}
+.card{flex:1;background:var(--card);border:1px solid var(--line);border-radius:28px;box-shadow:var(--shadow);padding:28px 24px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden}
+.card::before{content:"";position:absolute;inset:0 0 auto 0;height:6px;background:linear-gradient(90deg,var(--a),var(--b))}
+.card.flip{animation:flip .55s cubic-bezier(.2,.8,.2,1)}
+@keyframes flip{0%{transform:rotateY(90deg) translateY(20px);opacity:0}100%{transform:none;opacity:1}}
+.tag{align-self:flex-start;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:6px 12px;border-radius:99px;background:color-mix(in srgb,var(--a) 15%,transparent);color:var(--a)}
+.tag.t2{background:color-mix(in srgb,var(--b) 15%,transparent);color:var(--b)}
+.q{font-size:clamp(22px,5.5vw,30px);line-height:1.3;font-weight:700;letter-spacing:-.015em;margin:22px 0;min-height:110px;display:flex;align-items:center}
+.q.hidden{color:var(--mute);font-weight:500;font-size:18px}
+.num{font-size:13px;color:var(--mute)}
+.row{display:flex;gap:10px}
+.btn{flex:1;border:1px solid var(--line);background:var(--card);color:var(--ink);font:600 15px inherit;font-family:inherit;padding:14px 12px;border-radius:16px;cursor:pointer;transition:.15s}
+.btn:hover{transform:translateY(-1px);border-color:var(--a)}
+.btn.main{background:linear-gradient(135deg,var(--a),var(--b));color:#fff;border:0;font-size:17px;padding:16px;box-shadow:0 10px 24px color-mix(in srgb,var(--a) 40%,transparent)}
+.btn.speaking{border-color:var(--b);color:var(--b)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px 16px;display:grid;gap:12px;font-size:14px}
+.panel label{display:flex;align-items:center;justify-content:space-between;gap:12px;color:var(--mute)}
+.panel select,.panel input[type=range]{max-width:60%;flex:1;font-family:inherit}
+.panel select{background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:8px}
+.panel input[type=checkbox]{width:20px;height:20px;accent-color:var(--a)}
+.hint{text-align:center;font-size:12px;color:var(--mute)}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Conditionals <span>Deck</span></h1>
+    <div class="count" id="count">0 / 100</div>
+  </header>
+  <div class="bar"><i id="bar"></i></div>
+
+  <div class="seg" id="seg">
+    <button data-m="0" class="on">Все 100</button>
+    <button data-m="1">1st conditional</button>
+    <button data-m="2">2nd conditional</button>
+  </div>
+
+  <div class="stage">
+    <div class="card" id="card">
+      <span class="tag" id="tag">Готовы?</span>
+      <div class="q hidden" id="q">Нажмите «Вытянуть карточку», чтобы начать.</div>
+      <span class="num" id="num">&nbsp;</span>
+    </div>
+  </div>
+
+  <div class="row">
+    <button class="btn" id="speak">🔊 Озвучить</button>
+    <button class="btn" id="reveal">👁 Показать текст</button>
+  </div>
+  <button class="btn main" id="draw">🎴 Вытянуть карточку</button>
+
+  <div class="panel">
+    <label>Голос <select id="voice"></select></label>
+    <label>Скорость <input type="range" id="rate" min="0.6" max="1.2" step="0.05" value="0.9"></label>
+    <label>Автоозвучка при вытягивании <input type="checkbox" id="auto" checked></label>
+    <label>Показывать текст сразу <input type="checkbox" id="showtxt" checked></label>
+  </div>
+  <div class="hint">Пробел — новая карточка · S — озвучить · T — показать/скрыть текст</div>
+</main>
+
+<script>
+const F=[
+"What will you do if it rains this weekend?","If you win the lottery tomorrow, what will you buy first?","What will happen if you forget your phone at home?","If you miss the last bus, how will you get home?","Will you cook dinner if you come home early?","If your friend calls you at midnight, will you answer?","What will you do if you lose your keys?","If the weather is nice tomorrow, where will you go?","What will you say if your boss asks you to work on Sunday?","If you get a day off next week, how will you spend it?",
+"Where will you travel if you save enough money?","What will you do if you can’t sleep tonight?","If your team loses the match, will you be upset?","Will you learn a new skill if you have more free time?","If someone gives you a free ticket, will you go to the concert?","What will you do if your flight is cancelled?","If you feel tired tomorrow, will you stay in bed?","What will you eat if the restaurant is closed?","If you pass your exam, how will you celebrate?","Will you call me if you arrive late?",
+"If you find a wallet on the street, what will you do?","What will you do if your computer breaks down?","If your neighbours are noisy tonight, will you complain?","How will you feel if you don’t finish your work today?","If you meet a celebrity, what will you ask?","What will you do if the internet stops working?","If you get hungry at night, what will you eat?","Will you buy a new phone if the price goes down?","If your best friend moves abroad, will you visit?","What will you do if you get lost in a new city?",
+"If you get a promotion, what will you change in your life?","Will you go for a walk if it stops raining?","If you wake up early tomorrow, what will you do?","What will happen if people stop using plastic?","If I invite you to dinner, will you come?","What will you do if you run out of money before payday?","If your phone battery dies, how will you contact your friends?","Will you stay at home if you catch a cold?","If the shop doesn’t have your size, will you buy another colour?","What will you do if you see a spider in your room?",
+"If you have a free evening, will you watch a film or read a book?","What will you do if your alarm doesn’t ring?","If you don’t understand a word, will you ask for help?","What will you do if you get a surprise visitor?","If it snows heavily tomorrow, will you go to work?","What will you do if you win a free trip?","If you see an old friend on the street, will you stop and talk?","Will you take an umbrella if the sky looks dark?","If you have enough time, will you visit a museum this week?","What will you do if someone is rude to you?"];
+const S=[
+"What would you do if you won a million dollars?","If you could live anywhere, where would you live?","Who would you invite to dinner if you could choose anyone?","What would you do if you were invisible for a day?","If you could speak any language, which would you choose?","What would you change if you were the president?","If you had a time machine, where would you go first?","Would you quit your job if you didn’t need money?","If you could have any superpower, what would it be?","What would you do if you met your favourite singer?",
+"If you were an animal, which animal would you be?","What would you do if you found a hidden treasure?","If you had more free time, what would you do?","Where would you go if you had a private jet?","If you could change one thing about yourself, what would it be?","What would you say if you could talk to your younger self?","If you lived on the Moon, what would you miss most?","Would you be happier if you lived in the countryside?","If you could meet any historical person, who would it be?","What would you do if you were the boss for a day?",
+"If you could learn anything instantly, what would you learn?","What would you do if you woke up in another century?","If you had a magic wand, what would you wish for?","Would you move abroad if you got a great job offer?","If you could talk to animals, what would you ask your pet?","What would you do if you had no phone for a month?","If you could redesign your city, what would you change?","What would you buy if money were not a problem?","If you were a famous actor, which film would you star in?","What would you do if you were stuck in a lift for hours?",
+"If you could have dinner with your hero, what would you ask?","Would you tell the truth if it hurt your friend?","If you could be any age, how old would you be?","What would you do if you saw a ghost?","If you owned a café, what would you serve?","What would you do if you could fly?","If you had a robot assistant, what would you ask it to do?","Would you go to space if you had the chance?","If you could swap lives with someone for a day, who would it be?","What would you do if you lost all your photos?",
+"If you could eat only one food forever, what would it be?","What would you do if your best friend forgot your birthday?","If you could start a new hobby today, what would it be?","Where would you hide if you were in a horror film?","If you could rewind one day, which day would you choose?","What would you do if you became famous overnight?","If you had a garden, what would you grow?","What would you do if everyone could read your mind?","If you could ban one thing in the world, what would it be?","What advice would you give me if I were in your place?"];
+const ALL=[...F.map(q=>({t:1,q})),...S.map(q=>({t:2,q}))].map((c,i)=>({...c,n:i+1}));
+
+const $=id=>document.getElementById(id);
+let mode=0,pool=[],seen=new Set(),cur=null,textOn=true,voices=[];
+const synth=window.speechSynthesis;
+
+function refill(){pool=ALL.filter(c=>!mode||c.t===mode);for(let i=pool.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[pool[i],pool[j]]=[pool[j],pool[i]]}seen=new Set()}
+function progress(){const total=ALL.filter(c=>!mode||c.t===mode).length;$("count").textContent=seen.size+" / "+total;$("bar").style.width=(seen.size/total*100)+"%"}
+function render(){
+  if(!cur)return;
+  $("tag").textContent=cur.t===1?"1st conditional":"2nd conditional";
+  $("tag").className="tag"+(cur.t===2?" t2":"");
+  const q=$("q");
+  if(textOn){q.textContent=cur.q;q.className="q"}else{q.textContent="🎧 Слушайте вопрос… текст скрыт";q.className="q hidden"}
+  $("num").textContent="Карточка №"+cur.n;
+  $("reveal").textContent=textOn?"🙈 Скрыть текст":"👁 Показать текст";
+}
+function draw(){
+  if(!pool.length)refill();
+  cur=pool.pop();seen.add(cur.n);
+  const c=$("card");c.classList.remove("flip");void c.offsetWidth;c.classList.add("flip");
+  textOn=$("showtxt").checked;
+  render();progress();
+  if($("auto").checked)speak();
+}
+function loadVoices(){
+  voices=synth.getVoices().filter(v=>/^en/i.test(v.lang));
+  const sel=$("voice"),prev=sel.value;sel.innerHTML="";
+  voices.sort((a,b)=>score(b)-score(a));
+  voices.forEach((v,i)=>{const o=document.createElement("option");o.value=v.name;o.textContent=v.name+" ("+v.lang+")";sel.appendChild(o)});
+  if(prev&&voices.some(v=>v.name===prev))sel.value=prev;
+}
+function score(v){
+  if(/Google US English/i.test(v.name))return 100;
+  if(/Samantha/i.test(v.name))return 90;
+  if(/natural/i.test(v.name)&&/en-US/i.test(v.lang))return 80;
+  if(v.lang==="en-US")return 50;
+  return 10;
+}
+function speak(){
+  if(!cur)return;
+  if(!synth){alert("Ваш браузер не поддерживает озвучку.");return}
+  synth.cancel();
+  const u=new SpeechSynthesisUtterance(cur.q);
+  const v=voices.find(v=>v.name===$("voice").value);
+  if(v){u.voice=v;u.lang=v.lang}else u.lang="en-US";
+  u.rate=parseFloat($("rate").value);
+  u.onstart=()=>$("speak").classList.add("speaking");
+  u.onend=u.onerror=()=>$("speak").classList.remove("speaking");
+  synth.speak(u);
+}
+$("draw").onclick=draw;
+$("speak").onclick=speak;
+$("reveal").onclick=()=>{if(!cur)return;textOn=!textOn;render()};
+$("seg").onclick=e=>{const b=e.target.closest("button");if(!b)return;mode=+b.dataset.m;[...$("seg").children].forEach(x=>x.classList.toggle("on",x===b));refill();cur=null;$("tag").textContent="Готовы?";$("tag").className="tag";$("q").className="q hidden";$("q").textContent="Колода перемешана. Вытяните карточку!";$("num").innerHTML="&nbsp;";progress()};
+document.addEventListener("keydown",e=>{
+  if(/SELECT|INPUT/.test(e.target.tagName))return;
+  if(e.code==="Space"){e.preventDefault();draw()}
+  else if(e.key==="s"||e.key==="S")speak();
+  else if(e.key==="t"||e.key==="T"){if(cur){textOn=!textOn;render()}}
+});
+if(synth){loadVoices();synth.onvoiceschanged=loadVoices}
+refill();progress();
+</script>
+</body>
+</html>
